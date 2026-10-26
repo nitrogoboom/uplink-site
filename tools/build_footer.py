@@ -1,6 +1,6 @@
 """Builds the hero-select footer markup and puts it into every page.
 Edit the CONTENT lists below to change the footer; run again to update all pages.
-usage: python3 build_footer.py <site dir>
+usage: python tools/build_footer.py site
 """
 import re, sys, html, pathlib
 
@@ -94,7 +94,7 @@ for g in GROUPS:
     rows = ''.join(f'<li><a class="fc-link" href="{h}">{e(t)}{ic("arrow", 2)}</a></li>' for t, h in g['links'])
     more = f'<a class="link-arrow" href="{g["more"][1]}">{e(g["more"][0])}{ic("arrow", 2)}</a>' if g.get('more') else ''
     add(g['id'], g['map'], g['name'], g['icon'], f'{len(g["links"])} links',
-        head(f'{len(g["links"])} pages', e(g['name']), e(g['lead'])) +
+        head(f'{len(g["links"])} links', e(g['name']), e(g['lead'])) +
         f'<nav class="fc-body" aria-label="{e(g["name"])}"><ul class="fc-rows{" fc-rows--two" if len(g["links"]) > 3 else ""}">{rows}</ul>{more}</nav>')
 
 wall = ''.join(f'<li><a class="fc-wall-item" href="{SOCIAL_HREF}"><span class="icon-tile">{ic(k)}</span><span><b>{n}</b><small>{h}</small></span></a></li>' for n, k, h in SOCIALS)
@@ -104,8 +104,8 @@ add('follow', 'follow', 'Follow', 'signal', f'{len(SOCIALS)} channels',
   <ul class="fc-wall">{wall}</ul>
   <form class="fc-nl" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email">The Monthly Patch</label>
-    <div class="fc-nl-row"><input class="input" id="fc-nl-email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required><button class="btn btn--secondary" type="submit">Subscribe</button></div>
-    <p class="small muted" data-fc-nl-msg>One email a month. Threats to watch and fixes that matter.</p>
+    <div class="fc-nl-row"><input class="input" id="fc-nl-email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
+    <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>One email a month. Threats to watch and fixes that matter.</p>
   </form>
 </div>''')
 

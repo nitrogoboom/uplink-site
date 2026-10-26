@@ -176,15 +176,13 @@
 
   function goPage(step) {
     if (leaving) return;
-    leaving = true;
     const i = pageLinks.findIndex((a) => a.dataset.page === currentPage);
-    if (i < 0) {
-      const hop = $$('.keyhop')[step < 0 ? 0 : 1];
-      if (hop) window.location.href = hop.getAttribute('href');
-      return;
-    }
-    const next = pageLinks[(i + step + pageLinks.length) % pageLinks.length];
-    window.location.href = next.getAttribute('href');
+    const target = i >= 0
+      ? pageLinks[(i + step + pageLinks.length) % pageLinks.length]
+      : $$('.keyhop')[step < 0 ? 0 : 1];
+    if (!target) return;
+    leaving = true;
+    window.location.href = target.getAttribute('href');
   }
 
   function isTyping(el) {
@@ -506,7 +504,6 @@
      segment picks one. Reduced motion: no timer, no line animation.
      ------------------------------------------------------------------ */
   const cloud = document.querySelector('svg.ob .ob-cloud');
-  const cloudRoot = cloud;
   if (cloud) {
     const svg = cloud.ownerSVGElement;
     const APPS = [
@@ -517,11 +514,10 @@
       { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
       { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
     ];
-    const svgRoot = cloud.ownerSVGElement;
-    const focus = svgRoot.querySelector('.ob-focus');
-    const appText = svgRoot.querySelector('.ob-app');
-    const stateText = svgRoot.querySelector('.ob-state');
-    const detailText = svgRoot.querySelector('.ob-detail');
+    const focus = svg.querySelector('.ob-focus');
+    const appText = svg.querySelector('.ob-app');
+    const stateText = svg.querySelector('.ob-state');
+    const detailText = svg.querySelector('.ob-detail');
     const base = cloud.querySelector('.ob-link-base');
     const flow = cloud.querySelector('.ob-link');
     const end = svg.querySelector('.ob-link-end');
@@ -563,7 +559,7 @@
         stateText.textContent = app.state.toUpperCase();
         detailText.textContent = app.detail;
         focus.classList.remove('is-out');
-        const sd = svgRoot.querySelector('.ob-state-dot');
+        const sd = svg.querySelector('.ob-state-dot');
         if (sd) { const b = stateText.getBBox(); sd.setAttribute('cx', b.x - 10); }
       };
       window.clearTimeout(swap);

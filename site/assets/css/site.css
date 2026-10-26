@@ -265,7 +265,7 @@ h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line
 }
 @media (hover: hover) and (pointer: fine) and (min-width: 1100px) {
   :root:not([data-shortcuts="off"]) .kbd-hint { display: inline-grid; }
-  }
+}
 .keyhop {
   place-items: center;
   width: var(--tap); height: var(--tap);
@@ -508,7 +508,6 @@ textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; 
   width: min(25rem, 100% - 2 * var(--sp-4));
   pointer-events: none;
 }
-.dialog .toasts { position: fixed; }
 .toast {
   pointer-events: auto;
   display: flex;
@@ -1006,12 +1005,10 @@ a.fc-cl:hover { color: var(--c-accent); }
 .hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
 @media (min-width: 700px) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .news { flex-direction: row; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3); }
-.news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; }
-.news-thumb img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-1); }
+.news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; overflow: hidden; }
+.news-thumb img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-1); transform: scale(1.35); }
 .news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
 .news-text .chip { align-self: flex-start; }
-.news-thumb { overflow: hidden; }
-.news-thumb img { transform: scale(1.35); }
 .news-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: 1.05; text-transform: uppercase; }
 
 /* services overview grid */
@@ -1035,7 +1032,6 @@ a.fc-cl:hover { color: var(--c-accent); }
   border-radius: var(--r-3);
 }
 .grow-art svg { width: 100%; max-width: 32.5rem; height: auto; }
-@media (max-width: 699px) { .grow-art { padding: var(--sp-2); } .grow-art svg { max-height: 30vh; width: auto; } }
 @media (min-width: 1100px) {
   .grow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sp-7); }
   .grow-side .section-head { grid-column: 1 / -1; }
@@ -1279,10 +1275,10 @@ html:not(.js) .roster-wrap { display: none; }
   .form-body { padding: var(--sp-5) var(--sp-6); }
   .form-foot { padding: 0 var(--sp-6) var(--sp-6); }
 }
-.ring { position: relative; align-self: center; width: calc(var(--sp-9) + var(--sp-8)); aspect-ratio: 1; }
-.ring svg { width: 100%; height: 100%; }
-.ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); }
-.ring-arc { transition: stroke-dasharray var(--dur-3) var(--ease); }
+.queue-ring { position: relative; align-self: center; width: calc(var(--sp-9) + var(--sp-8)); aspect-ratio: 1; }
+.queue-ring svg { width: 100%; height: 100%; }
+.queue-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); }
+.queue-ring-arc { transition: stroke-dasharray var(--dur-3) var(--ease); }
 
 /* ---------- 21. DESKTOP: one section per screen -------------------------
    Desktop and wider (>= 1100 wide and >= 700 tall). The root font size scales
