@@ -1354,7 +1354,7 @@ picture { display: contents; }
   .svc-cards .card-body { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; }
   .help-cards .card { flex-direction: column; align-items: flex-start; }
   @media (min-aspect-ratio: 2/1) {
-    .svc-cards { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }   /* one row, however many services */
     .svc-cards .card { flex-direction: column; align-items: stretch; }
     .svc-cards .card-media { width: auto; }
     .svc-cards .card-body { padding: 0 var(--sp-3) var(--sp-3); }

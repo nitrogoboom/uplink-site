@@ -38,6 +38,7 @@ GROUPS = [
          more=('Compare all services', 'services.html'),
          links=[('Managed help desk', 'services.html#help-desk'), ('Cybersecurity', 'services.html#security'),
                 ('Microsoft 365 & Google', 'services.html#cloud'), ('Networks & Wi-Fi', 'services.html#network'),
+                ('Phones & Teams calling', 'services.html#voip'),
                 ('Backup & recovery', 'services.html#backup'), ('IT strategy & planning', 'services.html#strategy')]),
     dict(id='company', map='company', name='Company', icon='building',
          lead='The people behind the screen, and how we work.',

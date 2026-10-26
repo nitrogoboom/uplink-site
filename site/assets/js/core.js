@@ -318,6 +318,6 @@
   }
 
   /* ---------- shared with the page scripts ------------------------------ */
-  // picker: set by services.js so the 1-6 keys can pick a service
+  // picker: set by services.js so the number keys (1 to 9) can pick a service
   window.Uplink = { $, $$, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, picker: null };
 })();

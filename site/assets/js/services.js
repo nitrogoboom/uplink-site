@@ -15,6 +15,17 @@
   const pickerEl = $('[data-picker]');
   const svcs = pickerEl ? $$('[data-svc]', pickerEl) : [];
   if (svcs.length) {
+    // Counts and tiles come from the sections, so adding a service is one more <article data-svc data-tile="...">.
+    const two = (n) => String(n).padStart(2, '0');
+    svcs.forEach((s, i) => $$('[data-svc-n]', s).forEach((c) => { c.textContent = 'Service ' + two(i + 1) + ' of ' + two(svcs.length); }));
+    const keys = $('[data-svc-keys]', pickerEl);
+    if (keys) keys.textContent = '· press 1 to ' + Math.min(9, svcs.length);
+    const roster = $('[data-roster]', pickerEl);
+    if (roster) {
+      roster.innerHTML = svcs.map((s, i) => '<li><button class="tile" type="button" data-pick="' + i + '" aria-controls="' + s.id +
+        '" aria-pressed="' + s.classList.contains('is-on') + '"><span class="tile-n">' + two(i + 1) + '</span><span class="tile-t">' +
+        (s.dataset.tile || $('h2', s).textContent) + '</span></button></li>').join('');
+    }
     const tiles = $$('[data-pick]', pickerEl);
     const live = $('[data-picker-live]', pickerEl);
     let current = Math.max(0, svcs.findIndex((s) => s.classList.contains('is-on')));

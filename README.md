@@ -34,6 +34,15 @@ Python 3.10+ and Node 18+.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
 - `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
 
+## Adding a service
+
+The services list is open-ended: counts, tiles and the number-key hint come from the page.
+1. `services.html`: add one `<article class="svc" id="..." data-svc data-tile="Short name">` (copy an existing one; its chip `<span class="chip" data-svc-n>` is filled in for you).
+2. `index.html`: add one card to `.svc-cards` (image `NAME-compact.svg?card#plain`).
+3. `tools/build_footer.py`: add one line to the services links, then `python tools/build_footer.py site`.
+4. Add an `<option>` to the "What do you need?" lists (contact form and the book-a-call dialog on each page).
+5. Drawing: a `tools/gen_NAME.py` writing `NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`).
+
 ## Footer (hero select)
 
 Every page has the same footer. On desktop it is exactly one screen tall.
@@ -63,7 +72,7 @@ Without script, every panel shows in a stack and the roster is hidden.
 Every drawing was made by a generator with world → screen = `origin + ((x − y)·cos30·u, (x + y)·u/2 − z·u)`.
 `tools/iso.py` has `W(ox, oy, u)` for this. Known values: helpdesk `W(0,0,23)`, office/hero `W(616.4,240.2,28.127)`, tower `W(262,283.2,24)`, backup `W(0,0,16.46)`, network `W(0,0,1)`, footer map `W(0,0,38)`.
 
-- `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security` and `cloud` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Running a script with nothing changed gives the same file byte for byte, so a git diff only ever shows what you changed.
+- `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud` and `voip` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Running a script with nothing changed gives the same file byte for byte, so a git diff only ever shows what you changed.
 - `gen_office.py site` – the office floor plan: `office.svg`, `office-build.svg` and the hero block in `index.html` (only that block is replaced). The animation CSS and the hero's hand-drawn cloud live in `tools/office_parts/`.
 - `gen_tower.py site` – the growing tower: `tower-grow.svg` and the inline tower block in `index.html`. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
 - `isoprops.py` – shared kit: office chair, monitor on a stand (with `screen_glass` / `app_window` for its screen), VoIP desk phone, and `on_front` / `on_side` / `on_top` for drawing flat details exactly on an iso face. Props sit on a grid (x, y in 0.25s, z in 0.125s) so their parts can never nearly-touch; keep the scene around them on the same grid.
