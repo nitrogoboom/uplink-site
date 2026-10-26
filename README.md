@@ -81,3 +81,11 @@ The one-off fix scripts from the precision pass (`tools/fixes/`) were not kept i
 ## Publishing back to the artifact (optional)
 
 The artifact link above only updates from a Claude chat. To push local changes there: zip `site/`, attach it in a Claude chat in the "OW Inspired website" Project, and ask Claude to republish it to the artifact URL.
+
+## Hosting (Cloudflare Pages, password-locked)
+
+- Code: private GitHub repo `nitrogoboom/uplink-site`.
+- Site: Cloudflare Pages project `uplink-site` (https://uplink-site.pages.dev). `functions/_middleware.js` puts every page and file behind a browser password prompt. Any username works. The password is the Cloudflare secret `SITE_PASSWORD`. With no secret set, the site stays locked.
+- Deploy from the project root: `npx wrangler pages deploy` (settings in `wrangler.toml`).
+- Change the password: `npx wrangler pages secret put SITE_PASSWORD --project-name uplink-site`, then deploy again.
+- The local preview (`python -m http.server`) has no lock. To test the lock locally: `npx wrangler pages dev --binding SITE_PASSWORD=some-test-value`.
