@@ -182,7 +182,9 @@
 .ob-link-base.is-draw{animation:ob-link-draw .55s cubic-bezier(.3,.6,.2,1) both}
 @keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
 .ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
-@media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}</style>
+@media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}
+.ob .num{display:none}.ob .num text{font-family:Barlow,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+@media (max-width:599px){.ob .lt{display:none}.ob .num{display:inline}}</style>
 <g class="ob-i ob-fade" style="--d:0ms">
 <polygon points="251.0,463.8 786.9,773.2 786.9,760.5 251.0,451.2" fill="#313F54" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1152.3,562.3 786.9,773.2 786.9,760.5 1152.3,549.6" fill="#283447" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -628,50 +630,62 @@
 <polygon points="899.6,8.8 1132.4,143.2 1132.4,141.4 1136.1,141.5 1139.7,140.7 1142.8,139.0 1145.4,136.4 1147.3,133.0 1148.4,129.5 1148.9,125.5 1148.9,120.4 1148.1,115.0 1146.5,109.4 1144.3,103.7 1141.5,98.2 1137.1,91.6 1132.4,86.2 1132.4,84.3 1125.4,80.3 1124.8,76.1 1123.9,71.7 1122.7,67.2 1121.1,62.8 1117.7,55.0 1115.3,50.6 1112.7,46.4 1109.9,42.4 1106.2,37.7 1103.0,34.3 1098.9,30.4 1095.4,27.6 1091.1,24.7 1086.8,22.3 1083.0,20.9 1082.1,14.6 1080.6,7.1 1078.4,-0.4 1075.8,-8.0 1072.7,-15.5 1069.0,-23.0 1065.0,-30.2 1060.6,-37.2 1055.7,-43.9 1050.6,-50.2 1045.3,-56.1 1039.7,-61.4 1034.0,-66.2 1029.6,-69.4 1023.7,-73.1 1017.9,-76.2 1010.6,-79.0 1002.2,-80.9 994.2,-81.2 986.9,-79.8 980.4,-76.7 974.8,-72.1 970.3,-65.9 967.2,-59.4 961.4,-64.6 955.0,-69.2 948.4,-72.8 942.0,-75.2 935.8,-76.5 930.0,-76.4 924.6,-75.2 919.9,-72.7 917.2,-70.4 914.7,-67.6 911.4,-61.7 910.0,-57.7 909.1,-53.3 908.4,-45.0 899.6,-50.1 899.6,-48.2 896.4,-48.4 893.8,-48.1 890.9,-47.0 888.7,-45.6 885.7,-41.9 883.9,-37.6 883.1,-33.1 883.0,-28.0 883.7,-22.6 885.4,-16.2 887.6,-10.6 890.9,-4.3 894.3,0.8 899.6,7.0" fill="#313F54" stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 <polygon points="1093.8,-84.1 1088.2,-89.4 1082.5,-94.2 1078.1,-97.4 1072.2,-101.1 1066.4,-104.2 1059.1,-107.0 1050.7,-108.9 1042.7,-109.2 1035.4,-107.8 1028.9,-104.7 1009.0,-93.2 1003.5,-97.2 996.9,-100.8 990.5,-103.2 984.3,-104.5 978.5,-104.4 973.1,-103.2 968.4,-100.7 919.9,-72.7 917.2,-70.4 914.7,-67.6 911.4,-61.7 910.2,-58.2 910.2,-58.2 890.9,-47.0 888.7,-45.6 885.7,-41.9 883.9,-37.6 883.1,-33.1 883.0,-28.0 883.7,-22.6 885.4,-16.2 887.6,-10.6 890.9,-4.3 894.3,0.8 899.6,7.0 899.6,8.8 1132.4,143.2 1135.3,141.5 1136.1,141.5 1139.7,140.7 1142.8,139.0 1191.3,111.0 1193.9,108.4 1195.8,105.0 1196.9,101.5 1197.4,97.5 1197.4,92.4 1196.6,87.0 1195.0,81.4 1192.8,75.7 1190.0,70.2 1185.6,63.6 1180.9,58.2 1180.9,56.3 1173.9,52.3 1173.3,48.1 1172.4,43.7 1171.2,39.2 1169.6,34.8 1166.2,27.0 1163.8,22.6 1161.2,18.4 1158.4,14.4 1154.7,9.7 1151.5,6.3 1147.4,2.4 1143.9,-0.4 1139.6,-3.3 1135.3,-5.7 1131.5,-7.1 1130.6,-13.4 1129.1,-20.9 1126.9,-28.4 1124.3,-36.0 1121.2,-43.5 1117.5,-51.0 1113.5,-58.2 1109.0,-65.2 1104.2,-71.9 1099.1,-78.2 1093.8,-84.1" fill="none" stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-lab co" style="--d:3100ms">
-<polyline points="950.1,-36.0 894.7,-82.0 854.7,-82.0" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle cx="950.1" cy="-36.0" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
-<text x="842.7" y="-74.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">CLOUD WORKSPACE</text>
-<g class="ob-focus">
+<g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE" data-s="email, files, chat and sign-in, kept in sync" style="--d:3100ms">
+<polyline class="lt" points="950.1,-36.0 894.7,-82.0 854.7,-82.0" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="950.1" cy="-36.0" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
+<text class="lt" x="842.7" y="-74.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">CLOUD WORKSPACE</text>
+<g class="ob-focus lt">
 <text x="842.7" y="-46.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" fill="#A9B4C3" text-anchor="end"><tspan class="ob-app" font-weight="600" fill="#F1F4F8">EMAIL</tspan><tspan> · </tspan><tspan class="ob-detail">Spam and phishing filtered</tspan></text>
 <text x="842.7" y="-18.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="15" font-weight="600" letter-spacing="0.08em" fill="#6FD3A0" text-anchor="end"><tspan class="ob-state">ONLINE</tspan></text>
 <circle class="ob-pulse ob-state-dot" cx="0" cy="-23.0" r="4.5" fill="#6FD3A0"/>
 </g>
+<g class="num"><circle cx="950.1" cy="-36.0" r="30" fill="#7DB9E8" stroke="#151E2C" stroke-width="2"/><text x="950.1" y="-20.9" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">1</text></g>
 </g>
-<g class="ob-i ob-lab co" style="--d:2800ms">
-<polyline points="1022.0,523.9 944.0,712.0 984.0,712.0" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle cx="1022.0" cy="523.9" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
-<text x="996.0" y="720.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="start">FIREWALL RACK</text>
-<text x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="start">core switch + backups</text>
+<g class="ob-i ob-lab co lbl" data-t="FIREWALL RACK" data-s="core switch + backups" style="--d:2800ms">
+<polyline class="lt" points="1022.0,523.9 944.0,712.0 984.0,712.0" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="1022.0" cy="523.9" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
+<text class="lt" x="996.0" y="720.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="start">FIREWALL RACK</text>
+<text class="lt" x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="start">core switch + backups</text>
+<g class="num"><circle cx="1022.0" cy="523.9" r="30" fill="#F4A340" stroke="#151E2C" stroke-width="2"/><text x="1022.0" y="539.0" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">2</text></g>
 </g>
-<g class="ob-i ob-lab co" style="--d:2880ms">
-<polyline points="391.1,338.6 361.1,208.7 321.1,208.7" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle cx="391.1" cy="338.6" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
-<text x="309.1" y="216.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="end">WI-FI ACCESS POINT</text>
-<text x="309.1" y="244.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">Wi-Fi 6E, no dead spots</text>
+<g class="ob-i ob-lab co lbl" data-t="WI-FI ACCESS POINT" data-s="Wi-Fi 6E, no dead spots" style="--d:2880ms">
+<polyline class="lt" points="391.1,338.6 361.1,208.7 321.1,208.7" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="391.1" cy="338.6" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
+<text class="lt" x="309.1" y="216.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="end">WI-FI ACCESS POINT</text>
+<text class="lt" x="309.1" y="244.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">Wi-Fi 6E, no dead spots</text>
+<g class="num"><circle cx="391.1" cy="338.6" r="30" fill="#F4A340" stroke="#151E2C" stroke-width="2"/><text x="391.1" y="353.8" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">3</text></g>
 </g>
-<g class="ob-i ob-lab co" style="--d:2960ms">
-<polyline points="704.1,527.1 634.1,695.7 594.1,695.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle cx="704.1" cy="527.1" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
-<text x="582.1" y="703.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">WORKSTATIONS</text>
-<text x="582.1" y="731.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">managed + patched</text>
+<g class="ob-i ob-lab co lbl" data-t="WORKSTATIONS" data-s="managed + patched" style="--d:2960ms">
+<polyline class="lt" points="704.1,527.1 634.1,695.7 594.1,695.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="704.1" cy="527.1" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
+<text class="lt" x="582.1" y="703.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">WORKSTATIONS</text>
+<text class="lt" x="582.1" y="731.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">managed + patched</text>
+<g class="num"><circle cx="704.1" cy="527.1" r="30" fill="#7DB9E8" stroke="#151E2C" stroke-width="2"/><text x="704.1" y="542.2" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">4</text></g>
 </g>
-<g class="ob-i ob-lab co" style="--d:3040ms">
-<polyline points="378.9,426.5 349.7,523.7 309.7,523.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle cx="378.9" cy="426.5" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
-<text x="297.7" y="531.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">TEAMS ROOM</text>
-<text x="297.7" y="559.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">one-touch meeting join</text>
+<g class="ob-i ob-lab co lbl" data-t="TEAMS ROOM" data-s="one-touch meeting join" style="--d:3040ms">
+<polyline class="lt" points="378.9,426.5 349.7,523.7 309.7,523.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="378.9" cy="426.5" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
+<text class="lt" x="297.7" y="531.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">TEAMS ROOM</text>
+<text class="lt" x="297.7" y="559.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">one-touch meeting join</text>
+<g class="num"><circle cx="378.9" cy="426.5" r="30" fill="#7DB9E8" stroke="#151E2C" stroke-width="2"/><text x="378.9" y="441.7" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">5</text></g>
 </g>
 <circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99" style="display:none"/>
 </svg>
       </div>
+      <ol class="fig-key fig-key--hero" data-key="hero">
+        <li class="k-sky"><span><b>CLOUD WORKSPACE</b> email, files, chat and sign-in, kept in sync</span></li>
+        <li><span><b>FIREWALL RACK</b> core switch + backups</span></li>
+        <li><span><b>WI-FI ACCESS POINT</b> Wi-Fi 6E, no dead spots</span></li>
+        <li class="k-sky"><span><b>WORKSTATIONS</b> managed + patched</span></li>
+        <li class="k-sky"><span><b>TEAMS ROOM</b> one-touch meeting join</span></li>
+      </ol>
       <div class="hero-dock">
         <a class="card news" href="contact.html#message" data-open="book-dialog">
-          <span class="news-thumb well"><img src="assets/img/security.svg" alt="" width="640" height="480"></span>
+          <span class="news-thumb well"><img src="assets/img/security.svg#plain" alt="" width="640" height="480"></span>
           <span class="news-text"><span class="chip chip--accent">Free</span><span class="news-title">IT and security check-up</span><span class="small muted">30 minutes. We look first, then quote.</span></span>
         </a>
         <a class="card news" href="soon.html#windows-10-guide">
-          <span class="news-thumb well"><img src="assets/img/cloud.svg" alt="" width="640" height="480"></span>
+          <span class="news-thumb well"><img src="assets/img/cloud.svg#plain" alt="" width="640" height="480"></span>
           <span class="news-text"><span class="chip chip--sky">Guide</span><span class="news-title">Windows 10 support has ended</span><span class="small muted">Your upgrade plan, step by step</span></span>
         </a>
       </div>
@@ -690,27 +704,27 @@
     </div>
     <ul class="svc-cards">
       <li><a class="card" href="services.html#help-desk">
-        <span class="card-media well"><img src="assets/img/helpdesk.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Support</span></span>
+        <span class="card-media well"><img src="assets/img/helpdesk.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Support</span></span>
         <span class="card-body"><span class="card-title">Managed help desk</span><span class="muted">Real people who pick up and fix it, by phone, email or chat.</span></span>
       </a></li>
       <li><a class="card" href="services.html#security">
-        <span class="card-media well"><img src="assets/img/security.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Protect</span></span>
+        <span class="card-media well"><img src="assets/img/security.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Protect</span></span>
         <span class="card-body"><span class="card-title">Cybersecurity</span><span class="muted">Devices, email and accounts watched around the clock.</span></span>
       </a></li>
       <li><a class="card" href="services.html#cloud">
-        <span class="card-media well"><img src="assets/img/cloud.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Build</span></span>
+        <span class="card-media well"><img src="assets/img/cloud.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Build</span></span>
         <span class="card-body"><span class="card-title">Cloud workspace</span><span class="muted">Microsoft 365 or Google Workspace, set up properly and licensed right.</span></span>
       </a></li>
       <li><a class="card" href="services.html#network">
-        <span class="card-media well"><img src="assets/img/network.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Build</span></span>
+        <span class="card-media well"><img src="assets/img/network.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Build</span></span>
         <span class="card-body"><span class="card-title">Networks &amp; Wi-Fi</span><span class="muted">Firewalls and Wi-Fi that reach every corner of the office.</span></span>
       </a></li>
       <li><a class="card" href="services.html#backup">
-        <span class="card-media well"><img src="assets/img/backup.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Protect</span></span>
+        <span class="card-media well"><img src="assets/img/backup.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Protect</span></span>
         <span class="card-body"><span class="card-title">Backup &amp; recovery</span><span class="muted">Offsite copies, tested every quarter so a restore works.</span></span>
       </a></li>
       <li><a class="card" href="services.html#strategy">
-        <span class="card-media well"><img src="assets/img/strategy.svg" alt="" width="640" height="480" loading="lazy"><span class="chip">Plan</span></span>
+        <span class="card-media well"><img src="assets/img/strategy.svg#plain" alt="" width="640" height="480" loading="lazy"><span class="chip">Plan</span></span>
         <span class="card-body"><span class="card-title">IT strategy &amp; planning</span><span class="muted">A yearly roadmap and budget, reviewed every quarter.</span></span>
       </a></li>
     </ul>
@@ -737,6 +751,7 @@
 .tg-td{fill:#7DB9E8;stroke:#151E2C;stroke-width:2;transition:fill .6s ease}
 .tg-tb{fill:#1E2938;stroke:#7DB9E8;stroke-opacity:.4;stroke-width:1;transition:stroke .6s ease,stroke-opacity .6s ease}
 .tg-tt{fill:#F1F4F8;text-transform:uppercase;transition:fill .6s ease}
+@media (max-width:599px){.tg-tl,.tg-td,.tg-tb,.tg-tt{display:none}}
 .tg[data-floors="1"] .tg-floor[data-f="2"],.tg[data-floors="1"] .tg-floor[data-f="3"],.tg[data-floors="2"] .tg-floor[data-f="3"]{opacity:0;transform:translateY(-30px);pointer-events:none}
 .tg[data-floors="2"] .tg-roof{transform:translateY(76.8px)}
 .tg[data-floors="1"] .tg-roof{transform:translateY(153.6px)}

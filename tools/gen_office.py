@@ -12,7 +12,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
 import math, pathlib, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import silhouette, clip_out, seg_path
+from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
 from svgfont import font_style
 
 w = W(616.4, 240.2, 28.127)
@@ -81,6 +81,8 @@ LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side:
     ((13.25, 9.65, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
     ((3.0, 12.75, 1.25), (349.7, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
+BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
+KEY_WIDTH = 425                        # below this rendered width the 24px titles fall under 8.5px (isogen.KEY_PX): numbers instead
 TAIL = 40                              # level tail, px; text starts 12px past it
 
 FACES = ('#313F54', '#283447', '#405169')
@@ -301,13 +303,15 @@ def card(v):
     x0, _, _, y1, _, z1 = tray_box()
     ex, ey = w.p(x0, y1, z1)
     rows = [('MICROSOFT 365', 87.8, 96.4), ('GOOGLE WORKSPACE', 121.4, 130.0)]
-    out = [f'<polyline points="{fmt(sx)},{fmt(sy)} {fmt(bx)},{fmt(sy)} {fmt(ex)},{fmt(ey)}" fill="none" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.55" stroke-dasharray="3 5" {ROUND}/>',
-           '<rect x="503.9" y="26.8" width="347.8" height="119.2" rx="16.8" fill="#212D40" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.6"/>',
-           f'<text x="525.5" y="54.8" font-family="{FONT}" font-size="16" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
+    out = [key_group('CLOUD WORKSPACE', 'Microsoft 365 or Google Workspace'),
+           f'<polyline class="lt" points="{fmt(sx)},{fmt(sy)} {fmt(bx)},{fmt(sy)} {fmt(ex)},{fmt(ey)}" fill="none" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.55" stroke-dasharray="3 5" {ROUND}/>',
+           '<rect class="lt" x="503.9" y="26.8" width="347.8" height="119.2" rx="16.8" fill="#212D40" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.6"/>',
+           f'<text class="lt" x="525.5" y="54.8" font-family="{FONT}" font-size="16" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
     for i, (name, cy, ty) in enumerate(rows):
-        g = f'<g class="ob-swap ob-swap-{i}">' if v != 'office' else '<g>'
+        g = f'<g class="lt ob-swap ob-swap-{i}">' if v != 'office' else '<g class="lt">'
         out.append(f'{g}<circle cx="532.2" cy="{cy}" r="6.2" fill="#6FD3A0"/><text x="545.9" y="{ty}" font-family="{FONT}" font-size="24" '
                    f'font-weight="600" letter-spacing="0.06em" fill="#F1F4F8">{name}</text></g>')
+    out.append(badge(ex, ey, '#7DB9E8', **BADGE) + '</g>')   # small screens: the card hides, its number sits on the tray corner
     return out
 
 
@@ -316,10 +320,11 @@ def label(dot, elbow, colour, title, sub, side='left'):
     ex, ey = elbow
     sign, anchor = (-1, 'end') if side == 'left' else (1, 'start')
     tx = ex + sign * TAIL
-    return [f'<polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
-            f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
-            f'<text x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
-            f'<text x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>']
+    return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
+            f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>',
+            badge(dx, dy, colour, **BADGE)]
 
 
 # ---- assembly -------------------------------------------------------------------
@@ -358,7 +363,7 @@ def groups(v):
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
     for dot, elbow, colour, title, sub, d, *side in LABELS:
-        G.append((f'class="ob-i ob-lab co" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
+        G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
     return G
 
 
@@ -368,20 +373,20 @@ def render(v):
         if attrs is None:                       # hero cloud: already wrapped
             out += shapes; continue
         if v == 'office':
-            open_, close = ('<g class="co">' if 'co"' in attrs else '<g>'), '</g>'
+            open_, close = (('<g class="co lbl"' + attrs.split('lbl"')[1].split(' style=')[0] + '>') if 'lbl"' in attrs else '<g>'), '</g>'
         elif isinstance(attrs, tuple):
             open_, close = f'<g {attrs[0]}>\n<g {attrs[1]}>', '</g>\n</g>'
         else:
             open_, close = f'<g {attrs}>', '</g>'
         out += [open_, *shapes, close]
-    body = '\n'.join(out)
+    body = number_badges('\n'.join(out))
     title = TITLES[v]
     if v == 'office':
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body)
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
+        style = font_style(body) + '\n' + key_css(KEY_WIDTH)
     elif v == 'build':
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body) + '\n<style>' + (PARTS / 'build.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" class="ob" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
+        style = font_style(body) + '\n' + key_css(KEY_WIDTH) + '\n<style>' + (PARTS / 'build.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
     else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
         style = '<style>' + (PARTS / 'hero.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'

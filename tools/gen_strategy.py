@@ -7,7 +7,7 @@ import sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
 
 w = W(43.3, 115, 20)                  # inside the group's translate(236.8,154)
 
@@ -65,7 +65,8 @@ def milestones():
     for i, txt, anchor, dx, dy, _ in MILESTONES:
         X, Y = w.p(*ROAD[i])
         dots.append(f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="6.5" fill="{FACES[2]}" stroke="{ORANGE}" stroke-width="2.5"/>')
-        texts.append(f'<text x="{fmt(X + dx)}" y="{fmt(Y + dy)}" font-size="11" font-weight="600" letter-spacing="0.66" fill="{WHITE}" text-anchor="{anchor}">{txt}</text>')
+        texts.append(key_group(txt) + f'<text class="lt" x="{fmt(X + dx)}" y="{fmt(Y + dy)}" font-size="11" font-weight="600" letter-spacing="0.66" '
+                     f'fill="{WHITE}" text-anchor="{anchor}">{txt}</text>' + badge(X, Y, ORANGE) + '</g>')
     return dots + texts
 
 

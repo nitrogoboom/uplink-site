@@ -7,7 +7,7 @@ import sys
 from shapely.geometry import LineString, Polygon, box as box_shape
 from shapely.ops import unary_union
 from iso import W, C30, fmt
-from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
 
 w = W(21.2, 36.7, 16.31)              # inside the group's translate(312.8,310.6)
 
@@ -29,6 +29,7 @@ LIT_TILE = 0                          # highlighted tile (mail)
 
 CARD = dict(w=202.9, h=70.8, top=-286.6, rx=9.8)   # screen space, centred over the slab
 CARD_ROWS = ['MICROSOFT 365', 'GOOGLE WORKSPACE']
+CARD_KEY = 'Microsoft 365 or Google Workspace'   # the card's line in the page key (phones)
 
 # sync arrows: start (top centre of that box, or the lid's top edge), screen end (arrow tip is 8px further), screen y of both curve handles
 SYNC = [('server', (-36.0, -119.6), -113.2),            # server top
@@ -156,15 +157,17 @@ def card(plat):
     _, by = w.p(bx, y0, z1)
     bottom = CARD['top'] + CARD['h']
     left = cx - CARD['w'] / 2
-    out = [f'<polyline points="{fmt(cx)},{fmt(bottom)} {fmt(cx)},{fmt(by)}" fill="none" stroke="{BLUE}" stroke-width="1.3" '
+    out = [key_group('CLOUD WORKSPACE', CARD_KEY),
+           f'<polyline class="lt" points="{fmt(cx)},{fmt(bottom)} {fmt(cx)},{fmt(by)}" fill="none" stroke="{BLUE}" stroke-width="1.3" '
            f'stroke-opacity="0.55" stroke-dasharray="3 5"/>',
-           f'<rect x="{fmt(left)}" y="{fmt(CARD["top"])}" width="{fmt(CARD["w"])}" height="{fmt(CARD["h"])}" rx="{fmt(CARD["rx"])}" '
+           f'<rect class="lt" x="{fmt(left)}" y="{fmt(CARD["top"])}" width="{fmt(CARD["w"])}" height="{fmt(CARD["h"])}" rx="{fmt(CARD["rx"])}" '
            f'fill="#212D40" stroke="{BLUE}" stroke-width="1.3" stroke-opacity="0.6"/>',
-           f'<text x="{fmt(left + 12.6)}" y="{fmt(CARD["top"] + 17.5)}" font-size="10" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
+           f'<text class="lt" x="{fmt(left + 12.6)}" y="{fmt(CARD["top"] + 17.5)}" font-size="10" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
     for n, row in enumerate(CARD_ROWS):
         y = CARD['top'] + 37 + n * 19.6
-        out.append(f'<g><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="#6FD3A0"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
+        out.append(f'<g class="lt"><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="#6FD3A0"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
                    f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="#F1F4F8">{row}</text></g>')
+    out.append(badge(cx, by, BLUE) + '</g>')            # small: the card hides, its number sits where the riser meets the slab
     return out
 
 

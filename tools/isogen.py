@@ -1,6 +1,6 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match README "Drawing rules" and the drawing palette in site/assets/css/tokens.css."""
-import math
+import html, math
 from shapely.geometry import LineString, MultiPoint, Point
 from iso import fmt
 from svgfont import font_style
@@ -99,6 +99,35 @@ def seg_path(segs, attrs):
     return f'<path d="{d}" {attrs}/>'
 
 
+def badge(x, y, colour, r=16, size=22):
+    """Numbered dot shown in place of a label when the drawing renders small (see KEY_CSS).
+    The number is filled in by number_badges(); the page shows the matching key under the drawing."""
+    return (f'<g class="num"><circle cx="{fmt(x)}" cy="{fmt(y)}" r="{r}" fill="{colour}" stroke="{INK}" stroke-width="2"/>'
+            f'<text x="{fmt(x)}" y="{fmt(y + size * 0.36)}" font-size="{size}" font-weight="600" fill="{INK}" text-anchor="middle">#</text></g>')
+
+
+def number_badges(body):
+    """Fill the badges' # in draw order: 1, 2, 3..."""
+    parts = body.split('>#</text></g>')
+    return ''.join(p + (f'>{i + 1}</text></g>' if i < len(parts) - 1 else '') for i, p in enumerate(parts))
+
+
+KEY_PX = 8.5   # labels whose titles would render smaller than this switch to numbered dots (phones, narrow columns)
+
+
+def key_group(title, sub=''):
+    """Opening tag for one label; tools/build_keys.py reads data-t / data-s to write the page's key."""
+    return f'<g class="lbl" data-t="{html.escape(title)}" data-s="{html.escape(sub or "")}">'
+
+
+def key_css(width):
+    """Below `width` px of rendered drawing (titles under KEY_PX) the leader and text
+    hide and the numbered badge shows. An <img> SVG measures its own box, so this follows the drawing's size.
+    `drawing.svg#plain` (cards) hides labels altogether."""
+    return (f'<style>.num{{display:none}}.num text{{font-family:{FONT}}}@media (max-width:{width}px){{.lt{{display:none}}.num{{display:inline}}}}'
+            f'svg:target .lbl{{display:none}}</style>')
+
+
 def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y=None, sub_y=None):
     """Leader dot + free-angle diagonal to elbow + 20px level tail, then caps title and grey subline.
     Leaders are annotation, not geometry, so the diagonal can take any angle.
@@ -107,24 +136,27 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
     tail = text_x - 7 if anchor == 'start' else text_x + 7
     ty = ey + 4.5 if title_y is None else title_y
     sy = ty + 15 if sub_y is None else sub_y
-    out = [f'<g class="co"><polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tail)},{fmt(ey)}" '
+    out = [key_group(title, sub) + f'<g class="co lt"><polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tail)},{fmt(ey)}" '
            f'fill="none" stroke="{colour}" stroke-width="1.2" stroke-opacity="0.55"/>'
            f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="3" fill="{colour}" stroke="{INK}" stroke-width="1.5"/></g>',
-           f'<text x="{fmt(text_x)}" y="{fmt(ty)}" font-size="13" font-weight="600" letter-spacing="0.78" fill="{colour}" text-anchor="{anchor}">{title}</text>']
+           f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty)}" font-size="13" font-weight="600" letter-spacing="0.78" fill="{colour}" text-anchor="{anchor}">{title}</text>']
     if sub:
-        out.append(f'<text x="{fmt(text_x)}" y="{fmt(sy)}" font-size="11" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{sub}</text>')
+        out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy)}" font-size="11" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{sub}</text>')
+    out.append(badge(dx, dy, colour) + '</g>')
     return out
 
 
 def doc(title, body, translate=None, view=(640, 480)):
     vw, vh = view
     g = f' transform="translate({translate[0]},{translate[1]})"' if translate else ''
+    body = number_badges('\n'.join(body))
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {vw} {vh}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 {vw} {vh}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
         f'<title>{title}</title>',
-        font_style('\n'.join(body)),     # <img> SVGs can't see the page's fonts, so carry the letters they use
+        font_style(body),     # <img> SVGs can't see the page's fonts, so carry the letters they use
+        key_css(round(vw * KEY_PX / 13)),    # 13px titles
         f'<g{g} font-family="{FONT}" stroke-linecap="round" stroke-linejoin="round">',
-        *body, '</g>', '</svg>', ''])
+        body, '</g>', '</svg>', ''])
 
 
 def write(path, text):

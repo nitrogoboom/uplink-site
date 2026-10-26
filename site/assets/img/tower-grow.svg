@@ -8,6 +8,7 @@
 .tg-td{fill:#7DB9E8;stroke:#151E2C;stroke-width:2;transition:fill .6s ease}
 .tg-tb{fill:#1E2938;stroke:#7DB9E8;stroke-opacity:.4;stroke-width:1;transition:stroke .6s ease,stroke-opacity .6s ease}
 .tg-tt{fill:#F1F4F8;text-transform:uppercase;transition:fill .6s ease}
+@media (max-width:599px){.tg-tl,.tg-td,.tg-tb,.tg-tt{display:none}}
 .tg[data-floors="1"] .tg-floor[data-f="2"],.tg[data-floors="1"] .tg-floor[data-f="3"],.tg[data-floors="2"] .tg-floor[data-f="3"]{opacity:0;transform:translateY(-30px);pointer-events:none}
 .tg[data-floors="2"] .tg-roof{transform:translateY(76.8px)}
 .tg[data-floors="1"] .tg-roof{transform:translateY(153.6px)}

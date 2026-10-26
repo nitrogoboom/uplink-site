@@ -48,6 +48,8 @@
       });
       const im = $('[data-case-img]', dlg), srcImg = $('img', src);
       if (im && srcImg) { im.src = srcImg.getAttribute('src'); im.alt = srcImg.alt; }
+      const key = $('[data-case-key]', dlg), srcKey = $('.fig-key', src);
+      if (key) key.innerHTML = srcKey ? srcKey.innerHTML : '';
       const list = visible();
       const pos = $('[data-case-pos]', dlg);
       if (pos) pos.textContent = (list.indexOf(i) + 1) + ' of ' + list.length;
