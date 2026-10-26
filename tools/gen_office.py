@@ -5,6 +5,8 @@
 usage: python tools/gen_office.py site
 Edit the numbers below and run again; don't hand-edit any of the three.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
+Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
+to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
 The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept as the page's JS and CSS expect:
   tools/office_parts/build.css, hero.css   the animation CSS inside the two animated versions
   tools/office_parts/hero_cloud.svg        hero only: sync lines, 3D cloud and its label (hand-drawn, fixed screen points)
@@ -13,6 +15,7 @@ import math, pathlib, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
+from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect
 from svgfont import font_style
 
 w = W(616.4, 240.2, 28.127)
@@ -26,19 +29,20 @@ WIN = (1, 2.5, 3.25, 1.5, 3.75)        # windows: first edge, width, pitch, sill
 BACK_WINDOWS, LEFT_WINDOWS = 5, 3
 TV = (11.75, 13.75, 1.5, 3.0)          # Teams room screen on the left wall: y0, y1, z0, z1
 ZONE = [(0.25, 10.5), (6, 10.5), (6, 15)]   # dashed outline round the Teams room
-CABINET = (1.25, 3.5, 6, 7, 0, 1.6)
+CABINET = (0.25, 1.25, 1.0, 3.5, 0, 1.375)   # filing cabinet against the left wall, under its first window
+DRAWERS = 3                                  # drawer lines on its front face
 
 # ---- furniture --------------------------------------------------------------
-DESK = (2.5, 1.3, 1.25)                # w, d, h; desks sit at these corners (in draw order, with their drop-in delay)
+PROP_S = 0.5                           # shared kit scale: a chair back tops out at desk height + 0.4
+DESK = (2.5, 1.25, 1.25)               # w, d, h; desks sit at these corners (in draw order, with their drop-in delay)
 DESKS = {(6, 5.5): 1000, (9, 5.5): 1150, (6, 9): 850, (12, 5.5): 1300, (9, 9): 925,
          (15, 5.5): 1375, (12, 9): 1075, (15, 9): 1225}
-MONITOR = (0.8, 1.7, 0.15, 0.25, 1.9)  # x0, x1, y0, y1 (from the desk corner), top
-SCREEN_INSET = 0.07
-SEAT = (0.9, 1.6, 1.65, 2.35, 0.8)     # chair seat x0, x1, y0, y1 (from the desk corner), height
-BACK_T, BACK_TOP = 0.07, 1.6           # chair back thickness, top
-KEYBOARD = (0.85, 1.65, 0.6, 0.9, 0.04)
-TABLE = (1.25, 4.75, 11.95, 13.55, 1.25)
-TABLE_CHAIRS = [(1.9, 11.1), (3.4, 11.1), (1.9, 13.7), (3.4, 13.7)]   # 0.7 square seats, 0.8 tall
+MON = (1.25, 0.375, 2.0, 1.25)         # monitor: centre x and screen face y (from the desk corner), kit width and height
+KEYBOARD = (0.75, 1.75, 0.625, 0.875, 0.0625)   # x0 x1 y0 y1 (from the desk corner), thickness
+PHONE = (2.125, 0.5)                   # VoIP desk phone centre (from the desk corner), back right of the desk
+CHAIR_AT = (1.25, 1.75)                # chair centre (from the desk corner): in front of the desk, facing it
+TABLE = (1.375, 4.875, 12.0, 13.5, 1.25)   # Teams room table, centred in its zone
+TABLE_CHAIRS = [(2.25, 11.5, '+y'), (4.0, 11.5, '+y'), (2.25, 14.0, '-y'), (4.0, 14.0, '-y')]   # centre x, y, facing the table
 
 # ---- server room --------------------------------------------------------------
 GLASS = (17, 4.5, 4)                   # partition: along x = 17 from the back wall to y = 4.5, then along y = 4.5 to the right edge; height
@@ -52,9 +56,9 @@ LED_ANIM = {18.5: {0: (2800, 0), 2: (3840, -1060), 4: (3580, -2120), 6: (3320, -
             20.1: {1: (3320, -1440), 3: (3060, -2500), 5: (2800, -760), 7: (3840, -780), 9: (3580, -2100)}}
 
 # ---- Wi-Fi --------------------------------------------------------------------
-CABLE_Z = 4.4                          # cable trays run just under the ceiling
-APS = [(10.5, 7.5), (16.5, 11), (3.5, 12.75)]   # access point centres; 0.6 square, 0.125 thick, hung from the ceiling
-AP = (0.6, 0.125, 4.5)                 # size, thickness, bottom z
+CABLE_Z = 4.3125                       # cable trays run just under the ceiling (a height that clears every window and chair edge on screen)
+APS = [(11.75, 8.25), (19.5, 12.75), (3.125, 12.75)]   # access point centres (desk block, front right, Teams room); 0.625 square, hung from the ceiling
+AP = (0.625, 0.125, 4.5)               # size, thickness, bottom z
 RINGS = [(3.25, 0.36), (2.25, 0.58), (1.25, 0.8)]   # Wi-Fi halo radius and opacity, at the AP's bottom
 RING_D = [[2420, 2490, 2560], [2360, 2430, 2500], [2300, 2370, 2440]]   # drop-in delay per ring size, per AP
 RING_PULSE = [[-1800, -1300, -800], [-2100, -1600, -1100], [-2400, -1900, -1400]]
@@ -77,9 +81,9 @@ CARD_LINK = (851.6, 86.4, 878.0)       # office/build: dashed line from the card
 # ---- labels (annotation: fixed screen elbow and text, dot on the object) -------
 LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side: text 'left' (default) or 'right' of the elbow]
     ((18.95, 2.3, 0.54), (944.0, 712.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800, 'right'),   # outside the room's front edge
-    ((3.5, 12.75, 4.625), (361.1, 208.7), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
-    ((13.25, 9.65, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
-    ((3.0, 12.75, 1.25), (349.7, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
+    ((APS[2][0], APS[2][1], 4.625), (361.1, 208.7), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
+    ((13.25, 9.25, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
+    ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
 BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
 KEY_WIDTH = 425                        # below this rendered width the 24px titles fall under 8.5px (isogen.KEY_PX): numbers instead
@@ -108,7 +112,11 @@ def line(pts, attrs, pre=''):
     return f'<polyline {pre}points="{w.pts(*pts)}" fill="none" {attrs}/>'
 
 
+BOXES = []                             # every box drawn, in order (rules_office.py reads it for painter.py)
+
+
 def box(b, cols=FACES, edge=EDGE, classes=('', '', '')):
+    BOXES.append(b)
     x0, x1, y0, y1, z0, z1 = b
     return [f'<polygon {f"class={chr(34)}{c}{chr(34)} " if c else ""}points="{pts}" fill="{col}" {edge} stroke-linejoin="round"/>'
             for pts, col, c in zip(w.box(x0, x1, y0, y1, z0, z1), cols, classes)]
@@ -133,22 +141,35 @@ def desk_box(cx, cy):
     return (cx, cx + DESK[0], cy, cy + DESK[1], 0, DESK[2])
 
 
-def chair_back_box(cx, cy):
-    x0, x1, y0, y1, h = SEAT
-    return (cx + x0, cx + x1, cy + y1 - BACK_T, cy + y1, h, BACK_TOP)
+def desk_parts(cx, cy):
+    """(monitor parts, screen, phone parts, phone top, keyboard box, chair parts) for the desk at corner (cx, cy)."""
+    top = DESK[2]
+    mon, scr = monitor(cx + MON[0], cy + MON[1], top, '+y', s=PROP_S, width=MON[2], height=MON[3])
+    ph, ph_top = desk_phone(cx + PHONE[0], cy + PHONE[1], top, '+y', s=PROP_S)
+    kx0, kx1, ky0, ky1, kh = KEYBOARD
+    kb = (cx + kx0, cx + kx1, cy + ky0, cy + ky1, top, top + kh)
+    ch = chair(cx + CHAIR_AT[0], cy + CHAIR_AT[1], '-y', s=PROP_S)
+    return mon, scr, ph, ph_top, kb, ch
+
+
+def screen_ui(scr, accent='#7DB9E8'):
+    """A small app on a desk monitor: a lit header bar and two text lines, sized to the glass."""
+    _f, _xyz, wd, ht = scr
+    return (rect(0.06, 0.06, wd - 0.12, ht * 0.2, accent, 0.03, ' fill-opacity="0.55"')
+            + rect(0.06, ht * 0.42, wd * 0.62, ht * 0.11, '#D9E4F0', 0.03, ' fill-opacity="0.35"')
+            + rect(0.06, ht * 0.64, wd * 0.42, ht * 0.11, '#D9E4F0', 0.03, ' fill-opacity="0.25"'))
 
 
 def solids():
     """Everything that stands on the floor (for cutting hidden floor lines in the static version)."""
     out = [(0, FLOOR[0], 0, WALL_T, 0, WALL_H), (0, WALL_T, WALL_T, FLOOR[1], 0, WALL_H), CABINET]
     for (cx, cy) in DESKS:
-        x0, x1, y0, y1, h = SEAT
-        mx0, mx1, my0, my1, mtop = MONITOR
-        out += [desk_box(cx, cy), (cx + mx0, cx + mx1, cy + my0, cy + my1, DESK[2], mtop),
-                (cx + x0, cx + x1, cy + y0, cy + y1, 0, h), chair_back_box(cx, cy)]
+        mon, _scr, ph, _pt, kb, ch = desk_parts(cx, cy)
+        out += [desk_box(cx, cy), kb] + [b for _n, b in mon + ph + ch]
     x0, x1, y0, y1, h = TABLE
     out.append((x0, x1, y0, y1, 0, h))
-    out += [(x, x + 0.7, y, y + 0.7, 0, 0.8) for x, y in TABLE_CHAIRS]
+    for x, y, f in TABLE_CHAIRS:
+        out += [b for _n, b in chair(x, y, f, s=PROP_S)]
     out += [(x, x + RACK[0], RACK[1], RACK[2], 0, RACK[3]) for x, _ in RACKS]
     s, t, z = AP
     out += [(x - s / 2, x + s / 2, y - s / 2, y + s / 2, z, z + t) for x, y in APS]   # hung high, but they hide the floor behind them
@@ -189,25 +210,44 @@ def left_wall():
 
 
 def desk(cx, cy):
-    mx0, mx1, my0, my1, mtop = MONITOR
-    kx0, kx1, ky0, ky1, kh = KEYBOARD
-    sx0, sx1, sy0, sy1, sh = SEAT
-    top = DESK[2]
-    i = SCREEN_INSET
+    mon, scr, ph, ph_top, kb, ch = desk_parts(cx, cy)
     out = box(desk_box(cx, cy))
-    out += box((cx + mx0, cx + mx1, cy + my0, cy + my1, top, mtop))
-    out.append(poly(wall_y(cy + my1, cx + mx0 + i, cx + mx1 - i, top + i, mtop - i),
-                    'fill="#7DB9E8" fill-opacity="0.35" stroke="#7DB9E8" stroke-width="0.6" stroke-opacity="0.5"'))
-    out += box((cx + sx0, cx + sx1, cy + sy0, cy + sy1, 0, sh))
-    out += box((cx + kx0, cx + kx1, cy + ky0, cy + ky1, top, top + kh))
-    out += box(chair_back_box(cx, cy))
+    for _n, b in mon:
+        out += box(b)
+    out.append(screen_glass(w, scr, screen_ui(scr)))
+    for _n, b in ph:
+        out += box(b)
+    out.append(phone_face(w, ph_top))
+    out += box(kb)
+    for _n, b in ch:
+        out += box(b)
     return out
 
 
 def meeting():
     x0, x1, y0, y1, h = TABLE
-    chair = lambda x, y: box((x, x + 0.7, y, y + 0.7, 0, 0.8))
-    return chair(*TABLE_CHAIRS[0]) + chair(*TABLE_CHAIRS[1]) + box((x0, x1, y0, y1, 0, h)) + chair(*TABLE_CHAIRS[2]) + chair(*TABLE_CHAIRS[3])
+    out = []
+    for x, y, f in TABLE_CHAIRS[:2]:          # far side first, then the table, then the near side
+        for _n, b in chair(x, y, f, s=PROP_S):
+            out += box(b)
+    out += box((x0, x1, y0, y1, 0, h))
+    for x, y, f in TABLE_CHAIRS[2:]:
+        for _n, b in chair(x, y, f, s=PROP_S):
+            out += box(b)
+    return out
+
+
+def cabinet():
+    """Filing cabinet with drawer lines on its front (x1) face."""
+    x0, x1, y0, y1, z0, z1 = CABINET
+    out = box(CABINET)
+    step = (z1 - z0) / DRAWERS
+    for k in range(1, DRAWERS):
+        out.append(line([(x1, y1 - 0.25, z0 + k * step), (x1, y0 + 0.25, z0 + k * step)], f'stroke="#D9E4F0" stroke-width="0.8" stroke-opacity="0.35" {ROUND}'))
+    for k in range(DRAWERS):
+        out.append(line([(x1, (y0 + y1) / 2 + 0.25, z0 + (k + 0.55) * step), (x1, (y0 + y1) / 2 - 0.25, z0 + (k + 0.55) * step)],
+                        f'stroke="#D9E4F0" stroke-width="1.2" stroke-opacity="0.5" {ROUND}'))
+    return out
 
 
 def glass_back():
@@ -255,7 +295,7 @@ def cable_pair(pts, v, base_style='', flow_style='', join=True):
 def cable(ap, v):
     x, y, z = rack_top()
     ax, ay = ap
-    return cable_pair([(x, y, z), (x, y, CABLE_Z), (ax, y, CABLE_Z), (ax, ay, CABLE_Z)], v)
+    return cable_pair([(x, y, z), (x, y, CABLE_Z), (ax, y, CABLE_Z), (ax, ay, CABLE_Z), (ax, ay, AP[2])], v)   # last bit up into the AP
 
 
 def ring(ap, r, op):
@@ -333,7 +373,7 @@ def groups(v):
     G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v)),
          ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall()),
          ('class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms"', left_wall()),
-         ('class="ob-i" style="--d:775ms"', box(CABINET))]
+         ('class="ob-i" style="--d:775ms"', cabinet())]
     desks = list(DESKS.items())
     order = [desks[0], 'meeting', desks[1], desks[2], desks[3], desks[4], 'glass', 'rack0', desks[5], desks[6], 'rack1', 'front', desks[7]]
     for item in order:
@@ -368,6 +408,7 @@ def groups(v):
 
 
 def render(v):
+    BOXES.clear()
     out = []
     for attrs, shapes in groups(v):
         if attrs is None:                       # hero cloud: already wrapped

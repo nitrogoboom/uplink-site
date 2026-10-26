@@ -1,17 +1,33 @@
-from painter import resolve
-def dims(b):
-    x0,x1,y0,y1,_,_ = resolve(b, 0); return x1-x0, y1-y0, b['h']
-def kind(b):
-    w,d,h = dims(b)
-    if b['fill'] in ('#2C3A4F','#3A4A61') : return 'tray'
-    if abs(d-0.1)<0.02 and abs(h-0.65)<0.02: return 'monitor'
-    if h < 0.06: return 'keyboard'
-    if d < 0.09 and abs(h-0.8)<0.02: return 'chairback'
-    if abs(w-1.7)<0.02 and abs(h-0.2)<0.02: return 'tile'
-    if abs(h-0.125)<0.01 and abs(w-0.6)<0.02: return 'ap'
-    if abs(h-0.45)<0.01 and w>20: return 'slab'
-    return f'box{w:.2f}x{d:.2f}x{h:.2f}'
+"""painter.py rules for office.svg: each box's base height, looked up from gen_office.py by its left face.
+usage: python tools/painter.py site/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py"""
+import gen_office
+from iso import C30
+
+gen_office.render('office')
+w = gen_office.w
+
+
+def _left(b):
+    x0, x1, y0, y1, z0, z1 = b
+    pts = [w.p(x0, y1, z0), w.p(x1, y1, z0), w.p(x1, y1, z1), w.p(x0, y1, z1)]
+    return [((X - w.ox) / (C30 * w.u), (Y - w.oy) / (w.u / 2)) for X, Y in pts]
+
+
+_known = [(_left(b), b) for b in gen_office.BOXES]
+
+
+def _find(b):
+    for pts, box in _known:
+        if all(abs(p[0] - q[0]) < 0.02 and abs(p[1] - q[1]) < 0.02 for p, q in zip(pts, b['A'])):
+            return box
+    return None
+
+
 def z0(b):
-    k = kind(b)
-    return {'monitor':1.25,'keyboard':1.25,'chairback':0.8,'slab':-0.45}.get(k, None if k in ('tray','tile','ap') else 0.0)
-def label(b): return kind(b)
+    box = _find(b)
+    return None if box is None else box[4]
+
+
+def label(b):
+    box = _find(b)
+    return 'unknown' if box is None else 'box x%.3g-%.3g y%.3g-%.3g z%.3g-%.3g' % box

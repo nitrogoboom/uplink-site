@@ -12,40 +12,44 @@ from shapely.geometry import Polygon
 from iso import W, fmt
 from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_out, seg_path
 from svgfont import font_style
+from isoprops import on_front, rect
 
 w = W(262, 283.2, 24)
 
-GROUND = 11.7                         # ground slab is GROUND x GROUND, top at z = 0
-GROUND_T = 0.8                        # slab thickness
+# Grid: x, y in 0.25s, z in 0.125s (as tools/isoprops.py), so nothing nearly-touches.
+GROUND = 11.75                        # ground slab is GROUND x GROUND, top at z = 0
+GROUND_T = 0.75                       # slab thickness
 GROUND_TOP = '#1E2938'
 GRID = range(0, 12)                   # ground lines at x = k and y = k
-LAWN_INSET = 0.4                      # faint green tint, inset from the slab edge
-B0, B1 = 1.2, 9.2                     # building footprint, x and y
-FLOOR = 3.2                           # storey height
+LAWN_INSET = 0.5                      # faint green tint, inset from the slab edge
+B0, B1 = 1.25, 9.25                   # building footprint, x and y (8 wide, centre 5.25)
+FLOOR = 3.25                          # storey height
 FLOORS = 3
-CORNICE = (0.25, 0.3)                 # overhang each side, depth below the storey top
-WIN_SPANS = [(2.2, 3.6), (4.5, 5.9), (6.8, 8.2)]      # along each wall
-WIN_Z = (0.95, 2.35)                  # sill and head, from the storey floor
+CORNICE = (0.25, 0.25)                # overhang each side, depth below the storey top
+WIN_SPANS = [(2.25, 3.75), (4.5, 6.0), (6.75, 8.25)]  # along each wall: 1.5 wide, 1.0 margins, 0.75 gaps
+WIN_Z = (1.0, 2.375)                  # sill and head, from the storey floor
 WIN_ON = {1: {'r': [2]}, 2: {'l': [0, 2], 'r': [1]}, 3: {}}   # windows lit from the start (tg-on), by storey
-DOOR = (4.55, 5.85, 2.1)              # on the front-left wall (y = B1): x from, x to, height
-AWNING = (4.2, 6.2, 0.9, 2.2, 0.18)   # x from, x to, depth out from the wall, z, thickness
-STEP = (4.25, 6.15, 0.6, 0.14)        # x from, x to, depth out from the wall, height
-WALK = (4.4, 6.0)                     # path from the door to the slab edge, x from, x to
-WALK_LINE = (10.05, 10.15)            # thin seam across the path, y from, y to
-LABEL_DOT = (B1, 1.7, 1.85)           # leader dot on the front-right wall: x, y, z above the storey floor
+DOOR = (4.5, 6.0, 2.125)              # on the front-left wall (y = B1), under the middle windows: x from, x to, height
+AWNING = (4.25, 6.25, 0.75, 2.25, 0.125)   # x from, x to, depth out from the wall, z, thickness
+STEP = (4.25, 6.25, 0.5, 0.125)       # x from, x to, depth out from the wall, height
+WALK = (4.5, 6.0)                     # path from the door to the slab edge, x from, x to (door width)
+WALK_LINE = (10.375, 10.5)            # thin seam across the path, y from, y to
+LABEL_DOT = (B1, 1.75, 1.75)          # leader dot on the front-right wall: x, y, z above the storey floor (window middle height)
 LABEL_GAP = 48.4                      # px from dot to the label pill
 PILL_PAD, PILL_H = 14, 30
 LABELS = [('1–10 people', 117.7), ('11–50 people', 125.8), ('51–150 people', 133.9)]   # text, pill width (px)
-ROOF = (1.7, 8.7, 0.35)               # roof slab: from, to (x and y), thickness
-HVAC = (2.3, 4.7, 5.8, 7.6, 1.0)      # x0, x1, y0, y1, height (on the roof)
-FAN = (2.7, 3.7, 6.1, 7.1, 0.25)      # on top of the HVAC unit
-PLANTER = (5.6, 7.1, 2.5, 4.0, 0.5)   # on the roof
-MAST = (7.4, 3.25)                    # at x = y = MAST[0], height above the roof
+ROOF = (1.75, 8.75, 0.375)            # roof slab: from, to (x and y), thickness (0.5 in from the walls)
+HVAC = (2.25, 4.75, 5.75, 7.75, 1.0)  # x0, x1, y0, y1, height (on the roof)
+FAN = (3.0, 4.0, 6.25, 7.25, 0.25)    # centred on top of the HVAC unit
+PLANTER = (5.5, 7.0, 2.5, 4.0, 0.5)   # on the roof
+MAST = (7.5, 3.25)                    # at x = y = MAST[0], height above the roof
 WIFI = [(9, 0.8), (16, 0.5)]          # signal arcs round the mast top: radius px, opacity
-TREES = [(1.28, 10.63, 0.9), (10.675, 10.925, 0.75)]   # centre x, y, scale
-TREE = [(0.5, 1.0), (1.4, 1.2), (0.9, 0.8)]          # trunk, canopy, top: width, height (x scale)
-BUSHES = [(2.3, 9.65), (9.9, 3.2), (3.2, 10.3), (9.9, 4.2), (6.2, 9.6), (7.2, 10.3), (10.55, 7.8)]   # back corner x, y
-BUSH = (0.9, 0.55)                    # width, height
+TREES = [(1.0, 10.5, 'big'), (10.5, 10.5, 'small')]   # centre x, y, kind: front-left corner and front corner
+TREE = {'big': [(0.5, 1.0), (1.5, 1.25), (1.0, 0.75)],      # trunk, canopy, top: width, height
+        'small': [(0.5, 0.75), (1.0, 1.0), (0.5, 0.5)]}
+BUSH = (0.75, 0.5)                    # width, height
+BUSHES = [(2.25, 10.0), (3.25, 10.0), (6.5, 10.0), (7.5, 10.0),       # back corner x, y: a row each side of the path,
+          (10.0, 2.5), (10.0, 3.5), (10.0, 6.25), (10.0, 7.25)]       # and two pairs along the right wall
 
 GREEN = ('#4E9C78', '#3C7C60', '#6FD3A0')
 GREEN_EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.22"'
@@ -63,8 +67,8 @@ STYLE = '''<style>.tg-floor,.tg-roof{transition:opacity .6s ease,transform .6s e
 .tg-tt{fill:#F1F4F8;text-transform:uppercase;transition:fill .6s ease}
 @media (max-width:599px){.tg-tl,.tg-td,.tg-tb,.tg-tt{display:none}}
 .tg[data-floors="1"] .tg-floor[data-f="2"],.tg[data-floors="1"] .tg-floor[data-f="3"],.tg[data-floors="2"] .tg-floor[data-f="3"]{opacity:0;transform:translateY(-30px);pointer-events:none}
-.tg[data-floors="2"] .tg-roof{transform:translateY(76.8px)}
-.tg[data-floors="1"] .tg-roof{transform:translateY(153.6px)}
+.tg[data-floors="2"] .tg-roof{transform:translateY(DROP1px)}
+.tg[data-floors="1"] .tg-roof{transform:translateY(DROP2px)}
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-w,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-w,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-w,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-w{fill:#F7B868;fill-opacity:1}
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-wr,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-wr,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-wr,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-wr{fill:#E2953F}
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tl,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tl,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tl,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tl{stroke:#F4A340}
@@ -84,12 +88,12 @@ def flat(pts, attrs):
     return f'<polygon points="{w.pts(*pts)}" {attrs}/>'
 
 
-def tree_boxes(cx, cy, s):
+def tree_boxes(cx, cy, kind):
     out, z = [], 0
-    for size, h in TREE:
-        r = size * s / 2
-        out.append((cx - r, cx + r, cy - r, cy + r, z, z + h * s))
-        z += h * s
+    for size, h in TREE[kind]:
+        r = size / 2
+        out.append((cx - r, cx + r, cy - r, cy + r, z, z + h))
+        z += h
     return out
 
 
@@ -104,11 +108,17 @@ def door_boxes():
 
 
 def door_front():
-    """Door, awning and step on the ground storey."""
+    """Glass double door (drawn flat on the wall), awning and step on the ground storey."""
     d0, d1, dh = DOOR
+    dw = d1 - d0
     awning, step = door_boxes()
-    return ([flat([(d0, B1, 0), (d1, B1, 0), (d1, B1, dh), (d0, B1, dh)], f'fill="#1F2A3B" stroke="{BLUE}" stroke-width="0.9" stroke-opacity="0.5"')]
-            + box(*awning, HIGH, AWNING_EDGE) + box(*step))
+    leaf = (dw - 0.375) / 2           # two leaves, 0.125 frame each side and between
+    door = [rect(0, 0, dw, dh, '#1F2A3B', 0, f' stroke="{BLUE}" stroke-opacity="0.5" stroke-width="0.9" vector-effect="non-scaling-stroke"')]
+    for k in range(2):
+        u = 0.125 + k * (leaf + 0.125)
+        door.append(rect(u, 0.125, leaf, dh - 0.25, BLUE, 0, ' fill-opacity="0.22"'))
+        door.append(rect(u + (leaf - 0.1 if k == 0 else 0.04), dh * 0.5, 0.06, 0.3, '#D9E4F0', 0.03, ' fill-opacity="0.7"'))
+    return [f'<g transform="{on_front(w, d0, B1, dh)}">' + ''.join(door) + '</g>'] + box(*awning, HIGH, AWNING_EDGE) + box(*step)
 
 
 def ground(mask):
@@ -145,7 +155,7 @@ def windows(z0, lit):
 def storey(f):
     z0 = (f - 1) * FLOOR
     o, d = CORNICE
-    out = box(B0, B1, B0, B1, z0, z0 + FLOOR)
+    out = box(B0, B1, B0, B1, z0, z0 + FLOOR - d)          # walls stop under the cornice band
     out += box(B0 - o, B1 + o, B0 - o, B1 + o, z0 + FLOOR - d, z0 + FLOOR)
     out += windows(z0, WIN_ON[f])
     if f == 1:
@@ -183,15 +193,13 @@ def roof():
 
 
 def front():
-    """Trees and bushes, in the original draw order: each tree's trunk and canopy, the bush behind it, then its top."""
-    t1, t2 = (tree_boxes(*t) for t in TREES)
-    b = [bush_box(*p) for p in BUSHES]
-    trunk, leaf = [t1[0], t2[0]], [t1[1], t1[2], t2[1], t2[2]] + b
-    order = [t1[0], t1[1], b[0], t1[2], *b[1:], t2[0], t2[1], t2[2]]
+    """Trees and bushes, back to front (by footprint centre x + y); a tree is trunk, canopy, top."""
+    plants = [(t[0] + t[1], tree_boxes(*t)) for t in TREES]
+    plants += [(p[0] + p[1] + BUSH[0], [bush_box(*p)]) for p in BUSHES]
     out = []
-    for bx in order:
-        out += box(*bx) if bx in trunk else box(*bx, GREEN, GREEN_EDGE)
-    assert all(bx in trunk or bx in leaf for bx in order)
+    for _d, boxes in sorted(plants, key=lambda q: q[0]):
+        for k, bx in enumerate(boxes):
+            out += box(*bx) if len(boxes) > 1 and k == 0 else box(*bx, GREEN, GREEN_EDGE)
     return out
 
 
@@ -217,7 +225,8 @@ def build(embed_font):
     return '\n'.join([
         f'<svg xmlns="http://www.w3.org/2000/svg" class="tg" data-floors="3" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="{TITLE}">',
         f'<title>{TITLE}</title>',
-        STYLE + (font_style(text) if embed_font else ''),
+        STYLE.replace('DROP1', f'{FLOOR * w.u:g}').replace('DROP2', f'{2 * FLOOR * w.u:g}')   # roof drops one storey per missing floor
+        + (font_style(text) if embed_font else ''),
         f'<g font-family="{FONT}" stroke-linecap="round" stroke-linejoin="round">',
         text, '</g>', '</svg>'])
 

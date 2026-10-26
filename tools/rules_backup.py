@@ -1,8 +1,7 @@
-"""painter.py rules for backup.svg: three drives (1.4 tall, 0.2 apart), then two offsite boxes (1.0 tall, 0.2 apart).
-usage: python tools/painter.py site/assets/img/backup.svg 289.9 207.4 16.46 tools/rules_backup.py"""
-def z0(b):
-    k = b['idx'] // 3
-    return k * 1.6 if k < 3 else (k - 3) * 1.2
-def label(b):
-    k = b['idx'] // 3
-    return f'drive {k}' if k < 3 else f'offsite {k - 3}'
+"""painter.py rules for backup.svg: the offsite building, then three appliances (1.375 tall, 0.125 apart).
+usage: python tools/painter.py site/assets/img/backup.svg 268.6 214.6 16.46 tools/rules_backup.py"""
+BOXES = [('offsite building', 0), ('appliance 0', 0), ('appliance 1', 1.5), ('appliance 2', 3.0)]
+_order = {}
+def _k(b): return _order.setdefault(b['idx'], len(_order))
+def z0(b): return BOXES[_k(b)][1]
+def label(b): return BOXES[_k(b)][0]

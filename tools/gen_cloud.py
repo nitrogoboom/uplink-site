@@ -2,39 +2,40 @@
 Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_cloud.py site/assets/img/cloud.svg
 World: 1 unit = 16.31px (one floor-grid square). Origin = floor-disc centre. x runs right-down, y left-down, z up.
+Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (server bays, screens, keys)
+are drawn in 2D on their face and mapped onto it, so they sit exactly in the iso plane.
 """
 import sys
 from shapely.geometry import LineString, Polygon, box as box_shape
 from shapely.ops import unary_union
 from iso import W, C30, fmt
 from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
+from isoprops import on_front, on_top, rect, screen_glass, app_window
 
 w = W(21.2, 36.7, 16.31)              # inside the group's translate(312.8,310.6)
+GREEN, LINE = '#6FD3A0', '#D9E4F0'
 
 DISC_R = 9.085                        # floor disc; grid lines on whole x and half y
 
-SERVER = (-6, -3.4, -2.5, 0.1, 0, 5)  # x0 x1 y0 y1 z0 z1
-STRIPE_INSET = 0.2                    # drive-bay lines on the server's left wall, at z = 1, 2, 3, 4
-LAPTOP = (-1, 2.6, -0.5, 1.9, 0, 0.2)
-LID_BACK, LID_UP = 0.4, 2.4               # lid's top edge sits this far behind and above the hinge (leans ~9.5 deg);
-                                      # puts both top corners exactly on floor-grid lines, so no line ends a hair from a corner
-SCREEN_INSET = 0.3
-PHONE = (4.6, 5.8, 1.5, 1.8, 0, 2.2)  # x was 4.5: its corner sat 1.6px from the laptop's
+# the three devices spread across the disc (server back left, laptop front centre, phone right); each sync line
+# rises straight up the screen into the slab
+SERVER = (-4.5, -2.0, 0.5, 3.0, 0, 5.0)         # x0 x1 y0 y1 z0 z1: old tower server
+BAYS = 4                                         # drive bays on its front (y1) face; the rest is a vented panel
+LAPTOP = (-0.75, 2.75, 0.5, 2.75, 0, 0.25)       # laptop base
+LID = (-0.75, 2.75, 0.25, 0.5, 0.125, 2.625)     # lid stands upright behind the base, screen on its front (y1) face
+DOCK = (3.25, 4.75, -0.75, 0.25, 0, 0.25)        # phone stand
+PHONE = (3.375, 4.625, -0.5, -0.25, 0.25, 3.0)   # phone upright in it, screen on its front (y1) face: a call
 
-PLAT_X, PLAT_Y, PLAT_Z = 0, -0.905, 10  # cloud slab: centre and underside
-TILE, TILE_GAP, PAD = 2.04, 0.42, 0.48  # 3 x 2 app tiles on the slab
-SLAB_H, TILE_H = 0.48, 0.24
+PLAT_X, PLAT_Y, PLAT_Z = 0.25, -0.25, 10         # cloud slab: centre and underside
+TILE, TILE_GAP, PAD = 2.0, 0.5, 0.5              # 3 x 2 app tiles on the slab
+SLAB_H, TILE_H = 0.5, 0.25
 ICON = 1.5                            # icon size on a tile (24-unit icon grid)
 LIT_TILE = 0                          # highlighted tile (mail)
+ARROW = (5, 9, 3)                     # sync arrowheads: half-width, length, gap below the slab (px)
 
 CARD = dict(w=202.9, h=70.8, top=-286.6, rx=9.8)   # screen space, centred over the slab
 CARD_ROWS = ['MICROSOFT 365', 'GOOGLE WORKSPACE']
 CARD_KEY = 'Microsoft 365 or Google Workspace'   # the card's line in the page key (phones)
-
-# sync arrows: start (top centre of that box, or the lid's top edge), screen end (arrow tip is 8px further), screen y of both curve handles
-SYNC = [('server', (-36.0, -119.6), -113.2),            # server top
-        ('lid', (20.0, -87.3), -55.7),                 # laptop lid, top edge centre
-        ('phone', (93.7, -93.7), -31.9)]                # phone top
 
 TITLE = ('Server, laptop and phone syncing to a cloud workspace of mail, files, meetings, chat, calendar and sign-in, '
          'run on Microsoft 365 or Google Workspace')
@@ -49,38 +50,19 @@ ICONS = [
     '<path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',                    # sign-in
 ]
 
-LABELS = [  # dot (middle of that box's left wall), elbow (screen), text x, anchor, title, subline
-    ('server', (-96.6, 8.4), -123.6, 'end', 'OLD SERVER', 'migrated, then retired'),
-    ('phone', (117.8, 113.4), 144.8, 'start', 'ANY DEVICE', 'same files everywhere'),
+LABELS = [  # dot (world), elbow (screen), text x, anchor, title, subline
+    ((-3.25, 3.0, 2.5), (-96.6, 8.4), -123.6, 'end', 'OLD SERVER', 'migrated, then retired'),       # middle of the server's front
+    ((4.625, -0.375, 1.625), (130.0, 86.0), 157.0, 'start', 'ANY DEVICE', 'same files everywhere'),   # the phone's right edge
 ]
-LABEL_GAPS = [box_shape(-1e4, -5.1, -118.6, 35.9), box_shape(139.8, 99.9, 1e4, 1e4)]   # floor clears round the text
+LABEL_GAPS = [box_shape(-1e4, -5.1, -118.6, 35.9), box_shape(152.0, 72.5, 1e4, 113.5)]   # floor clears round the text
 TAIL_PAD = 5                          # and round each leader's level tail
 
 
-def top_centre(b):
-    x0, x1, y0, y1, _, z1 = b
-    return ((x0 + x1) / 2, (y0 + y1) / 2, z1)
-
-
-def wall_centre(b):
-    """Middle of the box's left (front-left, y = y1) wall."""
-    x0, x1, _, y1, z0, z1 = b
-    return ((x0 + x1) / 2, y1, (z0 + z1) / 2)
-
-
-ANCHORS = {'server': SERVER, 'phone': PHONE}
-
-
-def lid():
-    """Hinge on the base's back top edge; returns (hinge-left, hinge-right, top-right, top-left) world points."""
-    x0, x1, y0, _, _, z1 = LAPTOP
-    return [(x0, y0, z1), (x1, y0, z1), (x1, y0 - LID_BACK, z1 + LID_UP), (x0, y0 - LID_BACK, z1 + LID_UP)]
-
-
-def on_lid(s, f):
-    """Point at fraction s along the hinge, f up the lid."""
-    a, b, _, d = lid()
-    return tuple(a[k] + (b[k] - a[k]) * s + (d[k] - a[k]) * f for k in range(3))
+def slab_box():
+    W_ = 3 * TILE + 2 * TILE_GAP + 2 * PAD
+    D_ = 2 * TILE + TILE_GAP + 2 * PAD
+    x0, y0 = PLAT_X - W_ / 2, PLAT_Y - D_ / 2
+    return (x0, x0 + W_, y0, y0 + D_, PLAT_Z, PLAT_Z + SLAB_H)
 
 
 def mask():
@@ -88,53 +70,94 @@ def mask():
     for _, (ex, ey), tx, a, *_ in LABELS:
         end = tx + 7 if a == 'end' else tx - 7
         tails.append(LineString([(ex, ey), (end, ey)]).buffer(TAIL_PAD))
-    solids = [silhouette(w, *SERVER), silhouette(w, *LAPTOP), Polygon([w.p(*p) for p in lid()]), silhouette(w, *PHONE)]
-    # solids grow by a hair so a floor line that runs exactly along an edge is dropped, not left as a sliver
-    return unary_union(LABEL_GAPS + tails + [p.buffer(0.05) for p in solids])
-
-
-
-
+    solids = [silhouette(w, *b) for b in (SERVER, LAPTOP, LID, DOCK, PHONE)]
+    heads = [Polygon(arrowhead(sx, tip)).buffer(6) for sx, _sy, tip in sync_paths()]    # floor lines stop around arrowheads too
+    return unary_union(LABEL_GAPS + tails + solids + heads)
 
 
 def server():
-    x0, x1, y0, y1, z0, z1 = SERVER
-    out = faces(w, *SERVER)
-    for z in range(1, int(z1 - z0)):
-        out.append(f'<polyline points="{w.pts((x0 + STRIPE_INSET, y1, z), (x1 - STRIPE_INSET, y1, z))}" '
-                   f'fill="none" stroke="{BLUE}" stroke-width="1" stroke-opacity="0.6"/>')
-    return out
+    """Tower with drive bays and a status light per bay (all dark but one: it's being retired), vents below."""
+    x0, x1, _, y1, _, z1 = SERVER
+    wd = x1 - x0
+    out = []
+    for k in range(BAYS):
+        v = 0.375 + k * 0.625
+        out.append(rect(0.25, v, wd - 0.5, 0.5, '#1E2938', 0.06, ' stroke="#7DB9E8" stroke-opacity="0.45" stroke-width="1" vector-effect="non-scaling-stroke"'))
+        out.append(rect(0.45, v + 0.2, wd - 1.3, 0.1, LINE, 0.05, ' fill-opacity="0.25"'))
+        out.append(f'<circle cx="{wd - 0.55:.4g}" cy="{v + 0.25:.4g}" r="0.08" fill="{ORANGE if k == 0 else "#55657D"}"/>')
+    for k in range(5):
+        out.append(rect(0.25, 3.25 + k * 0.25, wd - 0.5, 0.08, '#1E2938', 0.04))
+    return faces(w, *SERVER) + [f'<g transform="{on_front(w, x0, y1, z1)}">' + ''.join(out) + '</g>']
 
 
 def laptop():
-    out = faces(w, *LAPTOP)
-    out.append(f'<polygon class="free" points="{w.pts(*lid())}" fill="{FACES[0]}" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>')
-    i = SCREEN_INSET
-    s0, s1 = i / (LAPTOP[1] - LAPTOP[0]), 1 - i / (LAPTOP[1] - LAPTOP[0])
-    f0, f1 = i / LID_UP, 1 - i / LID_UP
-    out.append(f'<polygon class="free" points="{w.pts(on_lid(s0, f0), on_lid(s1, f0), on_lid(s1, f1), on_lid(s0, f1))}" '
-               f'fill="none" stroke="{ORANGE}" stroke-width="1" stroke-opacity="0.8"/>')
+    """Base with keys and a trackpad on top; upright lid with an app on screen."""
+    x0, x1, y0, y1, _, z1 = LAPTOP
+    wd = x1 - x0
+    keys = [rect(0.25, 0.25, wd - 0.5, 1.0, '#26324A', 0.06)]
+    keys += [rect(0.35 + c * ((wd - 0.7) / 8), 0.35 + r * 0.27, (wd - 0.7) / 8 - 0.06, 0.2, LINE, 0.03, ' fill-opacity="0.18"')
+             for r in range(3) for c in range(8)]
+    keys.append(rect(wd / 2 - 0.55, 1.45, 1.1, 0.6, '#26324A', 0.08))
+    lx0, lx1, _, ly1, lz0, lz1 = LID
+    inset = 0.125
+    scr = ('+y', (lx0 + inset, ly1, lz1 - inset), lx1 - lx0 - 2 * inset, lz1 - lz0 - 2 * inset - 0.125)
+    out = faces(w, *LID) + [screen_glass(w, scr, app_window(scr[2], scr[3]))]     # lid first: it stands behind the base
+    return out + faces(w, *LAPTOP) + [f'<g transform="{on_top(w, x0, y0, z1)}">' + ''.join(keys) + '</g>']
+
+
+def phone():
+    """Stand, then the phone in it showing a call: caller, name, and the green answer button."""
+    out = faces(w, *DOCK) + faces(w, *PHONE)
+    x0, x1, _, y1, z0, z1 = PHONE
+    inset = 0.0625
+    wd, ht = x1 - x0 - 2 * inset, z1 - z0 - 2 * inset
+    ui = [f'<circle cx="{wd / 2:.4g}" cy="0.6" r="0.24" fill="{BLUE}" fill-opacity="0.8"/>',
+          rect(wd / 2 - 0.3, 0.98, 0.6, 0.09, LINE, 0.045, ' fill-opacity="0.6"'),
+          rect(wd / 2 - 0.2, 1.15, 0.4, 0.07, LINE, 0.035, ' fill-opacity="0.3"'),
+          f'<circle cx="{wd * 0.3:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="#F47E6A"/>',
+          f'<circle cx="{wd * 0.7:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="{GREEN}"/>']
+    scr = ('+y', (x0 + inset, y1, z1 - inset), wd, ht)
+    out.append(screen_glass(w, scr, ''.join(ui), glow=GREEN))
     return out
 
 
+def sync_paths():
+    """(x, start y, tip y) on screen for each straight sync line: up from a device to just below the slab."""
+    gap = ARROW[2]
+    slab_sil = silhouette(w, *slab_box())
+    out = []
+    starts = [((SERVER[0] + SERVER[1]) / 2, (SERVER[2] + SERVER[3]) / 2, SERVER[5]),
+              ((LID[0] + LID[1]) / 2, (LID[2] + LID[3]) / 2, LID[5]),
+              ((PHONE[0] + PHONE[1]) / 2, (PHONE[2] + PHONE[3]) / 2, PHONE[5])]
+    for p in starts:
+        sx, sy = w.p(*p)
+        hit = LineString([(sx, sy), (sx, sy - 1000)]).intersection(slab_sil.boundary)
+        enter = max(pt.y for pt in getattr(hit, 'geoms', [hit]))      # lowest point of the slab above (screen y grows down)
+        out.append((sx, sy, enter + gap))
+    return out
+
+
+def arrowhead(sx, tip):
+    hw, ln, _ = ARROW
+    return [(sx, tip), (sx - hw, tip + ln), (sx + hw, tip + ln)]
+
+
 def sync():
-    curves, arrows = [], []
-    for start, (ex, ey), hy in SYNC:
-        sx, sy = w.p(*(on_lid(0.5, 1) if start == 'lid' else top_centre(ANCHORS[start])))
-        curves.append(f'<path d="M{fmt(sx)},{fmt(sy)} C{fmt(sx)},{fmt(hy)} {fmt(ex)},{fmt(hy)} {fmt(ex)},{fmt(ey)}" '
-                      f'fill="none" stroke="{ORANGE}" stroke-width="1.4" stroke-dasharray="5 5"/>')
-        arrows.append(f'<polygon class="mark" points="{fmt(ex)},{fmt(ey - 8)} {fmt(ex - 5)},{fmt(ey + 1)} {fmt(ex + 5)},{fmt(ey + 1)}" '
-                      f'fill="{ORANGE}" stroke="{ORANGE}" stroke-width="1"/>')
-    return curves + arrows
+    """Straight dashed lines up from each device into the slab, an arrowhead just below where each enters it."""
+    ln = ARROW[1]
+    lines, heads = [], []
+    for sx, sy, tip in sync_paths():
+        lines.append(f'<polyline points="{fmt(sx)},{fmt(sy)} {fmt(sx)},{fmt(tip + ln)}" fill="none" stroke="{ORANGE}" stroke-width="1.4" stroke-dasharray="5 5"/>')
+        heads.append(f'<polygon class="mark" points="{" ".join(f"{fmt(x)},{fmt(y)}" for x, y in arrowhead(sx, tip))}" '
+                     f'fill="{ORANGE}" stroke="{ORANGE}" stroke-width="1"/>')
+    return lines + heads
 
 
 def slab():
-    W_ = 3 * TILE + 2 * TILE_GAP + 2 * PAD
-    D_ = 2 * TILE + TILE_GAP + 2 * PAD
-    x0, y0 = PLAT_X - W_ / 2, PLAT_Y - D_ / 2
-    z1 = PLAT_Z + SLAB_H
-    out = faces(w, x0, x0 + W_, y0, y0 + D_, PLAT_Z, z1)
-    top = w.pts((x0, y0, z1), (x0 + W_, y0, z1), (x0 + W_, y0 + D_, z1), (x0, y0 + D_, z1))
+    x0, x1, y0, y1, _z0, z1 = slab_box()
+    W_, D_ = x1 - x0, y1 - y0
+    out = faces(w, *slab_box())
+    top = w.pts((x0, y0, z1), (x1, y0, z1), (x1, y1, z1), (x0, y1, z1))
     out.append(f'<polygon points="{top}" fill="none" stroke="{BLUE}" stroke-width="1.4" stroke-opacity="0.7"/>')
     k = ICON / 24                                    # world units per icon unit
     m = (fmt(C30 * w.u * k), fmt(w.u / 2 * k), fmt(-C30 * w.u * k), fmt(w.u / 2 * k))
@@ -174,11 +197,12 @@ def card(plat):
 def build():
     m = mask()
     body = [floor_grid(w, (0, 0), DISC_R, m, phase=(0, 0.5)) + disc_arcs(w, DISC_R, mask=unary_union(LABEL_GAPS))]
-    body += server() + laptop() + faces(w, *PHONE) + sync()
+    body += server() + laptop() + phone()
+    body += sync()                                      # drawn before the slab, so each line disappears into it
     plat_body, plat = slab()
     body += plat_body + card(plat)
     for dot, elbow, tx, anchor, title, sub in LABELS:
-        body += label(w.p(*wall_centre(ANCHORS[dot])), elbow, tx, title, sub, colour=BLUE, anchor=anchor)
+        body += label(w.p(*dot), elbow, tx, title, sub, colour=BLUE, anchor=anchor)
     return doc(TITLE, body, translate=(312.8, 310.6))
 
 

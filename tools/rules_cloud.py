@@ -1,7 +1,8 @@
-"""painter.py rules for cloud.svg: server, laptop base and phone on the floor; slab at z=10, tiles on it.
+"""painter.py rules for cloud.svg: the boxes in drawing order (painter calls z0 once per box, in order).
 usage: python tools/painter.py site/assets/img/cloud.svg 334 347.3 16.31 tools/rules_cloud.py"""
-def z0(b):
-    if abs(b['h'] - 0.48) < 0.02: return 10
-    if abs(b['h'] - 0.24) < 0.02: return 10.48
-    return 0.0
-def label(b): return {0.48: 'slab', 0.24: 'tile'}.get(round(b['h'], 2), f"box h={b['h']:.2f}")
+BOXES = ([('server', 0), ('laptop lid', 0.125), ('laptop base', 0), ('phone stand', 0), ('phone', 0.25), ('slab', 10)]
+         + [(f'tile {n + 1}', 10.5) for n in range(6)])
+_order = {}
+def _k(b): return _order.setdefault(b['idx'], len(_order))
+def z0(b): return BOXES[_k(b)][1]
+def label(b): return BOXES[_k(b)][0]
