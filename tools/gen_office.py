@@ -384,7 +384,8 @@ def render(v):
     else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
         style = '<style>' + (PARTS / 'hero.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
-        body += '\n<circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99"/>'
+        # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
+        body += '\n<circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
