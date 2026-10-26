@@ -238,7 +238,7 @@ a.fc-cl:hover { color: var(--c-accent); }
 }
 
 @media (min-width: 1100px) and (min-height: 700px) {
-  .fc.fc-js { height: var(--fold-h); min-height: 40rem; scroll-snap-align: start; }
+  .fc.fc-js { height: var(--fold-h); min-height: 40rem; }
   .fc-js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .fc-js .fc-panels { padding-top: var(--sp-2); }
   .fc-head h2 { font-size: min(var(--fs-8), 8.2svh); }

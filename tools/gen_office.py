@@ -456,6 +456,9 @@ def groups(v):
     return G
 
 
+HERO_FLOWS = []                          # the hero's flow layer, filled by render('hero'); written to 1-hero-flows.svg
+
+
 def split_flows(body):
     """The marching dashes (stroke-dashoffset) can't be composited, so each frame repaints the whole drawing under
     them. Move them to a second svg on its own layer: same box and viewBox, drawn last. Each keeps its group's class
@@ -502,9 +505,8 @@ def render(v):
         body += '\n<circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
     if v == 'hero':
         body, over = split_flows(body)
-        return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>',
-                          '<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',
-                          over, '</svg>'])
+        HERO_FLOWS[:] = ['<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',
+                         over, '</svg>']
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
@@ -514,4 +516,5 @@ if __name__ == '__main__':
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent
     (root / 'src/pages/home/1-hero-office.svg').write_text(render('hero') + '\n', encoding='utf-8', newline='\n')
+    (root / 'src/pages/home/1-hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
     subprocess.run([sys.executable, str(root / 'tools/build_pages.py')], check=True)

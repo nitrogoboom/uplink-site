@@ -1,6 +1,7 @@
 <!--- HOME · 1. Hero (first screen)
       Headline, "Get started" button, main menu, office drawing and news cards.
-      Drawing: 1-hero-office.svg, written by tools/gen_office.py. Don't edit it by hand.
+      Drawing: 1-hero-office.svg, plus its moving dashes on their own layer in 1-hero-flows.svg,
+      both written by tools/gen_office.py. Don't edit them by hand.
       Styles: 1-hero.css. Desktop layout: src/styles/desktop.css.
 --->
 <section class="hero fold" id="top" data-section="Main menu" aria-labelledby="hero-title">
@@ -53,6 +54,7 @@
     <div class="hero-art">
       <div class="stage">
         <!-- @include 1-hero-office.svg -->
+        <!-- @include 1-hero-flows.svg -->
         <img class="hero-still" src="assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800">
       </div>
       <div class="hero-dock">

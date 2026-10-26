@@ -39,7 +39,7 @@ def screen(u, v):
     return (ORIGIN[0] + u * C30, ORIGIN[1] + u * 0.5 - v)
 
 
-DX, DY = -DEPTH * -C30, -DEPTH * 0.5   # slab direction on screen: (+48.5, -28)
+DX, DY = DEPTH * C30, -DEPTH * 0.5      # slab direction on screen: (+48.5, -28)
 
 
 def face():
