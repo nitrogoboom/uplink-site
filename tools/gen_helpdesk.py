@@ -8,27 +8,24 @@ with an SVG matrix, so they sit exactly in the iso plane.
 import sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
-from iso import W, C30, fmt
+from iso import W
+from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_top, rect
 from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 0, 23)                       # inside the group's translate(265.7,200.9)
 GREEN = '#6FD3A0'                     # tokens --c-ok
 
-DESK = (0, 8, 0, 3.6, 0, 2.6)         # x0 x1 y0 y1 z0 z1
+DESK = (0, 8, 0, 3.5, 0, 2.625)       # x0 x1 y0 y1 z0 z1 (everything on the isoprops grid: x, y in 0.25s, z in 0.125s)
 TOP = DESK[5]
-FOOT = (3.1, 4.9, 0.2, 1.1, TOP, TOP + 0.12)          # monitor stand: foot, neck, then the panel (small offsets keep edges a clear pixel apart)
-NECK = (3.85, 4.15, 0.3, 0.5, TOP + 0.12, TOP + 0.5)
-MONITOR = (2, 6, 0.5, 0.8, TOP + 0.45, TOP + 3.05)
-KEYBOARD = (2.4, 5.6, 1.6, 2.7, TOP, TOP + 0.12)
-MOUSE = (6.2, 7, 1.55, 2.75, TOP, TOP + 0.1)
-CHAIR_BASE = (3.3, 4.9, 4.7, 6.3, 0, 0.18)               # chair: base, post, seat, back support, back
-CHAIR_POST = (3.85, 4.15, 5.4, 5.7, 0.18, 1.1)
-SEAT = (3, 5, 4.6, 6.4, 1.1, 1.45)
-BACK_POST = (3.9, 4.1, 6.4, 6.6, 1.45, 1.8)             # short support, so the seat shows under and beside the back
-BACK = (3.15, 4.65, 6.4, 6.6, 1.8, 3.4)
+MON_PARTS, SCREEN = monitor(4, 0.75, TOP, '+y')           # shared monitor on a stand (isoprops): screen face at y = 0.75
+MONITOR = dict(MON_PARTS)['panel']
+PHONE_PARTS, PHONE_TOP = desk_phone(6.75, 1.0, TOP, '+y')   # VoIP desk phone, facing the chair
+KEYBOARD = (2.5, 5.5, 1.5, 2.5, TOP, TOP + 0.125)
+MOUSE = (6.0, 6.5, 1.75, 2.5, TOP, TOP + 0.125)
+CHAIR_PARTS = chair(4, 5.5, '-y')                         # shared office chair, facing the desk
+BACK = dict(CHAIR_PARTS)['back']
 
 # chat window on the screen: local units, u across from the screen's left edge, v down from its top
-SCREEN_INSET = 0.16
 CHAT = [  # (kind, u, v, width, height): header bar, then messages top to bottom
     ('bar', 0, 0, None, 0.36),
     ('in', 0.22, 0.6, 1.9, 0.46),
@@ -37,10 +34,10 @@ CHAT = [  # (kind, u, v, width, height): header bar, then messages top to bottom
 ]
 SCREEN_BG, BUBBLE_IN, LINE = '#1A2333', '#3A4A63', '#D9E4F0'
 
-TICKET = (3.8, 2.4, 0.22)             # width (x), depth (y), thickness
+TICKET = (3.75, 2.5, 0.25)            # width (x), depth (y), thickness
 TICKETS = [  # (x0, y0, z0, status colour, status): top to bottom
-    (9.6, -2.35, 7.5, BLUE, 'open'),
-    (9.3, -2.05, 5.0, ORANGE, 'in progress'),
+    (9.5, -2.25, 7.75, BLUE, 'open'),
+    (9.25, -2.0, 5.0, ORANGE, 'in progress'),
     (9.0, -1.75, 2.5, GREEN, 'resolved'),
 ]
 SHADOW = (0.4, 0.35, 5)               # soft floor shadow under the bottom ticket: opacity, inset (units), blur (px)
@@ -49,7 +46,7 @@ DISC = (5.5, 1.5, 7.65)               # floor disc centre x, y and radius; grid 
 
 # labels: dot in world, elbow and text in screen; title/sub widths are measured text widths (for the floor gap)
 LABELS = [
-    dict(dot=(3.1, MONITOR[3], MONITOR[5] - SCREEN_INSET - 1.05), elbow=(43.7, -124.0), x=16.7, title='LIVE CHAT', sub='phone, email, chat', tw=70, sw=95, colour=ORANGE),
+    dict(dot=(3.1, MONITOR[3], MONITOR[5] - 0.16 - 1.05), elbow=(43.7, -124.0), x=16.7, title='LIVE CHAT', sub='phone, email, chat', tw=70, sw=95, colour=ORANGE),
     dict(dot=(4.0, BACK[3], 2.6), elbow=(-82.8, 127.9), x=-109.8, title='REAL PERSON', sub='local help desk', tw=96, sw=79, colour=BLUE),
     dict(dot=(TICKETS[2][0] + TICKET[0] - 0.55, TICKETS[2][1] + TICKET[1] / 2, TICKETS[2][2] + TICKET[2]), elbow=(250.9, 145.1), x=223.9, title='TICKETS', sub='open, in progress, resolved', tw=61.3, sw=141.7, colour=ORANGE),
 ]
@@ -62,7 +59,7 @@ def ticket_boxes():
 
 
 def objects():
-    return [DESK, FOOT, NECK, MONITOR, KEYBOARD, MOUSE, CHAIR_BASE, CHAIR_POST, SEAT, BACK_POST, BACK] + ticket_boxes()
+    return [DESK] + [b for _n, b in MON_PARTS + PHONE_PARTS + CHAIR_PARTS] + [KEYBOARD, MOUSE] + ticket_boxes()
 
 
 def label_gaps(L):
@@ -76,26 +73,9 @@ def hidden():
     return unary_union([silhouette(w, *b) for b in objects()] + [g for L in LABELS for g in label_gaps(L)])
 
 
-def on_front(x, y, z):
-    """matrix() mapping local 2D (u right, v down, world units) onto the plane y = const, origin at (x, y, z)."""
-    X, Y = w.p(x, y, z)
-    return f'matrix({fmt(C30 * w.u)} {fmt(w.u / 2)} 0 {fmt(w.u)} {fmt(X)} {fmt(Y)})'
-
-
-def on_top(x, y, z):
-    """matrix() mapping local 2D (u along x, v along y, world units) onto the plane z = const."""
-    X, Y = w.p(x, y, z)
-    return f'matrix({fmt(C30 * w.u)} {fmt(w.u / 2)} {fmt(-C30 * w.u)} {fmt(w.u / 2)} {fmt(X)} {fmt(Y)})'
-
-
-def rect(u, v, wd, ht, fill, r=0, extra=''):
-    return f'<rect x="{u:g}" y="{v:g}" width="{wd:g}" height="{ht:g}" rx="{r:g}" fill="{fill}"{extra}/>'
-
-
 def chat_window():
-    x0, x1, _, y, z0, z1 = MONITOR; i = SCREEN_INSET
-    sw, sh = x1 - x0 - 2 * i, z1 - z0 - 2 * i
-    out = [rect(0, 0, sw, sh, SCREEN_BG, 0.08, ' stroke="#7DB9E8" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"')]
+    sw = SCREEN[2]
+    out = []
     for kind, u, v, wd, ht in CHAT:
         if kind == 'bar':
             out.append(rect(0, 0, sw, ht, '#26324A', 0.08))
@@ -112,7 +92,7 @@ def chat_window():
         else:                          # someone typing
             out.append(rect(u, v, wd, ht, BUBBLE_IN, 0.16))
             out += [f'<circle cx="{u + 0.28 + k * 0.2:g}" cy="{v + ht / 2:g}" r="0.06" fill="{LINE}" fill-opacity="{0.8 - k * 0.2:g}"/>' for k in range(3)]
-    return f'<g transform="{on_front(x0 + i, y, z1 - i)}">' + ''.join(out) + '</g>'
+    return screen_glass(w, SCREEN, ''.join(out))
 
 
 def ticket_card(b, colour, status):
@@ -131,7 +111,7 @@ def ticket_card(b, colour, status):
     else:
         out.append(rect(px, py, pw, ph, colour, 0.19, ' fill-opacity="0.22"'))
         out.append(rect(px + 0.18, py + ph / 2 - 0.05, pw - 0.36, 0.1, colour, 0.05))
-    return f'<g transform="{on_top(x0, y0, z1)}">' + ''.join(out) + '</g>'
+    return f'<g transform="{on_top(w, x0, y0, z1)}">' + ''.join(out) + '</g>'
 
 
 def ticket_shadow():
@@ -148,9 +128,12 @@ def build():
     body = [floor_grid(w, DISC[:2], DISC[2], mask) + disc_arcs(w, DISC[2], *DISC[:2], mask=mask)]
     body.append(ticket_shadow())
     body += faces(w, *DESK)
-    body += faces(w, *FOOT) + faces(w, *NECK) + faces(w, *MONITOR) + [chat_window()]
+    for _n, b in MON_PARTS: body += faces(w, *b)
+    body.append(chat_window())
+    for _n, b in PHONE_PARTS: body += faces(w, *b)
+    body.append(phone_face(w, PHONE_TOP))
     body += faces(w, *KEYBOARD) + faces(w, *MOUSE)
-    body += faces(w, *CHAIR_BASE) + faces(w, *CHAIR_POST) + faces(w, *SEAT) + faces(w, *BACK_POST) + faces(w, *BACK)
+    for _n, b in CHAIR_PARTS: body += faces(w, *b)
     for b, (*_, colour, status) in zip(ticket_boxes(), TICKETS):
         body += faces(w, *b) + [ticket_card(b, colour, status)]
     for L in LABELS:
