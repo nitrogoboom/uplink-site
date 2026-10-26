@@ -1,0 +1,34 @@
+/*--- WORK · 1. Projects: filters and cards. Desktop layout: src/styles/desktop.css. ---*/
+/* ---------- 17. WORK ----------------------------------------------------- */
+.filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
+.filter {
+  display: inline-flex; align-items: center; gap: var(--sp-3);
+  min-height: var(--tap);
+  padding-inline: var(--sp-4) var(--sp-3);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-surface);
+  font-weight: 600;
+  font-size: var(--fs-2);
+  transition: background-color var(--dur-1) var(--ease);
+}
+.filter:hover { background: var(--c-surface-2); }
+.filter[aria-pressed="true"] { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); }
+.filter .count { display: inline-grid; place-items: center; min-width: var(--sp-5); height: var(--sp-5); padding-inline: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); font-size: var(--fs-1); }
+.filter[aria-pressed="true"] .count { background: var(--c-ink-tint); }
+@media (max-width: 699px) {
+  .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); padding-block: var(--sp-1); scrollbar-width: none; }
+  .filters > li { flex: none; }
+}
+.work-layout { display: flex; flex-direction: column; gap: var(--sp-6); }
+.work-side { display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.work-side .filters { margin-top: var(--sp-2); }
+.work-main { min-width: 0; }
+.work-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+@media (min-width: 700px) { .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
+.work-grid > li { display: flex; }
+.work-grid > li[hidden] { display: none; }
+.work-grid .card { flex: 1; width: 100%; font: inherit; }
+.empty-note { margin-top: var(--sp-5); }
+

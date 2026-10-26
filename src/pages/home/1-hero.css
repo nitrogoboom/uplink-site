@@ -1,0 +1,81 @@
+/*--- HOME · 1. Hero, phone and tablet. Desktop layout: src/styles/desktop.css. ---*/
+/* ---------- 15. HOME ----------------------------------------------------- */
+/* phone + tablet: one column. Desktop layout is in section 21. */
+/* Hero colour: warm key light (orange, behind the call to action) and cool
+   fill light (sky, behind the office). Orange and sky blue sit opposite each
+   other on the colour wheel, so the two glows balance instead of fighting.
+   Surfaces inside the hero pick up a slight blue tint to match the page. */
+.hero {
+  --c-surface:   var(--c-cool-surface);
+  --c-surface-2: var(--c-cool-surface-2);
+  --c-line:      var(--c-cool-surface-2);
+  --c-muted:     var(--c-cool-muted);
+  position: relative;
+  isolation: isolate;
+  padding-block: var(--sp-6) var(--sp-7);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 72% 48%, var(--c-glow-sky), transparent 70%),
+    radial-gradient(45% 55% at 8% 92%, var(--c-glow-accent), transparent 70%);
+}
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
+.hero-menu { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+.hero-top { display: flex; flex-direction: column; gap: var(--sp-4); }
+.hero-cta { display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+/* the top tabs (tablet) and bottom bar (phone) already hold these links,
+   so below desktop the menu is dropped and the office moves up */
+@media (max-width: 1099px) { .hero-menu nav { display: none; } }
+.menu-label { display: block; margin: 0 0 var(--sp-2) var(--sp-3); }
+.hero-cta .small { text-align: center; }
+@media (min-width: 700px) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
+.hero-menu h1 .line { display: block; }
+.hero-menu h1 em { font-style: italic; color: var(--c-accent); }
+.hero-top .lead { text-wrap: pretty; }
+
+.hero-art { position: relative; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.hero-art .stage { position: relative; aspect-ratio: 40 / 31; max-width: 100%; }
+.hero-art .stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.menu { display: flex; flex-direction: column; gap: var(--sp-1); list-style: none; }
+.mi {
+  display: flex; align-items: center; gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  border-radius: var(--r-3);
+  color: var(--c-text);
+  text-decoration: none;
+  transition: background-color var(--dur-1) var(--ease), transform var(--dur-2) var(--ease);
+}
+.mi:hover { background: var(--c-surface-2); }
+@media (hover: hover) { .mi:hover { transform: translateX(var(--sp-1)); } }
+.mi--on { background: var(--c-surface-2); }
+.mi--on .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
+.mi .icon-tile { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
+.mi:hover .icon-tile, .mi:focus-visible .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
+.mi:focus-visible { background: var(--c-surface-2); }
+.menu:hover .mi--on:not(:hover),
+.menu:focus-within .mi--on:not(:focus-visible) { background: transparent; }
+.menu:hover .mi--on:not(:hover) .icon-tile,
+.menu:focus-within .mi--on:not(:focus-visible) .icon-tile { background: var(--c-surface-2); color: var(--c-text); }
+.menu:hover .mi--on:not(:hover) .mi-go,
+.menu:focus-within .mi--on:not(:focus-visible) .mi-go { opacity: 0; }
+.mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
+.mi-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: 1; text-transform: uppercase; }
+.mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
+.mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
+.mi:hover .mi-go, .mi:focus-visible .mi-go, .mi--on .mi-go { opacity: 1; }
+
+.hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
+@media (min-width: 700px) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.news { flex-direction: row; align-items: center; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3); }
+.news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; overflow: hidden; }
+.news-thumb img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-1); transform: scale(1.35); }
+.news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
+.news-text .chip { align-self: flex-start; }
+.news-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: 1.05; text-transform: uppercase; }
+

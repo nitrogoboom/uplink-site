@@ -1,0 +1,99 @@
+<!--- CONTACT · 1. Contact (first screen)
+      Ways to reach us, the message form and the help desk queue ring (contact.js).
+      Styles: 1-message.css. Desktop layout: src/styles/desktop.css.
+--->
+<section class="page-intro fold" id="message" data-section="Contact" aria-labelledby="contact-title">
+  <div class="container">
+    <div class="lobby">
+      <div class="lobby-intro">
+        <p class="eyebrow">Lobby</p>
+        <h1 id="contact-title">Talk to a real person</h1>
+        <p class="lead">No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk options further down.</p>
+      </div>
+      <div class="lobby-chan">
+        <span class="label">Reach us directly</span>
+        <div class="chan panel">
+          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg></span>
+          <span class="chan-text"><span class="chan-title">Call</span><a class="chan-value" id="tel-val" href="tel:+18555550142">1-855-555-0142</a></span>
+          <button class="iconbtn copy-btn" type="button" data-copy="1-855-555-0142" data-copy-target="tel-val" aria-label="Copy phone number"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+        </div>
+        <div class="chan panel">
+          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span>
+          <span class="chan-text"><span class="chan-title">Email</span><a class="chan-value" id="mail-val" href="mailto:hello@uplinkit.ca">hello@uplinkit.ca</a></span>
+          <button class="iconbtn copy-btn" type="button" data-copy="hello@uplinkit.ca" data-copy-target="mail-val" aria-label="Copy email address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+        </div>
+        <a class="chan panel card" href="contact#message" data-open="book-dialog">
+          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+          <span class="chan-text"><span class="chan-title">Book a check-up</span><span class="chan-value">Free, 30 minutes</span></span>
+        </a>
+      </div>
+
+      <div class="lobby-form">
+        <form class="form-panel panel" data-validate="contact" aria-labelledby="form-title">
+          <div class="form-head">
+            <h2 id="form-title">Send us a message</h2>
+            <p class="small muted">Fields are required unless marked optional.</p>
+          </div>
+          <div class="form-body">
+            <div class="form-grid">
+              <div class="field">
+                <label for="c-name">Name</label>
+                <input class="input" id="c-name" name="name" type="text" autocomplete="name" required pattern=".*\S.*">
+                <span class="field-error" id="c-name-err">Add your name so we know who to reply to.</span>
+              </div>
+              <div class="field">
+                <label for="c-email">Work email</label>
+                <input class="input" id="c-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+                <span class="field-error" id="c-email-err">Enter an email like name@company.com.</span>
+              </div>
+              <div class="field">
+                <label for="c-company">Company <span class="opt">(optional)</span></label>
+                <input class="input" id="c-company" name="company" type="text" autocomplete="organization">
+              </div>
+              <div class="field">
+                <label for="c-topic">What do you need?</label>
+                <select class="input" id="c-topic" name="topic">
+                  <option>Free IT check-up</option>
+                  <option>Managed help desk</option>
+                  <option>Cybersecurity</option>
+                  <option value="Cloud workspace">Cloud workspace (Microsoft 365 or Google)</option>
+                  <option>Networks &amp; Wi-Fi</option>
+                  <option>Phones &amp; Teams calling</option>
+                  <option>Backup &amp; recovery</option>
+                  <option>IT strategy &amp; planning</option>
+                  <option>Something else</option>
+                </select>
+              </div>
+              <div class="field span-2">
+                <label for="c-msg">Message</label>
+                <textarea class="input" id="c-msg" name="message" required minlength="10" placeholder="Tell us a little about your team and what is going on."></textarea>
+                <span class="field-error" id="c-msg-err">Write at least a sentence so we can help.</span>
+              </div>
+            </div>
+          </div>
+          <div class="form-foot">
+            <span class="small muted">Prototype form: nothing is sent yet.</span>
+            <button class="btn btn--primary" type="submit">Send message</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="lobby-queue panel pad" data-queue>
+        <div class="row">
+          <span class="label">Queue status</span>
+          <span class="chip chip--ok chip--dot" data-queue-text="You're in the queue">Open now</span>
+        </div>
+        <div class="queue-ring">
+          <svg viewBox="0 0 168 168" aria-hidden="true"><circle class="queue-ring-track" cx="84" cy="84" r="70" fill="none" stroke-width="12"/><circle class="queue-ring-arc" data-queue-arc cx="84" cy="84" r="70" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="120 440" transform="rotate(-90 84 84)"/></svg>
+          <div class="queue-ring-label"><span class="stat-val">1 day</span><span class="label">Reply within</span></div>
+        </div>
+        <dl class="facts">
+          <div><dt>Monday to Friday</dt><dd>7 am to 7 pm ET</dd></div>
+          <div><dt>Weekends</dt><dd>Emergency line</dd></div>
+          <div><dt>Monitoring</dt><dd>24/7 for clients</dd></div>
+          <div><dt>Office</dt><dd>Toronto, ON</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>

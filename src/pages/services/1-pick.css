@@ -1,0 +1,58 @@
+/*--- SERVICES · 1. Choose a service. Desktop layout: src/styles/desktop.css. ---*/
+/* ---------- 16. SERVICES ------------------------------------------------- */
+/* All six services are in the HTML as <article class="svc">. With script,
+   each article's parts drop into the picker grid (display: contents) and
+   only the picked one shows. Without script they stack and the tiles hide. */
+.picker {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "title" "head" "prev" "roster" "detail";
+  gap: var(--sp-5);
+}
+@media (min-width: 700px) {
+  .picker {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: "title prev" "head prev" "detail prev" "roster roster";
+    column-gap: var(--sp-7);
+  }
+}
+.picker-title { grid-area: title; margin-bottom: calc(var(--sp-4) - var(--sp-5)); }
+.js .svc { display: contents; }
+.js .svc:not(.is-on) { display: none; }
+html:not(.js) .picker { display: flex; flex-direction: column; gap: var(--sp-7); height: auto; }
+html:not(.js) .svc { display: flex; flex-direction: column; gap: var(--sp-5); }
+html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
+html:not(.js) .roster-wrap { display: none; }
+.picker-head { grid-area: head; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.picker-detail { grid-area: detail; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
+.picker-prev { grid-area: prev; min-width: 0; max-width: 100%; display: flex; flex-direction: column; }
+.picker-art { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
+.picker-prev img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: var(--sp-7) var(--sp-5) var(--sp-5); }
+.picker-prev .tags { position: absolute; top: var(--sp-4); left: var(--sp-4); right: var(--sp-4); display: flex; justify-content: space-between; gap: var(--sp-2); }
+.picker-roster { grid-area: roster; display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sp-4); min-width: 0; }
+.roster-wrap { flex: 1 1 auto; display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
+.roster { display: flex; gap: var(--sp-3); padding: var(--sp-2) var(--sp-1) var(--sp-1); overflow-x: auto; list-style: none; scrollbar-width: thin; }
+.tile {
+  flex: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+  width: calc(var(--sp-9) + var(--sp-2));
+  height: calc(var(--sp-9) - var(--sp-1));
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-3);
+  background: var(--c-surface);
+  color: var(--c-text);
+  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+}
+.tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); }
+.tile[aria-pressed="true"] { border: 2px solid var(--c-accent); background: var(--c-accent-tint); transform: translateY(-4px); }
+.tile-n { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: 1; }
+.tile[aria-pressed="true"] .tile-n { color: var(--c-accent); }
+.tile-t { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); text-transform: uppercase; color: var(--c-muted); }
+.feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
+.feat { display: flex; align-items: center; gap: var(--sp-4); }
+.feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent); }
+.feat-t { display: block; font-weight: 600; }
+.feat-d { display: block; font-size: var(--fs-2); color: var(--c-muted); }
+.picker-roster .btn { flex: 1 1 100%; }
+@media (min-width: 700px) { .picker-roster .btn { flex: none; } }
+

@@ -1,7 +1,7 @@
 # Uplink Technology site
 
 Overwatch 2–style website for a made-up IT company, "Uplink Technology".
-Plain HTML, CSS and JS. No build step.
+Plain HTML, CSS and JS. One small build step: pages are written in parts in `src/` and joined into `site/` by `python tools/build_pages.py` (see `src/README.md`). Headed for Astro later; `src/` is laid out to match.
 Also published as a claude.ai artifact: https://claude.ai/code/artifact/89e3144d-e7d5-4695-9503-653554d0ff98
 
 ## Run it on your PC
@@ -24,11 +24,12 @@ Python 3.10+ and Node 18+.
 
 ## What's where
 
-- `site/` – the website, exactly as the live artifact (26 Oct 2026)
-  - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file, written by `tools/gen_office.py` and `tools/gen_tower.py`.
+- `src/` – **edit pages here.** One folder per page, one file per section, shared parts (header, footer, pop-ups) in `src/components/`, CSS in `src/styles/`. `src/README.md` maps it all.
+- `site/` – the built website, what gets served and deployed. The `.html` files and `assets/css/site.css` are written by `tools/build_pages.py`; don't edit them by hand.
+  - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG**, written by `tools/gen_office.py` and `tools/gen_tower.py` into `src/pages/home/`.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
   - `404.html` – Cloudflare serves it for any missing address, at any depth, so its links and files start at the root (`/services`, `/assets/...`). `build_footer.py` writes its footer that way too.
-  - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
+  - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css` (built from `src/styles/site.css`)
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
   - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags (including `og:image`) in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
@@ -39,10 +40,10 @@ Python 3.10+ and Node 18+.
 ## Adding a service
 
 The services list is open-ended: counts, tiles and the number-key hint come from the page.
-1. `services.html`: add one `<article class="svc" id="..." data-svc data-tile="Short name">` (copy an existing one; its chip `<span class="chip" data-svc-n>` is filled in for you).
-2. `index.html`: add one card to `.svc-cards` (image `NAME-compact.svg?card#plain`).
-3. `tools/build_footer.py`: add one line to the services links, then `python tools/build_footer.py site`.
-4. Add an `<option>` to the "What do you need?" lists (contact form and the book-a-call dialog on each page).
+1. `src/pages/services/1-pick.html`: add one `<article class="svc" id="..." data-svc data-tile="Short name">` (copy an existing one; its chip `<span class="chip" data-svc-n>` is filled in for you).
+2. `src/pages/home/2-services.html`: add one card to `.svc-cards` (image `NAME-compact.svg?card#plain`).
+3. `tools/build_footer.py`: add one line to the services links, then `python tools/build_footer.py`.
+4. Add an `<option>` to the "What do you need?" lists (`src/pages/contact/1-message.html` and `src/components/BookDialog.html`), then `python tools/build_pages.py`.
 5. Drawing: a `tools/gen_NAME.py` writing `NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`).
 
 ## Footer (hero select)
@@ -53,7 +54,7 @@ Every page has the same footer. On desktop it is exactly one screen tall.
 - **Dock:** a roster of tiles (Contact, Services, Company, Support, Resources, Follow). Arrow keys or the two key-cap buttons switch tiles.
 - **Base bar:** brand, legal links, keyboard shortcuts, status.
 
-The footer markup comes from `tools/build_footer.py`. Change the lists at the top of that file (link groups, socials, legal links), then run `python tools/build_footer.py site` to rewrite the footer on every page.
+The footer markup comes from `tools/build_footer.py`. Change the lists at the top of that file (link groups, socials, legal links), then run `python tools/build_footer.py`. It writes `src/components/Footer.html` and rebuilds every page.
 
 Each panel has a `data-map` value that picks a spot on the map: `hq`, `services`, `industries`, `company`, `support`, `resources`, `follow`. Anything else points at HQ. The map is drawn by `assets/js/footer.js` with the same true-isometric formula as the illustrations, `u = 38`. Draw order is back to front: resources, follow, services, company, hq, support, industries.
 
@@ -75,8 +76,8 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 `tools/iso.py` has `W(ox, oy, u)` for this. Known values: helpdesk `W(0,0,23)`, office/hero `W(616.4,240.2,28.127)`, tower `W(262,283.2,24)`, backup `W(0,0,16.46)`, network `W(0,0,1)`, footer map `W(0,0,38)`.
 
 - `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud` and `voip` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Running a script with nothing changed gives the same file byte for byte, so a git diff only ever shows what you changed.
-- `gen_office.py site` – the office floor plan: `office.svg`, `office-build.svg` and the hero block in `index.html` (only that block is replaced). The animation CSS and the hero's hand-drawn cloud live in `tools/office_parts/`.
-- `gen_tower.py site` – the growing tower: `tower-grow.svg` and the inline tower block in `index.html`. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
+- `gen_office.py site` – the office floor plan: `office.svg`, `office-build.svg` and the hero `src/pages/home/1-hero-office.svg`, then rebuilds the pages. The animation CSS and the hero's hand-drawn cloud live in `tools/office_parts/`.
+- `gen_tower.py site` – the growing tower: `tower-grow.svg` and the inline tower `src/pages/home/3-grow-tower.svg`, then rebuilds the pages. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
 - `isoprops.py` – shared kit: office chair, monitor on a stand (with `screen_glass` / `app_window` for its screen), VoIP desk phone, and `on_front` / `on_side` / `on_top` for drawing flat details exactly on an iso face. Props sit on a grid (x, y in 0.25s, z in 0.125s) so their parts can never nearly-touch; keep the scene around them on the same grid.
 - Compact cuts: every `gen_*.py` (except the tower) also writes `NAME-compact.svg`, the same scene framed closer with fewer, bigger labels (its `COMPACT` settings; `isogen.doc(crop=)`, `label(scale=)`, a `
 ` in a subline wraps it). Pages swap it in with `<picture>` where the drawing shows small (Services below 1200px wide, About and the Work pop-up below 1600px), cards always use `NAME-compact.svg?card#plain` (no labels; the `?card` keeps the browser from reusing the label-less copy elsewhere, since it caches an SVG by address without the `#`), and on phones the home hero shows `office-compact.svg` in place of the animated drawing. When you change a drawing's labels or layout, check its compact cut too.
@@ -87,9 +88,10 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `discs.py`, `floorfit.py` – check floor discs and rings are true iso circles; `roundify.py` rebuilds a floor disc as one (needs `site/` served on port 8765)
 - `shoot1.js`, `shoot.js`, `compare.py` – zoomed screenshots and before/after sheets
 - `verify.js` – checks the hero builds, tiles respond to hover, the tower grows on scroll, and there's no sideways scroll at phone, tablet, 1440×900 and 3440×1440
-- `build_footer.py` – writes the footer into every page (see above)
+- `build_pages.py` – joins `src/` into `site/*.html` and `site/assets/css/site.css`, with stamps. `--check` (also run by `verify_footer.py`) says if `site/` is out of date
+- `build_footer.py` – writes `src/components/Footer.html` and rebuilds (see above)
 - `gen_og.py site` – the share picture `assets/img/og.png` (1200×630) and `apple-touch-icon.png` (180×180, site root). Screenshots of a small page made from the site's tokens, fonts and `office-compact.svg`; rerun after changing those.
-- `stamp.py site` – cache busting: puts `?v=<hash>` on every CSS and JS link. Run it after any CSS or JS edit; `site/_headers` lets browsers keep those files for a year. `stamp.py site --check` (also run by `verify_footer.py`) says if a stamp is out of date.
+- `stamp.py site` – cache busting: puts `?v=<hash>` on every CSS and JS link. `build_pages.py` runs it for you; run it yourself after a JS edit; `site/_headers` lets browsers keep those files for a year. `stamp.py site --check` (also run by `verify_footer.py`) says if a stamp is out of date.
 - `verify_footer.py out/` – verify.js checks plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
 - `footer_painter.py url` – painter-order and poke-through check on the boxes the footer map draws. It reads `window.__isoLog`, so add `window.__isoLog && window.__isoLog.push({k, x, y, z, w, d, h, cls})` to `box()` in a local copy first.
 - `fixlib.py` – small helper for exact find-and-replace edits on SVG points

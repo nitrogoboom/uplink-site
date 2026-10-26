@@ -1,0 +1,52 @@
+/*--- Pop-ups (native <dialog>). ---*/
+/* ---------- 9. dialogs (native <dialog>) -------------------------------- */
+.dialog {
+  width: min(100% - 2 * var(--sp-4), 37.5rem);
+  max-height: calc(100dvh - 2 * var(--sp-6));
+  padding: 0;
+  border: 1px solid var(--c-line-2);
+  border-radius: var(--r-3);
+  background: var(--c-solid);
+  color: var(--c-text);
+  box-shadow: var(--shadow-2);
+  overflow: auto;
+}
+.dialog--wide { width: min(100% - 2 * var(--sp-4), 60rem); }
+.dialog::backdrop { background: var(--c-backdrop); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.dialog[open] { animation: dlg-in var(--dur-2) var(--ease); }
+@keyframes dlg-in { from { opacity: 0; transform: translateY(var(--sp-3)); } }
+
+.dlg-head {
+  position: sticky; top: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-3) var(--sp-4) var(--sp-6);
+  background: var(--c-solid);
+  border-bottom: 1px solid var(--c-line);
+}
+.dlg-head h2 { font-size: var(--fs-6); }
+.dlg-close { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.dlg-body { display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-5) var(--sp-6); }
+.dlg-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-3); padding: 0 var(--sp-6) var(--sp-6); }
+
+@media (max-width: 699px) {
+  .dialog, .dialog--wide {
+    width: 100%;
+    max-width: 100%;
+    max-height: 90dvh;
+    margin: auto 0 0;
+    border-radius: var(--r-3) var(--r-3) 0 0;
+    border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .dlg-head { padding-left: var(--sp-5); }
+  .dlg-body { padding: var(--sp-5); }
+  .dlg-actions { padding: 0 var(--sp-5) var(--sp-5); }
+  .dlg-actions .btn { flex: 1 1 0; }
+}
+
+/* shortcuts list */
+.keys-list { display: flex; flex-direction: column; list-style: none; }
+.keys-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); padding-block: var(--sp-3); border-bottom: 1px solid var(--c-line); }
+.keys-list li:last-child { border-bottom: 0; }
+.keys-list .keys { display: flex; gap: var(--sp-1); flex: none; }
+

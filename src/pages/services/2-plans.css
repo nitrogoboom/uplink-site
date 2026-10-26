@@ -1,0 +1,16 @@
+/*--- SERVICES · 2. Plans table. ---*/
+/* plans table */
+.table-wrap { position: relative; overflow-x: auto; border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); }
+.plans { width: 100%; min-width: 40rem; border-collapse: collapse; font-size: var(--fs-3); }
+.plans th, .plans td { padding: var(--sp-4) var(--sp-5); text-align: left; border-bottom: 1px solid var(--c-line); vertical-align: middle; }
+.plans tbody tr:last-child > * { border-bottom: 0; }
+.plans thead th { font-family: var(--font-display); font-style: italic; font-weight: 700; font-size: var(--fs-5); text-transform: uppercase; vertical-align: bottom; }
+.plans thead th small { display: block; margin-top: var(--sp-1); font-family: var(--font-body); font-style: normal; font-weight: 400; font-size: var(--fs-2); text-transform: none; color: var(--c-muted); }
+.plans tbody th { font-weight: 600; }
+.plans .col-hi { background: var(--c-accent-faint); }
+.plans td { color: var(--c-muted); }
+.yes, .no { display: inline-grid; place-items: center; width: var(--sp-5); height: var(--sp-5); border-radius: 50%; }
+.yes { background: var(--c-ok-tint); color: var(--c-ok); }
+.no { color: var(--c-muted); }
+.yes svg, .no svg { width: var(--sp-4); height: var(--sp-4); }
+

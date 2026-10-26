@@ -1,0 +1,44 @@
+<!--- PAGE NOT FOUND (built into site/404.html)
+      This file is the page's <head> and the order of its parts.
+      "@include 1-hero.html" pulls in that file from this folder;
+      "@include Header" pulls in src/components/Header.html.
+      Leave out the ?v= stamps on CSS and JS links: the build adds them.
+--->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Page not found · Uplink Technology</title>
+<meta name="description" content="There is no page at this address.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#151E2C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/core.js" defer></script>
+<script src="/assets/js/footer.js" defer></script>
+</head>
+<body data-page="notfound">
+<a class="skip-link" href="#main">Skip to content</a>
+<!-- @include Header -->
+
+<main id="main" tabindex="-1">
+<!-- @include 1-intro.html -->
+</main>
+<!-- @include Footer -->
+
+<!-- @include BottomNav -->
+
+<!-- @include BookDialog -->
+
+<!-- @include ShortcutsDialog -->
+
+<div class="toasts" aria-live="polite"></div>
+</body>
+</html>

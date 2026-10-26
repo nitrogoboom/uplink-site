@@ -7,6 +7,7 @@ async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); rep=[]
         rep.append(subprocess.run([sys.executable,'tools/stamp.py','site','--check'],capture_output=True,text=True).stdout.strip())
+        rep.append(subprocess.run([sys.executable,'tools/build_pages.py','--check'],capture_output=True,text=True).stdout.strip())
         pg=await b.new_page(viewport={'width':1440,'height':900})
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e))); pg.on('console',lambda m: m.type=='error' and errs.append(m.text))
         await pg.goto(base+'/'); await pg.wait_for_timeout(5500)

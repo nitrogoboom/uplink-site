@@ -25,6 +25,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CSP `style-src` needs `'unsafe-inline'` because of the hero's inline `<style>` blocks and `style=""` attributes. Drop it once they move into CSS.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
+- [ ] `src/styles/desktop.css` is still one block for every page. Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
+- [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
 ## Before going live
 - [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Pages Function in `functions/` that emails each submission to one inbox.

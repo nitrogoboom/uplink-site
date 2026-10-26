@@ -1,0 +1,78 @@
+/*--- Buttons, chips, links. ---*/
+/* ---------- 6. buttons, chips, links ------------------------------------ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  min-height: var(--control-h);
+  padding-inline: var(--sp-5);
+  border: 1px solid transparent;
+  border-radius: var(--r-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: var(--fs-4);
+  letter-spacing: var(--tracking-2);
+  line-height: 1;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform var(--dur-1) var(--ease), filter var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: none; }
+.btn svg { width: var(--icon); height: var(--icon); flex: none; }
+.btn--primary { background: var(--c-accent); color: var(--c-on-accent); box-shadow: var(--shadow-1); }
+.btn--primary:hover { filter: brightness(1.06); }
+.btn--secondary { background: var(--c-surface-2); border-color: var(--c-line); color: var(--c-text); }
+.btn--secondary:hover { background: var(--c-line-2); }
+.btn--lg { min-height: var(--control-lg); padding-inline: var(--sp-6); font-size: var(--fs-6); border-radius: var(--r-3); }
+.btn--block { width: 100%; }
+.btn--primary .kbd { background: var(--c-ink-tint); border-color: var(--c-ink-tint); color: var(--c-on-accent); }
+
+.iconbtn {
+  display: grid; place-items: center;
+  width: var(--tap); height: var(--tap);
+  border: 0;
+  border-radius: var(--r-2);
+  background: transparent;
+  color: var(--c-muted);
+}
+.iconbtn:hover { background: var(--c-surface-2); color: var(--c-text); }
+.iconbtn svg { width: var(--icon); height: var(--icon); }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  align-self: flex-start;
+  height: var(--sp-5);
+  padding-inline: var(--sp-3);
+  border-radius: var(--r-pill);
+  background: var(--c-surface-2);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-3);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chip--accent { background: var(--c-accent); color: var(--c-on-accent); }
+.chip--sky { background: var(--c-sky-tint); color: var(--c-sky); }
+.chip--ok { background: var(--c-ok-tint); color: var(--c-ok); }
+.chip--dot::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: currentColor; }
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  align-self: flex-start;
+  min-height: var(--tap);
+  font-weight: 600;
+  color: var(--c-accent);
+  text-decoration: none;
+}
+.link-arrow svg { width: var(--sp-4); height: var(--sp-4); transition: transform var(--dur-1) var(--ease); }
+.link-arrow:hover svg { transform: translateX(var(--sp-1)); }
+

@@ -1,8 +1,8 @@
-"""Builds the hero-select footer markup and puts it into every page.
+"""Builds the hero-select footer markup into src/components/Footer.html, then rebuilds the pages.
 Edit the CONTENT lists below to change the footer; run again to update all pages.
-usage: python tools/build_footer.py site
+usage: python tools/build_footer.py
 """
-import re, sys, html, pathlib
+import sys, html, pathlib, subprocess
 
 I = {
     'grid': '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
@@ -138,14 +138,12 @@ FOOTER = f'''<footer class="site-footer fc" id="footer" aria-labelledby="fc-titl
   </div></div>
 </footer>'''
 
-site = pathlib.Path(sys.argv[1])
-for f in sorted(site.glob('*.html')):
-    t = f.read_text(encoding='utf-8')
-    n = len(re.findall(r'<footer class="site-footer[^"]*"', t))
-    assert n == 1, (f, n)
-    footer = FOOTER
-    if f.name == '404.html':  # served at any depth, so its links start at the root
-        footer = re.sub(r'(href=")(?!https?:|mailto:|tel:|#|/)', r'\1/', footer)
-    t = re.sub(r'<footer class="site-footer[^"]*".*?</footer>', lambda m: footer, t, flags=re.S)
-    f.write_text(t, encoding='utf-8')
-    print('footer ->', f.name)
+NOTE = """<!--- SHARED · Footer (every page). GENERATED: edit the lists in
+      tools/build_footer.py and run it. Don't edit this file by hand.
+      Styles: src/styles/footer.css. Script: assets/js/footer.js.
+--->
+"""
+root = pathlib.Path(__file__).resolve().parent.parent
+(root / 'src/components/Footer.html').write_text(NOTE + FOOTER + '\n', encoding='utf-8', newline='\n')
+print('footer -> src/components/Footer.html')
+subprocess.run([sys.executable, str(root / 'tools/build_pages.py')], check=True)

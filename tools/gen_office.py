@@ -1,7 +1,7 @@
 """Draws the office floor plan from one world-space description, in three versions that share every shape:
   site/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
   site/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
-  site/index.html                   the hero: the <svg class="ob"> block only, spliced in place (page fonts apply)
+  src/pages/home/1-hero-office.svg  the hero, inlined into the home page by build_pages.py (page fonts apply)
   site/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
 usage: python tools/gen_office.py site
 Edit the numbers below and run again; don't hand-edit any of the three.
@@ -12,7 +12,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
   tools/office_parts/build.css, hero.css   the animation CSS inside the two animated versions
   tools/office_parts/hero_cloud.svg        hero only: sync lines, 3D cloud and its label (hand-drawn, fixed screen points)
 """
-import math, pathlib, sys
+import math, pathlib, subprocess, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
@@ -486,16 +486,10 @@ def render(v):
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
-def splice_hero(index_path, svg):
-    """Replace only the <svg class="ob"> block in index.html; read fresh, write at once."""
-    text = index_path.read_text(encoding='utf-8')
-    start = text.index('<svg xmlns="http://www.w3.org/2000/svg" class="ob"')
-    end = text.index('</svg>', start) + len('</svg>')
-    index_path.write_text(text[:start] + svg + text[end:], encoding='utf-8', newline='')
-
-
 if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
     for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
-    splice_hero(site / 'index.html', render('hero'))
+    root = pathlib.Path(__file__).resolve().parent.parent
+    (root / 'src/pages/home/1-hero-office.svg').write_text(render('hero') + '\n', encoding='utf-8', newline='\n')
+    subprocess.run([sys.executable, str(root / 'tools/build_pages.py')], check=True)

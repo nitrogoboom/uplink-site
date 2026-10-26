@@ -1,0 +1,63 @@
+<!--- WORK PAGE (built into site/work.html)
+      This file is the page's <head> and the order of its parts.
+      "@include 1-hero.html" pulls in that file from this folder;
+      "@include Header" pulls in src/components/Header.html.
+      Leave out the ?v= stamps on CSS and JS links: the build adds them.
+--->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Our work · Uplink Technology</title>
+<meta name="description" content="Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.">
+<link rel="canonical" href="https://uplinkit.ca/work">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Uplink Technology">
+<meta property="og:title" content="Our work · Uplink Technology">
+<meta property="og:description" content="Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.">
+<meta property="og:url" content="https://uplinkit.ca/work">
+<meta property="og:locale" content="en_CA">
+<meta property="og:image" content="https://uplinkit.ca/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#151E2C">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/core.js" defer></script>
+<script src="assets/js/footer.js" defer></script>
+<script src="assets/js/work.js" defer></script>
+</head>
+<body data-page="work">
+<a class="skip-link" href="#main">Skip to content</a>
+<!-- @include Header -->
+
+<main id="main" tabindex="-1">
+<!-- @include 1-projects.html -->
+
+<!-- @include 2-details.html -->
+
+<!-- @include 3-case-popup.html -->
+
+<!-- @include 4-industries.html -->
+</main>
+<!-- @include Footer -->
+
+<!-- @include BottomNav -->
+
+<!-- @include BookDialog -->
+
+<!-- @include ShortcutsDialog -->
+
+<div class="toasts" aria-live="polite"></div>
+</body>
+</html>

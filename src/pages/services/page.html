@@ -1,0 +1,61 @@
+<!--- SERVICES PAGE (built into site/services.html)
+      This file is the page's <head> and the order of its parts.
+      "@include 1-hero.html" pulls in that file from this folder;
+      "@include Header" pulls in src/components/Header.html.
+      Leave out the ?v= stamps on CSS and JS links: the build adds them.
+--->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Services · Uplink Technology</title>
+<meta name="description" content="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.">
+<link rel="canonical" href="https://uplinkit.ca/services">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Uplink Technology">
+<meta property="og:title" content="Services · Uplink Technology">
+<meta property="og:description" content="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.">
+<meta property="og:url" content="https://uplinkit.ca/services">
+<meta property="og:locale" content="en_CA">
+<meta property="og:image" content="https://uplinkit.ca/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#151E2C">
+<script>document.documentElement.classList.add('js')</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap">
+<link rel="stylesheet" href="assets/css/tokens.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/core.js" defer></script>
+<script src="assets/js/footer.js" defer></script>
+<script src="assets/js/services.js" defer></script>
+</head>
+<body data-page="services">
+<a class="skip-link" href="#main">Skip to content</a>
+<!-- @include Header -->
+
+<main id="main" tabindex="-1">
+<!-- @include 1-pick.html -->
+
+<!-- @include 2-plans.html -->
+
+<!-- @include 3-faq.html -->
+</main>
+<!-- @include Footer -->
+
+<!-- @include BottomNav -->
+
+<!-- @include BookDialog -->
+
+<!-- @include ShortcutsDialog -->
+
+<div class="toasts" aria-live="polite"></div>
+</body>
+</html>

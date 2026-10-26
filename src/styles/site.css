@@ -1,0 +1,43 @@
+/* ==========================================================================
+   Uplink Technology · site styles
+   Spacing, type, radius and colour come from tokens.css only.
+   Raw values allowed below: 0, hairlines (1-3px), percentages, a few
+   component max-widths (dialogs, toasts, tables) and the vh spacing of the
+   scroll story, which is tied to screen height on purpose.
+   Breakpoints: 700 / 1100.
+   ========================================================================== */
+
+/*--- The site's CSS, in cascade order: the build (tools/build_pages.py) joins
+   these files into site/assets/css/site.css. Order matters: later files win
+   a tie. Colours, sizes and timings come from site/assets/css/tokens.css.
+   Page CSS sits next to its section in src/pages/. ---*/
+/* @include base.css */
+/* @include layout.css */
+/* @include type.css */
+/* @include header.css */
+/* @include key-hints.css */
+/* @include buttons.css */
+/* @include surfaces.css */
+/* @include forms.css */
+/* @include dialogs.css */
+/* @include toasts.css */
+/* @include section-tracker.css */
+/* @include footer.css */
+/* @include bottom-nav.css */
+/* @include shared-blocks.css */
+/* @include ../pages/home/1-hero.css */
+/* @include ../pages/home/2-services.css */
+/* @include ../pages/home/3-grow.css */
+/* @include ../pages/services/1-pick.css */
+/* @include ../pages/services/2-plans.css */
+/* @include fold-foot.css */
+/* @include ../pages/work/1-projects.css */
+/* @include ../pages/work/2-details.css */
+/* @include ../pages/work/4-industries.css */
+/* @include ../pages/about/1-profile.css */
+/* @include compact-cuts.css */
+/* @include ../pages/about/2-story.css */
+/* @include ../pages/about/3-team.css */
+/* @include ../pages/contact/1-message.css */
+/* @include desktop.css */
+/* @include motion.css */

@@ -6,33 +6,36 @@
 `assets/css/site.css` becomes `assets/css/site.css?v=1a2b3c4d`. The hash comes
 from the file's contents, so it changes only when the file does. `site/_headers`
 lets browsers keep these files for a year, so run this after every CSS or JS
-edit (verify_footer.py runs the check).
+edit (verify_footer.py runs the check). build_pages.py stamps as it builds.
 """
 import hashlib
 import pathlib
 import re
 import sys
 
-site = pathlib.Path(sys.argv[1])
-check = '--check' in sys.argv
 ref = re.compile(r'((?:href|src)="/?(assets/(?:css|js)/[\w.-]+\.(?:css|js)))(?:\?v=\w*)?"')
 
 
-def stamp(m):
-    data = (site / m.group(2)).read_bytes().replace(b'\r\n', b'\n')  # same stamp whatever git did to line endings
-    v = hashlib.sha256(data).hexdigest()[:8]
-    return f'{m.group(1)}?v={v}"'
+def stamp_text(site, t):
+    def stamp(m):
+        data = (site / m.group(2)).read_bytes().replace(b'\r\n', b'\n')  # same stamp whatever git did to line endings
+        v = hashlib.sha256(data).hexdigest()[:8]
+        return f'{m.group(1)}?v={v}"'
+    return ref.sub(stamp, t)
 
 
-stale = []
-for f in sorted(site.glob('*.html')):
-    t = f.read_text(encoding='utf-8')
-    new = ref.sub(stamp, t)
-    if new != t:
-        stale.append(f.name)
-        if not check:
-            f.write_text(new, encoding='utf-8', newline='')
-if check:
-    print('stamps out of date: ' + ', '.join(stale) if stale else 'stamps ok')
-    sys.exit(1 if stale else 0)
-print('stamped: ' + (', '.join(stale) or 'nothing changed'))
+if __name__ == '__main__':
+    site = pathlib.Path(sys.argv[1])
+    check = '--check' in sys.argv
+    stale = []
+    for f in sorted(site.glob('*.html')):
+        t = f.read_text(encoding='utf-8')
+        new = stamp_text(site, t)
+        if new != t:
+            stale.append(f.name)
+            if not check:
+                f.write_text(new, encoding='utf-8', newline='')
+    if check:
+        print('stamps out of date: ' + ', '.join(stale) if stale else 'stamps ok')
+        sys.exit(1 if stale else 0)
+    print('stamped: ' + (', '.join(stale) or 'nothing changed'))

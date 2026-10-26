@@ -1,0 +1,12 @@
+/*--- Compact cuts: the closer drawing swapped in with <picture> on small screens (any page). ---*/
+/* ---- compact cuts ----------------------------------------------------------
+   Each drawing has a closer cut with bigger labels (NAME-compact.svg, from its
+   tools/gen_*.py). Pages swap it in with <picture> wherever the drawing shows
+   small; picture takes no box of its own, so the img keeps its usual sizing. */
+picture { display: contents; }
+.hero-still { display: none; }
+@media (max-width: 599px) {
+  .hero-art .stage svg.ob { display: none; }
+  .hero-art .stage .hero-still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+}
+

@@ -1,0 +1,48 @@
+/*--- Bottom tab bar on phones (src/components/BottomNav.html). ---*/
+/* ---------- 13. bottom nav (phone) -------------------------------------- */
+.botnav { display: none; }
+@media (max-width: 699px) {
+  .tabs, .hdr-actions .hbtn-text { display: none; }
+  .site-header .container { justify-content: space-between; gap: var(--sp-3); }
+  .brand-sub { display: none; }
+  .botnav {
+    position: fixed;
+    z-index: var(--z-botnav);
+    left: max(var(--sp-3), env(safe-area-inset-left, 0px));
+    right: max(var(--sp-3), env(safe-area-inset-right, 0px));
+    bottom: calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+    display: block;
+    padding: var(--sp-1);
+    border-radius: var(--r-3);
+    border: 1px solid var(--c-line-2);
+    background: var(--c-glass-2);
+    -webkit-backdrop-filter: blur(var(--blur));
+    backdrop-filter: blur(var(--blur));
+    box-shadow: var(--shadow-1);
+  }
+  .botnav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); list-style: none; }
+  .bn {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+    min-height: calc(var(--botnav-h) - var(--sp-2));
+    border-radius: var(--r-2);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-2);
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--c-muted);
+  }
+  .bn svg { width: var(--icon); height: var(--icon); }
+  .bn[aria-current="page"] { background: var(--c-surface-2); color: var(--c-text); }
+  .bn[aria-current="page"] svg { color: var(--c-accent); }
+  body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
+  .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
+}
+@media (min-width: 700px) and (max-width: 1099px) {
+  .hdr-actions .hbtn-text { display: none; }
+  .brand-sub { display: none; }
+  .site-header .container { gap: var(--sp-3); }
+  .tab { padding-inline: var(--sp-3); }
+}
+

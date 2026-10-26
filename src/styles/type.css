@@ -1,0 +1,36 @@
+/*--- Type helpers: eyebrow, lead, small, muted. ---*/
+/* ---------- 3. type helpers --------------------------------------------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.eyebrow::before {
+  content: "";
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  background: var(--c-accent);
+}
+h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line-height: var(--lh-snug); }
+.lead { max-width: var(--measure-lead); font-size: var(--fs-4); color: var(--c-muted); }
+.prose { max-width: var(--measure); color: var(--c-muted); }
+.prose > * + * { margin-top: var(--sp-4); }
+.label {
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.muted { color: var(--c-muted); }
+.small { font-size: var(--fs-2); }
+.accent { color: var(--c-accent); }
+.display { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; line-height: var(--lh-display); }
+.num { font-variant-numeric: tabular-nums; }
+

@@ -1,0 +1,25 @@
+<!--- SHARED · Keyboard shortcuts pop-up (every page)
+      Opened with ? or the footer's "Keyboard shortcuts" button.
+      Styles: src/styles/dialogs.css.
+--->
+<dialog class="dialog" id="shortcuts-dialog" aria-labelledby="sc-title">
+  <div class="dlg-head">
+    <h2 id="sc-title">Keyboard shortcuts</h2>
+    <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">Close</span></button>
+  </div>
+  <div class="dlg-body">
+    <label class="switch" for="sc-toggle">
+      <span class="stack-2"><strong>Single-key shortcuts</strong><span class="small muted">Turn off if they get in the way of a screen reader or voice control.</span></span>
+      <input id="sc-toggle" type="checkbox" role="switch" checked>
+    </label>
+    <ul class="keys-list">
+      <li><span>Previous page</span><span class="keys"><span class="kbd">Q</span></span></li>
+      <li><span>Next page</span><span class="keys"><span class="kbd">E</span></span></li>
+      <li><span>Pick a service <span class="muted">(Services page)</span></span><span class="keys"><span class="kbd">1</span><span class="muted">to</span><span class="kbd">6</span></span></li>
+      <li><span>Previous or next project <span class="muted">(project pop-up)</span></span><span class="keys"><span class="kbd">←</span><span class="kbd">→</span></span></li>
+      <li><span>Close a pop-up</span><span class="keys"><span class="kbd">Esc</span></span></li>
+      <li><span>Show this panel</span><span class="keys"><span class="kbd">?</span></span></li>
+    </ul>
+    <p class="small muted">Shortcuts pause while you type in a field or while a pop-up is open.</p>
+  </div>
+</dialog>
