@@ -82,6 +82,12 @@
 .news-text .chip { align-self: flex-start; }
 .news-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: 1.05; text-transform: uppercase; }
 
+/* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
+   news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
+@media (min-width: 700px) and (orientation: portrait) {
+  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 34rem) * 40 / 31))); margin-inline: auto; }
+}
+
 /* phone: the still drawing (office-compact.svg, compact-cuts.css) is 3:2,
    so its box is too; no empty bands above and below it */
 @media (max-width: 599px) { .hero-art .stage { aspect-ratio: 3 / 2; } }
@@ -118,7 +124,9 @@
 @media (min-width: 1100px) and (min-height: 800px) and (orientation: landscape) {
   .hero.fold { padding-block: var(--sp-5); }
   .hero-grid {
-    height: calc(var(--fold-h) - 2 * var(--sp-5));
+    /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
+       office and news cards stay beside the text and not at opposite ends of a tall column */
+    height: min(calc(var(--fold-h) - 2 * var(--sp-5)), 56rem);
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "menu stage" "menu dock";
