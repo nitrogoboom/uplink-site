@@ -7,6 +7,7 @@
 <title>Services · Uplink Technology</title>
 <meta name="description" content="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.">
 <meta name="theme-color" content="#151E2C">
+<script>document.documentElement.classList.add('js')</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap">
@@ -55,39 +56,139 @@
 
 <main id="main" tabindex="-1">
 <section class="hero fold" id="pick" data-section="Choose a service" aria-labelledby="svc-page-title">
-  <div class="container picker" data-picker data-initial="0">
-    <div class="picker-head">
-      <h1 class="eyebrow" id="svc-page-title">Services</h1>
-      <span class="chip chip--sky" data-bind="tag">Support</span>
-      <h2 data-bind="name">Managed help desk</h2>
-      <p class="lead" data-bind="blurb">Real people who pick up, fix it, and explain it in plain words. Phone, email, chat or the client portal.</p>
-    </div>
-
-    <div class="picker-prev panel">
-      <div class="tags"><span class="chip">Service <span data-bind="n">01</span> of 06</span><span class="chip" data-bind="when">Starts day one</span></div>
-      <img data-bind-img src="assets/img/helpdesk.svg" alt="Help desk workstation with support tickets moving to resolved" width="640" height="480">
-    </div>
-
-    <div class="picker-detail">
-      <span class="label">What's included</span>
-      <ul class="feat-list">
-        <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t" data-bind="f1">Unlimited support</span><span class="feat-d" data-bind="d1">Every user, every device, no ticket counting</span></span></li>
-        <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t" data-bind="f2">Remote and on-site</span><span class="feat-d" data-bind="d2">We come in when it can't be fixed remotely</span></span></li>
-        <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t" data-bind="f3">Staff on and off</span><span class="feat-d" data-bind="d3">New hires ready day one, leavers locked out the same day</span></span></li>
-      </ul>
-      <p class="row"><span class="label">Best for</span><span data-bind="best">Every team, from 5 people to 150</span></p>
-    </div>
+  <div class="container picker" data-picker>
+    <h1 class="eyebrow picker-title" id="svc-page-title">Services</h1>
+    <article class="svc is-on" id="help-desk" data-svc aria-labelledby="svc-help-desk">
+      <div class="picker-head">
+        <span class="chip chip--sky">Support</span>
+        <h2 id="svc-help-desk">Managed help desk</h2>
+        <p class="lead">Real people who pick up, fix it, and explain it in plain words. Phone, email, chat or the client portal.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 01 of 06</span><span class="chip">Starts day one</span></div>
+        <img src="assets/img/helpdesk.svg" alt="Help desk workstation with support tickets moving to resolved" width="640" height="480">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">Unlimited support</span><span class="feat-d">Every user, every device, no ticket counting</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Remote and on-site</span><span class="feat-d">We come in when it can't be fixed remotely</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Staff on and off</span><span class="feat-d">New hires ready day one, leavers locked out the same day</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Every team, from 5 people to 150</span></p>
+      </div>
+    </article>
+    <article class="svc" id="security" data-svc aria-labelledby="svc-security">
+      <div class="picker-head">
+        <span class="chip chip--sky">Protect</span>
+        <h2 id="svc-security">Cybersecurity</h2>
+        <p class="lead">Layered protection for devices, email and accounts, watched around the clock by people, not just software.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 02 of 06</span><span class="chip">Always on</span></div>
+        <img src="assets/img/security.svg" alt="Office building inside a security perimeter with threats blocked" width="640" height="480" loading="lazy">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">24/7 threat monitoring</span><span class="feat-d">Someone is watching when you are not</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Email and phishing defence</span><span class="feat-d">Bad links stopped before staff see them</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Security training</span><span class="feat-d">Short monthly lessons and practice phishing tests</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Anyone holding client or patient data</span></p>
+      </div>
+    </article>
+    <article class="svc" id="cloud" data-svc aria-labelledby="svc-cloud">
+      <div class="picker-head">
+        <span class="chip chip--sky">Build</span>
+        <h2 id="svc-cloud">Cloud workspace</h2>
+        <p class="lead">Microsoft 365 or Google Workspace: email, files and meetings set up properly, licensed right, and backed up.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 03 of 06</span><span class="chip">Project</span></div>
+        <img src="assets/img/cloud.svg" alt="Server, laptop and phone syncing to a cloud workspace hub" width="640" height="480" loading="lazy">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">Migrations</span><span class="feat-d">Off old servers, or between Microsoft and Google</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Licence clean-up</span><span class="feat-d">Pay only for what you actually use</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Files people can find</span><span class="feat-d">SharePoint or Google shared drives, laid out clearly</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Old servers, messy licences, or a mix of both</span></p>
+      </div>
+    </article>
+    <article class="svc" id="network" data-svc aria-labelledby="svc-network">
+      <div class="picker-head">
+        <span class="chip chip--sky">Build</span>
+        <h2 id="svc-network">Networks &amp; Wi-Fi</h2>
+        <p class="lead">Fast, secure networks with firewalls and Wi-Fi that reach every corner of the office.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 04 of 06</span><span class="chip">Project</span></div>
+        <img src="assets/img/network.svg" alt="Server rack with firewall, cabling to desks and a Wi-Fi access point" width="640" height="480" loading="lazy">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">Firewall management</span><span class="feat-d">Patched, watched and documented</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Wi-Fi design</span><span class="feat-d">Coverage mapped before anything is installed</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Multi-site links</span><span class="feat-d">Several offices that work like one</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Offices that are moving or growing</span></p>
+      </div>
+    </article>
+    <article class="svc" id="backup" data-svc aria-labelledby="svc-backup">
+      <div class="picker-head">
+        <span class="chip chip--sky">Protect</span>
+        <h2 id="svc-backup">Backup &amp; recovery</h2>
+        <p class="lead">Copies of your data kept safe offsite, and tested so a restore actually works when you need it.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 05 of 06</span><span class="chip">Always on</span></div>
+        <img src="assets/img/backup.svg" alt="Backup drives with a restore loop and an offsite copy" width="640" height="480" loading="lazy">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">Daily backups</span><span class="feat-d">Servers, laptops, Microsoft 365 and Google</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Restore testing</span><span class="feat-d">We prove it works every quarter</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Disaster plan</span><span class="feat-d">Who does what if the worst happens</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Anyone who can't lose a day of work</span></p>
+      </div>
+    </article>
+    <article class="svc" id="strategy" data-svc aria-labelledby="svc-strategy">
+      <div class="picker-head">
+        <span class="chip chip--sky">Plan</span>
+        <h2 id="svc-strategy">IT strategy &amp; planning</h2>
+        <p class="lead">A yearly roadmap and budget, so tech spending is planned instead of a surprise.</p>
+      </div>
+      <div class="picker-prev panel">
+        <div class="tags"><span class="chip">Service 06 of 06</span><span class="chip">Quarterly</span></div>
+        <img src="assets/img/strategy.svg" alt="Rising budget bars and a quarterly IT roadmap" width="640" height="480" loading="lazy">
+      </div>
+      <div class="picker-detail">
+        <span class="label">What's included</span>
+        <ul class="feat-list">
+          <li class="feat"><span class="icon-tile" aria-hidden="true">1</span><span><span class="feat-t">Quarterly reviews</span><span class="feat-d">What changed and what is next</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">2</span><span><span class="feat-t">Budget forecasting</span><span class="feat-d">Know your IT costs a year ahead</span></span></li>
+          <li class="feat"><span class="icon-tile" aria-hidden="true">3</span><span><span class="feat-t">Insurance alignment</span><span class="feat-d">Help meeting cyber insurance requirements</span></span></li>
+        </ul>
+        <p class="row"><span class="label">Best for</span><span>Owners who want fewer surprises</span></p>
+      </div>
+    </article>
 
     <div class="picker-roster">
       <div class="roster-wrap">
         <span class="label" id="roster-label">All services <span class="kbd-hint" aria-hidden="true">· press 1 to 6</span></span>
         <ul class="roster" aria-labelledby="roster-label">
-          <li><button class="tile" type="button" data-pick="0" aria-pressed="true"><span class="tile-n">01</span><span class="tile-t">Help desk</span></button></li>
-          <li><button class="tile" type="button" data-pick="1" aria-pressed="false"><span class="tile-n">02</span><span class="tile-t">Security</span></button></li>
-          <li><button class="tile" type="button" data-pick="2" aria-pressed="false"><span class="tile-n">03</span><span class="tile-t">Cloud</span></button></li>
-          <li><button class="tile" type="button" data-pick="3" aria-pressed="false"><span class="tile-n">04</span><span class="tile-t">Network</span></button></li>
-          <li><button class="tile" type="button" data-pick="4" aria-pressed="false"><span class="tile-n">05</span><span class="tile-t">Backup</span></button></li>
-          <li><button class="tile" type="button" data-pick="5" aria-pressed="false"><span class="tile-n">06</span><span class="tile-t">Strategy</span></button></li>
+          <li><button class="tile" type="button" data-pick="0" aria-controls="help-desk" aria-pressed="true"><span class="tile-n">01</span><span class="tile-t">Help desk</span></button></li>
+          <li><button class="tile" type="button" data-pick="1" aria-controls="security" aria-pressed="false"><span class="tile-n">02</span><span class="tile-t">Security</span></button></li>
+          <li><button class="tile" type="button" data-pick="2" aria-controls="cloud" aria-pressed="false"><span class="tile-n">03</span><span class="tile-t">Cloud</span></button></li>
+          <li><button class="tile" type="button" data-pick="3" aria-controls="network" aria-pressed="false"><span class="tile-n">04</span><span class="tile-t">Network</span></button></li>
+          <li><button class="tile" type="button" data-pick="4" aria-controls="backup" aria-pressed="false"><span class="tile-n">05</span><span class="tile-t">Backup</span></button></li>
+          <li><button class="tile" type="button" data-pick="5" aria-controls="strategy" aria-pressed="false"><span class="tile-n">06</span><span class="tile-t">Strategy</span></button></li>
         </ul>
       </div>
       <a class="btn btn--primary btn--lg" href="contact.html#message" data-open="book-dialog" data-service-cta data-service="Managed help desk">Talk to us about this</a>
@@ -95,47 +196,6 @@
     <p class="sr-only" aria-live="polite" data-picker-live></p>
   </div>
 </section>
-
-<script type="application/json" id="services-data">
-[
-  {"id":"help-desk","n":"01","tag":"Support","when":"Starts day one","name":"Managed help desk",
-   "blurb":"Real people who pick up, fix it, and explain it in plain words. Phone, email, chat or the client portal.",
-   "f1":"Unlimited support","d1":"Every user, every device, no ticket counting",
-   "f2":"Remote and on-site","d2":"We come in when it can't be fixed remotely",
-   "f3":"Staff on and off","d3":"New hires ready day one, leavers locked out the same day",
-   "best":"Every team, from 5 people to 150","img":"assets/img/helpdesk.svg","alt":"Help desk workstation with support tickets moving to resolved"},
-  {"id":"security","n":"02","tag":"Protect","when":"Always on","name":"Cybersecurity",
-   "blurb":"Layered protection for devices, email and accounts, watched around the clock by people, not just software.",
-   "f1":"24/7 threat monitoring","d1":"Someone is watching when you are not",
-   "f2":"Email and phishing defence","d2":"Bad links stopped before staff see them",
-   "f3":"Security training","d3":"Short monthly lessons and practice phishing tests",
-   "best":"Anyone holding client or patient data","img":"assets/img/security.svg","alt":"Office building inside a security perimeter with threats blocked"},
-  {"id":"cloud","n":"03","tag":"Build","when":"Project","name":"Cloud workspace",
-   "blurb":"Microsoft 365 or Google Workspace: email, files and meetings set up properly, licensed right, and backed up.",
-   "f1":"Migrations","d1":"Off old servers, or between Microsoft and Google",
-   "f2":"Licence clean-up","d2":"Pay only for what you actually use",
-   "f3":"Files people can find","d3":"SharePoint or Google shared drives, laid out clearly",
-   "best":"Old servers, messy licences, or a mix of both","img":"assets/img/cloud.svg","alt":"Server, laptop and phone syncing to a cloud workspace hub"},
-  {"id":"network","n":"04","tag":"Build","when":"Project","name":"Networks & Wi-Fi",
-   "blurb":"Fast, secure networks with firewalls and Wi-Fi that reach every corner of the office.",
-   "f1":"Firewall management","d1":"Patched, watched and documented",
-   "f2":"Wi-Fi design","d2":"Coverage mapped before anything is installed",
-   "f3":"Multi-site links","d3":"Several offices that work like one",
-   "best":"Offices that are moving or growing","img":"assets/img/network.svg","alt":"Server rack with firewall, cabling to desks and a Wi-Fi access point"},
-  {"id":"backup","n":"05","tag":"Protect","when":"Always on","name":"Backup & recovery",
-   "blurb":"Copies of your data kept safe offsite, and tested so a restore actually works when you need it.",
-   "f1":"Daily backups","d1":"Servers, laptops, Microsoft 365 and Google",
-   "f2":"Restore testing","d2":"We prove it works every quarter",
-   "f3":"Disaster plan","d3":"Who does what if the worst happens",
-   "best":"Anyone who can't lose a day of work","img":"assets/img/backup.svg","alt":"Backup drives with a restore loop and an offsite copy"},
-  {"id":"strategy","n":"06","tag":"Plan","when":"Quarterly","name":"IT strategy & planning",
-   "blurb":"A yearly roadmap and budget, so tech spending is planned instead of a surprise.",
-   "f1":"Quarterly reviews","d1":"What changed and what is next",
-   "f2":"Budget forecasting","d2":"Know your IT costs a year ahead",
-   "f3":"Insurance alignment","d3":"Help meeting cyber insurance requirements",
-   "best":"Owners who want fewer surprises","img":"assets/img/strategy.svg","alt":"Rising budget bars and a quarterly IT roadmap"}
-]
-</script>
 
 <section class="section section--band fold" id="plans" data-section="Plans" aria-labelledby="plans-title">
   <div class="container split">

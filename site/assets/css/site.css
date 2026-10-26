@@ -1093,19 +1093,29 @@ a.fc-cl:hover { color: var(--c-accent); }
 .grow-card ul { display: flex; flex-direction: column; gap: var(--sp-2); padding-left: var(--sp-5); color: var(--c-muted); }
 
 /* ---------- 16. SERVICES ------------------------------------------------- */
+/* All six services are in the HTML as <article class="svc">. With script,
+   each article's parts drop into the picker grid (display: contents) and
+   only the picked one shows. Without script they stack and the tiles hide. */
 .picker {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "head" "prev" "roster" "detail";
+  grid-template-areas: "title" "head" "prev" "roster" "detail";
   gap: var(--sp-5);
 }
 @media (min-width: 700px) {
   .picker {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-areas: "head prev" "detail prev" "roster roster";
+    grid-template-areas: "title prev" "head prev" "detail prev" "roster roster";
     column-gap: var(--sp-7);
   }
 }
+.picker-title { grid-area: title; margin-bottom: calc(var(--sp-4) - var(--sp-5)); }
+.js .svc { display: contents; }
+.js .svc:not(.is-on) { display: none; }
+html:not(.js) .picker { display: flex; flex-direction: column; gap: var(--sp-7); height: auto; }
+html:not(.js) .svc { display: flex; flex-direction: column; gap: var(--sp-5); }
+html:not(.js) .picker-prev { aspect-ratio: 4 / 3; height: auto; max-width: 40rem; }
+html:not(.js) .roster-wrap { display: none; }
 .picker-head { grid-area: head; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
 .picker-detail { grid-area: detail; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
 .picker-prev { grid-area: prev; position: relative; min-width: 0; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden; }
@@ -1355,7 +1365,7 @@ a.fc-cl:hover { color: var(--c-accent); }
 
   /* height-led layouts: big pictures take the room that is left, never more */
   :root { --fold-inner: calc(var(--fold-h) - 2 * var(--sp-7)); }
-  .picker { height: calc(var(--fold-h) - 2 * var(--sp-5)); grid-template-rows: auto minmax(0, 1fr) auto; }
+  .picker { height: calc(var(--fold-h) - 2 * var(--sp-5)); grid-template-rows: auto auto minmax(0, 1fr) auto; }
   .picker-prev { aspect-ratio: auto; min-height: 0; height: 100%; }
   .plans th, .plans td { padding-block: var(--sp-2); }
   .plans thead th { padding-block: var(--sp-3); }
