@@ -30,7 +30,7 @@ async def main():
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
         rep.append(f"console errors: {errs or 'none'}")
         await pg.close()
-        for page in ['index','services','work','about','contact','soon']:
+        for page in ['index','services','work','about','contact','soon','404']:
             for n,w,h in [['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]:
                 q=await b.new_page(viewport={'width':w,'height':h}); e2=[]; q.on('pageerror',lambda e: e2.append(str(e)))
                 await q.goto(f"{base}/{'' if page=='index' else page}"); await q.wait_for_timeout(700)

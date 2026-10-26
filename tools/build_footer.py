@@ -143,6 +143,9 @@ for f in sorted(site.glob('*.html')):
     t = f.read_text(encoding='utf-8')
     n = len(re.findall(r'<footer class="site-footer[^"]*"', t))
     assert n == 1, (f, n)
-    t = re.sub(r'<footer class="site-footer[^"]*".*?</footer>', lambda m: FOOTER, t, flags=re.S)
+    footer = FOOTER
+    if f.name == '404.html':  # served at any depth, so its links start at the root
+        footer = re.sub(r'(href=")(?!https?:|mailto:|tel:|#|/)', r'\1/', footer)
+    t = re.sub(r'<footer class="site-footer[^"]*".*?</footer>', lambda m: footer, t, flags=re.S)
     f.write_text(t, encoding='utf-8')
     print('footer ->', f.name)

@@ -27,6 +27,7 @@ Python 3.10+ and Node 18+.
 - `site/` – the website, exactly as the live artifact (26 Oct 2026)
   - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file, written by `tools/gen_office.py` and `tools/gen_tower.py`.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
+  - `404.html` – Cloudflare serves it for any missing address, at any depth, so its links and files start at the root (`/services`, `/assets/...`). `build_footer.py` writes its footer that way too.
   - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
@@ -52,7 +53,7 @@ Every page has the same footer. On desktop it is exactly one screen tall.
 - **Dock:** a roster of tiles (Contact, Services, Company, Support, Resources, Follow). Arrow keys or the two key-cap buttons switch tiles.
 - **Base bar:** brand, legal links, keyboard shortcuts, status.
 
-The footer markup comes from `tools/build_footer.py`. Change the lists at the top of that file (link groups, socials, legal links), then run `python tools/build_footer.py site` to rewrite the footer on all six pages.
+The footer markup comes from `tools/build_footer.py`. Change the lists at the top of that file (link groups, socials, legal links), then run `python tools/build_footer.py site` to rewrite the footer on every page.
 
 Each panel has a `data-map` value that picks a spot on the map: `hq`, `services`, `industries`, `company`, `support`, `resources`, `follow`. Anything else points at HQ. The map is drawn by `assets/js/footer.js` with the same true-isometric formula as the illustrations, `u = 38`. Draw order is back to front: resources, follow, services, company, hq, support, industries.
 
