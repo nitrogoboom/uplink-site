@@ -28,6 +28,8 @@ Python 3.10+ and Node 18+.
   - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
   - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`, `assets/js/site.js`
+  - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
+  - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero. `tower-grow.svg` matches the inline tower.
 - `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
 
