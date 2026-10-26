@@ -1,6 +1,6 @@
 """Replace a stretched floor oval with a true iso circle (same grid, same knockouts around labels).
 usage: python tools/roundify.py name   (edits site/assets/img/<name>.svg in place)
-Needs site/ served on port 8765 for bboxes.js:  python -m http.server 8765 --directory site"""
+Needs site/ served on port 8765 for bboxes.js:  python tools/serve.py"""
 import sys, os, re, json, math, subprocess
 import numpy as np
 TOOLS = os.path.dirname(os.path.abspath(__file__))

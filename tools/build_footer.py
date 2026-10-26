@@ -35,31 +35,31 @@ e = lambda s: html.escape(s, quote=True)
 GROUPS = [
     dict(id='services', map='services', name='Services', icon='grid',
          lead='Everything your office runs on, looked after by one team.',
-         more=('Compare all services', 'services.html'),
-         links=[('Managed help desk', 'services.html#help-desk'), ('Cybersecurity', 'services.html#security'),
-                ('Microsoft 365 & Google', 'services.html#cloud'), ('Networks & Wi-Fi', 'services.html#network'),
-                ('Phones & Teams calling', 'services.html#voip'),
-                ('Backup & recovery', 'services.html#backup'), ('IT strategy & planning', 'services.html#strategy')]),
+         more=('Compare all services', 'services'),
+         links=[('Managed help desk', 'services#help-desk'), ('Cybersecurity', 'services#security'),
+                ('Microsoft 365 & Google', 'services#cloud'), ('Networks & Wi-Fi', 'services#network'),
+                ('Phones & Teams calling', 'services#voip'),
+                ('Backup & recovery', 'services#backup'), ('IT strategy & planning', 'services#strategy')]),
     dict(id='company', map='company', name='Company', icon='building',
          lead='The people behind the screen, and how we work.',
-         more=('Meet the team', 'about.html#team'),
-         links=[('About us', 'about.html'), ('Our work', 'work.html'), ('Team', 'about.html#team'),
-                ('Our story', 'about.html#story'), ('Careers', 'soon.html#careers')]),
+         more=('Meet the team', 'about#team'),
+         links=[('About us', 'about'), ('Our work', 'work'), ('Team', 'about#team'),
+                ('Our story', 'about#story'), ('Careers', 'soon#careers')]),
     dict(id='support', map='support', name='Support', icon='headset',
          lead='Already a client? Get help or check on a ticket.',
-         more=('Get support now', 'contact.html#support'),
-         links=[('Client portal', 'soon.html#client-portal'), ('Remote support', 'soon.html#remote-support'),
-                ('System status', 'soon.html#system-status'), ('Contact the help desk', 'contact.html#support')]),
+         more=('Get support now', 'contact#support'),
+         links=[('Client portal', 'soon#client-portal'), ('Remote support', 'soon#remote-support'),
+                ('System status', 'soon#system-status'), ('Contact the help desk', 'contact#support')]),
     dict(id='resources', map='resources', name='Resources', icon='book',
          lead='Guides and checklists we hand our own clients.',
-         more=('Browse the blog', 'soon.html#blog'),
-         links=[('Blog', 'soon.html#blog'), ('Windows 10 guide', 'soon.html#windows-10-guide'),
-                ('Security checklist', 'soon.html#security-checklist'), ('Questions and answers', 'services.html#faq')]),
+         more=('Browse the blog', 'soon#blog'),
+         links=[('Blog', 'soon#blog'), ('Windows 10 guide', 'soon#windows-10-guide'),
+                ('Security checklist', 'soon#security-checklist'), ('Questions and answers', 'services#faq')]),
 ]
 SOCIALS = [('LinkedIn', 'profile', '/company/uplinkit'), ('YouTube', 'video', '@uplinkit'),
            ('Facebook', 'community', '/uplinkit'), ('Instagram', 'photo', '@uplink.it'), ('X', 'post', '@uplinkit')]
-SOCIAL_HREF = 'soon.html#social'
-LEGAL = [('Privacy', 'soon.html#privacy'), ('Terms', 'soon.html#terms'), ('Accessibility', 'soon.html#accessibility')]
+SOCIAL_HREF = 'soon#social'
+LEGAL = [('Privacy', 'soon#privacy'), ('Terms', 'soon#terms'), ('Accessibility', 'soon#accessibility')]
 
 # ---------------- MARKUP ----------------
 def head(eyebrow, title, lead):
@@ -79,7 +79,7 @@ def add(pid, mapkey, name, icon, count, body):
 add('contact', 'hq', 'Contact', 'chat', 'Start here',
     head('Managed IT · Ontario', 'Ready when <em>you are</em>', 'Start with a free 30-minute check-up. We look first, then quote.') +
     f'''<div class="fc-body">
-  <div class="fc-acts"><a class="btn btn--primary btn--lg" href="contact.html#message" data-open="book-dialog">Book a check-up{ic('arrow', 2)}</a></div>
+  <div class="fc-acts"><a class="btn btn--primary btn--lg" href="contact#message" data-open="book-dialog">Book a check-up{ic('arrow', 2)}</a></div>
   <div class="fc-facts">
     <div><p class="label">Reach us</p>
       <a class="fc-cl" href="tel:+18555550142">{ic('phone')}<span>1-855-555-0142</span></a>
@@ -110,7 +110,7 @@ add('follow', 'follow', 'Follow', 'signal', f'{len(SOCIALS)} channels',
   </form>
 </div>''')
 
-legal = ''.join(f'<a href="{h}">{t}</a>' for t, h in LEGAL) + '<a href="soon.html#francais" lang="fr" hreflang="fr">Français</a>'
+legal = ''.join(f'<a href="{h}">{t}</a>' for t, h in LEGAL) + '<a href="soon#francais" lang="fr" hreflang="fr">Français</a>'
 FOOTER = f'''<footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
   <h2 class="sr-only" id="fc-title">Site footer</h2>
   <div class="container fc-stage">

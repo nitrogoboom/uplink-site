@@ -3,7 +3,7 @@
   "private": true,
   "description": "Uplink Technology mockup site. Node is only needed for the screenshot/check tools.",
   "scripts": {
-    "serve": "python -m http.server 8765 --directory site",
+    "serve": "python tools/serve.py",
     "verify": "node tools/verify.js 8765 out"
   },
   "devDependencies": {

@@ -26,7 +26,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
 
 ## Before going live
-- [ ] Clean URLs: Cloudflare serves `/work`, but links, canonical tags and `sitemap.xml` use `/work.html` (extra redirect on every click).
 - [ ] `site/_headers` with security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, a Content-Security-Policy).
 - [ ] A `404.html` in the site's style.
 - [ ] Cache busting for CSS and JS (version in the file name or a `?v=`).

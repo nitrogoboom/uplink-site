@@ -8,7 +8,7 @@ const base = `http://localhost:${port}`;
   // 1. hero build animation + tile hover + console errors at 1440x900
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
   const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
-  await p.goto(base + '/index.html');
+  await p.goto(base + '/');
   await p.waitForTimeout(250);
   await (await p.$('svg.ob')).screenshot({ path: `${out}/anim-hero-0250ms.png` });
   await p.waitForTimeout(1250);
@@ -38,7 +38,7 @@ const base = `http://localhost:${port}`;
   // 3. viewports
   for (const [n, w, h] of [['phone', 390, 844], ['tablet', 820, 1180], ['1440', 1440, 900], ['3440', 3440, 1440]]) {
     const q = await b.newPage({ viewport: { width: w, height: h } });
-    await q.goto(base + '/index.html'); await q.waitForTimeout(5500);
+    await q.goto(base + '/'); await q.waitForTimeout(5500);
     const ov = await q.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     const box = await q.$eval('svg.ob', e => { const r = e.getBoundingClientRect(); return [Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height)]; });
     await q.screenshot({ path: `${out}/vp-${n}.png` });

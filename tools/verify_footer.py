@@ -1,14 +1,14 @@
 # Python port of tools/verify.js plus footer checks.
-# usage: python tools/verify_footer.py <outdir>   (serve site/ on port 8765 first)
+# usage: python tools/verify_footer.py <outdir> [port]   (serve site/ with tools/serve.py first; port 8765 by default)
 import asyncio, sys
 from playwright.async_api import async_playwright
-base='http://localhost:8765'; out=sys.argv[1]
+base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8765'); out=sys.argv[1]
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); rep=[]
         pg=await b.new_page(viewport={'width':1440,'height':900})
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e))); pg.on('console',lambda m: m.type=='error' and errs.append(m.text))
-        await pg.goto(base+'/index.html'); await pg.wait_for_timeout(5500)
+        await pg.goto(base+'/'); await pg.wait_for_timeout(5500)
         before=await pg.eval_on_selector('.ob-app','e=>e.textContent')
         await (await pg.query_selector('.ob-tile[data-tile="files"]')).hover(force=True); await pg.wait_for_timeout(500)
         rep.append(f"hero tile hover: {before} -> {await pg.eval_on_selector('.ob-app','e=>e.textContent')}")
@@ -33,7 +33,7 @@ async def main():
         for page in ['index','services','work','about','contact','soon']:
             for n,w,h in [['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]:
                 q=await b.new_page(viewport={'width':w,'height':h}); e2=[]; q.on('pageerror',lambda e: e2.append(str(e)))
-                await q.goto(f'{base}/{page}.html'); await q.wait_for_timeout(700)
+                await q.goto(f"{base}/{'' if page=='index' else page}"); await q.wait_for_timeout(700)
                 await q.eval_on_selector('#footer','e=>e.scrollIntoView()'); await q.wait_for_timeout(500)
                 r=await q.evaluate("""()=>{const f=document.getElementById('footer'); const s=document.querySelector('.fc-panels');
                   return [document.documentElement.scrollWidth-innerWidth, f.offsetHeight, s.scrollHeight-s.clientHeight, f.classList.contains('fc-js')]}""")

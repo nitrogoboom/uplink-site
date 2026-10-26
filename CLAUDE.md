@@ -2,7 +2,7 @@
 
 Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspired look. Read `README.md` first.
 
-- The site is `site/`. Plain HTML/CSS/JS, no build step. Preview: `python -m http.server 8765 --directory site`.
+- The site is `site/`. Plain HTML/CSS/JS, no build step. Preview: `python tools/serve.py`.
 - All colours, sizes and timings live in `site/assets/css/tokens.css`. Use the tokens, don't hard-code values.
 - Every illustration is written by a script in `tools/gen_*.py` (hero and tower too: `gen_office.py`, `gen_tower.py` splice their block into `site/index.html`). Change the numbers in the script and rerun; don't hand-edit the SVGs. Each script also writes `NAME-compact.svg` (the phone cut, used wherever the drawing shows small); check it when you change a drawing.
 - Illustrations are true isometric. Follow "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it.

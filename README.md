@@ -7,10 +7,10 @@ Also published as a claude.ai artifact: https://claude.ai/code/artifact/89e3144d
 ## Run it on your PC
 
 ```
-python -m http.server 8765 --directory site
+python tools/serve.py
 ```
 
-Then open http://localhost:8765. (Opening `site/index.html` straight from disk mostly works too.)
+Then open http://localhost:8765. Links use clean URLs (`work`, not `work.html`), as Cloudflare Pages serves them, so use this server: plain `python -m http.server` or opening the files from disk breaks the links between pages.
 
 ### For the check tools (optional)
 
@@ -29,6 +29,7 @@ Python 3.10+ and Node 18+.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
   - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
+  - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
   - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
@@ -90,7 +91,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `footer_painter.py url` – painter-order and poke-through check on the boxes the footer map draws. It reads `window.__isoLog`, so add `window.__isoLog && window.__isoLog.push({k, x, y, z, w, d, h, cls})` to `box()` in a local copy first.
 - `fixlib.py` – small helper for exact find-and-replace edits on SVG points
 
-Serve `site/` with `python -m http.server 8765 --directory site` before running the JS tools.
+Serve `site/` with `python tools/serve.py` before running the JS tools.
 
 The one-off fix scripts from the precision pass (`tools/fixes/`) were not kept in the Project, so they are not in this bundle. They were a record only.
 
@@ -104,4 +105,4 @@ The artifact link above only updates from a Claude chat. To push local changes t
 - Site: Cloudflare Pages project `uplink-site` (https://uplink-site-4p8.pages.dev). `functions/_middleware.js` puts every page and file behind a browser password prompt. Any username works. The password is the Cloudflare secret `SITE_PASSWORD`. With no secret set, the site stays locked.
 - Deploy from the project root: `npx wrangler pages deploy` (settings in `wrangler.toml`).
 - Change the password: `npx wrangler pages secret put SITE_PASSWORD --project-name uplink-site`, then deploy again.
-- The local preview (`python -m http.server`) has no lock. To test the lock locally: `npx wrangler pages dev --binding SITE_PASSWORD=some-test-value`.
+- The local preview (`python tools/serve.py`) has no lock. To test the lock locally: `npx wrangler pages dev --binding SITE_PASSWORD=some-test-value`.
