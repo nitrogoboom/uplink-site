@@ -405,7 +405,7 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
     return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
             f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
             f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
-            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>',
             badge(dx, dy, colour, **BADGE)]
 
 

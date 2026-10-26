@@ -639,28 +639,28 @@
 <polyline class="lt" points="1022.0,523.9 944.0,712.0 984.0,712.0" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="1022.0" cy="523.9" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
 <text class="lt" x="996.0" y="720.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="start">FIREWALL RACK</text>
-<text class="lt" x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="start">core switch + backups</text>
+<text class="lt" x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="start">core switch + backups</text>
 
 </g>
 <g class="ob-i ob-lab co lbl" data-t="WI-FI ACCESS POINT" data-s="Wi-Fi 6E, no dead spots" style="--d:2880ms">
 <polyline class="lt" points="381.9,333.4 361.1,208.7 321.1,208.7" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="381.9" cy="333.4" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
 <text class="lt" x="309.1" y="216.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="end">WI-FI ACCESS POINT</text>
-<text class="lt" x="309.1" y="244.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">Wi-Fi 6E, no dead spots</text>
+<text class="lt" x="309.1" y="244.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">Wi-Fi 6E, no dead spots</text>
 
 </g>
 <g class="ob-i ob-lab co lbl" data-t="WORKSTATIONS" data-s="managed + patched" style="--d:2960ms">
 <polyline class="lt" points="713.8,521.5 634.1,695.7 594.1,695.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="713.8" cy="521.5" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
 <text class="lt" x="582.1" y="703.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">WORKSTATIONS</text>
-<text class="lt" x="582.1" y="731.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">managed + patched</text>
+<text class="lt" x="582.1" y="731.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">managed + patched</text>
 
 </g>
 <g class="ob-i ob-lab co lbl" data-t="TEAMS ROOM" data-s="one-touch meeting join" style="--d:3040ms">
 <polyline class="lt" points="311.9,359.7 290.0,523.7 250.0,523.7" fill="none" stroke="#7DB9E8" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="311.9" cy="359.7" r="6" fill="#7DB9E8" stroke="#151E2C" stroke-width="3"/>
 <text class="lt" x="238.0" y="531.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#7DB9E8" text-anchor="end">TEAMS ROOM</text>
-<text class="lt" x="238.0" y="559.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">one-touch meeting join</text>
+<text class="lt" x="238.0" y="559.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">one-touch meeting join</text>
 
 </g>
 </svg>

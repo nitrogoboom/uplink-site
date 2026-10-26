@@ -6,6 +6,13 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["tools/serve.py", "8765", "site"],
       "port": 8765
+    },
+    {
+      "name": "site-alt",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["tools/serve.py", "8771", "site"],
+      "port": 8771,
+      "autoPort": false
     }
   ]
 }

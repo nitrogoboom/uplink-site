@@ -4,6 +4,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
+- [ ] Hero labels: sublines are 21 units now, but on 1024–1180px-wide screens they still render at about 9.5–10px (the drawing is narrow there). Bigger fix: a tablet cut with fewer, larger labels.
 - [ ] Hero 3D cloud is still hand-drawn (`tools/office_parts/hero_cloud.svg`), with ~99 checker flags. Rebuild it in `gen_office.py`.
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
 - [ ] Office plan: ~153 one-grid-step near-miss flags because the furniture is half size there. Not visible; tidy if the props get a half-size grid.
@@ -20,12 +21,12 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Site
 - [ ] Home services grid: with 7 cards the last row on laptops holds one card on its own.
-- [ ] Hero leaves an empty gap at around 1000px wide.
+- [ ] Home services grid: the one-row layout (`min-aspect-ratio: 2/1` in `src/styles/desktop.css`) also fires on a maximised 1080p browser (1920×945) and 125% laptops (1536×730), not only 21:9. The hero now uses 7/3; check the services section before changing it.
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
 - [ ] CSP `style-src` needs `'unsafe-inline'` because of the hero's inline `<style>` blocks and `style=""` attributes. Drop it once they move into CSS.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
-- [ ] `src/styles/desktop.css` is still one block for every page. Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
+- [ ] `src/styles/desktop.css` is still one block for every page (the home hero has moved out to `1-hero.css`). Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
 ## Before going live
