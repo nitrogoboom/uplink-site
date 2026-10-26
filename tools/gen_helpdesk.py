@@ -50,6 +50,12 @@ LABELS = [
     dict(dot=(4.0, BACK[3], 2.6), elbow=(-82.8, 127.9), x=-109.8, title='REAL PERSON', sub='local help desk', tw=96, sw=79, colour=BLUE),
     dict(dot=(TICKETS[2][0] + TICKET[0] - 0.55, TICKETS[2][1] + TICKET[1] / 2, TICKETS[2][2] + TICKET[2]), elbow=(250.9, 145.1), x=223.9, title='TICKETS', sub='open, in progress, resolved', tw=61.3, sw=141.7, colour=ORANGE),
 ]
+# compact phone cut (isogen.doc crop): the same scene framed closer, two labels at 1.6x. Crop is in page
+# coordinates; elbow and text are in the drawing's group coordinates (page minus translate). Keep the crop 4:3.
+COMPACT = dict(crop=(165, 38, 470, 352.5), scale=1.6, labels=[
+    dict(dot=LABELS[0]['dot'], elbow=(116.0, -147.9), x=74.3, title='LIVE CHAT', sub='phone, email, chat', tw=70, sw=95, colour=ORANGE, anchor='end'),
+    dict(dot=(9.5, 0.4, TICKETS[2][2] + TICKET[2]), elbow=(148.3, 124.9), x=189.3, title='TICKETS', sub='open, in progress,\nresolved', tw=61.3, sw=96, colour=ORANGE, anchor='start'),
+])
 TITLE = 'Help desk workstation: a chat on screen and support tickets moving from open to resolved'
 
 
@@ -68,9 +74,21 @@ def label_gaps(L):
     return [box_shape(x - L['tw'] - 5, ty - 18, ex + 4, ty - 1), box_shape(x - L['sw'] - 5, sy - 16, x + 5, sy + 8)]
 
 
-def hidden():
+def compact_gaps(L, k):
+    """Floor lines stop around a compact label's (bigger, maybe wrapped) text and tail."""
+    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
+    lines = L['sub'].count('\n') + 1
+    t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
+    s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
+    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
+            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
+
+
+def hidden(compact=False):
     """Floor lines skip everything drawn over them: objects and labels."""
-    return unary_union([silhouette(w, *b) for b in objects()] + [g for L in LABELS for g in label_gaps(L)])
+    gaps = ([g for L in COMPACT['labels'] for g in compact_gaps(L, COMPACT['scale'])] if compact
+            else [g for L in LABELS for g in label_gaps(L)])
+    return unary_union([silhouette(w, *b) for b in objects()] + gaps)
 
 
 def chat_window():
@@ -123,8 +141,8 @@ def ticket_shadow():
             f'<polygon class="shadow" points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="#0B1019" fill-opacity="{op}" filter="url(#soft)"/>')
 
 
-def build():
-    mask = hidden()
+def build(compact=False):
+    mask = hidden(compact)
     body = [floor_grid(w, DISC[:2], DISC[2], mask) + disc_arcs(w, DISC[2], *DISC[:2], mask=mask)]
     body.append(ticket_shadow())
     body += faces(w, *DESK)
@@ -136,6 +154,10 @@ def build():
     for _n, b in CHAIR_PARTS: body += faces(w, *b)
     for b, (*_, colour, status) in zip(ticket_boxes(), TICKETS):
         body += faces(w, *b) + [ticket_card(b, colour, status)]
+    if compact:
+        for L in COMPACT['labels']:
+            body += label(w.p(*L['dot']), L['elbow'], L['x'], L['title'], L['sub'], colour=L['colour'], anchor=L['anchor'], scale=COMPACT['scale'])
+        return doc(TITLE, body, translate=(265.7, 200.9), crop=COMPACT['crop'])
     for L in LABELS:
         body += label(w.p(*L['dot']), L['elbow'], L['x'], L['title'], L['sub'], colour=L['colour'], anchor='end')
     return doc(TITLE, body, translate=(265.7, 200.9))
@@ -143,3 +165,4 @@ def build():
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens

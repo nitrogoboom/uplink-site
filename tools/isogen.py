@@ -1,6 +1,6 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match README "Drawing rules" and the drawing palette in site/assets/css/tokens.css."""
-import html, math
+import html, math, re
 from shapely.geometry import LineString, MultiPoint, Point
 from iso import fmt
 from svgfont import font_style
@@ -117,7 +117,7 @@ KEY_PX = 8.5   # labels whose titles would render smaller than this switch to nu
 
 def key_group(title, sub=''):
     """Opening tag for one label; tools/build_keys.py reads data-t / data-s to write the page's key."""
-    return f'<g class="lbl" data-t="{html.escape(title)}" data-s="{html.escape(sub or "")}">'
+    return f'<g class="lbl" data-t="{html.escape(title)}" data-s="{html.escape((sub or "").replace(chr(10), " "))}">'
 
 
 def key_css(width):
@@ -128,33 +128,43 @@ def key_css(width):
             f'svg:target .lbl{{display:none}}</style>')
 
 
-def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y=None, sub_y=None):
+def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y=None, sub_y=None, scale=1.0):
     """Leader dot + free-angle diagonal to elbow + 20px level tail, then caps title and grey subline.
     Leaders are annotation, not geometry, so the diagonal can take any angle.
-    dot, elbow are screen points; the tail runs from elbow towards text_x and stops 7px short."""
+    dot, elbow are screen points; the tail runs from elbow towards text_x and stops 7px short.
+    scale enlarges text, dot and gaps together (the compact phone cut uses about 1.6)."""
     (dx, dy), (ex, ey) = dot, elbow
-    tail = text_x - 7 if anchor == 'start' else text_x + 7
-    ty = ey + 4.5 if title_y is None else title_y
-    sy = ty + 15 if sub_y is None else sub_y
+    k = scale
+    tail = text_x - 7 * k if anchor == 'start' else text_x + 7 * k
+    ty = ey + 4.5 * k if title_y is None else title_y
+    sy = ty + 15 * k if sub_y is None else sub_y
     out = [key_group(title, sub) + f'<g class="co lt"><polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tail)},{fmt(ey)}" '
-           f'fill="none" stroke="{colour}" stroke-width="1.2" stroke-opacity="0.55"/>'
-           f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="3" fill="{colour}" stroke="{INK}" stroke-width="1.5"/></g>',
-           f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty)}" font-size="13" font-weight="600" letter-spacing="0.78" fill="{colour}" text-anchor="{anchor}">{title}</text>']
-    if sub:
-        out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy)}" font-size="11" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{sub}</text>')
+           f'fill="none" stroke="{colour}" stroke-width="{1.2 * k:.3g}" stroke-opacity="0.55"/>'
+           f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="{3 * k:.3g}" fill="{colour}" stroke="{INK}" stroke-width="{1.5 * k:.3g}"/></g>',
+           f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty)}" font-size="{13 * k:.3g}" font-weight="600" letter-spacing="{0.78 * k:.3g}" fill="{colour}" text-anchor="{anchor}">{title}</text>']
+    for n, line in enumerate((sub or '').split('\n') if sub else []):   # a '\n' in sub wraps it (compact cuts)
+        out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{line}</text>')
     out.append(badge(dx, dy, colour) + '</g>')
     return out
 
 
-def doc(title, body, translate=None, view=(640, 480)):
+def doc(title, body, translate=None, view=(640, 480), crop=None):
+    """The SVG wrapper. crop = (x, y, w, h) makes the compact phone cut: the same drawing framed closer
+    (keep it 4:3 so it swaps in for the full one without moving the layout); it has no numbered badges."""
     vw, vh = view
     g = f' transform="translate({translate[0]},{translate[1]})"' if translate else ''
-    body = number_badges('\n'.join(body))
+    body = '\n'.join(body)
+    if crop:
+        body = re.sub(r'<g class="num">.*?</g>', '', body)
+        box, css = ' '.join(f'{v:g}' for v in crop), '<style>svg:target .lbl{display:none}</style>'
+    else:
+        body = number_badges(body)
+        box, css = f'0 0 {vw} {vh}', key_css(round(vw * KEY_PX / 13))    # 13px titles
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 {vw} {vh}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{box}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
         f'<title>{title}</title>',
         font_style(body),     # <img> SVGs can't see the page's fonts, so carry the letters they use
-        key_css(round(vw * KEY_PX / 13)),    # 13px titles
+        css,
         f'<g{g} font-family="{FONT}" stroke-linecap="round" stroke-linejoin="round">',
         body, '</g>', '</svg>', ''])
 

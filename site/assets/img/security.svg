@@ -53,9 +53,12 @@
 <polygon points="-67.4,36.5 -33.7,56.0 -42.1,60.8 -75.9,41.4" fill="#405169" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
 <ellipse cx="0.0" cy="-121.7" rx="23.8" ry="13.8" fill="#F4A340" fill-opacity="0.12" stroke="#F4A340" stroke-width="1" stroke-opacity="0.6"/>
 <polyline points="0.0,-121.7 0.0,-141.1" fill="none" stroke="#F4A340" stroke-width="2"/>
-<path d="M0,-211.1 L29.2,-199.9 L29.2,-173.3 C29.2,-153.7 11.1,-146.0 0,-141.1 C-11.1,-146.0 -29.2,-153.7 -29.2,-173.3 L-29.2,-199.9 Z" transform="translate(0,4)" fill="#C98030"/>
-<path d="M0,-211.1 L29.2,-199.9 L29.2,-173.3 C29.2,-153.7 11.1,-146.0 0,-141.1 C-11.1,-146.0 -29.2,-153.7 -29.2,-173.3 L-29.2,-199.9 Z" fill="#405169" stroke="#F4A340" stroke-width="2.5"/>
-<rect x="-5.8" y="-180.2" width="11.7" height="11.9" rx="2" fill="#F4A340" stroke="#F4A340" stroke-width="2"/><path d="M-3.7,-180.2 v-6.3 a3.7,3.7 0 0 1 7.5,0 v6.3" fill="none" stroke="#F4A340" stroke-width="2"/><circle cx="0" cy="-174.6" r="1.6" fill="#151E2C"/>
+<path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -21.073 -228.73)" fill="#C98030" stroke="#A86A24" stroke-width="1" vector-effect="non-scaling-stroke"/>
+<path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -21.916 -228.25)" fill="#C98030"/>
+<path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -22.759 -227.76)" fill="#C98030"/>
+<path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -23.602 -227.27)" fill="#C98030"/>
+<path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -24.445 -226.79)" fill="#C98030"/>
+<g transform="matrix(16.859 9.7333 0 19.467 -25.288 -226.3)"><path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" fill="#405169" stroke="#F4A340" stroke-width="2.5" vector-effect="non-scaling-stroke"/><rect x="1.18" y="1.522" width="0.64" height="0.6" rx="0.1" fill="#F4A340"/><path d="M1.3,1.522 v-0.3 a0.2,0.2 0 0 1 0.4,0 v0.3" fill="none" stroke="#F4A340" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="1.5" cy="1.823" r="0.08" fill="#151E2C"/></g>
 <g class="lbl" data-t="24/7 MONITORING" data-s="threats stopped at the edge"><g class="co lt"><polyline points="-27.3,142.3 36.3,186.4 56.3,186.4" fill="none" stroke="#F4A340" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="-27.3" cy="142.3" r="3" fill="#F4A340" stroke="#151E2C" stroke-width="1.5"/></g>
 <text class="lt" x="63.3" y="190.9" font-size="13" font-weight="600" letter-spacing="0.78" fill="#F4A340" text-anchor="start">24/7 MONITORING</text>
 <text class="lt" x="63.3" y="205.9" font-size="11" font-weight="400" fill="#A9B4C3" text-anchor="start">threats stopped at the edge</text>

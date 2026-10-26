@@ -8,6 +8,7 @@ import math, sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
+from isoprops import on_front
 from isogen import FACES, ORANGE, BLUE, INK, faces, ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 58.4, 58.4 / 3)              # inside the group's translate (CENTRE)
@@ -33,8 +34,8 @@ CROSS = 0.35                          # half-size of the blocked cross, world un
 RED = '#EE8A7C'
 
 POLE = 1.0                            # shield stands on a short pole above the roof centre
-SHIELD_W, SHIELD_H = 58.4, 70.0       # badge, screen px (a sign facing the viewer)
-DEPTH = 4                             # badge thickness, px down
+SHIELD_W, SHIELD_H = 3.0, 3.625       # a shield-shaped plate standing in the plane y = 0 (faces front-left), world units
+THICK = 0.25                          # plate thickness, back along -y; drawn as stacked copies so the edge is solid
 HALO_R = 1.0                          # glow ring on the roof under the pole
 
 GLASS, GLASS_LIT = '#1F2A3B', '#2C4A66'
@@ -113,25 +114,35 @@ def windows():
     return out
 
 
+def shield_path(wd, ht):
+    """Shield outline in a face's local units: u right, v down, tip at the bottom centre."""
+    hw = wd / 2
+    return (f'M{hw:.4g},0 L{wd:.4g},{0.16 * ht:.4g} L{wd:.4g},{0.54 * ht:.4g} '
+            f'C{wd:.4g},{0.82 * ht:.4g} {hw + 0.38 * hw:.4g},{0.93 * ht:.4g} {hw:.4g},{ht:.4g} '
+            f'C{hw - 0.38 * hw:.4g},{0.93 * ht:.4g} 0,{0.82 * ht:.4g} 0,{0.54 * ht:.4g} L0,{0.16 * ht:.4g} Z')
+
+
 def shield():
-    """A solid badge standing on a pole at the roof centre, with a glow ring on the roof under it."""
+    """A shield-shaped plate standing on a pole at the roof centre, in the plane y = 0 like a sign: its face
+    is mapped onto that plane, and its thickness runs back along -y (stacked copies make the edge solid)."""
     roof = HEIGHT + CAP[1]
     bx, by = w.p(0, 0, roof)
-    tip = by - POLE * w.u
-    hw, h = SHIELD_W / 2, SHIELD_H
-    top = tip - h
-    d = (f'M0,{fmt(top)} L{fmt(hw)},{fmt(top + 0.16 * h)} L{fmt(hw)},{fmt(top + 0.54 * h)} '
-         f'C{fmt(hw)},{fmt(top + 0.82 * h)} {fmt(0.38 * hw)},{fmt(top + 0.93 * h)} 0,{fmt(tip)} '
-         f'C{fmt(-0.38 * hw)},{fmt(top + 0.93 * h)} {fmt(-hw)},{fmt(top + 0.82 * h)} {fmt(-hw)},{fmt(top + 0.54 * h)} '
-         f'L{fmt(-hw)},{fmt(top + 0.16 * h)} Z')
-    cy = top + 0.47 * h                 # lock, centred in the badge
-    return [ellipse(w, HALO_R, z=roof, attrs=f'fill="{ORANGE}" fill-opacity="0.12" stroke="{ORANGE}" stroke-width="1" stroke-opacity="0.6"'),
-            f'<polyline points="{fmt(bx)},{fmt(by)} {fmt(bx)},{fmt(tip)}" fill="none" stroke="{ORANGE}" stroke-width="2"/>',
-            f'<path d="{d}" transform="translate(0,{DEPTH})" fill="#C98030"/>',
-            f'<path d="{d}" fill="#405169" stroke="{ORANGE}" stroke-width="2.5"/>',
-            f'<rect x="-5.8" y="{fmt(cy - 2)}" width="11.7" height="11.9" rx="2" fill="{ORANGE}" stroke="{ORANGE}" stroke-width="2"/>'
-            f'<path d="M-3.7,{fmt(cy - 2)} v-6.3 a3.7,3.7 0 0 1 7.5,0 v6.3" fill="none" stroke="{ORANGE}" stroke-width="2"/>'
-            f'<circle cx="0" cy="{fmt(cy + 3.6)}" r="1.6" fill="{INK}"/>']
+    wd, ht = SHIELD_W, SHIELD_H
+    base = roof + POLE                  # the tip sits on the pole
+    d = shield_path(wd, ht)
+    ns = ' vector-effect="non-scaling-stroke"'
+    out = [ellipse(w, HALO_R, z=roof, attrs=f'fill="{ORANGE}" fill-opacity="0.12" stroke="{ORANGE}" stroke-width="1" stroke-opacity="0.6"'),
+           f'<polyline points="{w.pts((0, 0, roof), (0, 0, base))}" fill="none" stroke="{ORANGE}" stroke-width="2"/>']
+    steps = 5
+    for k in range(steps, 0, -1):       # the edge: back face first, then copies forward
+        y = -THICK * k / steps
+        out.append(f'<path d="{d}" transform="{on_front(w, -wd / 2, y, base + ht)}" fill="#C98030"'
+                   f'{" stroke=\"#A86A24\" stroke-width=\"1\"" + ns if k == steps else ""}/>')
+    lock = (f'<rect x="{wd / 2 - 0.32:.4g}" y="{0.42 * ht:.4g}" width="0.64" height="0.6" rx="0.1" fill="{ORANGE}"/>'
+            f'<path d="M{wd / 2 - 0.2:.4g},{0.42 * ht:.4g} v-0.3 a0.2,0.2 0 0 1 0.4,0 v0.3" fill="none" stroke="{ORANGE}" stroke-width="2"{ns}/>'
+            f'<circle cx="{wd / 2:.4g}" cy="{0.42 * ht + 0.3:.4g}" r="0.08" fill="{INK}"/>')
+    out.append(f'<g transform="{on_front(w, -wd / 2, 0, base + ht)}"><path d="{d}" fill="#405169" stroke="{ORANGE}" stroke-width="2.5"{ns}/>{lock}</g>')
+    return out
 
 
 def build():

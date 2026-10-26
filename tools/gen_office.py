@@ -57,7 +57,7 @@ LED_ANIM = {18.5: {0: (2800, 0), 2: (3840, -1060), 4: (3580, -2120), 6: (3320, -
 
 # ---- Wi-Fi --------------------------------------------------------------------
 CABLE_Z = 4.3125                       # cable trays run just under the ceiling (a height that clears every window and chair edge on screen)
-APS = [(11.75, 8.25), (19.5, 12.75), (3.125, 12.75)]   # access point centres (desk block, front right, Teams room); 0.625 square, hung from the ceiling
+APS = [(8.75, 8.25), (14.75, 8.25), (3.125, 12.75)]   # access point centres: a pair over the desk block (centred on it, x 6..17.5), then the Teams room. On screen a ceiling AP shows 4.5 back-left of where it hangs, so these land over open floor behind row 1; 0.625 square
 AP = (0.625, 0.125, 4.5)               # size, thickness, bottom z
 RINGS = [(3.25, 0.36), (2.25, 0.58), (1.25, 0.8)]   # Wi-Fi halo radius and opacity, at the AP's bottom
 RING_D = [[2420, 2490, 2560], [2360, 2430, 2500], [2300, 2370, 2440]]   # drop-in delay per ring size, per AP

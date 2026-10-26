@@ -38,9 +38,9 @@ CHAIR_X = 30                          # chair centre, out from the desk's front 
 PORTS_AT = [(30, 40, 15, 25), (5, 15, 5, 15)]   # floor port per desk: x from, x to (from the desk's back edge), y from, y to (out from its left side)
 PORT_H = 5
 RUN_X = [50, 40]                      # each run leaves the rack's left wall at this x, then one turn along the floor to its port
-AP_Z = 160                            # ceiling height: the access point hangs below it on a drop rod
-AP = (130, 155, 80, 105, 95, 100)     # over the open floor between the desks, low enough to read clear of them
-RINGS = [(25, 0.8), (45, 0.6), (65, 0.4)]   # halo radius, opacity
+AP_Z = 160                            # ceiling height: the access point hangs from it on a short rod
+AP = (305, 330, 200, 225, 140, 145)   # over open floor front-right of the front desk: box, rod and floor below are clear of everything on screen
+RINGS = [(22, 0.8), (38, 0.6), (55, 0.4)]   # halo radius, opacity (55 keeps the outer ring inside the floor disc)
 
 DISC = (120, 60, 185)                # floor disc centre x, y and radius; grid every 20
 GRID = 20
@@ -50,7 +50,7 @@ MIN_STUB = 3                          # drop floor-line scraps shorter than this
 LABELS = [
     dict(name='firewall', elbow=(-45, -170), x=-72, title='FIREWALL', sub='managed and patched', tw=66, sw=101, anchor='end', colour=ORANGE),
     dict(name='phone', elbow=(-100, 165), x=-127, title='VOIP PHONES', sub='calls over your network', tw=88, sw=119, anchor='end', colour=BLUE),
-    dict(name='ap', elbow=(110, 140), x=137, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='start', colour=ORANGE),
+    dict(name='ap', elbow=(165, 150), x=192, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='start', colour=ORANGE),
 ]
 TITLE = 'Server rack with firewall, two workstations with VoIP desk phones on the same network, and a Wi-Fi access point'
 
@@ -112,11 +112,9 @@ def floor_runs():
 
 
 def ap_run():
-    """Firewall top -> up -> along the ceiling (away from the rack) -> down the drop rod to the access point."""
-    cx = (RACK[0] + RACK[1]) / 2
+    """The access point's rod, straight up to the ceiling (a long ceiling run would cross the rack or a desk on screen)."""
     ax, ay = (AP[0] + AP[1]) / 2, (AP[2] + AP[3]) / 2
-    pts = [(cx, cx, FIREWALL[5]), (cx, cx, AP_Z), (ax, cx, AP_Z), (ax, ay, AP_Z), (ax, ay, AP[5])]
-    return f'<polyline points="{w.pts(*pts)}" fill="none" stroke="{ORANGE}" stroke-width="1.2" stroke-opacity="0.7" stroke-dasharray="2 4"/>'
+    return f'<polyline points="{w.pts((ax, ay, AP[5]), (ax, ay, AP_Z))}" fill="none" stroke="{ORANGE}" stroke-width="1.2" stroke-opacity="0.7" stroke-dasharray="2 4"/>'
 
 
 def rack():
