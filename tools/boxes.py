@@ -1,5 +1,5 @@
 """Resolve box triples (Y-face, X-face, Top) into world extents.
-usage: python3 boxes.py file ox oy u [start end] [--z0 L=val ...]
+usage: python boxes.py file ox oy u [start end] [--z0 L=val ...]
 For each triple prints x0..x1, y0..y1, z0..z1 assuming base z0 (default 0; override per first-line with Lnn=z).
 Also: given a base z0, resolution is exact (front-bottom corner shared by Y and X faces).
 """

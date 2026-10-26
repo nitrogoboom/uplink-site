@@ -1,5 +1,5 @@
 """Generic geometry checks.
-usage: python3 check.py <svgfile> [startline endline]   (lines for inline svg inside html)
+usage: python check.py <svgfile> [startline endline]   (lines for inline svg inside html)
 Reports:
   ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
   SNAP   vertices of different shapes that almost (not exactly) coincide

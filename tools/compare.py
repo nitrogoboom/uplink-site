@@ -1,4 +1,4 @@
-# python3 compare.py before.png after.png out.png [crop x0 y0 x1 y1 in before-pixels]
+# python compare.py before.png after.png out.png [crop x0 y0 x1 y1 in before-pixels]
 import sys
 from PIL import Image, ImageDraw, ImageFont
 a = Image.open(sys.argv[1]).convert('RGB'); b = Image.open(sys.argv[2]).convert('RGB')

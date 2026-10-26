@@ -63,7 +63,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `check.py file.svg` – edges near (but not on) an iso angle, near-miss vertices, leader dots and what they sit on
 - `dump.py file.svg ox oy u` – every shape in world terms
 - `boxes.py` / `painter.py` – turn face triples into 3D boxes; find boxes drawn in the wrong order or poking into each other (`rules_office.py` is the rules file for the office drawing)
-- `discs.py`, `floorfit.py` – check floor discs and rings are true iso circles; `roundify.py` rebuilds a floor disc as one (needs `site/` served on port 8766)
+- `discs.py`, `floorfit.py` – check floor discs and rings are true iso circles; `roundify.py` rebuilds a floor disc as one (needs `site/` served on port 8765)
 - `shoot1.js`, `shoot.js`, `compare.py` – zoomed screenshots and before/after sheets
 - `verify.js` – checks the hero builds, tiles respond to hover, the tower grows on scroll, and there's no sideways scroll at phone, tablet, 1440×900 and 3440×1440
 - `build_footer.py` – writes the footer into every page (see above)

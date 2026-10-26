@@ -1,5 +1,5 @@
 """Painter-order + overlap check for box triples in an iso SVG.
-usage: python3 painter.py file ox oy u rules.py   (rules.py defines z0(box)->float|None to skip, label(box))
+usage: python painter.py file ox oy u rules.py   (rules.py defines z0(box)->float|None to skip, label(box))
 Prints pairs whose screen silhouettes overlap but whose DOM order contradicts 3D depth,
 and pairs whose 3D volumes intersect (poke-through)."""
 import sys, math, importlib.util

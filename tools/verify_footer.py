@@ -1,5 +1,5 @@
 # Python port of tools/verify.js plus footer checks.
-# usage: python3 tools/verify_footer.py <outdir>   (serve site/ on port 8765 first)
+# usage: python tools/verify_footer.py <outdir>   (serve site/ on port 8765 first)
 import asyncio, sys
 from playwright.async_api import async_playwright
 base='http://localhost:8765'; out=sys.argv[1]

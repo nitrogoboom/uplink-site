@@ -1,6 +1,6 @@
 """Replace a stretched floor oval with a true iso circle (same grid, same knockouts around labels).
-usage: python3 tools/roundify.py name   (edits site/assets/img/<name>.svg in place)
-Needs site/ served on port 8766 for bboxes.js:  python3 -m http.server 8766 --directory site"""
+usage: python tools/roundify.py name   (edits site/assets/img/<name>.svg in place)
+Needs site/ served on port 8765 for bboxes.js:  python -m http.server 8765 --directory site"""
 import sys, os, re, json, math, subprocess
 import numpy as np
 TOOLS = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +53,7 @@ sr, pr = lattice(rs); sl, pl = lattice(ls)
 print(f'  grid step r={sr:.2f} l={sl:.2f}')
 
 # --- knockouts: label text boxes (+5px), measured in the browser ---
-bbs = json.loads(subprocess.check_output(['node', os.path.join(TOOLS, 'bboxes.js'), '8766', name]))
+bbs = json.loads(subprocess.check_output(['node', os.path.join(TOOLS, 'bboxes.js'), '8765', name]))
 holes = unary_union([box(b['x']-5, b['y']-5, b['x']+b['w']+5, b['y']+b['h']+5) for b in bbs if b['w'] > 0])
 
 # circle in screen space

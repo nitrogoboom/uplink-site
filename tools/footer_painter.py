@@ -1,4 +1,4 @@
-# Painter-order check for the footer campus map. usage: python3 footer_painter.py <page url>  (needs a box() logger: window.__isoLog)
+# Painter-order check for the footer campus map. usage: python footer_painter.py <page url>  (needs a box() logger: window.__isoLog)
 # Painter-order + poke-through check on the boxes the map generator actually drew (same logic as tools/painter.py).
 import asyncio, sys, json, math
 from shapely.geometry import Polygon

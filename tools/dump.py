@@ -1,5 +1,5 @@
 """Dump an iso SVG in world units.
-usage: python3 dump.py file.svg ox oy u [start end]
+usage: python dump.py file.svg ox oy u [start end]
 For each polygon: face type and world coords of each vertex given the face plane.
  top face   -> needs z: printed as (x-y, x+y-2z) pairs 'a/b' and also x,y assuming z from box partner
  left face  (plane y=const, R+V edges)
