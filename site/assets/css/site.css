@@ -752,7 +752,7 @@ a.fc-cl:hover { color: var(--c-accent); }
 .linkbtn { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); padding: 0; border: 0; background: none; color: var(--c-muted); font-size: var(--fs-2); }
 .linkbtn:hover { color: var(--c-text); }
 
-/* the campus map itself (built by site.js) */
+/* the campus map itself (built by footer.js) */
 .fc-w polygon { stroke: #D9E4F0; stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill 450ms ease, stroke 450ms ease, stroke-opacity 450ms ease; }
 .fc-w .f-t { fill: #405169; } .fc-w .f-l { fill: #313F54; } .fc-w .f-r { fill: #283447; }
 .fc-w .on .b .f-t { fill: #F7B868; } .fc-w .on .b .f-l { fill: #E2953F; } .fc-w .on .b .f-r { fill: #C98030; }

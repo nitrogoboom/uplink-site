@@ -27,7 +27,8 @@ Python 3.10+ and Node 18+.
 - `site/` – the website, exactly as the live artifact (26 Oct 2026)
   - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
-  - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`, `assets/js/site.js`
+  - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
+  - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero. `tower-grow.svg` matches the inline tower.
@@ -43,7 +44,7 @@ Every page has the same footer. On desktop it is exactly one screen tall.
 
 The footer markup comes from `tools/build_footer.py`. Change the lists at the top of that file (link groups, socials, legal links), then run `python tools/build_footer.py site` to rewrite the footer on all six pages.
 
-Each panel has a `data-map` value that picks a spot on the map: `hq`, `services`, `industries`, `company`, `support`, `resources`, `follow`. Anything else points at HQ. The map is drawn by `site.js` (section "Footer: hero-select roster + campus map") with the same true-isometric formula as the illustrations, `u = 38`. Draw order is back to front: resources, follow, services, company, hq, support, industries.
+Each panel has a `data-map` value that picks a spot on the map: `hq`, `services`, `industries`, `company`, `support`, `resources`, `follow`. Anything else points at HQ. The map is drawn by `assets/js/footer.js` with the same true-isometric formula as the illustrations, `u = 38`. Draw order is back to front: resources, follow, services, company, hq, support, industries.
 
 Without script, every panel shows in a stack and the roster is hidden.
 
