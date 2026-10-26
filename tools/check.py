@@ -1,0 +1,97 @@
+"""Generic geometry checks.
+usage: python3 check.py <svgfile> [startline endline]   (lines for inline svg inside html)
+Reports:
+  ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
+  SNAP   vertices of different shapes that almost (not exactly) coincide
+  TJOIN  vertices that almost (not exactly) touch another shape's edge
+  DOT    leader dots (.co circles) and what filled faces they sit on
+"""
+import sys, math
+from iso import load, classify
+from shapely.geometry import Polygon, Point
+
+def get_text(argv):
+    t = open(argv[1]).read()
+    if len(argv) > 3:
+        lines = t.split('\n')[int(argv[2])-1:int(argv[3])]
+        t = '\n'.join(lines)
+        t = t[t.index('<svg'):]
+    return t
+
+def is_ui(sh):
+    # skip 2D UI (rects/labels, curved paths, matrix-mapped icons)
+    if sh.tag in ('rect', 'text', 'circle', 'ellipse'): return True
+    if sh.curved: return True
+    if any(len(sub) > 10 for sub in sh.subs): return True   # polyline curve approximations (rings, discs)
+    if abs(sh.m[1]) > 1e-6 or abs(sh.m[2]) > 1e-6: return True   # icon mapped with matrix
+    return False
+
+def main():
+    text = get_text(sys.argv)
+    off = int(sys.argv[2]) - 1 if len(sys.argv) > 3 else 0
+    _, shapes = load(text)
+    geo = [s for s in shapes if s.subs and not is_ui(s)]
+    out = []
+    # ANGLE
+    for s in geo:
+        for p, q in s.edges():
+            k, d, o, ln = classify(p, q)
+            if k is None or ln < 3: continue
+            hor = min(abs(math.degrees(math.atan2(q[1]-p[1], q[0]-p[0])) % 180), 180 - abs(math.degrees(math.atan2(q[1]-p[1], q[0]-p[0])) % 180))
+            if 0.12 < o and d < 10 and ln > 3:
+                out.append(f'ANGLE L{s.line+off} {s.tag} {k} off={o:.2f}px ang_err={d:.2f} len={ln:.1f} {p[0]:.1f},{p[1]:.1f}->{q[0]:.1f},{q[1]:.1f}')
+    # SNAP
+    verts = []
+    for i, s in enumerate(geo):
+        for sub in s.subs:
+            for p in sub: verts.append((p, i))
+    grid = {}
+    for v in verts:
+        grid.setdefault((int(v[0][0]//3), int(v[0][1]//3)), []).append(v)
+    seen = set()
+    for (gx, gy), vs in grid.items():
+        cand = []
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1): cand += grid.get((gx+dx, gy+dy), [])
+        for a in vs:
+            for b in cand:
+                if a[1] == b[1] or geo[a[1]].line == geo[b[1]].line: continue
+                d = math.dist(a[0], b[0])
+                if 0.15 < d < 2.0:
+                    key = tuple(sorted([(round(a[0][0],1), round(a[0][1],1)), (round(b[0][0],1), round(b[0][1],1))]))
+                    if key in seen: continue
+                    seen.add(key)
+                    out.append(f'SNAP  L{geo[a[1]].line+off}/L{geo[b[1]].line+off} d={d:.2f} {a[0][0]:.1f},{a[0][1]:.1f} vs {b[0][0]:.1f},{b[0][1]:.1f}')
+    # TJOIN (vertex near other shape's edge)
+    for i, s in enumerate(geo):
+        for sub in s.subs:
+            for p in sub:
+                for j, t in enumerate(geo):
+                    if j == i: continue
+                    for a, b in t.edges():
+                        ln = math.dist(a, b)
+                        if ln < 4: continue
+                        ux, uy = (b[0]-a[0])/ln, (b[1]-a[1])/ln
+                        tpar = (p[0]-a[0])*ux + (p[1]-a[1])*uy
+                        if tpar < 1 or tpar > ln-1: continue
+                        dperp = abs((p[0]-a[0])*uy - (p[1]-a[1])*ux)
+                        if 0.15 < dperp < 1.2:
+                            out.append(f'TJOIN L{s.line+off}->L{t.line+off} d={dperp:.2f} pt {p[0]:.1f},{p[1]:.1f}')
+    # DOTS
+    faces = [s for s in geo if s.closed and s.fill not in ('none', '') and len(s.subs[0]) >= 3]
+    for s in shapes:
+        if s.tag == 'circle' and s.el.getparent() is not None and 'co' in (s.el.getparent().get('class') or '').split():
+            hits = []
+            for f in faces:
+                try:
+                    P = Polygon(f.subs[0])
+                    if P.buffer(0).contains(Point(s.c)):
+                        hits.append(f'L{f.line+off}:{f.fill}')
+                    elif P.buffer(0).distance(Point(s.c)) < 3:
+                        hits.append(f'near L{f.line+off}:{f.fill}(d={P.buffer(0).distance(Point(s.c)):.1f})')
+                except Exception: pass
+            out.append(f'DOT   L{s.line+off} at {s.c[0]:.1f},{s.c[1]:.1f} on: {hits[-3:]}')
+    print('\n'.join(out))
+    print(f'-- {len(geo)} geometric shapes, {len(out)} findings', file=sys.stderr)
+
+main()

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" width="640" height="480" role="img" aria-label="Stacked backup drives with a restore loop and an offsite copy">
+<title>Stacked backup drives with a restore loop and an offsite copy</title>
+<g transform="translate(289.9,207.4)" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" stroke-linecap="round" stroke-linejoin="round">
+<path d="M-51.7,-36.0L-105.0,-5.1M-2.8,-47.7L-125.4,23.1M30.1,-50.3L-129.8,42.1M57.3,-49.5L-128.5,57.8M80.9,-46.7L-123.6,71.4M101.9,-42.3L-116.1,83.5M120.7,-36.7L-106.4,94.4M137.6,-30.1L-94.8,104.1M152.7,-22.3L-81.4,112.9M166.1,-13.6L-66.3,120.6M177.7,-3.8L-49.4,127.3M187.4,7.0L6.2,111.6M-10.7,121.4L-30.6,132.9M194.9,19.1L34.7,111.6M199.8,32.7L63.2,111.6M201.1,48.4L91.7,111.6M196.7,67.5L120.2,111.6M176.3,95.7L132.8,120.8M94.7,-44.0L190.3,11.1M56.6,-49.6L199.9,33.1M27.0,-50.2L201.0,50.2M1.8,-48.3L197.7,64.8M-20.4,-44.7L191.4,77.6M-40.3,-39.7L182.8,89.1M-58.1,-33.5L172.1,99.4M-74.1,-26.3L159.6,108.6M-88.3,-18.1L145.3,116.8M-100.9,-8.8L107.8,111.6M-111.5,1.5L79.3,111.6M-120.2,12.9L50.7,111.6M-126.4,25.8L22.2,111.6M-129.7,40.3L-6.3,111.6M-128.6,57.4L-10.7,125.5M-119.0,79.4L-23.6,134.5" fill="none" stroke="#2C3849" stroke-width="1" stroke-opacity="0.8"/><path d="M152.7,112.9L147.5,115.7L142.1,118.5L136.4,121.1L132.8,122.6M-10.7,137.0L-14.2,136.4L-21.0,135.1L-27.7,133.6L-34.3,131.9L-40.8,130.1L-47.2,128.0L-53.3,125.9L-59.3,123.6L-65.2,121.1L-70.8,118.5L-76.2,115.7L-81.5,112.9L-86.4,109.8L-91.2,106.7L-95.7,103.5L-100.0,100.1L-104.0,96.6L-107.8,93.1L-111.2,89.4L-114.4,85.7L-117.3,81.8L-120.0,78.0L-122.3,74.0L-124.3,70.0L-126.0,65.9L-127.4,61.9L-128.5,57.7L-129.3,53.6L-129.8,49.4L-129.9,45.3L-129.8,41.1L-129.3,36.9L-128.5,32.8L-127.4,28.7L-126.0,24.6L-124.3,20.5L-122.3,16.5L-120.0,12.6L-117.3,8.7L-114.4,4.9L-111.2,1.1L-107.8,-2.5L-104.0,-6.1L-100.0,-9.6L-95.7,-12.9L-91.2,-16.2L-86.4,-19.3L-81.5,-22.3L-76.2,-25.2L-70.8,-28.0L-65.2,-30.6L-59.3,-33.1L-53.3,-35.4L-47.2,-37.5L-40.8,-39.5L-34.3,-41.4L-27.7,-43.1L-21.0,-44.6L-14.2,-45.9L-7.2,-47.1L-0.2,-48.1L6.9,-48.9L14.0,-49.5L21.2,-50.0L28.4,-50.3L35.6,-50.3L42.9,-50.3L50.1,-50.0L57.2,-49.5L64.4,-48.9L71.5,-48.1L78.5,-47.1L85.4,-45.9L92.3,-44.6L99.0,-43.1L105.6,-41.4L112.1,-39.5L118.4,-37.5L124.6,-35.4L130.6,-33.1L136.4,-30.6L142.1,-28.0L147.5,-25.2L152.7,-22.3L157.7,-19.3L162.5,-16.2L167.0,-12.9L171.3,-9.6L175.3,-6.1L179.0,-2.5L182.5,1.1L185.7,4.9L188.6,8.7L191.2,12.6L193.6,16.5L195.6,20.5L197.3,24.6L198.7,28.7L199.8,32.8L200.6,36.9L201.1,41.1L201.2,45.3L201.1,49.4L200.6,53.6L199.8,57.7L198.7,61.9L197.3,65.9L195.6,70.0L193.6,74.0L191.2,78.0L188.6,81.8L185.7,85.7L182.5,89.4L179.0,93.1L175.3,96.6L171.3,100.1L167.0,103.5L162.5,106.7L157.7,109.8L152.7,112.9" fill="none" stroke="#2C3849" stroke-width="1.2"/>
+<polyline points="-40.6,-22.9 -31.5,-25.0 -22.1,-26.7 -12.5,-28.0 -2.7,-28.7 7.1,-29.0 17.0,-28.7 26.7,-28.0 36.3,-26.7 45.7,-25.0 54.8,-22.9 63.6,-20.2 71.9,-17.2 79.7,-13.7 86.9,-9.9 93.6,-5.7 99.6,-1.2 104.9,3.6 109.4,8.7 113.2,13.9 116.1,19.3 118.3,24.9 119.6,30.5 120.0,36.2 119.6,41.9 118.3,47.5 116.1,53.1 113.2,58.5 109.4,63.7 104.9,68.8 99.6,73.6 93.6,78.1 86.9,82.3 79.7,86.1 71.9,89.6 63.6,92.6 54.8,95.3 45.7,97.4 36.3,99.1 26.7,100.4 17.0,101.1 7.1,101.4 -2.7,101.1 -12.5,100.4 -22.1,99.1 -31.5,97.4 -40.6,95.3 -49.3,92.6 -57.6,89.6 -65.4,86.1 -72.7,82.3 -79.3,78.1 -85.3,73.6 -90.6,68.8 -95.2,63.7 -98.9,58.5 -101.9,53.1 -104.0,47.5 -105.3,41.9 -105.7,36.2 -105.3,30.5 -104.0,24.9 -101.9,19.3 -98.9,13.9 -95.2,8.7" fill="none" stroke="#F4A340" stroke-width="1.6" stroke-opacity="0.9"/>
+<polygon points="-89.3,-0.6 -93.3,15.0 -101.7,9.8" fill="#F4A340" stroke="#F4A340" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="-57.0,32.9 14.3,74.1 14.3,51.0 -57.0,9.9" fill="#313F54" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="71.3,41.1 14.3,74.1 14.3,51.0 71.3,18.1" fill="#283447" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="0.0,-23.0 71.3,18.1 14.3,51.0 -57.0,9.9" fill="#405169" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<circle cx="62.7" cy="34.6" r="1.8" fill="#F4A340"/>
+<circle cx="49.9" cy="42.0" r="1.8" fill="#7DB9E8"/>
+<circle cx="37.1" cy="49.4" r="1.8" fill="#7DB9E8"/>
+<circle cx="24.2" cy="56.8" r="1.8" fill="#7DB9E8"/>
+<polygon points="-57.0,6.6 14.3,47.7 14.3,24.7 -57.0,-16.5" fill="#313F54" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="71.3,14.8 14.3,47.7 14.3,24.7 71.3,-8.2" fill="#283447" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="0.0,-49.4 71.3,-8.2 14.3,24.7 -57.0,-16.5" fill="#405169" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<circle cx="62.7" cy="8.2" r="1.8" fill="#F4A340"/>
+<circle cx="49.9" cy="15.6" r="1.8" fill="#7DB9E8"/>
+<circle cx="37.1" cy="23.0" r="1.8" fill="#7DB9E8"/>
+<circle cx="24.2" cy="30.4" r="1.8" fill="#7DB9E8"/>
+<polygon points="-57.0,-19.7 14.3,21.4 14.3,-1.6 -57.0,-42.8" fill="#313F54" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="71.3,-11.5 14.3,21.4 14.3,-1.6 71.3,-34.6" fill="#283447" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="0.0,-75.7 71.3,-34.6 14.3,-1.6 -57.0,-42.8" fill="#405169" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<circle cx="62.7" cy="-18.1" r="1.8" fill="#F4A340"/>
+<circle cx="49.9" cy="-10.7" r="1.8" fill="#7DB9E8"/>
+<circle cx="37.1" cy="-3.3" r="1.8" fill="#7DB9E8"/>
+<circle cx="24.2" cy="4.1" r="1.8" fill="#7DB9E8"/>
+<polygon points="136.8,52.7 179.6,77.3 179.6,60.9 136.8,36.2" fill="#313F54" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="213.8,57.6 179.6,77.3 179.6,60.9 213.8,41.1" fill="#283447" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="171.0,16.5 213.8,41.1 179.6,60.9 136.8,36.2" fill="#405169" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="136.8,32.9 179.6,57.6 179.6,41.1 136.8,16.5" fill="#313F54" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="213.8,37.8 179.6,57.6 179.6,41.1 213.8,21.4" fill="#283447" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polygon points="171.0,-3.3 213.8,21.4 179.6,41.1 136.8,16.5" fill="#405169" fill-opacity="1.0" stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"/>
+<polyline points="7.1,-38.7 75.6,-78.2 175.3,-20.6 175.3,18.9" fill="none" stroke="#F4A340" stroke-width="1.3" stroke-opacity="0.8" stroke-dasharray="6 5"/>
+<g class="co"><polyline points="158.2,37.0 183.2,-16.2 203.2,-16.2" fill="none" stroke="#F4A340" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="158.2" cy="37.0" r="3" fill="#F4A340" stroke="#151E2C" stroke-width="1.5"/></g>
+<text x="210.2" y="-11.7" font-size="13" font-weight="600" letter-spacing="0.78" fill="#F4A340" text-anchor="start">OFFSITE COPY</text>
+<text x="210.2" y="3.3" font-size="11" font-weight="400" letter-spacing="0.00" fill="#A9B4C3" text-anchor="start">separate location</text>
+<g class="co"><polyline points="-42.8,-23.0 -82.0,-76.3 -102.0,-76.3" fill="none" stroke="#7DB9E8" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="-42.8" cy="-23.0" r="3" fill="#7DB9E8" stroke="#151E2C" stroke-width="1.5"/></g>
+<text x="-109.0" y="-71.8" font-size="13" font-weight="600" letter-spacing="0.78" fill="#7DB9E8" text-anchor="end">DAILY BACKUPS</text>
+<text x="-109.0" y="-56.8" font-size="11" font-weight="400" letter-spacing="0.00" fill="#A9B4C3" text-anchor="end">servers + Microsoft 365</text>
+<g class="co"><polyline points="-72.0,82.7 -32.7,125.1 -12.7,125.1" fill="none" stroke="#F4A340" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="-72.0" cy="82.7" r="3" fill="#F4A340" stroke="#151E2C" stroke-width="1.5"/></g>
+<text x="-5.7" y="129.6" font-size="13" font-weight="600" letter-spacing="0.78" fill="#F4A340" text-anchor="start">TESTED RESTORES</text>
+<text x="-5.7" y="144.6" font-size="11" font-weight="400" letter-spacing="0.00" fill="#A9B4C3" text-anchor="start">we prove it works</text>
+</g>
+</svg>
