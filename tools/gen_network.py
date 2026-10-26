@@ -3,11 +3,11 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_network.py site/assets/img/network.svg
 World: 1 unit = 1px. x runs right-down, y left-down, z up. Floor is z = 0.
 """
-import math, sys
-from shapely.geometry import MultiPoint, Point, box as box_shape
+import sys
+from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, FLOOR_LINE, ORANGE, BLUE, faces, ellipse, clip_out, seg_path, label, doc, write
+from isogen import HIGH, ORANGE, BLUE, faces, ellipse, clip_out, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 0, 1)                        # inside the group's translate(312.5,185.4)
 
@@ -34,8 +34,6 @@ MIN_STUB = 3                          # drop floor-line scraps shorter than this
 TITLE = 'Server rack with firewall, cabling to desks and a Wi-Fi access point'
 
 
-def outline(x0, x1, y0, y1, z0, z1):
-    return MultiPoint([w.p(x, y, z) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]).convex_hull
 
 
 def desk_parts(cx, cy):
@@ -56,60 +54,17 @@ def solids():
 
 def floor_mask():
     gaps = [box_shape(*g) for g in GAPS]
-    return unary_union(gaps + [outline(*b) for b in solids()])
+    return unary_union(gaps + [silhouette(w, *b) for b in solids()])
 
 
-def floor_grid(mask):
-    cx, cy, r = DISC
-    segs = []
-    for axis in (0, 1):
-        c0 = (cx if axis == 0 else cy)
-        for k in range(-r // GRID, r // GRID + 1):
-            c = c0 + k * GRID
-            off = c - c0
-            if abs(off) >= r: continue
-            s = math.sqrt(r * r - off * off)
-            a, b = ((c, cy - s), (c, cy + s)) if axis == 0 else ((cx - s, c), (cx + s, c))
-            segs += clip_out(w.p(*a), w.p(*b), mask)
-    segs = [(A, B) for A, B in segs if math.dist(A, B) >= MIN_STUB]
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def floor_disc(mask):
-    """The disc's rim as arcs, skipping the label gaps. Runs clockwise."""
-    cx, cy, r = DISC
-    rx, ry = r * math.sqrt(1.5), r / math.sqrt(2)
-    (X, Y) = w.p(cx, cy)
-    gaps = unary_union([box_shape(*g) for g in GAPS])
-    at = lambda t: (X + rx * math.cos(t), Y + ry * math.sin(t))
-    inside = lambda t: gaps.contains(Point(at(t)))
-    n = 1440
-    t0 = next(2 * math.pi * i / n for i in range(n) if inside(2 * math.pi * i / n))   # start inside a gap
-    t = lambda i: t0 + 2 * math.pi * i / n
-    d, i = '', 0
-    while i <= n:
-        if inside(t(i)): i += 1; continue
-        j = i
-        while not inside(t(j)): j += 1
-        a, b = edge(inside, t(i - 1), t(i)), edge(inside, t(j - 1), t(j))
-        (ax, ay), (bx, by) = at(a), at(b)
-        d += f'M{fmt(ax)},{fmt(ay)}A{fmt(rx)},{fmt(ry)} 0 {int(b - a > math.pi)} 1 {fmt(bx)},{fmt(by)}'
-        i = j
-    return f'<path d="{d}" fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>'
 
 
-def edge(inside, a, b):
-    """Bisect between angles a and b for where the rim crosses a gap edge."""
-    ia = inside(a)
-    for _ in range(40):
-        m = (a + b) / 2
-        if inside(m) == ia: a = m
-        else: b = m
-    return (a + b) / 2
 
 
 def floor_runs():
-    mask = unary_union([outline(*b) for b in solids()])
+    mask = unary_union([silhouette(w, *b) for b in solids()])
     out = []
     for run in FLOOR_RUNS:
         pts = [w.p(x, y) for x, y in run]
@@ -146,7 +101,7 @@ def access_point():
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     out = [ellipse(w, r, cx, cy, z0, f'fill="none" stroke="{ORANGE}" stroke-width="1" stroke-opacity="{o}" stroke-dasharray="4 5"') for r, o in RINGS]
     pts = [w.p(*p) for p in CEILING_RUN]
-    ap = outline(*AP)
+    ap = silhouette(w, *AP)
     segs = [s for p, q in zip(pts, pts[1:]) for s in clip_out(p, q, ap)]
     run = ' '.join(f'{fmt(x)},{fmt(y)}' for x, y in [segs[0][0]] + [s[1] for s in segs])
     out.append(f'<polyline points="{run}" fill="none" stroke="{ORANGE}" stroke-width="1.2" stroke-opacity="0.7" stroke-dasharray="2 4"/>')
@@ -155,7 +110,8 @@ def access_point():
 
 def build():
     mask = floor_mask()
-    body = [floor_grid(mask) + floor_disc(mask)]
+    body = [floor_grid(w, DISC[:2], DISC[2], mask, step=GRID, phase=DISC[:2], min_seg=MIN_STUB)
+            + disc_arcs(w, DISC[2], *DISC[:2], mask=unary_union([box_shape(*g) for g in GAPS]))]
     body += floor_runs() + rack()
     for c in DESKS: body += desk(*c)
     body += access_point()

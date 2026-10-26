@@ -1,7 +1,7 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match README "Drawing rules" and the drawing palette in site/assets/css/tokens.css."""
 import math
-from shapely.geometry import LineString
+from shapely.geometry import LineString, MultiPoint, Point
 from iso import fmt
 from svgfont import font_style
 
@@ -27,6 +27,64 @@ def iso_ellipse(w, r, x=0, y=0, z=0):
 def ellipse(w, r, x=0, y=0, z=0, attrs=''):
     rx, ry, (cx, cy) = iso_ellipse(w, r, x, y, z)
     return f'<ellipse cx="{fmt(cx)}" cy="{fmt(cy)}" rx="{fmt(rx)}" ry="{fmt(ry)}" {attrs}/>'
+
+
+def silhouette(w, x0, x1, y0, y1, z0, z1):
+    """A box's outline on screen (shapely), for masking floor lines drawn under it."""
+    return MultiPoint([w.p(x, y, z) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]).convex_hull
+
+
+def floor_grid(w, centre, r, mask, step=1, phase=(0, 0), min_seg=0):
+    """Floor lines inside an iso disc of radius r, cut by mask.
+    Lines sit at x = phase[0] + k*step and y = phase[1] + k*step (world units).
+    Pieces shorter than min_seg px are dropped (slivers peeking out beside a box)."""
+    cx, cy = centre
+    segs = []
+    for axis in (0, 1):
+        c0, ph = (cx, phase[0]) if axis == 0 else (cy, phase[1])
+        k0, k1 = math.floor((c0 - r - ph) / step), math.ceil((c0 + r - ph) / step)
+        for k in range(k0, k1 + 1):
+            c = ph + k * step
+            if abs(c - c0) >= r: continue
+            s = math.sqrt(r * r - (c - c0) ** 2)
+            a, b = ((c, cy - s), (c, cy + s)) if axis == 0 else ((cx - s, c), (cx + s, c))
+            segs += clip_out(w.p(*a), w.p(*b), mask)
+    segs = [(a, b) for a, b in segs if math.dist(a, b) >= min_seg]
+    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
+
+
+def disc_arcs(w, r, x=0, y=0, z=0, mask=None, attrs=f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"'):
+    """An iso circle as exact SVG arcs, leaving out the parts inside mask (labels, objects in front)."""
+    rx, ry, (cx, cy) = iso_ellipse(w, r, x, y, z)
+    at = lambda t: (cx + rx * math.cos(t), cy + ry * math.sin(t))
+    inside = lambda t: mask is not None and mask.contains(Point(at(t)))
+    n = 3600
+    ts = [2 * math.pi * k / n for k in range(n)]
+    hits = [inside(t) for t in ts]
+    if not any(hits):
+        return f'<ellipse cx="{fmt(cx)}" cy="{fmt(cy)}" rx="{fmt(rx)}" ry="{fmt(ry)}" {attrs}/>'
+    if all(hits):
+        return ''
+    def edge(a, b):                          # bisect where the rim crosses the mask's edge
+        ia = inside(a)
+        for _ in range(40):
+            m = (a + b) / 2
+            if inside(m) == ia: a = m
+            else: b = m
+        return (a + b) / 2
+    start = hits.index(True)                 # walk from inside the mask so runs don't wrap
+    d, t0 = '', None
+    for i in range(1, n + 1):
+        j, k = (start + i) % n, (start + i - 1) % n
+        a, b = start + i - 1, start + i      # unwrapped sample numbers
+        if hits[k] and not hits[j]: t0 = edge(2 * math.pi * a / n, 2 * math.pi * b / n)
+        if not hits[k] and hits[j]:
+            t1 = edge(2 * math.pi * a / n, 2 * math.pi * b / n)
+            span = t1 - t0
+            if span * rx >= 1:
+                (x0, y0), (x1, y1) = at(t0), at(t1)
+                d += f'M{fmt(x0)},{fmt(y0)}A{fmt(rx)},{fmt(ry)} 0 {int(span > math.pi)} 1 {fmt(x1)},{fmt(y1)}'
+    return f'<path d="{d}" {attrs}/>'
 
 
 def clip_out(p, q, mask):

@@ -4,10 +4,10 @@ usage: python tools/gen_backup.py site/assets/img/backup.svg
 World: 1 unit = 16.46px. x runs right-down, y left-down, z up. Origin is the back corner of the drive stack's floor.
 """
 import math, sys
-from shapely.geometry import Polygon, box as box_shape
+from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, FLOOR_LINE, ORANGE, BLUE, faces, iso_ellipse, clip_out, seg_path, label, doc, write
+from isogen import ORANGE, BLUE, faces, iso_ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 0, 16.46)                    # inside the group's translate(289.9,207.4)
 
@@ -33,41 +33,19 @@ def drive_z(i): return i * (DH + STACK_GAP)
 def offsite_z(i): return i * (OFFSITE_H + STACK_GAP)
 
 
-def silhouette(x0, x1, y0, y1, z0, z1):
-    return Polygon([w.p(x0, y0, z1), w.p(x1, y0, z1), w.p(x1, y0, z0),
-                    w.p(x1, y1, z0), w.p(x0, y1, z0), w.p(x0, y1, z1)])
 
 
 def hidden():
     """Screen areas floor lines skip: the label gap and both box stacks."""
     x0, x1, y0 = GAP
     parts = [box_shape(x0, y0, x1, 10_000)]
-    parts += [silhouette(0, DX, 0, DY, drive_z(i), drive_z(i) + DH) for i in range(DRIVES)]
-    parts += [silhouette(OX0, OX1, OY0, OY1, offsite_z(i), offsite_z(i) + OFFSITE_H) for i in range(OFFSITES)]
+    parts += [silhouette(w, 0, DX, 0, DY, drive_z(i), drive_z(i) + DH) for i in range(DRIVES)]
+    parts += [silhouette(w, OX0, OX1, OY0, OY1, offsite_z(i), offsite_z(i) + OFFSITE_H) for i in range(OFFSITES)]
     return unary_union(parts)
 
 
-def floor_grid():
-    mask = hidden()
-    cx, cy = DISC_C
-    segs = []
-    for x in range(math.ceil(cx - DISC_R), math.floor(cx + DISC_R) + 1):
-        s = math.sqrt(DISC_R ** 2 - (x - cx) ** 2)
-        segs += clip_out(w.p(x, cy - s), w.p(x, cy + s), mask)
-    for y in range(math.ceil(cy - DISC_R), math.floor(cy + DISC_R) + 1):
-        s = math.sqrt(DISC_R ** 2 - (y - cy) ** 2)
-        segs += clip_out(w.p(cx - s, y), w.p(cx + s, y), mask)
-    segs = [(a, b) for a, b in segs if math.dist(a, b) >= MIN_SEG]
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def floor_disc():
-    rx, ry, (cx, cy) = iso_ellipse(w, DISC_R, *DISC_C)
-    # open at the front where the label sits: run clockwise from the gap's left edge round to its right edge
-    def low_y(x): return cy + ry * math.sqrt(1 - ((x - cx) / rx) ** 2)
-    x0, x1, _ = GAP
-    return (f'<path d="M{fmt(x0)},{fmt(low_y(x0))}A{fmt(rx)},{fmt(ry)} 0 1 1 {fmt(x1)},{fmt(low_y(x1))}" '
-            f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>')
 
 
 def ring_point(deg):
@@ -118,7 +96,9 @@ def offsite():
 
 
 def build():
-    body = [floor_grid() + floor_disc()]
+    x0, x1, y0 = GAP
+    body = [floor_grid(w, DISC_C, DISC_R, hidden(), min_seg=MIN_SEG)
+            + disc_arcs(w, DISC_R, *DISC_C, mask=box_shape(x0, y0, x1, 10_000))]
     body += restore_loop() + drives() + offsite()
     up = offsite_z(OFFSITES - 1)
     body += label(w.p((OX0 + OX1) / 2, OY1, up + OFFSITE_H / 2), (186.2, -16.2), 213.2, 'OFFSITE COPY', 'separate location')

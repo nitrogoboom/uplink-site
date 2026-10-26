@@ -10,7 +10,7 @@ FILES = {'400': 'Barlow-Regular.ttf', '600': 'Barlow-SemiBold.ttf'}
 
 
 def _woff2(path, text):
-    f = TTFont(path)
+    f = TTFont(path, recalcTimestamp=False)     # same letters in, same bytes out (no fresh timestamp each run)
     o = subset.Options(); o.flavor = 'woff2'; o.layout_features = ['kern']; o.name_IDs = []; o.hinting = False
     s = subset.Subsetter(o); s.populate(text=text); s.subset(f)
     b = io.BytesIO(); f.flavor = 'woff2'; f.save(b)

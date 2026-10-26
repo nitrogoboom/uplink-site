@@ -3,10 +3,10 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_hq.py site/assets/img/hq.svg
 World: 1 unit = 18px. Origin = floor centre. x runs right-down, y left-down, z up.
 """
-import math, sys
-from shapely.geometry import Polygon, box as box_shape
-from iso import W, fmt
-from isogen import FACES, HIGH, FLOOR_LINE, ORANGE, BLUE, faces, iso_ellipse, ellipse, clip_out, seg_path, label, doc, write
+import sys
+from shapely.geometry import box as box_shape
+from iso import W
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, ellipse, silhouette, floor_grid, disc_arcs, label, doc, write
 
 w = W(0, 63, 18)                      # inside the group's translate(275.4,218.1)
 
@@ -25,34 +25,13 @@ GAP = (124.0, 40.8, 79.0)             # floor lines stop at x >= GAP[0], GAP[1] 
 TITLE = 'Three-storey office building with the help desk floor highlighted'
 
 
+def label_gap():
+    return box_shape(GAP[0], GAP[1], 10_000, GAP[2])
+
+
 def hidden():
-    """Screen areas floor lines skip: the label gap and the building's outline."""
-    gap = box_shape(GAP[0], GAP[1], 10_000, GAP[2])
-    top = FLOOR * FLOORS
-    outline = Polygon([w.p(-HALF, -HALF, top), w.p(HALF, -HALF, top), w.p(HALF, -HALF, 0),
-                       w.p(HALF, HALF, 0), w.p(-HALF, HALF, 0), w.p(-HALF, HALF, top)])
-    return gap.union(outline)
-
-
-def floor_grid():
-    mask = hidden()
-    segs = []
-    steps = [k + 0.5 for k in range(-DISC_R, DISC_R) if abs(k + 0.5) < DISC_R]
-    for axis in (0, 1):
-        for c in steps:
-            s = math.sqrt(DISC_R ** 2 - c ** 2)
-            a, b = ((c, -s), (c, s)) if axis == 0 else ((-s, c), (s, c))
-            segs += clip_out(w.p(*a), w.p(*b), mask)
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
-
-
-def floor_disc():
-    rx, ry, (cx, cy) = iso_ellipse(w, DISC_R)
-    # open on the right where the label sits: run clockwise from the gap's bottom to its top
-    def right_x(y): return cx + rx * math.sqrt(1 - ((y - cy) / ry) ** 2)
-    _, y0, y1 = GAP
-    return (f'<path d="M{fmt(right_x(y1))},{fmt(y1)}A{fmt(rx)},{fmt(ry)} 0 1 1 {fmt(right_x(y0))},{fmt(y0)}" '
-            f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>')
+    """Screen areas floor lines skip: the label gap and the building."""
+    return label_gap().union(silhouette(w, -HALF, HALF, -HALF, HALF, 0, FLOOR * FLOORS))
 
 
 def windows(z0):
@@ -74,7 +53,7 @@ def antenna():
 
 
 def build():
-    body = [floor_grid() + floor_disc()]
+    body = [floor_grid(w, (0, 0), DISC_R, hidden(), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=label_gap())]
     for f in range(FLOORS):
         body += faces(w, -HALF, HALF, -HALF, HALF, f * FLOOR, (f + 1) * FLOOR, HIGH if f == LIT else FACES)
     for f in range(FLOORS):

@@ -3,11 +3,11 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_cloud.py site/assets/img/cloud.svg
 World: 1 unit = 16.31px (one floor-grid square). Origin = floor-disc centre. x runs right-down, y left-down, z up.
 """
-import math, sys
-from shapely.geometry import LineString, MultiPoint, Point, Polygon, box as box_shape
+import sys
+from shapely.geometry import LineString, Polygon, box as box_shape
 from shapely.ops import unary_union
 from iso import W, C30, fmt
-from isogen import FACES, HIGH, FLOOR_LINE, ORANGE, BLUE, faces, iso_ellipse, clip_out, seg_path, label, doc, write
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(21.2, 36.7, 16.31)              # inside the group's translate(312.8,310.6)
 
@@ -82,56 +82,18 @@ def on_lid(s, f):
     return tuple(a[k] + (b[k] - a[k]) * s + (d[k] - a[k]) * f for k in range(3))
 
 
-def silhouette(b):
-    x0, x1, y0, y1, z0, z1 = b
-    return MultiPoint([w.p(x, y, z) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]).convex_hull
-
-
 def mask():
     tails = []
     for _, (ex, ey), tx, a, *_ in LABELS:
         end = tx + 7 if a == 'end' else tx - 7
         tails.append(LineString([(ex, ey), (end, ey)]).buffer(TAIL_PAD))
-    solids = [silhouette(SERVER), silhouette(LAPTOP), Polygon([w.p(*p) for p in lid()]), silhouette(PHONE)]
+    solids = [silhouette(w, *SERVER), silhouette(w, *LAPTOP), Polygon([w.p(*p) for p in lid()]), silhouette(w, *PHONE)]
     # solids grow by a hair so a floor line that runs exactly along an edge is dropped, not left as a sliver
     return unary_union(LABEL_GAPS + tails + [p.buffer(0.05) for p in solids])
 
 
-def floor_grid(m):
-    segs = []
-    n = int(DISC_R)
-    for k in range(-n, n + 1):                       # x = k, whole numbers
-        s = math.sqrt(DISC_R ** 2 - k ** 2)
-        segs += clip_out(w.p(k, -s), w.p(k, s), m)
-    for k in range(-n, n):                           # y = k + 0.5
-        c = k + 0.5
-        s = math.sqrt(DISC_R ** 2 - c ** 2)
-        segs += clip_out(w.p(-s, c), w.p(s, c), m)
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def floor_disc(m):
-    """The disc outline as elliptical arcs, broken where it crosses the label gaps."""
-    rx, ry, (cx, cy) = iso_ellipse(w, DISC_R)
-    gaps = unary_union(LABEL_GAPS)
-    N = 3600
-    pt = lambda i: (cx + rx * math.cos(2 * math.pi * i / N), cy + ry * math.sin(2 * math.pi * i / N))
-    out = [not gaps.contains(Point(pt(i))) for i in range(N)]
-    start = out.index(False)                         # walk from inside a gap so runs don't wrap
-    runs, i = [], 0
-    while i < N:
-        j = (start + i) % N
-        if out[j]:
-            k = i
-            while k + 1 < N and out[(start + k + 1) % N]: k += 1
-            runs.append(((start + i) % N, k - i + 1)); i = k + 1
-        else:
-            i += 1
-    d = ''
-    for a, n in runs:
-        p, q = pt(a), pt(a + n - 1)
-        d += f'M{fmt(p[0])},{fmt(p[1])}A{fmt(rx)},{fmt(ry)} 0 {int(n > N / 2)} 1 {fmt(q[0])},{fmt(q[1])}'
-    return f'<path d="{d}" fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>'
 
 
 def server():
@@ -208,7 +170,7 @@ def card(plat):
 
 def build():
     m = mask()
-    body = [floor_grid(m) + floor_disc(m)]
+    body = [floor_grid(w, (0, 0), DISC_R, m, phase=(0, 0.5)) + disc_arcs(w, DISC_R, mask=unary_union(LABEL_GAPS))]
     body += server() + laptop() + faces(w, *PHONE) + sync()
     plat_body, plat = slab()
     body += plat_body + card(plat)

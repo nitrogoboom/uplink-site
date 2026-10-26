@@ -3,11 +3,11 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_helpdesk.py site/assets/img/helpdesk.svg
 World: 1 unit = 23px. x runs right-down, y left-down, z up. Desk's back-left corner is the origin.
 """
-import math, sys
-from shapely.geometry import Point, Polygon, box as box_shape
+import sys
+from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, FLOOR_LINE, ORANGE, BLUE, faces, iso_ellipse, clip_out, seg_path, label, doc, write
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 0, 23)                       # inside the group's translate(265.7,200.9)
 
@@ -50,8 +50,6 @@ def objects():
     return [DESK, MONITOR, KEYBOARD, MOUSE, SEAT, BACK] + ticket_boxes()
 
 
-def silhouette(b):
-    return unary_union([Polygon([tuple(map(float, p.split(','))) for p in pts.split()]) for pts in w.box(*b)])
 
 
 def label_gaps(L):
@@ -62,45 +60,11 @@ def label_gaps(L):
 
 def hidden():
     """Floor lines skip everything drawn over them: objects and labels."""
-    return unary_union([silhouette(b) for b in objects()] + [g for L in LABELS for g in label_gaps(L)])
+    return unary_union([silhouette(w, *b) for b in objects()] + [g for L in LABELS for g in label_gaps(L)])
 
 
-def floor_grid(mask):
-    cx, cy, r = DISC
-    segs = []
-    for axis in (0, 1):
-        c0 = cx if axis == 0 else cy
-        for c in range(math.ceil(c0 - r), math.floor(c0 + r) + 1):
-            s = math.sqrt(max(r * r - (c - c0) ** 2, 0))
-            o = cy if axis == 0 else cx
-            a, b = ((c, o - s), (c, o + s)) if axis == 0 else ((o - s, c), (o + s, c))
-            if s > 0: segs += clip_out(w.p(*a), w.p(*b), mask)
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def floor_disc(mask):
-    """The disc edge as exact arcs, skipping the parts under objects and labels.
-    (local helper: isogen has no masked-ellipse yet)"""
-    rx, ry, (cx, cy) = iso_ellipse(w, DISC[2], DISC[0], DISC[1])
-    pt = lambda t: (cx + rx * math.cos(t), cy + ry * math.sin(t))
-    out = lambda t: not mask.contains(Point(pt(t)))
-    n = 1440; ts = [2 * math.pi * k / n for k in range(n)]
-    def edge(a, b):
-        for _ in range(40):
-            m = (a + b) / 2
-            if out(m) == out(a): a = m
-            else: b = m
-        return (a + b) / 2
-    flips = [(edge(ts[k], ts[k] + 2 * math.pi / n), out(ts[(k + 1) % n])) for k in range(n) if out(ts[k]) != out(ts[(k + 1) % n])]
-    if not flips: return f'<ellipse cx="{fmt(cx)}" cy="{fmt(cy)}" rx="{fmt(rx)}" ry="{fmt(ry)}" fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>'
-    while not flips[0][1]:                      # start where the edge comes out from under something
-        flips = flips[1:] + [(flips[0][0] + 2 * math.pi, flips[0][1])]
-    flips = [t for t, _ in flips]
-    d = ''
-    for a, b in zip(flips[0::2], flips[1::2]):
-        (x0, y0), (x1, y1) = pt(a), pt(b)
-        d += f'M{fmt(x0)},{fmt(y0)}A{fmt(rx)},{fmt(ry)} 0 {int(b - a > math.pi)} 1 {fmt(x1)},{fmt(y1)}'
-    return f'<path d="{d}" fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>'
 
 
 def outline(pts, colour, width, opacity):
@@ -129,7 +93,7 @@ def ticket_marks():
 
 def build():
     mask = hidden()
-    body = [floor_grid(mask) + floor_disc(mask)]
+    body = [floor_grid(w, DISC[:2], DISC[2], mask) + disc_arcs(w, DISC[2], *DISC[:2], mask=mask)]
     body += faces(w, *DESK) + faces(w, *MONITOR) + monitor_face()
     body += faces(w, *KEYBOARD) + faces(w, *MOUSE) + faces(w, *SEAT) + faces(w, *BACK)
     for k, b in enumerate(ticket_boxes()):

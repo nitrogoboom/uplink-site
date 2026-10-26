@@ -3,11 +3,11 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_strategy.py site/assets/img/strategy.svg
 World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
 """
-import math, sys
-from shapely.geometry import LineString, Polygon, box as box_shape
+import sys
+from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, FLOOR_LINE, ORANGE, faces, iso_ellipse, clip_out, seg_path, label, doc, write
+from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(43.3, 115, 20)                  # inside the group's translate(236.8,154)
 
@@ -48,43 +48,12 @@ def text_rect(i, txt, anchor, dx, dy, width):
 def hidden():
     """Screen areas floor lines skip: milestone text and the bars standing on the floor."""
     rects = [text_rect(*m) for m in MILESTONES]
-    sil = [Polygon([w.p(x0, y0, z1), w.p(x1, y0, z1), w.p(x1, y0, 0), w.p(x1, y1, 0), w.p(x0, y1, 0), w.p(x0, y1, z1)])
-           for (x0, x1, y0, y1, _, z1), _c in bar_boxes()]
+    sil = [silhouette(w, *b) for b, _c in bar_boxes()]
     return unary_union(rects + sil)
 
 
-def floor_grid(mask):
-    segs = []
-    for axis, off in ((0, GRID_X0), (1, GRID_Y0)):
-        for k in range(-math.ceil(DISC_R) - 1, math.ceil(DISC_R) + 1):
-            c = k + off
-            if abs(c) >= DISC_R: continue
-            s = math.sqrt(DISC_R ** 2 - c ** 2)
-            a, b = ((c, -s), (c, s)) if axis == 0 else ((-s, c), (s, c))
-            segs += clip_out(w.p(*a), w.p(*b), mask)
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def floor_disc(mask):
-    """The disc edge as true elliptical arcs, skipping whatever mask covers."""
-    rx, ry, (cx, cy) = iso_ellipse(w, DISC_R)
-    n = 1440
-    ring = [(cx + rx * math.cos(2 * math.pi * k / n), cy + ry * math.sin(2 * math.pi * k / n)) for k in range(n + 1)]
-    rest = LineString(ring).difference(mask)
-    parts = list(getattr(rest, 'geoms', [rest]))
-    # the ring starts at angle 0; join a piece that crosses that seam back into one
-    if len(parts) > 1 and parts[0].coords[0] == ring[0] and parts[-1].coords[-1] == ring[-1]:
-        parts = [LineString(list(parts[-1].coords) + list(parts[0].coords)[1:])] + parts[1:-1]
-    def ang(p): return math.atan2((p[1] - cy) / ry, (p[0] - cx) / rx) % (2 * math.pi)
-    d = ''
-    for g in parts:
-        if g.is_empty: continue
-        a0, a1 = ang(g.coords[0]), ang(g.coords[-1])
-        span = (a1 - a0) % (2 * math.pi)
-        if span * rx < 1: continue
-        p0 = (cx + rx * math.cos(a0), cy + ry * math.sin(a0)); p1 = (cx + rx * math.cos(a1), cy + ry * math.sin(a1))
-        d += f'M{fmt(p0[0])},{fmt(p0[1])}A{fmt(rx)},{fmt(ry)} 0 {int(span > math.pi)} 1 {fmt(p1[0])},{fmt(p1[1])}'
-    return f'<path d="{d}" fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"/>'
 
 
 def roadmap():
@@ -102,7 +71,7 @@ def milestones():
 
 def build():
     mask = hidden()
-    body = [floor_grid(mask) + floor_disc(mask), roadmap()]
+    body = [floor_grid(w, (0, 0), DISC_R, mask, phase=(GRID_X0, GRID_Y0)) + disc_arcs(w, DISC_R, mask=mask), roadmap()]
     for b, cols in bar_boxes():
         body += faces(w, *b, cols)
     body += milestones()

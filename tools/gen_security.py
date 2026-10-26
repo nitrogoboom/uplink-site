@@ -4,9 +4,9 @@ usage: python tools/gen_security.py site/assets/img/security.svg
 World: 1 unit = 58.4/3 px (the floor grid step). Origin = floor centre. x runs right-down, y left-down, z up.
 """
 import math, sys
-from shapely.geometry import Point, Polygon, box as box_shape
+from shapely.geometry import Point, box as box_shape
 from iso import W, fmt
-from isogen import FACES, FLOOR_LINE, ORANGE, BLUE, faces, ellipse, iso_ellipse, clip_out, seg_path, label, doc, write
+from isogen import FACES, ORANGE, BLUE, faces, ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 58.4, 58.4 / 3)              # inside the group's translate(272.5,247.3)
 
@@ -45,54 +45,15 @@ TITLE = 'Office building inside a security perimeter with blocked threats and a 
 
 
 def outline():
-    return Polygon([w.p(-HALF, -HALF, HEIGHT), w.p(HALF, -HALF, HEIGHT), w.p(HALF, -HALF, 0),
-                    w.p(HALF, HALF, 0), w.p(-HALF, HALF, 0), w.p(-HALF, HALF, HEIGHT)])
+    return silhouette(w, -HALF, HALF, -HALF, HALF, 0, HEIGHT)
 
 
 def gap():
     return box_shape(GAP[0], GAP[1], 10_000, GAP[2])
 
 
-def floor_grid():
-    mask = gap().union(outline())
-    segs = []
-    steps = [k + 0.5 for k in range(-10, 10) if abs(k + 0.5) < DISC_R]
-    for axis in (0, 1):
-        for c in steps:
-            s = math.sqrt(DISC_R ** 2 - c ** 2)
-            a, b = ((c, -s), (c, s)) if axis == 0 else ((-s, c), (s, c))
-            segs += clip_out(w.p(*a), w.p(*b), mask)
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
 
 
-def ellipse_arcs(r, mask, attrs):
-    """An iso circle drawn as SVG arcs, leaving out the parts inside mask."""
-    rx, ry, (cx, cy) = iso_ellipse(w, r)
-    at = lambda t: (cx + rx * math.cos(t), cy + ry * math.sin(t))
-    n = 3600
-    inside = [mask.contains(Point(at(2 * math.pi * k / n))) for k in range(n)]
-    if not any(inside):
-        return ellipse(w, r, attrs=attrs)
-    def edge(k):                       # refine the crossing between sample k and k+1
-        a, b = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
-        ia = inside[k]
-        for _ in range(40):
-            m = (a + b) / 2
-            if mask.contains(Point(at(m))) == ia: a = m
-            else: b = m
-        return (a + b) / 2
-    start = inside.index(True)
-    runs, k = [], start
-    for step in range(1, n + 1):
-        j = (start + step) % n
-        if inside[j - 1] and not inside[j]: t0 = edge((j - 1) % n)
-        if not inside[j - 1] and inside[j]: runs.append((t0, edge((j - 1) % n)))
-    d = ''
-    for t0, t1 in runs:
-        span = (t1 - t0) % (2 * math.pi)
-        (x0, y0), (x1, y1) = at(t0), at(t1)
-        d += f'M{fmt(x0)},{fmt(y0)}A{fmt(rx)},{fmt(ry)} 0 {int(span > math.pi)} 1 {fmt(x1)},{fmt(y1)}'
-    return f'<path d="{d}" {attrs}/>'
 
 
 def threats():
@@ -123,7 +84,7 @@ def windows():
 
 
 def build():
-    body = [floor_grid() + ellipse_arcs(DISC_R, gap(), f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"')]
+    body = [floor_grid(w, (0, 0), DISC_R, gap().union(outline()), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=gap())]
     body.append(ellipse(w, FENCE_R, attrs=f'fill="none" stroke="{BLUE}" stroke-width="1" stroke-opacity="0.55" stroke-dasharray="5 6"'))
     body.append(ellipse(w, GUARD_R, attrs=f'fill="none" stroke="{ORANGE}" stroke-width="1.4" stroke-opacity="0.9"'))
     body += threats()
