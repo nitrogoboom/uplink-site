@@ -373,11 +373,20 @@
     form.noValidate = true;
     const fields = $$('input, select, textarea', form).filter((el) => el.willValidate);
 
+    // The field's error text is linked only while the field is invalid, so a
+    // screen reader does not read it out on an empty, untouched field.
     const check = (el) => {
       if (el.required && el.value !== '' && el.value.trim() === '') el.setCustomValidity('empty');
       else el.setCustomValidity('');
       const ok = el.checkValidity();
-      if (ok) el.removeAttribute('aria-invalid'); else el.setAttribute('aria-invalid', 'true');
+      const err = $('.field-error', el.parentElement);
+      if (ok) {
+        el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
+      } else {
+        el.setAttribute('aria-invalid', 'true');
+        if (err && err.id) el.setAttribute('aria-describedby', err.id);
+      }
       return ok;
     };
     fields.forEach((el) => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid')) check(el); }));
@@ -392,7 +401,7 @@
       const dlg = form.closest('dialog');
       if (dlg) dlg.close();
       form.reset();
-      fields.forEach((el) => el.removeAttribute('aria-invalid'));
+      fields.forEach((el) => { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); });
 
       if (kind === 'book') {
         toast({ title: 'Check-up requested', text: 'We will email you within one business day to pick a time.' });
