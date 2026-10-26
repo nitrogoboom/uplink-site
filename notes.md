@@ -22,11 +22,11 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Home services grid: with 7 cards the last row on laptops holds one card on its own.
 - [ ] Hero leaves an empty gap at around 1000px wide.
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
+- [ ] CSP `style-src` needs `'unsafe-inline'` because of the hero's inline `<style>` blocks and `style=""` attributes. Drop it once they move into CSS.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
 
 ## Before going live
-- [ ] `site/_headers` with security headers (HSTS, nosniff, Referrer-Policy, Permissions-Policy, a Content-Security-Policy).
 - [ ] A `404.html` in the site's style.
 - [ ] Cache busting for CSS and JS (version in the file name or a `?v=`).
 - [ ] `og:image` (1200×630) and an `apple-touch-icon`.

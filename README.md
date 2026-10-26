@@ -103,6 +103,7 @@ The artifact link above only updates from a Claude chat. To push local changes t
 
 - Code: private GitHub repo `nitrogoboom/uplink-site`.
 - Site: Cloudflare Pages project `uplink-site` (https://uplink-site-4p8.pages.dev). `functions/_middleware.js` puts every page and file behind a browser password prompt. Any username works. The password is the Cloudflare secret `SITE_PASSWORD`. With no secret set, the site stays locked.
+- `site/_headers` sets the security headers on every file (HSTS, nosniff, Referrer-Policy, Permissions-Policy, CSP). The CSP allows one inline script by its hash: the `classList.add('js')` line in `services.html` and `work.html`. Change that line and update the hash (the comment at the top of `_headers` says how). Adding another outside host (fonts, analytics, a form service) means adding it to the CSP too.
 - Deploy from the project root: `npx wrangler pages deploy` (settings in `wrangler.toml`).
 - Change the password: `npx wrangler pages secret put SITE_PASSWORD --project-name uplink-site`, then deploy again.
 - The local preview (`python tools/serve.py`) has no lock. To test the lock locally: `npx wrangler pages dev --binding SITE_PASSWORD=some-test-value`.
