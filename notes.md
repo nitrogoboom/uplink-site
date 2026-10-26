@@ -27,7 +27,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
 
 ## Before going live
-- [ ] Forms are mockups: contact, book-a-call and newsletter send nothing.
+- [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Pages Function in `functions/` that emails each submission to one inbox.
 
 ## Copy to confirm
 - [ ] VoIP service wording ("Phones & Teams calling" section, card and footer).
