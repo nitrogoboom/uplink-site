@@ -959,9 +959,8 @@ a.fc-cl:hover { color: var(--c-accent); }
 }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
 .hero-menu { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
-.hero-top { order: 1; display: flex; flex-direction: column; gap: var(--sp-4); }
-.hero-cta { order: 2; display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2); }
-.hero-menu nav { order: 3; }
+.hero-top { display: flex; flex-direction: column; gap: var(--sp-4); }
+.hero-cta { display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2); }
 /* the top tabs (tablet) and bottom bar (phone) already hold these links,
    so below desktop the menu is dropped and the office moves up */
 @media (max-width: 1099px) { .hero-menu nav { display: none; } }
@@ -1313,9 +1312,7 @@ html:not(.js) .roster-wrap { display: none; }
   /* headline and call to action read as one block at the top; the menu
      sits on the bottom edge, level with the news cards on the right */
   .hero-menu { justify-content: flex-start; gap: var(--sp-6); min-height: 0; }
-  .hero-top { order: 1; }
-  .hero-cta { order: 2; }
-  .hero-menu nav { order: 3; margin-top: auto; }
+  .hero-menu nav { margin-top: auto; }
   .hero-cta { flex-direction: row; }
   .hero-art { height: 100%; min-height: 0; gap: var(--sp-3); }
   .hero-art .stage { flex: 1; min-height: 0; aspect-ratio: auto; }
