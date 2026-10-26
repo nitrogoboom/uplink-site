@@ -3,3 +3,5 @@ shapely
 numpy
 pillow
 playwright
+fonttools
+brotli

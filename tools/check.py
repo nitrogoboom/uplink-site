@@ -26,6 +26,14 @@ def is_ui(sh):
     if abs(sh.m[1]) > 1e-6 or abs(sh.m[2]) > 1e-6: return True   # icon mapped with matrix
     return False
 
+def is_leader(sh):
+    p = sh.el.getparent()
+    return p is not None and 'co' in (p.get('class') or '').split()
+
+def is_free(sh):
+    # class="mark" (arrowheads, 2D markers) or class="free" (parts tilted on purpose, like a laptop lid)
+    return bool({'mark', 'free'} & set((sh.a.get('class') or '').split()))
+
 def main():
     text = get_text(sys.argv)
     off = int(sys.argv[2]) - 1 if len(sys.argv) > 3 else 0
@@ -34,6 +42,7 @@ def main():
     out = []
     # ANGLE
     for s in geo:
+        if is_leader(s) or is_free(s): continue   # leaders, markers and tilted parts are off-axis by design
         for p, q in s.edges():
             k, d, o, ln = classify(p, q)
             if k is None or ln < 3: continue

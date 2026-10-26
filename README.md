@@ -63,7 +63,9 @@ Without script, every panel shows in a stack and the roster is hidden.
 Every drawing was made by a generator with world → screen = `origin + ((x − y)·cos30·u, (x + y)·u/2 − z·u)`.
 `tools/iso.py` has `W(ox, oy, u)` for this. Known values: helpdesk `W(0,0,23)`, office/hero `W(616.4,240.2,28.127)`, tower `W(262,283.2,24)`, backup `W(0,0,16.46)`, network `W(0,0,1)`, footer map `W(0,0,38)`.
 
-- `check.py file.svg` – edges near (but not on) an iso angle, near-miss vertices, leader dots and what they sit on
+- `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security` and `cloud` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
+- `svgfont.py` / `embed_font.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically; run `python tools/embed_font.py site/assets/img/office.svg` after editing a hand-made SVG with text. Needs `pip install fonttools brotli`.
+- `check.py file.svg` – edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on
 - `dump.py file.svg ox oy u` – every shape in world terms
 - `boxes.py` / `painter.py` – turn face triples into 3D boxes; find boxes drawn in the wrong order or poking into each other (`rules_office.py` is the rules file for the office drawing)
 - `discs.py`, `floorfit.py` – check floor discs and rings are true iso circles; `roundify.py` rebuilds a floor disc as one (needs `site/` served on port 8765)
