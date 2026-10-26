@@ -133,12 +133,17 @@
   /* very wide screens (21:9 and wider): news in a column beside the office.
      A maximised 16:9 browser is about 2:1, so this starts well past that. */
   @media (min-aspect-ratio: 7/3) {
+    /* the office is as wide as its height allows (aspect 40/31), no wider, and
+       the three columns sit together in the middle, so the spare width falls
+       at the two edges and not as holes between the parts */
     .hero-grid {
-      grid-template-columns: minmax(0, 34rem) minmax(0, 1fr) 24rem;
+      grid-template-columns: minmax(0, 34rem) auto 24rem;
       grid-template-rows: minmax(0, 1fr);
       grid-template-areas: "menu stage dock";
       column-gap: var(--sp-6);
+      justify-content: center;
     }
+    .hero-art .stage { aspect-ratio: 40 / 31; height: 100%; }
     .hero-menu { margin-right: var(--sp-6); }   /* menu to office: sp-6 + sp-6, as wide as the sp-8 gap above */
     .hero-dock { grid-template-columns: minmax(0, 1fr); align-content: end; }
   }

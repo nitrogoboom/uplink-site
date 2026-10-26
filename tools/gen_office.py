@@ -10,14 +10,16 @@ Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furnit
 to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
 The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept as the page's JS and CSS expect:
   tools/office_parts/build.css, hero.css   the animation CSS inside the two animated versions
-  tools/office_parts/hero_cloud.svg        hero only: sync lines, 3D cloud and its label (hand-drawn, fixed screen points)
+  tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
+  tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
-import math, pathlib, subprocess, sys
+import math, pathlib, re, subprocess, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect
 from svgfont import font_style
+from hero_cloud import cloud_shapes
 
 w = W(616.4, 240.2, 28.127)
 PARTS = pathlib.Path(__file__).parent / 'office_parts'
@@ -441,7 +443,8 @@ def groups(v):
         attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v == 'hero' else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
         G.append((attrs, tile(i, v)))
     if v == 'hero':
-        G.append((None, [(PARTS / 'hero_cloud.svg').read_text(encoding='utf-8').rstrip('\n')]))
+        hero_cloud = (PARTS / 'hero_cloud.svg').read_text(encoding='utf-8').rstrip('\n')
+        G.append((None, [hero_cloud.replace('{{CLOUD_SHAPES}}', cloud_shapes())]))
     elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
         for dot, elbow, colour, title, sub, side in COMPACT_LABELS:
             G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
@@ -451,6 +454,20 @@ def groups(v):
     for dot, elbow, colour, title, sub, d, *side in LABELS:
         G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
     return G
+
+
+def split_flows(body):
+    """The marching dashes (stroke-dashoffset) can't be composited, so each frame repaints the whole drawing under
+    them. Move them to a second svg on its own layer: same box and viewBox, drawn last. Each keeps its group's class
+    and --d, so its delay is unchanged."""
+    over, out, last = [], [], 0
+    for m in re.finditer(r'<polyline\b[^>]*class="ob-flow"[^>]*/>', body):
+        cls, d = re.findall(r'<g class="(ob-i[^"]*)"[^>]*?style="(--d:\d+ms)"[^>]*>', body[:m.start()])[-1]
+        out.append(body[last:m.start()])
+        last = m.end()
+        over.append(f'<g class="{cls}" style="{d}">{m.group(0)}</g>')
+    out.append(body[last:])
+    return ''.join(out), '\n'.join(over)
 
 
 def render(v):
@@ -483,6 +500,11 @@ def render(v):
         style = '<style>' + (PARTS / 'hero.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
         # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
         body += '\n<circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
+    if v == 'hero':
+        body, over = split_flows(body)
+        return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>',
+                          '<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',
+                          over, '</svg>'])
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
