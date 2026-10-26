@@ -27,13 +27,6 @@
     set(key, value) { try { window.localStorage.setItem(key, value); } catch (e) { /* ignore */ } }
   };
 
-  /* ---------- json data islands ----------------------------------------- */
-  function readData(id) {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    try { return JSON.parse(el.textContent); } catch (e) { return null; }
-  }
-
   /* ---------- icons used by script-built UI ------------------------------ */
   const ICON = {
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
@@ -309,10 +302,13 @@
   /* ======================================================================
      Work: filters + project pop-up
      ====================================================================== */
-  const cases = readData('cases-data');
+  // Each card links to its project's <article> further down the page; the
+  // pop-up copies that article's text in, so the HTML stays the only source.
   const workGrid = $('[data-work-grid]');
-  if (workGrid && Array.isArray(cases)) {
+  if (workGrid) {
     const items = $$('[data-tags]', workGrid);
+    const cards = items.map((li) => $('a[href^="#"]', li));
+    const sources = cards.map((a) => a && document.getElementById(a.hash.slice(1)));
     const filters = $$('[data-filter]');
     const liveCount = $('[data-work-live]');
     const empty = $('[data-work-empty]');
@@ -332,15 +328,18 @@
 
     const dlg = document.getElementById('case-dialog');
     let open = -1;
-    const visible = () => items.filter((li) => !li.hidden).map((li) => Number(li.dataset.case));
+    const visible = () => items.map((li, i) => (li.hidden ? -1 : i)).filter((i) => i >= 0);
 
     const fill = (i) => {
-      const c = cases[i];
-      if (!c || !dlg) return;
+      const src = sources[i];
+      if (!src || !dlg) return;
       open = i;
-      $$('[data-case-bind]', dlg).forEach((el) => { el.textContent = c[el.dataset.caseBind]; });
-      const im = $('[data-case-img]', dlg);
-      if (im) { im.src = c.img; im.alt = c.alt; }
+      $$('[data-case-bind]', dlg).forEach((el) => {
+        const field = $('[data-case-field="' + el.dataset.caseBind + '"]', src);
+        el.textContent = field ? field.textContent : '';
+      });
+      const im = $('[data-case-img]', dlg), srcImg = $('img', src);
+      if (im && srcImg) { im.src = srcImg.getAttribute('src'); im.alt = srcImg.alt; }
       const list = visible();
       const pos = $('[data-case-pos]', dlg);
       if (pos) pos.textContent = (list.indexOf(i) + 1) + ' of ' + list.length;
@@ -352,10 +351,9 @@
       fill(list[(at + d + list.length) % list.length]);
     };
 
-    $$('[data-case]', workGrid).forEach((btn) => {
-      const trigger = btn.matches('button') ? btn : $('button', btn);
-      if (!trigger) return;
-      trigger.addEventListener('click', () => { fill(Number(btn.dataset.case)); openDialog('case-dialog', trigger); });
+    cards.forEach((a, i) => {
+      if (!a || !sources[i] || !dlg) return;
+      a.addEventListener('click', (e) => { e.preventDefault(); fill(i); openDialog('case-dialog', a); });
     });
     if (dlg) {
       $$('[data-case-step]', dlg).forEach((b) => b.addEventListener('click', () => step(Number(b.dataset.caseStep))));

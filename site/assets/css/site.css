@@ -1199,6 +1199,11 @@ html:not(.js) .roster-wrap { display: none; }
 .work-grid .card { flex: 1; width: 100%; font: inherit; }
 .empty-note { margin-top: var(--sp-5); }
 
+/* project details: the full story of each card lives here in the HTML.
+   With script it is hidden and each card opens it in the pop-up instead. */
+.js .cases-list { display: none; }
+.case-src { display: flex; flex-direction: column; gap: var(--sp-4); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
+
 .case { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
 @media (min-width: 700px) { .case { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
 .case-img { aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center; }
