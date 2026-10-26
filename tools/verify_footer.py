@@ -1,11 +1,12 @@
 # Python port of tools/verify.js plus footer checks.
 # usage: python tools/verify_footer.py <outdir> [port]   (serve site/ with tools/serve.py first; port 8765 by default)
-import asyncio, sys
+import asyncio, subprocess, sys
 from playwright.async_api import async_playwright
 base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8765'); out=sys.argv[1]
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); rep=[]
+        rep.append(subprocess.run([sys.executable,'tools/stamp.py','site','--check'],capture_output=True,text=True).stdout.strip())
         pg=await b.new_page(viewport={'width':1440,'height':900})
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e))); pg.on('console',lambda m: m.type=='error' and errs.append(m.text))
         await pg.goto(base+'/'); await pg.wait_for_timeout(5500)

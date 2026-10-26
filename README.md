@@ -88,6 +88,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `shoot1.js`, `shoot.js`, `compare.py` – zoomed screenshots and before/after sheets
 - `verify.js` – checks the hero builds, tiles respond to hover, the tower grows on scroll, and there's no sideways scroll at phone, tablet, 1440×900 and 3440×1440
 - `build_footer.py` – writes the footer into every page (see above)
+- `stamp.py site` – cache busting: puts `?v=<hash>` on every CSS and JS link. Run it after any CSS or JS edit; `site/_headers` lets browsers keep those files for a year. `stamp.py site --check` (also run by `verify_footer.py`) says if a stamp is out of date.
 - `verify_footer.py out/` – verify.js checks plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
 - `footer_painter.py url` – painter-order and poke-through check on the boxes the footer map draws. It reads `window.__isoLog`, so add `window.__isoLog && window.__isoLog.push({k, x, y, z, w, d, h, cls})` to `box()` in a local copy first.
 - `fixlib.py` – small helper for exact find-and-replace edits on SVG points
