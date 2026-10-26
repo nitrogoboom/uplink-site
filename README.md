@@ -25,13 +25,13 @@ Python 3.10+ and Node 18+.
 ## What's where
 
 - `site/` – the website, exactly as the live artifact (26 Oct 2026)
-  - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file.
+  - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG** in this file, written by `tools/gen_office.py` and `tools/gen_tower.py`.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
   - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
-  - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero. `tower-grow.svg` matches the inline tower.
+  - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
 - `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
 
 ## Footer (hero select)
@@ -63,7 +63,9 @@ Without script, every panel shows in a stack and the roster is hidden.
 Every drawing was made by a generator with world → screen = `origin + ((x − y)·cos30·u, (x + y)·u/2 − z·u)`.
 `tools/iso.py` has `W(ox, oy, u)` for this. Known values: helpdesk `W(0,0,23)`, office/hero `W(616.4,240.2,28.127)`, tower `W(262,283.2,24)`, backup `W(0,0,16.46)`, network `W(0,0,1)`, footer map `W(0,0,38)`.
 
-- `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security` and `cloud` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
+- `gen_<name>.py site/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security` and `cloud` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Running a script with nothing changed gives the same file byte for byte, so a git diff only ever shows what you changed.
+- `gen_office.py site` – the office floor plan: `office.svg`, `office-build.svg` and the hero block in `index.html` (only that block is replaced). The animation CSS and the hero's hand-drawn cloud live in `tools/office_parts/`.
+- `gen_tower.py site` – the growing tower: `tower-grow.svg` and the inline tower block in `index.html`. Each has a `rules_<name>.py` for painter (its usage line is at the top). Shared pieces live in `isogen.py`.
 - `svgfont.py` / `embed_font.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically; run `python tools/embed_font.py site/assets/img/office.svg` after editing a hand-made SVG with text. Needs `pip install fonttools brotli`.
 - `check.py file.svg` – edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on
 - `dump.py file.svg ox oy u` – every shape in world terms

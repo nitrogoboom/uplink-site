@@ -1,0 +1,30 @@
+.ob-i{animation:ob-drop 450ms cubic-bezier(.2,.7,.2,1) var(--d,0ms) both}
+.ob-fade{animation-name:ob-fade;animation-duration:400ms;animation-timing-function:ease-out}
+.ob-lab{animation-name:ob-fade;animation-duration:220ms;animation-timing-function:ease-out}
+.ob-grow{animation-name:ob-grow;animation-duration:480ms;animation-timing-function:cubic-bezier(.3,.6,.2,1)}
+.ob-ring{animation-name:ob-ring;animation-duration:520ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);transform-box:fill-box;transform-origin:50% 50%}
+.ob-n{animation:none}
+.ob-cable{stroke-dasharray:100;animation:ob-draw 450ms ease-out var(--d,0ms) both}
+.ob-flow{stroke-dasharray:2 7;animation:ob-fade 300ms ease-out calc(var(--d,0ms) + 480ms) both,ob-flow 1.6s linear infinite}
+.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s ease-in-out infinite}
+.ob-led{animation:ob-led 3.2s step-end infinite}
+@keyframes ob-drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ob-fade{from{opacity:0}to{opacity:1}}
+@keyframes ob-grow{from{opacity:.2;clip-path:inset(100% -8px -8px -8px)}to{opacity:1;clip-path:inset(-8px)}}
+@keyframes ob-ring{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes ob-draw{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+@keyframes ob-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-18}}
+@keyframes ob-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
+@keyframes ob-led{0%,62%{opacity:1}68%,80%{opacity:.25}86%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.ob-i,.ob-i *{animation:none!important}}
+.ob-tile polygon,.ob-tile .f-ic{transition:fill .35s ease,stroke .35s ease}
+.ob-tile .f-l{fill:#313F54}.ob-tile .f-r{fill:#283447}.ob-tile .f-t{fill:#405169}.ob-tile polygon{stroke:#D9E4F0;stroke-opacity:.3}.ob-tile .f-ic{stroke:#F1F4F8}
+.ob-tile.is-on .f-l{fill:#E2953F}.ob-tile.is-on .f-r{fill:#C98030}.ob-tile.is-on .f-t{fill:#F7B868}.ob-tile.is-on polygon{stroke:#FFE6C4;stroke-opacity:.55}.ob-tile.is-on .f-ic{stroke:#1B2130}
+.ob-seg{fill:#6FD3A0;fill-opacity:.4;transition:fill .3s ease,fill-opacity .3s ease}.ob-seg.is-on{fill:#F4A340;fill-opacity:1}
+.ob-seg-hit,.ob-tile{cursor:pointer}
+.ob-focus{transition:opacity .18s ease}.ob-focus.is-out{opacity:0}
+.ob-link{stroke-dasharray:3 12;animation:ob-flow .9s linear infinite}
+.ob-link-base.is-draw{animation:ob-link-draw .55s cubic-bezier(.3,.6,.2,1) both}
+@keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
+.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}

@@ -1,0 +1,23 @@
+.ob-i{animation:ob-drop 450ms cubic-bezier(.2,.7,.2,1) var(--d,0ms) both}
+.ob-fade{animation-name:ob-fade;animation-duration:400ms;animation-timing-function:ease-out}
+.ob-lab{animation-name:ob-fade;animation-duration:220ms;animation-timing-function:ease-out}
+.ob-grow{animation-name:ob-grow;animation-duration:480ms;animation-timing-function:cubic-bezier(.3,.6,.2,1)}
+.ob-ring{animation-name:ob-ring;animation-duration:520ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);transform-box:fill-box;transform-origin:50% 50%}
+.ob-n{animation:none}
+.ob-cable{stroke-dasharray:100;animation:ob-draw 450ms ease-out var(--d,0ms) both}
+.ob-flow{stroke-dasharray:2 7;animation:ob-fade 300ms ease-out calc(var(--d,0ms) + 480ms) both,ob-flow 1.6s linear infinite}
+.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s ease-in-out infinite}
+.ob-led{animation:ob-led 3.2s step-end infinite}
+@keyframes ob-drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes ob-fade{from{opacity:0}to{opacity:1}}
+@keyframes ob-grow{from{opacity:.2;clip-path:inset(100% -8px -8px -8px)}to{opacity:1;clip-path:inset(-8px)}}
+@keyframes ob-ring{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
+@keyframes ob-draw{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+@keyframes ob-flow{from{stroke-dashoffset:0}to{stroke-dashoffset:-18}}
+@keyframes ob-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
+@keyframes ob-led{0%,62%{opacity:1}68%,80%{opacity:.25}86%,100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.ob-i,.ob-i *{animation:none!important}}
+.ob-swap{animation:ob-swap 6s ease-in-out 3.6s infinite}
+.ob-swap-1{animation-delay:6.6s}
+@keyframes ob-swap{0%,40%{opacity:1}50%,90%{opacity:.4}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.ob-swap{animation:none!important;opacity:1}}

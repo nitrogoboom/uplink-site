@@ -11,7 +11,7 @@ from iso import load, classify
 from shapely.geometry import Polygon, Point
 
 def get_text(argv):
-    t = open(argv[1]).read()
+    t = open(argv[1], encoding='utf-8').read()
     if len(argv) > 3:
         lines = t.split('\n')[int(argv[2])-1:int(argv[3])]
         t = '\n'.join(lines)
