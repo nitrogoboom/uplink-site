@@ -12,3 +12,4 @@ Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspir
 - Copy: short, plain sentences.
 
 When working with cloudflare please see glance at agents-cloudflare.md.
+- Open items (bugs, fixes, polish, copy to confirm) live in `notes.md`. Add new ones there and remove a line when it is done.
