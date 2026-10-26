@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const { $, $$, reduceMotion, toast } = window.Uplink;
+  const { $, $$, reduceMotion, toast, whenOnScreen } = window.Uplink;
 
   /* ======================================================================
      Footer: hero-select roster + campus map (every page)
@@ -53,7 +53,7 @@
       const [cx, cy] = pr(x, y, z);
       return `<circle class="led${cls}" style="animation-delay:${-(rnd() * 3).toFixed(2)}s" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="1.7"/>`;
     };
-    const dot = (x, y, z) => { const [cx, cy] = pr(x, y, z); return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.5" fill="#F4A340"/>`; };
+    const dot = (x, y, z) => { const [cx, cy] = pr(x, y, z); return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.5" class="dot"/>`; };
     const tree = (x, y, s = 0.5) => box(x, y, 0, s, s, s * 1.1, 'tree');
     const MARK = '<path d="M12 3l4 9-4 9-4-9z"/>';
 
@@ -63,7 +63,7 @@
         draw: () => box(6, 6, 0, 4, 4, 0.55) + box(6.9, 6.9, 0.55, 2.2, 2.2, 5.3) +
           winsY(6.9, 9.1, 9.1, 0.8, 5.6, 3, 6) + winsX(9.1, 6.9, 9.1, 0.8, 5.6, 3, 6) +
           box(7.25, 7.25, 5.85, 1.5, 1.5, 0.35) +
-          `<line x1="${pr(8, 8, 6.2)[0].toFixed(1)}" y1="${pr(8, 8, 6.2)[1].toFixed(1)}" x2="${pr(8, 8, 7.2)[0].toFixed(1)}" y2="${pr(8, 8, 7.2)[1].toFixed(1)}" stroke="#F4A340" stroke-width="1.6"/>` +
+          `<line x1="${pr(8, 8, 6.2)[0].toFixed(1)}" y1="${pr(8, 8, 6.2)[1].toFixed(1)}" x2="${pr(8, 8, 7.2)[0].toFixed(1)}" y2="${pr(8, 8, 7.2)[1].toFixed(1)}" class="mast"/>` +
           `<polyline class="beacon" points="${circ(8, 8, 7.2, 0.7)}"/><polyline class="beacon" style="animation-delay:-1.2s" points="${circ(8, 8, 7.2, 0.7)}"/>` +
           dot(8, 8, 7.2) },
       services: { name: 'Server farm', sub: 'monitored around the clock', at: [12.8, 3.5], top: [12.8, 3.5, 2.4], r: 2.4, zoom: 1.35,
@@ -213,6 +213,9 @@
     if (tracker && 'IntersectionObserver' in window) {
       new IntersectionObserver(([en]) => tracker.classList.toggle('is-off', en.intersectionRatio > 0.5), { threshold: [0, 0.5, 1] }).observe(fc);
     }
+
+    // the map's looping animations pause while it is off screen
+    whenOnScreen(svg);
 
     fc.classList.add('fc-js');
     select(cur, { instant: true });

@@ -35,6 +35,34 @@
   --c-glass:        rgb(21 30 44 / 0.88);    /* sticky header */
   --c-glass-2:      rgb(33 45 64 / 0.92);    /* phone bottom nav */
   --c-backdrop:     rgb(10 14 22 / 0.62);    /* behind pop-ups */
+  --c-glow-accent:  rgb(244 163 64 / 0.07);  /* warm key light behind the hero call to action */
+  --c-glow-sky:     rgb(125 185 232 / 0.09); /* cool fill light behind the hero office */
+  --c-glow-sky-2:   rgb(125 185 232 / 0.11); /* glow behind the footer map */
+
+  /* hero: surfaces pick up a slight blue tint to match the cool light */
+  --c-cool-surface:   rgb(196 220 248 / 0.05);
+  --c-cool-surface-2: rgb(196 220 248 / 0.10);
+  --c-cool-muted:     #ABB8CA;
+
+  /* ---- drawing palette (isometric illustrations, see README "Drawing rules") */
+  --iso-top:        #405169;  /* box faces */
+  --iso-left:       #313F54;
+  --iso-right:      #283447;
+  --iso-edge:       #D9E4F0;  /* face outline, used at 0.3 opacity */
+  --iso-hi-top:     #F7B868;  /* highlighted box faces */
+  --iso-hi-left:    #E2953F;
+  --iso-hi-right:   #C98030;
+  --iso-hi-edge:    #FFE6C4;
+  --iso-sky-top:    #9CCBF0;  /* blue boxes: top, left is --c-sky */
+  --iso-sky-right:  #5E9BCB;
+  --iso-green-top:  #8FE0B6;  /* green boxes and trees, with --c-ok */
+  --iso-green-mid:  #4E9C78;
+  --iso-green-dark: #3C7C60;
+  --iso-ground:     #1B2534;  /* map platform */
+  --iso-grid:       #2C3849;  /* floor grid lines */
+  --iso-window:     #1E2938;  /* unlit window */
+  --iso-light:      #FFF3DF;  /* warm lit window, white LED */
+  --iso-shadow:     #000;     /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
   --font-display: 'Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif;

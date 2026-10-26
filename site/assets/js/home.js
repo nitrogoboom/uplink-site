@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const { $, $$, reduceMotion } = window.Uplink;
+  const { $, $$, reduceMotion, whenOnScreen } = window.Uplink;
 
   /* ======================================================================
      Growth story: the building gains floors as you scroll (Home)
@@ -109,10 +109,11 @@
       focus.classList.add('is-out');
       swap = window.setTimeout(write, 180);
     };
+    let onScreen = true;
     const stop = () => { window.clearInterval(timer); timer = 0; };
     const start = () => {
       stop();
-      if (reduceMotion.matches || document.hidden) return;
+      if (reduceMotion.matches || document.hidden || !onScreen) return;
       timer = window.setInterval(() => show(index + 1), 3200);
     };
     const pick = (id) => { stop(); show(APPS.findIndex((a) => a.id === id)); };
@@ -126,6 +127,8 @@
     });
     document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
     reduceMotion.addEventListener('change', start);
+    // off screen: no timer, and the looping animations pause
+    whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
     show(0);
     start();
   }

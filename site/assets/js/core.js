@@ -306,7 +306,18 @@
     });
   });
 
+  /* ---------- off-screen pause ------------------------------------------ */
+  // Marks el with .is-idle while none of it is on screen (site.css pauses
+  // its looping animations) and tells onChange(onScreen) about each change.
+  function whenOnScreen(el, onChange) {
+    if (!el || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(([en]) => {
+      el.classList.toggle('is-idle', !en.isIntersecting);
+      if (onChange) onChange(en.isIntersecting);
+    }).observe(el);
+  }
+
   /* ---------- shared with the page scripts ------------------------------ */
   // picker: set by services.js so the 1-6 keys can pick a service
-  window.Uplink = { $, $$, reduceMotion, toast, openDialog, shortcutsOn, picker: null };
+  window.Uplink = { $, $$, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, picker: null };
 })();
