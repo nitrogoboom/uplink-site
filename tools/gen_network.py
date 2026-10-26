@@ -52,6 +52,13 @@ LABELS = [
     dict(name='phone', elbow=(-100, 165), x=-127, title='VOIP PHONES', sub='calls over your network', tw=88, sw=119, anchor='end', colour=BLUE),
     dict(name='ap', elbow=(165, 150), x=192, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='start', colour=ORANGE),
 ]
+# compact phone cut (isogen.doc crop): the same scene framed closer, labels at 1.76x so titles come out >= 14px
+# and sublines >= 12px at 340px wide. Crop is in page coordinates (4:3); dots, elbows and text are in group coordinates.
+COMPACT = dict(crop=(41, 39, 547, 410.25), scale=1.76, labels=[
+    dict(name='firewall', elbow=(-35, -150), x=-72, title='FIREWALL', sub='managed\nand patched', tw=66, sw=60, anchor='end', colour=ORANGE),
+    dict(name='phone back', elbow=(138, -110), x=165, title='VOIP PHONES', sub='calls over\nyour network', tw=88, sw=66, anchor='start', colour=BLUE),
+    dict(name='ap', elbow=(60, 200), x=33, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='end', colour=ORANGE),   # under the front desk: open floor
+])
 TITLE = 'Server rack with firewall, two workstations with VoIP desk phones on the same network, and a Wi-Fi access point'
 
 
@@ -85,8 +92,24 @@ def label_gaps(L):
     return [box_shape(ex - 4, ty - 18, x + L['tw'] + 5, ty - 1), box_shape(x - 5, sy - 16, x + L['sw'] + 5, sy + 8)]
 
 
-def floor_mask():
-    return unary_union([silhouette(w, *b) for b in solids()] + [g for L in LABELS for g in label_gaps(L)])
+def compact_gaps(L, k):
+    """Floor lines stop around a compact label's (bigger, maybe wrapped) text and tail."""
+    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
+    lines = L['sub'].count('\n') + 1
+    t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
+    s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
+    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
+            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
+
+
+def text_gaps(compact=False):
+    if compact:
+        return [g for L in COMPACT['labels'] for g in compact_gaps(L, COMPACT['scale'])]
+    return [g for L in LABELS for g in label_gaps(L)]
+
+
+def floor_mask(compact=False):
+    return unary_union([silhouette(w, *b) for b in solids()] + text_gaps(compact))
 
 
 def port(y0):
@@ -155,18 +178,25 @@ def dots():
     _p, _s, top, _c = workstation(DESK_Y[-1])
     px0, py0, pz, pw, pd, *_ = top
     ax, ay = (AP[0] + AP[1]) / 2, (AP[2] + AP[3]) / 2
-    return {'firewall': (fx, fx, FIREWALL[5]), 'phone': (px0 + pw / 2, py0 + pd / 2, pz), 'ap': (ax, ay, AP[5])}
+    _p, _s, back, _c = workstation(DESK_Y[0])
+    bx0, by0, bz, bw, bd, *_ = back
+    return {'firewall': (fx, fx, FIREWALL[5]), 'phone': (px0 + pw / 2, py0 + pd / 2, pz), 'phone back': (bx0 + bw / 2, by0 + bd / 2, bz),
+            'ap': (ax, ay, AP[5])}
 
 
-def build():
-    mask = floor_mask()
+def build(compact=False):
+    mask = floor_mask(compact)
     body = [floor_grid(w, DISC[:2], DISC[2], mask, step=GRID, phase=DISC[:2], min_seg=MIN_STUB)
-            + disc_arcs(w, DISC[2], *DISC[:2], mask=unary_union([g for L in LABELS for g in label_gaps(L)]))]
+            + disc_arcs(w, DISC[2], *DISC[:2], mask=unary_union(text_gaps(compact)))]
     body += floor_runs() + rack() + [ap_run()]
     for y0 in DESK_Y:
         body += desk(y0)
     body += access_point()
     d = dots()
+    if compact:
+        for L in COMPACT['labels']:
+            body += label(w.p(*d[L['name']]), L['elbow'], L['x'], L['title'], L['sub'], colour=L['colour'], anchor=L['anchor'], scale=COMPACT['scale'])
+        return doc(TITLE, body, translate=(TX, TY), crop=COMPACT['crop'])
     for L in LABELS:
         body += label(w.p(*d[L['name']]), L['elbow'], L['x'], L['title'], L['sub'], colour=L['colour'], anchor=L['anchor'])
     return doc(TITLE, body, translate=(TX, TY))
@@ -174,3 +204,4 @@ def build():
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens

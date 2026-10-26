@@ -40,6 +40,11 @@ DISC_R = 9                            # floor disc radius; grid every 1 unit, of
 DOT = (HALF, -1.0, STOREY * LIT + 1.125)   # leader dot: lit floor's right wall, between two windows
 TEXT_X, TITLE_Y = 137.6, 56.2
 GAP = (124.0, 40.8, 79.0)             # floor lines stop at x >= GAP[0], GAP[1] <= y <= GAP[2] (label clearance)
+# compact phone cut (isogen.doc crop): the same scene framed closer, the label at 1.75x on the open ground left of
+# the building. Crop is in page coordinates (keep it 4:3); elbow and text are in the drawing's group coordinates
+# (page minus the translate). Title 118.3px and subline 94.3px wide at 1x (measured).
+COMPACT = dict(crop=(-88, 45.5, 488, 366), scale=1.75, label=dict(
+    dot=(-1.0, HALF, STOREY * LIT + 1.125), elbow=(-115.4, -18.1), x=-147.65, tw=118.3, sw=94.3))
 TITLE = 'Three-storey office building with the help desk floor highlighted'
 
 BOXES = []                            # every box drawn, in order (rules_hq.py reads it for painter.py)
@@ -54,8 +59,12 @@ def flat(pts, fill, extra=''):
     return f'<polygon points="{w.pts(*pts)}" fill="{fill}"{extra}/>'
 
 
-def label_gap():
-    return box_shape(GAP[0], GAP[1], 10_000, GAP[2])
+def label_gap(compact=False):
+    if not compact:
+        return box_shape(GAP[0], GAP[1], 10_000, GAP[2])
+    L, k = COMPACT['label'], COMPACT['scale']        # the compact label's text and tail (end-anchored, left of the building)
+    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
+    return box_shape(x - L['tw'] * k - 5, ty - 15 * k, ex + 4, ty + 3).union(box_shape(x - L['sw'] * k - 5, sy - 12 * k, x + 5, sy + 5))
 
 
 def path_shape():
@@ -72,10 +81,10 @@ def tree_boxes(cx, cy, s):
     return out
 
 
-def hidden():
+def hidden(compact=False):
     """Screen areas floor lines skip: the label gap, the building, the path and the trees."""
     c = HALF + CORNICE
-    out = label_gap().union(silhouette(w, -c, c, -c, c, 0, STOREY * FLOORS + PARAPET[0]))
+    out = label_gap(compact).union(silhouette(w, -c, c, -c, c, 0, STOREY * FLOORS + PARAPET[0]))
     out = out.union(Polygon([w.p(*p) for p in path_shape()]))
     for t in TREES:
         for b in tree_boxes(*t):
@@ -151,17 +160,22 @@ def trees():
     return out
 
 
-def build():
+def build(compact=False):
     BOXES.clear()
-    body = [floor_grid(w, (0, 0), DISC_R, hidden(), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=label_gap())]
+    body = [floor_grid(w, (0, 0), DISC_R, hidden(compact), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=label_gap(compact))]
     body.append(flat(path_shape(), PATH_FILL, ' stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.15"'))
     for f in range(FLOORS):
         body += storey(f)
     body += roof()
     body += trees()
+    if compact:
+        L = COMPACT['label']
+        body += label(w.p(*L['dot']), L['elbow'], L['x'], 'HELP DESK FLOOR', 'your team\'s first call', anchor='end', scale=COMPACT['scale'])
+        return doc(TITLE, body, translate=(275.4, 218.1), crop=COMPACT['crop'])
     body += label(w.p(*DOT), (TEXT_X - 27, TITLE_Y - 4.5), TEXT_X, 'HELP DESK FLOOR', 'your team\'s first call')
     return doc(TITLE, body, translate=(275.4, 218.1))
 
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens

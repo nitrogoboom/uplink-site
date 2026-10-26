@@ -50,6 +50,13 @@ LABELS = [
     ((-1.75, HALF, TOP_WIN), -142.0, -66.0, 'EMAIL FILTER', 'phishing blocked', BLUE, 'end'),            # outer top windows, same height, same reach
 ]
 GAP = (30.0, 175.5, 213.7)            # floor lines stop at x >= GAP[0], GAP[1] <= y <= GAP[2] (bottom label + leader elbow clearance)
+# compact phone cut (isogen.doc crop): the same scene framed close, two labels at 1.65x in the top corners, the only
+# clear space wide enough (24/7 MONITORING at 188px won't fit beside the building; the ring and crosses still show it).
+# Crop is page coordinates, 4:3; elbows and text are group coordinates. Text sits above the floor disc, so no floor gaps.
+COMPACT = dict(crop=(65.33, 20, 509.33, 382), scale=1.65, labels=[
+    ((-1.75, HALF, TOP_WIN), (-40.0, -203.4), -85.0, 'EMAIL FILTER', 'phishing blocked', BLUE, 'end'),
+    ((HALF, -1.75, TOP_WIN), (40.0, -203.4), 85.0, 'MFA + EDR', 'every login,\nevery device', BLUE, 'start'),
+])
 TITLE = 'Office building inside a security perimeter with blocked threats and a shield'
 
 
@@ -145,8 +152,11 @@ def shield():
     return out
 
 
-def build():
-    body = [floor_grid(w, (0, 0), DISC_R, gap().union(outline()), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=gap())]
+def build(compact=False):
+    if compact:                       # no 24/7 label here, so the floor and its edge run unbroken
+        body = [floor_grid(w, (0, 0), DISC_R, outline(), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R)]
+    else:
+        body = [floor_grid(w, (0, 0), DISC_R, gap().union(outline()), phase=(0.5, 0.5)) + disc_arcs(w, DISC_R, mask=gap())]
     body.append(ellipse(w, FENCE_R, attrs=f'fill="none" stroke="{BLUE}" stroke-width="1" stroke-opacity="0.55" stroke-dasharray="5 6"'))
     body.append(ellipse(w, GUARD_R, attrs=f'fill="none" stroke="{ORANGE}" stroke-width="1.4" stroke-opacity="0.9"'))
     body += threats()
@@ -154,6 +164,10 @@ def build():
     body += windows()
     body += faces(w, *cap_box()) + faces(w, *hvac_box()) + faces(w, *awning_box())
     body += shield()
+    if compact:
+        for dot, elbow, tx, title, sub, colour, anchor in COMPACT['labels']:
+            body += label(w.p(*dot), elbow, tx, title, sub, colour, anchor, scale=COMPACT['scale'])
+        return doc(TITLE, body, translate=CENTRE, crop=COMPACT['crop'])
     for dot, tx, ty, title, sub, colour, anchor in LABELS:
         side = 27 if anchor == 'end' else -27
         body += label(w.p(*dot), (tx + side, ty - 4.5), tx, title, sub, colour, anchor)
@@ -162,3 +176,4 @@ def build():
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens

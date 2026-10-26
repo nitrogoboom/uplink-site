@@ -1118,7 +1118,7 @@ html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
 html:not(.js) .roster-wrap { display: none; }
 .picker-head { grid-area: head; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
 .picker-detail { grid-area: detail; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.picker-prev { grid-area: prev; min-width: 0; max-width: 100%; display: flex; flex-direction: column; container-type: inline-size; }
+.picker-prev { grid-area: prev; min-width: 0; max-width: 100%; display: flex; flex-direction: column; }
 .picker-art { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .picker-prev img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: var(--sp-7) var(--sp-5) var(--sp-5); }
 .picker-prev .tags { position: absolute; top: var(--sp-4); left: var(--sp-4); right: var(--sp-4); display: flex; justify-content: space-between; gap: var(--sp-2); }
@@ -1207,7 +1207,7 @@ html:not(.js) .roster-wrap { display: none; }
 
 .case { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
 @media (min-width: 700px) { .case { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); } }
-.case-fig { min-width: 0; container-type: inline-size; }
+.case-fig { min-width: 0; }
 .case-img { aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center; }
 .case-img img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-4); }
 .facts { display: flex; flex-direction: column; font-size: var(--fs-2); }
@@ -1228,44 +1228,20 @@ html:not(.js) .roster-wrap { display: none; }
 @media (min-width: 700px) { .profile { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "card text"; gap: var(--sp-6); } }
 .profile-card { display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-4); }
 .profile-card > :not(.profile-art) { margin-inline: var(--sp-2); }
-.profile-card { container-type: inline-size; }
 .profile-art { position: relative; aspect-ratio: 4 / 3; max-width: 100%; }
 .profile-art img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-3); }
 .profile-art .chip { position: absolute; left: var(--sp-3); bottom: var(--sp-3); }
 
-/* ---- drawing keys --------------------------------------------------------
-   Below about 420px a drawing's label titles would be under 8.5px, so the
-   drawing shows numbered dots instead (tools/isogen.py key_css, KEY_PX) and
-   this list says what they are (written by tools/build_keys.py). The
-   container widths below add each box's padding to that 418px. */
-.fig-key {
-  display: none;
-  list-style: none;
-  margin: 0;
-  padding: var(--sp-3) var(--sp-2) var(--sp-2);
-  counter-reset: fig-key;
-  gap: var(--sp-2);
-  font-size: var(--fs-2);
-  color: var(--c-muted);
+/* ---- compact cuts ----------------------------------------------------------
+   Each drawing has a closer cut with bigger labels (NAME-compact.svg, from its
+   tools/gen_*.py). Pages swap it in with <picture> wherever the drawing shows
+   small; picture takes no box of its own, so the img keeps its usual sizing. */
+picture { display: contents; }
+.hero-still { display: none; }
+@media (max-width: 599px) {
+  .hero-art .stage svg.ob { display: none; }
+  .hero-art .stage .hero-still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 }
-.fig-key li { counter-increment: fig-key; display: flex; align-items: center; gap: var(--sp-2); }
-.fig-key li::before {
-  content: counter(fig-key);
-  flex: none;
-  display: grid; place-items: center;
-  width: var(--sp-5); height: var(--sp-5);
-  border-radius: 50%;
-  background: var(--c-accent);
-  color: var(--c-bg);
-  font-size: var(--fs-1);
-  font-weight: 600;
-}
-.fig-key li.k-sky::before { background: var(--c-sky); }
-.fig-key b { color: var(--c-text); font-weight: 600; letter-spacing: 0.06em; }
-@container (max-width: 468px) { .picker-prev .fig-key { display: grid; } }
-@container (max-width: 452px) { .case-fig .fig-key { display: grid; } }
-@container (max-width: 476px) { .profile-card .fig-key { display: grid; } }
-@media (max-width: 599px) { .fig-key--hero { display: grid; } }
 
 .profile-text { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
 

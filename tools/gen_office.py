@@ -2,6 +2,7 @@
   site/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
   site/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
   site/index.html                   the hero: the <svg class="ob"> block only, spliced in place (page fonts apply)
+  site/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
 usage: python tools/gen_office.py site
 Edit the numbers below and run again; don't hand-edit any of the three.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
@@ -85,6 +86,17 @@ LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side:
     ((13.25, 9.25, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
     ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
+# compact phone cut ('compact'): a 3:2 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
+# titles render >= 14px and sublines >= 12px. Text sits where nothing stands: WORKSTATIONS below the room's
+# front-left edge, FIREWALL RACK on the open floor right of the desks and past the front-right edge.
+COMPACT_CROP = (220, 114, 990, 660)    # the whole room and tray, no card
+COMPACT_K = 1.85
+COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
+    (LABELS[0][0], (760.0, 675.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 'right'),
+    (LABELS[2][0], (651.8, 683.0), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 'left'),
+]
+HALO = 'stroke="#151E2C" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
+COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
 BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
 KEY_WIDTH = 425                        # below this rendered width the 24px titles fall under 8.5px (isogen.KEY_PX): numbers instead
 TAIL = 40                              # level tail, px; text starts 12px past it
@@ -180,8 +192,8 @@ def floor(v):
     X, Y = FLOOR
     out = box((0, X, 0, Y, -SLAB, 0), ('#313F54', '#283447', '#1E2938'))
     segs = [(w.p(k, 0), w.p(k, Y)) for k in range(X + 1)] + [(w.p(0, k), w.p(X, k)) for k in range(Y + 1)]
-    if v == 'office':   # static: floor lines stop where something stands on them (animated versions keep them: things drop in)
-        mask = unary_union([silhouette(w, *b) for b in solids()])
+    if v in ('office', 'compact'):   # static: floor lines stop where something stands on them (animated versions keep them: things drop in)
+        mask = unary_union([silhouette(w, *b) for b in solids()] + (compact_gaps() if v == 'compact' else []))
         segs = [s for p, q in segs for s in clip_out(p, q, mask)]
     out.append(seg_path(segs, f'fill="none" stroke="#2C3849" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))
     out.append(line(ZONE, f'stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
@@ -355,11 +367,41 @@ def card(v):
     return out
 
 
-def label(dot, elbow, colour, title, sub, side='left'):
+def label_text(elbow, side, k=1.0):
+    """(text x, title baseline, subline baseline, anchor) for a label whose tail ends at elbow."""
+    ex, ey = elbow
+    sign, anchor = (-1, 'end') if side == 'left' else (1, 'start')
+    tx = ex + sign * TAIL
+    sub_gap = 28 if k == 1 else 26 * k               # compact: a touch tighter so two lines fit under the room
+    return tx + sign * 12 * k, ey + 8 * k, ey + 8 * k + sub_gap, anchor
+
+
+def compact_gaps():
+    """Floor lines stop around the compact labels' text."""
+    from shapely.geometry import box as box_shape
+    k, out = COMPACT_K, []
+    for _dot, elbow, _c, title, sub, side in COMPACT_LABELS:
+        x, ty, sy, anchor = label_text(elbow, side, k)
+        for text, base, size in ((title, ty, 24), (sub, sy, 19)):
+            wd = COMPACT_TEXT_W[text] * k
+            x0, x1 = (x - wd, x) if anchor == 'end' else (x, x + wd)
+            out.append(box_shape(x0 - 6, base - size * k * 0.8, x1 + 6, base + size * k * 0.3))
+        ex, ey = elbow
+        out.append(box_shape(min(ex, x) - 4, ey - 4, max(ex, x) + 4, ey + 4))
+    return out
+
+
+def label(dot, elbow, colour, title, sub, side='left', k=1.0):
     dx, dy = w.p(*dot)
     ex, ey = elbow
     sign, anchor = (-1, 'end') if side == 'left' else (1, 'start')
     tx = ex + sign * TAIL
+    if k != 1.0:                                     # compact cut: bigger text, same line weights
+        x, ty, sy, anchor = label_text(elbow, side, k)
+        return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>',
+                f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="8" fill="{colour}" stroke="#151E2C" stroke-width="3.5"/>',
+                f'<text class="lt" x="{fmt(x)}" y="{fmt(ty)}" font-family="{FONT}" font-size="{24 * k:.3g}" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}" {HALO}>{title}</text>',
+                f'<text class="lt" x="{fmt(x)}" y="{fmt(sy)}" font-family="{FONT}" font-size="{19 * k:.3g}" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}" {HALO}>{sub}</text>']
     return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
             f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
             f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
@@ -400,6 +442,10 @@ def groups(v):
         G.append((attrs, tile(i, v)))
     if v == 'hero':
         G.append((None, [(PARTS / 'hero_cloud.svg').read_text(encoding='utf-8').rstrip('\n')]))
+    elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
+        for dot, elbow, colour, title, sub, side in COMPACT_LABELS:
+            G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
+        return G
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
     for dot, elbow, colour, title, sub, d, *side in LABELS:
@@ -413,7 +459,7 @@ def render(v):
     for attrs, shapes in groups(v):
         if attrs is None:                       # hero cloud: already wrapped
             out += shapes; continue
-        if v == 'office':
+        if v in ('office', 'compact'):
             open_, close = (('<g class="co lbl"' + attrs.split('lbl"')[1].split(' style=')[0] + '>') if 'lbl"' in attrs else '<g>'), '</g>'
         elif isinstance(attrs, tuple):
             open_, close = f'<g {attrs[0]}>\n<g {attrs[1]}>', '</g>\n</g>'
@@ -421,8 +467,12 @@ def render(v):
             open_, close = f'<g {attrs}>', '</g>'
         out += [open_, *shapes, close]
     body = number_badges('\n'.join(out))
-    title = TITLES[v]
-    if v == 'office':
+    title = TITLES['office' if v == 'compact' else v]
+    if v == 'compact':
+        crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="800" role="img" aria-label="{title}">'
+        style = font_style(body) + '\n<style>svg:target .lbl{display:none}</style>'
+    elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
         style = font_style(body) + '\n' + key_css(KEY_WIDTH)
     elif v == 'build':
@@ -446,6 +496,6 @@ def splice_hero(index_path, svg):
 
 if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
-    for v, name in (('office', 'office.svg'), ('build', 'office-build.svg')):
+    for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     splice_hero(site / 'index.html', render('hero'))

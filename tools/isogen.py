@@ -99,33 +99,27 @@ def seg_path(segs, attrs):
     return f'<path d="{d}" {attrs}/>'
 
 
-def badge(x, y, colour, r=16, size=22):
-    """Numbered dot shown in place of a label when the drawing renders small (see KEY_CSS).
-    The number is filled in by number_badges(); the page shows the matching key under the drawing."""
-    return (f'<g class="num"><circle cx="{fmt(x)}" cy="{fmt(y)}" r="{r}" fill="{colour}" stroke="{INK}" stroke-width="2"/>'
-            f'<text x="{fmt(x)}" y="{fmt(y + size * 0.36)}" font-size="{size}" font-weight="600" fill="{INK}" text-anchor="middle">#</text></g>')
+PLAIN_CSS = '<style>svg:target .lbl{display:none}</style>'   # drawing.svg#plain (cards) hides the labels
+
+
+def badge(*_a, **_k):
+    """Retired: drawings used to swap labels for numbered dots on phones. Phones now get the compact cut."""
+    return ''
 
 
 def number_badges(body):
-    """Fill the badges' # in draw order: 1, 2, 3..."""
-    parts = body.split('>#</text></g>')
-    return ''.join(p + (f'>{i + 1}</text></g>' if i < len(parts) - 1 else '') for i, p in enumerate(parts))
-
-
-KEY_PX = 8.5   # labels whose titles would render smaller than this switch to numbered dots (phones, narrow columns)
+    """Retired with badge(); strips any numbered dot still drawn by hand (the hero's cloud piece)."""
+    return re.sub(r'<g class="num">.*?</g>', '', body, flags=re.S)
 
 
 def key_group(title, sub=''):
-    """Opening tag for one label; tools/build_keys.py reads data-t / data-s to write the page's key."""
+    """Opening tag for one label; data-t / data-s keep its words with it."""
     return f'<g class="lbl" data-t="{html.escape(title)}" data-s="{html.escape((sub or "").replace(chr(10), " "))}">'
 
 
-def key_css(width):
-    """Below `width` px of rendered drawing (titles under KEY_PX) the leader and text
-    hide and the numbered badge shows. An <img> SVG measures its own box, so this follows the drawing's size.
-    `drawing.svg#plain` (cards) hides labels altogether."""
-    return (f'<style>.num{{display:none}}.num text{{font-family:{FONT}}}@media (max-width:{width}px){{.lt{{display:none}}.num{{display:inline}}}}'
-            f'svg:target .lbl{{display:none}}</style>')
+def key_css(_width=None):
+    """Retired with badge(); only the #plain rule is left."""
+    return PLAIN_CSS
 
 
 def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y=None, sub_y=None, scale=1.0):
@@ -144,22 +138,17 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
            f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty)}" font-size="{13 * k:.3g}" font-weight="600" letter-spacing="{0.78 * k:.3g}" fill="{colour}" text-anchor="{anchor}">{title}</text>']
     for n, line in enumerate((sub or '').split('\n') if sub else []):   # a '\n' in sub wraps it (compact cuts)
         out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{line}</text>')
-    out.append(badge(dx, dy, colour) + '</g>')
+    out.append('</g>')
     return out
 
 
 def doc(title, body, translate=None, view=(640, 480), crop=None):
     """The SVG wrapper. crop = (x, y, w, h) makes the compact phone cut: the same drawing framed closer
-    (keep it 4:3 so it swaps in for the full one without moving the layout); it has no numbered badges."""
+    (keep it 4:3 so it swaps in for the full one without moving the layout)."""
     vw, vh = view
     g = f' transform="translate({translate[0]},{translate[1]})"' if translate else ''
     body = '\n'.join(body)
-    if crop:
-        body = re.sub(r'<g class="num">.*?</g>', '', body)
-        box, css = ' '.join(f'{v:g}' for v in crop), '<style>svg:target .lbl{display:none}</style>'
-    else:
-        body = number_badges(body)
-        box, css = f'0 0 {vw} {vh}', key_css(round(vw * KEY_PX / 13))    # 13px titles
+    box, css = (' '.join(f'{v:g}' for v in crop) if crop else f'0 0 {vw} {vh}'), PLAIN_CSS
     return '\n'.join([
         f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{box}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
         f'<title>{title}</title>',

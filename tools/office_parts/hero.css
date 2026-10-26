@@ -28,5 +28,3 @@
 @keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
 .ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}
-.ob .num{display:none}.ob .num text{font-family:Barlow,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
-@media (max-width:599px){.ob .lt{display:none}.ob .num{display:inline}}

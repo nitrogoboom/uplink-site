@@ -52,6 +52,15 @@ LABELS = [
     (('ring', 105), (40, 48), 'right', 'TESTED RESTORES', 'we prove it works', ORANGE),
 ]
 TITLE_W, SUB_W = 8.4, 5.4             # rough px per character, for the floor-line gap round each label
+
+# compact phone cut (isogen.doc crop): the same scene framed closer, labels at 1.5x. Crop, elbows and text x are
+# page coordinates (the group's translate is taken off for you). Keep the crop 4:3.
+COMPACT = dict(crop=(106, 56, 440, 330), scale=1.5, labels=[
+    # (dot spec as in LABELS, elbow, text x, anchor, title, subline, colour)
+    (('unit', 1.0, DY, (UNITS - 1) * (DH + UNIT_GAP) + DH / 2), (228, 86), 255, 'start', 'DAILY BACKUPS', 'servers + Microsoft 365', BLUE),
+    (('site', SX0 + 0.5, SY1, 0.5), (389, 322), 407, 'start', 'OFFSITE COPY', 'a separate,\nlocked site', ORANGE),
+    (('ring', 5), (324, 345), 297, 'end', 'TESTED RESTORES', 'we prove it works', ORANGE),
+])
 LEADER_CLEAR = 3                      # px of floor kept clear either side of a leader line
 
 
@@ -72,6 +81,30 @@ def label_geom(spec):
     return dot, elbow, text_x, 'start' if side == 'right' else 'end'
 
 
+def dot_at(where):
+    return ring_point(where[1]) if where[0] == 'ring' else w.p(*where[1:])
+
+
+def compact_labels():
+    """(dot, elbow, text x, anchor, title, sub, colour) for the cut, in the drawing's group coordinates."""
+    tx0, ty0 = TRANSLATE
+    return [(dot_at(where), (ex - tx0, ey - ty0), x - tx0, anchor, t, sub, c)
+            for where, (ex, ey), x, anchor, t, sub, c in COMPACT['labels']]
+
+
+def compact_gaps():
+    """Floor lines stop round the cut's bigger text (sublines may wrap) and keep clear of its leaders."""
+    k, gaps = COMPACT['scale'], []
+    for dot, (ex, ey), x, anchor, t, sub, _c in compact_labels():
+        lines = sub.split('\n')
+        width = max(len(t) * TITLE_W, max(len(line) for line in lines) * SUB_W) * k
+        x0, x1 = (min(ex, x) - 4, x + width + 6) if anchor == 'start' else (x - width - 6, max(ex, x) + 4)
+        ty = ey + 4.5 * k
+        gaps.append(box_shape(x0, ty - 15 * k, x1, ty + 15 * k + (len(lines) - 1) * 13 * k + 5))
+        gaps.append(LineString([dot, (ex, ey), (x, ey)]).buffer(LEADER_CLEAR))
+    return gaps
+
+
 def label_gaps():
     gaps = []
     for spec in LABELS:
@@ -83,9 +116,9 @@ def label_gaps():
     return gaps
 
 
-def hidden():
+def hidden(compact=False):
     """Screen areas floor lines skip: the labels, the unit and the building."""
-    parts = label_gaps()
+    parts = compact_gaps() if compact else label_gaps()
     parts += [silhouette(w, 0, DX, 0, DY, unit_z(i), unit_z(i) + DH) for i in range(UNITS)]
     parts.append(silhouette(w, SX0, SX1, SY0, SY1, 0, SH))
     parts.append(Polygon(arrow_points()).buffer(LEADER_CLEAR))               # and of the arrowhead and the copy line
@@ -189,11 +222,15 @@ def copy_link():
             f'<circle cx="{fmt(ex)}" cy="{fmt(ey)}" r="3" fill="{ORANGE}"/>']
 
 
-def build():
-    mask = hidden()
-    gaps = unary_union(label_gaps())
+def build(compact=False):
+    mask = hidden(compact)
+    gaps = unary_union(compact_gaps() if compact else label_gaps())
     body = [floor_grid(w, DISC_C, DISC_R, mask, min_seg=MIN_SEG) + disc_arcs(w, DISC_R, *DISC_C, mask=gaps)]
     body += restore_loop() + offsite_site() + backup_unit() + copy_link()
+    if compact:
+        for dot, elbow, x, anchor, t, sub, c in compact_labels():
+            body += label(dot, elbow, x, t, sub, colour=c, anchor=anchor, scale=COMPACT['scale'])
+        return doc(TITLE, body, translate=TRANSLATE, crop=COMPACT['crop'])
     for spec in LABELS:
         dot, elbow, tx, anchor = label_geom(spec)
         body += label(dot, elbow, tx, spec[3], spec[4], colour=spec[5], anchor=anchor)
@@ -202,3 +239,4 @@ def build():
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens

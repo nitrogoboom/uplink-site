@@ -30,6 +30,13 @@ PAD = 5                               # floor lines stop this far from milestone
 
 BUDGET_ELBOW = (150.0, -96.0)         # IT BUDGET leader: elbow (screen); text starts 27px past it
 
+# compact phone cut (isogen.doc crop): the same scene framed close, labels at 1.55x. Crop is in page coordinates,
+# kept 4:3; elbows are in the drawing's group coordinates. Each quarter becomes two short lines (Q1 over AUDIT)
+# so the four still fit side by side at the bigger size.
+COMPACT = dict(crop=(88, 50, 473, 354.75), scale=1.55, budget_sub='planned,\nnot surprised',
+               budget_elbow=(136.0, -96.0))    # IT BUDGET a little left of the full one, clear of the frame
+GREY = '#A9B4C3'
+
 WHITE = '#F1F4F8'
 TITLE = 'Rising budget bars and a quarterly IT roadmap path'
 
@@ -44,9 +51,21 @@ def text_rect(i, txt, width):
     return box_shape(X - width / 2 - PAD, base - 16, X + width / 2 + PAD, base + 8)
 
 
-def hidden():
+def compact_rects():
+    """Floor lines stop around the compact cut's two-line quarters and the IT BUDGET text."""
+    k = COMPACT['scale']
+    out = []
+    for i, txt, width in MILESTONES:
+        X, Y = w.p(*ROAD[i]); half = (width - 17) * k / 2 + PAD     # the word line is the wider one
+        out.append(box_shape(X - half, Y - TEXT_RISE * k - 26 * k, X + half, Y - TEXT_RISE * k + 4 * k))
+    ex, ey = COMPACT['budget_elbow']; tx = ex + 27 * k; ty = ey + 4.5 * k
+    out.append(box_shape(ex - 4, ty - 15 * k, tx + 70 * k + 5, ty + 15 * k + 13 * k + 5 * k))
+    return out
+
+
+def hidden(compact=False):
     """Screen areas floor lines skip: milestone text and the bars standing on the floor."""
-    rects = [text_rect(*m) for m in MILESTONES]
+    rects = compact_rects() if compact else [text_rect(*m) for m in MILESTONES]
     sil = [silhouette(w, *b) for b, _c in bar_boxes()]
     return unary_union(rects + sil)
 
@@ -68,28 +87,43 @@ def trend():
             f'stroke-dasharray="4 4"/>' + dots)
 
 
-def milestones():
+def milestones(compact=False):
     dots, texts = [], []
+    k = COMPACT['scale']
     for i, txt, _ in MILESTONES:
         X, Y = w.p(*ROAD[i])
         dots.append(f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="6.5" fill="{FACES[2]}" stroke="{ORANGE}" stroke-width="2.5"/>')
+        if compact:                    # "Q1" in title size over its word in subline size
+            q, word = txt.split(' ', 1)
+            base = Y - TEXT_RISE * k
+            texts.append(key_group(txt) + f'<text class="lt" x="{fmt(X)}" y="{fmt(base - 18 * k)}" font-size="{13 * k:.3g}" font-weight="600" '
+                         f'letter-spacing="{0.78 * k:.3g}" fill="{ORANGE}" text-anchor="middle">{q}</text>'
+                         f'<text class="lt" x="{fmt(X)}" y="{fmt(base)}" font-size="{11 * k:.3g}" font-weight="600" letter-spacing="{0.66 * k:.3g}" '
+                         f'fill="{WHITE}" text-anchor="middle">{word}</text>' + badge(X, Y, ORANGE) + '</g>')
+            continue
         texts.append(key_group(txt) + f'<text class="lt" x="{fmt(X)}" y="{fmt(Y - TEXT_RISE)}" font-size="11" font-weight="600" letter-spacing="0.66" '
                      f'fill="{WHITE}" text-anchor="middle">{txt}</text>' + badge(X, Y, ORANGE) + '</g>')
     return dots + texts
 
 
-def build():
-    mask = hidden()
+def build(compact=False):
+    mask = hidden(compact)
     body = [floor_grid(w, (0, 0), DISC_R, mask, phase=(GRID_X0, GRID_Y0)) + disc_arcs(w, DISC_R, mask=mask), roadmap()]
     for b, cols in bar_boxes():
         body += faces(w, *b, cols)
     body.append(trend())
-    body += milestones()
+    body += milestones(compact)
     x0, h = BARS[-1]
     top = w.p(x0 + BAR_W / 2, sum(BAR_Y) / 2, h)          # centre of the tallest bar's top
+    if compact:
+        k = COMPACT['scale']
+        ex, ey = COMPACT['budget_elbow']
+        body += label(top, (ex, ey), ex + 27 * k, 'IT BUDGET', COMPACT['budget_sub'], scale=k)
+        return doc(TITLE, body, translate=(267.3, 170.5), crop=COMPACT['crop'])
     body += label(top, BUDGET_ELBOW, BUDGET_ELBOW[0] + 27, 'IT BUDGET', 'planned, not surprised')
     return doc(TITLE, body, translate=(267.3, 170.5))   # content centred in the 640 x 480 frame
 
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens
