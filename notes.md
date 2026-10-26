@@ -2,10 +2,8 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
-## Doing now
-- [ ] VoIP drawing polish (`tools/gen_voip.py`): proper headset on a stand, mobile in a dock on the desk, bigger desk phone, cleaner Teams screen, re-centred layout.
-
 ## Drawings
+- [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
 - [ ] Hero 3D cloud is still hand-drawn (`tools/office_parts/hero_cloud.svg`), with ~99 checker flags. Rebuild it in `gen_office.py`.
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
 - [ ] Office plan: ~153 one-grid-step near-miss flags because the furniture is half size there. Not visible; tidy if the props get a half-size grid.

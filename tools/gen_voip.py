@@ -2,72 +2,75 @@
 Edit the numbers below and run again; don't hand-edit the SVGs.
 usage: python tools/gen_voip.py site/assets/img/voip.svg       (also writes voip-compact.svg)
 World: 1 unit = 23px. x runs right-down, y left-down, z up. Desk's back-left corner is the origin.
-Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (the Teams call, the phone's
-incoming call) are drawn in 2D on their face and mapped onto it with an SVG matrix.
+Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (the Teams call, the phone
+screens, the headset band and pads) are drawn in 2D on their face and mapped onto it with an SVG matrix.
 """
 import sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W
-from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_side, rect
-from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_front, on_side, rect
+from isogen import ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
 
 w = W(0, 0, 23)
-TX, TY = 266.0, 226.0                 # the drawing's group translate (page coordinates)
-GREEN, RED = '#6FD3A0', '#F47E6A'     # tokens --c-ok, and the red the window dots use
+TX, TY = 288.0, 228.0                 # the drawing's group translate (page coordinates)
+GREEN, RED, SKY_TOP = '#6FD3A0', '#F47E6A', '#9CCBF0'   # tokens --c-ok, the window-dot red, --iso-sky-top
 SCREEN_BG, TILE, LINE = '#1A2333', '#26324A', '#D9E4F0'
+DARK = ('#26324A', '#1E2938', '#313F54')                 # headset cups: left, right, top faces
 
 DESK = (0, 7, 0, 3.5, 0, 2.625)       # x0 x1 y0 y1 z0 z1
 TOP = DESK[5]
-MON_PARTS, SCREEN = monitor(4.0, 0.75, TOP, '+y')         # shared monitor: screen face at y = 0.75, x 2..6
+MON_PARTS, SCREEN = monitor(3.5, 0.75, TOP, '+y')         # shared monitor: screen face at y = 0.75, x 1.5..5.5
 MONITOR = dict(MON_PARTS)['panel']
-KEYBOARD = (2.5, 5.5, 1.5, 2.25, TOP, TOP + 0.125)
-MOUSE = (5.75, 6.0, 1.5, 2.0, TOP, TOP + 0.125)
-PHONE_PARTS, PHONE_TOP = desk_phone(6.25, 2.75, TOP, '+y')  # VoIP desk phone, front right, facing the chair
-CHAIR_PARTS = chair(4.0, 5.5, '-y')
+KEYBOARD = (2.0, 4.5, 1.5, 2.25, TOP, TOP + 0.125)
+PHONE_PARTS, PHONE_TOP = desk_phone(5.75, 2.75, TOP, '+y', s=2.0)   # VoIP desk phone at twice the kit size: 2 x 1.5
+CHAIR_PARTS = chair(3.5, 5.75, '-y')
 
-HEADSET = [  # headset hanging on a stand at the desk's back-left corner, back to front: base, back cup, pole, front cup
-    ('stand base', (0.25, 1.0, 0.5, 1.25, TOP, TOP + 0.125), FACES),
-    ('back cup', (0.25, 1.0, 0.25, 0.5, TOP + 1.0, TOP + 1.625), HIGH),
-    ('stand pole', (0.5, 0.75, 0.75, 1.0, TOP + 0.125, TOP + 1.875), FACES),
-    ('front cup', (0.25, 1.0, 1.25, 1.5, TOP + 1.0, TOP + 1.625), HIGH),
-]
-BAND_X = 0.625                        # the headband arcs over the pole in the plane x = BAND_X, cup to cup
+# headset hanging on a stand, back-right of the desk beside the monitor: cups either side of the post, band over it
+STAND_BASE = (6.0, 6.75, 0.25, 1.0, TOP, TOP + 0.125)
+STAND_POST = (6.25, 6.5, 0.5, 0.75, TOP + 0.125, TOP + 2.125)
+CUP_BACK = (6.0, 6.75, -0.25, 0.0, TOP + 1.0, TOP + 1.75)
+CUP_FRONT = (6.0, 6.75, 1.25, 1.5, TOP + 1.0, TOP + 1.75)
+BAND_X = 6.375                        # plane of the band (the post's centre line)
 
-MOBILE = (8.75, 9.0, -0.25, 1.25, 3.5, 6.25)   # smartphone floating at the right, screen on its x1 face
+# mobile standing in a dock, front-left of the desk, screen facing the chair side (+y)
+DOCK = (0.25, 1.75, 2.25, 3.0, TOP, TOP + 0.25)
+MOBILE = (0.5, 1.5, 2.5, 2.75, TOP + 0.25, TOP + 2.0)
 
-# Teams call on the monitor: local units, u across from the screen's left edge, v down from its top
-CALL_BAR = 0.36                       # title bar height
-TILES = dict(top=0.5, margin=0.2, gap=0.12, rows=2, cols=2, height=1.32)   # 2 x 2 video tiles
-SPEAKER = 1                           # tile with the orange "speaking" ring
-AVATARS = [BLUE, ORANGE, GREEN, '#9CCBF0']
-CONTROLS_V = 2.0                      # call controls pill, v of its top
+# Teams call on the monitor (local units: u across from the screen's left edge, v down from its top)
+CALL_BAR = 0.34
+TILES = dict(top=0.5, margin=0.2, gap=0.14, rows=2, cols=2, height=1.34, radius=0.1)
+SPEAKER = 1
+AVATARS = [BLUE, ORANGE, GREEN, SKY_TOP]
+CONTROLS = dict(v=2.0, w=1.5, h=0.32)
 
-DISC = (4.5, 2.0, 7.5)                # floor disc centre x, y and radius; grid on whole units
+DISC = (3.5, 2.75, 7.0)               # floor disc centre x, y and radius; grid on whole units
 
 # labels: dot in world, elbow and text in the group's screen coordinates; tw/sw are measured text widths
 LABELS = [
-    dict(dot=(0.625, 1.5, TOP + 1.3125), elbow=(-62.0, -104.0), x=-89.0, title='HEADSETS', sub='clear calls all day',
-         tw=70, sw=92, colour=ORANGE, anchor='end'),
-    dict(dot=(9.0, 0.5, 5.5), elbow=(194.0, -78.0), x=221.0, title='TEAMS PHONE', sub='calls from any device',
-         tw=93, sw=108, colour=BLUE, anchor='start'),
-    dict(dot=(6.25, 2.625, TOP + 0.25), elbow=(118.0, 108.0), x=145.0, title='DESK PHONES', sub='plug in and dial',
+    dict(dot=(1.0, 2.75, TOP + 1.5), elbow=(-78.0, -84.0), x=-105.0, title='TEAMS PHONE', sub='calls from any device',
+         tw=93, sw=108, colour=BLUE, anchor='end'),
+    dict(dot=(6.375, 1.5, TOP + 1.25), elbow=(150.0, -20.0), x=177.0, title='HEADSETS', sub='clear calls all day',
+         tw=70, sw=92, colour=ORANGE, anchor='start'),
+    dict(dot=(5.25, 2.5, TOP + 0.5), elbow=(112.0, 78.0), x=139.0, title='DESK PHONES', sub='plug in and dial',
          tw=95, sw=82, colour=ORANGE, anchor='start'),
 ]
-# compact phone cut: same scene framed closer, two labels at 1.65x (HEADSETS is left to the picture: three don't fit
-# at phone size). TEAMS PHONE points at the call on the monitor here. Crop in page coordinates, exactly 4:3.
-COMPACT = dict(crop=(121, 71, 427, 320.25), scale=1.65, labels=[
-    dict(dot=(3.0, 0.75, 5.0), elbow=(50.0, -135.4), x=20.0, title='TEAMS PHONE', sub='calls from any device',
+# compact phone cut: the same scene framed closer, labels at 1.6x: TEAMS PHONE above, HEADSETS beside, DESK PHONES
+# below, so the frame stays narrow enough for 14px+ titles at 340px. Crop in page coordinates, exactly 4:3.
+COMPACT = dict(crop=(85, 53, 480, 360), scale=1.6, labels=[
+    dict(dot=(1.0, 2.75, TOP + 1.5), elbow=(12.0, -157.2), x=-20.0, title='TEAMS PHONE', sub='calls from any device',
          tw=93, sw=108, colour=BLUE, anchor='end'),
-    dict(dot=(6.0, 2.75, TOP + 0.25), elbow=(95.0, 110.6), x=120.0, title='DESK PHONES', sub='plug in and dial',
+    dict(dot=(6.375, 1.5, TOP + 1.25), elbow=(138.0, -17.2), x=160.0, title='HEADSETS', sub='clear calls\nall day',
+         tw=70, sw=60, colour=ORANGE, anchor='start'),
+    dict(dot=(5.25, 2.5, TOP + 0.5), elbow=(95.0, 132.8), x=120.0, title='DESK PHONES', sub='plug in and dial',
          tw=95, sw=82, colour=ORANGE, anchor='start'),
 ])
-TITLE = 'VoIP desk: a Teams call on screen, a desk phone, a headset and a smartphone taking a call'
+TITLE = 'VoIP desk: a Teams call on screen, a desk phone, a headset on its stand and a phone taking a call'
 
 
 def objects():
-    return ([DESK] + [b for _n, b, _c in HEADSET] + [b for _n, b in MON_PARTS + PHONE_PARTS + CHAIR_PARTS]
-            + [KEYBOARD, MOUSE, MOBILE])
+    return ([DESK] + [b for _n, b in MON_PARTS] + [KEYBOARD, CUP_BACK, STAND_BASE, STAND_POST, CUP_FRONT]
+            + [b for _n, b in PHONE_PARTS] + [DOCK, MOBILE] + [b for _n, b in CHAIR_PARTS])
 
 
 def text_gaps(L, k):
@@ -85,8 +88,50 @@ def hidden(compact=False):
     return unary_union([silhouette(w, *b) for b in objects()] + [g for L in labels for g in text_gaps(L, k)])
 
 
+# ---- headset -----------------------------------------------------------------------------------
+def cup_face(cup, pad):
+    """The visible y1 face of a cup: an orange ring on the outside (front cup), the orange cushion inside (back)."""
+    x0, x1, _y0, y1, z0, z1 = cup
+    wd, ht = x1 - x0, z1 - z0
+    if pad:
+        art = rect(0.12, 0.1, wd - 0.24, ht - 0.2, ORANGE, 0.18, ' fill-opacity="0.9"')
+    else:
+        art = (rect(0.12, 0.1, wd - 0.24, ht - 0.2, 'none', 0.18,
+                    f' stroke="{ORANGE}" stroke-width="2" vector-effect="non-scaling-stroke"')
+               + rect(0.27, 0.25, wd - 0.54, ht - 0.5, '#1A2333', 0.1))
+    return f'<g transform="{on_front(w, x0, y1, z1)}">{art}</g>'
+
+
+def headband():
+    """Smooth band from the back cup, over the post, to the front cup, in the plane x = BAND_X."""
+    top = TOP + 2.375                 # local frame: u = 1.5 - y (rightwards on screen), v = top - z
+    u_front, u_back = 1.5 - 1.375, 1.5 - (-0.125)
+    v_cup = top - CUP_FRONT[5]
+    v_post = top - STAND_POST[5]
+    d = (f'M{u_front:.4g},{v_cup:.4g} C{u_front:.4g},{v_post - 0.05:.4g} {u_front + 0.35:.4g},{v_post - 0.12:.4g} '
+         f'{(u_front + u_back) / 2:.4g},{v_post - 0.12:.4g} S{u_back:.4g},{v_post - 0.05:.4g} {u_back:.4g},{v_cup:.4g}')
+    return (f'<g transform="{on_side(w, BAND_X, 1.5, top)}" fill="none" stroke-linecap="round">'
+            f'<path d="{d}" stroke="{DARK[0]}" stroke-width="5" vector-effect="non-scaling-stroke"/>'
+            f'<path d="{d}" stroke="#D9E4F0" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"/></g>')
+
+
+def mic_boom():
+    """Short boom from the front cup towards the mouth, ending in a small orange mic, in the cup's outer plane."""
+    x0, _x1, _y0, y1, _z0, z1 = CUP_FRONT
+    d = 'M0.0,0.55 C-0.2,0.6 -0.3,0.85 -0.5,0.95'           # towards the front-left, where the sitter's mouth is
+    return (f'<g transform="{on_front(w, x0, y1, z1)}" fill="none" stroke-linecap="round">'
+            f'<path d="{d}" stroke="#5B6E8A" stroke-width="3" vector-effect="non-scaling-stroke"/>'
+            f'<circle cx="-0.52" cy="0.96" r="0.1" fill="{ORANGE}"/></g>')
+
+
+# ---- screens -------------------------------------------------------------------------------------
+def avatar(cx, base, colour, k=1.0):
+    """Head and shoulders, sitting on the line v = base."""
+    return (f'<circle cx="{cx:.4g}" cy="{base - 0.33 * k:.4g}" r="{0.13 * k:.4g}" fill="{colour}"/>'
+            f'<path d="M{cx - 0.25 * k:.4g},{base:.4g} a{0.25 * k:.4g},{0.17 * k:.4g} 0 0 1 {0.5 * k:.4g},0 z" fill="{colour}" fill-opacity="0.8"/>')
+
+
 def teams_call():
-    """A Teams-style call: title bar, 2 x 2 video tiles with avatars (one speaking), and the controls pill."""
     sw = SCREEN[2]
     out = [rect(0, 0, sw, CALL_BAR, TILE, 0.08)]
     out += [f'<circle cx="{0.2 + k * 0.17:.3g}" cy="{CALL_BAR / 2:.3g}" r="0.055" fill="{c}"/>' for k, c in enumerate((RED, ORANGE, GREEN))]
@@ -98,59 +143,50 @@ def teams_call():
         for c in range(t['cols']):
             n = r * t['cols'] + c
             u, v = t['margin'] + c * (tw + t['gap']), t['top'] + r * (th + t['gap'])
-            ring = f' stroke="{ORANGE}" stroke-width="1.5" vector-effect="non-scaling-stroke"' if n == SPEAKER else ''
-            out.append(rect(u, v, tw, th, TILE, 0.06, ring))
-            cx, cy = u + tw / 2, v + th / 2
-            out.append(f'<circle cx="{cx:.4g}" cy="{cy - 0.06:.4g}" r="0.13" fill="{AVATARS[n]}"/>')
-            out.append(f'<path d="M{cx - 0.24:.4g},{v + th:.4g} a0.24,0.17 0 0 1 0.48,0 z" fill="{AVATARS[n]}" fill-opacity="0.75"/>')
-    pw, ph = 1.3, 0.3
-    pu = sw / 2 - pw / 2
-    out.append(rect(pu, CONTROLS_V, pw, ph, TILE, ph / 2))
-    for k, col in enumerate((LINE, LINE, RED)):
-        op = '' if col == RED else ' fill-opacity="0.55"'
-        out.append(f'<circle cx="{pu + 0.3 + k * 0.35:.4g}" cy="{CONTROLS_V + ph / 2:.4g}" r="0.09" fill="{col}"{op}/>')
+            out.append(f'<svg x="{u:.4g}" y="{v:.4g}" width="{tw:.4g}" height="{th:.4g}" overflow="hidden">'
+                       + rect(0, 0, tw, th, TILE, t['radius']) + avatar(tw / 2, th, AVATARS[n]) + '</svg>')
+            if n == SPEAKER:
+                out.append(rect(u, v, tw, th, 'none', t['radius'], f' stroke="{ORANGE}" stroke-width="1.5" vector-effect="non-scaling-stroke"'))
+    cw, ch = CONTROLS['w'], CONTROLS['h']
+    cu, cv = sw / 2 - cw / 2, CONTROLS['v']
+    out.append(rect(cu, cv, cw, ch, TILE, ch / 2))
+    mid = cv + ch / 2
+    out.append(rect(cu + 0.27, mid - 0.09, 0.08, 0.15, LINE, 0.04, ' fill-opacity="0.7"'))                    # mute
+    out.append(rect(cu + 0.6, mid - 0.06, 0.16, 0.12, LINE, 0.02, ' fill-opacity="0.7"'))                     # camera
+    out.append(f'<path d="M{cu + 0.76:.4g},{mid:.4g} l0.08,-0.05 v0.1 z" fill="{LINE}" fill-opacity="0.7"/>')
+    out.append(rect(cu + 1.0, mid - 0.07, 0.3, 0.14, RED, 0.07))                                              # end call
     return screen_glass(w, SCREEN, ''.join(out))
 
 
 def incoming_call():
-    """Smartphone screen on the x1 face: caller avatar, name lines, decline and answer buttons."""
-    x0, x1, y0, y1, z0, z1 = MOBILE
-    i = 0.125
-    sw, sh = (y1 - y0) - 2 * i, (z1 - z0) - 2 * i
-    out = [rect(0, 0, sw, sh, SCREEN_BG, 0.1, f' stroke="{BLUE}" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"'),
-           f'<circle cx="{sw / 2:.4g}" cy="0.75" r="0.3" fill="{BLUE}"/>',
-           rect(sw / 2 - 0.45, 1.25, 0.9, 0.12, LINE, 0.06, ' fill-opacity="0.75"'),
-           rect(sw / 2 - 0.3, 1.5, 0.6, 0.09, LINE, 0.045, ' fill-opacity="0.35"'),
-           f'<circle cx="{sw / 2 - 0.35:.4g}" cy="{sh - 0.45:.4g}" r="0.18" fill="{RED}"/>',
-           f'<circle cx="{sw / 2 + 0.35:.4g}" cy="{sh - 0.45:.4g}" r="0.18" fill="{GREEN}"/>']
-    return f'<g transform="{on_side(w, x1, y1 - i, z1 - i)}">' + ''.join(out) + '</g>'
-
-
-def headband():
-    """Curved band from the back cup over the pole to the front cup, drawn flat in the plane x = BAND_X."""
-    top = TOP + 2.0                   # local frame: u = 1.5 - y (rightwards on screen), v = top - z
-    u_front, u_back = 1.5 - 1.375, 1.5 - 0.375
-    v_cup = top - (TOP + 1.625)
-    d = f'M{u_front:.4g},{v_cup:.4g} C{u_front:.4g},-0.05 {u_back:.4g},-0.05 {u_back:.4g},{v_cup:.4g}'
-    return (f'<g transform="{on_side(w, BAND_X, 1.5, top)}" fill="none" stroke-linecap="round">'
-            f'<path d="{d}" stroke="{FACES[0]}" stroke-width="6" vector-effect="non-scaling-stroke"/>'
-            f'<path d="{d}" stroke="#D9E4F0" stroke-opacity="0.3" stroke-width="1" vector-effect="non-scaling-stroke"/></g>')
+    """The mobile's screen (its y1 face): caller, name lines, decline and answer."""
+    x0, x1, _y0, y1, z0, z1 = MOBILE
+    i = 0.08
+    sw, sh = (x1 - x0) - 2 * i, (z1 - z0) - 2 * i
+    out = [rect(0, 0, sw, sh, SCREEN_BG, 0.1, f' stroke="{BLUE}" stroke-opacity="0.4" stroke-width="1" vector-effect="non-scaling-stroke"'),
+           f'<circle cx="{sw / 2:.4g}" cy="0.48" r="0.19" fill="{BLUE}"/>',
+           rect(sw / 2 - 0.26, 0.8, 0.52, 0.08, LINE, 0.04, ' fill-opacity="0.75"'),
+           rect(sw / 2 - 0.17, 0.97, 0.34, 0.06, LINE, 0.03, ' fill-opacity="0.35"'),
+           f'<circle cx="{sw / 2 - 0.2:.4g}" cy="{sh - 0.3:.4g}" r="0.11" fill="{RED}"/>',
+           f'<circle cx="{sw / 2 + 0.2:.4g}" cy="{sh - 0.3:.4g}" r="0.11" fill="{GREEN}"/>']
+    return f'<g transform="{on_front(w, x0 + i, y1, z1 - i)}">' + ''.join(out) + '</g>'
 
 
 def build(compact=False):
     mask = hidden(compact)
     body = [floor_grid(w, DISC[:2], DISC[2], mask) + disc_arcs(w, DISC[2], *DISC[:2], mask=mask)]
     body += faces(w, *DESK)
-    for n, b, cols in HEADSET:
-        if n == 'front cup': body.append(headband())       # between the cups, so the front cup covers its end
-        body += faces(w, *b, cols=cols)
     for _n, b in MON_PARTS: body += faces(w, *b)
     body.append(teams_call())
-    body += faces(w, *KEYBOARD) + faces(w, *MOUSE)
+    body += faces(w, *KEYBOARD)
+    body += faces(w, *CUP_BACK, cols=DARK) + [cup_face(CUP_BACK, pad=True)]       # headset, back to front
+    body += faces(w, *STAND_BASE) + faces(w, *STAND_POST)
+    body.append(headband())
+    body += faces(w, *CUP_FRONT, cols=DARK) + [cup_face(CUP_FRONT, pad=False), mic_boom()]
     for _n, b in PHONE_PARTS: body += faces(w, *b)
     body.append(phone_face(w, PHONE_TOP))
+    body += faces(w, *DOCK) + faces(w, *MOBILE) + [incoming_call()]
     for _n, b in CHAIR_PARTS: body += faces(w, *b)
-    body += faces(w, *MOBILE) + [incoming_call()]
     labels, k = (COMPACT['labels'], COMPACT['scale']) if compact else (LABELS, 1.0)
     for L in labels:
         body += label(w.p(*L['dot']), L['elbow'], L['x'], L['title'], L['sub'], colour=L['colour'], anchor=L['anchor'], scale=k)
