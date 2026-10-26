@@ -27,7 +27,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Self-host the Barlow fonts instead of loading Google Fonts.
 
 ## Before going live
-- [ ] `og:image` (1200×630) and an `apple-touch-icon`.
 - [ ] Forms are mockups: contact, book-a-call and newsletter send nothing.
 
 ## Copy to confirm

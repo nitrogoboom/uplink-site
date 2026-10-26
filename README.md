@@ -31,7 +31,7 @@ Python 3.10+ and Node 18+.
   - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css`
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
-  - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
+  - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags (including `og:image`) in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
 - `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
@@ -88,6 +88,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `shoot1.js`, `shoot.js`, `compare.py` – zoomed screenshots and before/after sheets
 - `verify.js` – checks the hero builds, tiles respond to hover, the tower grows on scroll, and there's no sideways scroll at phone, tablet, 1440×900 and 3440×1440
 - `build_footer.py` – writes the footer into every page (see above)
+- `gen_og.py site` – the share picture `assets/img/og.png` (1200×630) and `apple-touch-icon.png` (180×180, site root). Screenshots of a small page made from the site's tokens, fonts and `office-compact.svg`; rerun after changing those.
 - `stamp.py site` – cache busting: puts `?v=<hash>` on every CSS and JS link. Run it after any CSS or JS edit; `site/_headers` lets browsers keep those files for a year. `stamp.py site --check` (also run by `verify_footer.py`) says if a stamp is out of date.
 - `verify_footer.py out/` – verify.js checks plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
 - `footer_painter.py url` – painter-order and poke-through check on the boxes the footer map draws. It reads `window.__isoLog`, so add `window.__isoLog && window.__isoLog.push({k, x, y, z, w, d, h, cls})` to `box()` in a local copy first.
