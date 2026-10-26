@@ -75,8 +75,8 @@ ICONS = {
 CARD_LINK = (851.6, 86.4, 878.0)       # office/build: dashed line from the card (start, bend x) to the tray's top-left corner
 
 # ---- labels (annotation: fixed screen elbow and text, dot on the object) -------
-LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay
-    ((18.95, 2.3, 0.54), (1014.4, 679.2), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800),
+LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side: text 'left' (default) or 'right' of the elbow]
+    ((18.95, 2.3, 0.54), (944.0, 712.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800, 'right'),   # outside the room's front edge
     ((3.5, 12.75, 4.625), (361.1, 208.7), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
     ((13.25, 9.65, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
     ((3.0, 12.75, 1.25), (349.7, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
@@ -311,14 +311,15 @@ def card(v):
     return out
 
 
-def label(dot, elbow, colour, title, sub):
+def label(dot, elbow, colour, title, sub, side='left'):
     dx, dy = w.p(*dot)
     ex, ey = elbow
-    tx = ex - TAIL
+    sign, anchor = (-1, 'end') if side == 'left' else (1, 'start')
+    tx = ex + sign * TAIL
     return [f'<polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
             f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
-            f'<text x="{fmt(tx - 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="end">{title}</text>',
-            f'<text x="{fmt(tx - 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">{sub}</text>']
+            f'<text x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
+            f'<text x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>']
 
 
 # ---- assembly -------------------------------------------------------------------
@@ -356,8 +357,8 @@ def groups(v):
         G.append((None, [(PARTS / 'hero_cloud.svg').read_text(encoding='utf-8').rstrip('\n')]))
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
-    for dot, elbow, colour, title, sub, d in LABELS:
-        G.append((f'class="ob-i ob-lab co" style="--d:{d}ms"', label(dot, elbow, colour, title, sub)))
+    for dot, elbow, colour, title, sub, d, *side in LABELS:
+        G.append((f'class="ob-i ob-lab co" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
     return G
 
 

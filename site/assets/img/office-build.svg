@@ -404,10 +404,10 @@
 <g class="ob-swap ob-swap-1"><circle cx="532.2" cy="121.4" r="6.2" fill="#6FD3A0"/><text x="545.9" y="130.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F1F4F8">GOOGLE WORKSPACE</text></g>
 </g>
 <g class="ob-i ob-lab co" style="--d:2800ms">
-<polyline points="1022.0,523.9 1014.4,679.2 974.4,679.2" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<polyline points="1022.0,523.9 944.0,712.0 984.0,712.0" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle cx="1022.0" cy="523.9" r="6" fill="#F4A340" stroke="#151E2C" stroke-width="3"/>
-<text x="962.4" y="687.2" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="end">FIREWALL RACK</text>
-<text x="962.4" y="715.2" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="end">core switch + backups</text>
+<text x="996.0" y="720.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#F4A340" text-anchor="start">FIREWALL RACK</text>
+<text x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="19" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="start">core switch + backups</text>
 </g>
 <g class="ob-i ob-lab co" style="--d:2880ms">
 <polyline points="391.1,338.6 361.1,208.7 321.1,208.7" fill="none" stroke="#F4A340" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>

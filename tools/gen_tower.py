@@ -42,9 +42,9 @@ FAN = (2.7, 3.7, 6.1, 7.1, 0.25)      # on top of the HVAC unit
 PLANTER = (5.6, 7.1, 2.5, 4.0, 0.5)   # on the roof
 MAST = (7.4, 3.25)                    # at x = y = MAST[0], height above the roof
 WIFI = [(9, 0.8), (16, 0.5)]          # signal arcs round the mast top: radius px, opacity
-TREES = [(1.33, 10.73, 0.9), (10.625, 10.825, 0.75)]   # centre x, y, scale
+TREES = [(1.28, 10.63, 0.9), (10.675, 10.925, 0.75)]   # centre x, y, scale
 TREE = [(0.5, 1.0), (1.4, 1.2), (0.9, 0.8)]          # trunk, canopy, top: width, height (x scale)
-BUSHES = [(2.3, 9.7), (9.9, 3.2), (3.2, 10.3), (9.9, 4.2), (6.3, 9.7), (7.2, 10.3), (10.6, 7.8)]   # back corner x, y
+BUSHES = [(2.3, 9.65), (9.9, 3.2), (3.2, 10.3), (9.9, 4.2), (6.2, 9.6), (7.2, 10.3), (10.55, 7.8)]   # back corner x, y
 BUSH = (0.9, 0.55)                    # width, height
 
 GREEN = ('#4E9C78', '#3C7C60', '#6FD3A0')
