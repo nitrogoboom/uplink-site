@@ -6,8 +6,8 @@
 # style-src needs 'unsafe-inline': the build puts the site's CSS in a <style> in every page, and the hero SVG
 # in index.html has <style> blocks and style="" attributes.
 # font-src allows data: because each SVG carries its own letters as a data: font.
-# static.cloudflareinsights.com (script) and cloudflareinsights.com (connect): Cloudflare Web Analytics, which
-# Cloudflare adds to every page it serves (switched on in the dashboard, uplink-site > Metrics). No cookies.
+# static.cloudflareinsights.com (script) and cloudflareinsights.com (connect): Cloudflare Web Analytics. core.js
+# loads the beacon after the page has loaded (Cloudflare's own injection, uplink-site > Metrics, stays off). No cookies.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (Uplink.html). A new innerHTML elsewhere fails until it goes through it.
 /*

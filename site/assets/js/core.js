@@ -39,7 +39,12 @@
   /* ---------- Trusted Types ---------------------------------------------- */
   // The CSP (site/_headers) lets only this policy write HTML into the page (innerHTML and the like).
   // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
-  const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', { createHTML: (s) => s }) : null;
+  // The one script it may load from elsewhere is the analytics beacon (BEACON, below).
+  const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
+  const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', {
+    createHTML: (s) => s,
+    createScriptURL: (u) => { if (u === BEACON) return u; throw new TypeError('script not allowed: ' + u); }
+  }) : null;
   const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
 
   /* ---------- icons used by script-built UI ------------------------------ */
@@ -265,6 +270,26 @@
       if (onChange) onChange(en.isIntersecting);
     }).observe(el);
   }
+
+  /* ---------- Cloudflare Web Analytics ----------------------------------- */
+  // Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and
+  // the browser is idle, so it never competes with the first screen (Cloudflare's own injection put it in the
+  // HTML, which cost the phone score). It still reads the timings the browser kept from the start.
+  // Only the live address reports: Cloudflare refuses others, so the beacon loads only where the page's
+  // canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
+  const BEACON_TOKEN = 'ea58826b12d54c25a50f9bcd60fead61';   // public site token, Web Analytics > uplink-site-4p8.pages.dev
+  const startBeacon = () => {
+    const canon = $('link[rel="canonical"]');
+    if (!canon || new URL(canon.href).hostname !== window.location.hostname) return;
+    const s = document.createElement('script');
+    s.defer = true;
+    s.setAttribute('data-cf-beacon', JSON.stringify({ token: BEACON_TOKEN }));
+    s.src = ttPolicy ? ttPolicy.createScriptURL(BEACON) : BEACON;
+    document.body.append(s);
+  };
+  const whenIdle = (fn) => ('requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : window.setTimeout(fn, 1500));
+  if (document.readyState === 'complete') whenIdle(startBeacon);
+  else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
   /* ---------- shared with the page scripts ------------------------------ */
   // picker: set by services.js so the number keys (1 to 9) can pick a service
