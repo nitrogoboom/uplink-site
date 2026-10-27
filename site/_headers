@@ -3,7 +3,8 @@
 #   document.documentElement.classList.add('js')
 # Change that line and the hash must change too. New hash:
 #   python -c "import hashlib,base64;print(base64.b64encode(hashlib.sha256(b\"document.documentElement.classList.add('js')\").digest()).decode())"
-# style-src needs 'unsafe-inline': the hero SVG in index.html has <style> blocks and style="" attributes.
+# style-src needs 'unsafe-inline': the build puts the site's CSS in a <style> in every page, and the hero SVG
+# in index.html has <style> blocks and style="" attributes.
 # font-src allows data: because each SVG carries its own letters as a data: font.
 /*
   Strict-Transport-Security: max-age=31536000
@@ -14,21 +15,23 @@
   X-Frame-Options: DENY
   Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Du+OJKJSbdUgz5nrHeWWINvez6XKDDU/tyj/5c2uvwo='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'
 
-# Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the two
-# first-screen fonts while the HTML is still on its way. Pages can't add them itself here, because every request
-# goes through functions/_middleware.js. Same two fonts as the preloads in each src/pages/*/page.html.
+# Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
+# five first-screen fonts while the HTML is still on its way. (The CSS is inside each page, so it needs none.)
+# The block below is written by tools/build_pages.py (HINTS there).
+# @early-hints (written by tools/build_pages.py; edit HINTS there, not these lines)
 /
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
-/services
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
-/work
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
 /about
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
 /contact
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+/services
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
 /soon
-  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+/work
+  Link: </assets/fonts/barlow-condensed-700-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-400.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-600.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-700.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin, </assets/fonts/barlow-condensed-600-italic.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin
+# @end early-hints
 
 # CSS and JS are linked with ?v=<hash> (tools/stamp.py), so browsers can keep them for a year.
 /assets/css/*
@@ -39,7 +42,10 @@
 /assets/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Images keep their names when redrawn (no ?v= stamp), so a short cache: a day fresh, then served from cache
-# for up to a week while the browser checks for a newer copy in the background.
+# Images are linked with ?v=<hash> too (tools/stamp.py), so the same year-long cache.
 /assets/img/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=31536000, immutable
+# The share picture is fetched by its plain name (og:image), with no stamp: a day only.
+/assets/img/og.png
+  ! Cache-Control
+  Cache-Control: public, max-age=86400

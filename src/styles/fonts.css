@@ -1,5 +1,5 @@
 /*--- Fonts: Barlow and Barlow Condensed, served from site/assets/fonts/ (Latin set, which covers French).
-   SIL Open Font License, copy in site/assets/fonts/OFL.txt. The two faces the first screen needs are
+   SIL Open Font License, copy in site/assets/fonts/OFL.txt. The five faces the first screen needs are
    preloaded in each page's <head>. The "Fallback" faces are Arial resized to Barlow's width and line
    height, so text set in the fallback takes the same room and nothing moves when Barlow arrives. ---*/
 @font-face { font-family: 'Barlow'; font-style: normal; font-weight: 400; font-display: swap; src: url('../fonts/barlow-400.woff2') format('woff2'); }

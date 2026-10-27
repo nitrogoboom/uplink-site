@@ -49,7 +49,7 @@
       const im = $('[data-case-img]', dlg), srcImg = $('img', src);
       if (im && srcImg) { im.src = srcImg.getAttribute('src'); im.alt = srcImg.alt; }
       const cut = $('[data-case-src]', dlg);   // the compact cut used on smaller screens
-      if (cut && srcImg) cut.srcset = srcImg.getAttribute('src').replace(/\.svg$/, '-compact.svg');
+      if (cut && srcImg && srcImg.dataset.compact) cut.srcset = srcImg.dataset.compact;   // stamped link, from 2-details.html
       const list = visible();
       const pos = $('[data-case-pos]', dlg);
       if (pos) pos.textContent = (list.indexOf(i) + 1) + ' of ' + list.length;

@@ -55,8 +55,9 @@
       <div class="stage">
         <!-- @include 1-hero-office.svg -->
         <!-- @include 1-hero-flows.svg -->
-        <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still -->
-        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" src="assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture>
+        <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still.
+             It is the phone's largest paint, so it is preloaded in page.html and asked for first. -->
+        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture>
       </div>
       <div class="hero-dock">
         <a class="card news" href="contact#message" data-open="book-dialog">

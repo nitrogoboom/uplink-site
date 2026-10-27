@@ -36,7 +36,7 @@
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
-    update();
+    onScroll();   // first pick on the next frame, not during page load (measuring now forces an extra layout pass)
   }
 
   /* ------------------------------------------------------------------
@@ -102,7 +102,10 @@
         detailText.textContent = app.detail;
         focus.classList.remove('is-out');
         const sd = svg.querySelector('.ob-state-dot');
-        if (sd) { const b = stateText.getBBox(); sd.setAttribute('cx', b.x - 10); }
+        const place = () => { const b = stateText.getBBox(); sd.setAttribute('cx', b.x - 10); };
+        // on page load the dot is already in place: hero_cloud.svg starts it beside the first state (ONLINE).
+        // Measuring during load would force an extra layout pass.
+        if (sd && !first) place();
       };
       window.clearTimeout(swap);
       if (first || reduceMotion.matches) { write(); return; }

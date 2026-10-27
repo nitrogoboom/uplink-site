@@ -24,12 +24,15 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Home services grid: with 7 cards the last row on laptops holds one card on its own.
 - [ ] Home services grid: the one-row layout (`min-aspect-ratio: 2/1` in `src/styles/desktop.css`) also fires on a maximised 1080p browser (1920×945) and 125% laptops (1536×730), not only 21:9. The hero now uses 7/3; check the services section before changing it.
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
-- [ ] CSP `style-src` needs `'unsafe-inline'` because of the hero's inline `<style>` blocks and `style=""` attributes. Drop it once they move into CSS.
+- [ ] CSP `style-src` needs `'unsafe-inline'`: the build inlines the site CSS in every page (for speed), and the hero has inline `<style>` blocks and `style=""` attributes. To drop it, give the inline CSS a hash in the CSP (the build could write it).
+- [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.
+- [ ] PageSpeed desktop (all 100) still lists an unscored "Forced reflow, unattributed, ~100ms": the browser laying out the ~900-element inline hero drawing during load. Splitting the drawing's static parts into a cached image should clear it.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
 - [ ] `src/styles/desktop.css` is still one block for every page (the home hero has moved out to `1-hero.css`). Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
 ## Before going live
+- [ ] Site is open and indexable at https://uplink-site-4p8.pages.dev (since 26 Oct 2026; test build, placeholder company). At launch: set `SITE_URL` in `tools/build_pages.py` to the real domain and rebuild. To lock it again instead: move `tools/site-lock/_middleware.js` back to `functions/` and deploy.
 - [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Pages Function in `functions/` that emails each submission to one inbox.
 
 ## Copy to confirm

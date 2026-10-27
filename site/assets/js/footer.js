@@ -178,7 +178,10 @@
       panels.forEach((p, j) => { p.classList.toggle('is-on', j === cur); p.classList.remove('is-in'); });
       if (!opts.instant) { void panels[cur].offsetWidth; panels[cur].classList.add('is-in'); }
       const roster = $('.fc-roster', fc), t = tabs[cur];
-      roster.scrollTo({ left: t.offsetLeft - (roster.clientWidth - t.offsetWidth) / 2, behavior: opts.instant || reduceMotion.matches ? 'auto' : 'smooth' });
+      const centre = () => roster.scrollTo({ left: t.offsetLeft - (roster.clientWidth - t.offsetWidth) / 2, behavior: opts.instant || reduceMotion.matches ? 'auto' : 'smooth' });
+      // on page load the first tab is already in view (the roster starts at the left), so nothing to measure;
+      // measuring during load would force an extra layout pass
+      if (!opts.instant) centre(); else if (cur > 0) window.requestAnimationFrame(() => window.setTimeout(centre));
       if (opts.focus) t.focus({ preventScroll: true });
       focusMap(panels[cur].dataset.map, opts.instant);
     };

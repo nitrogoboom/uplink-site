@@ -16,8 +16,22 @@ Shared parts change a little per page, like Astro props:
     Header's {prev} and {next} are the Q / E keyhop links.
   - 404 is served at any depth, so its shared parts get root links (/services).
 src/styles/site.css lists the CSS files in cascade order; the build joins
-them into site/assets/css/site.css. Stamps (?v=) are added last (stamp.py).
+site/assets/css/tokens.css and them into site/assets/css/site.css, minified,
+and puts that CSS inside each page's <head> (no stylesheet request blocks the
+first paint). Stamps (?v=) are added last (stamp.py).
+
+The site's own address is SITE_URL (below, or the SITE_URL environment
+variable): `{site}` in a page.html (canonical, og:url, og:image, JSON-LD)
+becomes it, and so do the links in the files the build writes:
+  - site/sitemap.xml and site/robots.txt: every page without a noindex tag
+  - site/llms.txt and site/agents.md (same text, as Shopify does): a guide to
+    the site for AI agents, from each page's <title> and description and the
+    service cards on the home page
+  - the Early Hints block in site/_headers (HINTS below): the five
+    first-screen fonts, sent before each page
 """
+import html
+import os
 import pathlib
 import re
 import sys
@@ -31,6 +45,36 @@ TABS = [('home', './'), ('services', 'services'), ('work', 'work'), ('about', 'a
 
 INCLUDE = re.compile(r'<!-- @include ([\w./-]+) -->|/\* @include ([\w./-]+) \*/')
 NOTE = re.compile(r'<!---.*?--->\n?|/\*---.*?---\*/\n?', re.S)
+
+# The live address. A test build for now; set the real domain here (or SITE_URL in the environment) at launch.
+SITE_URL = os.environ.get('SITE_URL', 'https://uplink-site-4p8.pages.dev').rstrip('/')
+
+# Early Hints: sent as a 103 before every page, in this order. They match the font preloads in each page.html.
+# Every page's first screen uses these five faces (checked in Chrome on all pages, phone and desktop).
+FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600', 'barlow-condensed-700', 'barlow-condensed-600-italic']
+HINTS = [f'</assets/fonts/{f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin' for f in FIRST_FONTS]
+STYLESHEET = re.compile(r'<link rel="stylesheet" href="/?assets/css/site\.css(?:\?v=\w+)?">')
+HINTS_BLOCK = re.compile(r'(# @early-hints[^\n]*\n).*?(# @end early-hints\n)', re.S)
+
+# CSS minifier: drops comments and spare whitespace, never touches the inside of a string
+CSS_TOKEN = re.compile(r'/\*.*?\*/|"(?:\\.|[^"\\\n])*"|\'(?:\\.|[^\'\\\n])*\'', re.S)
+
+
+def squeeze(s):
+    s = re.sub(r'\s+', ' ', s)
+    s = re.sub(r' ?([{};,>]) ?', r'\1', s)
+    return s.replace(': ', ':').replace(';}', '}')
+
+
+def minify_css(css):
+    out, last = [], 0
+    for m in CSS_TOKEN.finditer(css):
+        out.append(squeeze(css[last:m.start()]))
+        if not m.group(0).startswith('/*'):
+            out.append(m.group(0))
+        last = m.end()
+    out.append(squeeze(css[last:]))
+    return ''.join(out).strip().replace(';}', '}') + '\n'
 
 
 def read(p):
@@ -64,28 +108,65 @@ def build_page(folder):
     return expand(page, part)
 
 
+def page_info(path, text):
+    """What the sitemap and llms.txt need from a built page: its address, name, description, and noindex."""
+    title = html.unescape(re.search(r'<title>(.*?)</title>', text).group(1))
+    desc = html.unescape(re.search(r'<meta name="description" content="(.*?)">', text).group(1))
+    return {'url': SITE_URL + path, 'name': 'Home' if path == '/' else title.split(' · ')[0], 'desc': desc,
+            'index': not re.search(r'<meta name="robots" content="[^"]*noindex', text)}
+
+
+def guide(pages, home):
+    """llms.txt / agents.md: the site in Markdown for AI agents (llmstxt.org layout)."""
+    cards = re.findall(r'<a class="card" href="(services#[\w-]+)">.*?class="card-title">(.*?)</span>'
+                       r'<span class="muted">(.*?)</span>', home, re.S)
+    out = ['# Uplink Technology', '', '> ' + pages[0]['desc'], '',
+           'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.', '',
+           '## Pages', '']
+    out += [f"- [{p['name']}]({p['url']}): {p['desc']}" for p in pages]
+    out += ['', '## Services', '']
+    out += [f'- [{html.unescape(t)}]({SITE_URL}/{href}): {html.unescape(d)}' for href, t, d in cards]
+    return '\n'.join(out) + '\n'
+
+
 def outputs():
-    out = {SITE / 'assets/css/site.css': expand(SRC / 'styles/site.css')}
-    pages = {}
-    for folder in sorted((SRC / 'pages').iterdir()):
+    css = minify_css(read(SITE / 'assets/css/tokens.css') + '\n' + expand(SRC / 'styles/site.css'))
+    out = {SITE / 'assets/css/site.css': css}
+    inline = '<style>' + css.strip().replace("url('../", "url('/assets/") + '</style>'   # font paths from the page, at any depth
+    pages, paths, info = {}, [], []
+    order = {key: i for i, (key, _) in enumerate(TABS)}
+    for folder in sorted((SRC / 'pages').iterdir(), key=lambda f: (order.get(f.name, len(TABS)), f.name)):
         if (folder / 'page.html').exists():
-            pages[SITE / ('index.html' if folder.name == 'home' else folder.name + '.html')] = build_page(folder)
+            text = build_page(folder).replace('{site}', SITE_URL)
+            text = STYLESHEET.sub(lambda m: inline, stamp_text(SITE, text))
+            pages[SITE / ('index.html' if folder.name == 'home' else folder.name + '.html')] = text
+            if folder.name != '404':   # served at any path, so no rule can name it
+                path = '/' if folder.name == 'home' else '/' + folder.name
+                paths.append(path)
+                info.append(page_info(path, text))
+    listed = [p for p in info if p['index']]
+    out[SITE / '_headers'] = headers(sorted(paths))
+    out[SITE / 'sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                                 + ''.join(f"  <url><loc>{p['url']}</loc></url>\n" for p in listed) + '</urlset>\n')
+    out[SITE / 'robots.txt'] = f'User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n'
+    out[SITE / 'llms.txt'] = out[SITE / 'agents.md'] = guide(listed, pages[SITE / 'index.html'])
     return out, pages
+
+
+def headers(paths):
+    """site/_headers with its Early Hints block rewritten."""
+    link = '  Link: ' + ', '.join(HINTS)
+    block = ''.join(f'{p}\n{link}\n' for p in paths)
+    return HINTS_BLOCK.sub(lambda m: m.group(1) + block + m.group(2), read(SITE / '_headers'))
 
 
 if __name__ == '__main__':
     check = '--check' in sys.argv
-    css, pages = outputs()
+    files, pages = outputs()
     stale = []
-    for f, text in css.items():   # CSS first: the page stamps hash it
+    for f, text in {**files, **pages}.items():
         if not f.exists() or read(f) != text:
             stale.append(f.relative_to(SITE).as_posix())
-            if not check:
-                f.write_text(text, encoding='utf-8', newline='')
-    for f, text in pages.items():
-        text = stamp_text(SITE, text)
-        if not f.exists() or read(f) != text:
-            stale.append(f.name)
             if not check:
                 f.write_text(text, encoding='utf-8', newline='')
     if check:

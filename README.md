@@ -29,10 +29,11 @@ Python 3.10+ and Node 18+.
   - `index.html` – home page. The hero drawing (office floor plan, app-tile tray, 3D cloud) and the growing tower are **inline SVG**, written by `tools/gen_office.py` and `tools/gen_tower.py` into `src/pages/home/`.
   - `about.html`, `services.html`, `work.html`, `contact.html`, `soon.html`
   - `404.html` – Cloudflare serves it for any missing address, at any depth, so its links and files start at the root (`/services`, `/assets/...`). `build_footer.py` writes its footer that way too.
-  - `assets/css/tokens.css` (all colours, sizes, timings), `assets/css/site.css` (built from `src/styles/site.css`)
+  - `assets/css/tokens.css` (all colours, sizes, timings; edit here), `assets/css/site.css` (built: `tokens.css` plus `src/styles/site.css`, minified; the only stylesheet the pages link)
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
-  - `robots.txt`, `sitemap.xml`, and the canonical / Open Graph tags (including `og:image`) in each page's `<head>` use `https://uplinkit.ca/` as the site address. Change it in all three places when the real domain is known. `soon.html` is `noindex`.
+  - The site's address is set once: `SITE_URL` in `tools/build_pages.py` (now the test address, https://uplink-site-4p8.pages.dev; set the real domain at launch, or run the build with a `SITE_URL` environment variable). `{site}` in each `page.html` (canonical, Open Graph, `og:image`, JSON-LD) becomes it, and the build writes `robots.txt`, `sitemap.xml`, `llms.txt` and `agents.md` from it. Don't hand-edit those four.
+  - `llms.txt` and `agents.md` (same text, as Shopify does): a short Markdown guide to the site for AI agents, built from each page's title and description and the service cards on the home page.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
 - `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
@@ -107,7 +108,8 @@ The artifact link above only updates from a Claude chat. To push local changes t
 ## Hosting (Cloudflare Pages, password-locked)
 
 - Code: private GitHub repo `nitrogoboom/uplink-site`.
-- Site: Cloudflare Pages project `uplink-site` (https://uplink-site-4p8.pages.dev). `functions/_middleware.js` puts every page and file behind a browser password prompt. Any username works. The password is the Cloudflare secret `SITE_PASSWORD`. With no secret set, the site stays locked.
+- Site: Cloudflare Pages project `uplink-site` (https://uplink-site-4p8.pages.dev).
+- Password lock: **off since 26 Oct 2026**, and the site is open to search engines (a test build with placeholder content). The lock lives in `tools/site-lock/_middleware.js`. To turn it on, move it back to `functions/_middleware.js` and deploy. With it on, every page and file is behind a browser password prompt. Any username works. The password is the Cloudflare secret `SITE_PASSWORD` (still set). With no secret set, the site stays locked. Cloudflare marks each one-off deploy address (`<hash>.uplink-site-4p8.pages.dev`) noindex on its own; only the main address is indexed.
 - `site/_headers` sets the security headers on every file (HSTS, nosniff, Referrer-Policy, Permissions-Policy, CSP). The CSP allows one inline script by its hash: the `classList.add('js')` line in `services.html` and `work.html`. Change that line and update the hash (the comment at the top of `_headers` says how). Adding another outside host (fonts, analytics, a form service) means adding it to the CSP too.
 - Deploy from the project root: `npx wrangler pages deploy` (settings in `wrangler.toml`).
 - Change the password: `npx wrangler pages secret put SITE_PASSWORD --project-name uplink-site`, then deploy again.

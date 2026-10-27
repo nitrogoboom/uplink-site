@@ -123,6 +123,8 @@ def poly(pts, attrs, cls=''):
 
 
 def line(pts, attrs, pre=''):
+    if 'pathLength' in pre:            # pathLength is valid on <path> but not on <polyline> (W3C checker)
+        return f'<path {pre}d="M{w.pts(*pts).replace(" ", " L")}" fill="none" {attrs}/>'
     return f'<polyline {pre}points="{w.pts(*pts)}" fill="none" {attrs}/>'
 
 
@@ -348,7 +350,7 @@ def tile(i, v):
     a, b = math.cos(math.radians(30)) * w.u * s, w.u / 2 * s
     cls = 'class="f-ic" ' if v == 'hero' else ''
     out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{"#1B2130" if lit else "#F1F4F8"}" '
-               f'stroke-width="2.0" {ROUND} vector-effect="non-scaling-stroke">{ICONS[TILES[i]]}</g>')
+               f'stroke-width="2.0" {ROUND}>{ICONS[TILES[i]]}</g>')   # vector-effect sits on each icon shape (it isn't inherited)
     return out
 
 

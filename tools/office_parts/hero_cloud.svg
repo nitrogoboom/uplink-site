@@ -14,7 +14,7 @@
 <g class="ob-focus lt">
 <text x="842.7" y="-46.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#A9B4C3" text-anchor="end"><tspan class="ob-app" font-weight="600" fill="#F1F4F8">EMAIL</tspan><tspan> · </tspan><tspan class="ob-detail">Spam and phishing filtered</tspan></text>
 <text x="842.7" y="-18.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#6FD3A0" text-anchor="end"><tspan class="ob-state">ONLINE</tspan></text>
-<circle class="ob-pulse ob-state-dot" cx="0" cy="-23.0" r="4.5" fill="#6FD3A0"/>
+<circle class="ob-pulse ob-state-dot" cx="767.2" cy="-23.0" r="4.5" fill="#6FD3A0"/>
 </g>
 <g class="num"><circle cx="950.1" cy="-36.0" r="30" fill="#7DB9E8" stroke="#151E2C" stroke-width="2"/><text x="950.1" y="-20.9" font-size="42" font-weight="600" fill="#151E2C" text-anchor="middle">#</text></g>
 </g>

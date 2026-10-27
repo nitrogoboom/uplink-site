@@ -1,0 +1,21 @@
+/*--- Page transitions: a soft crossfade between pages (cross-document view transitions). Chrome, Edge and
+   Safari 18.2+; other browsers just load the next page as before. The header and the phone tab bar hold
+   still while the page under them fades. Off when the system asks for less motion. ---*/
+@view-transition { navigation: auto; }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}
+
+.site-header { view-transition-name: site-header; }
+.botnav { view-transition-name: botnav; }
+
+/* the old page eases out quickly; the new one follows just behind it and settles more slowly, so the swap
+   reads as one soft dissolve and never as a flash of empty page */
+::view-transition-old(root) { animation: vt-out var(--dur-1) ease-in both; }
+::view-transition-new(root) { animation: vt-in var(--dur-2) var(--ease) calc(var(--dur-1) / 3) both; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; } }
+
+/* header and tab bar: no movement, only the current tab's highlight fades across */
+::view-transition-group(site-header),
+::view-transition-group(botnav) { animation-duration: var(--dur-2); }

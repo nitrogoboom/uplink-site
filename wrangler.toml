@@ -1,6 +1,6 @@
 # Cloudflare Pages project. Deploy from the project root:
 #   npx wrangler pages deploy
-# functions/_middleware.js puts the whole site behind a password.
+# Password lock: off for now. To turn it on, move tools/site-lock/_middleware.js back to functions/ (README, "Hosting").
 name = "uplink-site"
 pages_build_output_dir = "site"
 compatibility_date = "2025-09-01"
