@@ -1,34 +1,53 @@
-"""Lighthouse gate: run Lighthouse (mobile, the PageSpeed settings) on every page in the sitemap
-and fail if any score is under the bar.
+"""Lighthouse gate: ask Google's PageSpeed Insights (its servers, its Lighthouse) to test every page in the
+sitemap, phone and desktop, and fail if Home scores under the bar.
 
     python tools/lighthouse_gate.py https://<hash>.uplink-site-4p8.pages.dev    # a preview deploy
     python tools/lighthouse_gate.py https://uplink-site-4p8.pages.dev --min 100   # the live site
+    python tools/lighthouse_gate.py <address> --strict                            # every page must pass
 
-Pages come from site/sitemap.xml, so a new page is checked once it is in the sitemap.
-Lighthouse is the version PageSpeed runs (LH below); it needs Chrome installed.
+The test runs on Google's machines, as pagespeed.web.dev does, so this PC's connection doesn't count.
+It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment.
+The key lives in Google Cloud, project uplink-site, APIs & Services > Credentials > pagespeed-gate
+(limited to the PageSpeed Insights API).
+
+Pages come from site/sitemap.xml. Home (GATED) must reach the bar on both; the other pages are drafts for
+now, so they are shown but don't fail the gate unless --strict.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
-Cloudflare Web Analytics is blocked during the runs (BLOCK): Cloudflare adds its beacon to previews too,
-but only accepts data from the live address, so on a preview it logs a console error that isn't the site's.
 Each page and the files it links are fetched once first: a fresh preview starts with a cold
 Cloudflare cache, and the first visit would measure that, not the site.
-Performance moves a point or so between runs, so a page under the bar is run again (up to RUNS times)
-and its best run counts. Reports go to out/lighthouse/<page>.json.
+Performance moves a point or so between runs, so a test under the bar is run again (up to RUNS times)
+and its best run counts. Reports go to out/lighthouse/<page>-<strategy>.json.
 deploy.py runs this on a preview before it deploys to the live address.
 """
+import concurrent.futures
 import json
+import os
 import pathlib
 import re
-import subprocess
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 
-LH = 'lighthouse@13.5.0'
+API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed'
 CATS = ['performance', 'accessibility', 'best-practices', 'seo']
+STRATEGIES = ['mobile', 'desktop']
+GATED = ['/']
 RUNS = 3
-BLOCK = '*cloudflareinsights.com*'
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'out' / 'lighthouse'
+
+
+def api_key():
+    key = os.environ.get('PSI_API_KEY')
+    vars_file = ROOT / '.dev.vars'
+    if not key and vars_file.exists():
+        key = next((line.split('=', 1)[1].strip() for line in vars_file.read_text(encoding='utf-8').splitlines()
+                    if line.startswith('PSI_API_KEY=')), None)
+    if not key:
+        sys.exit('No PageSpeed API key: put PSI_API_KEY=... in .dev.vars (see the note at the top).')
+    return key
 
 
 def pages():
@@ -44,11 +63,14 @@ def warm(url):
         get(f'{base}/{ref}')
 
 
-def run(url, path):
-    cmd = ['npx', '-y', LH, url, '--output=json', f'--output-path={path}', '--quiet',
-           '--only-categories=' + ','.join(CATS), f'--blocked-url-patterns={BLOCK}', '--chrome-flags=--headless=new']
-    subprocess.run(cmd, check=True, shell=(sys.platform == 'win32'), stdout=subprocess.DEVNULL)
-    return json.loads(path.read_text(encoding='utf-8'))
+def run(url, strategy, key):
+    """One PageSpeed test; returns its Lighthouse report."""
+    query = urllib.parse.urlencode([('url', url), ('strategy', strategy), ('key', key)] + [('category', c) for c in CATS])
+    try:
+        with urllib.request.urlopen(f'{API}?{query}', timeout=180) as resp:
+            return json.load(resp)['lighthouseResult']
+    except urllib.error.HTTPError as e:   # never print the request: the key is in it
+        sys.exit(f'PageSpeed API {e.code} for {url} ({strategy}): ' + json.load(e).get('error', {}).get('message', '')[:200])
 
 
 def scores(report):
@@ -64,30 +86,45 @@ def scores(report):
     return out
 
 
+def test(base, path, strategy, key, bar):
+    """Best scores over up to RUNS tests, stopping once all reach the bar."""
+    name = path.strip('/') or 'home'
+    best = None
+    for n in range(1, RUNS + 1):
+        report = run(base + path, strategy, key)
+        (OUT / f'{name}-{strategy}.json').write_text(json.dumps(report), encoding='utf-8')
+        s = scores(report)
+        best = s if best is None else {c: max(best[c], s[c]) for c in CATS}
+        if min(best.values()) >= bar:
+            break
+    return name, strategy, best, n
+
+
 def main():
     args = sys.argv[1:]
     if not args:
         sys.exit(__doc__)
     base = args[0].rstrip('/')
     bar = int(args[args.index('--min') + 1]) if '--min' in args else 100
+    gated = pages() if '--strict' in args else GATED
+    key = api_key()
     OUT.mkdir(parents=True, exist_ok=True)
-    failed = []
-    print(f'{"page":10} ' + ' '.join(f'{c[:6]:>6}' for c in CATS) + '  runs')
     for p in pages():
-        name = p.strip('/') or 'home'
-        best = None
         warm(base + p)
-        for n in range(1, RUNS + 1):
-            s = scores(run(base + p, OUT / f'{name}.json'))
-            best = s if best is None else {c: max(best[c], s[c]) for c in CATS}
-            if min(best.values()) >= bar:
-                break
-        print(f'{name:10} ' + ' '.join(f'{best[c]:>6}' for c in CATS) + f'  {n}')
-        failed += [f'{name} {c} {best[c]}' for c in CATS if best[c] < bar]
+    jobs = [(p, s) for p in pages() for s in STRATEGIES]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=len(jobs)) as pool:
+        results = list(pool.map(lambda j: test(base, j[0], j[1], key, bar), jobs))
+    failed = []
+    print(f'{"page":10} {"device":8} ' + ' '.join(f'{c[:6]:>6}' for c in CATS) + '  runs')
+    for (path, _), (name, strategy, best, n) in zip(jobs, results):
+        mark = '' if path in gated else '  (not gated)'
+        print(f'{name:10} {strategy:8} ' + ' '.join(f'{best[c]:>6}' for c in CATS) + f'  {n}{mark}')
+        if path in gated:
+            failed += [f'{name} {strategy} {c} {best[c]}' for c in CATS if best[c] < bar]
     if failed:
         print(f'\nUnder {bar}: ' + ', '.join(failed))
         sys.exit(1)
-    print(f'\nAll pages at {bar} or more.')
+    print(f'\nGated pages at {bar} or more.')
 
 
 if __name__ == '__main__':

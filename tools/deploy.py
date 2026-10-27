@@ -1,12 +1,12 @@
-"""Deploy with a Lighthouse gate: preview first, live only if every page scores 100.
+"""Deploy with a PageSpeed gate: preview first, live only if Home scores 100 (Google's servers test it).
 
     python tools/deploy.py              # check build, deploy a preview, run the gate, then go live
-    python tools/deploy.py --no-gate    # skip Lighthouse (still checks the build first)
+    python tools/deploy.py --no-gate    # skip the PageSpeed tests (still checks the build first)
 
 Steps:
 1. build_pages.py --check and stamp.py --check, so site/ matches src/ and every ?v= stamp is current.
 2. wrangler pages deploy to the "preview" branch; Cloudflare gives it its own <hash>.uplink-site-4p8.pages.dev address.
-3. lighthouse_gate.py on that address (see its notes). Under 100 anywhere: stop, nothing goes live.
+3. lighthouse_gate.py on that address (see its notes). Home under 100: stop, nothing goes live.
 4. wrangler pages deploy to "main", the live address.
 """
 import os
