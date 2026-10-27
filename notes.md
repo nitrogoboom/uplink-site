@@ -33,6 +33,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CSP `style-src` needs `'unsafe-inline'`: the build inlines the site CSS in every page (for speed), and the hero has inline `<style>` blocks and `style=""` attributes. To drop it, give the inline CSS a hash in the CSP (the build could write it).
 - [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.
 - [ ] PageSpeed mobile Performance reads 99 on some runs: simulated LCP 1.9–2.0 s on the phone hero picture (`office-compact.svg`), right on the 99/100 line. Real load is ~0.4 s.
+- [ ] Shared blocks that live in a page folder: `.hero` base (`home/1-hero.css`, used by Services), `.facts` (`work/2-details.css`, About and Contact), `.industries` (`work/4-industries.css`, About), `.svc-cards` (`home/2-services.css`, Contact). Move them to `src/styles/` and empty `BORROWS` in `tools/build_pages.py`; run `tools/verify_css_split.py` after.
 - [ ] `src/styles/desktop.css` is still one block for every page (the home hero has moved out to `1-hero.css`). Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 

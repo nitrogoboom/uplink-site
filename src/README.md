@@ -46,7 +46,7 @@ The build fills in the bits that change per page: the current tab and root links
 
 ## CSS: `styles/`
 
-`styles/site.css` is the list of CSS files in cascade order. Later files win a tie, so order matters. Shared styles live in `styles/`; a section's own styles sit next to it in its page folder.
+`styles/site.css` is the list of CSS files in cascade order. Later files win a tie, so order matters. Shared styles live in `styles/`; a section's own styles sit next to it in its page folder. Each page gets the shared styles plus only its own folder's CSS, so a class used on two pages belongs in `styles/` (or in `BORROWS` in `tools/build_pages.py` until it moves). After moving CSS around, run `python tools/verify_css_split.py` with the server up.
 
 `styles/desktop.css` holds the desktop layout (≥ 1100 wide, ≥ 700 tall) for every page in one block. Its comments mark which section each part is for.
 

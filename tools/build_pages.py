@@ -16,8 +16,10 @@ Shared parts change a little per page, like Astro props:
   - 404 is served at any depth, so its shared parts get root links (/services).
 src/styles/site.css lists the CSS files in cascade order; the build joins
 site/assets/css/tokens.css and them into site/assets/css/site.css, minified,
-and puts that CSS inside each page's <head> (no stylesheet request blocks the
-first paint). Stamps (?v=) are added last (stamp.py).
+and puts CSS inside each page's <head> (no stylesheet request blocks the
+first paint): the shared files plus only that page's own (src/pages/<page>/*.css),
+in the same cascade order (page_css()). tools/verify_css_split.py checks each page
+still computes exactly the styles it would with the whole site.css. Stamps (?v=) are added last (stamp.py).
 
 The site's own address is SITE_URL (below, or the SITE_URL environment
 variable): `{site}` in a page.html (canonical, og:url, og:image, JSON-LD)
@@ -29,12 +31,16 @@ becomes it, and so do the links in the files the build writes:
     hand in src/agents.md and src/index.md, with {site} filled in
   - the Early Hints block in site/_headers (HINTS below): the five
     first-screen fonts, sent before each page
+  - JSON-LD in the <head> of Services, Our work, About and Contact (structured()):
+    breadcrumbs and the page type, plus each service and the FAQ on Services, read
+    from the page itself. Home's business block is written by hand in its page.html.
 The home hero drawing (src/pages/home/1-hero-office.svg) is not inlined: it is
 copied to site/assets/img/hero-office.svg, and `{hero}` in the home page (the
 stage's data-hero and its preload) becomes that address; stamp.py stamps both.
 home.js fetches it on screens 600px and wider; phones show the still picture.
 """
 import html
+import json
 import os
 import pathlib
 import re
@@ -58,6 +64,9 @@ SITE_URL = os.environ.get('SITE_URL', 'https://uplink-site-4p8.pages.dev').rstri
 FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600', 'barlow-condensed-700', 'barlow-condensed-600-italic']
 HINTS = [f'</assets/fonts/{f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin' for f in FIRST_FONTS]
 HERO = 'assets/img/hero-office.svg'
+# schema.org type of each inner page; each one's JSON-LD points at Home's business block by this @id
+PAGE_TYPES = {'services': 'FAQPage', 'work': 'CollectionPage', 'about': 'AboutPage', 'contact': 'ContactPage'}
+BUSINESS = '{site}/#business'
 STYLESHEET = re.compile(r'<link rel="stylesheet" href="/?assets/css/site\.css(?:\?v=\w+)?">')
 HINTS_BLOCK = re.compile(r'(# @early-hints[^\n]*\n).*?(# @end early-hints\n)', re.S)
 
@@ -86,12 +95,15 @@ def read(p):
     return p.read_text(encoding='utf-8').replace('\r\n', '\n')
 
 
-def expand(path, part=lambda name, text: text):
-    """The file with its notes dropped and its includes filled in (one trailing newline dropped from each)."""
+def expand(path, part=lambda name, text: text, keep=lambda name: True):
+    """The file with its notes dropped and its includes filled in (one trailing newline dropped from each).
+    An include that keep() turns down is dropped."""
     def sub(m):
         name = m.group(1) or m.group(2)
+        if not keep(name):
+            return ''
         if '.' in name:
-            return expand(path.parent / name, part).removesuffix('\n')
+            return expand(path.parent / name, part, keep).removesuffix('\n')
         return part(name, expand(SRC / 'components' / (name + '.html'), part)).removesuffix('\n')
     return INCLUDE.sub(sub, NOTE.sub('', read(path)))
 
@@ -117,6 +129,27 @@ def page_info(path, text):
             'index': not re.search(r'<meta name="robots" content="[^"]*noindex', text)}
 
 
+def structured(key, info, text):
+    """The page's JSON-LD (see PAGE_TYPES), as a <script> for its <head>."""
+    biz = {'@id': BUSINESS.replace('{site}', SITE_URL)}
+    page = {'@type': PAGE_TYPES[key], '@id': info['url'], 'url': info['url'], 'name': info['name'],
+            'description': info['desc'], 'inLanguage': 'en-CA', 'publisher': biz}
+    if key == 'about':
+        page['about'] = biz
+    graph = [page, {'@type': 'BreadcrumbList', 'itemListElement': [
+        {'@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL + '/'},
+        {'@type': 'ListItem', 'position': 2, 'name': info['name'], 'item': info['url']}]}]
+    if key == 'services':
+        plain = lambda s: html.unescape(re.sub(r'<[^>]+>', '', s)).strip()
+        page['mainEntity'] = [{'@type': 'Question', 'name': plain(q), 'acceptedAnswer': {'@type': 'Answer', 'text': plain(a)}}
+                              for q, a in re.findall(r'<details>\s*<summary>(.*?)<svg.*?</summary>\s*<div>(.*?)</div>\s*</details>', text, re.S)]
+        graph += [{'@type': 'Service', '@id': f"{info['url']}#{sid}", 'url': f"{info['url']}#{sid}", 'name': plain(name),
+                   'description': plain(lead), 'provider': biz, 'areaServed': 'Ontario'}
+                  for sid, name, lead in re.findall(r'<article class="svc[^"]*" id="([\w-]+)".*?<h2[^>]*>(.*?)</h2>\s*<p class="lead">(.*?)</p>', text, re.S)]
+    data = json.dumps({'@context': 'https://schema.org', '@graph': graph}, indent=1, ensure_ascii=False)
+    return '<script type="application/ld+json">\n' + data.replace('</', '<\\/') + '\n</script>\n'
+
+
 def guide(pages, home):
     """llms.txt / agents.md: the site in Markdown for AI agents (llmstxt.org layout)."""
     cards = re.findall(r'<a class="card" href="(services#[\w-]+)">.*?class="card-title">(.*?)</span>'
@@ -130,22 +163,37 @@ def guide(pages, home):
     return '\n'.join(out) + '\n'
 
 
+# Page CSS another page also uses (found by tools/verify_css_split.py). These are shared blocks that live in
+# a page folder; moving them to src/styles/ would retire this list.
+BORROWS = {'services': ['home/1-hero.css'],                              # .hero
+           'about': ['work/2-details.css', 'work/4-industries.css'],     # .facts, .industries
+           'contact': ['home/2-services.css', 'work/2-details.css']}     # .svc-cards, .facts
+
+
+def page_css(folder=None):
+    """tokens.css and site.css minified; for a page folder, the other pages' own files are left out (BORROWS aside)."""
+    own = lambda name: name.startswith(f'../pages/{folder}/') or name.removeprefix('../pages/') in BORROWS.get(folder, [])
+    keep = lambda name: folder is None or not name.startswith('../pages/') or own(name)
+    return minify_css(read(SITE / 'assets/css/tokens.css') + '\n' + expand(SRC / 'styles/site.css', keep=keep))
+
+
 def outputs():
-    css = minify_css(read(SITE / 'assets/css/tokens.css') + '\n' + expand(SRC / 'styles/site.css'))
-    out = {SITE / 'assets/css/site.css': css}
-    inline = '<style>' + css.strip().replace("url('../", "url('/assets/") + '</style>'   # font paths from the page, at any depth
+    out = {SITE / 'assets/css/site.css': page_css()}
+    inline = lambda folder: '<style>' + page_css(folder).strip().replace("url('../", "url('/assets/") + '</style>'   # font paths from the page, at any depth
     out[SITE / HERO] = read(SRC / 'pages/home/1-hero-office.svg')
     pages, paths, info = {}, [], []
     order = {key: i for i, (key, _) in enumerate(TABS)}
     for folder in sorted((SRC / 'pages').iterdir(), key=lambda f: (order.get(f.name, len(TABS)), f.name)):
         if (folder / 'page.html').exists():
             text = build_page(folder).replace('{site}', SITE_URL).replace('{hero}', HERO)
-            text = STYLESHEET.sub(lambda m: inline, stamp_text(SITE, text))
-            pages[SITE / ('index.html' if folder.name == 'home' else folder.name + '.html')] = text
+            text = STYLESHEET.sub(lambda m: inline(folder.name), stamp_text(SITE, text))
             if folder.name != '404':   # served at any path, so no rule can name it
                 path = '/' if folder.name == 'home' else '/' + folder.name
                 paths.append(path)
                 info.append(page_info(path, text))
+                if folder.name in PAGE_TYPES:
+                    text = text.replace('</head>', structured(folder.name, info[-1], text) + '</head>', 1)
+            pages[SITE / ('index.html' if folder.name == 'home' else folder.name + '.html')] = text
     listed = [p for p in info if p['index']]
     out[SITE / '_headers'] = headers(sorted(paths))
     out[SITE / 'sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
