@@ -10,7 +10,10 @@
 # loads the beacon after the page has loaded (Cloudflare's own injection, uplink-site > Metrics, stays off). No cookies.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (Uplink.html). A new innerHTML elsewhere fails until it goes through it.
+# X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
+# robots.txt still allows crawling, so search engines can read this. At launch, delete the line.
 /*
+  X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

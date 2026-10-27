@@ -39,7 +39,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
 ## Before going live
-- [ ] Site is open and indexable at https://uplink-site-4p8.pages.dev (since 26 Oct 2026; test build, placeholder company). At launch: set `SITE_URL` in `tools/build_pages.py` to the real domain and rebuild. To lock it again instead: move `tools/site-lock/_middleware.js` back to `functions/` and deploy.
+- [ ] Site is open but kept out of search results: `X-Robots-Tag: noindex` on every response in `site/_headers` (since 27 Oct 2026; test build, placeholder company). PageSpeed's SEO score reads below 100 because of it; the deploy gate ignores that one audit. At launch: delete that header line, set `SITE_URL` in `tools/build_pages.py` to the real domain and rebuild. To lock it again instead: move `tools/site-lock/_middleware.js` back to `functions/` and deploy.
 - [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Pages Function in `functions/` that emails each submission to one inbox.
 
 ## Copy to confirm
