@@ -8,6 +8,8 @@ Pages come from site/sitemap.xml, so a new page is checked once it is in the sit
 Lighthouse is the version PageSpeed runs (LH below); it needs Chrome installed.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
+Cloudflare Web Analytics is blocked during the runs (BLOCK): Cloudflare adds its beacon to previews too,
+but only accepts data from the live address, so on a preview it logs a console error that isn't the site's.
 Each page and the files it links are fetched once first: a fresh preview starts with a cold
 Cloudflare cache, and the first visit would measure that, not the site.
 Performance moves a point or so between runs, so a page under the bar is run again (up to RUNS times)
@@ -24,6 +26,7 @@ import urllib.request
 LH = 'lighthouse@13.5.0'
 CATS = ['performance', 'accessibility', 'best-practices', 'seo']
 RUNS = 3
+BLOCK = '*cloudflareinsights.com*'
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / 'out' / 'lighthouse'
 
@@ -43,7 +46,7 @@ def warm(url):
 
 def run(url, path):
     cmd = ['npx', '-y', LH, url, '--output=json', f'--output-path={path}', '--quiet',
-           '--only-categories=' + ','.join(CATS), '--chrome-flags=--headless=new']
+           '--only-categories=' + ','.join(CATS), f'--blocked-url-patterns={BLOCK}', '--chrome-flags=--headless=new']
     subprocess.run(cmd, check=True, shell=(sys.platform == 'win32'), stdout=subprocess.DEVNULL)
     return json.loads(path.read_text(encoding='utf-8'))
 

@@ -6,6 +6,8 @@
 # style-src needs 'unsafe-inline': the build puts the site's CSS in a <style> in every page, and the hero SVG
 # in index.html has <style> blocks and style="" attributes.
 # font-src allows data: because each SVG carries its own letters as a data: font.
+# static.cloudflareinsights.com (script) and cloudflareinsights.com (connect): Cloudflare Web Analytics, which
+# Cloudflare adds to every page it serves (switched on in the dashboard, uplink-site > Metrics). No cookies.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (Uplink.html). A new innerHTML elsewhere fails until it goes through it.
 /*
@@ -15,7 +17,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   X-Frame-Options: DENY
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-Du+OJKJSbdUgz5nrHeWWINvez6XKDDU/tyj/5c2uvwo='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-Du+OJKJSbdUgz5nrHeWWINvez6XKDDU/tyj/5c2uvwo='; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
 # five first-screen fonts while the HTML is still on its way. (The CSS is inside each page, so it needs none.)
