@@ -211,12 +211,6 @@
       toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
     });
 
-    // the section tracker would sit on top of the map: hide it while the footer fills the screen
-    const tracker = $('.tracker');
-    if (tracker && 'IntersectionObserver' in window) {
-      new IntersectionObserver(([en]) => tracker.classList.toggle('is-off', en.intersectionRatio > 0.5), { threshold: [0, 0.5, 1] }).observe(fc);
-    }
-
     // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
     whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
 

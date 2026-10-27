@@ -5,8 +5,8 @@
    project is in the HTML, the full building is drawn).
 
    Files, loaded with defer in this order:
-     core.js      every page   helpers, toasts, pop-ups, forms, shortcuts,
-                               section dots; shares window.Uplink
+     core.js      every page   helpers, toasts, pop-ups, forms, shortcuts;
+                               shares window.Uplink
      footer.js    every page   footer roster + campus map
      home.js      Home         growing tower, hero cloud
      services.js  Services     service picker
@@ -202,41 +202,6 @@
       if (n < picker.count) { e.preventDefault(); picker.select(n, { focus: true }); }
     }
   });
-
-  /* ======================================================================
-     Section tracker (HUD dots, desktop)
-     ====================================================================== */
-  const sections = $$('main [data-section]');
-  if (sections.length >= 3 && 'IntersectionObserver' in window) {
-    const nav = document.createElement('nav');
-    nav.className = 'tracker';
-    nav.setAttribute('aria-label', 'Sections on this page');
-    const ol = document.createElement('ol');
-    const links = sections.map((sec) => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = '#' + sec.id;
-      const tip = document.createElement('span');
-      tip.className = 'tip';
-      tip.textContent = sec.dataset.section;
-      a.append(tip);
-      li.append(a);
-      ol.append(li);
-      return a;
-    });
-    nav.append(ol);
-    document.body.append(nav);
-
-    const setActive = (id) => links.forEach((a) => {
-      if (a.hash === '#' + id) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
-    });
-    setActive(sections[0].id);
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id); });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    sections.forEach((s) => io.observe(s));
-  }
-
 
   /* ======================================================================
      Forms: inline validation, then a confirmation toast.

@@ -1,7 +1,7 @@
 /* ==========================================================================
    Uplink Technology · design tokens
    Every size, colour and timing on the site comes from this file.
-   Layout concept: game-client chrome (sticky top bar, HUD tracker) around
+   Layout concept: game-client chrome (sticky top bar) around
    calm scrolling sections on a 12-column grid, max 1280px wide.
    ========================================================================== */
 
@@ -132,7 +132,6 @@
   --dur-3: 600ms;
 
   /* ---- layers ---------------------------------------------------------- */
-  --z-tracker: 20;
   --z-header: 30;
   --z-botnav: 30;
   --z-toast: 60;
