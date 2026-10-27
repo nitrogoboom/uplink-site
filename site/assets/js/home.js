@@ -17,26 +17,38 @@
     // step whose top passes 60% of the screen sets the floors. Phone and
     // tablet: the cards pass over the building, so it grows as soon as the
     // next card peeks in at the bottom, while the building is still in view.
+    // The browser reports when a step crosses the line (IntersectionObserver),
+    // so nothing is measured on scroll or during page load.
     const wide = window.matchMedia('(min-width: 1100px)');
+    const passed = new Set();
     let shown = null;
     const update = () => {
-      const line = window.innerHeight * (wide.matches ? 0.6 : 0.88);
       let pick = growSteps[0];
-      growSteps.forEach((s) => { if (s.getBoundingClientRect().top < line) pick = s; });
+      growSteps.forEach((s) => { if (passed.has(s)) pick = s; });
       if (pick === shown) return;
       shown = pick;
       tower.setAttribute('data-floors', pick.dataset.floors);
       growSteps.forEach((s) => { if (s === pick) s.setAttribute('data-active', ''); else s.removeAttribute('data-active'); });
     };
-    let ticking = false;
-    const onScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => { ticking = false; update(); });
+    let io = null;
+    const watch = () => {
+      if (io) io.disconnect();
+      passed.clear();
+      // the watched area runs from far above the screen down to the line,
+      // so "intersecting" means the step's top is above the line, even after a fast scroll
+      const below = wide.matches ? '-40%' : '-12%';
+      io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) passed.add(en.target); else passed.delete(en.target); });
+        update();
+      }, { rootMargin: '100000px 0px ' + below + ' 0px' });
+      growSteps.forEach((s) => io.observe(s));
     };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    onScroll();   // first pick on the next frame, not during page load (measuring now forces an extra layout pass)
+    if ('IntersectionObserver' in window) {
+      watch();
+      wide.addEventListener('change', watch);
+    } else {
+      update();
+    }
   }
 
   /* ------------------------------------------------------------------
