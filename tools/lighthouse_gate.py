@@ -8,6 +8,8 @@ Pages come from site/sitemap.xml, so a new page is checked once it is in the sit
 Lighthouse is the version PageSpeed runs (LH below); it needs Chrome installed.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
+Each page and the files it links are fetched once first: a fresh preview starts with a cold
+Cloudflare cache, and the first visit would measure that, not the site.
 Performance moves a point or so between runs, so a page under the bar is run again (up to RUNS times)
 and its best run counts. Reports go to out/lighthouse/<page>.json.
 deploy.py runs this on a preview before it deploys to the live address.
@@ -17,6 +19,7 @@ import pathlib
 import re
 import subprocess
 import sys
+import urllib.request
 
 LH = 'lighthouse@13.5.0'
 CATS = ['performance', 'accessibility', 'best-practices', 'seo']
@@ -28,6 +31,14 @@ OUT = ROOT / 'out' / 'lighthouse'
 def pages():
     xml = (ROOT / 'site' / 'sitemap.xml').read_text(encoding='utf-8')
     return [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', xml)]
+
+
+def warm(url):
+    """Fetch the page and every file it links from assets/, so the edge cache is filled."""
+    get = lambda u: urllib.request.urlopen(urllib.request.Request(u, headers={'User-Agent': 'lighthouse-gate warm-up'}), timeout=30).read()
+    base = re.match(r'https?://[^/]+', url).group(0)
+    for ref in set(re.findall(r'(?:href|src|srcset|data-hero)="/?(assets/[^"#]+)', get(url).decode('utf-8'))):
+        get(f'{base}/{ref}')
 
 
 def run(url, path):
@@ -62,6 +73,7 @@ def main():
     for p in pages():
         name = p.strip('/') or 'home'
         best = None
+        warm(base + p)
         for n in range(1, RUNS + 1):
             s = scores(run(base + p, OUT / f'{name}.json'))
             best = s if best is None else {c: max(best[c], s[c]) for c in CATS}
