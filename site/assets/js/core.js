@@ -277,7 +277,7 @@
   // HTML, which cost the phone score). It still reads the timings the browser kept from the start.
   // Only the live address reports: Cloudflare refuses others, so the beacon loads only where the page's
   // canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
-  const BEACON_TOKEN = 'ea58826b12d54c25a50f9bcd60fead61';   // public site token, Web Analytics > uplink-site-4p8.pages.dev
+  const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053';   // public site token: Web Analytics > uplink-site-4p8.pages.dev > Manage site
   const startBeacon = () => {
     const canon = $('link[rel="canonical"]');
     if (!canon || new URL(canon.href).hostname !== window.location.hostname) return;
