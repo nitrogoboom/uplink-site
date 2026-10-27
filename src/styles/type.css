@@ -32,5 +32,4 @@ h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line
 .small { font-size: var(--fs-2); }
 .accent { color: var(--c-accent); }
 .display { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; line-height: var(--lh-display); }
-.num { font-variant-numeric: tabular-nums; }
 

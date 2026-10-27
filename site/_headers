@@ -1,5 +1,5 @@
 # Cloudflare Pages response headers. Not served as a page.
-# The script-src hash is for the one-line inline script on services.html and work.html:
+# The script-src hash is for the one-line inline script in every page's head:
 #   document.documentElement.classList.add('js')
 # Change that line and the hash must change too. New hash:
 #   python -c "import hashlib,base64;print(base64.b64encode(hashlib.sha256(b\"document.documentElement.classList.add('js')\").digest()).decode())"

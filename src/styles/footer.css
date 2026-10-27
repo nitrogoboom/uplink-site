@@ -25,10 +25,10 @@
 /* stage */
 .fc-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding-block: var(--sp-6) var(--sp-5); }
 .fc-panels { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
-.fc-js .fc-panels { gap: 0; }
-.fc-js .fc-panel:not(.is-on) { display: none; }
+.js .fc-panels { gap: 0; }
+.js .fc-panel:not(.is-on) { display: none; }
 .fc-panel { display: flex; flex-direction: column; min-width: 0; }
-.fc-js .fc-panel.is-in { animation: fc-in 360ms var(--ease); }
+.js .fc-panel.is-in { animation: fc-in 360ms var(--ease); }
 @keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
 .fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
 .fc-head h2 { font-size: var(--fs-8); line-height: 0.92; }
@@ -144,7 +144,7 @@ a.fc-cl:hover { color: var(--c-accent); }
 }
 .fc-rk:hover { background: var(--c-surface-2); }
 .fc-rk svg { width: var(--sp-4); height: var(--sp-4); }
-.fc:not(.fc-js) .fc-dock { display: none; }
+:root:not(.js) .fc-dock { display: none; }
 
 /* base bar */
 .fc-base { background: var(--c-bg-band); }
@@ -239,13 +239,13 @@ a.fc-cl:hover { color: var(--c-accent); }
 }
 
 @media (min-width: 1100px) and (min-height: 700px) {
-  .fc.fc-js { height: var(--fold-h); min-height: 40rem; }
-  .fc-js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
-  .fc-js .fc-panels { padding-top: var(--sp-2); }
+  .js .fc { height: var(--fold-h); min-height: 40rem; }
+  .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
+  .js .fc-panels { padding-top: var(--sp-2); }
   .fc-head h2 { font-size: min(var(--fs-8), 8.2svh); }
-  .fc-js .fc-map { min-height: 0; height: 100%; }
+  .js .fc-map { min-height: 0; height: 100%; }
   @media (max-height: 820px) {
-    .fc-js .fc-stage { padding-top: var(--sp-6); }
+    .js .fc-stage { padding-top: var(--sp-6); }
     .fc-body { margin-top: var(--sp-5); }
   }
 }

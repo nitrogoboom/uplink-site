@@ -72,7 +72,7 @@ def socials_row():
 panels, tiles = [], []
 def add(pid, mapkey, name, icon, count, body):
     first = not panels
-    panels.append(f'<section class="fc-panel{" is-on" if first else ""}" id="fc-p-{pid}" role="tabpanel" aria-labelledby="fc-t-{pid}" data-map="{mapkey}">\n{body}\n</section>')
+    panels.append(f'<section class="fc-panel{" is-on" if first else ""}" id="fc-p-{pid}" role="tabpanel" aria-labelledby="fc-t-{pid}" tabindex="-1" data-map="{mapkey}">\n{body}\n</section>')
     tiles.append(f'<button class="fc-tile" type="button" role="tab" id="fc-t-{pid}" aria-controls="fc-p-{pid}" aria-selected="{"true" if first else "false"}" tabindex="{0 if first else -1}">'
                  f'<span class="icon-tile">{ic(icon)}</span><span class="fc-tile-n">{name}</span><span class="fc-tile-c">{count}</span></button>')
 
@@ -104,7 +104,7 @@ add('follow', 'follow', 'Follow', 'signal', f'{len(SOCIALS)} channels',
     f'''<div class="fc-body">
   <ul class="fc-wall">{wall}</ul>
   <form class="fc-nl" data-fc-nl novalidate>
-    <label class="label" for="fc-nl-email">The Monthly Patch</label>
+    <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>The Monthly Patch</label>
     <div class="fc-nl-row"><input class="input" id="fc-nl-email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
     <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>One email a month. Threats to watch and fixes that matter.</p>
   </form>

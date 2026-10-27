@@ -185,7 +185,12 @@
       if (opts.focus) t.focus({ preventScroll: true });
       focusMap(panels[cur].dataset.map, opts.instant);
     };
-    tabs.forEach((t, i) => t.addEventListener('click', () => select(i)));
+    // the panels sit above the tiles, so Tab from a tile would skip them; Enter or Space (a click with
+    // detail 0) moves focus into the chosen panel instead
+    tabs.forEach((t, i) => t.addEventListener('click', (e) => {
+      select(i);
+      if (e.detail === 0) panels[i].focus();
+    }));
     $('.fc-roster', fc).addEventListener('keydown', (e) => {
       const map = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: tabs.length - 1 };
       if (!(e.key in map)) return;
@@ -214,6 +219,7 @@
     // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
     whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
 
+    // the CSS keys on html.js (set in each page's head, before paint); fc-js only says this script ran
     fc.classList.add('fc-js');
     select(cur, { instant: true });
   }

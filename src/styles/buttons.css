@@ -28,7 +28,6 @@
 .btn--secondary { background: var(--c-surface-2); border-color: var(--c-line); color: var(--c-text); }
 .btn--secondary:hover { background: var(--c-line-2); }
 .btn--lg { min-height: var(--control-lg); padding-inline: var(--sp-6); font-size: var(--fs-6); border-radius: var(--r-3); }
-.btn--block { width: 100%; }
 .btn--primary .kbd { background: var(--c-ink-tint); border-color: var(--c-ink-tint); color: var(--c-on-accent); }
 
 .iconbtn {
