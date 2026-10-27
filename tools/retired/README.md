@@ -15,4 +15,4 @@ They no longer run from here (they expect `iso.py` next to them). To bring one b
 | `shoot.js`, `shoot1.js`, `compare.py` | Screenshots and before/after sheets of the drawings | Need Node Playwright; Claude's browser does this now |
 | `footer_painter.py` | Painter-order check on the footer map | Only ran after hand-adding a logger to `footer.js` |
 
-Delete the folder once the home PC's work is merged and nothing has asked for these.
+Delete the folder once nothing has asked for these.

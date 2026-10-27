@@ -2,11 +2,9 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
-## Merge from home (27 Oct 2026)
-- [ ] Work from the night of 26 Oct (commits `c53ab7d`, `cfaabab`, `4b9b944`) is only on the home PC; it was deployed but never pushed. Branch `rebuild-last-night` rebuilds it from the live deploy so `site/` matches it exactly. At home: push those commits, then merge `rebuild-last-night`; on every clash keep the home version, except `site/assets/js/home.js` (the tower and hero-dot fixes are newer).
-- [ ] Until then, `tools/gen_office.py` here is behind: the hero in `src/pages/home/1-hero-office.svg` and `1-hero-flows.svg` was copied from the live build (GUEST WI-FI label, new desk layout, new timings). Running `gen_office.py` here puts the old hero back.
-- [ ] `src/agents.md` and `src/index.md` were rebuilt as hand-written files. If home generates `index.md` from the home page, keep that instead.
-- [ ] Delete `tools/retired/` (13 old hand-fix tools, see its README) after the merge, if the home work didn't need any of them.
+## Tools
+- [ ] `tools/gen_office.py` is behind the hero: `src/pages/home/1-hero-office.svg` and `1-hero-flows.svg` were copied from the live build (GUEST WI-FI label, new desk layout, new timings). Running `gen_office.py` puts the old hero back. Bring the script up to match those files before running it again.
+- [ ] Delete `tools/retired/` (13 old hand-fix tools, see its README). Nothing uses them.
 
 ## Drawings
 - [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
