@@ -36,6 +36,12 @@
     set(key, value) { try { window.localStorage.setItem(key, value); } catch (e) { /* ignore */ } }
   };
 
+  /* ---------- Trusted Types ---------------------------------------------- */
+  // The CSP (site/_headers) lets only this policy write HTML into the page (innerHTML and the like).
+  // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
+  const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', { createHTML: (s) => s }) : null;
+  const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
+
   /* ---------- icons used by script-built UI ------------------------------ */
   const ICON = {
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
@@ -71,7 +77,7 @@
 
     const ic = document.createElement('span');
     ic.className = 'toast-ic';
-    ic.innerHTML = tone === 'info' ? ICON.info : ICON.check;
+    ic.innerHTML = html(tone === 'info' ? ICON.info : ICON.check);
 
     const body = document.createElement('span');
     body.className = 'toast-text';
@@ -89,7 +95,7 @@
     btn.type = 'button';
     btn.className = 'iconbtn';
     btn.setAttribute('aria-label', 'Dismiss');
-    btn.innerHTML = ICON.close;
+    btn.innerHTML = html(ICON.close);
 
     el.append(ic, body, btn);
     region.append(el);
@@ -262,5 +268,5 @@
 
   /* ---------- shared with the page scripts ------------------------------ */
   // picker: set by services.js so the number keys (1 to 9) can pick a service
-  window.Uplink = { $, $$, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, picker: null };
+  window.Uplink = { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, picker: null };
 })();

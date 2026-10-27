@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const { $, $$, reduceMotion, toast, whenOnScreen } = window.Uplink;
+  const { $, $$, html, reduceMotion, toast, whenOnScreen } = window.Uplink;
 
   /* ======================================================================
      Footer: hero-select roster + campus map (every page)
@@ -132,7 +132,7 @@
 
     const mapBox = $('[data-fc-map]', fc);
     const hud = $('.fc-hud', fc);
-    mapBox.insertAdjacentHTML('afterbegin', buildMap());
+    mapBox.insertAdjacentHTML('afterbegin', html(buildMap()));
     const svg = $('svg.fc-w', mapBox), marker = $('.mk', svg), ring = $('.ring', svg);
     let vb = VB0.slice(), mk = [0, 0], raf = 0;
 
@@ -152,7 +152,7 @@
       $$('.dist', svg).forEach((g) => g.classList.toggle('on', g.dataset.k === k));
       $$('.route, .flow', svg).forEach((g) => g.classList.toggle('on', g.dataset.k === k));
       ring.setAttribute('points', circ(d.at[0], d.at[1], 0.02, d.r));
-      hud.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">${MARK}</svg><span><b>${d.name}</b><small>${d.sub}</small></span>`;
+      hud.innerHTML = html(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">${MARK}</svg><span><b>${d.name}</b><small>${d.sub}</small></span>`);
       const t = aim(k);
       window.cancelAnimationFrame(raf);
       if (instant || reduceMotion.matches) { vb = t.vb; mk = t.mk; paint(); return; }

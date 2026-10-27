@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const { $, $$, reduceMotion } = window.Uplink;
+  const { $, $$, html, reduceMotion } = window.Uplink;
 
   /* ======================================================================
      Services picker (Services page)
@@ -23,9 +23,9 @@
     $$('[data-svc-max]').forEach((k) => { k.textContent = Math.min(9, svcs.length); });
     const roster = $('[data-roster]', pickerEl);
     if (roster) {
-      roster.innerHTML = svcs.map((s, i) => '<li><button class="tile" type="button" data-pick="' + i + '" aria-controls="' + s.id +
+      roster.innerHTML = html(svcs.map((s, i) => '<li><button class="tile" type="button" data-pick="' + i + '" aria-controls="' + s.id +
         '" aria-pressed="' + s.classList.contains('is-on') + '"><span class="tile-n">' + two(i + 1) + '</span><span class="tile-t">' +
-        (s.dataset.tile || $('h2', s).textContent) + '</span></button></li>').join('');
+        (s.dataset.tile || $('h2', s).textContent) + '</span></button></li>').join(''));
     }
     const tiles = $$('[data-pick]', pickerEl);
     const live = $('[data-picker-live]', pickerEl);
