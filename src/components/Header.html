@@ -1,8 +1,7 @@
 <!--- SHARED · Header (every page)
-      Logo, page tabs with the Q / E keys, "Get support" and "Client portal".
-      The build fills in per page: aria-current on the current tab, and
-      {prev} / {next} with the pages either side (order is TABS in build_pages.py).
-      Styles: src/styles/header.css, src/styles/key-hints.css.
+      Logo, page tabs, "Get support" and "Client portal".
+      The build fills in per page: aria-current on the current tab.
+      Styles: src/styles/header.css.
 --->
 <header class="site-header">
   <div class="container">
@@ -17,7 +16,6 @@
     </a>
 
     <nav class="tabs" aria-label="Main">
-      <a class="keyhop" href="{prev}" tabindex="-1" aria-hidden="true" hidden></a>
       <ul>
         <li><a class="tab" href="./" data-page="home">Home</a></li>
         <li><a class="tab" href="services" data-page="services">Services</a></li>
@@ -25,7 +23,6 @@
         <li><a class="tab" href="about" data-page="about">About</a></li>
         <li><a class="tab" href="contact" data-page="contact">Contact</a></li>
       </ul>
-      <a class="keyhop" href="{next}" tabindex="-1" aria-hidden="true" hidden></a>
     </nav>
 
     <div class="hdr-actions">

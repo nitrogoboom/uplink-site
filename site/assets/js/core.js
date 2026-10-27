@@ -15,8 +15,7 @@
      soon.js      soon.html    names the missing page
 
    Keyboard map (single keys, can be switched off in the shortcuts panel):
-     Q / E      previous / next page          all pages
-     1 - 6      pick a service                Services page
+     1 - 7      pick a service                Services page
      ?          open the shortcuts panel      all pages
      Left/Right previous / next project       inside the project pop-up
      Esc        close the open pop-up         native <dialog> behaviour
@@ -177,24 +176,6 @@
     });
   }
 
-  const pageLinks = $$('.tabs [data-page]');
-  const currentPage = document.body.dataset.page;
-
-  // one page change at a time, so a fast double press does not skip a page
-  let leaving = false;
-  window.addEventListener('pageshow', () => { leaving = false; });
-
-  function goPage(step) {
-    if (leaving) return;
-    const i = pageLinks.findIndex((a) => a.dataset.page === currentPage);
-    const target = i >= 0
-      ? pageLinks[(i + step + pageLinks.length) % pageLinks.length]
-      : $$('.keyhop')[step < 0 ? 0 : 1];
-    if (!target) return;
-    leaving = true;
-    window.location.href = target.getAttribute('href');
-  }
-
   function isTyping(el) {
     if (!el || el === document.body) return false;
     if (el.isContentEditable) return true;
@@ -215,9 +196,6 @@
     if (e.key === '?') { e.preventDefault(); openDialog('shortcuts-dialog'); return; }
     if (e.shiftKey) return;
 
-    const k = e.key.toLowerCase();
-    if (k === 'q') { e.preventDefault(); goPage(-1); return; }
-    if (k === 'e') { e.preventDefault(); goPage(1); return; }
     const picker = window.Uplink.picker;
     if (/^[1-9]$/.test(e.key) && picker) {
       const n = Number(e.key) - 1;

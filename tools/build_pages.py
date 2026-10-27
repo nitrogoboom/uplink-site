@@ -12,8 +12,7 @@ Notes between `<!---` and `--->` (or `/*---` and `---*/` in CSS) are for
 people reading the source; the build drops them.
 
 Shared parts change a little per page, like Astro props:
-  - Header and BottomNav: the current page's tab gets aria-current="page";
-    Header's {prev} and {next} are the Q / E keyhop links.
+  - Header and BottomNav: the current page's tab gets aria-current="page".
   - 404 is served at any depth, so its shared parts get root links (/services).
 src/styles/site.css lists the CSS files in cascade order; the build joins
 site/assets/css/tokens.css and them into site/assets/css/site.css, minified,
@@ -95,13 +94,9 @@ def expand(path, part=lambda name, text: text):
 def build_page(folder):
     page = folder / 'page.html'
     key = re.search(r'<body data-page="(\w+)"', read(page)).group(1)
-    keys = [k for k, _ in TABS]
-    i = keys.index(key) if key in keys else len(TABS)   # pages off the tab bar sit after Contact
-    prev, next_ = TABS[i - 1][1], (TABS[i + 1] if i + 1 < len(TABS) else TABS[0])[1]
 
     def part(name, text):
         text = text.replace(f'data-page="{key}">', f'data-page="{key}" aria-current="page">')
-        text = text.replace('{prev}', prev).replace('{next}', next_)
         if folder.name == '404':  # served at any depth, so its links start at the root
             text = text.replace('href="./"', 'href="/"')
             text = re.sub(r'(href=")(?!https?:|mailto:|tel:|#|/)', r'\1/', text)

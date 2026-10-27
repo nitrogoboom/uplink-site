@@ -1,4 +1,4 @@
-/*--- Keyboard hints (Q, E, Esc): desktop with a mouse, when shortcuts are on. ---*/
+/*--- Keyboard hints (Esc, arrows, service numbers): desktop with a mouse, when shortcuts are on. ---*/
 /* ---------- 5. keyboard hints (desktop + mouse only, and only when on) --- */
 .kbd {
   display: inline-grid;
@@ -24,12 +24,4 @@
 @media (any-hover: hover) and (any-pointer: fine) and (min-width: 1100px) {
   :root:not([data-shortcuts="off"]) .kbd-hint { display: inline-grid; }
 }
-.keyhop {
-  place-items: center;
-  width: var(--tap); height: var(--tap);
-  border-radius: var(--r-2);
-  text-decoration: none;
-}
-.keyhop:hover { background: var(--c-surface); }
-.keyhop .kbd { font-size: var(--fs-2); }
 
