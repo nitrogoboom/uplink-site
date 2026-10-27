@@ -199,7 +199,8 @@ a.fc-cl:hover { color: var(--c-accent); }
 .fc-w .dot { fill: var(--c-accent); }
 .fc-w .mast { stroke: var(--c-accent); stroke-width: 1.6; }
 @media (prefers-reduced-motion: no-preference) {
-  .fc-w .flow { animation: fc-flow 1.2s linear infinite; }
+  /* the dashes redraw every frame (not GPU work), so they start only once the map has been on screen (footer.js) */
+  .fc-w.is-seen .flow { animation: fc-flow 1.2s linear infinite; }
   .fc-w .lit.blink, .fc-w .led { animation: fc-blink 4s step-end infinite; }
   .fc-w .bob { animation: fc-bob 3s ease-in-out infinite; }
   .fc-w .mk-bob { animation: fc-bob 2.2s ease-in-out infinite; }

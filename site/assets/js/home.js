@@ -22,6 +22,10 @@
     const wide = window.matchMedia('(min-width: 1100px)');
     const passed = new Set();
     let shown = null;
+    // The first pick shows at once: no fade on load (colour fades are not GPU work,
+    // and nobody is watching yet). Fades come back two frames later.
+    const grow = tower.closest('.grow');
+    if (grow) grow.classList.add('no-trans');
     const update = () => {
       let pick = growSteps[0];
       growSteps.forEach((s) => { if (passed.has(s)) pick = s; });
@@ -29,6 +33,9 @@
       shown = pick;
       tower.setAttribute('data-floors', pick.dataset.floors);
       growSteps.forEach((s) => { if (s === pick) s.setAttribute('data-active', ''); else s.removeAttribute('data-active'); });
+      if (grow && grow.classList.contains('no-trans')) {
+        window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
+      }
     };
     let io = null;
     const watch = () => {
@@ -56,9 +63,12 @@
      line runs from the cloud to that app's tile in the floating tray.
      It steps through the apps on a timer; hovering a tile or a bar
      segment picks one. Reduced motion: no timer, no line animation.
+     Phones get the still picture instead (below 600px, compact-cuts.css),
+     so the cloud is set up only once the animated drawing shows.
      ------------------------------------------------------------------ */
   const cloud = document.querySelector('svg.ob .ob-cloud');
-  if (cloud) {
+  const heroShown = window.matchMedia('(min-width: 600px)');
+  const startCloud = () => {
     const svg = cloud.ownerSVGElement;
     const APPS = [
       { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
@@ -151,5 +161,12 @@
     whenOnScreen(document.querySelector('svg.ob-over'));   // the moving dashes' own layer (1-hero-flows.svg)
     show(0);
     start();
+  };
+  if (cloud) {
+    if (heroShown.matches) startCloud();
+    else {
+      const later = () => { if (!heroShown.matches) return; heroShown.removeEventListener('change', later); startCloud(); };
+      heroShown.addEventListener('change', later);
+    }
   }
 })();

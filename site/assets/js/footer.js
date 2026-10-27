@@ -217,8 +217,8 @@
       new IntersectionObserver(([en]) => tracker.classList.toggle('is-off', en.intersectionRatio > 0.5), { threshold: [0, 0.5, 1] }).observe(fc);
     }
 
-    // the map's looping animations pause while it is off screen
-    whenOnScreen(svg);
+    // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
+    whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
 
     fc.classList.add('fc-js');
     select(cur, { instant: true });

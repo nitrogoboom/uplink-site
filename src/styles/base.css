@@ -65,6 +65,7 @@ a:hover { text-decoration-color: currentColor; }
 /* set by script on the hero and footer drawings while they are off screen.
    !important because the inline drawings' own <style> comes later. */
 .is-idle, .is-idle * { animation-play-state: paused !important; }
+.no-trans, .no-trans * { transition: none !important; }   /* a first state that should appear at once (home.js) */
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
