@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Palette A Preview</title>
+<style>
+:root {
+  /* neutral */
+  --neutral-50: #F3F7FB;
+  --neutral-100: #E5EAEE;
+  --neutral-200: #D0D7DC;
+  --neutral-300: #B7BFC5;
+  --neutral-400: #9DA6AD;
+  --neutral-500: #838E95;
+  --neutral-600: #6B767F;
+  --neutral-700: #536069;
+  --neutral-800: #3C4A53;
+  --neutral-900: #24323D;
+  --neutral-950: #0E1E28;
+  /* blue */
+  --blue-50: #EFF8FF;
+  --blue-100: #D5EDFF;
+  --blue-200: #B2DCFA;
+  --blue-300: #8FC5EB;
+  --blue-400: #6BADD9;
+  --blue-500: #4694C6;
+  --blue-600: #1F75A6;
+  --blue-700: #006494;
+  --blue-800: #004D73;
+  --blue-900: #003450;
+  --blue-950: #001E31;
+  /* amber */
+  --amber-50: #FFF5E9;
+  --amber-100: #FFE5C3;
+  --amber-200: #FFCC86;
+  --amber-300: #FBAB18;
+  --amber-400: #DC9400;
+  --amber-500: #BC7E00;
+  --amber-600: #9F6700;
+  --amber-700: #825200;
+  --amber-800: #663D00;
+  --amber-900: #472800;
+  --amber-950: #2C1600;
+  /* green */
+  --green-50: #E5FFE9;
+  --green-100: #C8F8D0;
+  --green-200: #A5E9B1;
+  --green-300: #7CD58F;
+  --green-400: #62BC76;
+  --green-500: #4BA160;
+  --green-600: #35884B;
+  --green-700: #1E6F37;
+  --green-800: #025724;
+  --green-900: #003C16;
+  --green-950: #00230A;
+  /* coral */
+  --coral-50: #FFF4F2;
+  --coral-100: #FFE2DD;
+  --coral-200: #FFC6BD;
+  --coral-300: #FFA192;
+  --coral-400: #F37D6D;
+  --coral-500: #D76455;
+  --coral-600: #B94E40;
+  --coral-700: #9B382D;
+  --coral-800: #7E231A;
+  --coral-900: #5E0905;
+  --coral-950: #3D0000;
+}
+.mode-dark { color-scheme: dark;
+  --c-bg: #0E1E28;
+  --c-bg-band: #13222D;
+  --c-solid: #1C2E39;
+  --c-surface: rgb(255 255 255 / 0.05);
+  --c-surface-2: rgb(255 255 255 / 0.09);
+  --c-well: rgb(0 0 0 / 0.18);
+  --c-line: rgb(255 255 255 / 0.09);
+  --c-line-2: rgb(255 255 255 / 0.18);
+  --c-edge: rgb(255 255 255 / 0.34);
+  --c-text: #F3F7FB;
+  --c-muted: #CBD2D7;
+  --c-accent: #FBAB18;
+  --c-on-accent: #0E1E28;
+  --c-sky: #8FC5EB;
+  --c-ok: #A5E9B1;
+  --c-alert: #FD8C7C;
+  --c-accent-tint: rgb(251 171 24 / 0.12);
+  --c-accent-faint: rgb(251 171 24 / 0.06);
+  --c-accent-ring: rgb(251 171 24 / 0.35);
+  --c-sky-tint: rgb(143 197 235 / 0.16);
+  --c-ok-tint: rgb(165 233 177 / 0.16);
+  --c-ink-tint: rgb(14 30 40 / 0.16);
+  --c-glass: rgb(14 30 40 / 0.88);
+  --c-glass-2: rgb(28 46 57 / 0.92);
+  --c-backdrop: rgb(0 10 21 / 0.62);
+  --c-glow-accent: rgb(251 171 24 / 0.07);
+  --c-glow-sky: rgb(143 197 235 / 0.09);
+  --c-glow-sky-2: rgb(143 197 235 / 0.11);
+  --c-cool-surface: rgb(213 237 255 / 0.05);
+  --c-cool-surface-2: rgb(213 237 255 / 0.1);
+  --c-cool-muted: #A4C2D8;
+  --iso-top: #4A5E6C;
+  --iso-left: #344856;
+  --iso-right: #263946;
+  --iso-edge: #E5EAEE;
+  --iso-hi-top: #FFCC86;
+  --iso-hi-left: #DC9400;
+  --iso-hi-right: #BC7E00;
+  --iso-hi-edge: #FFF5E9;
+  --iso-sky-top: #B2DCFA;
+  --iso-sky-right: #4694C6;
+  --iso-green-top: #A5E9B1;
+  --iso-green-mid: #4BA160;
+  --iso-green-dark: #35884B;
+  --iso-ground: #16252F;
+  --iso-grid: #293742;
+  --iso-window: #1A2833;
+  --iso-light: #FFF3E4;
+  --iso-shadow: #000000;
+}
+.mode-light { color-scheme: light;
+  --c-bg: #F3F7FB;
+  --c-bg-band: #EAEFF3;
+  --c-solid: #FFFFFF;
+  --c-surface: rgb(255 255 255 / 0.8);
+  --c-surface-2: rgb(31 117 166 / 0.08);
+  --c-well: rgb(36 50 61 / 0.05);
+  --c-line: rgb(36 50 61 / 0.12);
+  --c-line-2: rgb(36 50 61 / 0.26);
+  --c-edge: rgb(36 50 61 / 0.53);
+  --c-text: #0E1E28;
+  --c-muted: #536069;
+  --c-accent: #825200;
+  --c-on-accent: #FFFFFF;
+  --c-sky: #006494;
+  --c-ok: #025724;
+  --c-alert: #B63C2F;
+  --c-accent-tint: rgb(251 171 24 / 0.2);
+  --c-accent-faint: rgb(251 171 24 / 0.1);
+  --c-accent-ring: rgb(130 82 0 / 0.35);
+  --c-sky-tint: rgb(31 117 166 / 0.08);
+  --c-ok-tint: rgb(2 87 36 / 0.1);
+  --c-ink-tint: rgb(255 255 255 / 0.2);
+  --c-glass: rgb(243 247 251 / 0.88);
+  --c-glass-2: rgb(255 255 255 / 0.94);
+  --c-backdrop: rgb(14 30 40 / 0.45);
+  --c-glow-accent: rgb(251 171 24 / 0.16);
+  --c-glow-sky: rgb(143 197 235 / 0.18);
+  --c-glow-sky-2: rgb(143 197 235 / 0.2);
+  --c-cool-surface: rgb(31 117 166 / 0.04);
+  --c-cool-surface-2: rgb(31 117 166 / 0.08);
+  --c-cool-muted: #496172;
+  --iso-top: #FFFFFF;
+  --iso-left: #D6E1EA;
+  --iso-right: #BACAD5;
+  --iso-edge: #3C4A53;
+  --iso-hi-top: #FFCC86;
+  --iso-hi-left: #FBAB18;
+  --iso-hi-right: #DC9400;
+  --iso-hi-edge: #663D00;
+  --iso-sky-top: #4694C6;
+  --iso-sky-right: #004D73;
+  --iso-green-top: #7CD58F;
+  --iso-green-mid: #4BA160;
+  --iso-green-dark: #35884B;
+  --iso-ground: #E5EAEE;
+  --iso-grid: #CBD2D7;
+  --iso-window: #91A1AD;
+  --iso-light: #FFF3E4;
+  --iso-shadow: #0E1E28;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Barlow', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #838E95; }
+.wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+@media (max-width: 900px) { .wrap { grid-template-columns: 1fr; } }
+.mode { background: var(--c-bg); color: var(--c-text); padding: 0 0 2rem; min-width: 0; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem;
+  background: var(--c-glass); border-bottom: 1px solid var(--c-line); }
+header img { height: 34px; width: auto; display: block; }
+nav { display: flex; gap: 1rem; font-size: .875rem; color: var(--c-muted); }
+nav b { color: var(--c-text); font-weight: 600; }
+.hero { padding: 2rem 1.25rem 1.5rem; background:
+  radial-gradient(60% 80% at 15% 90%, var(--c-glow-accent), transparent 70%),
+  radial-gradient(60% 80% at 85% 30%, var(--c-glow-sky), transparent 70%); }
+.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--c-accent); font-weight: 700; margin: 0 0 .5rem; }
+h1 { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: clamp(2rem, 4vw, 3.25rem); line-height: .95; margin: 0 0 .75rem; text-transform: uppercase; letter-spacing: .02em; }
+.lead { color: var(--c-muted); margin: 0 0 1.25rem; max-width: 46ch; line-height: 1.6; }
+.btns { display: flex; flex-wrap: wrap; gap: .75rem; }
+.btn { height: 3rem; padding: 0 1.25rem; border-radius: .75rem; font: 700 1rem/1 inherit; letter-spacing: .04em; text-transform: uppercase; cursor: pointer; }
+.btn-primary { background: var(--c-accent); color: var(--c-on-accent); border: 0; }
+.btn-primary:focus-visible, .btn-ghost:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
+.btn-ghost { background: transparent; color: var(--c-text); border: 1px solid var(--c-edge); }
+.btn-ghost:hover { background: var(--c-surface-2); }
+.kbd { display: inline-block; margin-left: .5rem; padding: .1rem .35rem; border-radius: .375rem; background: var(--c-ink-tint); font-size: .75rem; }
+section { padding: 1.25rem; }
+section.band { background: var(--c-bg-band); }
+h2 { font-size: 1rem; margin: 0 0 .75rem; letter-spacing: .04em; text-transform: uppercase; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .75rem; }
+.card { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: 1.25rem; padding: 1rem; }
+.card.sel { background: var(--c-accent-tint); border-color: var(--c-accent); }
+.card h3 { margin: .5rem 0 .25rem; font-size: 1.125rem; }
+.card p { margin: 0; color: var(--c-muted); font-size: .875rem; line-height: 1.5; }
+.tile { width: 2.25rem; height: 2.25rem; border-radius: .75rem; background: var(--c-surface-2); display: grid; place-items: center; color: var(--c-sky); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip { padding: .3rem .7rem; border-radius: 999px; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--c-line-2); color: var(--c-muted); }
+.chip.on { background: var(--c-accent-tint); color: var(--c-accent); border-color: transparent; }
+.chip.sky { background: var(--c-sky-tint); color: var(--c-sky); border-color: transparent; }
+.chip.ok { background: var(--c-ok-tint); color: var(--c-ok); border-color: transparent; }
+.msgs { display: grid; gap: .5rem; }
+.msg { display: flex; gap: .6rem; align-items: center; padding: .65rem .85rem; border-radius: .75rem; background: var(--c-surface); border: 1px solid var(--c-line); font-size: .9rem; }
+.msg svg { flex: none; width: 18px; height: 18px; }
+.msg.info { color: var(--c-sky); } .msg.ok { color: var(--c-ok); } .msg.alert { color: var(--c-alert); border-color: var(--c-alert); }
+.msg span { color: var(--c-text); }
+.input { width: 100%; height: 3rem; border-radius: .75rem; background: var(--c-well); border: 1px solid var(--c-edge); color: var(--c-text); padding: 0 .9rem; font: inherit; }
+.input:focus { outline: none; border-color: var(--c-accent); box-shadow: 0 0 0 3px var(--c-accent-ring); }
+.dialog { background: var(--c-solid); border-radius: 1.25rem; padding: 1rem; box-shadow: 0 12px 32px -12px rgb(0 0 0 / .45); }
+.iso { width: 100%; max-width: 460px; display: block; margin: 0 auto; }
+.swatches { display: grid; grid-template-columns: repeat(11, 1fr); gap: 2px; margin-bottom: 2px; }
+.swatches div { height: 18px; }
+.label { font-size: .75rem; color: var(--c-muted); margin: .75rem 0 .25rem; }
+</style></head><body>
+<div class="wrap">
+
+<div class="mode mode-dark">
+  <header><img src="../inputs/svs-logo-white-text.svg" alt="Silicon Valley Services">
+    <nav><b>Services</b><span>Work</span><span>About</span></nav></header>
+  <div class="hero">
+    <p class="eyebrow">Managed IT · dark mode</p>
+    <h1>Your IT, handled.<br>Before it breaks.</h1>
+    <p class="lead">We watch your systems day and night. You get one team and one number to call.</p>
+    <div class="btns"><button class="btn btn-primary">Book a call <span class="kbd">F</span></button><button class="btn btn-ghost">See plans</button></div>
+  </div>
+  <section class="band"><h2>Plans</h2>
+    <div class="cards">
+      <div class="card"><div class="tile">1</div><h3>Help desk</h3><p>Real people answer. Most fixes in an hour.</p></div>
+      <div class="card sel"><div class="tile">2</div><h3>Full care</h3><p>Help desk, security and backups in one plan.</p></div>
+      <div class="card"><div class="tile">3</div><h3>Projects</h3><p>Moves, new offices and cloud work.</p></div>
+    </div></section>
+  <section><h2>Chips</h2><div class="chips"><span class="chip on">Selected</span><span class="chip">Default</span><span class="chip sky">Info</span><span class="chip ok">Online</span></div></section>
+  <section><h2>Status</h2><div class="msgs">
+    <div class="msg info"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 9v5M10 6v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Info: maintenance on Sunday at 2 am.</span></div>
+    <div class="msg ok"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor"/><path d="M6 10l3 3 5-6" fill="none" stroke="var(--c-bg)" stroke-width="2"/></svg><span>Online: all 42 devices backed up.</span></div>
+    <div class="msg alert"><svg viewBox="0 0 20 20"><path d="M10 2l9 16H1z" fill="currentColor"/><path d="M10 8v4M10 14.5v.5" stroke="var(--c-bg)" stroke-width="2" stroke-linecap="round"/></svg><span>Error: one laptop missed its backup.</span></div>
+  </div>
+    <p class="label">Input (focus it)</p><input class="input" placeholder="Work email">
+  </section>
+  <section class="band"><h2>Dialog</h2><div class="dialog"><b>Saved.</b> <span style="color:var(--c-muted)">We will call you back today.</span></div></section>
+  <section><h2>Isometric</h2><svg viewBox="0 0 420 330" class="iso" role="img" aria-label="Isometric test scene"><polygon points="210.0,100.0 386.7,202.0 210.0,304.0 33.3,202.0" fill="var(--iso-ground)"/><line x1="239.4" y1="117.0" x2="62.8" y2="219.0" stroke="var(--iso-grid)"/><line x1="180.6" y1="117.0" x2="357.2" y2="219.0" stroke="var(--iso-grid)"/><line x1="268.9" y1="134.0" x2="92.2" y2="236.0" stroke="var(--iso-grid)"/><line x1="151.1" y1="134.0" x2="327.8" y2="236.0" stroke="var(--iso-grid)"/><line x1="298.3" y1="151.0" x2="121.7" y2="253.0" stroke="var(--iso-grid)"/><line x1="121.7" y1="151.0" x2="298.3" y2="253.0" stroke="var(--iso-grid)"/><line x1="327.8" y1="168.0" x2="151.1" y2="270.0" stroke="var(--iso-grid)"/><line x1="92.2" y1="168.0" x2="268.9" y2="270.0" stroke="var(--iso-grid)"/><line x1="357.2" y1="185.0" x2="180.6" y2="287.0" stroke="var(--iso-grid)"/><line x1="62.8" y1="185.0" x2="239.4" y2="287.0" stroke="var(--iso-grid)"/><polygon points="268.9,168.0 304.2,188.4 274.8,205.4 239.4,185.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="342.5,193.5 357.2,202.0 327.8,219.0 313.1,210.5" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="151.1,185.0 165.8,193.5 136.4,210.5 121.7,202.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="239.4,219.0 254.2,227.5 224.7,244.5 210.0,236.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="274.8,246.2 283.6,251.3 254.2,268.3 245.3,263.2" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="151.1,215.6 171.7,227.5 154.1,237.7 133.4,225.8" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="180.6,151.0 239.4,185.0 239.4,103.4 180.6,69.4" fill="var(--iso-left)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="268.9,168.0 239.4,185.0 239.4,103.4 268.9,86.4" fill="var(--iso-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,52.4 268.9,86.4 239.4,103.4 180.6,69.4" fill="var(--iso-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="261.5,155.2 246.8,163.8 246.8,151.8 261.5,143.3" fill="var(--iso-window)"/><polygon points="261.5,134.8 246.8,143.3 246.8,131.4 261.5,122.9" fill="var(--iso-light)"/><polygon points="261.5,114.5 246.8,123.0 246.8,111.1 261.5,102.6" fill="var(--iso-window)"/><polygon points="92.2,185.0 121.7,202.0 121.7,168.0 92.2,151.0" fill="var(--iso-green-mid)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="151.1,185.0 121.7,202.0 121.7,168.0 151.1,151.0" fill="var(--iso-green-dark)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="121.7,134.0 151.1,151.0 121.7,168.0 92.2,151.0" fill="var(--iso-green-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="283.6,193.5 313.1,210.5 313.1,176.5 283.6,159.5" fill="var(--c-sky)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="342.5,193.5 313.1,210.5 313.1,176.5 342.5,159.5" fill="var(--iso-sky-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="313.1,142.5 342.5,159.5 313.1,176.5 283.6,159.5" fill="var(--iso-sky-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="115.8,215.6 133.4,225.8 133.4,178.2 115.8,168.0" fill="var(--iso-green-mid)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="151.1,215.6 133.4,225.8 133.4,178.2 151.1,168.0" fill="var(--iso-green-dark)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="133.4,157.8 151.1,168.0 133.4,178.2 115.8,168.0" fill="var(--iso-green-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="180.6,219.0 210.0,236.0 210.0,202.0 180.6,185.0" fill="var(--iso-hi-left)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="239.4,219.0 210.0,236.0 210.0,202.0 239.4,185.0" fill="var(--iso-hi-right)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,168.0 239.4,185.0 210.0,202.0 180.6,185.0" fill="var(--iso-hi-top)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="180.6,185.0 210.0,202.0 210.0,168.0 180.6,151.0" fill="var(--iso-hi-left)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="239.4,185.0 210.0,202.0 210.0,168.0 239.4,151.0" fill="var(--iso-hi-right)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,134.0 239.4,151.0 210.0,168.0 180.6,151.0" fill="var(--iso-hi-top)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="215.9,246.2 245.3,263.2 245.3,242.8 215.9,225.8" fill="var(--iso-left)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="274.8,246.2 245.3,263.2 245.3,242.8 274.8,225.8" fill="var(--iso-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="245.3,208.8 274.8,225.8 245.3,242.8 215.9,225.8" fill="var(--iso-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/></svg></section>
+  <section><h2>Ramps</h2>
+    <p class="label">neutral</p><div class="swatches" title="neutral"><div style="background:var(--neutral-50)" title="neutral-50"></div><div style="background:var(--neutral-100)" title="neutral-100"></div><div style="background:var(--neutral-200)" title="neutral-200"></div><div style="background:var(--neutral-300)" title="neutral-300"></div><div style="background:var(--neutral-400)" title="neutral-400"></div><div style="background:var(--neutral-500)" title="neutral-500"></div><div style="background:var(--neutral-600)" title="neutral-600"></div><div style="background:var(--neutral-700)" title="neutral-700"></div><div style="background:var(--neutral-800)" title="neutral-800"></div><div style="background:var(--neutral-900)" title="neutral-900"></div><div style="background:var(--neutral-950)" title="neutral-950"></div></div><p class="label">blue</p><div class="swatches" title="blue"><div style="background:var(--blue-50)" title="blue-50"></div><div style="background:var(--blue-100)" title="blue-100"></div><div style="background:var(--blue-200)" title="blue-200"></div><div style="background:var(--blue-300)" title="blue-300"></div><div style="background:var(--blue-400)" title="blue-400"></div><div style="background:var(--blue-500)" title="blue-500"></div><div style="background:var(--blue-600)" title="blue-600"></div><div style="background:var(--blue-700)" title="blue-700"></div><div style="background:var(--blue-800)" title="blue-800"></div><div style="background:var(--blue-900)" title="blue-900"></div><div style="background:var(--blue-950)" title="blue-950"></div></div><p class="label">amber</p><div class="swatches" title="amber"><div style="background:var(--amber-50)" title="amber-50"></div><div style="background:var(--amber-100)" title="amber-100"></div><div style="background:var(--amber-200)" title="amber-200"></div><div style="background:var(--amber-300)" title="amber-300"></div><div style="background:var(--amber-400)" title="amber-400"></div><div style="background:var(--amber-500)" title="amber-500"></div><div style="background:var(--amber-600)" title="amber-600"></div><div style="background:var(--amber-700)" title="amber-700"></div><div style="background:var(--amber-800)" title="amber-800"></div><div style="background:var(--amber-900)" title="amber-900"></div><div style="background:var(--amber-950)" title="amber-950"></div></div><p class="label">green</p><div class="swatches" title="green"><div style="background:var(--green-50)" title="green-50"></div><div style="background:var(--green-100)" title="green-100"></div><div style="background:var(--green-200)" title="green-200"></div><div style="background:var(--green-300)" title="green-300"></div><div style="background:var(--green-400)" title="green-400"></div><div style="background:var(--green-500)" title="green-500"></div><div style="background:var(--green-600)" title="green-600"></div><div style="background:var(--green-700)" title="green-700"></div><div style="background:var(--green-800)" title="green-800"></div><div style="background:var(--green-900)" title="green-900"></div><div style="background:var(--green-950)" title="green-950"></div></div><p class="label">coral</p><div class="swatches" title="coral"><div style="background:var(--coral-50)" title="coral-50"></div><div style="background:var(--coral-100)" title="coral-100"></div><div style="background:var(--coral-200)" title="coral-200"></div><div style="background:var(--coral-300)" title="coral-300"></div><div style="background:var(--coral-400)" title="coral-400"></div><div style="background:var(--coral-500)" title="coral-500"></div><div style="background:var(--coral-600)" title="coral-600"></div><div style="background:var(--coral-700)" title="coral-700"></div><div style="background:var(--coral-800)" title="coral-800"></div><div style="background:var(--coral-900)" title="coral-900"></div><div style="background:var(--coral-950)" title="coral-950"></div></div>
+  </section>
+</div>
+<div class="mode mode-light">
+  <header><img src="../inputs/svs-logo-black-text.svg" alt="Silicon Valley Services">
+    <nav><b>Services</b><span>Work</span><span>About</span></nav></header>
+  <div class="hero">
+    <p class="eyebrow">Managed IT · light mode</p>
+    <h1>Your IT, handled.<br>Before it breaks.</h1>
+    <p class="lead">We watch your systems day and night. You get one team and one number to call.</p>
+    <div class="btns"><button class="btn btn-primary">Book a call <span class="kbd">F</span></button><button class="btn btn-ghost">See plans</button></div>
+  </div>
+  <section class="band"><h2>Plans</h2>
+    <div class="cards">
+      <div class="card"><div class="tile">1</div><h3>Help desk</h3><p>Real people answer. Most fixes in an hour.</p></div>
+      <div class="card sel"><div class="tile">2</div><h3>Full care</h3><p>Help desk, security and backups in one plan.</p></div>
+      <div class="card"><div class="tile">3</div><h3>Projects</h3><p>Moves, new offices and cloud work.</p></div>
+    </div></section>
+  <section><h2>Chips</h2><div class="chips"><span class="chip on">Selected</span><span class="chip">Default</span><span class="chip sky">Info</span><span class="chip ok">Online</span></div></section>
+  <section><h2>Status</h2><div class="msgs">
+    <div class="msg info"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 9v5M10 6v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Info: maintenance on Sunday at 2 am.</span></div>
+    <div class="msg ok"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="currentColor"/><path d="M6 10l3 3 5-6" fill="none" stroke="var(--c-bg)" stroke-width="2"/></svg><span>Online: all 42 devices backed up.</span></div>
+    <div class="msg alert"><svg viewBox="0 0 20 20"><path d="M10 2l9 16H1z" fill="currentColor"/><path d="M10 8v4M10 14.5v.5" stroke="var(--c-bg)" stroke-width="2" stroke-linecap="round"/></svg><span>Error: one laptop missed its backup.</span></div>
+  </div>
+    <p class="label">Input (focus it)</p><input class="input" placeholder="Work email">
+  </section>
+  <section class="band"><h2>Dialog</h2><div class="dialog"><b>Saved.</b> <span style="color:var(--c-muted)">We will call you back today.</span></div></section>
+  <section><h2>Isometric</h2><svg viewBox="0 0 420 330" class="iso" role="img" aria-label="Isometric test scene"><polygon points="210.0,100.0 386.7,202.0 210.0,304.0 33.3,202.0" fill="var(--iso-ground)"/><line x1="239.4" y1="117.0" x2="62.8" y2="219.0" stroke="var(--iso-grid)"/><line x1="180.6" y1="117.0" x2="357.2" y2="219.0" stroke="var(--iso-grid)"/><line x1="268.9" y1="134.0" x2="92.2" y2="236.0" stroke="var(--iso-grid)"/><line x1="151.1" y1="134.0" x2="327.8" y2="236.0" stroke="var(--iso-grid)"/><line x1="298.3" y1="151.0" x2="121.7" y2="253.0" stroke="var(--iso-grid)"/><line x1="121.7" y1="151.0" x2="298.3" y2="253.0" stroke="var(--iso-grid)"/><line x1="327.8" y1="168.0" x2="151.1" y2="270.0" stroke="var(--iso-grid)"/><line x1="92.2" y1="168.0" x2="268.9" y2="270.0" stroke="var(--iso-grid)"/><line x1="357.2" y1="185.0" x2="180.6" y2="287.0" stroke="var(--iso-grid)"/><line x1="62.8" y1="185.0" x2="239.4" y2="287.0" stroke="var(--iso-grid)"/><polygon points="268.9,168.0 304.2,188.4 274.8,205.4 239.4,185.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="342.5,193.5 357.2,202.0 327.8,219.0 313.1,210.5" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="151.1,185.0 165.8,193.5 136.4,210.5 121.7,202.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="239.4,219.0 254.2,227.5 224.7,244.5 210.0,236.0" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="274.8,246.2 283.6,251.3 254.2,268.3 245.3,263.2" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="151.1,215.6 171.7,227.5 154.1,237.7 133.4,225.8" fill="var(--iso-shadow)" fill-opacity="0.35"/><polygon points="180.6,151.0 239.4,185.0 239.4,103.4 180.6,69.4" fill="var(--iso-left)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="268.9,168.0 239.4,185.0 239.4,103.4 268.9,86.4" fill="var(--iso-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,52.4 268.9,86.4 239.4,103.4 180.6,69.4" fill="var(--iso-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="261.5,155.2 246.8,163.8 246.8,151.8 261.5,143.3" fill="var(--iso-window)"/><polygon points="261.5,134.8 246.8,143.3 246.8,131.4 261.5,122.9" fill="var(--iso-light)"/><polygon points="261.5,114.5 246.8,123.0 246.8,111.1 261.5,102.6" fill="var(--iso-window)"/><polygon points="92.2,185.0 121.7,202.0 121.7,168.0 92.2,151.0" fill="var(--iso-green-mid)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="151.1,185.0 121.7,202.0 121.7,168.0 151.1,151.0" fill="var(--iso-green-dark)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="121.7,134.0 151.1,151.0 121.7,168.0 92.2,151.0" fill="var(--iso-green-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="283.6,193.5 313.1,210.5 313.1,176.5 283.6,159.5" fill="var(--c-sky)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="342.5,193.5 313.1,210.5 313.1,176.5 342.5,159.5" fill="var(--iso-sky-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="313.1,142.5 342.5,159.5 313.1,176.5 283.6,159.5" fill="var(--iso-sky-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="115.8,215.6 133.4,225.8 133.4,178.2 115.8,168.0" fill="var(--iso-green-mid)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="151.1,215.6 133.4,225.8 133.4,178.2 151.1,168.0" fill="var(--iso-green-dark)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="133.4,157.8 151.1,168.0 133.4,178.2 115.8,168.0" fill="var(--iso-green-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="180.6,219.0 210.0,236.0 210.0,202.0 180.6,185.0" fill="var(--iso-hi-left)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="239.4,219.0 210.0,236.0 210.0,202.0 239.4,185.0" fill="var(--iso-hi-right)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,168.0 239.4,185.0 210.0,202.0 180.6,185.0" fill="var(--iso-hi-top)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="180.6,185.0 210.0,202.0 210.0,168.0 180.6,151.0" fill="var(--iso-hi-left)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="239.4,185.0 210.0,202.0 210.0,168.0 239.4,151.0" fill="var(--iso-hi-right)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="210.0,134.0 239.4,151.0 210.0,168.0 180.6,151.0" fill="var(--iso-hi-top)" stroke="var(--iso-hi-edge)" stroke-opacity="0.5" stroke-width="1" stroke-linejoin="round"/><polygon points="215.9,246.2 245.3,263.2 245.3,242.8 215.9,225.8" fill="var(--iso-left)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="274.8,246.2 245.3,263.2 245.3,242.8 274.8,225.8" fill="var(--iso-right)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/><polygon points="245.3,208.8 274.8,225.8 245.3,242.8 215.9,225.8" fill="var(--iso-top)" stroke="var(--iso-edge)" stroke-opacity="0.3" stroke-width="1" stroke-linejoin="round"/></svg></section>
+  <section><h2>Ramps</h2>
+    <p class="label">neutral</p><div class="swatches" title="neutral"><div style="background:var(--neutral-50)" title="neutral-50"></div><div style="background:var(--neutral-100)" title="neutral-100"></div><div style="background:var(--neutral-200)" title="neutral-200"></div><div style="background:var(--neutral-300)" title="neutral-300"></div><div style="background:var(--neutral-400)" title="neutral-400"></div><div style="background:var(--neutral-500)" title="neutral-500"></div><div style="background:var(--neutral-600)" title="neutral-600"></div><div style="background:var(--neutral-700)" title="neutral-700"></div><div style="background:var(--neutral-800)" title="neutral-800"></div><div style="background:var(--neutral-900)" title="neutral-900"></div><div style="background:var(--neutral-950)" title="neutral-950"></div></div><p class="label">blue</p><div class="swatches" title="blue"><div style="background:var(--blue-50)" title="blue-50"></div><div style="background:var(--blue-100)" title="blue-100"></div><div style="background:var(--blue-200)" title="blue-200"></div><div style="background:var(--blue-300)" title="blue-300"></div><div style="background:var(--blue-400)" title="blue-400"></div><div style="background:var(--blue-500)" title="blue-500"></div><div style="background:var(--blue-600)" title="blue-600"></div><div style="background:var(--blue-700)" title="blue-700"></div><div style="background:var(--blue-800)" title="blue-800"></div><div style="background:var(--blue-900)" title="blue-900"></div><div style="background:var(--blue-950)" title="blue-950"></div></div><p class="label">amber</p><div class="swatches" title="amber"><div style="background:var(--amber-50)" title="amber-50"></div><div style="background:var(--amber-100)" title="amber-100"></div><div style="background:var(--amber-200)" title="amber-200"></div><div style="background:var(--amber-300)" title="amber-300"></div><div style="background:var(--amber-400)" title="amber-400"></div><div style="background:var(--amber-500)" title="amber-500"></div><div style="background:var(--amber-600)" title="amber-600"></div><div style="background:var(--amber-700)" title="amber-700"></div><div style="background:var(--amber-800)" title="amber-800"></div><div style="background:var(--amber-900)" title="amber-900"></div><div style="background:var(--amber-950)" title="amber-950"></div></div><p class="label">green</p><div class="swatches" title="green"><div style="background:var(--green-50)" title="green-50"></div><div style="background:var(--green-100)" title="green-100"></div><div style="background:var(--green-200)" title="green-200"></div><div style="background:var(--green-300)" title="green-300"></div><div style="background:var(--green-400)" title="green-400"></div><div style="background:var(--green-500)" title="green-500"></div><div style="background:var(--green-600)" title="green-600"></div><div style="background:var(--green-700)" title="green-700"></div><div style="background:var(--green-800)" title="green-800"></div><div style="background:var(--green-900)" title="green-900"></div><div style="background:var(--green-950)" title="green-950"></div></div><p class="label">coral</p><div class="swatches" title="coral"><div style="background:var(--coral-50)" title="coral-50"></div><div style="background:var(--coral-100)" title="coral-100"></div><div style="background:var(--coral-200)" title="coral-200"></div><div style="background:var(--coral-300)" title="coral-300"></div><div style="background:var(--coral-400)" title="coral-400"></div><div style="background:var(--coral-500)" title="coral-500"></div><div style="background:var(--coral-600)" title="coral-600"></div><div style="background:var(--coral-700)" title="coral-700"></div><div style="background:var(--coral-800)" title="coral-800"></div><div style="background:var(--coral-900)" title="coral-900"></div><div style="background:var(--coral-950)" title="coral-950"></div></div>
+  </section>
+</div>
+</div>
+</body></html>

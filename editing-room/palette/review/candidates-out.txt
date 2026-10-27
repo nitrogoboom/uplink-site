@@ -1,0 +1,37 @@
+dark alert candidates
+#FB817A 0.74 0.15 25 bg 7.13/53 solid 5.61/50  acc dE normal 12.6 protan 12.9 deutan 9.5 tritan 9.0  ok dE 25.8 23.3 13.9 29.7
+#FA887D 0.75 0.14 27 bg 7.43/55 solid 5.84/51  acc dE normal 11.4 protan 11.6 deutan 8.8 tritan 7.3  ok dE 24.4 21.8 13.0 28.2
+#FF8785 0.76 0.15 22 bg 7.57/56 solid 5.96/52  acc dE normal 12.2 protan 12.2 deutan 8.9 tritan 7.5  ok dE 24.8 21.5 12.1 28.3
+#F97770 0.72 0.16 25 bg 6.61/49 solid 5.20/46  acc dE normal 14.1 protan 14.6 deutan 10.6 tritan 11.3  ok dE 27.7 25.9 15.8 31.9
+#FC928A 0.77 0.13 25 bg 8.04/58 solid 6.33/55  acc dE normal 10.5 protan 10.6 deutan 8.3 tritan 4.9  ok dE 22.5 19.1 10.8 25.8
+light accent-text candidates
+#8E5308 0.5 0.11 64 bg 5.75 band 5.20 surf2 5.30/69 solid 6.19
+#925512 0.51 0.11 62 bg 5.52 band 5.00 surf2 5.09/68 solid 5.95
+#8B5510 0.5 0.105 66 bg 5.73 band 5.18 surf2 5.28/69 solid 6.17
+#88520A 0.49 0.105 66 bg 5.98 band 5.42 surf2 5.52/70 solid 6.45
+light alert candidates vs accent-text #8B5510
+#9E2D28 0.47 0.15 27 band 6.17  acc nor 9.9 pro 8.5 deu 3.2 tri 8.7  ok 23.8 0.7 11.8 27.3
+#972527 0.45 0.15 25 band 6.76  acc nor 11.1 pro 10.7 deu 5.3 tri 8.9  ok 23.2 2.7 9.7 26.2
+#B24438 0.535 0.146 29 band 4.67  acc nor 9.5 pro 4.4 deu 4.2 tri 8.7  ok 26.5 6.5 17.8 29.8
+#A5292B 0.48 0.16 25 band 5.98  acc nor 10.8 pro 8.5 deu 2.5 tri 9.0  ok 25.2 0.3 12.7 28.4
+#9E212C 0.46 0.16 22 band 6.52  acc nor 11.8 pro 10.7 deu 4.4 tri 8.8  ok 24.7 2.4 10.6 27.3
+light ok candidates
+#004F2E band 8.18  vs alert 23.8 0.7 11.8 27.3  vs acc-t 18.6 8.4 14.9 21.2  vs sky 15.0 9.3
+#036639 band 5.95  vs alert 23.5 8.2 5.3 26.9  vs acc-t 15.9 4.1 8.4 19.3  vs sky 14.3 2.9
+#1F6F3D band 5.19  vs alert 23.2 11.3 3.4 27.3  vs acc-t 14.8 5.3 6.0 19.3  vs sky 15.0 2.7
+edges
+dark 0.4 bg 3.61 solid 3.37 surf 3.51
+dark 0.42 bg 3.85 solid 3.56 surf 3.73
+dark 0.44 bg 4.10 solid 3.76 surf 3.95
+dark 0.46 bg 4.36 solid 3.97 surf 4.18
+light 0.5 bg 2.91 band 2.83 solid 2.97
+light 0.54 bg 3.23 band 3.13 solid 3.31
+light 0.58 bg 3.60 band 3.48 solid 3.70
+light fill #FFAD51 ink 9.49/68, fill vs bg 1.72, dE 22.4
+light tint 0.14 acc-text on tint 5.30 text 15.09
+light tint 0.18 acc-text on tint 5.18 text 14.76
+light tint 0.22 acc-text on tint 5.07 text 14.43
+blue ['0.81', '0.64', '0.46'] right~ground 49.4 top~ground 14.3
+green ['0.81', '0.64', '0.46'] right~ground 49.6 top~ground 17.0
+amber ['0.88', '0.81', '0.63'] right~ground 34.1 top~ground 11.3
+box ['1.00', '0.88', '0.81'] right~ground 13.0 top~ground 6.1
