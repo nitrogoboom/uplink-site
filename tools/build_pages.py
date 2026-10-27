@@ -29,8 +29,8 @@ becomes it, and so do the links in the files the build writes:
     and description and the service cards on the home page (Home links to index.md)
   - site/agents.md and site/index.md (the home page as Markdown): written by
     hand in src/agents.md and src/index.md, with {site} filled in
-  - the Early Hints block in site/_headers (HINTS below): the five
-    first-screen fonts, sent before each page
+  - the Early Hints block in site/_headers (HINTS below): the three
+    fonts every first screen uses, sent before each page
   - JSON-LD in the <head> of Services, Our work, About and Contact (structured()):
     breadcrumbs and the page type, plus each service and the FAQ on Services, read
     from the page itself. Home's business block is written by hand in its page.html.
@@ -60,8 +60,10 @@ NOTE = re.compile(r'<!---.*?--->\n?|/\*---.*?---\*/\n?', re.S)
 SITE_URL = os.environ.get('SITE_URL', 'https://uplink-site-4p8.pages.dev').rstrip('/')
 
 # Early Hints: sent as a 103 before every page, in this order. They match the font preloads in each page.html.
-# Every page's first screen uses these five faces (checked in Chrome on all pages, phone and desktop).
-FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600', 'barlow-condensed-700', 'barlow-condensed-600-italic']
+# Every page's first screen uses these three faces, phone and desktop (checked in Chrome on all pages, 27 Oct 2026).
+# The nav tabs' Barlow Condensed 600 italic shows from 700px wide, so page.html preloads it with that media query
+# and it is not hinted here (a phone would fetch it first, ahead of the hero picture). Anything else loads when used.
+FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600']
 HINTS = [f'</assets/fonts/{f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin' for f in FIRST_FONTS]
 HERO = 'assets/img/hero-office.svg'
 # schema.org type of each inner page; each one's JSON-LD points at Home's business block by this @id
