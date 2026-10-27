@@ -39,6 +39,7 @@ def deploy(branch):
 
 
 def main():
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # wrangler prints emoji; a Windows console can't
     step([sys.executable, 'tools/build_pages.py', '--check'])
     step([sys.executable, 'tools/stamp.py', 'site', '--check'])
     if '--no-gate' not in sys.argv:
