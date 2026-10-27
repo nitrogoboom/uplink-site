@@ -19,3 +19,8 @@
   Cache-Control: public, max-age=31536000, immutable
 /assets/js/*
   Cache-Control: public, max-age=31536000, immutable
+
+# Images keep their names when redrawn (no ?v= stamp), so a short cache: a day fresh, then served from cache
+# for up to a week while the browser checks for a newer copy in the background.
+/assets/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

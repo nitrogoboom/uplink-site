@@ -65,7 +65,7 @@
 <link rel="stylesheet" href="assets/css/site.css?v=7eb6a27c">
 <script src="assets/js/core.js?v=440ab45f" defer></script>
 <script src="assets/js/footer.js?v=2910a3f7" defer></script>
-<script src="assets/js/home.js?v=990f13ae" defer></script>
+<script src="assets/js/home.js?v=6034a1df" defer></script>
 </head>
 <body data-page="home">
 <a class="skip-link" href="#main">Skip to content</a>
@@ -954,7 +954,8 @@
 <g class="ob-i ob-fade ob-sync" style="--d:2960ms"><polyline class="ob-flow" style="animation-delay:calc(var(--d,0ms) + 470ms),0s" points="1040.2,91.0 1040.2,180.4" fill="none" stroke="#7DB9E8" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
 <g class="ob-i ob-fade ob-sync" style="--d:2960ms"><polyline class="ob-flow" style="animation-delay:calc(var(--d,0ms) + 560ms),0s" points="1122.5,138.5 1122.5,227.9" fill="none" stroke="#7DB9E8" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
 </svg>
-        <img class="hero-still" src="assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800">
+        <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still -->
+        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" src="assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture>
       </div>
       <div class="hero-dock">
         <a class="card news" href="contact#message" data-open="book-dialog">

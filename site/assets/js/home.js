@@ -129,6 +129,7 @@
     reduceMotion.addEventListener('change', start);
     // off screen: no timer, and the looping animations pause
     whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
+    whenOnScreen(document.querySelector('svg.ob-over'));   // the moving dashes' own layer (1-hero-flows.svg)
     show(0);
     start();
   }
