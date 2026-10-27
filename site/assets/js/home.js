@@ -82,6 +82,15 @@
       const pts = t.querySelector('.f-t').getAttribute('points').trim().split(/\s+/).map((p) => p.split(',').map(Number));
       return { x: pts.reduce((a, p) => a + p[0], 0) / pts.length, y: pts.reduce((a, p) => a + p[1], 0) / pts.length };
     };
+    // The state word is right-aligned, so the dot before it moves with the word's width.
+    // The browser reports the new size after its own layout pass (ResizeObserver), so
+    // nothing is measured straight after the text changes (that would force a layout).
+    // For SVG it reports only the size, so: the word's right edge (its x) minus its width.
+    const dot = svg.querySelector('.ob-state-dot');
+    if (dot && 'ResizeObserver' in window) {
+      const right = +stateText.parentNode.getAttribute('x');
+      new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1))).observe(stateText.parentNode);
+    }
     let index = -1;
     let timer = 0;
     let swap = 0;
@@ -113,11 +122,6 @@
         stateText.textContent = app.state.toUpperCase();
         detailText.textContent = app.detail;
         focus.classList.remove('is-out');
-        const sd = svg.querySelector('.ob-state-dot');
-        const place = () => { const b = stateText.getBBox(); sd.setAttribute('cx', b.x - 10); };
-        // on page load the dot is already in place: hero_cloud.svg starts it beside the first state (ONLINE).
-        // Measuring during load would force an extra layout pass.
-        if (sd && !first) place();
       };
       window.clearTimeout(swap);
       if (first || reduceMotion.matches) { write(); return; }

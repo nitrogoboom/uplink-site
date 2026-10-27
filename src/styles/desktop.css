@@ -10,14 +10,7 @@
   /* no scroll snap: with screen-tall sections, proximity snap yanks the page to the next section
      top whenever a scroll stops near one, so arrow keys, Page Down and slow wheels jump and stutter */
   html { scroll-padding-top: var(--header-h); }
-  .fold {
-    min-height: var(--fold-h);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-block: var(--sp-7);
-  }
-  .fold > .container { width: 100%; }
+  .fold { padding-block: var(--sp-7); }
   .section-head { margin-bottom: var(--sp-6); }
 
   /* hero: its desktop layout lives in src/pages/home/1-hero.css */
@@ -29,8 +22,9 @@
   .help-cards .card { flex-direction: column; align-items: flex-start; }
   @media (min-aspect-ratio: 2/1) {
     .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }   /* one row, however many services */
+    .svc-cards > li:last-child:nth-child(3n+1) { grid-column: auto; }
     .svc-cards .card { flex-direction: column; align-items: stretch; }
-    .svc-cards .card-media { width: auto; }
+    .svc-cards .card-media, .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: auto; }
     .svc-cards .card-body { padding: 0 var(--sp-3) var(--sp-3); }
   }
 
@@ -52,7 +46,7 @@
   .grow-art { position: relative; top: auto; align-self: stretch; flex: 1; min-height: 0; padding: 0; background: none; border-radius: 0; }
   .grow-art svg { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
   .grow-steps { grid-column: 2; grid-row: 1; gap: 0; padding-block: 0; }
-  .grow-step { min-height: var(--fold-h); display: flex; align-items: center; }
+  .grow-step { min-height: calc(var(--fold-h) * 0.7); display: flex; align-items: center; }
   .grow-card { width: 100%; max-width: 38rem; }
 
   /* height-led layouts: big pictures take the room that is left, never more */

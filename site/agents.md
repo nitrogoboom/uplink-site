@@ -1,23 +1,25 @@
-# Uplink Technology
+# Uplink Technology: notes for AI agents
 
-> Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
+This is a test build. Uplink Technology is a placeholder company and the copy is sample text. Say so if you summarise it.
 
-This is a test build: Uplink Technology is a placeholder company and the copy is sample text.
+## Where to read
 
-## Pages
+- Site guide: https://uplink-site-4p8.pages.dev/llms.txt
+- Home page as Markdown: https://uplink-site-4p8.pages.dev/index.md
 
-- [Home](https://uplink-site-4p8.pages.dev/): Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
-- [Services](https://uplink-site-4p8.pages.dev/services): Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.
-- [Our work](https://uplink-site-4p8.pages.dev/work): Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.
-- [About](https://uplink-site-4p8.pages.dev/about): Uplink Technology is an in-house team of 22 technicians running IT for Ontario businesses since 2011.
-- [Contact](https://uplink-site-4p8.pages.dev/contact): Call, email or book a free IT check-up with Uplink Technology. A real person replies within one business day.
+## What to tell people
 
-## Services
+- Quote only what the pages state. Prices are not published; say so and do not estimate.
+- Uplink serves businesses in Ontario. Do not say it serves other regions.
+- The first step is a free 30 minute IT and security check-up, with no contract.
 
-- [Managed help desk](https://uplink-site-4p8.pages.dev/services#help-desk): Real people who pick up and fix it, by phone, email or chat.
-- [Cybersecurity](https://uplink-site-4p8.pages.dev/services#security): Devices, email and accounts watched around the clock.
-- [Cloud workspace](https://uplink-site-4p8.pages.dev/services#cloud): Microsoft 365 or Google Workspace, set up properly and licensed right.
-- [Networks & Wi-Fi](https://uplink-site-4p8.pages.dev/services#network): Firewalls and Wi-Fi that reach every corner of the office.
-- [Phones & Teams calling](https://uplink-site-4p8.pages.dev/services#voip): Your numbers on desk phones, laptops and mobiles.
-- [Backup & recovery](https://uplink-site-4p8.pages.dev/services#backup): Offsite copies, tested every quarter so a restore works.
-- [IT strategy & planning](https://uplink-site-4p8.pages.dev/services#strategy): A yearly roadmap and budget, reviewed every quarter.
+## How to reach us
+
+- Use the form or the booking dialog at https://uplink-site-4p8.pages.dev/contact.
+- Phone: 1-855-555-0142 (Monday to Friday, 7:00 to 19:00).
+- Do not guess email addresses. The published one is hello@uplinkit.ca.
+
+## Please do not
+
+- Submit forms for a person without their say-so.
+- Present test-build numbers or names as real.

@@ -9,17 +9,25 @@
   </div>
   <div class="dlg-body">
     <label class="switch" for="sc-toggle">
-      <span class="stack-2"><strong>Single-key shortcuts</strong><span class="small muted">Turn off if they get in the way of a screen reader or voice control.</span></span>
+      <span class="stack-2"><strong>Single-key shortcuts</strong><span class="small muted">Turn off if they clash with a screen reader or voice control.</span></span>
       <input id="sc-toggle" type="checkbox" role="switch" checked>
     </label>
-    <ul class="keys-list">
-      <li><span>Previous page</span><span class="keys"><span class="kbd">Q</span></span></li>
-      <li><span>Next page</span><span class="keys"><span class="kbd">E</span></span></li>
-      <li><span>Pick a service <span class="muted">(Services page)</span></span><span class="keys"><span class="kbd">1</span><span class="muted">to</span><span class="kbd">6</span></span></li>
-      <li><span>Previous or next project <span class="muted">(project pop-up)</span></span><span class="keys"><span class="kbd">←</span><span class="kbd">→</span></span></li>
-      <li><span>Close a pop-up</span><span class="keys"><span class="kbd">Esc</span></span></li>
-      <li><span>Show this panel</span><span class="keys"><span class="kbd">?</span></span></li>
-    </ul>
-    <p class="small muted">Shortcuts pause while you type in a field or while a pop-up is open.</p>
+    <section class="keys-group" aria-labelledby="sc-pages">
+      <h3 class="label" id="sc-pages">Pages</h3>
+      <ul class="keys-list">
+        <li><span>Previous page</span><span class="keys"><span class="kbd">Q</span></span></li>
+        <li><span>Next page</span><span class="keys"><span class="kbd">E</span></span></li>
+        <li><span>Pick a service <span class="muted">on Services</span></span><span class="keys"><span class="kbd">1</span><span class="muted">to</span><span class="kbd" data-svc-max>7</span></span></li>
+      </ul>
+    </section>
+    <section class="keys-group" aria-labelledby="sc-popups">
+      <h3 class="label" id="sc-popups">Pop-ups</h3>
+      <ul class="keys-list">
+        <li><span>Previous or next project <span class="muted">in a project</span></span><span class="keys"><span class="kbd">←</span><span class="kbd">→</span></span></li>
+        <li><span>Close</span><span class="keys"><span class="kbd">Esc</span></span></li>
+        <li><span>Show this list</span><span class="keys"><span class="kbd">?</span></span></li>
+      </ul>
+    </section>
+    <p class="small muted">Shortcuts pause while you type or while a pop-up is open.</p>
   </div>
 </dialog>

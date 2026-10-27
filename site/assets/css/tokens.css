@@ -118,6 +118,7 @@
   --container:  80rem;
   --gutter:     1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
+  --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
 
   /* ---- depth ----------------------------------------------------------- */
   --shadow-1: 0 12px 32px -12px rgb(0 0 0 / 0.55);
@@ -138,6 +139,9 @@
 }
 
 /* breakpoints: phone < 700, tablet 700-1099, desktop >= 1100 */
+@media (max-width: 699px) {
+  :root { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+}
 @media (min-width: 700px) {
   :root { --gutter: 1.5rem; }
 }

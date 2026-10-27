@@ -24,9 +24,10 @@ The site's own address is SITE_URL (below, or the SITE_URL environment
 variable): `{site}` in a page.html (canonical, og:url, og:image, JSON-LD)
 becomes it, and so do the links in the files the build writes:
   - site/sitemap.xml and site/robots.txt: every page without a noindex tag
-  - site/llms.txt and site/agents.md (same text, as Shopify does): a guide to
-    the site for AI agents, from each page's <title> and description and the
-    service cards on the home page
+  - site/llms.txt: a guide to the site for AI agents, from each page's <title>
+    and description and the service cards on the home page (Home links to index.md)
+  - site/agents.md and site/index.md (the home page as Markdown): written by
+    hand in src/agents.md and src/index.md, with {site} filled in
   - the Early Hints block in site/_headers (HINTS below): the five
     first-screen fonts, sent before each page
 """
@@ -123,7 +124,7 @@ def guide(pages, home):
     out = ['# Uplink Technology', '', '> ' + pages[0]['desc'], '',
            'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.', '',
            '## Pages', '']
-    out += [f"- [{p['name']}]({p['url']}): {p['desc']}" for p in pages]
+    out += [f"- [{p['name']}]({SITE_URL + '/index.md' if p['url'] == SITE_URL + '/' else p['url']}): {p['desc']}" for p in pages]
     out += ['', '## Services', '']
     out += [f'- [{html.unescape(t)}]({SITE_URL}/{href}): {html.unescape(d)}' for href, t, d in cards]
     return '\n'.join(out) + '\n'
@@ -149,7 +150,9 @@ def outputs():
     out[SITE / 'sitemap.xml'] = ('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                                  + ''.join(f"  <url><loc>{p['url']}</loc></url>\n" for p in listed) + '</urlset>\n')
     out[SITE / 'robots.txt'] = f'User-agent: *\nAllow: /\n\nSitemap: {SITE_URL}/sitemap.xml\n'
-    out[SITE / 'llms.txt'] = out[SITE / 'agents.md'] = guide(listed, pages[SITE / 'index.html'])
+    out[SITE / 'llms.txt'] = guide(listed, pages[SITE / 'index.html'])
+    for name in ('agents.md', 'index.md'):   # written by hand in src/; only the address is filled in
+        out[SITE / name] = read(SRC / name).replace('{site}', SITE_URL)
     return out, pages
 
 

@@ -38,7 +38,7 @@
     border-radius: 0;
     place-items: start center;
   }
-  .grow .grow-art svg { width: auto; max-width: 100%; height: 100%; max-height: min(30rem, 62svh); }
+  .grow .grow-art svg { width: auto; max-width: 100%; height: 100%; max-height: min(30rem, 54svh); }
   .grow .grow-steps {
     grid-area: stage;
     position: relative;
@@ -46,8 +46,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 70svh;
-    padding-block: 62svh 34svh;
+    gap: 40svh;
+    padding-block: 60svh 22svh;
   }
   .grow .grow-step { width: 100%; max-width: 34rem; }
   .grow .grow-card {
@@ -59,7 +59,7 @@
 }
 @media (max-width: 699px) {
   .grow .grow-art { --stage-h: calc(100svh - var(--header-h) - var(--botnav-h) - var(--sp-5) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
-  .grow .grow-steps { padding-bottom: 20svh; }
+  .grow .grow-steps { padding-bottom: 12svh; }
 }
 .grow-steps { display: flex; flex-direction: column; gap: var(--sp-5); list-style: none; }
 .grow-card { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-5); transition: border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease); }

@@ -20,6 +20,7 @@
     svcs.forEach((s, i) => $$('[data-svc-n]', s).forEach((c) => { c.textContent = 'Service ' + two(i + 1) + ' of ' + two(svcs.length); }));
     const keys = $('[data-svc-keys]', pickerEl);
     if (keys) keys.textContent = '· press 1 to ' + Math.min(9, svcs.length);
+    $$('[data-svc-max]').forEach((k) => { k.textContent = Math.min(9, svcs.length); });
     const roster = $('[data-roster]', pickerEl);
     if (roster) {
       roster.innerHTML = svcs.map((s, i) => '<li><button class="tile" type="button" data-pick="' + i + '" aria-controls="' + s.id +

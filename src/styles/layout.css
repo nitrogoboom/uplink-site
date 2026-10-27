@@ -11,6 +11,8 @@
 .section { padding-block: var(--section-y); }
 .section--band { background: var(--c-bg-band); border-block: 1px solid var(--c-line); }
 .section--tight { padding-block: var(--sp-7); }
+.fold { min-height: var(--fold-h); display: flex; flex-direction: column; justify-content: center; }
+.fold > .container { width: 100%; }
 
 .section-head {
   display: flex;

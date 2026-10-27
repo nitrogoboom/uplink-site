@@ -6,7 +6,7 @@ This is a test build: Uplink Technology is a placeholder company and the copy is
 
 ## Pages
 
-- [Home](https://uplink-site-4p8.pages.dev/): Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
+- [Home](https://uplink-site-4p8.pages.dev/index.md): Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
 - [Services](https://uplink-site-4p8.pages.dev/services): Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.
 - [Our work](https://uplink-site-4p8.pages.dev/work): Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.
 - [About](https://uplink-site-4p8.pages.dev/about): Uplink Technology is an in-house team of 22 technicians running IT for Ontario businesses since 2011.

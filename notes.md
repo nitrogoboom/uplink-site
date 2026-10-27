@@ -2,6 +2,11 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Merge from home (27 Oct 2026)
+- [ ] Work from the night of 26 Oct (commits `c53ab7d`, `cfaabab`, `4b9b944`) is only on the home PC; it was deployed but never pushed. Branch `rebuild-last-night` rebuilds it from the live deploy so `site/` matches it exactly. At home: push those commits, then merge `rebuild-last-night`; on every clash keep the home version, except `site/assets/js/home.js` (the tower and hero-dot fixes are newer).
+- [ ] Until then, `tools/gen_office.py` here is behind: the hero in `src/pages/home/1-hero-office.svg` and `1-hero-flows.svg` was copied from the live build (GUEST WI-FI label, new desk layout, new timings). Running `gen_office.py` here puts the old hero back.
+- [ ] `src/agents.md` and `src/index.md` were rebuilt as hand-written files. If home generates `index.md` from the home page, keep that instead.
+
 ## Drawings
 - [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
 - [ ] Hero labels: sublines are 21 units now, but on 1024–1180px-wide screens they still render at about 9.5–10px (the drawing is narrow there). Bigger fix: a tablet cut with fewer, larger labels.
@@ -26,7 +31,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
 - [ ] CSP `style-src` needs `'unsafe-inline'`: the build inlines the site CSS in every page (for speed), and the hero has inline `<style>` blocks and `style=""` attributes. To drop it, give the inline CSS a hash in the CSP (the build could write it).
 - [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.
-- [ ] PageSpeed desktop (all 100) still lists an unscored "Forced reflow, unattributed, ~100ms": the browser laying out the ~900-element inline hero drawing during load. Splitting the drawing's static parts into a cached image should clear it.
+- [ ] PageSpeed mobile Performance reads 99 on some runs: simulated LCP 1.9–2.0 s on the phone hero picture (`office-compact.svg`), right on the 99/100 line. Real load is ~0.4 s.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
 - [ ] `src/styles/desktop.css` is still one block for every page (the home hero has moved out to `1-hero.css`). Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).

@@ -5,4 +5,15 @@
 @media (min-width: 1100px) { .svc-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
 .svc-cards > li { display: flex; }
 .svc-cards .card { flex: 1; }
+/* an odd last card spans the row instead of leaving a hole */
+@media (min-width: 700px) and (max-width: 1099px) {
+  .svc-cards > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .svc-cards > li:last-child:nth-child(odd) .card { flex-direction: row; align-items: center; gap: var(--sp-5); }
+  .svc-cards > li:last-child:nth-child(odd) .card-media { flex: none; width: 36%; }
+  .svc-cards > li:last-child:nth-child(odd) .card-body { padding: var(--sp-3) var(--sp-5) var(--sp-3) 0; }
+}
+@media (min-width: 1100px) {
+  .svc-cards > li:last-child:nth-child(3n+1) { grid-column: 1 / -1; }
+  .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: 14%; }
+}
 
