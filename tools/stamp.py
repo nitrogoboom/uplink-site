@@ -15,7 +15,7 @@ import pathlib
 import re
 import sys
 
-ref = re.compile(r'((?:href|src|srcset|data-compact)=")(/?)(assets/(?:css|js|img)/[\w.-]+\.(?:css|js|svg|png))'
+ref = re.compile(r'((?:href|src|srcset|data-compact|data-hero)=")(/?)(assets/(?:css|js|img)/[\w.-]+\.(?:css|js|svg|png))'
                  r'(?:\?([^"#]*))?(#[^"]*)?"')
 
 

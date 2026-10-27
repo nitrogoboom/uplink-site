@@ -5,7 +5,7 @@
 (() => {
   'use strict';
 
-  const { $, $$, reduceMotion, whenOnScreen } = window.Uplink;
+  const { $, $$, html, reduceMotion, whenOnScreen } = window.Uplink;
 
   /* ======================================================================
      Growth story: the building gains floors as you scroll (Home)
@@ -63,12 +63,15 @@
      line runs from the cloud to that app's tile in the floating tray.
      It steps through the apps on a timer; hovering a tile or a bar
      segment picks one. Reduced motion: no timer, no line animation.
-     Phones get the still picture instead (below 600px, compact-cuts.css),
-     so the cloud is set up only once the animated drawing shows.
+     Phones get the still picture instead (below 600px, compact-cuts.css).
+     The animated drawing is its own file (assets/img/hero-office.svg, in the
+     stage's data-hero, preloaded on wide screens), so phones never download
+     it: screens 600px and wider fetch it, put it in ahead of the dashes'
+     layer (svg.ob-over), then start the cloud.
      ------------------------------------------------------------------ */
-  const cloud = document.querySelector('svg.ob .ob-cloud');
+  const stage = $('.hero-art .stage[data-hero]');
   const heroShown = window.matchMedia('(min-width: 600px)');
-  const startCloud = () => {
+  const startCloud = (cloud) => {
     const svg = cloud.ownerSVGElement;
     const APPS = [
       { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
@@ -162,10 +165,20 @@
     show(0);
     start();
   };
-  if (cloud) {
-    if (heroShown.matches) startCloud();
+  const loadHero = () => {
+    window.fetch(stage.dataset.hero)
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+      .then((text) => {
+        stage.insertAdjacentHTML('afterbegin', html(text));
+        const cloud = $('svg.ob .ob-cloud', stage);
+        if (cloud) startCloud(cloud);
+      })
+      .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
+  };
+  if (stage) {
+    if (heroShown.matches) loadHero();
     else {
-      const later = () => { if (!heroShown.matches) return; heroShown.removeEventListener('change', later); startCloud(); };
+      const later = () => { if (!heroShown.matches) return; heroShown.removeEventListener('change', later); loadHero(); };
       heroShown.addEventListener('change', later);
     }
   }

@@ -2,6 +2,8 @@
       Headline, "Get started" button, main menu, office drawing and news cards.
       Drawing: 1-hero-office.svg, plus its moving dashes on their own layer in 1-hero-flows.svg,
       both written by tools/gen_office.py. Don't edit them by hand.
+      The office drawing is not inlined: the build copies it to assets/img/hero-office.svg ({hero}),
+      and home.js puts it in the stage on screens 600px and wider. Without script, office.svg shows.
       Styles: 1-hero.css. Desktop layout: src/styles/desktop.css.
 --->
 <section class="hero fold" id="top" aria-labelledby="hero-title">
@@ -52,8 +54,8 @@
     </div>
 
     <div class="hero-art">
-      <div class="stage">
-        <!-- @include 1-hero-office.svg -->
+      <div class="stage" data-hero="{hero}">
+        <noscript><img class="hero-nojs" src="assets/img/office.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></noscript>
         <!-- @include 1-hero-flows.svg -->
         <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still.
              It is the phone's largest paint, so it is preloaded in page.html and asked for first. -->

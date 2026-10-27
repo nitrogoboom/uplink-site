@@ -6,7 +6,7 @@
 picture { display: contents; }
 .hero-still { display: none; }
 @media (max-width: 599px) {
-  .hero-art .stage svg.ob, .hero-art .stage svg.ob-over { display: none; }
+  .hero-art .stage svg.ob, .hero-art .stage svg.ob-over, .hero-art .stage .hero-nojs { display: none; }
   .hero-art .stage .hero-still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 }
 

@@ -29,6 +29,10 @@ becomes it, and so do the links in the files the build writes:
     hand in src/agents.md and src/index.md, with {site} filled in
   - the Early Hints block in site/_headers (HINTS below): the five
     first-screen fonts, sent before each page
+The home hero drawing (src/pages/home/1-hero-office.svg) is not inlined: it is
+copied to site/assets/img/hero-office.svg, and `{hero}` in the home page (the
+stage's data-hero and its preload) becomes that address; stamp.py stamps both.
+home.js fetches it on screens 600px and wider; phones show the still picture.
 """
 import html
 import os
@@ -53,6 +57,7 @@ SITE_URL = os.environ.get('SITE_URL', 'https://uplink-site-4p8.pages.dev').rstri
 # Every page's first screen uses these five faces (checked in Chrome on all pages, phone and desktop).
 FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600', 'barlow-condensed-700', 'barlow-condensed-600-italic']
 HINTS = [f'</assets/fonts/{f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin' for f in FIRST_FONTS]
+HERO = 'assets/img/hero-office.svg'
 STYLESHEET = re.compile(r'<link rel="stylesheet" href="/?assets/css/site\.css(?:\?v=\w+)?">')
 HINTS_BLOCK = re.compile(r'(# @early-hints[^\n]*\n).*?(# @end early-hints\n)', re.S)
 
@@ -129,11 +134,12 @@ def outputs():
     css = minify_css(read(SITE / 'assets/css/tokens.css') + '\n' + expand(SRC / 'styles/site.css'))
     out = {SITE / 'assets/css/site.css': css}
     inline = '<style>' + css.strip().replace("url('../", "url('/assets/") + '</style>'   # font paths from the page, at any depth
+    out[SITE / HERO] = read(SRC / 'pages/home/1-hero-office.svg')
     pages, paths, info = {}, [], []
     order = {key: i for i, (key, _) in enumerate(TABS)}
     for folder in sorted((SRC / 'pages').iterdir(), key=lambda f: (order.get(f.name, len(TABS)), f.name)):
         if (folder / 'page.html').exists():
-            text = build_page(folder).replace('{site}', SITE_URL)
+            text = build_page(folder).replace('{site}', SITE_URL).replace('{hero}', HERO)
             text = STYLESHEET.sub(lambda m: inline, stamp_text(SITE, text))
             pages[SITE / ('index.html' if folder.name == 'home' else folder.name + '.html')] = text
             if folder.name != '404':   # served at any path, so no rule can name it
@@ -160,6 +166,10 @@ def headers(paths):
 
 if __name__ == '__main__':
     check = '--check' in sys.argv
+    if not check:   # the pages' stamps hash the hero file on disk, so it goes first
+        hero = read(SRC / 'pages/home/1-hero-office.svg')
+        if not (SITE / HERO).exists() or read(SITE / HERO) != hero:
+            (SITE / HERO).write_text(hero, encoding='utf-8', newline='')
     files, pages = outputs()
     stale = []
     for f, text in {**files, **pages}.items():
