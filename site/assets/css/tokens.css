@@ -65,8 +65,8 @@
   --iso-shadow:     #000;     /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
-  --font-display: 'Barlow Condensed', 'Roboto Condensed', 'Arial Narrow', sans-serif;
-  --font-body:    'Barlow', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow Condensed Fallback', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+  --font-body:    'Barlow', 'Barlow Fallback', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* 8-step scale */
   --fs-1: 0.75rem;    /* 12  labels, key caps */

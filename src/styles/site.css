@@ -11,6 +11,7 @@
    these files into site/assets/css/site.css. Order matters: later files win
    a tie. Colours, sizes and timings come from site/assets/css/tokens.css.
    Page CSS sits next to its section in src/pages/. ---*/
+/* @include fonts.css */
 /* @include base.css */
 /* @include layout.css */
 /* @include type.css */

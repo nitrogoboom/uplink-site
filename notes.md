@@ -26,7 +26,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
 - [ ] CSP `style-src` needs `'unsafe-inline'` because of the hero's inline `<style>` blocks and `style=""` attributes. Drop it once they move into CSS.
 - [ ] Unused CSS classes: `btn--block`, `dlg-close`, `num`, `section--tight`, `tk-1`, `tk-2`, `tk-3`.
-- [ ] Self-host the Barlow fonts instead of loading Google Fonts.
 - [ ] `src/styles/desktop.css` is still one block for every page (the home hero has moved out to `1-hero.css`). Split it per section (each with its own `@media`) and move each piece next to its section; check computed styles match after.
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
