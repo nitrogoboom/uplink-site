@@ -33,10 +33,10 @@ Python 3.10+ and Node 18+.
   - `assets/js/` – `core.js` and `footer.js` on every page, plus one script per page (`home.js`, `services.js`, `work.js`, `contact.js`, `soon.js`) loaded only there. The file list and keyboard map are at the top of `core.js`.
   - Links between pages have no `.html` (`services#voip`, home is `./`), and so do canonical tags and `sitemap.xml`. Keep it that way: Cloudflare redirects `work.html` to `work`.
   - The site's address is set once: `SITE_URL` in `tools/build_pages.py` (now the test address, https://uplink-site-4p8.pages.dev; set the real domain at launch, or run the build with a `SITE_URL` environment variable). `{site}` in each `page.html` (canonical, Open Graph, `og:image`, JSON-LD) becomes it, and the build writes `robots.txt`, `sitemap.xml`, `llms.txt` and `agents.md` from it. Don't hand-edit those four.
-  - `llms.txt` and `agents.md` (same text, as Shopify does): a short Markdown guide to the site for AI agents, built from each page's title and description and the service cards on the home page.
+  - `llms.txt`: a short Markdown guide to the site for AI agents, built from each page's title and description and the service cards on the home page. `agents.md` (notes for AI agents) and `index.md` (the home page as Markdown) are written by hand in `src/`; the build fills in the address.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
-- `tools/` – the scripts used for the precision pass on the illustrations and the footer (Python + Playwright). Run them from the project root.
+- `tools/` – the build, the drawing scripts and their checks (Python + Playwright). Run them from the project root. `tools/retired/` holds old tools waiting to be deleted (see its README).
 
 ## Adding a service
 
@@ -82,22 +82,16 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `isoprops.py` – shared kit: office chair, monitor on a stand (with `screen_glass` / `app_window` for its screen), VoIP desk phone, and `on_front` / `on_side` / `on_top` for drawing flat details exactly on an iso face. Props sit on a grid (x, y in 0.25s, z in 0.125s) so their parts can never nearly-touch; keep the scene around them on the same grid.
 - Compact cuts: every `gen_*.py` (except the tower) also writes `NAME-compact.svg`, the same scene framed closer with fewer, bigger labels (its `COMPACT` settings; `isogen.doc(crop=)`, `label(scale=)`, a `
 ` in a subline wraps it). Pages swap it in with `<picture>` where the drawing shows small (Services below 1200px wide, About and the Work pop-up below 1600px), cards always use `NAME-compact.svg?card#plain` (no labels; the `?card` keeps the browser from reusing the label-less copy elsewhere, since it caches an SVG by address without the `#`), and on phones the home hero shows `office-compact.svg` in place of the animated drawing. When you change a drawing's labels or layout, check its compact cut too.
-- `svgfont.py` / `embed_font.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically; run `python tools/embed_font.py site/assets/img/office.svg` after editing a hand-made SVG with text. Needs `pip install fonttools brotli`.
+- `svgfont.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically. Needs `pip install fonttools brotli`.
 - `check.py file.svg` – edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on
-- `dump.py file.svg ox oy u` – every shape in world terms
-- `boxes.py` / `painter.py` – turn face triples into 3D boxes; find boxes drawn in the wrong order or poking into each other (`rules_office.py` is the rules file for the office drawing)
-- `discs.py`, `floorfit.py` – check floor discs and rings are true iso circles; `roundify.py` rebuilds a floor disc as one (needs `site/` served on port 8765)
-- `shoot1.js`, `shoot.js`, `compare.py` – zoomed screenshots and before/after sheets
-- `verify.js` – checks the hero builds, tiles respond to hover, the tower grows on scroll, and there's no sideways scroll at phone, tablet, 1440×900 and 3440×1440
+- `painter.py` – finds boxes drawn in the wrong order or poking into each other. Each drawing has a `rules_<name>.py`; its first lines give the exact command
 - `build_pages.py` – joins `src/` into `site/*.html` and `site/assets/css/site.css`, with stamps. `--check` (also run by `verify_footer.py`) says if `site/` is out of date
 - `build_footer.py` – writes `src/components/Footer.html` and rebuilds (see above)
 - `gen_og.py site` – the share picture `assets/img/og.png` (1200×630) and `apple-touch-icon.png` (180×180, site root). Screenshots of a small page made from the site's tokens, fonts and `office-compact.svg`; rerun after changing those.
 - `stamp.py site` – cache busting: puts `?v=<hash>` on every CSS and JS link. `build_pages.py` runs it for you; run it yourself after a JS edit; `site/_headers` lets browsers keep those files for a year. `stamp.py site --check` (also run by `verify_footer.py`) says if a stamp is out of date.
-- `verify_footer.py out/` – verify.js checks plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
-- `footer_painter.py url` – painter-order and poke-through check on the boxes the footer map draws. It reads `window.__isoLog`, so add `window.__isoLog && window.__isoLog.push({k, x, y, z, w, d, h, cls})` to `box()` in a local copy first.
-- `fixlib.py` – small helper for exact find-and-replace edits on SVG points
+- `verify_footer.py out/` – the hero builds, tiles respond to hover, the tower grows on scroll, no sideways scroll, plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
 
-Serve `site/` with `python tools/serve.py` before running the JS tools.
+Serve `site/` with `python tools/serve.py` before running `verify_footer.py`.
 
 The one-off fix scripts from the precision pass (`tools/fixes/`) were not kept in the Project, so they are not in this bundle. They were a record only.
 

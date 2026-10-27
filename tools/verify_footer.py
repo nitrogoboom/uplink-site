@@ -1,4 +1,4 @@
-# Python port of tools/verify.js plus footer checks.
+# Site checks: hero, tower, footer and sideways scroll at every size.
 # usage: python tools/verify_footer.py <outdir> [port]   (serve site/ with tools/serve.py first; port 8765 by default)
 import asyncio, subprocess, sys
 from playwright.async_api import async_playwright

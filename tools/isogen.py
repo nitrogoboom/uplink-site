@@ -14,7 +14,7 @@ FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 
 def faces(w, x0, x1, y0, y1, z0, z1, cols=FACES, extra=''):
-    """A box as its (left, right, top) face triple, the order painter.py/boxes.py expect."""
+    """A box as its (left, right, top) face triple, the order painter.py expects."""
     return [f'<polygon points="{pts}" fill="{c}" {EDGE}{extra}/>'
             for pts, c in zip(w.box(x0, x1, y0, y1, z0, z1), cols)]
 
