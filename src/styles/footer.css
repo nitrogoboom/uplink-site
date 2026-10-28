@@ -46,7 +46,7 @@
   margin-inline: calc(var(--sp-2) * -1);
   border-bottom: 1px solid var(--c-line);
   border-radius: var(--r-1) var(--r-1) 0 0;
-  font-family: var(--font-display); font-weight: 600; font-style: italic; text-transform: uppercase;
+  font-family: var(--font-display); font-weight: 600; text-transform: uppercase;
   font-size: var(--fs-5); letter-spacing: 0.01em; line-height: 1.05;
   color: var(--c-text); text-decoration: none;
   transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
@@ -134,7 +134,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-tile[aria-selected="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
 .fc-tile .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
 .fc-tile[aria-selected="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-.fc-tile-n { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: 1; text-transform: uppercase; }
+.fc-tile-n { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: 1; text-transform: uppercase; }
 .fc-tile-c { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: 1; text-transform: uppercase; color: var(--c-muted); }
 .fc-rk {
   display: grid; place-items: center; flex: none;

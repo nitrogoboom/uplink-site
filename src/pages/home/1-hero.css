@@ -67,7 +67,7 @@
 .menu:hover .mi--on:not(:hover) .mi-go,
 .menu:focus-within .mi--on:not(:focus-visible) .mi-go { opacity: 0; }
 .mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
-.mi-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: 1; text-transform: uppercase; }
+.mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); line-height: 1; text-transform: uppercase; }
 .mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
 .mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
 .mi:hover .mi-go, .mi:focus-visible .mi-go, .mi--on .mi-go { opacity: 1; }
@@ -81,7 +81,7 @@
 .news-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
 .news-text .chip { align-self: flex-start; }
-.news-title { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: 1.05; text-transform: uppercase; }
+.news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: 1.05; text-transform: uppercase; }
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */

@@ -8,7 +8,7 @@
   width: var(--control-lg); height: var(--control-lg);
   border-radius: var(--r-3);
   background: var(--c-surface-2);
-  font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6);
+  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6);
   color: var(--c-accent-text);
 }
 .person-name { font-weight: 600; font-size: var(--fs-4); }

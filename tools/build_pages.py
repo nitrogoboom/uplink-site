@@ -60,10 +60,11 @@ NOTE = re.compile(r'<!---.*?--->\n?|/\*---.*?---\*/\n?', re.S)
 SITE_URL = os.environ.get('SITE_URL', 'https://uplink-site-4p8.pages.dev').rstrip('/')
 
 # Early Hints: sent as a 103 before every page, in this order. They match the font preloads in each page.html.
-# Every page's first screen uses these three faces, phone and desktop (checked in Chrome on all pages, 27 Oct 2026).
-# The nav tabs' Barlow Condensed 600 italic shows from 700px wide, so page.html preloads it with that media query
+# Every page's first screen uses these four faces, phone and desktop: titles in 700 italic, buttons and card titles
+# in 700 upright, body 400 and 600 (checked in Chrome on all pages, 28 Oct 2026).
+# The nav tabs' Barlow Condensed 600 (upright) shows from 700px wide, so page.html preloads it with that media query
 # and it is not hinted here (a phone would fetch it first, ahead of the hero picture). Anything else loads when used.
-FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-400', 'barlow-600']
+FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-400', 'barlow-600']
 HINTS = [f'</assets/fonts/{f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin' for f in FIRST_FONTS]
 HERO = 'assets/img/hero-office.svg'
 # schema.org type of each inner page; each one's JSON-LD points at Home's business block by this @id
