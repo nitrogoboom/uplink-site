@@ -2,15 +2,16 @@
 
 Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspired look. Read `README.md` first.
 
-**Where things stand (28 Oct 2026):** the site is built by a small Python build and hosted on Cloudflare Pages. The next job is the move to Astro 7 and Cloudflare Workers; the plan is `review.md`. Until a file says otherwise, the rules below describe the current build and are current. When the Astro move changes a rule, change it here in the same commit.
+**Where things stand (28 Oct 2026, branch `astro`):** the site is moving to Astro 7 in the steps in `review.md` ("Order of work"). Step 1 is done: Astro builds the Home page from `src/pages/index.astro`. The other pages are still in `src/legacy/` (their old HTML parts) until their step. The old Python build (`tools/build_pages.py`, `stamp.py`, `build_footer.py`, `serve.py`, `deploy.py`) no longer runs here and is deleted at step 6; `site/` is kept only as the reference to diff against. When a step changes a rule, change it here in the same commit.
 
-- Pages are edited in `src/` (one folder per page, one file per section; map in `src/README.md`) and built into `site/` with `python tools/build_pages.py`. Never hand-edit `site/*.html` or `site/assets/css/site.css`. Preview: `python tools/serve.py`.
-- All colours, sizes and timings live in `site/assets/css/tokens.css`. Use the tokens, don't hard-code values. Colour roles come from `editing-room/palette/DESIGN.md`.
-- Every illustration is written by a script in `tools/gen_*.py` (hero and tower too: `gen_office.py`, `gen_tower.py` write `src/pages/home/1-hero-office.svg` and `3-grow-tower.svg`). Change the numbers in the script and rerun; don't hand-edit the SVGs. Each script also writes `NAME-compact.svg` (the phone cut, used wherever the drawing shows small); check it when you change a drawing.
+- Dev server: `npm run dev` (http://localhost:4321). Build: `npm run build` → `dist/`. Pages are `src/pages/*.astro`; the shared `<head>`, header, footer and pop-ups are `src/layouts/Base.astro`; one component per section in `src/components/<page>/`, with that section's CSS next to it and imported there. Shared CSS is `src/styles/global.css` (the cascade order) and the files it imports.
+- All colours, sizes and timings live in `src/styles/tokens.css`. Use the tokens, don't hard-code values. Colour roles come from `editing-room/palette/DESIGN.md`.
+- Links are root-relative (`/services`, `/contact#message`), never `services` or `./`.
+- Static files (fonts, drawings, `_headers`, `og.png`, favicon) live in `public/` and are served at the same path. Scripts are ES modules in `src/scripts/` (every page script imports `core.js`); a page adds its own with `<script>import '../scripts/x.js'</script>`.
+- Every illustration is written by a script in `tools/gen_*.py`, output to `public/assets/img/` (run as `python tools/gen_office.py public`). The hero and tower too: `gen_office.py` writes `public/assets/img/hero-office.svg` and `src/components/home/hero-flows.svg`; `gen_tower.py` writes `src/components/home/grow-tower.svg`. Change the numbers in the script and rerun; don't hand-edit the SVGs. Each script also writes `NAME-compact.svg` (the phone cut); check it when you change a drawing.
 - Illustrations are true isometric. Follow "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it.
-- The footer is generated. Edit the lists in `tools/build_footer.py`, then run `python tools/build_footer.py`. Don't hand-edit `src/components/Footer.html`.
-- After any `src/` edit, run `python tools/build_pages.py` (it also stamps). After a JS or image edit, run `python tools/stamp.py site` (updates the `?v=` cache stamps; browsers keep CSS, JS and images for a year). The build bundles `tokens.css` into a minified `site.css`, puts it inline in every page, and writes `sitemap.xml`, `robots.txt`, `llms.txt`, `agents.md` and the Early Hints block in `site/_headers`; don't hand-edit those. The site address is `SITE_URL` in `tools/build_pages.py` (`{site}` in page heads).
-- After layout changes, run `tools/verify_footer.py out/` (needs the server on 8765) and check for no sideways scroll at phone, tablet, 1440×900 and 3440×1440.
+- The footer is `src/components/Footer.astro` (static for now; becomes data-driven at step 3).
+- After layout changes, check for no sideways scroll at phone, tablet, 1440×900 and 3440×1440 (`tools/verify_footer.py out/` does this; it still expects port 8765, to be repointed at the Astro server).
 - Cloudflare: the `cloudflare:*` skills cover Workers, Wrangler and the rest. Hosting details are in README under "Hosting".
 - Style: no "AI slop" tells. No left-side border accents on cards.
 - Copy: short, plain sentences.

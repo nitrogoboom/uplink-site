@@ -1,6 +1,6 @@
 """Draws cloud.svg (Services, Work) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_cloud.py site/assets/img/cloud.svg
+usage: python tools/gen_cloud.py public/assets/img/cloud.svg
 World: 1 unit = 16.31px (one floor-grid square). Origin = floor-disc centre. x runs right-down, y left-down, z up.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (server bays, screens, keys)
 are drawn in 2D on their face and mapped onto it, so they sit exactly in the iso plane.

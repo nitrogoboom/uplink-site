@@ -3,7 +3,7 @@
 Overwatch 2–style website for a made-up IT company, "Uplink Technology".
 Plain HTML, CSS and JS. One small build step: pages are written in parts in `src/` and joined into `site/` by `python tools/build_pages.py` (see `src/README.md`).
 
-**Next: the move to Astro 7.** The plan, the target layout and the order of work are in `review.md`. Until that work starts, everything below describes the current Python build and is current.
+**Branch `astro`: the move to Astro 7 is under way.** The plan, the target layout and the order of work are in `review.md`; `CLAUDE.md` says what is done and how the Astro build works. On this branch: `npm install`, then `npm run dev` (http://localhost:4321) and `npm run build` (writes `dist/`). The Home page is built by Astro; the other pages are still old HTML parts in `src/legacy/` until their step. The sections below about `tools/build_pages.py`, `stamp.py`, `build_footer.py`, `serve.py` and `site/` describe the old build, which no longer runs on this branch; they are rewritten at step 6.
 
 ## Run it on your PC
 

@@ -1,0 +1,17 @@
+---
+// SHARED · Bottom tab bar (phones only, every page). `current` marks the page's tab with aria-current.
+// Styles: src/styles/bottom-nav.css.
+import type { Page } from '../layouts/Base.astro';
+interface Props { current: Page }
+const { current } = Astro.props;
+const cur = (key: Page) => (current === key ? 'page' : undefined);
+---
+<nav class="botnav" aria-label="Main (bottom bar)">
+  <ul>
+    <li><a class="bn" href="/" data-page="home" aria-current={cur('home')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>Home</a></li>
+    <li><a class="bn" href="/services" data-page="services" aria-current={cur('services')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Services</a></li>
+    <li><a class="bn" href="/work" data-page="work" aria-current={cur('work')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/></svg>Work</a></li>
+    <li><a class="bn" href="/about" data-page="about" aria-current={cur('about')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18"/></svg>About</a></li>
+    <li><a class="bn" href="/contact" data-page="contact" aria-current={cur('contact')}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/></svg>Contact</a></li>
+  </ul>
+</nav>

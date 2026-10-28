@@ -1,6 +1,6 @@
 """Draws backup.svg (Services, Work) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_backup.py site/assets/img/backup.svg
+usage: python tools/gen_backup.py public/assets/img/backup.svg
 World: 1 unit = 16.46px. x runs right-down, y left-down, z up. Origin is the back corner of the backup unit's floor.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (drive bays, status panel,
 door, lock) are drawn in 2D on their face with isoprops.on_front / on_side.

@@ -2,17 +2,16 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "astro",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["astro", "dev", "--port", "4321"],
+      "port": 4321
+    },
+    {
       "name": "site",
       "runtimeExecutable": "python",
       "runtimeArgs": ["tools/serve.py", "8765", "site"],
       "port": 8765
-    },
-    {
-      "name": "site-alt",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["tools/serve.py", "8771", "site"],
-      "port": 8771,
-      "autoPort": false
     }
   ]
 }

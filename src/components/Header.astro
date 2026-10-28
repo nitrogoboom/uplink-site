@@ -1,0 +1,43 @@
+---
+// SHARED · Header (every page): logo, page tabs, "Get support" and "Client portal".
+// `current` marks the page's tab with aria-current. Styles: src/styles/header.css.
+import type { Page } from '../layouts/Base.astro';
+interface Props { current: Page }
+const { current } = Astro.props;
+const tabs: [Page, string, string][] = [
+  ['home', '/', 'Home'], ['services', '/services', 'Services'], ['work', '/work', 'Our work'],
+  ['about', '/about', 'About'], ['contact', '/contact', 'Contact'],
+];
+---
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="/" aria-label="Uplink Technology, home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 14l7-7 7 7"/><path d="M8.5 19l3.5-3.5 3.5 3.5"/></svg>
+      </span>
+      <span class="brand-text">
+        <span class="brand-name">Uplink</span>
+        <span class="brand-sub">Technology management</span>
+      </span>
+    </a>
+
+    <nav class="tabs" aria-label="Main">
+      <ul>
+        {tabs.map(([key, href, label]) => (
+          <li><a class="tab" href={href} data-page={key} aria-current={current === key ? 'page' : undefined}>{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="hdr-actions">
+      <a class="hbtn" href="/contact#support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/></svg>
+        <span class="hbtn-text">Get support</span><span class="sr-only"> (existing clients)</span>
+      </a>
+      <a class="hbtn" href="/soon#client-portal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>
+        <span class="hbtn-text">Client portal</span><span class="sr-only"> sign in</span>
+      </a>
+    </div>
+  </div>
+</header>

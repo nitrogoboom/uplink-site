@@ -3,9 +3,10 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Astro move (plan: `review.md`)
-- [ ] Do the move in the order in `review.md` "Order of work": scaffold and Home, the other pages, content collections with one page per service and project, generated files, CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`) and `site/`.
-- [ ] Config to carry over: `build.format: 'file'`, `trailingSlash: 'never'` (keeps today's URLs), `compressHTML: true` (the hero title's space between `</span>` and `<em>` vanishes under the new `'jsx'` default), `site` set to the live address.
-- [ ] Remove `<meta name="claude:viewport-fit-sides">` from every `page.html` (artifact leftover).
+- [ ] Do the move in the order in `review.md` "Order of work" (branch `astro`). Step 1 done 28 Oct: scaffold, `Base.astro`, shared components, Home page, structurally identical to the old `site/index.html`. Next: step 2, the other five pages from `src/legacy/pages/`; then content collections with one page per service and project, generated files (sitemap, llms.txt, JSON-LD from data), CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`), `src/legacy/` and `site/`.
+- [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
+- [ ] `tools/verify_footer.py` and `tools/pagespeed.py` still expect port 8765 and `site/sitemap.xml`; repoint at the Astro dev server / `dist/`.
+- [ ] `src/scripts/*.js` keep `window.Uplink` beside the `Uplink` export so the page scripts share the picker slot; move to proper imports once every page is converted.
 - [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
 - [ ] `og.png` is 257 KB; run it through `oxipng`/`pngquant` in `gen_og.py` (aim for under 100 KB).
 - [ ] Hosting: Cloudflare Pages → Workers static assets (`wrangler.jsonc`, `assets.directory`, `not_found_handling: "404-page"`, `.assetsignore`); the password lock becomes a Worker with `run_worker_first`. Check Early Hints still arrive after the move. The real domain's DNS must be on Cloudflare.
@@ -30,7 +31,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
-- [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
+- [ ] The hero's moving dashes (`hero-flows.svg`) carry 11 inline `style="--d:…"` / `animation-delay` attributes; move them into CSS (needed before the CSP can drop `'unsafe-inline'`).
 - [ ] CSP `style-src` needs `'unsafe-inline'`: the build inlines the site CSS in every page (for speed), and the hero has inline `<style>` blocks and `style=""` attributes. To drop it, give the inline CSS a hash in the CSP (the build could write it).
 - [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.
 - [ ] PageSpeed mobile Performance reads 99 on some runs: simulated LCP 1.9–2.0 s on the phone hero picture (`office-compact.svg`), right on the 99/100 line. Real load is ~0.4 s.
