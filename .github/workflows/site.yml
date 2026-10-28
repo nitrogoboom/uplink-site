@@ -1,6 +1,7 @@
 # Build and check on every push and pull request; deploy to the Cloudflare Worker on main.
-# Needs two repository secrets: CLOUDFLARE_API_TOKEN (a token with "Workers Scripts: Edit") and
-# CLOUDFLARE_ACCOUNT_ID. Without them the deploy step fails and the build still tells you if the site is sound.
+# Deploying needs two secrets in the "cloudflare" environment: CLOUDFLARE_API_TOKEN (a token with
+# "Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID. Until both are set, the deploy and preview jobs are
+# skipped (the run stays green and says "skipped"); the build still tells you if the site is sound.
 # While the Astro move is on its own branch, `astro` deploys too; drop it from the list after the merge.
 name: site
 
@@ -15,7 +16,12 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: cloudflare   # so the step below can see whether the deploy secrets exist
+    outputs:
+      cloudflare: ${{ steps.cf.outputs.ready }}
     steps:
+      - id: cf
+        run: echo "ready=${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0   # the sitemap's lastmod dates come from git history
@@ -34,7 +40,7 @@ jobs:
 
   deploy:
     needs: build
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     environment: cloudflare
     steps:
@@ -56,7 +62,7 @@ jobs:
   # a pull request gets a preview address (wrangler prints it) without touching the live Worker
   preview:
     needs: build
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     environment: cloudflare
     steps:
