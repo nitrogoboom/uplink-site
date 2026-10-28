@@ -1,0 +1,16 @@
+// Cloudflare Workers, static assets: the built site in dist/ is served as is, no Worker script.
+//   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787), _headers included
+//   npx wrangler deploy   deploy (CI does this on a push to main; see .github/workflows/site.yml)
+// not_found_handling "404-page": a missing address gets dist/404.html with a 404 status (Pages did this on its own).
+// To put the password lock back, see tools/site-lock/worker.js.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "uplink-site",
+  "compatibility_date": "2026-10-28",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  "preview_urls": true,
+  "observability": { "enabled": true }
+}
