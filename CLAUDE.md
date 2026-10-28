@@ -16,7 +16,7 @@ Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspir
 - `public/_headers` is the template for the response headers (CSP, HSTS, caching); `scripts/headers.mjs` fills in the script hashes and the Early Hints block at build. Don't paste a hash in by hand. A script that writes HTML must go through `Uplink.html()` (Trusted Types).
 - Every illustration is written by a script in `tools/gen_*.py`, output to `public/assets/img/` (run as `python tools/gen_office.py public`). The hero and tower too: `gen_office.py` writes `public/assets/img/hero-office.svg` and `src/components/home/hero-flows.svg`; `gen_tower.py` writes `src/components/home/grow-tower.svg`. Change the numbers in the script and rerun; don't hand-edit the SVGs. Each script also writes `NAME-compact.svg` (the phone cut); check it when you change a drawing.
 - Illustrations are true isometric. Follow "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it.
-- After layout changes: `npm run build && npm run serve`, then `python tools/verify_footer.py out/` (no sideways scroll at phone, tablet, 1440×900 and 3440×1440, footer one screen tall, hero and tower working).
+- After layout changes: `npm run build && npm run serve`, then `python tools/verify_footer.py out/` (no sideways scroll at phone, tablet, 1440×900 and 3440×1440, footer one screen tall, hero and tower working, and an axe pass on every page that fails on anything serious or critical).
 - Cloudflare: the `cloudflare:*` skills cover Workers and Wrangler. Hosting details are in README under "Hosting".
 - Style: no "AI slop" tells. No left-side border accents on cards.
 - Copy: short, plain sentences.
