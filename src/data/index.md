@@ -1,4 +1,5 @@
 # Uplink Technology
+<!-- The home page as Markdown, served at /index.md by src/pages/index.md.ts. {site} is the site address; {services} is the service list from src/content/services/. -->
 
 > Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
 
@@ -8,13 +9,7 @@ This is a test build. Uplink Technology is a placeholder company and the copy is
 
 We run the technology behind a business, so the owner can run the business.
 
-- [Managed help desk]({site}/services#help-desk): real people who pick up and fix it, by phone, email or chat.
-- [Cybersecurity]({site}/services#security): devices, email and accounts watched around the clock.
-- [Cloud workspace]({site}/services#cloud): Microsoft 365 or Google Workspace, set up properly and licensed right.
-- [Networks & Wi-Fi]({site}/services#network): firewalls and Wi-Fi that reach every corner of the office.
-- [Phones & Teams calling]({site}/services#voip): your numbers on desk phones, laptops and mobiles.
-- [Backup & recovery]({site}/services#backup): offsite copies, tested every quarter so a restore works.
-- [IT strategy & planning]({site}/services#strategy): a yearly roadmap and budget, reviewed every quarter.
+{services}
 
 ## How we grow with a business
 

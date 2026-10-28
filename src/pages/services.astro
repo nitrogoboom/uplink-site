@@ -4,6 +4,7 @@
 import { getCollection } from 'astro:content';
 import { byOrder } from '../content.config';
 import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/site';
 import Picker from '../components/services/Picker.astro';
 import Plans from '../components/services/Plans.astro';
 import Faq from '../components/services/Faq.astro';
@@ -18,8 +19,7 @@ const serviceNodes = services.map(({ id, data: s }) => {
   return { '@type': 'Service', '@id': url, url, name: s.title, description: s.lead, provider: business, areaServed: 'Ontario' };
 });
 ---
-<Base title="Services · Uplink Technology"
-      description="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses."
+<Base title={PAGES.services.title} description={PAGES.services.description}
       page="services" path="/services" type="FAQPage" ldPage={{ mainEntity }} ldGraph={serviceNodes}>
   <Picker />
   <Plans />

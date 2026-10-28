@@ -2,6 +2,7 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/site';
 import Hero, { HERO } from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
@@ -25,8 +26,7 @@ const business = {
   knowsLanguage: ['en', 'fr'],
 };
 ---
-<Base title="Uplink Technology · Managed IT for Ontario businesses"
-      description="Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team."
+<Base title={PAGES.home.title} description={PAGES.home.description}
       page="home" path="/">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(business, null, 1).replace(/<\//g, '<\\/')} />

@@ -1,14 +1,14 @@
 ---
 // OUR WORK. Sections in page order; each is one component in src/components/work/.
 import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/site';
 import Projects from '../components/work/Projects.astro';
 import Details from '../components/work/Details.astro';
 import CasePopup from '../components/work/CasePopup.astro';
 import Industries from '../components/work/Industries.astro';
 import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
 ---
-<Base title="Our work · Uplink Technology"
-      description="Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run."
+<Base title={PAGES.work.title} description={PAGES.work.description}
       page="work" path="/work" type="CollectionPage">
   <Projects />
   <Details />

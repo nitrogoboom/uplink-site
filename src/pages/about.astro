@@ -1,13 +1,13 @@
 ---
 // ABOUT. Sections in page order; each is one component in src/components/about/.
 import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/site';
 import Profile from '../components/about/Profile.astro';
 import Story from '../components/about/Story.astro';
 import Team from '../components/about/Team.astro';
 import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
 ---
-<Base title="About · Uplink Technology"
-      description="Uplink Technology is an in-house team of 22 technicians running IT for Ontario businesses since 2011."
+<Base title={PAGES.about.title} description={PAGES.about.description}
       page="about" path="/about" type="AboutPage">
   <Profile />
   <Story />

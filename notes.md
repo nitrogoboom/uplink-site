@@ -3,12 +3,13 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Astro move (plan: `review.md`)
-- [ ] Do the move in the order in `review.md` "Order of work" (branch `astro`). Steps 1 to 3 done 28 Oct: every page builds (step 2 structurally identical to `site/*.html`, zero computed-style differences at phone, 1440 and 3440); content in collections with one page per service and project, JSON-LD from data. Next: step 4, generated files (sitemap with lastmod, robots.txt, llms.txt, agents.md, index.md as endpoints), then CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`), `src/legacy/` and `site/`.
+- [ ] Do the move in the order in `review.md` "Order of work" (branch `astro`). Steps 1 to 4 done 28 Oct: every page builds (step 2 structurally identical to `site/*.html`, zero computed-style differences at phone, 1440 and 3440); content in collections with one page per service and project, JSON-LD from data; sitemap (18 URLs, lastmod from git), robots, llms.txt, index.md, agents.md as endpoints. Next: step 5, CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`), `src/legacy/` and `site/`.
 - [ ] The new service and project pages reuse the picker's and the details list's CSS; they have no layout of their own yet (the service page's "Compare all services" link sits in the roster slot). Give each a quick pass once the content is final, and decide whether the home cards should keep going to `/services/<slug>` (now) or back to the picker.
 - [ ] `work/[slug]` JSON-LD uses `Article`; `CreativeWork` or a plain `WebPage` may fit a case study better. Decide at launch.
 - [ ] Astro inlines CSS under 4 KB as a `<style>` (Work, About, Contact get one); fine, but it must be hashed when the CSP drops `'unsafe-inline'` (step 5), or set `build.inlineStylesheets: 'never'`.
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
-- [ ] `tools/verify_footer.py` and `tools/pagespeed.py` still expect port 8765 and `site/sitemap.xml`; repoint at the Astro dev server / `dist/`.
+- [ ] `tools/verify_footer.py` and `tools/pagespeed.py` still expect port 8765 and `site/sitemap.xml`; repoint at the Astro dev server / `dist/sitemap.xml` (18 URLs now; pagespeed should test a sample, not all).
+- [ ] Sitemap `lastmod` comes from `git log`; a CI build must clone with history (`fetch-depth: 0`) or every page reads the same date.
 - [ ] `src/scripts/*.js` keep `window.Uplink` beside the `Uplink` export so the page scripts share the picker slot; move to proper imports once every page is converted.
 - [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
 - [ ] `og.png` is 257 KB; run it through `oxipng`/`pngquant` in `gen_og.py` (aim for under 100 KB).
