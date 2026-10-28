@@ -2,7 +2,7 @@
 
 Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspired look. Astro 7, hosted on Cloudflare Workers. Read `README.md` first.
 
-**State (28 Oct 2026):** the move from the old Python build to Astro is complete on branch `astro` (plan and reasoning in `review.md`); it merges to `main` once the Worker has been compared with the Pages site. Open items live in `notes.md`.
+**State (28 Oct 2026):** the move from the old Python build to Astro is complete on branch `astro` (plan and reasoning in `review.md`) and live on the Worker at https://uplink-site.johnoreilly.workers.dev; the old Pages site is deleted. Next: merge `astro` to `main`. Open items live in `notes.md`.
 
 - Dev server: `npm run dev` (http://localhost:4321). Build: `npm run build` → `dist/` (also writes `dist/_headers`). Types: `npm run check`. The built site as Cloudflare serves it, headers and 404 included: `npm run serve` (http://localhost:8787). Deploy: CI on push; by hand `npm run deploy`.
 - Pages are `src/pages/*.astro`; the shared `<head>`, header, footer and pop-ups are `src/layouts/Base.astro` (props: title, description, page, path, robots, type, ldPage, ldGraph); one component per section in `src/components/<page>/`, with that section's CSS next to it and imported there. Shared CSS is `src/styles/global.css` (the cascade order) and the files it imports.

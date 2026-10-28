@@ -1,8 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// The live address. A test build for now; set the real domain here (or SITE_URL in the environment) at launch.
-const site = (process.env.SITE_URL || 'https://uplink-site-4p8.pages.dev').replace(/\/$/, '');
+// The live address: the Worker's workers.dev name until it has a domain. Set the real domain here (or SITE_URL
+// in the environment) at launch. It goes into canonicals, Open Graph, the sitemap, llms.txt and JSON-LD.
+const site = (process.env.SITE_URL || 'https://uplink-site.johnoreilly.workers.dev').replace(/\/$/, '');
 
 export default defineConfig({
   site,

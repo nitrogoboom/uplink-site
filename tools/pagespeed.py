@@ -2,8 +2,8 @@
 sitemap, phone and desktop, and report if Home scores under the bar. A tool to run when you want it;
 CI doesn't run it.
 
-    python tools/pagespeed.py https://uplink-site-4p8.pages.dev             # the live site
-    python tools/pagespeed.py https://<hash>.uplink-site-4p8.pages.dev      # a one-off deploy
+    python tools/pagespeed.py https://uplink-site.johnoreilly.workers.dev     # the live site
+    python tools/pagespeed.py https://<version>-uplink-site.johnoreilly.workers.dev   # a preview version
     python tools/pagespeed.py <address> --min 100 --strict                  # every page held to the bar
 
 The test runs on Google's machines, as pagespeed.web.dev does, so this PC's connection doesn't count.
