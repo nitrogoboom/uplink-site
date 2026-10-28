@@ -52,7 +52,9 @@ def api_key():
 
 def pages(base):
     """The paths in the live site's sitemap (18 pages now: five static, one per service and project)."""
-    xml = urllib.request.urlopen(f'{base}/sitemap.xml', timeout=30).read().decode('utf-8')
+    # a named User-Agent: Cloudflare answers Python's default one with 403
+    req = urllib.request.Request(f'{base}/sitemap.xml', headers={'User-Agent': 'lighthouse-gate warm-up'})
+    xml = urllib.request.urlopen(req, timeout=30).read().decode('utf-8')
     return [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', xml)]
 
 
