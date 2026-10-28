@@ -44,13 +44,13 @@ html:not(.js) .roster-wrap { display: none; }
   transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
 .tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); }
-.tile[aria-pressed="true"] { border: 2px solid var(--c-accent); background: var(--c-accent-tint); transform: translateY(-4px); }
+.tile[aria-pressed="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
 .tile-n { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: 1; }
-.tile[aria-pressed="true"] .tile-n { color: var(--c-accent); }
+.tile[aria-pressed="true"] .tile-n { color: var(--c-accent-text); }
 .tile-t { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); text-transform: uppercase; color: var(--c-muted); }
 .feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
 .feat { display: flex; align-items: center; gap: var(--sp-4); }
-.feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent); }
+.feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent-text); }
 .feat-t { display: block; font-weight: 600; }
 .feat-d { display: block; font-size: var(--fs-2); color: var(--c-muted); }
 .picker-roster .btn { flex: 1 1 100%; }

@@ -69,7 +69,7 @@
   align-self: flex-start;
   min-height: var(--tap);
   font-weight: 600;
-  color: var(--c-accent);
+  color: var(--c-accent-text);
   text-decoration: none;
 }
 .link-arrow svg { width: var(--sp-4); height: var(--sp-4); transition: transform var(--dur-1) var(--ease); }

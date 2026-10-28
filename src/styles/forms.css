@@ -8,7 +8,7 @@
   min-height: var(--control-h);
   padding: var(--sp-3) var(--sp-4);
   background: var(--c-well);
-  border: 1px solid var(--c-line-2);
+  border: 1px solid var(--c-edge);
   border-radius: var(--r-2);
   color: var(--c-text);
   font-size: var(--fs-3);
@@ -17,7 +17,7 @@
 }
 textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; }
 .input::placeholder { color: var(--c-muted); opacity: 0.7; }
-.input:focus { outline: none; border-color: var(--c-accent); box-shadow: 0 0 0 3px var(--c-accent-ring); }
+.input:focus { outline: none; border-color: var(--c-accent-text); box-shadow: 0 0 0 3px var(--c-accent-ring); }
 .input[aria-invalid="true"] { border-color: var(--c-alert); }
 .field-error { display: none; font-size: var(--fs-2); color: var(--c-alert); }
 .input[aria-invalid="true"] ~ .field-error { display: block; }
@@ -35,7 +35,7 @@ textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; 
   margin: 0;
   border-radius: var(--r-pill);
   background: var(--c-surface-2);
-  border: 1px solid var(--c-line-2);
+  border: 1px solid var(--c-edge);
   transition: background-color var(--dur-2) var(--ease);
 }
 .switch input::after {

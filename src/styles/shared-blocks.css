@@ -27,7 +27,7 @@
 .step { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--sp-3) var(--sp-4); padding: var(--sp-5); }
 .step > :not(.step-n) { grid-column: 1 / -1; }
 .step > .step-n + * { grid-column: 2; }
-.step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent); }
+.step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent-text); }
 .step:first-child .step-n { background: var(--c-accent); color: var(--c-on-accent); }
 
 /* stat tiles */
@@ -51,6 +51,6 @@
 }
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
-.faq details[open] summary svg { transform: rotate(45deg); color: var(--c-accent); }
+.faq details[open] summary svg { transform: rotate(45deg); color: var(--c-accent-text); }
 .faq details > div { padding: 0 var(--sp-5) var(--sp-5); max-width: var(--measure-lead); color: var(--c-muted); }
 

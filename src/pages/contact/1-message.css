@@ -26,5 +26,5 @@
 .queue-ring svg { width: 100%; height: 100%; }
 .queue-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); }
 .queue-ring-track { stroke: var(--c-line); }
-.queue-ring-arc { stroke: var(--c-accent); transition: stroke-dasharray var(--dur-3) var(--ease); }
+.queue-ring-arc { stroke: var(--c-accent-text); transition: stroke-dasharray var(--dur-3) var(--ease); }
 

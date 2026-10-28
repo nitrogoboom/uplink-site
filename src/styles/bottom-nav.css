@@ -34,7 +34,7 @@
   }
   .bn svg { width: var(--icon); height: var(--icon); }
   .bn[aria-current="page"] { background: var(--c-surface-2); color: var(--c-text); }
-  .bn[aria-current="page"] svg { color: var(--c-accent); }
+  .bn[aria-current="page"] svg { color: var(--c-accent-text); }
   body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }

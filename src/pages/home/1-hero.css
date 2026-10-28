@@ -36,7 +36,7 @@
 .hero-cta .small { text-align: center; }
 @media (min-width: 700px) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
 .hero-menu h1 .line { display: block; }
-.hero-menu h1 em { font-style: italic; color: var(--c-accent); }
+.hero-menu h1 em { font-style: italic; color: var(--c-accent-text); }
 .hero-top .lead { text-wrap: pretty; }
 
 .hero-art { position: relative; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
