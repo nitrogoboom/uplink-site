@@ -24,7 +24,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Site
 - [ ] Titles: a font file was dropped today to cut load time, and now every title is the same 700 italic. It saves time but makes the site look cheaper. Review which weights and styles the titles need (e.g. upright for some, a lighter weight for sub-heads) and bring the font back if it pays for itself. After the colour passes.
-- [ ] Drawing colours with no DESIGN.md role (DESIGN-GAP, listed in `tools/palette.py`: screen glass, app bars, tray, cloud faces and side, rug, mat, step, mug, guest Wi-Fi, leaf, vent, red dot, green LEDs): add them to DESIGN.md as drawing roles (rollout step 5).
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
 - [ ] `index.html` still has 11 inline `style="animation-duration…"` attributes in the hero; move them into CSS.
 - [ ] CSP `style-src` needs `'unsafe-inline'`: the build inlines the site CSS in every page (for speed), and the hero has inline `<style>` blocks and `style=""` attributes. To drop it, give the inline CSS a hash in the CSP (the build could write it).

@@ -6,7 +6,7 @@ A portable colour spec. Hand this file to an agent to recolour a site, a documen
 
 It does not belong to one project. Each project maps its own names onto the roles below. See "Name maps" at the end.
 
-- Version: 1.0 (2026-10-27)
+- Version: 1.1 (2026-10-28). 1.1 adds two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
 - Colour values: approved by an independent colour-theory and accessibility review. All 12 checks pass. Measured by `palette/final/build.py`.
 
 ---
@@ -151,8 +151,42 @@ Light comes from the top. On every box: **top lightest, left middle, right darke
 | `window` | `#182431` | `#A1A9B1` | unlit window |
 | `window-lit` | `#FFF5EC` | `#FFF5EC` | lit window, white LED |
 | `shadow` | `#000000` | `#0E1A27` | drop shadow, drawn at 0.35 opacity |
+| `led` | `#A9E9C3` | DESIGN-GAP | green LED and online dot in a drawing (same value as `success` in dark, its own job) |
+| `window-lit-cool` | `box-blue-left` at 0.38 opacity | DESIGN-GAP | window lit by screens, not lamps |
 
 Illustration roles are for drawings only. Never use them for text, even where a value matches a text role.
+
+### 5.5 Derived drawing shades
+
+Small parts of the drawings need shades the roles above don't cover. Each is worked out from the palette, never picked by eye:
+
+- **navy(L):** the neutral (hue 250) at OKLCH lightness L, with the chroma the neutral ramp has at that lightness.
+- **tone(hue, L, C):** a colour on one of the five hues (4.1) at lightness L and chroma C.
+
+L and C are the shade's old lightness and chroma, so each part keeps its weight in the drawing. Dark values only; a light drawing set would derive its own from the light ramp (DESIGN-GAP until then).
+
+| Name | Dark | Rule | Job |
+|---|---|---|---|
+| drop | `#05111D` | navy(0.173) | soft drop shadow under furniture |
+| screen | `#182430` | navy(0.255) | screen glass |
+| glass | `#1F2B37` | navy(0.283) | unlit windows, drive bays |
+| path | `#25303C` | navy(0.305) | paved path |
+| app-bar | `#283440` | navy(0.318) | app window title bar, keyboard |
+| tray left / right / top | `#2F3B47` / `#25313D` / `#3F4A56` | navy(0.346 / 0.307 / 0.405) | app-tile tray under the cloud |
+| cloud top / bottom | `#3D4853` / `#2C3844` | navy(0.395 / 0.335) | 3D cloud face gradient |
+| cloud side dark / light | `#28333F` / `#4D5763` | navy(0.317 / 0.453) | 3D cloud side wall, shaded between |
+| rug / mat | `#3A4551` / `#444F5B` | navy(0.387 / 0.423) | floor rug, entrance mat |
+| bubble | `#404B56` | navy(0.406) | chat bubble |
+| step left / right / top | `#535D68` / `#414C58` / `#656F78` | navy(0.474 / 0.412 / 0.536) | front step |
+| dim | `#5B6570` | navy(0.503) | unlit indicator dot |
+| cable | `#656E78` | navy(0.534) | handset cord |
+| mug left / right / top, paper | `#CDD3D9` / `#B1B9C0` / `#E6ECF2` | navy(0.863 / 0.781 / 0.940) | mug; paper in a printer |
+| glass-lit | `#264C64` | tone(blue, 0.399, 0.060) | window lit from inside |
+| guest left / right | `#3382B2` / `#276C96` | tone(blue, 0.579, 0.106 / 0.509, 0.095) | guest Wi-Fi point (top is `box-blue-left`) |
+| leaf shade / light | `#35654B` / `#5FB586` | tone(green, 0.466, 0.069 / 0.705, 0.109) | plant (dark side is `box-green-right`) |
+| vent | `#89571A` | tone(amber, 0.501, 0.099) | vent lines on an amber box |
+| step-edge | `#A76B22` | tone(amber, 0.579, 0.114) | outline of a lit amber step |
+| red-dot | `#F57D6E` | tone(red, 0.723, 0.149) | red dot in app windows and phones (decoration, not status) |
 
 ---
 
@@ -265,9 +299,9 @@ A project lists its own names here so an agent can apply the roles without guess
 |---|---|
 | page / band / raised | `--c-bg` / `--c-bg-band` / `--c-solid` |
 | surface / surface-hover / well | `--c-surface` / `--c-surface-2` / `--c-well` |
-| line / line-strong / edge | `--c-line` / `--c-line-2` / `--c-edge` (new) |
+| line / line-strong / edge | `--c-line` / `--c-line-2` / `--c-edge` |
 | text / text-muted | `--c-text` / `--c-muted` |
-| action / on-action / action-ink | `--c-accent` / `--c-on-accent` / `--c-accent-text` (new) |
+| action / on-action / action-ink | `--c-accent` / `--c-on-accent` / `--c-accent-text` |
 | action-tint / action-faint / action-ring / on-action-tint | `--c-accent-tint` / `--c-accent-faint` / `--c-accent-ring` / `--c-ink-tint` |
 | link / link-tint | `--c-sky` / `--c-sky-tint` |
 | success / success-tint / error | `--c-ok` / `--c-ok-tint` / `--c-alert` |
@@ -276,14 +310,15 @@ A project lists its own names here so an agent can apply the roles without guess
 | cool-surface / -hover / cool-text-muted | `--c-cool-surface` / `--c-cool-surface-2` / `--c-cool-muted` |
 | box-top / left / right / edge | `--iso-top` / `--iso-left` / `--iso-right` / `--iso-edge` |
 | box-hi-* | `--iso-hi-top` / `--iso-hi-left` / `--iso-hi-right` / `--iso-hi-edge` |
-| box-blue-* | `--iso-sky-top` / `--iso-sky-left` (new) / `--iso-sky-right` |
+| box-blue-* | `--iso-sky-top` / `--iso-sky-left` / `--iso-sky-right` |
 | box-green-* | `--iso-green-top` / `--iso-green-mid` / `--iso-green-dark` |
-| ground / grid / window / window-lit / shadow | `--iso-ground` / `--iso-grid` / `--iso-window` / `--iso-light` / `--iso-shadow` |
+| ground / grid / window / window-lit / shadow / led | `--iso-ground` / `--iso-grid` / `--iso-window` / `--iso-light` / `--iso-shadow` / `--iso-led` |
 
 Notes for this project:
 - Logo files: `Documents/Design.MD/svs-design/assets/logo/` (copy them; don't use the rest of that folder).
-- The drawings come from `tools/gen_*.py`, which hard-code hex values. A recolour there means changing the generator numbers and rerunning, not editing SVGs.
-- Ready-made values in the site's names: `palette/final/tokens.css`.
+- The drawings come from `tools/gen_*.py`. Their colours come from `tools/palette.py`, which reads the roles from `tokens.css` and computes the 5.5 shades (names there match 5.5 in capitals: `pal.APP_BAR`). A recolour: change `tokens.css`, rerun the gen scripts; never edit SVGs.
+- Landed on 28 Oct 2026 (dark mode only). The site has no light mode yet.
+- Ready-made values in the site's names: `palette/final/tokens.css` (the source for `tokens.css`).
 
 ### Adding a new project
 

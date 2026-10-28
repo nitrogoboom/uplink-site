@@ -65,10 +65,11 @@ Without script, every panel shows in a stack and the roster is hidden.
 ## Drawing rules (measured in the files)
 
 - True isometric: one axis right-and-down at 30°, one left-and-down at 30°, verticals straight up.
-- Faces: top `#405169`, left `#313F54`, right `#283447`. Edge stroke `#D9E4F0`, width 1, opacity 0.3.
-- Highlight faces: `#F7B868` / `#E2953F` / `#C98030`. Accents: `#F4A340` orange, `#7DB9E8` blue.
-- Labels: thin leader line (width 1.2, opacity 0.55), dot r=3 with a `#151E2C` 1.5 ring, caps title 13px/600, grey subline 11px `#A9B4C3`.
-- Window outlines on walls: `#7DB9E8`, width 0.9, opacity 0.5.
+- Colours come from `tools/palette.py` (read from `tokens.css`, roles from DESIGN.md); scripts use names, never hex.
+- Faces: top `pal.TOP` (#4D5863), left `pal.LEFT` (#37424E), right `pal.RIGHT` (#222E3A): top lightest, right darkest, on every box. Edge stroke `pal.EDGE` (#E6ECF2), width 1, opacity 0.3.
+- Highlight faces: `pal.HI_TOP` / `pal.HI_LEFT` / `pal.HI_RIGHT` (#FFCD9B / #FFAD51 / #C37600). Accents: `pal.AMBER` (#FFAD51), `pal.SKY` (#97C8EA) blue.
+- Labels: thin leader line (width 1.2, opacity 0.55), dot r=3 with a `pal.PAGE` (#0E1A27) 1.5 ring, caps title 13px/600, grey subline 11px `pal.GREY` (#BBC2C9).
+- Window outlines on walls: `pal.SKY`, width 0.9, opacity 0.5.
 - Floor discs are true iso circles (height/width = 0.577), with gaps cut around labels.
 - Wi-Fi access points hang at ceiling height; their rings are halos at the AP's height, not on the floor.
 

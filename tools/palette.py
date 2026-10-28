@@ -80,7 +80,8 @@ PAGE = tok('c-bg')                # halos and dot rims: the page colour
 SOLID = tok('c-solid')            # opaque label card
 WHITE, GREY = tok('c-text'), tok('c-muted')     # label text
 ON_AMBER = tok('c-on-accent')     # ink on a lit amber tile
-GREEN = tok('c-ok')               # online dot and text, green LEDs (DESIGN-GAP for LEDs)
+GREEN = tok('c-ok')               # online text and dot
+LED = tok('iso-led')              # green LED (same value as GREEN today, its own job)
 RED = tok('c-alert')              # alarm red
 
 # ---- shades with no role (DESIGN-GAP), from the old shade's lightness and chroma ------------------

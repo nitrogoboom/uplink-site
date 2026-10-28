@@ -65,6 +65,7 @@
   --iso-grid:       #2B3743;  /* floor grid lines */
   --iso-window:     #182431;  /* unlit window */
   --iso-light:      #FFF5EC;  /* lit window, white LED */
+  --iso-led:        #A9E9C3;  /* green LED, online dot */
   --iso-shadow:     #000;     /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
