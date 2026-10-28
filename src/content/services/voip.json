@@ -22,5 +22,29 @@
       "detail": "Picked, set up and swapped when they fail"
     }
   ],
-  "bestFor": "Teams that live on the phone"
+  "bestFor": "Teams that live on the phone",
+  "page": {
+    "heading": "Your numbers, wherever you work",
+    "body": [
+      "Your business numbers move to the cloud, so a call can ring a desk phone, a laptop or a mobile. Staff take calls from the office, from home or on the road, and callers see the same company number.",
+      "We set up Teams Phone if you already use Microsoft 365, or a standalone phone system if that fits better. Call menus, hunt groups, voicemail to email and after-hours messages are all set up before the switch.",
+      "Your existing numbers come with you. We handle the transfer with your old provider and schedule the cut-over so there is no gap in service.",
+      "Desk phones and headsets are picked to suit how each person works. When one fails, we swap it."
+    ],
+    "plans": "Included in Complete. An add-on for Essentials and Business. Phone system moves are quoted as a project.",
+    "faq": [
+      {
+        "q": "Can we keep our phone numbers?",
+        "a": "Yes. We transfer your numbers from your current provider. Callers will not notice the change."
+      },
+      {
+        "q": "Do we need desk phones?",
+        "a": "No. Many staff use a headset and their laptop or a mobile app. Desk phones are there for reception and anyone who prefers one."
+      },
+      {
+        "q": "What about 911 calls?",
+        "a": "Each number is registered to an address, and staff who work from home can update theirs. We set this up and test it before go-live."
+      }
+    ]
+  }
 }

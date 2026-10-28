@@ -8,5 +8,35 @@
   "result": "Faster check-in, guest Wi-Fi kept separate",
   "image": "network",
   "alt": "Server rack with cabling to desks and a Wi-Fi access point",
-  "story": "Old switches and patchy Wi-Fi were slowing down patient check-in. We replaced the core network, split guest and staff Wi-Fi, and documented every port."
+  "story": "Old switches and patchy Wi-Fi were slowing down patient check-in. We replaced the core network, split guest and staff Wi-Fi, and documented every port.",
+  "page": {
+    "timeline": "Two weekends, one per location",
+    "challenge": [
+      "A health clinic with two locations had check-in tablets that kept dropping off the Wi-Fi. Front-desk staff were re-entering patient details by hand.",
+      "The switches were nine years old. Patients and staff shared one Wi-Fi network, and nothing was documented."
+    ],
+    "steps": [
+      {
+        "title": "Survey both sites",
+        "detail": "We mapped coverage and found the dead spots behind the reception desks."
+      },
+      {
+        "title": "Replace the core",
+        "detail": "New firewall, switches and access points at each location."
+      },
+      {
+        "title": "Split the networks",
+        "detail": "Separate Wi-Fi for staff, patients and medical devices, kept apart from each other."
+      },
+      {
+        "title": "Document everything",
+        "detail": "Every port labelled, and a network map handed to the clinic manager."
+      }
+    ],
+    "results": [
+      "Check-in tablets have stayed connected since the refresh.",
+      "Patient check-in takes about half as long.",
+      "Guest Wi-Fi cannot reach anything that holds patient data."
+    ]
+  }
 }

@@ -21,6 +21,12 @@ const services = defineCollection({
     bestFor: z.string(),
     footerLabel: z.string().optional(),   // when the footer link says it differently
     optionLabel: z.string().optional(),   // when the "What do you need?" option says it differently
+    page: z.object({                   // only on the service's own page (/services/<slug>)
+      heading: z.string(),             // "How it works" section title
+      body: z.array(z.string()).min(2),   // its paragraphs
+      plans: z.string(),               // which plans include it
+      faq: z.array(z.object({ q: z.string(), a: z.string() })).min(2),
+    }),
   }),
 });
 
@@ -37,6 +43,12 @@ const projects = defineCollection({
     image: z.string(),
     alt: z.string(),
     story: z.string(),
+    page: z.object({                   // only on the project's own page (/work/<slug>)
+      timeline: z.string(),            // "Six weeks"
+      challenge: z.array(z.string()).min(1),   // paragraphs: where they started
+      steps: z.array(z.object({ title: z.string(), detail: z.string() })).min(3),
+      results: z.array(z.string()).min(2),     // one line each, with a number where there is one
+    }),
   }),
 });
 

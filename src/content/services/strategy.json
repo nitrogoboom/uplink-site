@@ -22,5 +22,29 @@
       "detail": "Help meeting cyber insurance requirements"
     }
   ],
-  "bestFor": "Owners who want fewer surprises"
+  "bestFor": "Owners who want fewer surprises",
+  "page": {
+    "heading": "A plan instead of surprises",
+    "body": [
+      "Most IT costs are predictable. Laptops wear out, licences renew and warranties end. The trouble is that nobody writes it down, so each one arrives as a surprise.",
+      "We start by listing every device, licence and contract you have, with its age and renewal date. From that we build a roadmap: what to replace, when, and roughly what it will cost. You get a budget for the year ahead that you can take to the owner or the board.",
+      "Every quarter we meet for an hour. We look at what changed, what is coming up, and any risks we have spotted. You leave with a short list of decisions, not a pile of jargon.",
+      "We also help with cyber insurance forms and vendor quotes, so you can compare options with someone on your side."
+    ],
+    "plans": "Quarterly IT review in Business and Complete. The yearly roadmap and budget in Complete.",
+    "faq": [
+      {
+        "q": "Is this a virtual CIO service?",
+        "a": "Close to it. A senior technician who knows your setup runs your reviews and builds your roadmap. It costs far less than a full-time IT manager."
+      },
+      {
+        "q": "Do we have to buy what you recommend?",
+        "a": "No. We give you options with prices, and you decide. Some items you can buy anywhere."
+      },
+      {
+        "q": "How long is the roadmap?",
+        "a": "Usually three years, reviewed every quarter and rebuilt each year."
+      }
+    ]
+  }
 }

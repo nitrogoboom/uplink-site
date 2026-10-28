@@ -5,7 +5,18 @@
 .crumbs a:hover { text-decoration: underline; }
 .crumbs [aria-current] { color: var(--c-text); }
 
+/* the full write-up under a service or project: paragraphs, sub-headings and lists at reading width */
+.detail-body .prose { font-size: var(--fs-4); }
+.detail-body .prose h3 { color: var(--c-text); }
+.detail-body .prose > * + h3 { margin-top: var(--sp-6); }
+.detail-body .prose :is(ol, ul) { display: flex; flex-direction: column; gap: var(--sp-3); padding-left: var(--sp-5); }
+.detail-body .prose li { padding-left: var(--sp-1); }
+.detail-body .prose li::marker { color: var(--c-accent-text); font-weight: 600; }
+.detail-body .prose strong { color: var(--c-text); font-weight: 600; }
+.detail-body .facts { max-width: var(--measure); font-size: var(--fs-3); }
+
 .page-end { padding-block: var(--sp-7) var(--sp-8); }
+.section:not(.section--band) + .page-end { padding-top: 0; }   /* no band between them: one gap, not two */
 .next-link {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

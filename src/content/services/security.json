@@ -22,5 +22,29 @@
       "detail": "Short monthly lessons and practice phishing tests"
     }
   ],
-  "bestFor": "Anyone holding client or patient data"
+  "bestFor": "Anyone holding client or patient data",
+  "page": {
+    "heading": "Watched by people, day and night",
+    "body": [
+      "Most break-ins at small businesses start with a stolen password or a fake email. So we start there: multi-factor sign-in on every account, email filtering that holds bad links and attachments, and patching that keeps devices up to date.",
+      "Every device runs protection that reports to our security team. Software flags the odd login or the strange program. A person looks at it, decides if it is real, and acts. That can mean isolating a laptop from the network at 3 a.m. before anyone at your office is awake.",
+      "Staff get a short lesson each month and the odd practice phishing email. People who click get a quick explainer, not a lecture. Over a few months, the click rate drops.",
+      "Each quarter you get a plain report: what we blocked, what we fixed, and what still needs a decision from you."
+    ],
+    "plans": "Email and phishing defence in every plan. 24/7 monitoring and staff training in Business and Complete.",
+    "faq": [
+      {
+        "q": "Will this help with cyber insurance?",
+        "a": "Usually, yes. Insurers ask for multi-factor sign-in, backups, patching and training. We fill in the security part of the form with you and keep the proof on file."
+      },
+      {
+        "q": "What happens if something gets through?",
+        "a": "We contain it first, by locking the account or cutting the device off the network. Then we clean up, find out how it got in, and tell you in plain words what happened."
+      },
+      {
+        "q": "Do practice phishing emails embarrass staff?",
+        "a": "No. Results go to you as team numbers. Anyone who clicks gets a short lesson in private."
+      }
+    ]
+  }
 }
