@@ -6,13 +6,21 @@ Writes `public/assets/img/og.png` (1200x630, the link preview on social sites an
 chat apps) and `public/apple-touch-icon.png` (180x180, at the site root, where
 iPhones look for it). Both are screenshots of a small page built from the site's
 tokens (src/styles/tokens.css), fonts and the office drawing, so they follow the
-site when it changes. Needs Playwright and the internet (Google Fonts).
+site when it changes. Needs Playwright, Pillow and the internet (Google Fonts).
+Each screenshot is cut to 256 colours (dithered), as pngquant would: the share
+picture drops from about 257 KB to under 100 KB with no visible change.
 """
 import asyncio
 import pathlib
 import sys
 
+from PIL import Image
 from playwright.async_api import async_playwright
+
+
+def shrink(path):
+    im = Image.open(path).convert('RGB')
+    im.quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.FLOYDSTEINBERG).save(path, optimize=True)
 
 site = pathlib.Path(sys.argv[1]).resolve()
 assets = (site / 'assets').as_uri()
@@ -68,6 +76,7 @@ async def shoot(b, html, w, h, out):
     await pg.evaluate('document.fonts.ready')
     await pg.wait_for_timeout(500)
     await pg.screenshot(path=str(out))
+    shrink(out)
     await pg.close()
     print(out.relative_to(site.parent))
 

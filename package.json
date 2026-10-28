@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/headers.mjs",
+    "build": "astro build && node scripts/svgo.mjs && node scripts/headers.mjs",
     "preview": "astro preview",
     "check": "astro check",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
@@ -31,6 +31,7 @@
     "prettier-plugin-astro": "^1.1.2",
     "stylelint": "^17.16.0",
     "stylelint-config-standard": "^40.0.0",
+    "svgo": "^4.1.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "wrangler": "^4.154.0"

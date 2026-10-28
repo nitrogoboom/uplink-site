@@ -10,7 +10,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] `tools/pagespeed.py` now reads the live sitemap (18 pages × 2 = 36 tests, about two minutes); add a `--sample` that tests Home plus one service and one project.
 - [ ] Sitemap `lastmod` comes from `git log`; a CI build must clone with history (`fetch-depth: 0`) or every page reads the same date.
 - [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
-- [ ] `og.png` is 257 KB; run it through `oxipng`/`pngquant` in `gen_og.py` (aim for under 100 KB).
 - [ ] The real domain's DNS must be on Cloudflare before it can be put on the Worker.
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
