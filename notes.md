@@ -7,9 +7,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Home service cards go to `/services/<slug>` (each service's own page). Decide whether they should go back to the picker (`/services#<slug>`) instead.
 - [ ] `work/[slug]` JSON-LD uses `Article`; `CreativeWork` or a plain `WebPage` may fit a case study better. Decide at launch.
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
-- [ ] `tools/pagespeed.py` now reads the live sitemap (18 pages × 2 = 36 tests, about two minutes); add a `--sample` that tests Home plus one service and one project.
 - [ ] Sitemap `lastmod` comes from `git log`; a CI build must clone with history (`fetch-depth: 0`) or every page reads the same date.
-- [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
 - [ ] The real domain's DNS must be on Cloudflare before it can be put on the Worker.
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
@@ -39,7 +37,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] PageSpeed mobile Home lists "Forced reflow: [unattributed] 36 ms" (unscored; score stays 100). Not reproducible locally (live site, beacon on and off, CPU slowed 6x), and no script reads layout at load on phones. Recheck now and then; act only if it starts naming a source.
 
 ## Before going live
-- [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, Français, five social links). Each needs a page or no link. The `Français` link carries `hreflang="fr"` to a placeholder; drop it or build the page.
+- [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.
 - [ ] CSP reporting: `Reporting-Endpoints` + `report-to` so blocked scripts on real visitors get seen.
 - [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. `FAQPage` markup stays but gives no rich result (Google limits those to government and health sites since Aug 2023).

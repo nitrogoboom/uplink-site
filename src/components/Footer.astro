@@ -68,7 +68,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
   </div></div>
   <div class="fc-base"><div class="container">
     <span class="fc-brand"><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b><span>{f.copyright}</span></span>
-    <nav class="fc-legal" aria-label="Legal">{f.legal.map((l) => <a href={l.href} lang={'lang' in l ? l.lang : undefined} hreflang={'lang' in l ? l.lang : undefined}>{l.label}</a>)}</nav>
+    <nav class="fc-legal" aria-label="Legal">{f.legal.map((l) => <a href={l.href}>{l.label}</a>)}</nav>
     <span class="fc-base-end">
       <button class="linkbtn kbd-only" type="button" data-open="shortcuts-dialog"><span class="kbd">?</span>Keyboard shortcuts</button>
       <span class="status">{f.status}</span>

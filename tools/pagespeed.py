@@ -5,6 +5,7 @@ CI doesn't run it.
     python tools/pagespeed.py https://uplink-site.johnoreilly.workers.dev     # the live site
     python tools/pagespeed.py https://<version>-uplink-site.johnoreilly.workers.dev   # a preview version
     python tools/pagespeed.py <address> --min 100 --strict                  # every page held to the bar
+    python tools/pagespeed.py <address> --sample                            # Home, one service, one project
 
 The test runs on Google's machines, as pagespeed.web.dev does, so this PC's connection doesn't count.
 It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment.
@@ -110,6 +111,8 @@ def main():
     base = args[0].rstrip('/')
     bar = int(args[args.index('--min') + 1]) if '--min' in args else 100
     paths = pages(base)
+    if '--sample' in args:   # Home plus the first service and the first project: 6 tests, not 36
+        paths = ['/'] + [next(p for p in paths if p.startswith(d)) for d in ('/services/', '/work/')]
     gated = paths if '--strict' in args else GATED
     key = api_key()
     OUT.mkdir(parents=True, exist_ok=True)
