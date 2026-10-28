@@ -8,60 +8,63 @@
 :root {
   color-scheme: dark;
 
-  /* ---- colour ---------------------------------------------------------- */
-  --c-bg:         #151E2C;  /* page */
-  --c-bg-band:    #18222F;  /* alternate section band */
-  --c-solid:      #212D40;  /* dialogs, toasts, menus */
-  --c-surface:    rgb(255 255 255 / 0.05);  /* panels and cards */
-  --c-surface-2:  rgb(255 255 255 / 0.09);  /* hover, selected, icon tiles */
+  /* ---- colour: Navy & Amber, dark (editing-room/palette/DESIGN.md; values from palette/final/tokens.css) */
+  --c-bg:         #0E1A27;  /* page */
+  --c-bg-band:    #14202D;  /* alternate section band */
+  --c-solid:      #222E3A;  /* dialogs, toasts, menus */
+  --c-surface:    rgb(242 247 252 / 0.05);  /* panels and cards */
+  --c-surface-2:  rgb(242 247 252 / 0.09);  /* hover, selected, icon tiles */
   --c-well:       rgb(0 0 0 / 0.18);        /* image wells, inputs */
-  --c-line:       rgb(255 255 255 / 0.09);
-  --c-line-2:     rgb(255 255 255 / 0.18);
-  --c-text:       #F1F4F8;
-  --c-muted:      #A9B4C3;
-  --c-accent:     #F4A340;  /* the one signal colour */
-  --c-on-accent:  #1B2130;
-  --c-sky:        #7DB9E8;  /* info */
-  --c-ok:         #6FD3A0;  /* online / success */
-  --c-alert:      #EE8A7C;  /* errors */
+  --c-line:       rgb(242 247 252 / 0.1);   /* decorative divider, card border */
+  --c-line-2:     rgb(242 247 252 / 0.18);  /* soft divider, hover border, link underline */
+  --c-edge:       rgb(242 247 252 / 0.46);  /* border of anything you can click or type in (3:1) */
+  --c-text:       #F2F7FC;
+  --c-muted:      #BBC2C9;
+  --c-accent:     #FFAD51;  /* amber fill: the one signal colour (primary button, selected tile) */
+  --c-on-accent:  #0E1A27;  /* label on the amber fill */
+  --c-accent-text: #FFAD51; /* amber as ink: amber words, icon strokes, focus outline */
+  --c-sky:        #97C8EA;  /* links and info */
+  --c-ok:         #A9E9C3;  /* online / success */
+  --c-alert:      #FF897E;  /* errors (16px+, weight 500+, with icon) */
 
   /* tints of the colours above */
-  --c-accent-tint:  rgb(244 163 64 / 0.12);  /* selected tile */
-  --c-accent-faint: rgb(244 163 64 / 0.06);  /* highlighted table column */
-  --c-accent-ring:  rgb(244 163 64 / 0.25);  /* input focus ring */
-  --c-sky-tint:     rgb(125 185 232 / 0.16);
-  --c-ok-tint:      rgb(111 211 160 / 0.16);
-  --c-ink-tint:     rgb(27 33 48 / 0.16);    /* dark chip on accent */
-  --c-glass:        rgb(21 30 44 / 0.88);    /* sticky header */
-  --c-glass-2:      rgb(33 45 64 / 0.92);    /* phone bottom nav */
-  --c-backdrop:     rgb(10 14 22 / 0.62);    /* behind pop-ups */
-  --c-glow-accent:  rgb(244 163 64 / 0.07);  /* warm key light behind the hero call to action */
-  --c-glow-sky:     rgb(125 185 232 / 0.09); /* cool fill light behind the hero office */
-  --c-glow-sky-2:   rgb(125 185 232 / 0.11); /* glow behind the footer map */
+  --c-accent-tint:  rgb(255 173 81 / 0.14);  /* selected tile */
+  --c-accent-faint: rgb(255 173 81 / 0.06);  /* highlighted table column */
+  --c-accent-ring:  rgb(255 173 81 / 0.3);   /* focus halo, always beside a solid --c-accent-text outline */
+  --c-sky-tint:     rgb(151 200 234 / 0.16);
+  --c-ok-tint:      rgb(169 233 195 / 0.16);
+  --c-ink-tint:     rgb(14 26 39 / 0.08);    /* dark chip on accent */
+  --c-glass:        rgb(14 26 39 / 0.88);    /* sticky header */
+  --c-glass-2:      rgb(34 46 58 / 0.92);    /* phone bottom nav */
+  --c-backdrop:     rgb(14 26 39 / 0.62);    /* behind pop-ups */
+  --c-glow-accent:  rgb(255 173 81 / 0.07);  /* warm key light behind the hero call to action */
+  --c-glow-sky:     rgb(151 200 234 / 0.09); /* cool fill light behind the hero office */
+  --c-glow-sky-2:   rgb(151 200 234 / 0.11); /* glow behind the footer map */
 
   /* hero: surfaces pick up a slight blue tint to match the cool light */
-  --c-cool-surface:   rgb(196 220 248 / 0.05);
-  --c-cool-surface-2: rgb(196 220 248 / 0.10);
-  --c-cool-muted:     #ABB8CA;
+  --c-cool-surface:   rgb(216 239 255 / 0.05);
+  --c-cool-surface-2: rgb(216 239 255 / 0.1);
+  --c-cool-muted:     #ADC5D6;
 
   /* ---- drawing palette (isometric illustrations, see README "Drawing rules") */
-  --iso-top:        #405169;  /* box faces */
-  --iso-left:       #313F54;
-  --iso-right:      #283447;
-  --iso-edge:       #D9E4F0;  /* face outline, used at 0.3 opacity */
-  --iso-hi-top:     #F7B868;  /* highlighted box faces */
-  --iso-hi-left:    #E2953F;
-  --iso-hi-right:   #C98030;
-  --iso-hi-edge:    #FFE6C4;
-  --iso-sky-top:    #9CCBF0;  /* blue boxes: top, left is --c-sky */
-  --iso-sky-right:  #5E9BCB;
-  --iso-green-top:  #8FE0B6;  /* green boxes and trees, with --c-ok */
-  --iso-green-mid:  #4E9C78;
-  --iso-green-dark: #3C7C60;
-  --iso-ground:     #1B2534;  /* map platform */
-  --iso-grid:       #2C3849;  /* floor grid lines */
-  --iso-window:     #1E2938;  /* unlit window */
-  --iso-light:      #FFF3DF;  /* warm lit window, white LED */
+  --iso-top:        #4D5863;  /* box faces */
+  --iso-left:       #37424E;
+  --iso-right:      #222E3A;
+  --iso-edge:       #E6ECF2;  /* face outline, used at 0.3 opacity */
+  --iso-hi-top:     #FFCD9B;  /* highlighted box faces */
+  --iso-hi-left:    #FFAD51;
+  --iso-hi-right:   #C37600;
+  --iso-hi-edge:    #FFF5EC;
+  --iso-sky-top:    #B7DDF8;  /* blue boxes */
+  --iso-sky-left:   #97C8EA;
+  --iso-sky-right:  #73AFD9;
+  --iso-green-top:  #82D6A6;  /* green boxes and trees */
+  --iso-green-mid:  #3BA16E;
+  --iso-green-dark: #198152;
+  --iso-ground:     #15212E;  /* map platform */
+  --iso-grid:       #2B3743;  /* floor grid lines */
+  --iso-window:     #182431;  /* unlit window */
+  --iso-light:      #FFF5EC;  /* lit window, white LED */
   --iso-shadow:     #000;     /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
