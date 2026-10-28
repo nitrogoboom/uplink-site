@@ -37,6 +37,8 @@ Python 3.10+ and Node 18+.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
 - `tools/` – the build, the drawing scripts and their checks (Python + Playwright). Run them from the project root. `tools/retired/` holds old tools waiting to be deleted (see its README).
+- `layout-reference.md` – layout patterns from Overwatch 2 menus, written from the screenshots in `RAW Screenshots/` (kept out of git).
+- `mockups/` – design tries that don't touch `site/`. `home-touchup/` is the home page with `touchup.css` layered on top; `python mockups/home-touchup/make.py`, then `python tools/serve.py 8772 .` and open `/mockups/home-touchup/` (the corner switch turns the layer on and off). `compare/` holds before/after images.
 
 ## Adding a service
 

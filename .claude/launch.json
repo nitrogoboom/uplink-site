@@ -13,6 +13,13 @@
       "runtimeArgs": ["tools/serve.py", "8771", "site"],
       "port": 8771,
       "autoPort": false
+    },
+    {
+      "name": "mockup",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["tools/serve.py", "8772", "."],
+      "port": 8772,
+      "autoPort": false
     }
   ]
 }

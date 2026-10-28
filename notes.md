@@ -24,6 +24,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Trees are coded twice (tower and hq). Move one tree into `tools/isoprops.py`.
 
 ## Site
+- [ ] Apply the home touch-up (`mockups/home-touchup/touchup.css`, all 7 blocks approved 28 Oct 2026): corner tokens to `tokens.css`, header tab to `src/styles/header.css`, centred block to `tokens.css`/`layout.css`, service cards and the 16:9 one-row rule to `2-services.css`/`desktop.css`, stats and steps to `shared-blocks.css`. Those last two are shared, so check About and Contact too. Then delete the mockup.
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
 - [ ] Home services grid: with 7 cards the last row on laptops holds one card on its own.
 - [ ] Home services grid: the one-row layout (`min-aspect-ratio: 2/1` in `src/styles/desktop.css`) also fires on a maximised 1080p browser (1920×945) and 125% laptops (1536×730), not only 21:9. The hero now uses 7/3; check the services section before changing it.
