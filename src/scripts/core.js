@@ -6,7 +6,7 @@
 
    Files (each page script imports core.js, so core always runs first):
      core.js      every page   helpers, toasts, pop-ups, forms, shortcuts;
-                               shares window.Uplink
+                               exports the helpers the page scripts import
      footer.js    every page   footer roster + campus map
      home.js      Home         growing tower, hero cloud
      services.js  Services     service picker
@@ -196,6 +196,10 @@ function isTyping(el) {
   return false;
 }
 
+// the Services picker, once services.js registers it: the number keys (1 to 9) pick a service
+let picker = null;
+export const registerPicker = (p) => { picker = p; };
+
 document.addEventListener('keydown', (e) => {
   if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
   if (!shortcutsOn()) return;
@@ -205,7 +209,6 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '?') { e.preventDefault(); openDialog('shortcuts-dialog'); return; }
   if (e.shiftKey) return;
 
-  const picker = Uplink.picker;
   if (/^[1-9]$/.test(e.key) && picker) {
     const n = Number(e.key) - 1;
     if (n < picker.count) { e.preventDefault(); picker.select(n, { focus: true }); }
@@ -290,6 +293,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-// picker: set by services.js so the number keys (1 to 9) can pick a service
-export const Uplink = { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, picker: null };
-window.Uplink = Uplink;
+export { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen };

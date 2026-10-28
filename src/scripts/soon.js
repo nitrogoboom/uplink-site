@@ -3,9 +3,7 @@
    Names the page that is not built yet.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $ } = Uplink;
+import { $ } from './core.js';
 
 /* ======================================================================
    Placeholder page: name the page that is missing (soon.html#client-portal)

@@ -3,9 +3,7 @@
    Service picker: the tiles show one service at a time.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, html, reduceMotion } = Uplink;
+import { $, $$, html, reduceMotion, registerPicker } from './core.js';
 
 /* ======================================================================
    Services picker (Services page)
@@ -64,5 +62,5 @@ if (svcs.length) {
     pickerEl.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   });
 
-  Uplink.picker = { select, count: svcs.length };
+  registerPicker({ select, count: svcs.length });
 }

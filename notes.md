@@ -9,7 +9,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
 - [ ] `tools/pagespeed.py` now reads the live sitemap (18 pages × 2 = 36 tests, about two minutes); add a `--sample` that tests Home plus one service and one project.
 - [ ] Sitemap `lastmod` comes from `git log`; a CI build must clone with history (`fetch-depth: 0`) or every page reads the same date.
-- [ ] `src/scripts/*.js` keep `window.Uplink` beside the `Uplink` export so the page scripts share the picker slot; move to proper imports once every page is converted.
 - [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
 - [ ] `og.png` is 257 KB; run it through `oxipng`/`pngquant` in `gen_og.py` (aim for under 100 KB).
 - [ ] The real domain's DNS must be on Cloudflare before it can be put on the Worker.

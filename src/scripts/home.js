@@ -3,9 +3,7 @@
    Growing tower and hero cloud.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, html, reduceMotion, whenOnScreen } = Uplink;
+import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 
 /* ======================================================================
    Growth story: the building gains floors as you scroll (Home)

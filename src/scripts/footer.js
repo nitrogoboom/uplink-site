@@ -3,9 +3,7 @@
    Hero-select roster and campus map.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, html, reduceMotion, toast, whenOnScreen } = Uplink;
+import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
 
 /* ======================================================================
    Footer: hero-select roster + campus map (every page)
