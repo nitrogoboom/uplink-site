@@ -4,7 +4,7 @@ What to take from the screenshots in `RAW Screenshots/` (git ignores that folder
 
 What we want is the **layout**: how the boxes sit, their corners, the spacing, the sizes, and how one design fills a 21:9 screen and a 1080p screen without breaking. We're **not** taking their colours or backgrounds. We **are** taking how they place one strong image. We're **not** taking the slanted tabs or skewed boxes (see "Skip").
 
-Applied site-wide on 28 Oct 2026: small corners, straight header tab, centred ~94rem block on desktop, edge-to-edge pictures on service cards, bigger stat numbers, steps with the number beside the title.
+**Applied site-wide on 28 Oct 2026:** small corners (`--r-2` 0.25rem, `--r-3` 0.5rem), straight header tab, centred 94rem block on desktop (`--container` in `tokens.css`), edge-to-edge pictures on service cards, bigger stat numbers, steps with the number beside the title. The "Ours now" column and the "Ours:" notes below are what the site looked like **before** that pass; they are kept to show what changed and why.
 
 ## How it fits every screen
 
@@ -17,7 +17,7 @@ Each item has one of two jobs:
 
 The image fills the whole screen behind both. The subject sits in the middle or the right, in the space the copy leaves free. [2, 4, 14, 16]
 
-**Our site already scales by height:** `tokens.css` sets the root font to `min(1.1111vw, 1.7778vh)` from 1100px wide, which gives 25.6px at 3440×1440 and 19.2px at 1920×1080. What's missing is the centred block. Desktop sets `--container: none`, so content stretches across all 3440px. The fix would be a block of about `min(94rem, 100% - 2 * var(--gutter))` for card grids and lists, with heroes and the header kept full width.
+**Our site already scales by height:** `tokens.css` sets the root font to `min(1.1111vw, 1.7778vh)` from 1100px wide, which gives 25.6px at 3440×1440 and 19.2px at 1920×1080. Before 28 Oct, desktop set `--container: none`, so content stretched across all 3440px. Now `--container` is the 94rem block plus gutters, for card grids and lists, with heroes and the header kept full width.
 
 ## Measurements
 
@@ -45,7 +45,7 @@ The main difference from our site. OW keeps corners **small**:
 - Cards and panels: about 8–10px (0.35–0.4rem). Shop art cards about 12px. [1, 5, 6]
 - Only status things are round: price pills, check pills, avatars in circles. [4, 5, 9]
 
-Ours: `--r-2` is 0.75rem (19px at 3440) on buttons, and `--r-3` is 1.25rem (32px) on cards. That's two to three times rounder. To get the OW feel, bring them down to about 0.125rem on buttons and inputs and 0.4rem on cards and panels. Leave `--r-pill` as it is.
+Ours before 28 Oct: `--r-2` was 0.75rem (19px at 3440) on buttons, and `--r-3` 1.25rem (32px) on cards, two to three times rounder. Now 0.25rem and 0.5rem. `--r-pill` is unchanged.
 
 ## Boxes
 
@@ -70,4 +70,4 @@ Ours: `--r-2` is 0.75rem (19px at 3440) on buttons, and `--r-3` is 1.25rem (32px
 - **Slanted nav tabs** (the parallelogram behind the active link) and **skewed thumbnail cards** along the bottom of the home screen. [1, 2, 5, 14]
 - **The blue edge on the left of the active mode tab.** It breaks our no-left-accent rule. [1]
 
-Replacement for the slanted tab: a **straight full-height block**. The active link fills the bar's full height edge to edge, with square corners, a lighter fill and a short accent line along the bottom edge of the bar. It's the same look OW uses on its own right-hand icons. [7, 16] Ours now is a rounded chip (`--r-2`) floating in the bar, with a line under it (`src/styles/header.css`).
+Replacement for the slanted tab: a **straight full-height block**. The active link fills the bar's full height edge to edge, with square corners, a lighter fill and a short accent line along the bottom edge of the bar. It's the same look OW uses on its own right-hand icons. [7, 16] That is what `src/styles/header.css` does now; before 28 Oct it was a rounded chip floating in the bar.

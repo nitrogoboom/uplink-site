@@ -4,7 +4,7 @@
   "description": "Uplink Technology mockup site. Node is only needed for the screenshot/check tools.",
   "scripts": {
     "serve": "python tools/serve.py",
-    "verify": "node tools/verify.js 8765 out"
+    "verify": "python tools/verify_footer.py out"
   },
   "devDependencies": {
     "playwright": "^1.47.0"

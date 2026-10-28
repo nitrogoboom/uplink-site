@@ -1,8 +1,9 @@
 # Uplink Technology site
 
 Overwatch 2–style website for a made-up IT company, "Uplink Technology".
-Plain HTML, CSS and JS. One small build step: pages are written in parts in `src/` and joined into `site/` by `python tools/build_pages.py` (see `src/README.md`). Headed for Astro later; `src/` is laid out to match.
-Also published as a claude.ai artifact: https://claude.ai/code/artifact/89e3144d-e7d5-4695-9503-653554d0ff98
+Plain HTML, CSS and JS. One small build step: pages are written in parts in `src/` and joined into `site/` by `python tools/build_pages.py` (see `src/README.md`).
+
+**Next: the move to Astro 7.** The plan, the target layout and the order of work are in `review.md`. Until that work starts, everything below describes the current Python build and is current.
 
 ## Run it on your PC
 
@@ -36,8 +37,10 @@ Python 3.10+ and Node 18+.
   - `llms.txt`: a short Markdown guide to the site for AI agents, built from each page's title and description and the service cards on the home page. `agents.md` (notes for AI agents) and `index.md` (the home page as Markdown) are written by hand in `src/`; the build fills in the address.
   - Content lives in the HTML, not in script. Services and Work hold every service and project as HTML. Script only shows one at a time. A one-line inline script adds a `js` class to `<html>` on those two pages so the stacked no-script layout never flashes.
   - `assets/img/*.svg` – the isometric illustrations. `office.svg` and `office-build.svg` share their geometry with the hero, and `tower-grow.svg` with the inline tower; the same scripts write them, so they stay in sync.
-- `tools/` – the build, the drawing scripts and their checks (Python + Playwright). Run them from the project root. `tools/retired/` holds old tools waiting to be deleted (see its README).
-- `layout-reference.md` – layout patterns from Overwatch 2 menus, written from the screenshots in `RAW Screenshots/` (kept out of git).
+- `tools/` – the build, the drawing scripts and their checks (Python + Playwright). Run them from the project root.
+- `layout-reference.md` – layout patterns from Overwatch 2 menus, written from the screenshots in `RAW Screenshots/` (kept out of git). Applied to the site on 28 Oct 2026.
+- `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec (roles for `tokens.css` and `tools/palette.py`); the rest is the record of how it was chosen. See its README.
+- `review.md` – the developer review of 28 Oct 2026 and the plan for the Astro move. `notes.md` – open items.
 
 ## Adding a service
 
@@ -95,12 +98,6 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `verify_footer.py out/` – the hero builds, tiles respond to hover, the tower grows on scroll, no sideways scroll, plus: every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), and every page at phone, tablet, 1440×900 and 3440×1440
 
 Serve `site/` with `python tools/serve.py` before running `verify_footer.py`.
-
-The one-off fix scripts from the precision pass (`tools/fixes/`) were not kept in the Project, so they are not in this bundle. They were a record only.
-
-## Publishing back to the artifact (optional)
-
-The artifact link above only updates from a Claude chat. To push local changes there: zip `site/`, attach it in a Claude chat in the "OW Inspired website" Project, and ask Claude to republish it to the artifact URL.
 
 ## Hosting (Cloudflare Pages, password-locked)
 

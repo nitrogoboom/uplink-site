@@ -52,11 +52,12 @@ The build fills in the bits that change per page: the current tab and root links
 
 Colours, sizes and timings stay in `site/assets/css/tokens.css`. Scripts stay in `site/assets/js/`.
 
-## Moving to Astro later
+## Moving to Astro
 
-The layout matches Astro on purpose:
+The layout matches Astro on purpose. The full plan (target layout, config choices, order of work) is `review.md` at the root. In short:
 
 - `components/Header.html` → `src/components/Header.astro`, and so on
 - each numbered section → a component, e.g. `src/components/home/Hero.astro`, with its `.css` as the component's `<style>`
 - `page.html` → `src/pages/index.astro`: the `<head>` goes into a shared layout and each `@include` line becomes `<Hero />`
 - the per-page bit the build fills in (current tab) becomes a prop
+- services, projects, FAQ, plans, team and footer links become content collections, and each service and project gets its own page

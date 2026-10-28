@@ -1,8 +1,9 @@
 /* ==========================================================================
    Uplink Technology · design tokens
    Every size, colour and timing on the site comes from this file.
-   Layout concept: game-client chrome (sticky top bar) around
-   calm scrolling sections on a 12-column grid, max 1280px wide.
+   Layout concept: game-client chrome (sticky top bar) around calm scrolling
+   sections. Heroes and the header run full width; cards and lists sit in one
+   centred block (--container, 94rem on desktop; layout-reference.md).
    ========================================================================== */
 
 :root {

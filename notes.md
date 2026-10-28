@@ -2,8 +2,14 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
-## Tools
-- [ ] Delete `tools/retired/` (13 old hand-fix tools, see its README). Nothing uses them.
+## Astro move (plan: `review.md`)
+- [ ] Do the move in the order in `review.md` "Order of work": scaffold and Home, the other pages, content collections with one page per service and project, generated files, CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`) and `site/`.
+- [ ] Config to carry over: `build.format: 'file'`, `trailingSlash: 'never'` (keeps today's URLs), `compressHTML: true` (the hero title's space between `</span>` and `<em>` vanishes under the new `'jsx'` default), `site` set to the live address.
+- [ ] Remove `<meta name="claude:viewport-fit-sides">` from every `page.html` (artifact leftover).
+- [ ] `<html lang="en">` → `en-CA` (matches `og:locale` and `inLanguage`).
+- [ ] `og.png` is 257 KB; run it through `oxipng`/`pngquant` in `gen_og.py` (aim for under 100 KB).
+- [ ] Hosting: Cloudflare Pages → Workers static assets (`wrangler.jsonc`, `assets.directory`, `not_found_handling: "404-page"`, `.assetsignore`); the password lock becomes a Worker with `run_worker_first`. Check Early Hints still arrive after the move. The real domain's DNS must be on Cloudflare.
+- [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
 ## Drawings
 - [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
@@ -34,8 +40,14 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] The `<head>` is copied in each `src/pages/*/page.html`. Make it one shared layout with per-page title, description and scripts (the Astro move does this anyway).
 
 ## Before going live
+- [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, Français, five social links). Each needs a page or no link. The `Français` link carries `hreflang="fr"` to a placeholder; drop it or build the page.
+- [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.
+- [ ] CSP reporting: `Reporting-Endpoints` + `report-to` so blocked scripts on real visitors get seen.
+- [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. `FAQPage` markup stays but gives no rich result (Google limits those to government and health sites since Aug 2023).
+- [ ] Search Console: verify the domain, submit the sitemap; redirect the `pages.dev` address to the real domain.
+- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode. Auto Minify and Rocket Loader stay off (they break the hashes and the CSP).
 - [ ] Site is open but kept out of search results: `X-Robots-Tag: noindex` on every response in `site/_headers` (since 27 Oct 2026; test build, placeholder company). PageSpeed's SEO score reads below 100 because of it; `tools/pagespeed.py` ignores that one audit. At launch: delete that header line, set `SITE_URL` in `tools/build_pages.py` to the real domain and rebuild. To lock it again instead: move `tools/site-lock/_middleware.js` back to `functions/` and deploy.
-- [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Pages Function in `functions/` that emails each submission to one inbox.
+- [ ] Forms are mockups: contact, book-a-call and newsletter send nothing. Left as mockups for now (26 Oct 2026). When wanted: a Worker endpoint (same origin, so `form-action 'self'` holds) with Turnstile, a honeypot field, a rate limit, and email via Cloudflare Email Service or Postmark. CSP then needs `challenges.cloudflare.com` in `script-src` and `frame-src`, and the Trusted Types policy in `core.js` must allow Turnstile's script.
 
 ## Copy to confirm
 - [ ] VoIP service wording ("Phones & Teams calling" section, card and footer).
