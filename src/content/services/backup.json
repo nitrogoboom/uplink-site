@@ -22,5 +22,29 @@
       "detail": "Who does what if the worst happens"
     }
   ],
-  "bestFor": "Anyone who can't lose a day of work"
+  "bestFor": "Anyone who can't lose a day of work",
+  "page": {
+    "heading": "A restore you have already tested",
+    "body": [
+      "Backups only matter on the day you need them. So we test them. Every quarter we restore real files and a whole server to prove the copies work, and we send you the result.",
+      "Servers, laptops and Microsoft 365 or Google accounts are backed up daily. One copy stays close for fast restores. Another sits offsite, locked so that ransomware cannot change or delete it.",
+      "We also write a short disaster plan with you: who to call, which systems come back first, and how long each step takes. It fits on two pages and lives somewhere you can reach without your network.",
+      "If something does go wrong, we restore the files or the whole machine and tell you what happened."
+    ],
+    "plans": "Microsoft 365 or Google backup in every plan. Server and offsite backup in Business and Complete.",
+    "faq": [
+      {
+        "q": "How far back can we restore?",
+        "a": "Daily copies are kept for 30 days and monthly copies for a year. We can keep them longer if your industry requires it."
+      },
+      {
+        "q": "How long does a full restore take?",
+        "a": "A single file takes minutes. A whole server usually takes a few hours. Your disaster plan lists the times for your systems."
+      },
+      {
+        "q": "Can ransomware reach the backups?",
+        "a": "The offsite copy is locked for a set period, so nothing can change or delete it, including an attacker with a stolen password."
+      }
+    ]
+  }
 }

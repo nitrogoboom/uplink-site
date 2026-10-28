@@ -8,5 +8,35 @@
   "result": "Budget approved a year ahead",
   "image": "strategy",
   "alt": "Rising budget bars and a quarterly roadmap",
-  "story": "Tech spending was one surprise after another. We mapped every device and licence, then built a three-year roadmap and budget the board could approve."
+  "story": "Tech spending was one surprise after another. We mapped every device and licence, then built a three-year roadmap and budget the board could approve.",
+  "page": {
+    "timeline": "Six weeks to the first roadmap",
+    "challenge": [
+      "A non-profit of 30 people kept getting surprise IT bills: a failed laptop here, a licence renewal there. Each one came out of a program budget.",
+      "Their board wanted a number for the year ahead, and nobody could give one."
+    ],
+    "steps": [
+      {
+        "title": "Count everything",
+        "detail": "Every device, licence and contract, with its age and renewal date."
+      },
+      {
+        "title": "Plan replacements",
+        "detail": "A schedule that spreads hardware costs evenly across three years."
+      },
+      {
+        "title": "Find savings",
+        "detail": "Unused licences cut and two contracts moved to non-profit pricing."
+      },
+      {
+        "title": "Present to the board",
+        "detail": "A one-page budget and a three-year roadmap, explained in plain words."
+      }
+    ],
+    "results": [
+      "The board approved the IT budget a year ahead.",
+      "No surprise IT bills in the first year.",
+      "Non-profit pricing and licence clean-up covered most of the new laptops."
+    ]
+  }
 }

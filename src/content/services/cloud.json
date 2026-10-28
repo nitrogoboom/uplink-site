@@ -24,5 +24,29 @@
       "detail": "SharePoint or Google shared drives, laid out clearly"
     }
   ],
-  "bestFor": "Old servers, messy licences, or a mix of both"
+  "bestFor": "Old servers, messy licences, or a mix of both",
+  "page": {
+    "heading": "Set up once, set up right",
+    "body": [
+      "Microsoft 365 and Google Workspace both work well. The trouble is usually how they were set up: shared passwords, files scattered across personal drives, and licences nobody remembers buying.",
+      "We start by mapping what you have: who uses which account, where the files live, and what you pay for. Then we tell you which platform fits and why. If you are already on the right one, we tidy it instead of moving you.",
+      "Moves happen over a weekend or after hours. Email, calendars and files come across, staff sign in on Monday, and we stay close for the first week to answer questions.",
+      "Afterwards, files sit in shared drives with clear folders and the right permissions. Every account has multi-factor sign-in, and everything is backed up outside Microsoft or Google."
+    ],
+    "plans": "Microsoft 365 or Google backup in every plan. Moves and clean-ups are quoted as a project.",
+    "faq": [
+      {
+        "q": "Microsoft 365 or Google Workspace?",
+        "a": "It depends on the apps your staff use every day. Heavy Excel and Outlook users usually stay with Microsoft. Teams that live in the browser often prefer Google. We lay out the trade-offs before you choose."
+      },
+      {
+        "q": "How long does a move take?",
+        "a": "For a team of 25, about three to four weeks of planning and one weekend for the move itself."
+      },
+      {
+        "q": "Why back up Microsoft 365 or Google?",
+        "a": "They keep the service running, not your data. A deleted folder or a ransomware attack on a synced drive can still lose files. Our backup keeps a separate copy."
+      }
+    ]
+  }
 }

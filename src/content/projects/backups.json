@@ -8,5 +8,35 @@
   "result": "Restores proven, not just promised",
   "image": "backup",
   "alt": "Backup drives with a restore loop and an offsite copy",
-  "story": "Production could not afford to lose a day. We set up daily backups with an offsite copy, and we run a test restore every quarter."
+  "story": "Production could not afford to lose a day. We set up daily backups with an offsite copy, and we run a test restore every quarter.",
+  "page": {
+    "timeline": "Five weeks, then a test every quarter",
+    "challenge": [
+      "A manufacturer with 60 staff runs production from a scheduling server. A lost day of data would mean a lost day of shipping.",
+      "They had a backup drive on a shelf. Nobody had tried a restore, and the drive sat on the same network as the server."
+    ],
+    "steps": [
+      {
+        "title": "List what matters",
+        "detail": "We ranked every system by how long the plant could run without it."
+      },
+      {
+        "title": "Daily backups",
+        "detail": "Servers, laptops and Microsoft 365, with a local copy for fast restores."
+      },
+      {
+        "title": "Locked offsite copy",
+        "detail": "A second copy offsite that ransomware cannot change or delete."
+      },
+      {
+        "title": "Test and write it down",
+        "detail": "A full restore test, then a two-page disaster plan with times for each step."
+      }
+    ],
+    "results": [
+      "The scheduling server can be back running in under four hours.",
+      "Every quarterly restore test since launch has passed.",
+      "The disaster plan is printed and kept off the network."
+    ]
+  }
 }

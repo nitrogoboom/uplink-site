@@ -22,5 +22,29 @@
       "detail": "New hires ready day one, leavers locked out the same day"
     }
   ],
-  "bestFor": "Every team, from 5 people to 150"
+  "bestFor": "Every team, from 5 people to 150",
+  "page": {
+    "heading": "One number, real people",
+    "body": [
+      "Your staff call, email, chat or open a ticket in the client portal. A technician answers, not a phone menu. During business hours our average first response on a ticket is 12 minutes.",
+      "Most problems are fixed remotely while you watch. If something needs hands on it, like a dead laptop or a printer that will not talk to anyone, we book a visit. We keep notes on every device and every user, so nobody has to explain the same thing twice.",
+      "We also handle the routine work that falls between the cracks. New hires get a laptop, accounts and access ready on their first morning. When someone leaves, their access is closed the same day and their files are handed to the right person.",
+      "Support covers everyone on your team and every device they use for work. We do not count tickets or charge by the call."
+    ],
+    "plans": "Every plan. On-site visits are included in Business and Complete, and billed per visit on Essentials.",
+    "faq": [
+      {
+        "q": "What hours is the help desk open?",
+        "a": "Monday to Friday, 7:00 to 19:00, by phone, email, chat and the portal. Outside those hours, urgent problems go to the on-call technician."
+      },
+      {
+        "q": "Can staff call in French?",
+        "a": "Yes. The help desk takes calls and tickets in English and French."
+      },
+      {
+        "q": "Do you support Macs and phones?",
+        "a": "Yes. We support Windows, macOS, iPhone and Android devices used for work."
+      }
+    ]
+  }
 }

@@ -8,5 +8,35 @@
   "result": "Fake invoices stopped before they land",
   "image": "security",
   "alt": "Office building inside a security perimeter",
-  "story": "After a near-miss with a fake invoice email, we added multi-factor sign-in, email filtering and short staff training, then watched every account around the clock."
+  "story": "After a near-miss with a fake invoice email, we added multi-factor sign-in, email filtering and short staff training, then watched every account around the clock.",
+  "page": {
+    "timeline": "Three weeks",
+    "challenge": [
+      "A law office of 18 people received an email that looked like a supplier invoice with new bank details. A bookkeeper caught it the day before payment.",
+      "The office had no multi-factor sign-in, only the spam filter that came with their email, and no security training."
+    ],
+    "steps": [
+      {
+        "title": "Multi-factor sign-in",
+        "detail": "Turned on for every account, with a short walk-through for each person."
+      },
+      {
+        "title": "Email filtering",
+        "detail": "Added a filter that holds look-alike domains and checks links when they are clicked."
+      },
+      {
+        "title": "Staff training",
+        "detail": "A 20-minute session, then short monthly lessons and practice phishing emails."
+      },
+      {
+        "title": "Around-the-clock watch",
+        "detail": "Every account and device now reports to our security team."
+      }
+    ],
+    "results": [
+      "No fake invoices have reached a staff inbox since the filter went in.",
+      "Clicks on practice phishing emails fell from 1 in 4 to 1 in 25 over six months.",
+      "Their cyber insurance renewal went through with a lower premium."
+    ]
+  }
 }

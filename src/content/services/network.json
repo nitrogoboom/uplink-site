@@ -22,5 +22,29 @@
       "detail": "Several offices that work like one"
     }
   ],
-  "bestFor": "Offices that are moving or growing"
+  "bestFor": "Offices that are moving or growing",
+  "page": {
+    "heading": "Wi-Fi that reaches every desk",
+    "body": [
+      "Slow or patchy networks are rarely about internet speed. Usually it is an old switch, a firewall nobody has updated, or access points placed where it was easy to run a cable.",
+      "We survey the office first and map Wi-Fi coverage room by room. Then we design the network: business firewall, switches, and access points where people actually sit. Guest Wi-Fi stays separate from staff and from anything that holds client data.",
+      "Installs happen after hours. Every cable and port is labelled and documented, so the next fix takes minutes instead of an afternoon of tracing wires.",
+      "Once it is in, we keep the firewall patched, watch the network for faults, and replace hardware before it fails. Several offices can be joined so they work like one."
+    ],
+    "plans": "Day-to-day support in every plan. Multi-site management in Complete. New installs are quoted as a project.",
+    "faq": [
+      {
+        "q": "Can you reuse our existing equipment?",
+        "a": "Often, yes. We test what you have and only replace the parts that are old, unsupported or in the wrong place."
+      },
+      {
+        "q": "Will the install interrupt work?",
+        "a": "No. We install after hours or over a weekend and test every desk before staff come back."
+      },
+      {
+        "q": "Do you help with an office move?",
+        "a": "Yes. We plan the network for the new space, coordinate with your landlord and internet provider, and move everything over a weekend."
+      }
+    ]
+  }
 }

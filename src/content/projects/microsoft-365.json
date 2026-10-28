@@ -8,5 +8,35 @@
   "result": "Old server retired, files on any device",
   "image": "cloud",
   "alt": "Server, laptop and phone syncing to a cloud workspace hub",
-  "story": "Files lived on an ageing server in a closet. We moved email and files to Microsoft 365, cleaned up licences, and set up Teams so staff could work from anywhere."
+  "story": "Files lived on an ageing server in a closet. We moved email and files to Microsoft 365, cleaned up licences, and set up Teams so staff could work from anywhere.",
+  "page": {
+    "timeline": "Four weeks",
+    "challenge": [
+      "An accounting firm of 25 people kept every file on a server in a closet. It was eight years old and out of warranty, and working from home meant a slow VPN.",
+      "Licences had been bought over the years by different people. Some staff had two, and some ex-staff still had one."
+    ],
+    "steps": [
+      {
+        "title": "Map the files",
+        "detail": "We sorted client folders, templates and archives, and agreed who needs what."
+      },
+      {
+        "title": "Clean up licences",
+        "detail": "One licence per person, at the level they actually use."
+      },
+      {
+        "title": "Move over a weekend",
+        "detail": "Email and files moved to Microsoft 365, with SharePoint sites for each team."
+      },
+      {
+        "title": "Teams and training",
+        "detail": "Teams set up for calls and chat, with a short session for staff on Monday."
+      }
+    ],
+    "results": [
+      "The old server is retired, and files open on any device.",
+      "Licence costs dropped by about a fifth.",
+      "Staff work from home without the VPN."
+    ]
+  }
 }

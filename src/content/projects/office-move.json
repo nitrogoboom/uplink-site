@@ -8,5 +8,35 @@
   "result": "Staff logged in Monday like nothing happened",
   "image": "office",
   "alt": "Floor plan of the new office with desks, server rack and Wi-Fi",
-  "story": "A growing firm moved floors on a Friday. We planned the network, Wi-Fi and desks in advance, cabled over the weekend, and tested every seat on Sunday night."
+  "story": "A growing firm moved floors on a Friday. We planned the network, Wi-Fi and desks in advance, cabled over the weekend, and tested every seat on Sunday night.",
+  "page": {
+    "timeline": "Six weeks of planning, one weekend",
+    "challenge": [
+      "A professional services firm of 40 people was moving two floors up in the same building. The lease set the date: out on Friday, open on Monday.",
+      "Their old office had grown one desk at a time. Nobody knew which cable went where, and the Wi-Fi had dead spots in both meeting rooms."
+    ],
+    "steps": [
+      {
+        "title": "Survey the new floor",
+        "detail": "We mapped Wi-Fi coverage and planned the cabling before the walls were closed."
+      },
+      {
+        "title": "Order and stage",
+        "detail": "New switches and access points were set up and tested in our shop the week before."
+      },
+      {
+        "title": "Move over the weekend",
+        "detail": "Cabling, the network rack and every desk went in on Saturday and Sunday."
+      },
+      {
+        "title": "Test every seat",
+        "detail": "On Sunday night we signed in at each desk, printed a page and placed a call."
+      }
+    ],
+    "results": [
+      "All 40 staff logged in on Monday with no tickets about the move.",
+      "Full Wi-Fi coverage, including both meeting rooms.",
+      "Every port and cable labelled and documented."
+    ]
+  }
 }

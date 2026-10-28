@@ -22,6 +22,7 @@ const { id, data: p } = projects[0];
         <dl class="facts">
           <div><dt>Client</dt><dd data-case-bind="client">{p.client}</dd></div>
           <div><dt>Services</dt><dd data-case-bind="services">{p.services}</dd></div>
+          <div><dt>Timeline</dt><dd data-case-bind="timeline">{p.page.timeline}</dd></div>
           <div><dt>Result</dt><dd class="accent" data-case-bind="result">{p.result}</dd></div>
         </dl>
         <a class="link-arrow" href={`/work/${id}`} data-case-link>Open this project's page<Icon name="arrow" /></a>
