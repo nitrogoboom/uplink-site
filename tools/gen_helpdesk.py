@@ -11,9 +11,10 @@ from shapely.ops import unary_union
 from iso import W
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_top, rect
 from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+import palette as pal
 
 w = W(0, 0, 23)                       # inside the group's translate(265.7,200.9)
-GREEN = '#6FD3A0'                     # tokens --c-ok
+GREEN = pal.GREEN                     # tokens --c-ok
 
 DESK = (0, 8, 0, 3.5, 0, 2.625)       # x0 x1 y0 y1 z0 z1 (everything on the isoprops grid: x, y in 0.25s, z in 0.125s)
 TOP = DESK[5]
@@ -32,7 +33,7 @@ CHAT = [  # (kind, u, v, width, height): header bar, then messages top to bottom
     ('out', 1.38, 1.22, 1.9, 0.46),
     ('typing', 0.22, 1.84, 0.95, 0.42),
 ]
-SCREEN_BG, BUBBLE_IN, LINE = '#1A2333', '#3A4A63', '#D9E4F0'
+SCREEN_BG, BUBBLE_IN, LINE = pal.SCREEN, pal.BUBBLE, pal.EDGE
 
 TICKET = (3.75, 2.5, 0.25)            # width (x), depth (y), thickness
 TICKETS = [  # (x0, y0, z0, status colour, status): top to bottom
@@ -96,8 +97,8 @@ def chat_window():
     out = []
     for kind, u, v, wd, ht in CHAT:
         if kind == 'bar':
-            out.append(rect(0, 0, sw, ht, '#26324A', 0.08))
-            out += [f'<circle cx="{0.2 + k * 0.17:g}" cy="{ht / 2:g}" r="0.055" fill="{c}"/>' for k, c in enumerate(('#F47E6A', ORANGE, GREEN))]
+            out.append(rect(0, 0, sw, ht, pal.APP_BAR, 0.08))
+            out += [f'<circle cx="{0.2 + k * 0.17:g}" cy="{ht / 2:g}" r="0.055" fill="{c}"/>' for k, c in enumerate((pal.RED_DOT, ORANGE, GREEN))]
             out.append(rect(sw / 2 - 0.55, ht / 2 - 0.045, 1.1, 0.09, LINE, 0.045, ' fill-opacity="0.3"'))
         elif kind == 'in':
             out.append(rect(u, v, wd, ht, BUBBLE_IN, 0.16))
@@ -138,7 +139,7 @@ def ticket_shadow():
     x0, x1, y0, y1, _z0, _z1 = ticket_boxes()[-1]
     x0, x1, y0, y1 = x0 + inset, x1 - inset, y0 + inset, y1 - inset
     return (f'<filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="{blur}"/></filter>'
-            f'<polygon class="shadow" points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="#0B1019" fill-opacity="{op}" filter="url(#soft)"/>')
+            f'<polygon class="shadow" points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="{pal.DROP}" fill-opacity="{op}" filter="url(#soft)"/>')
 
 
 def build(compact=False):

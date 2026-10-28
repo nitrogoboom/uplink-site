@@ -8,6 +8,7 @@ from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
+import palette as pal
 
 w = W(43.3, 115, 20)                  # inside the group's translate(267.3,170.5)
 
@@ -35,9 +36,9 @@ BUDGET_ELBOW = (150.0, -96.0)         # IT BUDGET leader: elbow (screen); text s
 # so the four still fit side by side at the bigger size.
 COMPACT = dict(crop=(88, 50, 473, 354.75), scale=1.55, budget_sub='planned,\nnot surprised',
                budget_elbow=(136.0, -96.0))    # IT BUDGET a little left of the full one, clear of the frame
-GREY = '#A9B4C3'
+GREY = pal.GREY
 
-WHITE = '#F1F4F8'
+WHITE = pal.WHITE
 TITLE = 'Rising budget bars and a quarterly IT roadmap path'
 
 

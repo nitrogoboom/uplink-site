@@ -14,13 +14,14 @@ from iso import W, fmt
 from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_out, seg_path
 from svgfont import font_style
 from isoprops import on_front, rect
+import palette as pal
 
 w = W(262, 283.2, 24)
 
 # Grid: x, y in 0.25s, z in 0.125s (as tools/isoprops.py), so nothing nearly-touches.
 GROUND = 11.75                        # ground slab is GROUND x GROUND, top at z = 0
 GROUND_T = 0.75                       # slab thickness
-GROUND_TOP = '#1E2938'
+GROUND_TOP = pal.WINDOW
 GRID = range(0, 12)                   # ground lines at x = k and y = k
 LAWN_INSET = 0.5                      # faint green tint, inset from the slab edge
 B0, B1 = 1.25, 9.25                   # building footprint, x and y (8 wide, centre 5.25)
@@ -52,31 +53,31 @@ BUSH = (0.75, 0.5)                    # width, height
 BUSHES = [(2.25, 10.0), (3.25, 10.0), (6.5, 10.0), (7.5, 10.0),       # back corner x, y: a row each side of the path,
           (10.0, 2.5), (10.0, 3.5), (10.0, 6.25), (10.0, 7.25)]       # and two pairs along the right wall
 
-GREEN = ('#4E9C78', '#3C7C60', '#6FD3A0')
-GREEN_EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.22"'
-AWNING_EDGE = 'stroke="#FFE6C4" stroke-width="1" stroke-opacity="0.55"'
-WALL_LINE = 'fill="none" stroke="#D9E4F0" stroke-width="0.8" stroke-opacity="0.3"'
+GREEN = (pal.GREEN_MID, pal.GREEN_DARK, pal.GREEN)
+GREEN_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
+AWNING_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
+WALL_LINE = f'fill="none" stroke="{pal.EDGE}" stroke-width="0.8" stroke-opacity="0.3"'
 TITLE = 'Isometric office building that grows from one to three storeys as a company grows'
 
-STYLE = '''<style>.tg-floor,.tg-roof{transition:opacity .6s ease,transform .6s ease}
-.tg-w{fill:#1F2A3B;transition:fill .6s ease,fill-opacity .6s ease}
-.tg-w.tg-on{fill:#7DB9E8;fill-opacity:.6}
-.tg-wr.tg-on{fill-opacity:.42}
-.tg-tl{stroke:#7DB9E8;transition:stroke .6s ease}
-.tg-td{fill:#7DB9E8;stroke:#151E2C;stroke-width:2;transition:fill .6s ease}
-.tg-tb{fill:#1E2938;stroke:#7DB9E8;stroke-opacity:.4;stroke-width:1;transition:stroke .6s ease,stroke-opacity .6s ease}
-.tg-tt{fill:#F1F4F8;text-transform:uppercase;transition:fill .6s ease}
-@media (max-width:599px){.tg-tl,.tg-td,.tg-tb,.tg-tt{display:none}}
-.tg[data-floors="1"] .tg-floor[data-f="2"],.tg[data-floors="1"] .tg-floor[data-f="3"],.tg[data-floors="2"] .tg-floor[data-f="3"]{opacity:0;transform:translateY(-30px);pointer-events:none}
-.tg[data-floors="2"] .tg-roof{transform:translateY(DROP1px)}
-.tg[data-floors="1"] .tg-roof{transform:translateY(DROP2px)}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-w,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-w,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-w,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-w{fill:#F7B868;fill-opacity:1}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-wr,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-wr,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-wr,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-wr{fill:#E2953F}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tl,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tl,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tl,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tl{stroke:#F4A340}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-td,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-td,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-td,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-td{fill:#F4A340}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tb,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tb,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tb,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tb{stroke:#F4A340;stroke-opacity:.9}
-.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tt,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tt,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tt,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tt{fill:#F4A340}
-@media (prefers-reduced-motion:reduce){.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{transition:none!important}}</style>'''
+STYLE = f'''<style>.tg-floor,.tg-roof{{transition:opacity .6s ease,transform .6s ease}}
+.tg-w{{fill:{pal.GLASS};transition:fill .6s ease,fill-opacity .6s ease}}
+.tg-w.tg-on{{fill:{pal.SKY};fill-opacity:.6}}
+.tg-wr.tg-on{{fill-opacity:.42}}
+.tg-tl{{stroke:{pal.SKY};transition:stroke .6s ease}}
+.tg-td{{fill:{pal.SKY};stroke:{pal.PAGE};stroke-width:2;transition:fill .6s ease}}
+.tg-tb{{fill:{pal.WINDOW};stroke:{pal.SKY};stroke-opacity:.4;stroke-width:1;transition:stroke .6s ease,stroke-opacity .6s ease}}
+.tg-tt{{fill:{pal.WHITE};text-transform:uppercase;transition:fill .6s ease}}
+@media (max-width:599px){{.tg-tl,.tg-td,.tg-tb,.tg-tt{{display:none}}}}
+.tg[data-floors="1"] .tg-floor[data-f="2"],.tg[data-floors="1"] .tg-floor[data-f="3"],.tg[data-floors="2"] .tg-floor[data-f="3"]{{opacity:0;transform:translateY(-30px);pointer-events:none}}
+.tg[data-floors="2"] .tg-roof{{transform:translateY(DROP1px)}}
+.tg[data-floors="1"] .tg-roof{{transform:translateY(DROP2px)}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-w,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-w,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-w,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-w{{fill:{pal.HI_TOP};fill-opacity:1}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-wr,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-wr,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-wr,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-wr{{fill:{pal.HI_LEFT}}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tl,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tl,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tl,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tl{{stroke:{pal.AMBER}}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-td,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-td,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-td,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-td{{fill:{pal.AMBER}}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tb,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tb,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tb,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tb{{stroke:{pal.AMBER};stroke-opacity:.9}}
+.tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tt,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tt,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tt,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tt{{fill:{pal.AMBER}}}
+@media (prefers-reduced-motion:reduce){{.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{{transition:none!important}}}}</style>'''
 
 
 def box(x0, x1, y0, y1, z0, z1, cols=FACES, edge=EDGE):
@@ -114,11 +115,11 @@ def door_front():
     dw = d1 - d0
     awning, step = door_boxes()
     leaf = (dw - 0.375) / 2           # two leaves, 0.125 frame each side and between
-    door = [rect(0, 0, dw, dh, '#1F2A3B', 0, f' stroke="{BLUE}" stroke-opacity="0.5" stroke-width="0.9" vector-effect="non-scaling-stroke"')]
+    door = [rect(0, 0, dw, dh, pal.GLASS, 0, f' stroke="{BLUE}" stroke-opacity="0.5" stroke-width="0.9" vector-effect="non-scaling-stroke"')]
     for k in range(2):
         u = 0.125 + k * (leaf + 0.125)
         door.append(rect(u, 0.125, leaf, dh - 0.25, BLUE, 0, ' fill-opacity="0.22"'))
-        door.append(rect(u + (leaf - 0.1 if k == 0 else 0.04), dh * 0.5, 0.06, 0.3, '#D9E4F0', 0.03, ' fill-opacity="0.7"'))
+        door.append(rect(u + (leaf - 0.1 if k == 0 else 0.04), dh * 0.5, 0.06, 0.3, pal.EDGE, 0.03, ' fill-opacity="0.7"'))
     return [f'<g transform="{on_front(w, d0, B1, dh)}">' + ''.join(door) + '</g>'] + box(*awning, HIGH, AWNING_EDGE) + box(*step)
 
 
@@ -130,9 +131,9 @@ def ground(mask):
         segs += clip_out(w.p(k, 0), w.p(k, g), mask)
         segs += clip_out(w.p(0, k), w.p(g, k), mask)
     out.append(seg_path([s for s in segs if abs(s[0][0] - s[1][0]) + abs(s[0][1] - s[1][1]) >= 3],
-                        'fill="none" stroke="#2C3849" stroke-width="0.8" stroke-opacity="0.5"'))
+                        f'fill="none" stroke="{pal.GRID}" stroke-width="0.8" stroke-opacity="0.5"'))
     i = LAWN_INSET
-    out.append(flat([(i, i), (g - i, i), (g - i, g - i), (i, g - i)], 'fill="#6FD3A0" fill-opacity="0.13"'))
+    out.append(flat([(i, i), (g - i, i), (g - i, g - i), (i, g - i)], f'fill="{pal.GREEN}" fill-opacity="0.13"'))
     out.append(flat([(WALK[0], B1), (WALK[1], B1), (WALK[1], g), (WALK[0], g)], f'fill="{FACES[2]}" fill-opacity="0.95"'))
     out.append(flat([(WALK[0], WALK_LINE[0]), (WALK[1], WALK_LINE[0]), (WALK[1], WALK_LINE[1]), (WALK[0], WALK_LINE[1])], f'fill="{FACES[0]}"'))
     return out
@@ -185,7 +186,7 @@ def roof():
     out += box(px0, px1, py0, py1, z, z + ph, GREEN, GREEN_EDGE)
     m, mh = MAST
     (bx, by), (tx, ty) = w.p(m, m, z), w.p(m, m, z + mh)
-    out.append(f'<polyline points="{fmt(bx)},{fmt(by)} {fmt(tx)},{fmt(ty)}" fill="none" stroke="#D9E4F0" stroke-width="1.6" stroke-opacity="0.8"/>')
+    out.append(f'<polyline points="{fmt(bx)},{fmt(by)} {fmt(tx)},{fmt(ty)}" fill="none" stroke="{pal.EDGE}" stroke-width="1.6" stroke-opacity="0.8"/>')
     out.append(f'<circle cx="{fmt(tx)}" cy="{fmt(ty)}" r="4" fill="{ORANGE}" stroke="{INK}" stroke-width="2"/>')
     for r, o in WIFI:
         k = r / 2 ** 0.5

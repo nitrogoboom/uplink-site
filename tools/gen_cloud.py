@@ -11,9 +11,10 @@ from shapely.ops import unary_union
 from iso import W, C30, fmt
 from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
 from isoprops import on_front, on_top, rect, screen_glass, app_window
+import palette as pal
 
 w = W(21.2, 36.7, 16.31)              # inside the group's translate(312.8,310.6)
-GREEN, LINE = '#6FD3A0', '#D9E4F0'
+GREEN, LINE = pal.GREEN, pal.EDGE
 
 DISC_R = 9.085                        # floor disc; grid lines on whole x and half y
 
@@ -106,11 +107,11 @@ def server():
     out = []
     for k in range(BAYS):
         v = 0.375 + k * 0.625
-        out.append(rect(0.25, v, wd - 0.5, 0.5, '#1E2938', 0.06, ' stroke="#7DB9E8" stroke-opacity="0.45" stroke-width="1" vector-effect="non-scaling-stroke"'))
+        out.append(rect(0.25, v, wd - 0.5, 0.5, pal.WINDOW, 0.06, f' stroke="{pal.SKY}" stroke-opacity="0.45" stroke-width="1" vector-effect="non-scaling-stroke"'))
         out.append(rect(0.45, v + 0.2, wd - 1.3, 0.1, LINE, 0.05, ' fill-opacity="0.25"'))
-        out.append(f'<circle cx="{wd - 0.55:.4g}" cy="{v + 0.25:.4g}" r="0.08" fill="{ORANGE if k == 0 else "#55657D"}"/>')
+        out.append(f'<circle cx="{wd - 0.55:.4g}" cy="{v + 0.25:.4g}" r="0.08" fill="{ORANGE if k == 0 else pal.DIM}"/>')
     for k in range(5):
-        out.append(rect(0.25, 3.25 + k * 0.25, wd - 0.5, 0.08, '#1E2938', 0.04))
+        out.append(rect(0.25, 3.25 + k * 0.25, wd - 0.5, 0.08, pal.WINDOW, 0.04))
     return faces(w, *SERVER) + [f'<g transform="{on_front(w, x0, y1, z1)}">' + ''.join(out) + '</g>']
 
 
@@ -118,10 +119,10 @@ def laptop():
     """Base with keys and a trackpad on top; upright lid with an app on screen."""
     x0, x1, y0, y1, _, z1 = LAPTOP
     wd = x1 - x0
-    keys = [rect(0.25, 0.25, wd - 0.5, 1.0, '#26324A', 0.06)]
+    keys = [rect(0.25, 0.25, wd - 0.5, 1.0, pal.APP_BAR, 0.06)]
     keys += [rect(0.35 + c * ((wd - 0.7) / 8), 0.35 + r * 0.27, (wd - 0.7) / 8 - 0.06, 0.2, LINE, 0.03, ' fill-opacity="0.18"')
              for r in range(3) for c in range(8)]
-    keys.append(rect(wd / 2 - 0.55, 1.45, 1.1, 0.6, '#26324A', 0.08))
+    keys.append(rect(wd / 2 - 0.55, 1.45, 1.1, 0.6, pal.APP_BAR, 0.08))
     lx0, lx1, _, ly1, lz0, lz1 = LID
     inset = 0.125
     scr = ('+y', (lx0 + inset, ly1, lz1 - inset), lx1 - lx0 - 2 * inset, lz1 - lz0 - 2 * inset - 0.125)
@@ -138,7 +139,7 @@ def phone():
     ui = [f'<circle cx="{wd / 2:.4g}" cy="0.6" r="0.24" fill="{BLUE}" fill-opacity="0.8"/>',
           rect(wd / 2 - 0.3, 0.98, 0.6, 0.09, LINE, 0.045, ' fill-opacity="0.6"'),
           rect(wd / 2 - 0.2, 1.15, 0.4, 0.07, LINE, 0.035, ' fill-opacity="0.3"'),
-          f'<circle cx="{wd * 0.3:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="#F47E6A"/>',
+          f'<circle cx="{wd * 0.3:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="{pal.RED_DOT}"/>',
           f'<circle cx="{wd * 0.7:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="{GREEN}"/>']
     scr = ('+y', (x0 + inset, y1, z1 - inset), wd, ht)
     out.append(screen_glass(w, scr, ''.join(ui), glow=GREEN))
@@ -190,7 +191,7 @@ def slab():
         out += faces(w, tx, tx + TILE, ty, ty + TILE, z1, z1 + TILE_H, HIGH if n == LIT_TILE else FACES)
         o = (TILE - ICON) / 2
         ox, oy = w.p(tx + o, ty + o, z1 + TILE_H)
-        ink = '#1B2130' if n == LIT_TILE else '#F1F4F8'
+        ink = pal.ON_AMBER if n == LIT_TILE else pal.WHITE
         out.append(f'<g transform="matrix({m[0]} {m[1]} {m[2]} {m[3]} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{ink}" '
                    f'stroke-width="1.6" vector-effect="non-scaling-stroke">{icon}</g>')
     return out, (x0, y0, W_, D_, z1)
@@ -208,12 +209,12 @@ def card(plat):
            f'<polyline class="lt" points="{fmt(cx)},{fmt(bottom)} {fmt(cx)},{fmt(by)}" fill="none" stroke="{BLUE}" stroke-width="1.3" '
            f'stroke-opacity="0.55" stroke-dasharray="3 5"/>',
            f'<rect class="lt" x="{fmt(left)}" y="{fmt(CARD["top"])}" width="{fmt(CARD["w"])}" height="{fmt(CARD["h"])}" rx="{fmt(CARD["rx"])}" '
-           f'fill="#212D40" stroke="{BLUE}" stroke-width="1.3" stroke-opacity="0.6"/>',
-           f'<text class="lt" x="{fmt(left + 12.6)}" y="{fmt(CARD["top"] + 17.5)}" font-size="10" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
+           f'fill="{pal.SOLID}" stroke="{BLUE}" stroke-width="1.3" stroke-opacity="0.6"/>',
+           f'<text class="lt" x="{fmt(left + 12.6)}" y="{fmt(CARD["top"] + 17.5)}" font-size="10" font-weight="600" letter-spacing="0.12em" fill="{pal.GREY}">CLOUD WORKSPACE</text>']
     for n, row in enumerate(CARD_ROWS):
         y = CARD['top'] + 37 + n * 19.6
-        out.append(f'<g class="lt"><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="#6FD3A0"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
-                   f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="#F1F4F8">{row}</text></g>')
+        out.append(f'<g class="lt"><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="{pal.GREEN}"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
+                   f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{row}</text></g>')
     out.append(badge(cx, by, BLUE) + '</g>')            # small: the card hides, its number sits where the riser meets the slab
     return out
 

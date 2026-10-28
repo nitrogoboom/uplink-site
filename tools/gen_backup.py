@@ -11,10 +11,11 @@ from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import ORANGE, BLUE, INK, faces, iso_ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
 from isoprops import on_front, on_side, rect
+import palette as pal
 
 w = W(0, 0, 16.46)
 TRANSLATE = (268.6, 214.6)            # puts the whole picture (labels included) in the middle of the 640 x 480 frame
-GREEN, BAY, SLOT = '#6FD3A0', '#1F2A3B', '#D9E4F0'
+GREEN, BAY, SLOT = pal.GREEN, pal.GLASS, pal.EDGE
 
 # backup unit: three stacked appliances, each with four drive bays on its right face and a status panel on its left
 UNIT = (5, 4, 1.375)                  # x, y, height of one appliance
@@ -164,7 +165,7 @@ def bays(i, z0):
     for k in range(BAYS):
         u = BAY_MARGIN + k * (bw + BAY_GAP)
         light = ORANGE if (i, k) in BUSY else GREEN
-        out += [rect(u, v0, bw, v1 - v0, BAY, 0.06, ' stroke="#D9E4F0" stroke-opacity="0.18" stroke-width="1" vector-effect="non-scaling-stroke"'),
+        out += [rect(u, v0, bw, v1 - v0, BAY, 0.06, f' stroke="{pal.EDGE}" stroke-opacity="0.18" stroke-width="1" vector-effect="non-scaling-stroke"'),
                 rect(u + 0.15, v0 + 0.2, bw - 0.3, 0.08, SLOT, 0.04, ' fill-opacity="0.35"'),
                 f'<circle cx="{u + bw - 0.18:.4g}" cy="{v1 - 0.17:.4g}" r="0.07" fill="{light}"/>']
     return f'<g transform="{on_side(w, DX, DY, z1)}">' + ''.join(out) + '</g>'
@@ -173,7 +174,7 @@ def bays(i, z0):
 def status_panel(i, z0):
     """Small lit display and a power light on the appliance's left face."""
     z1 = z0 + DH
-    out = [rect(0.5, 0.375, 1.5, 0.5, '#1A2333', 0.06, ' stroke="#7DB9E8" stroke-opacity="0.4" stroke-width="1" vector-effect="non-scaling-stroke"'),
+    out = [rect(0.5, 0.375, 1.5, 0.5, pal.SCREEN, 0.06, f' stroke="{pal.SKY}" stroke-opacity="0.4" stroke-width="1" vector-effect="non-scaling-stroke"'),
            rect(0.66, 0.53, 0.9, 0.08, BLUE, 0.04, ' fill-opacity="0.85"'),
            rect(0.66, 0.69, 0.55, 0.06, BLUE, 0.03, ' fill-opacity="0.45"'),
            f'<circle cx="{DX - 0.5:.4g}" cy="0.625" r="0.09" fill="{GREEN if i else ORANGE}"/>']
@@ -202,10 +203,10 @@ def offsite_site():
     out = faces(w, SX0, SX1, SY0, SY1, 0, SH)
     # left face (y = SY1), u along +x from SX0, v down from the roof
     dl, dw, dh = DOOR
-    left = [rect(dl, SH - dh, dw, dh, BAY, 0.05, ' stroke="#D9E4F0" stroke-opacity="0.25" stroke-width="1" vector-effect="non-scaling-stroke"'),
+    left = [rect(dl, SH - dh, dw, dh, BAY, 0.05, f' stroke="{pal.EDGE}" stroke-opacity="0.25" stroke-width="1" vector-effect="non-scaling-stroke"'),
             f'<circle cx="{dl + dw - 0.15:.4g}" cy="{SH - dh / 2:.4g}" r="0.05" fill="{SLOT}" fill-opacity="0.7"/>']
     for wl, wt in WINDOWS:
-        left.append(rect(wl, wt, 0.75, 0.5, BLUE, 0.04, ' fill-opacity="0.35" stroke="#7DB9E8" stroke-opacity="0.6" stroke-width="1" vector-effect="non-scaling-stroke"'))
+        left.append(rect(wl, wt, 0.75, 0.5, BLUE, 0.04, f' fill-opacity="0.35" stroke="{pal.SKY}" stroke-opacity="0.6" stroke-width="1" vector-effect="non-scaling-stroke"'))
     out.append(f'<g transform="{on_front(w, SX0, SY1, SH)}">' + ''.join(left) + '</g>')
     # right face (x = SX1): the lock, centred
     fw = SY1 - SY0

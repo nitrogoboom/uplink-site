@@ -11,6 +11,7 @@ from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import HIGH, ORANGE, BLUE, faces, ellipse, clip_out, label, doc, write, silhouette, floor_grid, disc_arcs
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, app_window
+import palette as pal
 
 w = W(0, 0, 1)                        # inside the group's translate(TX, TY)
 TX, TY = 264.0, 209.0                 # centres the drawing: disc and rack top span about -170..282 x -155..218
@@ -21,7 +22,7 @@ FIREWALL = (-5, 65, -5, 65, 140, 150) # sits on the rack, 5 wider each side
 PORT_X = (5, 55)                      # patch rows on the rack's left wall (y = 60)
 PORT_STEP, PORTS = 12.5, 10           # rows at z = 12.5, 25 ... 125
 LED_X = 50                            # status lights, between the rows
-LEDS = [BLUE, '#F1F4F8', '#F1F4F8'] * 4   # repeats bottom to top
+LEDS = [BLUE, pal.WHITE, pal.WHITE] * 4   # repeats bottom to top
 
 # two workstations in front of the rack, facing +x (towards the viewer's right), with open floor between them
 DESK = (45, 85, 52.5)                 # depth (x), width (y), height: desk top = 0.78 x chair back, as at the help desk

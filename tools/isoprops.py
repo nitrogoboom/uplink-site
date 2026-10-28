@@ -13,6 +13,7 @@ same grid). On screen that puts any two corners either exactly together or at le
 23px a unit, so parts can't nearly-touch (check.py stays clean) however a prop is turned or placed.
 """
 from iso import C30
+import palette as pal
 
 
 def num(v):
@@ -115,19 +116,19 @@ def screen_transform(w, screen):
     return on_front(w, x, y, z) if facing == '+y' else on_side(w, x, y, z)
 
 
-def screen_glass(w, screen, content='', glow='#7DB9E8'):
+def screen_glass(w, screen, content='', glow=pal.SKY):
     """Dark glass with a faint edge, plus whatever content (local units) the drawing puts on it."""
     _f, _xyz, wd, ht = screen
     return (f'<g transform="{screen_transform(w, screen)}">'
-            + rect(0, 0, wd, ht, '#1A2333', 0.08 * min(wd, ht) / 2.4, f' stroke="{glow}" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"')
+            + rect(0, 0, wd, ht, pal.SCREEN, 0.08 * min(wd, ht) / 2.4, f' stroke="{glow}" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"')
             + content + '</g>')
 
 
-def app_window(wd, ht, accent='#F4A340', line='#D9E4F0'):
+def app_window(wd, ht, accent=pal.AMBER, line=pal.EDGE):
     """A plain app window for screens that don't need their own story: title bar, a highlight, three lines."""
     bar = min(0.36, ht * 0.15)
-    out = [rect(0, 0, wd, bar, '#26324A', 0.06)]
-    out += [f'<circle cx="{0.2 + k * 0.17:.3g}" cy="{bar / 2:.3g}" r="0.055" fill="{c}"/>' for k, c in enumerate(('#F47E6A', accent, '#6FD3A0'))]
+    out = [rect(0, 0, wd, bar, pal.APP_BAR, 0.06)]
+    out += [f'<circle cx="{0.2 + k * 0.17:.3g}" cy="{bar / 2:.3g}" r="0.055" fill="{c}"/>' for k, c in enumerate((pal.RED_DOT, accent, pal.GREEN))]
     out.append(rect(0.22, bar + 0.25, wd * 0.45, 0.16, accent, 0.08, ' fill-opacity="0.85"'))
     for k, f in enumerate((0.8, 0.65, 0.5)):
         out.append(rect(0.22, bar + 0.6 + k * 0.32, wd * f - 0.44, 0.1, line, 0.05, ' fill-opacity="0.3"'))
@@ -149,7 +150,7 @@ def desk_phone(x, y, top, facing='-y', s=1.0):
     return [('body', parts['body']), ('handset', parts['handset'])], (bx0, by0, bz1, bx1 - bx0, by1 - by0, facing, s)
 
 
-def phone_face(w, top_face, glow='#7DB9E8', key='#D9E4F0'):
+def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
     """Little lit screen and a 3 x 3 keypad on the phone's top, clear of the handset."""
     x0, y0, z, wx, dy, facing, s = top_face
     # lay out in the phone's own frame (u across its width, v front to back) then map with on_top

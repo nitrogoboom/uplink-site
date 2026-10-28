@@ -10,6 +10,7 @@ from shapely.ops import unary_union
 from iso import W, fmt
 from isoprops import on_front
 from isogen import FACES, ORANGE, BLUE, INK, faces, ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
+import palette as pal
 
 w = W(0, 58.4, 58.4 / 3)              # inside the group's translate (CENTRE)
 CENTRE = (320, 252)                   # group origin in the 640 x 480 frame: drawing centred left to right
@@ -31,14 +32,14 @@ GUARD_R = 6.2                         # orange monitoring ring
 THREATS = [0, 90, 180, 270]           # degrees: one per side, each along an iso axis, all four in view
 THREAT_R = (9.3, 6.7)                 # each runs from here in to the cross
 CROSS = 0.35                          # half-size of the blocked cross, world units: its arms run along the floor's x and y axes
-RED = '#EE8A7C'
+RED = pal.RED
 
 POLE = 1.0                            # shield stands on a short pole above the roof centre
 SHIELD_W, SHIELD_H = 3.0, 3.625       # a shield-shaped plate standing in the plane y = 0 (faces front-left), world units
 THICK = 0.25                          # plate thickness, back along -y; drawn as stacked copies so the edge is solid
 HALO_R = 1.0                          # glow ring on the roof under the pole
 
-GLASS, GLASS_LIT = '#1F2A3B', '#2C4A66'
+GLASS, GLASS_LIT = pal.GLASS, pal.GLASS_LIT
 
 # labels: (dot world point, text x, title y, title, subline, colour, anchor)
 MON_DOT = math.degrees(math.acos(3.5 / GUARD_R))   # round the orange ring, where it meets grid line x = 3.5
@@ -115,7 +116,7 @@ def windows():
                 continue
             out.append(pane([(a, HALF, lo), (b, HALF, lo), (b, HALF, hi), (a, HALF, hi)], ('l', row, k) in LIT))
     d0, d1, dh = DOOR
-    out.append(f'<polygon points="{w.pts((d0, HALF, 0), (d1, HALF, 0), (d1, HALF, dh), (d0, HALF, dh))}" fill="#1A2333" '
+    out.append(f'<polygon points="{w.pts((d0, HALF, 0), (d1, HALF, 0), (d1, HALF, dh), (d0, HALF, dh))}" fill="{pal.SCREEN}" '
                f'stroke="{BLUE}" stroke-width="0.9" stroke-opacity="0.6"/>')
     out.append(f'<polyline points="{w.pts((0, HALF, 0), (0, HALF, dh))}" fill="none" stroke="{BLUE}" stroke-width="0.9" stroke-opacity="0.4"/>')
     return out
@@ -143,12 +144,12 @@ def shield():
     steps = 5
     for k in range(steps, 0, -1):       # the edge: back face first, then copies forward
         y = -THICK * k / steps
-        out.append(f'<path d="{d}" transform="{on_front(w, -wd / 2, y, base + ht)}" fill="#C98030"'
-                   f'{" stroke=\"#A86A24\" stroke-width=\"1\"" + ns if k == steps else ""}/>')
+        out.append(f'<path d="{d}" transform="{on_front(w, -wd / 2, y, base + ht)}" fill="{pal.HI_RIGHT}"'
+                   f'{f" stroke=\"{pal.STEP_EDGE}\" stroke-width=\"1\"" + ns if k == steps else ""}/>')
     lock = (f'<rect x="{wd / 2 - 0.32:.4g}" y="{0.42 * ht:.4g}" width="0.64" height="0.6" rx="0.1" fill="{ORANGE}"/>'
             f'<path d="M{wd / 2 - 0.2:.4g},{0.42 * ht:.4g} v-0.3 a0.2,0.2 0 0 1 0.4,0 v0.3" fill="none" stroke="{ORANGE}" stroke-width="2"{ns}/>'
             f'<circle cx="{wd / 2:.4g}" cy="{0.42 * ht + 0.3:.4g}" r="0.08" fill="{INK}"/>')
-    out.append(f'<g transform="{on_front(w, -wd / 2, 0, base + ht)}"><path d="{d}" fill="#405169" stroke="{ORANGE}" stroke-width="2.5"{ns}/>{lock}</g>')
+    out.append(f'<g transform="{on_front(w, -wd / 2, 0, base + ht)}"><path d="{d}" fill="{pal.TOP}" stroke="{ORANGE}" stroke-width="2.5"{ns}/>{lock}</g>')
     return out
 
 

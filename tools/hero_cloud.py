@@ -11,6 +11,7 @@ import math
 from shapely.geometry import Point, Polygon, box
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
+import palette as pal
 
 C30 = math.cos(math.pi / 6)
 ORIGIN = (899.6, 8.8)                 # screen point of u = 0, v = 0 (bottom-left of the face)
@@ -28,9 +29,9 @@ BASE_TOP = 29.4                       # the body under the bumps: flat bottom at
 FILLET = 3.5                          # rounds the notches where two bumps meet
 SEG = 24                              # segments per quarter circle: 2px or less along the outline, a hair off true at every zoom
 
-RIM, RIM_OP, RIM_W = '#7DB9E8', 0.75, 1.4
-SIDE_DARK, SIDE_LIGHT = (0x26, 0x32, 0x49), (0x45, 0x57, 0x72)
-FACE_TOP, FACE_BOT = '#38475F', '#2B374B'
+RIM, RIM_OP, RIM_W = pal.SKY, 0.75, 1.4
+SIDE_DARK, SIDE_LIGHT = (tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in (pal.CLOUD_SIDE_DARK, pal.CLOUD_SIDE_LIGHT))
+FACE_TOP, FACE_BOT = pal.CLOUD_TOP, pal.CLOUD_BOT
 SHADES = 56                           # steps in the side-wall ramp (finer than the 8-bit colour can show)
 GID = 'hc'                            # id prefix for the gradients
 

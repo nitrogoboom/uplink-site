@@ -4,12 +4,13 @@ import html, math, re
 from shapely.geometry import LineString, MultiPoint, Point
 from iso import fmt
 from svgfont import font_style
+import palette as pal
 
-FACES = ('#313F54', '#283447', '#405169')      # left, right, top
-HIGH = ('#E2953F', '#C98030', '#F7B868')
-EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"'
-FLOOR_LINE = '#2C3849'
-ORANGE, BLUE, GREY, INK = '#F4A340', '#7DB9E8', '#A9B4C3', '#151E2C'
+FACES = (pal.LEFT, pal.RIGHT, pal.TOP)      # left, right, top
+HIGH = (pal.HI_LEFT, pal.HI_RIGHT, pal.HI_TOP)
+EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.3"'
+FLOOR_LINE = pal.GRID
+ORANGE, BLUE, GREY, INK = pal.AMBER, pal.SKY, pal.GREY, pal.PAGE
 FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 

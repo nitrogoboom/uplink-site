@@ -22,9 +22,16 @@ from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, nu
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
+import palette as pal
 
 w = W(616.4, 240.2, 28.127)
 PARTS = pathlib.Path(__file__).parent / 'office_parts'
+
+
+def part(name):
+    """A file from office_parts/, with its {{pal:NAME}} colours filled in from palette.py."""
+    text = (PARTS / name).read_text(encoding='utf-8').rstrip('\n')
+    return re.sub(r'\{\{pal:(\w+)\}\}', lambda m: getattr(pal, m.group(1)), text)
 
 # ---- the room ---------------------------------------------------------------
 FLOOR = (22, 15)                       # floor size; grid every 1 unit
@@ -85,10 +92,10 @@ CARD_LINK = (851.6, 86.4, 878.0)       # office/build: dashed line from the card
 
 # ---- labels (annotation: fixed screen elbow and text, dot on the object) -------
 LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side: text 'left' (default) or 'right' of the elbow]
-    ((18.95, 2.3, 0.54), (944.0, 712.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800, 'right'),   # outside the room's front edge
-    ((APS[2][0], APS[2][1], 4.625), (361.1, 208.7), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
-    ((13.25, 9.25, 1.25), (634.1, 695.7), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
-    ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
+    ((18.95, 2.3, 0.54), (944.0, 712.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 2800, 'right'),   # outside the room's front edge
+    ((APS[2][0], APS[2][1], 4.625), (361.1, 208.7), pal.AMBER, 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
+    ((13.25, 9.25, 1.25), (634.1, 695.7), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
+    ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
 # compact phone cut ('compact'): a 3:2 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
 # titles render >= 14px and sublines >= 12px. Text sits where nothing stands: WORKSTATIONS below the room's
@@ -96,8 +103,8 @@ LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side:
 COMPACT_CROP = (220, 114, 990, 660)    # the whole room and tray, no card
 COMPACT_K = 1.85
 COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
-    (LABELS[0][0], (760.0, 675.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 'right'),
-    (LABELS[2][0], (651.8, 683.0), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 'left'),
+    (LABELS[0][0], (760.0, 675.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 'right'),
+    (LABELS[2][0], (651.8, 683.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
 # ---- hero layout (hero only for now; office, build and compact keep the plan above) ------------
 # Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 2-wide aisle, set right so the meeting
@@ -113,7 +120,7 @@ HERO_DESKS_B = {(9.5, 4.25): 1400, (12.5, 4.25): 1500}   # row B: two desks (a w
 PRINTER = [(0.375, 1.375, 4.25, 5.25, 0, 0.875), (0.5, 1.25, 4.375, 5.125, 0.875, 1.0)]   # body, lid: print nook, below the cabinet
 PAPER = (0.625, 1.125, 4.5, 5.0)                # a sheet on the printer lid (x0 x1 y0 y1)
 COFFEE = [(0.25, 1.25, 5.5, 7.25, 0, 1.25), (0.375, 0.875, 5.75, 6.375, 1.25, 1.875), (0.5, 0.75, 6.75, 7.0, 1.25, 1.5)]   # counter on the left wall, machine, mug
-MUG = ('#C9D3DF', '#AEB9C6', '#E5ECF3')
+MUG = (pal.MUG_LEFT, pal.MUG_RIGHT, pal.MUG_TOP)
 HERO_APS = [(15.25, 7.875), (RACKS[0][0] + RACK[0] / 2, 8.5), (6.5, 13.875)]
 # The desks' and meeting room's points: on screen a ceiling AP shows 4.5 back-left of where it hangs, so these read
 # as over the desks (10.75, 3.375) and the middle of the meeting room's box (centred left to right on screen).
@@ -130,16 +137,16 @@ CREDENZA = (0.25, 1.0, 9.5, 11.75, 0, 1.25)     # low cabinet under the screen
 MEET_TABLE = (1.75, 5.75, 9.75, 11.5, 1.25)     # x0 x1 y0 y1 h: points at the screen
 MEET_CHAIRS = ([(x, 9.25, '+y') for x in (2.5, 3.75, 5.0)] + [(x, 12.0, '-y') for x in (2.5, 3.75, 5.0)]
                + [(6.5, 10.625, '-x')])          # far side, near side, the end facing the screen (0.25 apart: no doubled edges)
-RUG = ((17.375, 21.125, 6.625, 10.375), '#33455F')  # waiting area, flat (x0 x1 y0 y1, fill), edges off the floor grid lines
-MAT = ((9.0, 11.5, 13.875, 14.875), '#3B4F6B')    # entrance, flat; chevrons point in
+RUG = ((17.375, 21.125, 6.625, 10.375), pal.RUG)  # waiting area, flat (x0 x1 y0 y1, fill), edges off the floor grid lines
+MAT = ((9.0, 11.5, 13.875, 14.875), pal.MAT)    # entrance, flat; chevrons point in
 SOFA = [(19.75, 20.5, 7.0, 7.25, 0, 1.0), (19.75, 20.5, 7.25, 9.75, 0, 0.75),     # far arm, seat,
         (19.75, 20.5, 9.75, 10.0, 0, 1.0), (20.5, 21.0, 7.0, 10.0, 0, 1.375)]     # near arm, back: faces -x, towards reception
 LOW_TABLE = (18.0, 19.0, 7.75, 9.25, 0, 0.5)
 PLANT_AT = (18.75, 5.0)                         # pot centre: the waiting area's back corner, by the closet, out of the doorway
 POT = [(0.375, 0, 0.625), (0.5, 0.625, 0.75)]   # pot, rim: half width, z0, z1
 BLADES = [(-0.375, -0.375, 1.75), (0.125, -0.375, 2.125), (-0.125, -0.125, 2.5), (-0.375, 0.125, 2.0), (0.125, 0.125, 1.625)]   # leaf blades: cell corner (0.25 square), top z
-LEAF = ('#3C7C60', '#2F6650', '#58B58C')
-LEAF_EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.22"'
+LEAF = (pal.GREEN_DARK, pal.LEAF_SHADE, pal.LEAF_LIGHT)
+LEAF_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
 RECEPTION_CHAIR = (14.75, 10.5)                 # faces +y, behind the counter
 COUNTER = (13.0, 16.5, 11.25, 12.25, 0, 1.25)   # beside the mat, facing the door
 COUNTER_TOP = (12.75, 16.75, 11.0, 12.5, 1.25, 1.375)
@@ -159,24 +166,24 @@ def _along(dot, y):
 
 
 _TV_DOT = (WALL_T, MEET_TV[1], (MEET_TV[2] + MEET_TV[3]) / 2)   # the screen's left edge, so the call tiles stay clear
-HERO_LABELS = [((19.5, 2.3, 0.54), (1052.0, 760.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800, 'left'),
-               ((*HERO_APS[0], 4.625), (w.p(*HERO_APS[0], 4.625)[0], 60.0), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
-               ((9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
-               (_TV_DOT, (290.0, w.p(*_TV_DOT)[1]), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
-               ((*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), '#7DB9E8', 'GUEST WI-FI', 'separate from staff', 3120)]
+HERO_LABELS = [((19.5, 2.3, 0.54), (1052.0, 760.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 2800, 'left'),
+               ((*HERO_APS[0], 4.625), (w.p(*HERO_APS[0], 4.625)[0], 60.0), pal.AMBER, 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
+               ((9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
+               (_TV_DOT, (290.0, w.p(*_TV_DOT)[1]), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
+               ((*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), pal.SKY, 'GUEST WI-FI', 'separate from staff', 3120)]
 
-HALO = 'stroke="#151E2C" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
+HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
 BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
 KEY_WIDTH = 425                        # below this rendered width the 24px titles fall under 8.5px (isogen.KEY_PX): numbers instead
 TAIL = 40                              # level tail, px; text starts 12px past it
 
-FACES = ('#313F54', '#283447', '#405169')
-HIGH = ('#E2953F', '#C98030', '#F7B868')
-EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.3"'
-HIGH_EDGE = 'stroke="#FFE6C4" stroke-width="1" stroke-opacity="0.55"'
-TRAY_FACES = ('#2C3A4F', '#243043', '#3A4A61')
-TRAY_EDGE = 'stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.75"'
+FACES = (pal.LEFT, pal.RIGHT, pal.TOP)
+HIGH = (pal.HI_LEFT, pal.HI_RIGHT, pal.HI_TOP)
+EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.3"'
+HIGH_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
+TRAY_FACES = (pal.TRAY_LEFT, pal.TRAY_RIGHT, pal.TRAY_TOP)
+TRAY_EDGE = f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.75"'
 FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
 TITLES = {'office': 'Isometric office floor plan with desks, server racks, Wi-Fi and a cloud workspace hub for Microsoft 365 and Google Workspace',
@@ -236,12 +243,12 @@ def desk_parts(cx, cy):
     return mon, scr, ph, ph_top, kb, ch
 
 
-def screen_ui(scr, accent='#7DB9E8'):
+def screen_ui(scr, accent=pal.SKY):
     """A small app on a desk monitor: a lit header bar and two text lines, sized to the glass."""
     _f, _xyz, wd, ht = scr
     return (rect(0.06, 0.06, wd - 0.12, ht * 0.2, accent, 0.03, ' fill-opacity="0.55"')
-            + rect(0.06, ht * 0.42, wd * 0.62, ht * 0.11, '#D9E4F0', 0.03, ' fill-opacity="0.35"')
-            + rect(0.06, ht * 0.64, wd * 0.42, ht * 0.11, '#D9E4F0', 0.03, ' fill-opacity="0.25"'))
+            + rect(0.06, ht * 0.42, wd * 0.62, ht * 0.11, pal.EDGE, 0.03, ' fill-opacity="0.35"')
+            + rect(0.06, ht * 0.64, wd * 0.42, ht * 0.11, pal.EDGE, 0.03, ' fill-opacity="0.25"'))
 
 
 def solids():
@@ -262,14 +269,14 @@ def solids():
 
 def floor(v, zone=ZONE):
     X, Y = FLOOR
-    out = box((0, X, 0, Y, -SLAB, 0), ('#313F54', '#283447', '#1E2938'))
+    out = box((0, X, 0, Y, -SLAB, 0), (pal.LEFT, pal.RIGHT, pal.WINDOW))
     segs = [(w.p(k, 0), w.p(k, Y)) for k in range(X + 1)] + [(w.p(0, k), w.p(X, k)) for k in range(Y + 1)]
     if v in ('office', 'compact'):   # static: floor lines stop where something stands on them (animated versions keep them: things drop in)
         mask = unary_union([silhouette(w, *b) for b in solids()] + (compact_gaps() if v == 'compact' else []))
         segs = [s for p, q in segs for s in clip_out(p, q, mask)]
-    out.append(seg_path(segs, f'fill="none" stroke="#2C3849" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))
+    out.append(seg_path(segs, f'fill="none" stroke="{pal.GRID}" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))
     if zone:
-        out.append(line(zone, f'stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
+        out.append(line(zone, f'stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
     return out
 
 
@@ -279,9 +286,9 @@ def windows(n, plane, win=WIN):
     starts = first if isinstance(first, tuple) else [first + i * pitch for i in range(n)]
     out, mullions = [], []
     for a in starts:
-        out.append(poly(plane(a, a + width, sill, head), 'fill="#1E2938" fill-opacity="0.55" stroke="#7DB9E8" stroke-width="0.9" stroke-opacity="0.5"'))
+        out.append(poly(plane(a, a + width, sill, head), f'fill="{pal.WINDOW}" fill-opacity="0.55" stroke="{pal.SKY}" stroke-width="0.9" stroke-opacity="0.5"'))
         m = plane(a + width / 2, a + width / 2, sill, head)
-        mullions.append(line([m[0], m[3]], f'stroke="#7DB9E8" stroke-width="0.7" stroke-opacity="0.4" {ROUND}'))
+        mullions.append(line([m[0], m[3]], f'stroke="{pal.SKY}" stroke-width="0.7" stroke-opacity="0.4" {ROUND}'))
     return out + mullions
 
 
@@ -292,7 +299,7 @@ def back_wall(n=BACK_WINDOWS, win=WIN):
 def left_wall(n=LEFT_WINDOWS, win=WIN, tv=TV, call=False):
     out = box((0, WALL_T, WALL_T, FLOOR[1], 0, WALL_H)) + windows(n, lambda a, b, z0, z1: wall_x(WALL_T, a, b, z0, z1), win)
     y0, y1, z0, z1 = tv
-    out.append(poly(wall_x(WALL_T, y0, y1, z0, z1), 'fill="#F4A340" fill-opacity="0.14" stroke="#F4A340" stroke-width="1.4" stroke-opacity="0.95"'))
+    out.append(poly(wall_x(WALL_T, y0, y1, z0, z1), f'fill="{pal.AMBER}" fill-opacity="0.14" stroke="{pal.AMBER}" stroke-width="1.4" stroke-opacity="0.95"'))
     return out + ([call_tiles(tv)] if call else [])
 
 
@@ -306,9 +313,9 @@ def call_tiles(tv):
         u, v = m + (k % 2) * (tw + m), m + (k // 2) * (th + m)
         cx, cy = u + tw / 2, v + th / 2
         lit = k == 1
-        out.append(rect(u, v, tw, th, '#26324A', 0.05))
-        out.append(f'<circle cx="{cx:.4g}" cy="{cy - 0.07:.4g}" r="0.1" fill="{"#F4A340" if lit else "#7DB9E8"}" fill-opacity="0.85"/>')
-        out.append(f'<path d="M{cx - 0.17:.4g} {v + th - 0.04:.4g}a0.17 0.15 0 0 1 0.34 0z" fill="{"#F4A340" if lit else "#7DB9E8"}" fill-opacity="0.85"/>')
+        out.append(rect(u, v, tw, th, pal.APP_BAR, 0.05))
+        out.append(f'<circle cx="{cx:.4g}" cy="{cy - 0.07:.4g}" r="0.1" fill="{pal.AMBER if lit else pal.SKY}" fill-opacity="0.85"/>')
+        out.append(f'<path d="M{cx - 0.17:.4g} {v + th - 0.04:.4g}a0.17 0.15 0 0 1 0.34 0z" fill="{pal.AMBER if lit else pal.SKY}" fill-opacity="0.85"/>')
     return f'<g transform="{on_side(w, WALL_T, y1, z1)}">' + ''.join(out) + '</g>'
 
 
@@ -346,22 +353,22 @@ def cabinet(c=CABINET):
     out = box(c)
     step = (z1 - z0) / DRAWERS
     for k in range(1, DRAWERS):
-        out.append(line([(x1, y1 - 0.25, z0 + k * step), (x1, y0 + 0.25, z0 + k * step)], f'stroke="#D9E4F0" stroke-width="0.8" stroke-opacity="0.35" {ROUND}'))
+        out.append(line([(x1, y1 - 0.25, z0 + k * step), (x1, y0 + 0.25, z0 + k * step)], f'stroke="{pal.EDGE}" stroke-width="0.8" stroke-opacity="0.35" {ROUND}'))
     for k in range(DRAWERS):
         out.append(line([(x1, (y0 + y1) / 2 + 0.25, z0 + (k + 0.55) * step), (x1, (y0 + y1) / 2 - 0.25, z0 + (k + 0.55) * step)],
-                        f'stroke="#D9E4F0" stroke-width="1.2" stroke-opacity="0.5" {ROUND}'))
+                        f'stroke="{pal.EDGE}" stroke-width="1.2" stroke-opacity="0.5" {ROUND}'))
     return out
 
 
 def glass_back(g=GLASS):
     x, y, h = g
-    return [poly(wall_x(x, WALL_T, y, 0, h), 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"')]
+    return [poly(wall_x(x, WALL_T, y, 0, h), f'fill="{pal.SKY}" fill-opacity="0.09" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.5"')]
 
 
 def glass_front(g=GLASS):
     x, y, h = g
-    return [poly(wall_y(y, x, FLOOR[0], 0, h), 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"'),
-            line([(x, y, 0), (x, y, h)], f'stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.7" {ROUND}')]
+    return [poly(wall_y(y, x, FLOOR[0], 0, h), f'fill="{pal.SKY}" fill-opacity="0.09" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.5"'),
+            line([(x, y, 0), (x, y, h)], f'stroke="{pal.SKY}" stroke-width="1.6" stroke-opacity="0.7" {ROUND}')]
 
 
 def rack(x0, v, h=RACK[3], slots=RACK_SLOTS):
@@ -370,12 +377,12 @@ def rack(x0, v, h=RACK[3], slots=RACK_SLOTS):
     out = box((x0, x0 + rw, y0, y1, 0, h), HIGH, HIGH_EDGE)
     for k in range(1, slots):                  # vents between slots, bottom up
         z = k * slot
-        out.append(line([(x0 + VENT[0], y1, z), (x0 + VENT[1], y1, z)], f'stroke="#8A561C" stroke-width="0.9" stroke-opacity="0.45" {ROUND}'))
+        out.append(line([(x0 + VENT[0], y1, z), (x0 + VENT[1], y1, z)], f'stroke="{pal.VENT}" stroke-width="0.9" stroke-opacity="0.45" {ROUND}'))
     for k, c in enumerate(LEDS[x0][:slots]):
         X, Y = w.p(x0 + LED_X, y1, slot * (k + 0.5))
         anim = LED_ANIM[x0].get(k)
         pre = f'class="ob-led" style="animation-duration:{anim[0]}ms;animation-delay:{anim[1]}ms" ' if anim and v != 'office' else ''
-        out.append(f'<circle {pre}cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="{"#6FD3A0" if c == "G" else "#FFF3DF"}"/>')
+        out.append(f'<circle {pre}cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="{pal.GREEN if c == "G" else pal.LIGHT}"/>')
     return out
 
 
@@ -384,7 +391,7 @@ def rack_top(i=0, h=RACK[3]):
     return (x0 + RACK[0] / 2, (RACK[1] + RACK[2]) / 2, h)
 
 
-def cable_pair(pts, v, base_style='', flow_style='', join=True, colour='#F4A340'):
+def cable_pair(pts, v, base_style='', flow_style='', join=True, colour=pal.AMBER):
     j = ' stroke-linejoin="round"' if join else ''
     base = f'stroke="{colour}" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"{j}'
     flow = f'stroke="{colour}" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"{j}'
@@ -395,7 +402,7 @@ def cable_pair(pts, v, base_style='', flow_style='', join=True, colour='#F4A340'
     return [line(pts, base, f'class="ob-cable" {bs}pathLength="100" '), line(pts, flow, f'class="ob-flow" {fs}')]
 
 
-def cable(ap, v, rack_h=RACK[3], colour='#F4A340'):
+def cable(ap, v, rack_h=RACK[3], colour=pal.AMBER):
     """Up from the rack to the ceiling, along x (the back wall) then out along y to the AP (straight out when the AP
     is in line with the rack)."""
     x, y, z = rack_top(0, rack_h)
@@ -404,10 +411,10 @@ def cable(ap, v, rack_h=RACK[3], colour='#F4A340'):
     return cable_pair(pts, v, colour=colour)
 
 
-GUEST = ('#3F7FB5', '#336A99', '#7DB9E8')       # guest Wi-Fi: blue where staff is orange
+GUEST = (pal.GUEST_LEFT, pal.GUEST_RIGHT, pal.SKY)       # guest Wi-Fi: blue where staff is orange
 
 
-def ring(ap, r, op, colour='#F4A340'):
+def ring(ap, r, op, colour=pal.AMBER):
     return [ellipse(r, *ap, AP[2], f'stroke="{colour}" stroke-width="1.1" stroke-opacity="{op}"')]
 
 
@@ -447,7 +454,7 @@ def tile(i, v):
     s = ICON / 24
     a, b = math.cos(math.radians(30)) * w.u * s, w.u / 2 * s
     cls = 'class="f-ic" ' if v == 'hero' else ''
-    out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{"#1B2130" if lit else "#F1F4F8"}" '
+    out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{pal.ON_AMBER if lit else pal.WHITE}" '
                f'stroke-width="2.0" {ROUND}>{ICONS[TILES[i]]}</g>')   # vector-effect sits on each icon shape (it isn't inherited)
     return out
 
@@ -458,7 +465,7 @@ def entrance():
            for (x0, x1, y0, y1), fill in (RUG, MAT)]
     cx = (MAT[0][0] + MAT[0][1]) / 2
     for y in (14.75, 14.5):
-        out.append(line([(cx - 0.5, y, 0), (cx, y - 0.5, 0), (cx + 0.5, y, 0)], f'stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.55" {ROUND}'))
+        out.append(line([(cx - 0.5, y, 0), (cx, y - 0.5, 0), (cx + 0.5, y, 0)], f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.55" {ROUND}'))
     return out
 
 
@@ -477,7 +484,7 @@ def nook():
         out += box(b)
     x0, x1, y0, y1 = PAPER
     z = PRINTER[-1][5]
-    return out + [poly([(x0, y0, z), (x1, y0, z), (x1, y1, z), (x0, y1, z)], 'fill="#E5ECF3" fill-opacity="0.8"')]
+    return out + [poly([(x0, y0, z), (x1, y0, z), (x1, y1, z), (x0, y1, z)], f'fill="{pal.MUG_TOP}" fill-opacity="0.8"')]
 
 
 def coffee():
@@ -485,7 +492,7 @@ def coffee():
     counter, machine, mug = COFFEE
     out = box(counter) + box(machine)
     X, Y = w.p((machine[0] + machine[1]) / 2, machine[3], machine[5] - 0.25)
-    return out + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="#F4A340"/>'] + box(mug, MUG)
+    return out + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="{pal.AMBER}"/>'] + box(mug, MUG)
 
 
 def hero_meeting():
@@ -502,7 +509,7 @@ def hero_meeting():
     return out
 
 
-GLASS_STYLE = 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"'
+GLASS_STYLE = f'fill="{pal.SKY}" fill-opacity="0.09" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.5"'
 
 
 def meeting_glass_back():
@@ -515,11 +522,11 @@ def meeting_glass_front():
     """Its side glass wall (x, out to y1) with the door, and the corner post: in front of the room. A front pane
     is drawn only when y1 stops short of the floor's open edge."""
     x, y0, y1, h = MEET_GLASS
-    post = f'stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.7" {ROUND}'
+    post = f'stroke="{pal.SKY}" stroke-width="1.6" stroke-opacity="0.7" {ROUND}'
     d0, d1, dh = MEET_DOOR
     front = [poly(wall_y(y1, WALL_T, x, 0, h), GLASS_STYLE)] if y1 < FLOOR[1] else []
     return front + [poly(wall_x(x, y0, y1, 0, h), GLASS_STYLE),
-            poly(wall_x(x, d0, d1, 0, dh), 'fill="#7DB9E8" fill-opacity="0.12" stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.85"'),
+            poly(wall_x(x, d0, d1, 0, dh), f'fill="{pal.SKY}" fill-opacity="0.12" stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.85"'),
             line([(x, y0, 0), (x, y0, h)], post)] + ([line([(x, y1, 0), (x, y1, h)], post)] if front else [])
 
 
@@ -539,7 +546,7 @@ def ups():
     """Battery backup beside the rack: a dark box with a lit status LED on its front."""
     x0, x1, y0, y1, z0, z1 = UPS
     X, Y = w.p((x0 + x1) / 2, y1, z1 - 0.25)
-    return box(UPS) + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="#6FD3A0"/>']
+    return box(UPS) + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="{pal.GREEN}"/>']
 
 
 def reception():
@@ -565,14 +572,14 @@ def card(v):
     ex, ey = w.p(x0, y1, z1)
     rows = [('MICROSOFT 365', 87.8, 96.4), ('GOOGLE WORKSPACE', 121.4, 130.0)]
     out = [key_group('CLOUD WORKSPACE', 'Microsoft 365 or Google Workspace'),
-           f'<polyline class="lt" points="{fmt(sx)},{fmt(sy)} {fmt(bx)},{fmt(sy)} {fmt(ex)},{fmt(ey)}" fill="none" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.55" stroke-dasharray="3 5" {ROUND}/>',
-           '<rect class="lt" x="503.9" y="26.8" width="347.8" height="119.2" rx="16.8" fill="#212D40" stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.6"/>',
-           f'<text class="lt" x="525.5" y="54.8" font-family="{FONT}" font-size="16" font-weight="600" letter-spacing="0.12em" fill="#A9B4C3">CLOUD WORKSPACE</text>']
+           f'<polyline class="lt" points="{fmt(sx)},{fmt(sy)} {fmt(bx)},{fmt(sy)} {fmt(ex)},{fmt(ey)}" fill="none" stroke="{pal.SKY}" stroke-width="1.6" stroke-opacity="0.55" stroke-dasharray="3 5" {ROUND}/>',
+           f'<rect class="lt" x="503.9" y="26.8" width="347.8" height="119.2" rx="16.8" fill="{pal.SOLID}" stroke="{pal.SKY}" stroke-width="1.6" stroke-opacity="0.6"/>',
+           f'<text class="lt" x="525.5" y="54.8" font-family="{FONT}" font-size="16" font-weight="600" letter-spacing="0.12em" fill="{pal.GREY}">CLOUD WORKSPACE</text>']
     for i, (name, cy, ty) in enumerate(rows):
         g = f'<g class="lt ob-swap ob-swap-{i}">' if v != 'office' else '<g class="lt">'
-        out.append(f'{g}<circle cx="532.2" cy="{cy}" r="6.2" fill="#6FD3A0"/><text x="545.9" y="{ty}" font-family="{FONT}" font-size="24" '
-                   f'font-weight="600" letter-spacing="0.06em" fill="#F1F4F8">{name}</text></g>')
-    out.append(badge(ex, ey, '#7DB9E8', **BADGE) + '</g>')   # small screens: the card hides, its number sits on the tray corner
+        out.append(f'{g}<circle cx="532.2" cy="{cy}" r="6.2" fill="{pal.GREEN}"/><text x="545.9" y="{ty}" font-family="{FONT}" font-size="24" '
+                   f'font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{name}</text></g>')
+    out.append(badge(ex, ey, pal.SKY, **BADGE) + '</g>')   # small screens: the card hides, its number sits on the tray corner
     return out
 
 
@@ -608,13 +615,13 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
     if k != 1.0:                                     # compact cut: bigger text, same line weights
         x, ty, sy, anchor = label_text(elbow, side, k)
         return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>',
-                f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="8" fill="{colour}" stroke="#151E2C" stroke-width="3.5"/>',
+                f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="8" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3.5"/>',
                 f'<text class="lt" x="{fmt(x)}" y="{fmt(ty)}" font-family="{FONT}" font-size="{24 * k:.3g}" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}" {HALO}>{title}</text>',
-                f'<text class="lt" x="{fmt(x)}" y="{fmt(sy)}" font-family="{FONT}" font-size="{19 * k:.3g}" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}" {HALO}>{sub}</text>']
+                f'<text class="lt" x="{fmt(x)}" y="{fmt(sy)}" font-family="{FONT}" font-size="{19 * k:.3g}" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}" {HALO}>{sub}</text>']
     return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
-            f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="#151E2C" stroke-width="3"/>',
+            f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3"/>',
             f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
-            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="#A9B4C3" text-anchor="{anchor}">{sub}</text>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}">{sub}</text>',
             badge(dx, dy, colour, **BADGE)]
 
 
@@ -670,7 +677,7 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None):
     """Everything above the floor plan, appended to G: a cable to each AP, Wi-Fi (aps[guest] in blue, smaller rings),
     uplink, tray and tiles, the cloud or card, labels."""
     for i, ap in enumerate(aps):
-        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v, rack_h, GUEST[2] if i == guest else '#F4A340')))
+        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v, rack_h, GUEST[2] if i == guest else pal.AMBER)))
     for k, (r, op) in enumerate(RINGS):
         for i, ap in enumerate(aps):
             G.append(((f'class="ob-i ob-ring" style="--d:{RING_D[k][i]}ms"', f'class="ob-pulse" style="animation-delay:{RING_PULSE[k][i]}ms"'),
@@ -683,7 +690,7 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None):
         attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v == 'hero' else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
         G.append((attrs, tile(i, v)))
     if v == 'hero':
-        hero_cloud = (PARTS / 'hero_cloud.svg').read_text(encoding='utf-8').rstrip('\n')
+        hero_cloud = part('hero_cloud.svg')
         G.append((None, [hero_cloud.replace('{{CLOUD_SHAPES}}', cloud_shapes())]))
     elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
         for dot, elbow, colour, title, sub, side in COMPACT_LABELS:
@@ -737,12 +744,12 @@ def render(v):
         style = font_style(body) + '\n' + key_css(KEY_WIDTH)
     elif v == 'build':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" class="ob" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body) + '\n' + key_css(KEY_WIDTH) + '\n<style>' + (PARTS / 'build.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
+        style = font_style(body) + '\n' + key_css(KEY_WIDTH) + '\n<style>' + part('build.css') + '</style>'
     else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
-        style = '<style>' + (PARTS / 'hero.css').read_text(encoding='utf-8').rstrip('\n') + '</style>'
+        style = '<style>' + part('hero.css') + '</style>'
         # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
-        body += '\n<circle class="ob-link-end" r="6.5" fill="#1B2130" stroke="#F4A340" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
+        body += f'\n<circle class="ob-link-end" r="6.5" fill="{pal.ON_AMBER}" stroke="{pal.AMBER}" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
     if v == 'hero':
         body, over = split_flows(body)
         HERO_FLOWS[:] = ['<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',

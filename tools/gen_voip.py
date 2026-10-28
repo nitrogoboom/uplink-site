@@ -11,12 +11,13 @@ from shapely.ops import unary_union
 from iso import W
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_front, on_side, rect
 from isogen import ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+import palette as pal
 
 w = W(0, 0, 23)
 TX, TY = 288.0, 228.0                 # the drawing's group translate (page coordinates)
-GREEN, RED, SKY_TOP = '#6FD3A0', '#F47E6A', '#9CCBF0'   # tokens --c-ok, the window-dot red, --iso-sky-top
-SCREEN_BG, TILE, LINE = '#1A2333', '#26324A', '#D9E4F0'
-DARK = ('#26324A', '#1E2938', '#313F54')                 # headset cups: left, right, top faces
+GREEN, RED, SKY_TOP = pal.GREEN, pal.RED_DOT, pal.SKY_TOP   # tokens --c-ok, the window-dot red, --iso-sky-top
+SCREEN_BG, TILE, LINE = pal.SCREEN, pal.APP_BAR, pal.EDGE
+DARK = (pal.APP_BAR, pal.WINDOW, pal.LEFT)                 # headset cups: left, right, top faces
 
 DESK = (0, 7, 0, 3.5, 0, 2.625)       # x0 x1 y0 y1 z0 z1
 TOP = DESK[5]
@@ -98,7 +99,7 @@ def cup_face(cup, pad):
     else:
         art = (rect(0.12, 0.1, wd - 0.24, ht - 0.2, 'none', 0.18,
                     f' stroke="{ORANGE}" stroke-width="2" vector-effect="non-scaling-stroke"')
-               + rect(0.27, 0.25, wd - 0.54, ht - 0.5, '#1A2333', 0.1))
+               + rect(0.27, 0.25, wd - 0.54, ht - 0.5, pal.SCREEN, 0.1))
     return f'<g transform="{on_front(w, x0, y1, z1)}">{art}</g>'
 
 
@@ -112,7 +113,7 @@ def headband():
          f'{(u_front + u_back) / 2:.4g},{v_post - 0.12:.4g} S{u_back:.4g},{v_post - 0.05:.4g} {u_back:.4g},{v_cup:.4g}')
     return (f'<g transform="{on_side(w, BAND_X, 1.5, top)}" fill="none" stroke-linecap="round">'
             f'<path d="{d}" stroke="{DARK[0]}" stroke-width="5" vector-effect="non-scaling-stroke"/>'
-            f'<path d="{d}" stroke="#D9E4F0" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"/></g>')
+            f'<path d="{d}" stroke="{pal.EDGE}" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"/></g>')
 
 
 def mic_boom():
@@ -120,7 +121,7 @@ def mic_boom():
     x0, _x1, _y0, y1, _z0, z1 = CUP_FRONT
     d = 'M0.0,0.55 C-0.2,0.6 -0.3,0.85 -0.5,0.95'           # towards the front-left, where the sitter's mouth is
     return (f'<g transform="{on_front(w, x0, y1, z1)}" fill="none" stroke-linecap="round">'
-            f'<path d="{d}" stroke="#5B6E8A" stroke-width="3" vector-effect="non-scaling-stroke"/>'
+            f'<path d="{d}" stroke="{pal.CABLE}" stroke-width="3" vector-effect="non-scaling-stroke"/>'
             f'<circle cx="-0.52" cy="0.96" r="0.1" fill="{ORANGE}"/></g>')
 
 
