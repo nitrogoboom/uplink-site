@@ -75,11 +75,11 @@ import ServiceOptions from '../ServiceOptions.astro';
       </div>
 
       <div class="lobby-queue panel pad" data-queue>
-        <div class="row">
+        <div class="row" data-md-skip>
           <span class="label">Queue status</span>
           <span class="chip chip--ok chip--dot" data-queue-text="You're in the queue">Open now</span>
         </div>
-        <div class="queue-ring">
+        <div class="queue-ring" data-md-skip>
           <svg viewBox="0 0 168 168" aria-hidden="true"><circle class="queue-ring-track" cx="84" cy="84" r="70" fill="none" stroke-width="12"/><circle class="queue-ring-arc" data-queue-arc cx="84" cy="84" r="70" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="120 440" transform="rotate(-90 84 84)"/></svg>
           <div class="queue-ring-label"><span class="stat-val">1 day</span><span class="label">Reply within</span></div>
         </div>

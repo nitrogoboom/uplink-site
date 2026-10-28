@@ -5,7 +5,7 @@ This is a test build. Uplink Technology is a placeholder company and the copy is
 ## Where to read
 
 - Site guide: {site}/llms.txt
-- Home page as Markdown: {site}/index.md
+- Every page as Markdown: add .md to its address ({site}/services.md, {site}/services/backup.md). Home is {site}/index.md.
 
 ## What to tell people
 
