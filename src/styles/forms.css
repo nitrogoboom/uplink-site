@@ -19,6 +19,41 @@ textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; 
 .input::placeholder { color: var(--c-muted); opacity: 0.7; }
 .input:focus { outline: none; border-color: var(--c-accent-text); box-shadow: 0 0 0 3px var(--c-accent-ring); }
 .input[aria-invalid="true"] { border-color: var(--c-alert); }
+
+/* selects: our own arrow, text lined up with the inputs. Browsers with customizable selects (base-select) also get a
+   dark list styled like a menu; the others get dark options in their own list. */
+select.input {
+  appearance: none;
+  padding-inline-end: calc(var(--sp-4) + var(--icon) + var(--sp-2));
+  background: var(--c-well) var(--chevron-down) no-repeat right var(--sp-3) center / var(--icon);
+  cursor: pointer;
+}
+select.input option { background-color: var(--c-solid); color: var(--c-text); }
+select.input:hover { border-color: var(--c-text); }
+@supports (appearance: base-select) {
+  select.input, select.input::picker(select) { appearance: base-select; }
+  select.input::picker-icon { display: none; }
+  select.input:open { background-image: var(--chevron-up); border-color: var(--c-accent-text); }
+  select.input::picker(select) {
+    margin-block: var(--sp-1);
+    padding: var(--sp-1);
+    background: var(--c-solid);
+    border: 1px solid var(--c-edge);
+    border-radius: var(--r-2);
+    box-shadow: var(--shadow-2);
+  }
+  select.input option {
+    gap: var(--sp-3);
+    min-height: var(--tap);
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-1);
+    background: none;
+    font-size: var(--fs-3);
+  }
+  select.input option:hover, select.input option:focus-visible { background: var(--c-surface-2); outline: none; }
+  select.input option:checked { color: var(--c-accent-text); }
+  select.input option::checkmark { order: 1; margin-inline-start: auto; color: var(--c-accent-text); }
+}
 .field-error { display: none; font-size: var(--fs-2); color: var(--c-alert); }
 .input[aria-invalid="true"] ~ .field-error { display: block; }
 .form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
