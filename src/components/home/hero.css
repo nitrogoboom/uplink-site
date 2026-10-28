@@ -1,30 +1,8 @@
 /*--- HOME · 1. Hero, every screen size. Phone and portrait tablet first, then
-   the two-column layouts at the end of this file. ---*/
+   the two-column layouts at the end of this file. The .hero section itself (colour, glow, padding) is
+   src/styles/hero.css, shared with the Services picker and the service pages. ---*/
 /* ---------- 15. HOME ----------------------------------------------------- */
 /* phone + portrait tablet: one column. */
-/* Hero colour: warm key light (orange, behind the call to action) and cool
-   fill light (sky, behind the office). Orange and sky blue sit opposite each
-   other on the colour wheel, so the two glows balance instead of fighting.
-   Surfaces inside the hero pick up a slight blue tint to match the page. */
-.hero {
-  --c-surface:   var(--c-cool-surface);
-  --c-surface-2: var(--c-cool-surface-2);
-  --c-line:      var(--c-cool-surface-2);
-  --c-muted:     var(--c-cool-muted);
-  position: relative;
-  isolation: isolate;
-  padding-block: var(--sp-6) var(--sp-7);
-}
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(60% 70% at 72% 48%, var(--c-glow-sky), transparent 70%),
-    radial-gradient(45% 55% at 8% 92%, var(--c-glow-accent), transparent 70%);
-}
 .hero-grid { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
 .hero-menu { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
 .hero-top { display: flex; flex-direction: column; gap: var(--sp-4); }
@@ -98,8 +76,6 @@
    screen. The news cards sit just below it. .hero-art steps aside
    (display: contents) so the stage and the news cards place on this grid. */
 @media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
-  .hero { --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)); }
-  .hero, .hero.fold { padding-block: var(--sp-5) var(--sp-7); }
   .hero-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: calc(var(--hero-h) - 2 * var(--sp-5)) auto;
@@ -123,7 +99,6 @@
    left, the office over the news cards on the right. The root font scales
    with the screen (tokens.css), so this keeps its shape from 1440 x 900 up. */
 @media (min-width: 1100px) and (min-height: 800px) and (orientation: landscape) {
-  .hero.fold { padding-block: var(--sp-5); }
   .hero-grid {
     /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */

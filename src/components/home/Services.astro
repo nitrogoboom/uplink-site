@@ -1,9 +1,8 @@
 ---
 // HOME · 2. Services: one card per service from the collection, each linking to the service's own page.
-// Styles: services.css (imported here). Desktop layout: src/styles/desktop.css.
+// Styles: src/styles/svc-cards.css (shared with Contact). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import Icon from '../Icon.astro';
-import './services.css';
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section class="section section--band fold" id="services" aria-labelledby="services-title">

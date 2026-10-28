@@ -6,9 +6,7 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
-import '../../components/home/hero.css';
 import '../../components/services/pick.css';
-import '../../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);

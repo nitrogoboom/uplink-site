@@ -1,6 +1,0 @@
-/*--- The CSS that comes last, after every section's own file: the desktop layout block, page transitions and
-   motion. Each page imports this file as its LAST import, so these win a tie against the section CSS the page
-   pulled in before it, as they did in the old single-file cascade (src/styles/global.css has the rest). ---*/
-@import './desktop.css';
-@import './page-transitions.css';
-@import './motion.css';

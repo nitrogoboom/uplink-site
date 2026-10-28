@@ -6,7 +6,6 @@ import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
 import Icon from '../../components/Icon.astro';
 import '../../components/work/details.css';
-import '../../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
