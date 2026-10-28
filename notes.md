@@ -4,7 +4,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Astro move (plan: `review.md`)
 - [ ] Cloudflare Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host, so the beacon loads (the canonical host matches now) but Cloudflare may refuse its reports. In Web Analytics, add `uplink-site.johnoreilly.workers.dev` to that site (or make a new site and swap the token), and again for the real domain at launch.
-- [ ] The new service and project pages reuse the picker's and the details list's CSS; they have no layout of their own yet (the service page's "Compare all services" link sits in the roster slot). Give each a quick pass once the content is final, and decide whether the home cards should keep going to `/services/<slug>` (now) or back to the picker.
+- [ ] Home service cards go to `/services/<slug>` (each service's own page). Decide whether they should go back to the picker (`/services#<slug>`) instead.
 - [ ] `work/[slug]` JSON-LD uses `Article`; `CreativeWork` or a plain `WebPage` may fit a case study better. Decide at launch.
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
 - [ ] `tools/pagespeed.py` now reads the live sitemap (18 pages × 2 = 36 tests, about two minutes); add a `--sample` that tests Home plus one service and one project.

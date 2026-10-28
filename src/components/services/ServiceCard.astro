@@ -5,16 +5,17 @@
 //   n, total  its place ("Service 03 of 07"; services.js writes the same text when the picker is on)
 //   on        the one the picker shows first
 //   first     the first drawing on the page loads eagerly; the rest lazily
+//   heading   h2 in the picker; h1 on the service's own page
 import type { CollectionEntry } from 'astro:content';
-interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean }
-const { service, n, total, on = false, first = false } = Astro.props;
+interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
+const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
 ---
 <article class:list={['svc', { 'is-on': on }]} id={id} data-svc data-tile={s.tile} aria-labelledby={`svc-${id}`}>
   <div class="picker-head">
     <span class="chip chip--sky">{s.chip}</span>
-    <h2 id={`svc-${id}`}>{s.title}</h2>
+    <Heading id={`svc-${id}`}>{s.title}</Heading>
     <p class="lead">{s.lead}</p>
   </div>
   <div class="picker-prev panel">

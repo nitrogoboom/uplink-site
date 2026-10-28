@@ -1,11 +1,13 @@
 ---
 // One page per project (/work/office-move …), from src/content/projects/<slug>.json: the same ProjectCase the
-// Work page lists, on its own, with links to the next project and back to the list.
+// Work page lists, laid out as a page of its own (project-page.css): breadcrumb and title beside the drawing, the
+// story and facts, a link to the next project, and the call-to-action band.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
 import Icon from '../../components/Icon.astro';
 import '../../components/work/details.css';
+import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
   const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -30,14 +32,31 @@ const ld = {
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
   </Fragment>
-  <section class="section case-page" id="details" aria-labelledby={`case-${id}-t`}>
+  <section class="hero proj-page" aria-labelledby={`case-${id}-t`}>
+    <div class="container proj-page-grid">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol><li><a href="/work">Our work</a></li><li aria-current="page">{p.name}</li></ol>
+      </nav>
+      <ProjectCase project={project} heading="h1" />
+    </div>
+  </section>
+  <section class="section page-end" aria-label="More">
     <div class="container stack-5">
-      <p class="eyebrow">Our work · {p.tag}</p>
-      <ProjectCase project={project} heading="h2" />
-      <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
-        <a class="btn btn--secondary btn--lg" href={`/work/${next.id}`}>Next: {next.data.name}<Icon name="arrow" /></a>
-        <a class="link-arrow" href="/work">All projects<Icon name="arrow" /></a>
+      <a class="next-link panel" href={`/work/${next.id}`}>
+        <span class="label">Next project</span>
+        <span class="next-title">{next.data.name}</span>
+        <span class="next-line muted">{next.data.clientShort}</span>
+        <Icon name="arrow" />
+      </a>
+      <div class="panel cta-band">
+        <div class="stack">
+          <h2>Want a result like this?</h2>
+          <p class="lead">Start with the free check-up. We look first, then quote.</p>
+        </div>
+        <div class="row">
+          <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+          <a class="btn btn--secondary btn--lg" href="/work">All projects</a>
+        </div>
       </div>
     </div>
   </section>

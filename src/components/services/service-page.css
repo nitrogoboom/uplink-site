@@ -1,0 +1,38 @@
+/*--- SERVICES · a service's own page (/services/<slug>): breadcrumb, title and button beside the drawing, then
+   what's included as three cards. The parts are ServiceCard's (pick.css styles them); this places them.
+   Desktop layout at the end. ---*/
+.svc-page { padding-block: var(--sp-6) var(--sp-7); }
+.svc-page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "crumbs" "head" "cta" "prev" "detail";
+  gap: var(--sp-5);
+}
+.svc-page .svc { display: contents; }
+.svc-page .crumbs { grid-area: crumbs; }
+.svc-page-cta { grid-area: cta; gap: var(--sp-5); }
+.svc-page .picker-head .lead { font-size: var(--fs-5); }
+.svc-page .picker-art { aspect-ratio: 4 / 3; flex: none; }
+.svc-page .picker-detail { gap: var(--sp-5); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
+.svc-page .feat-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+.svc-page .feat { align-items: flex-start; padding: var(--sp-4); background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-3); }
+.svc-page .feat-t { font-size: var(--fs-4); }
+@media (min-width: 700px) {
+  .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .svc-page-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: auto auto 1fr auto;
+    grid-template-areas: "crumbs prev" "head prev" "cta prev" "detail detail";
+    column-gap: var(--sp-7);
+  }
+  .svc-page .picker-head { align-self: end; }
+  .svc-page-cta { align-self: start; }
+}
+
+/* desktop (>= 1100 wide and >= 700 tall): the drawing never taller than most of the screen */
+@media (min-width: 1100px) and (min-height: 700px) {
+  .svc-page .picker-art { max-height: calc(var(--fold-h) * 0.68); }
+  .svc-page-grid { column-gap: var(--sp-8); }
+}
