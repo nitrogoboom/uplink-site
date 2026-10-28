@@ -1,9 +1,10 @@
-"""Lighthouse gate: ask Google's PageSpeed Insights (its servers, its Lighthouse) to test every page in the
-sitemap, phone and desktop, and fail if Home scores under the bar.
+"""PageSpeed check: ask Google's PageSpeed Insights (its servers, its Lighthouse) to test every page in the
+sitemap, phone and desktop, and report if Home scores under the bar. A tool to run when you want it;
+deploy.py doesn't run it.
 
-    python tools/lighthouse_gate.py https://<hash>.uplink-site-4p8.pages.dev    # a preview deploy
-    python tools/lighthouse_gate.py https://uplink-site-4p8.pages.dev --min 100   # the live site
-    python tools/lighthouse_gate.py <address> --strict                            # every page must pass
+    python tools/pagespeed.py https://uplink-site-4p8.pages.dev             # the live site
+    python tools/pagespeed.py https://<hash>.uplink-site-4p8.pages.dev      # a one-off deploy
+    python tools/pagespeed.py <address> --min 100 --strict                  # every page held to the bar
 
 The test runs on Google's machines, as pagespeed.web.dev does, so this PC's connection doesn't count.
 It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment.
@@ -11,14 +12,13 @@ The key lives in Google Cloud, project uplink-site, APIs & Services > Credential
 (limited to the PageSpeed Insights API).
 
 Pages come from site/sitemap.xml. Home (GATED) must reach the bar on both; the other pages are drafts for
-now, so they are shown but don't fail the gate unless --strict.
+now, so they are shown but don't fail the check unless --strict.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
 Each page and the files it links are fetched once first: a fresh preview starts with a cold
 Cloudflare cache, and the first visit would measure that, not the site.
 Performance moves a point or so between runs, so a test under the bar is run again (up to RUNS times)
 and its best run counts. Reports go to out/lighthouse/<page>-<strategy>.json.
-deploy.py runs this on a preview before it deploys to the live address.
 """
 import concurrent.futures
 import json

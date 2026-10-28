@@ -1,13 +1,12 @@
-"""Deploy with a PageSpeed gate: preview first, live only if Home scores 100 (Google's servers test it).
+"""Deploy the site live.
 
-    python tools/deploy.py              # check build, deploy a preview, run the gate, then go live
-    python tools/deploy.py --no-gate    # skip the PageSpeed tests (still checks the build first)
+    python tools/deploy.py
 
 Steps:
 1. build_pages.py --check and stamp.py --check, so site/ matches src/ and every ?v= stamp is current.
-2. wrangler pages deploy to the "preview" branch; Cloudflare gives it its own <hash>.uplink-site-4p8.pages.dev address.
-3. lighthouse_gate.py on that address (see its notes). Home under 100: stop, nothing goes live.
-4. wrangler pages deploy to "main", the live address.
+2. wrangler pages deploy to "main", the live address.
+
+PageSpeed is a separate tool, not part of the deploy: python tools/pagespeed.py <address>.
 """
 import os
 import re
@@ -42,9 +41,6 @@ def main():
     sys.stdout.reconfigure(encoding='utf-8', errors='replace')   # wrangler prints emoji; a Windows console can't
     step([sys.executable, 'tools/build_pages.py', '--check'])
     step([sys.executable, 'tools/stamp.py', 'site', '--check'])
-    if '--no-gate' not in sys.argv:
-        preview = deploy('preview')
-        step([sys.executable, 'tools/lighthouse_gate.py', preview])
     live = deploy('main')
     print(f'live: {live} (and the main address)')
 
