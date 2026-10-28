@@ -2,12 +2,11 @@
 # Deploying needs two secrets in the "cloudflare" environment: CLOUDFLARE_API_TOKEN (a token with
 # "Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID. Until both are set, the deploy and preview jobs are
 # skipped (the run stays green and says "skipped"); the build still tells you if the site is sound.
-# While the Astro move is on its own branch, `astro` deploys too; drop it from the list after the merge.
 name: site
 
 on:
   push:
-    branches: [main, astro]
+    branches: [main]
   pull_request:
   workflow_dispatch:   # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
 

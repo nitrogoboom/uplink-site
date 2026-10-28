@@ -3,7 +3,6 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Astro move (plan: `review.md`)
-- [ ] The move is complete on branch `astro` (28 Oct; all six steps of `review.md` "Order of work") and live on the Worker; the Pages project is deleted. To finish: merge `astro` into `main`, then drop `astro` from the workflow's branch list.
 - [ ] Cloudflare Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host, so the beacon loads (the canonical host matches now) but Cloudflare may refuse its reports. In Web Analytics, add `uplink-site.johnoreilly.workers.dev` to that site (or make a new site and swap the token), and again for the real domain at launch.
 - [ ] The new service and project pages reuse the picker's and the details list's CSS; they have no layout of their own yet (the service page's "Compare all services" link sits in the roster slot). Give each a quick pass once the content is final, and decide whether the home cards should keep going to `/services/<slug>` (now) or back to the picker.
 - [ ] `work/[slug]` JSON-LD uses `Article`; `CreativeWork` or a plain `WebPage` may fit a case study better. Decide at launch.
