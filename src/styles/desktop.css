@@ -63,7 +63,7 @@
   .work-grid { height: 100%; grid-template-rows: repeat(2, minmax(0, 1fr)); }
   .work-grid > li, .work-grid .card { min-height: 0; }
   .work-grid .card-media img { position: absolute; inset: 0; }
-  .work-grid .card-media { aspect-ratio: auto; flex: 1; min-height: 0; }
+  .work-grid .card-media { aspect-ratio: 16 / 10; flex: 1; min-height: 0; }
   .profile { height: var(--fold-inner); align-items: stretch; }
   .profile-card { min-height: 0; }
   .profile-art { aspect-ratio: auto; flex: 1; min-height: 0; }
@@ -88,7 +88,6 @@
   .page-intro .work-layout { display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); column-gap: var(--sp-8); align-items: center; }
   .work-side .filters { flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
   .work-side .filter { width: 100%; justify-content: space-between; border-radius: var(--r-2); }
-  .work-grid .card-media { aspect-ratio: 16 / 10; }
 
   /* contact: three columns */
   .lobby { grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr); grid-template-rows: auto 1fr; grid-template-areas: "intro form queue" "chan form queue"; column-gap: var(--sp-6); row-gap: var(--sp-6); align-items: start; }

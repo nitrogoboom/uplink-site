@@ -4,8 +4,12 @@
 //               title and description from here, so the sitemap and llms.txt say the same thing.
 //   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
+//   HERO        the home hero drawing's address (Hero.astro fetches it; index.astro preloads it).
 import { execFileSync } from 'node:child_process';
 import { getCollection } from 'astro:content';
+
+// written by tools/gen_office.py
+export const HERO = '/assets/img/hero-office.svg';
 
 export const PAGES = {
   home: { path: '/', name: 'Home', title: 'Uplink Technology · Managed IT for Ontario businesses',

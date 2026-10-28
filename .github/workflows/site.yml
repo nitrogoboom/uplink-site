@@ -8,7 +8,7 @@ on:
   push:
     branches: [main]
   pull_request:
-  workflow_dispatch:   # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
+  workflow_dispatch: # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: cloudflare   # so the step below can see whether the deploy secrets exist
+    environment: cloudflare # so the step below can see whether the deploy secrets exist
     outputs:
       cloudflare: ${{ steps.cf.outputs.ready }}
     steps:
@@ -24,13 +24,14 @@ jobs:
         run: echo "ready=${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0   # the sitemap's lastmod dates come from git history
+          fetch-depth: 0 # the sitemap's lastmod dates come from git history
       - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run check
+      - run: npm run lint
       - run: npm run build
       - uses: actions/upload-artifact@v5
         with:

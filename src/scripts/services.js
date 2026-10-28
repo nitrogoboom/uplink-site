@@ -41,7 +41,7 @@ if (svcs.length) {
     if (live) live.textContent = name + ' selected';
     if (opts.focus) tiles[i].focus({ preventScroll: true });
     if (opts.hash !== false && window.history && history.replaceState) {
-      try { history.replaceState(null, '', '#' + svcs[i].id); } catch (e) { /* ignore */ }
+      try { history.replaceState(null, '', '#' + svcs[i].id); } catch { /* ignore */ }
     }
   };
 
@@ -49,7 +49,7 @@ if (svcs.length) {
 
   const fromHash = () => {
     let id = '';
-    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return -1; }
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return -1; }
     return svcs.findIndex((s) => s.id === id);
   };
   const start = fromHash();

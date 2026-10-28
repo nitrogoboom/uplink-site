@@ -17,107 +17,55 @@
   "rows": [
     {
       "feature": "Help desk by phone, email and chat",
-      "cells": [
-        true,
-        true,
-        true
-      ]
+      "cells": [true, true, true]
     },
     {
       "feature": "Device patching and monitoring",
-      "cells": [
-        true,
-        true,
-        true
-      ]
+      "cells": [true, true, true]
     },
     {
       "feature": "Microsoft 365 or Google backup",
-      "cells": [
-        true,
-        true,
-        true
-      ]
+      "cells": [true, true, true]
     },
     {
       "feature": "Email and phishing defence",
-      "cells": [
-        true,
-        true,
-        true
-      ]
+      "cells": [true, true, true]
     },
     {
       "feature": "On-site visits",
-      "cells": [
-        "Billed per visit",
-        "Included",
-        "Included"
-      ]
+      "cells": ["Billed per visit", "Included", "Included"]
     },
     {
       "feature": "24/7 threat monitoring",
-      "cells": [
-        false,
-        true,
-        true
-      ]
+      "cells": [false, true, true]
     },
     {
       "feature": "Staff security training",
-      "cells": [
-        false,
-        true,
-        true
-      ]
+      "cells": [false, true, true]
     },
     {
       "feature": "Server and offsite backup",
-      "cells": [
-        false,
-        true,
-        true
-      ]
+      "cells": [false, true, true]
     },
     {
       "feature": "Quarterly IT review",
-      "cells": [
-        false,
-        true,
-        true
-      ]
+      "cells": [false, true, true]
     },
     {
       "feature": "Teams Phone and desk phones",
-      "cells": [
-        "Add-on",
-        "Add-on",
-        true
-      ]
+      "cells": ["Add-on", "Add-on", true]
     },
     {
       "feature": "Multi-site network management",
-      "cells": [
-        false,
-        false,
-        true
-      ]
+      "cells": [false, false, true]
     },
     {
       "feature": "Yearly roadmap and budget",
-      "cells": [
-        false,
-        false,
-        true
-      ]
+      "cells": [false, false, true]
     },
     {
       "feature": "Price",
-      "cells": [
-        "Quote after check-up",
-        "Quote after check-up",
-        "Quote after check-up"
-      ]
+      "cells": ["Quote after check-up", "Quote after check-up", "Quote after check-up"]
     }
   ]
 }

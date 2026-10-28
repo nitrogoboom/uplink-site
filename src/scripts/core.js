@@ -30,8 +30,8 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 /* ---------- storage (can be unavailable) ------------------------------ */
 const store = {
-  get(key) { try { return window.localStorage.getItem(key); } catch (e) { return null; } },
-  set(key, value) { try { window.localStorage.setItem(key, value); } catch (e) { /* ignore */ } }
+  get(key) { try { return window.localStorage.getItem(key); } catch { return null; } },
+  set(key, value) { try { window.localStorage.setItem(key, value); } catch { /* ignore */ } }
 };
 
 /* ---------- Trusted Types ---------------------------------------------- */

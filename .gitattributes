@@ -1,0 +1,5 @@
+# LF everywhere, whatever core.autocrlf says, so OneDrive and Windows git cannot flip line endings.
+* text=auto eol=lf
+*.woff2 binary
+*.png binary
+*.ttf binary
