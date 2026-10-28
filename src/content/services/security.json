@@ -1,0 +1,26 @@
+{
+  "order": 2,
+  "title": "Cybersecurity",
+  "chip": "Protect",
+  "tile": "Security",
+  "tag": "Always on",
+  "image": "security",
+  "alt": "Office building inside a security perimeter with threats blocked",
+  "lead": "Layered protection for devices, email and accounts, watched around the clock by people, not just software.",
+  "card": "Devices, email and accounts watched around the clock.",
+  "features": [
+    {
+      "title": "24/7 threat monitoring",
+      "detail": "Someone is watching when you are not"
+    },
+    {
+      "title": "Email and phishing defence",
+      "detail": "Bad links stopped before staff see them"
+    },
+    {
+      "title": "Security training",
+      "detail": "Short monthly lessons and practice phishing tests"
+    }
+  ],
+  "bestFor": "Anyone holding client or patient data"
+}

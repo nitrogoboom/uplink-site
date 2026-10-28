@@ -1,0 +1,42 @@
+# Response headers for every file, read by Cloudflare (Workers static assets and Pages alike). Not served as a page.
+# This is the template: `npm run build` copies it to dist/_headers and scripts/headers.mjs fills in
+#   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (the classList.add('js') line)
+#   the Early Hints block   one rule per page
+# style-src still needs 'unsafe-inline': the hero drawing (tools/gen_office.py) carries style="" attributes on
+# its animated parts, and footer.js writes animation delays the same way. Hashes can't cover attributes, so
+# the CSP can't tighten until those move to classes (notes.md).
+# font-src allows data: because each SVG carries its own letters as a data: font.
+# static.cloudflareinsights.com (script) and cloudflareinsights.com (connect): Cloudflare Web Analytics. core.js
+# loads the beacon after the page has loaded (Cloudflare's own injection, uplink-site > Metrics, stays off). No cookies.
+# require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
+# the 'uplink' policy in core.js (Uplink.html). A new innerHTML elsewhere fails until it goes through it.
+# X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
+# robots.txt still allows crawling, so search engines can read this. At launch, delete the line.
+/*
+  X-Robots-Tag: noindex
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com {script-hashes}; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
+
+# Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
+# first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
+# @early-hints (written by scripts/headers.mjs; edit FIRST_FONTS there, not these lines)
+# @end early-hints
+
+# Astro names every bundled CSS and JS file by its content hash (/_astro/x.ab12cd34.css), so a year is safe.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+# Fonts are never edited in place: a new version gets a new file name.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+# Drawings keep their names when they change (the generators overwrite them), so a day, then revalidate.
+/assets/img/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+# The share picture is fetched by social sites by its plain name: a day only.
+/assets/img/og.png
+  ! Cache-Control
+  Cache-Control: public, max-age=86400

@@ -1,6 +1,6 @@
 """Draws voip.svg (Services: VoIP and Teams Phone) and its compact phone cut from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVGs.
-usage: python tools/gen_voip.py site/assets/img/voip.svg       (also writes voip-compact.svg)
+usage: python tools/gen_voip.py public/assets/img/voip.svg       (also writes voip-compact.svg)
 World: 1 unit = 23px. x runs right-down, y left-down, z up. Desk's back-left corner is the origin.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s). Flat details (the Teams call, the phone
 screens, the headset band and pads) are drawn in 2D on their face and mapped onto it with an SVG matrix.

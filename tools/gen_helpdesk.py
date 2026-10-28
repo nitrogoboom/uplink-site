@@ -1,6 +1,6 @@
 """Draws helpdesk.svg (Services, Work) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_helpdesk.py site/assets/img/helpdesk.svg
+usage: python tools/gen_helpdesk.py public/assets/img/helpdesk.svg
 World: 1 unit = 23px. x runs right-down, y left-down, z up. Desk's back-left corner is the origin.
 Flat details (the chat window, the ticket cards' contents) are drawn in 2D on their face and mapped onto it
 with an SVG matrix, so they sit exactly in the iso plane.

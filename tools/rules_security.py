@@ -1,5 +1,5 @@
 """painter.py rules for security.svg: the boxes in drawing order (painter calls z0 once per box, in order).
-usage: python tools/painter.py site/assets/img/security.svg 320 310.4 19.4667 tools/rules_security.py"""
+usage: python tools/painter.py public/assets/img/security.svg 320 310.4 19.4667 tools/rules_security.py"""
 BOXES = [('building', 0), ('roof cap', 9.0), ('roof unit', 9.25), ('awning', 2.0)]
 _order = {}
 def _k(b): return _order.setdefault(b['idx'], len(_order))

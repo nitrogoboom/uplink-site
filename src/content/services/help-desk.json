@@ -1,0 +1,26 @@
+{
+  "order": 1,
+  "title": "Managed help desk",
+  "chip": "Support",
+  "tile": "Help desk",
+  "tag": "Starts day one",
+  "image": "helpdesk",
+  "alt": "Help desk workstation with support tickets moving to resolved",
+  "lead": "Real people who pick up, fix it, and explain it in plain words. Phone, email, chat or the client portal.",
+  "card": "Real people who pick up and fix it, by phone, email or chat.",
+  "features": [
+    {
+      "title": "Unlimited support",
+      "detail": "Every user, every device, no ticket counting"
+    },
+    {
+      "title": "Remote and on-site",
+      "detail": "We come in when it can't be fixed remotely"
+    },
+    {
+      "title": "Staff on and off",
+      "detail": "New hires ready day one, leavers locked out the same day"
+    }
+  ],
+  "bestFor": "Every team, from 5 people to 150"
+}

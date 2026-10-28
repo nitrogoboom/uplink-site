@@ -1,9 +1,10 @@
 """Draws the office floor plan from one world-space description, in three versions that share every shape:
-  site/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
-  site/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
-  src/pages/home/1-hero-office.svg  the hero, inlined into the home page by build_pages.py (page fonts apply)
-  site/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
-usage: python tools/gen_office.py site
+  public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
+  public/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
+  public/assets/img/hero-office.svg  the hero, fetched by home.js on screens 600px and wider (page fonts apply)
+  src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro
+  public/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
+usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of the three.
 The hero has its own floor layout for now ('hero layout' below: desk rows, lounge, guest Wi-Fi, reception, entrance);
 the other three still draw the plan above. To move them over, send them through hero_groups() too.
@@ -15,7 +16,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
   tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
   tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
-import math, pathlib, re, subprocess, sys
+import math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
@@ -762,6 +763,5 @@ if __name__ == '__main__':
     for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent
-    (root / 'src/pages/home/1-hero-office.svg').write_text(render('hero') + '\n', encoding='utf-8', newline='\n')
-    (root / 'src/pages/home/1-hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
-    subprocess.run([sys.executable, str(root / 'tools/build_pages.py')], check=True)
+    (site / 'assets/img/hero-office.svg').write_text(render('hero') + '\n', encoding='utf-8', newline='\n')
+    (root / 'src/components/home/hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')

@@ -1,0 +1,12 @@
+{
+  "order": 1,
+  "name": "Office move in a weekend",
+  "tag": "Build",
+  "client": "Professional services firm, 40 staff",
+  "clientShort": "Professional services firm · 40 staff",
+  "services": "Networks & Wi-Fi, help desk",
+  "result": "Staff logged in Monday like nothing happened",
+  "image": "office",
+  "alt": "Floor plan of the new office with desks, server rack and Wi-Fi",
+  "story": "A growing firm moved floors on a Friday. We planned the network, Wi-Fi and desks in advance, cabled over the weekend, and tested every seat on Sunday night."
+}

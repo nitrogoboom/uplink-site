@@ -1,0 +1,12 @@
+{
+  "order": 3,
+  "name": "Clinic network refresh",
+  "tag": "Build",
+  "client": "Health clinic, 2 locations",
+  "clientShort": "Health clinic · 2 locations",
+  "services": "Networks & Wi-Fi",
+  "result": "Faster check-in, guest Wi-Fi kept separate",
+  "image": "network",
+  "alt": "Server rack with cabling to desks and a Wi-Fi access point",
+  "story": "Old switches and patchy Wi-Fi were slowing down patient check-in. We replaced the core network, split guest and staff Wi-Fi, and documented every port."
+}

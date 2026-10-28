@@ -1,0 +1,25 @@
+---
+// SERVICES · 1. Choose a service (first screen). Every service from the collection is an <article class="svc">
+// here (ServiceCard); services.js shows one at a time and builds the numbered tiles. Without script they all
+// stack. Styles: pick.css, plus the .hero base from home/hero.css. Desktop layout: src/styles/desktop.css.
+import { getCollection } from 'astro:content';
+import ServiceCard from './ServiceCard.astro';
+import '../home/hero.css';
+import './pick.css';
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+---
+<section class="hero fold" id="pick" aria-labelledby="svc-page-title">
+  <div class="container picker" data-picker>
+    <h1 class="eyebrow picker-title" id="svc-page-title">Services</h1>
+    {services.map((s, i) => <ServiceCard service={s} n={i + 1} total={services.length} on={i === 0} first={i === 0} />)}
+
+    <div class="picker-roster">
+      <div class="roster-wrap">
+        <span class="label" id="roster-label">All services <span class="kbd-hint" aria-hidden="true" data-svc-keys></span></span>
+        <ul class="roster" aria-labelledby="roster-label" data-roster></ul>
+      </div>
+      <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service-cta data-service={services[0].data.title}>Talk to us about this</a>
+    </div>
+    <p class="sr-only" aria-live="polite" data-picker-live></p>
+  </div>
+</section>

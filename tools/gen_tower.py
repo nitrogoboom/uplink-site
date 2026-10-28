@@ -1,13 +1,13 @@
 """Draws the growing tower (home page "grow" section) from a world-space description.
-Writes the inline <svg class="tg"> (src/pages/home/3-grow-tower.svg, built into the home page) and the reference
-copy site/assets/img/tower-grow.svg.
+Writes the inline <svg class="tg"> (src/components/home/grow-tower.svg, inlined by Grow.astro) and the reference
+copy public/assets/img/tower-grow.svg.
 Edit the numbers below and run again; don't hand-edit either copy.
-usage: python tools/gen_tower.py site
+usage: python tools/gen_tower.py public
 World: 1 unit = 24px, W(262, 283.2, 24). Origin = back corner of the ground slab's top. x runs right-down, y left-down, z up.
 home.js only sets data-floors on the <svg>; the <style> inside hides upper floors and drops the roof.
 Keep the classes (tg-ground, tg-floor + data-f, tg-roof, tg-front, tg-w/wl/wr/on, tg-tl/td/tb/tt) and group order.
 """
-import pathlib, subprocess, sys
+import pathlib, sys
 from shapely.ops import unary_union
 from shapely.geometry import Polygon
 from iso import W, fmt
@@ -240,5 +240,4 @@ if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
     open(site / 'assets/img/tower-grow.svg', 'w', encoding='utf-8', newline='\n').write(build(True) + '\n')
     root = pathlib.Path(__file__).resolve().parent.parent
-    open(root / 'src/pages/home/3-grow-tower.svg', 'w', encoding='utf-8', newline='\n').write(build(False) + '\n')
-    subprocess.run([sys.executable, str(root / 'tools/build_pages.py')], check=True)
+    open(root / 'src/components/home/grow-tower.svg', 'w', encoding='utf-8', newline='\n').write(build(False) + '\n')

@@ -1,5 +1,5 @@
 """painter.py rules for network.svg: each box's base height, looked up from gen_network.py by its left face.
-usage: python tools/painter.py site/assets/img/network.svg 264 209 1 tools/rules_network.py"""
+usage: python tools/painter.py public/assets/img/network.svg 264 209 1 tools/rules_network.py"""
 import gen_network
 from iso import C30, W
 

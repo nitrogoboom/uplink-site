@@ -1,0 +1,55 @@
+---
+// HOME · 3. Growing with you. Scroll story: the building gets taller as the steps scroll past (home.js).
+// Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand.
+// Styles: grow.css (imported here). Desktop layout: src/styles/desktop.css.
+import Tower from './grow-tower.svg';
+import './grow.css';
+---
+<section class="section grow-section" id="grow" aria-labelledby="grow-title">
+  <div class="container">
+    <div class="grow">
+      <div class="grow-side">
+        <div class="section-head">
+          <p class="eyebrow">Built to scale</p>
+          <h2 id="grow-title">We grow with you</h2>
+          <p class="lead">Start with the basics and add more as your team grows. Same people, same help desk, the whole way.</p>
+        </div>
+        <div class="grow-art">
+          <Tower />
+        </div>
+      </div>
+      <ol class="grow-steps">
+        <li class="grow-step" id="grow-l1" data-floors="1"><div class="grow-card panel">
+          <span class="chip">Level 1 · 1 to 10 people</span>
+          <h3>Get set up right</h3>
+          <p class="muted">A small team needs things to just work. We set up every laptop, phone and account the same way, and you get one number to call.</p>
+          <ul>
+            <li>Help desk for every person</li>
+            <li>Microsoft 365 or Google set up and backed up</li>
+            <li>Devices patched and monitored</li>
+          </ul>
+        </div></li>
+        <li class="grow-step" id="grow-l2" data-floors="2"><div class="grow-card panel">
+          <span class="chip">Level 2 · 11 to 50 people</span>
+          <h3>Lock it down</h3>
+          <p class="muted">More people means more logins to protect. We add round-the-clock security and train your staff to spot a bad email.</p>
+          <ul>
+            <li>24/7 threat monitoring</li>
+            <li>Email and phishing defence</li>
+            <li>Staff security training</li>
+          </ul>
+        </div></li>
+        <li class="grow-step" id="grow-l3" data-floors="3"><div class="grow-card panel">
+          <span class="chip">Level 3 · 51 to 150 people</span>
+          <h3>Plan ahead</h3>
+          <p class="muted">Bigger teams need a plan. We map every device and licence, link your offices, and review the budget with you each quarter.</p>
+          <ul>
+            <li>Multi-site networks</li>
+            <li>Quarterly IT reviews</li>
+            <li>Yearly roadmap and budget</li>
+          </ul>
+        </div></li>
+      </ol>
+    </div>
+  </div>
+</section>

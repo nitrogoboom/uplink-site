@@ -1,6 +1,6 @@
 """Draws hq.svg (About page) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_hq.py site/assets/img/hq.svg
+usage: python tools/gen_hq.py public/assets/img/hq.svg
 World: 1 unit = 18px. Origin = floor centre. x runs right-down, y left-down, z up.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch.
 """

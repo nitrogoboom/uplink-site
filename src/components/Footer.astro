@@ -1,0 +1,77 @@
+---
+// SHARED · Footer (every page). Hero-select roster and campus map: one panel per section, one roster tile per
+// panel; each panel's data-map names a spot on the map that footer.js draws (hq, services, company, support,
+// resources, follow). The lists come from src/data/footer.json; the Services panel's links from the services
+// collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
+import { getCollection } from 'astro:content';
+import Icon, { type IconName } from './Icon.astro';
+import f from '../data/footer.json';
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
+type Link = { label: string; href: string };
+const panels = f.panels.map((p) => ({ ...p, links: (p.id === 'services' ? serviceLinks : (p.links as Link[])) }));
+const roster: { id: string; icon: IconName; name: string; count: string }[] = [
+  { id: 'contact', icon: 'bubble', name: 'Contact', count: 'Start here' },
+  ...panels.map((p) => ({ id: p.id, icon: p.icon as IconName, name: p.tile, count: `${p.links.length} links` })),
+  { id: 'follow', icon: f.follow.icon as IconName, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
+];
+---
+<footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
+  <h2 class="sr-only" id="fc-title">Site footer</h2>
+  <div class="container fc-stage">
+    <div class="fc-panels" id="fc-panels">
+<section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq">
+<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h2 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
+  <div class="fc-acts"><a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up<Icon name="arrow" /></a></div>
+  <div class="fc-facts">
+    <div><p class="label">Reach us</p>
+      <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
+      <a class="fc-cl" href={`mailto:${f.email}`}><Icon name="mail" /><span>{f.email}</span></a></div>
+    <div><p class="label">Office</p>
+      <p class="fc-cl fc-cl--two"><Icon name="pin" /><span>{f.office.city}<small>{f.office.street}</small></span></p>
+      <p class="fc-cl fc-cl--two"><Icon name="clock" /><span>{f.hours.line}<small>{f.hours.days}</small></span></p></div>
+  </div>
+  <div class="fc-follow"><span class="label">Follow</span><ul class="fc-socials">{f.follow.socials.map((s) => (
+    <li><a class="fc-soc" href={s.href} aria-label={s.name} title={s.name}><Icon name={s.icon as IconName} /></a></li>))}</ul></div>
+</div>
+</section>
+{panels.map((p) => (
+<section class="fc-panel" id={`fc-p-${p.id}`} role="tabpanel" aria-labelledby={`fc-t-${p.id}`} tabindex="-1" data-map={p.map}>
+<div class="fc-head"><p class="eyebrow">{p.links.length} links</p><h2>{p.title}</h2></div><p class="fc-lead">{p.lead}</p><nav class="fc-body" aria-label={p.title}><ul class="fc-rows fc-rows--two">{p.links.map((l) => (
+  <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={p.more.href}>{p.more.label}<Icon name="arrow" /></a></nav>
+</section>
+))}
+<section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow">
+<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h2 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
+  <ul class="fc-wall">{f.follow.socials.map((s) => (
+    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><span><b>{s.name}</b><small>{s.handle}</small></span></a></li>))}</ul>
+  <form class="fc-nl" data-fc-nl novalidate>
+    <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
+    <div class="fc-nl-row"><input class="input" id="fc-nl-email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
+    <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
+  </form>
+</div>
+</section>
+    </div>
+    <div class="fc-map" data-fc-map>
+      <div class="fc-hud" aria-live="polite"></div>
+    </div>
+  </div>
+  <div class="fc-dock"><div class="container">
+    <button class="fc-rk" type="button" data-fc-step="-1" aria-label="Previous footer section"><Icon name="chevronL" /></button>
+    <div class="fc-roster" role="tablist" aria-label="Footer sections">
+      {roster.map((t, i) => (
+      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><span class="fc-tile-c">{t.count}</span></button>
+      ))}
+    </div>
+    <button class="fc-rk" type="button" data-fc-step="1" aria-label="Next footer section"><Icon name="chevronR" /></button>
+  </div></div>
+  <div class="fc-base"><div class="container">
+    <span class="fc-brand"><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b><span>{f.copyright}</span></span>
+    <nav class="fc-legal" aria-label="Legal">{f.legal.map((l) => <a href={l.href} lang={'lang' in l ? l.lang : undefined} hreflang={'lang' in l ? l.lang : undefined}>{l.label}</a>)}</nav>
+    <span class="fc-base-end">
+      <button class="linkbtn kbd-only" type="button" data-open="shortcuts-dialog"><span class="kbd">?</span>Keyboard shortcuts</button>
+      <span class="status">{f.status}</span>
+    </span>
+  </div></div>
+</footer>

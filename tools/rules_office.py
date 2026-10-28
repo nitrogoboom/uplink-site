@@ -1,5 +1,5 @@
 """painter.py rules for office.svg: each box's base height, looked up from gen_office.py by its left face.
-usage: python tools/painter.py site/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py"""
+usage: python tools/painter.py public/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py"""
 import gen_office
 from iso import C30
 

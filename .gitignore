@@ -5,3 +5,5 @@ __pycache__/
 .wrangler/
 .dev.vars
 RAW Screenshots/
+dist/
+.astro/

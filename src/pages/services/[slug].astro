@@ -1,0 +1,46 @@
+---
+// One page per service (/services/help-desk …), from src/content/services/<slug>.json. The same ServiceCard
+// the picker shows, on its own, plus the call-to-action band. Its JSON-LD is the Service block the Services page
+// also lists, with a three-step breadcrumb.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ServiceCard from '../../components/services/ServiceCard.astro';
+import Icon from '../../components/Icon.astro';
+import '../../components/home/hero.css';
+import '../../components/services/pick.css';
+import '../../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+
+export async function getStaticPaths() {
+  const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length } }));
+}
+const { service, n, total } = Astro.props;
+const { id, data: s } = service;
+const url = new URL(`/services/${id}`, Astro.site).href;
+const business = { '@id': `${Astro.site!.href}#business` };
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Service', '@id': url, url, name: s.title, description: s.lead, provider: business, areaServed: 'Ontario' },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: 'Services', item: new URL('/services', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: s.title, item: url } ] },
+  ],
+};
+---
+<Base title={`${s.title} · Uplink Technology`} description={s.lead} page="services" path={`/services/${id}`}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
+  </Fragment>
+  <section class="hero fold" id="pick" aria-labelledby={`svc-${id}`}>
+    <div class="container picker">
+      <p class="eyebrow picker-title">Services · {n} of {total}</p>
+      <ServiceCard service={service} n={n} total={total} on first />
+      <div class="picker-roster">
+        <a class="link-arrow" href={`/services#${id}`}>Compare all services<Icon name="arrow" /></a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}>Talk to us about this</a>
+      </div>
+    </div>
+  </section>
+</Base>

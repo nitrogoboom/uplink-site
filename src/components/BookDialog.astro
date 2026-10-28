@@ -1,0 +1,54 @@
+---
+// SHARED · "Book your free check-up" pop-up (every page)
+// Opened by any link with data-open="book-dialog". Mockup: sends nothing.
+// Styles: src/styles/dialogs.css, src/styles/forms.css.
+import ServiceOptions from './ServiceOptions.astro';
+---
+<dialog class="dialog" id="book-dialog" aria-labelledby="book-title">
+  <form data-validate="book" method="dialog">
+    <div class="dlg-head">
+      <h2 id="book-title">Book your free check-up</h2>
+      <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">Close</span></button>
+    </div>
+    <div class="dlg-body">
+      <p class="muted">We scan your network, devices and accounts, walk you through what we find, then talk options. It takes 30 minutes and there is no contract to look.</p>
+      <div class="form-grid">
+        <div class="field">
+          <label for="book-name">Name</label>
+          <input class="input" id="book-name" name="name" type="text" autocomplete="name" required pattern=".*\S.*">
+          <span class="field-error" id="book-name-err">Add your name so we know who to ask for.</span>
+        </div>
+        <div class="field">
+          <label for="book-email">Work email</label>
+          <input class="input" id="book-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+          <span class="field-error" id="book-email-err">Enter an email like name@company.com.</span>
+        </div>
+        <div class="field">
+          <label for="book-company">Company <span class="opt">(optional)</span></label>
+          <input class="input" id="book-company" name="company" type="text" autocomplete="organization">
+        </div>
+        <div class="field">
+          <label for="book-size">Team size</label>
+          <select class="input" id="book-size" name="size">
+            <option>1 to 10 people</option>
+            <option>11 to 50 people</option>
+            <option>51 to 150 people</option>
+            <option>More than 150</option>
+          </select>
+        </div>
+        <div class="field span-2">
+          <label for="book-service">Main interest</label>
+          <select class="input" id="book-service" name="service">
+            <option>Not sure yet</option>
+            <ServiceOptions />
+          </select>
+        </div>
+      </div>
+      <p class="small muted">Prototype form: nothing is sent yet.</p>
+    </div>
+    <div class="dlg-actions">
+      <button class="btn btn--secondary" type="button" data-close>Cancel</button>
+      <button class="btn btn--primary" type="submit">Request check-up</button>
+    </div>
+  </form>
+</dialog>

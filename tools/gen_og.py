@@ -1,12 +1,12 @@
 """Share picture and home-screen icon.
 
-    python tools/gen_og.py site
+    python tools/gen_og.py public
 
-Writes `assets/img/og.png` (1200x630, the link preview on social sites and chat
-apps) and `apple-touch-icon.png` (180x180, at the site root, where iPhones look
-for it). Both are screenshots of a small page built from the site's tokens,
-fonts and the office drawing, so they follow the site when it changes.
-Needs Playwright and the internet (Google Fonts).
+Writes `public/assets/img/og.png` (1200x630, the link preview on social sites and
+chat apps) and `public/apple-touch-icon.png` (180x180, at the site root, where
+iPhones look for it). Both are screenshots of a small page built from the site's
+tokens (src/styles/tokens.css), fonts and the office drawing, so they follow the
+site when it changes. Needs Playwright and the internet (Google Fonts).
 """
 import asyncio
 import pathlib
@@ -16,10 +16,11 @@ from playwright.async_api import async_playwright
 
 site = pathlib.Path(sys.argv[1]).resolve()
 assets = (site / 'assets').as_uri()
+tokens = (pathlib.Path(__file__).resolve().parent.parent / 'src' / 'styles' / 'tokens.css').as_uri()
 
 HEAD = f'''<!doctype html><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&amp;display=swap">
-<link rel="stylesheet" href="{assets}/css/tokens.css">
+<link rel="stylesheet" href="{tokens}">
 <style>
   * {{ margin: 0; box-sizing: border-box; }}
   body {{ background: var(--c-bg); color: var(--c-text); font-family: var(--font-body); overflow: hidden; }}

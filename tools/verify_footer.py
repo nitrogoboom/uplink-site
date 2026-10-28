@@ -1,13 +1,12 @@
-# Site checks: hero, tower, footer and sideways scroll at every size.
-# usage: python tools/verify_footer.py <outdir> [port]   (serve site/ with tools/serve.py first; port 8765 by default)
-import asyncio, subprocess, sys
+# Site checks: hero, tower, footer and sideways scroll at every size, against the built site.
+# usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port]
+import asyncio, sys
 from playwright.async_api import async_playwright
-base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8765'); out=sys.argv[1]
+base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.argv[1]
+PAGES=['index','services','work','about','contact','soon','404','services/help-desk','work/office-move']
 async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); rep=[]
-        rep.append(subprocess.run([sys.executable,'tools/stamp.py','site','--check'],capture_output=True,text=True).stdout.strip())
-        rep.append(subprocess.run([sys.executable,'tools/build_pages.py','--check'],capture_output=True,text=True).stdout.strip())
         pg=await b.new_page(viewport={'width':1440,'height':900})
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e))); pg.on('console',lambda m: m.type=='error' and errs.append(m.text))
         await pg.goto(base+'/'); await pg.wait_for_timeout(5500)
@@ -32,14 +31,14 @@ async def main():
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
         rep.append(f"console errors: {errs or 'none'}")
         await pg.close()
-        for page in ['index','services','work','about','contact','soon','404']:
+        for page in PAGES:
             for n,w,h in [['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]:
                 q=await b.new_page(viewport={'width':w,'height':h}); e2=[]; q.on('pageerror',lambda e: e2.append(str(e)))
                 await q.goto(f"{base}/{'' if page=='index' else page}"); await q.wait_for_timeout(700)
                 await q.eval_on_selector('#footer','e=>e.scrollIntoView()'); await q.wait_for_timeout(500)
                 r=await q.evaluate("""()=>{const f=document.getElementById('footer'); const s=document.querySelector('.fc-panels');
                   return [document.documentElement.scrollWidth-innerWidth, f.offsetHeight, s.scrollHeight-s.clientHeight, f.classList.contains('fc-js')]}""")
-                rep.append(f"{page:8} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]} {e2 or ''}")
+                rep.append(f"{page:18} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]} {e2 or ''}")
                 if page in ('soon','index'): await q.screenshot(path=f'{out}/f-{page}-{n}.png')
                 await q.close()
         print('\n'.join(rep)); await b.close()

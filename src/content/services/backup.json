@@ -1,0 +1,26 @@
+{
+  "order": 6,
+  "title": "Backup & recovery",
+  "chip": "Protect",
+  "tile": "Backup",
+  "tag": "Always on",
+  "image": "backup",
+  "alt": "Backup drives with a restore loop and an offsite copy",
+  "lead": "Copies of your data kept safe offsite, and tested so a restore actually works when you need it.",
+  "card": "Offsite copies, tested every quarter so a restore works.",
+  "features": [
+    {
+      "title": "Daily backups",
+      "detail": "Servers, laptops, Microsoft 365 and Google"
+    },
+    {
+      "title": "Restore testing",
+      "detail": "We prove it works every quarter"
+    },
+    {
+      "title": "Disaster plan",
+      "detail": "Who does what if the worst happens"
+    }
+  ],
+  "bestFor": "Anyone who can't lose a day of work"
+}

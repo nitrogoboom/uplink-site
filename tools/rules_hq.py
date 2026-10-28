@@ -1,5 +1,5 @@
 """painter.py rules for hq.svg: each box's base height, looked up from gen_hq.py by its left face.
-usage: python tools/painter.py site/assets/img/hq.svg 275.4 281.1 18 tools/rules_hq.py"""
+usage: python tools/painter.py public/assets/img/hq.svg 275.4 281.1 18 tools/rules_hq.py"""
 import gen_hq
 from iso import C30
 

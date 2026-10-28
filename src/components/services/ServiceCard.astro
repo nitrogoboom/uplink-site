@@ -1,0 +1,38 @@
+---
+// One service, in full: the <article class="svc"> the Services picker shows one at a time, and the whole of a
+// service's own page (/services/<slug>). The content comes from src/content/services/<slug>.json.
+//   service   the collection entry
+//   n, total  its place ("Service 03 of 07"; services.js writes the same text when the picker is on)
+//   on        the one the picker shows first
+//   first     the first drawing on the page loads eagerly; the rest lazily
+import type { CollectionEntry } from 'astro:content';
+interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean }
+const { service, n, total, on = false, first = false } = Astro.props;
+const { id, data: s } = service;
+const two = (k: number) => String(k).padStart(2, '0');
+---
+<article class:list={['svc', { 'is-on': on }]} id={id} data-svc data-tile={s.tile} aria-labelledby={`svc-${id}`}>
+  <div class="picker-head">
+    <span class="chip chip--sky">{s.chip}</span>
+    <h2 id={`svc-${id}`}>{s.title}</h2>
+    <p class="lead">{s.lead}</p>
+  </div>
+  <div class="picker-prev panel">
+    <div class="picker-art">
+      <div class="tags"><span class="chip" data-svc-n>Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span></div>
+      <picture>
+        <source media="(max-width: 1199px)" srcset={`/assets/img/${s.image}-compact.svg`}>
+        <img src={`/assets/img/${s.image}.svg`} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'} alt={s.alt} width="640" height="480">
+      </picture>
+    </div>
+  </div>
+  <div class="picker-detail">
+    <span class="label">What's included</span>
+    <ul class="feat-list">
+      {s.features.map((f, i) => (
+        <li class="feat"><span class="icon-tile" aria-hidden="true">{i + 1}</span><span><span class="feat-t">{f.title}</span><span class="feat-d">{f.detail}</span></span></li>
+      ))}
+    </ul>
+    <p class="row"><span class="label">Best for</span><span>{s.bestFor}</span></p>
+  </div>
+</article>

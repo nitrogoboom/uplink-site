@@ -1,0 +1,16 @@
+---
+// CONTACT. Sections in page order; each is one component in src/components/contact/.
+import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/site';
+import Message from '../components/contact/Message.astro';
+import Support from '../components/contact/Support.astro';
+import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+---
+<Base title={PAGES.contact.title} description={PAGES.contact.description}
+      page="contact" path="/contact" type="ContactPage">
+  <Message />
+  <Support />
+</Base>
+<script>
+  import '../scripts/contact.js';
+</script>

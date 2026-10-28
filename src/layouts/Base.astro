@@ -1,0 +1,109 @@
+---
+// The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it.
+//   title, description  the page's own
+//   page                which tab is current (home, services, work, about, contact; notfound and soon have none)
+//   path                the page's address ('/', '/services'); gives it a canonical and Open Graph tags.
+//                       Leave it out for pages that should carry neither (soon, 404).
+//   robots              e.g. 'noindex, follow'
+//   type                the page's schema.org type (FAQPage, CollectionPage, AboutPage, ContactPage): writes JSON-LD
+//                       for the page and its breadcrumb, pointing at Home's business block by @id.
+//   ldPage, ldGraph     more JSON-LD: fields for the page node, and more nodes (the Services page adds its FAQ and
+//                       the Service list from the collections).
+// Anything else a page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
+// The shared CSS (global.css) is imported here, so Astro links it once per page; the page's own CSS is
+// imported by its section components. Scripts: core.js and footer.js run on every page (ES modules);
+// a page adds its own with a <script> that imports it.
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BottomNav from '../components/BottomNav.astro';
+import BookDialog from '../components/BookDialog.astro';
+import ShortcutsDialog from '../components/ShortcutsDialog.astro';
+
+export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'soon' | 'notfound';
+interface Props {
+  title: string;
+  description: string;
+  page: Page;
+  path?: string;
+  robots?: string;
+  type?: 'FAQPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
+  ldPage?: Record<string, unknown>;   // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
+  ldGraph?: object[];                 // more nodes for the page's JSON-LD graph (e.g. the Services listed)
+}
+const { title, description, page, path, robots, type, ldPage = {}, ldGraph = [] } = Astro.props;
+const canonical = path === undefined ? null : new URL(path, Astro.site).href;
+const ogImage = new URL('/assets/img/og.png', Astro.site).href;
+const business = { '@id': `${Astro.site!.href}#business` };
+const name = title.split(' · ')[0];
+const jsonld = type && canonical && {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': type, '@id': canonical, url: canonical, name, description, inLanguage: 'en-CA', publisher: business,
+      ...(type === 'AboutPage' ? { about: business } : {}), ...ldPage },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name, item: canonical } ] },
+    ...ldGraph,
+  ],
+};
+// Every first screen uses these four faces, phone and desktop (titles 700 italic, buttons and card titles 700,
+// body 400 and 600). The nav tabs' Condensed 600 shows from 700px wide, so it is preloaded with that media query.
+const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-400', 'barlow-600'];
+---
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{title}</title>
+<meta name="description" content={description}>
+{robots && <meta name="robots" content={robots}>}
+{canonical && <link rel="canonical" href={canonical}>}
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+{canonical && (
+  <Fragment>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Uplink Technology">
+    <meta property="og:title" content={title}>
+    <meta property="og:description" content={description}>
+    <meta property="og:url" content={canonical}>
+    <meta property="og:locale" content="en_CA">
+    <meta property="og:image" content={ogImage}>
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack.">
+    <meta name="twitter:card" content="summary_large_image">
+  </Fragment>
+)}
+<meta name="theme-color" content="#0E1A27">
+<script is:inline>document.documentElement.classList.add('js')</script>
+{fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
+<link rel="preload" href="/assets/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 700px)">
+<slot name="head" />
+{jsonld && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonld, null, 1).replace(/<\//g, '<\\/')} />}
+</head>
+<body data-page={page}>
+<a class="skip-link" href="#main">Skip to content</a>
+<Header current={page} />
+
+<main id="main" tabindex="-1">
+<slot />
+</main>
+<Footer />
+
+<BottomNav current={page} />
+
+<BookDialog />
+
+<ShortcutsDialog />
+
+<div class="toasts" aria-live="polite"></div>
+
+<script>
+  import '../scripts/core.js';
+  import '../scripts/footer.js';
+</script>
+</body>
+</html>

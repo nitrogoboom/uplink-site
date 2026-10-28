@@ -1,0 +1,34 @@
+---
+// SERVICES · 3. Questions: the FAQ from src/data/faq.json, then the call-to-action band.
+// Styles: shared (.faq, .cta-band in src/styles/shared-blocks.css).
+import { getCollection } from 'astro:content';
+import { byOrder } from '../../content.config';
+import Icon from '../Icon.astro';
+const faq = (await getCollection('faq')).sort(byOrder);
+---
+<section class="section fold" id="faq" aria-labelledby="faq-title">
+  <div class="container split">
+    <div class="section-head">
+      <p class="eyebrow">Questions</p>
+      <h2 id="faq-title">Things people ask first</h2>
+    </div>
+    <div class="faq">
+      {faq.map(({ data: f }) => (
+        <details>
+          <summary>{f.q}<Icon name="plus" /></summary>
+          <div><p>{f.a}</p></div>
+        </details>
+      ))}
+    </div>
+    <div class="panel cta-band fold-foot" id="start">
+      <div class="stack">
+        <h2 id="start-title">Not sure which plan fits?</h2>
+        <p class="lead">Start with the free check-up. We will tell you what you need and what you can skip.</p>
+      </div>
+      <div class="row">
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--secondary btn--lg" href="tel:+18555550142">1-855-555-0142</a>
+      </div>
+    </div>
+  </div>
+</section>

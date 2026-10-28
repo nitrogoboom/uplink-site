@@ -1,4 +1,4 @@
-"""Drawing colours for every tools/gen_*.py, read from site/assets/css/tokens.css.
+"""Drawing colours for every tools/gen_*.py, read from src/styles/tokens.css.
 
     import palette as pal        then pal.AMBER, pal.EDGE, pal.SCREEN ...
 
@@ -12,7 +12,7 @@ import math
 import pathlib
 import re
 
-TOKENS = pathlib.Path(__file__).resolve().parent.parent / 'site' / 'assets' / 'css' / 'tokens.css'
+TOKENS = pathlib.Path(__file__).resolve().parent.parent / 'src' / 'styles' / 'tokens.css'
 _root = TOKENS.read_text(encoding='utf-8').split(':root {', 1)[1].split('}', 1)[0]
 _tok = {k: v.upper() for k, v in re.findall(r'--([a-z0-9-]+):\s*(#[0-9A-Fa-f]{3,6})\b', _root)}
 

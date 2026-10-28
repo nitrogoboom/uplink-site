@@ -1,0 +1,30 @@
+---
+// ABOUT · 3. Team: one card per person from src/data/team.json, then the call-to-action band. Styles: team.css.
+import { getCollection } from 'astro:content';
+import { byOrder } from '../../content.config';
+import './team.css';
+const team = (await getCollection('team')).sort(byOrder);
+---
+<section class="section fold" id="team" aria-labelledby="team-title">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Team</p>
+      <h2 id="team-title">The people who pick up</h2>
+    </div>
+    <ul class="team">
+      {team.map(({ data: t }) => (
+        <li class="person panel"><span class="avatar" aria-hidden="true">{t.initials}</span><span class="stack-2"><span class="person-name">{t.name}</span><span class="small muted">{t.role}</span></span></li>
+      ))}
+    </ul>
+    <div class="panel cta-band fold-foot" id="start">
+      <div class="stack">
+        <h2 id="start-title">Meet the team on a call</h2>
+        <p class="lead">The free check-up is run by the same technicians who would look after you.</p>
+      </div>
+      <div class="row">
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--secondary btn--lg" href="/soon#careers">Join the team</a>
+      </div>
+    </div>
+  </div>
+</section>

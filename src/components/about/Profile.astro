@@ -1,0 +1,51 @@
+---
+// ABOUT · 1. Who we are (first screen): intro text and the HQ building card.
+// Styles: profile.css, plus .facts (work/details.css) and .industries (work/industries.css). Desktop layout: src/styles/desktop.css.
+import '../work/details.css';
+import '../work/industries.css';
+import './profile.css';
+---
+<section class="page-intro fold" id="profile" aria-labelledby="about-title">
+  <div class="container">
+    <div class="profile">
+      <div class="profile-card panel">
+        <div class="profile-art well">
+          <picture><source media="(max-width: 1599px)" srcset="/assets/img/hq-compact.svg"><img src="/assets/img/hq.svg" fetchpriority="high" alt="Illustration of the Uplink office building with the help desk floor highlighted" width="640" height="480"></picture>
+          <span class="chip chip--accent">Since 2011</span>
+        </div>
+        <div class="stack-2">
+          <span class="brand-name">Uplink Technology</span>
+          <p class="muted">Your outsourced IT department. Help desk, security and cloud under one roof.</p>
+        </div>
+        <div class="stack-2">
+          <span class="label">Known for</span>
+          <ul class="industries">
+            <li><span class="chip">Plain-English help</span></li>
+            <li><span class="chip">Look before we quote</span></li>
+            <li><span class="chip">Security first</span></li>
+          </ul>
+        </div>
+        <dl class="facts">
+          <div><dt>Based in</dt><dd>Toronto, ON</dd></div>
+          <div><dt>Team</dt><dd>22 technicians</dd></div>
+          <div><dt>Languages</dt><dd>English, French</dd></div>
+        </dl>
+      </div>
+
+      <div class="profile-text">
+        <p class="eyebrow">About</p>
+        <h1 id="about-title">We're your IT company</h1>
+        <div class="prose">
+          <p>We are the IT department for businesses that do not want to build one. We look at your setup first, tell you straight what is covered and what is not, then run it for you: help desk, security, cloud and the network underneath.</p>
+          <p>Everyone who answers your call works here, in our office. We do not hand your tickets to an overseas call centre, and the person who fixes your problem today is the same person who will know your setup next year.</p>
+        </div>
+        <ul class="stats">
+          <li class="stat panel"><span class="label">Clients supported</span><span class="stat-val">120+</span></li>
+          <li class="stat panel"><span class="label">Average first response</span><span class="stat-val">12 min</span></li>
+          <li class="stat panel"><span class="label">Devices looked after</span><span class="stat-val">3,400</span></li>
+          <li class="stat panel"><span class="label">Client renewal rate</span><span class="stat-val">96%</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

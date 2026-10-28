@@ -1,6 +1,6 @@
 """Draws network.svg (Services: network) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_network.py site/assets/img/network.svg
+usage: python tools/gen_network.py public/assets/img/network.svg
 World: 1 unit = 1px. x runs right-down, y left-down, z up. Floor is z = 0.
 Grid: everything sits on x, y = multiples of 5 and z = multiples of 2.5 (the isoprops grid at S = 20), so edges
 either meet exactly or sit clearly apart.

@@ -1,6 +1,6 @@
 """Draws strategy.svg (Services: strategy) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
-usage: python tools/gen_strategy.py site/assets/img/strategy.svg
+usage: python tools/gen_strategy.py public/assets/img/strategy.svg
 World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
 """
 import sys

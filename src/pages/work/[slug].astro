@@ -1,0 +1,45 @@
+---
+// One page per project (/work/office-move …), from src/content/projects/<slug>.json: the same ProjectCase the
+// Work page lists, on its own, with links to the next project and back to the list.
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProjectCase from '../../components/work/ProjectCase.astro';
+import Icon from '../../components/Icon.astro';
+import '../../components/work/details.css';
+import '../../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, i) => ({ params: { slug: project.id }, props: { project, next: projects[(i + 1) % projects.length] } }));
+}
+const { project, next } = Astro.props;
+const { id, data: p } = project;
+const url = new URL(`/work/${id}`, Astro.site).href;
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Article', '@id': url, url, headline: p.name, description: p.story, inLanguage: 'en-CA',
+      publisher: { '@id': `${Astro.site!.href}#business` }, about: p.services },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: 'Our work', item: new URL('/work', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: p.name, item: url } ] },
+  ],
+};
+---
+<Base title={`${p.name} · Uplink Technology`} description={`${p.client}. ${p.story}`} page="work" path={`/work/${id}`}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
+  </Fragment>
+  <section class="section case-page" id="details" aria-labelledby={`case-${id}-t`}>
+    <div class="container stack-5">
+      <p class="eyebrow">Our work · {p.tag}</p>
+      <ProjectCase project={project} heading="h2" />
+      <div class="row">
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--secondary btn--lg" href={`/work/${next.id}`}>Next: {next.data.name}<Icon name="arrow" /></a>
+        <a class="link-arrow" href="/work">All projects<Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+</Base>
