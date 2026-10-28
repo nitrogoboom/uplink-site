@@ -1,11 +1,11 @@
 ---
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
-// Drawing: public/assets/img/hero-office.svg (HERO), fetched by home.js on screens 600px and wider, plus its moving
+// Drawing: public/assets/img/hero-office.svg (HERO, in src/lib/site.ts), fetched by home.js on screens 600px and wider, plus its moving
 // dashes on their own layer in hero-flows.svg, inlined here. Both are written by tools/gen_office.py; don't edit by hand.
-// Without script, office.svg shows. Styles: hero.css (imported here). Desktop layout: src/styles/desktop.css.
+// Without script, office.svg shows. Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
 import Flows from './hero-flows.svg';
 import './hero.css';
-export const HERO = '/assets/img/hero-office.svg';
+import { HERO } from '../../lib/site';
 ---
 <section class="hero fold" id="top" aria-labelledby="hero-title">
   <div class="container hero-grid">

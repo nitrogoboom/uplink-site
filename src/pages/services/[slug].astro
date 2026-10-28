@@ -1,20 +1,20 @@
 ---
 // One page per service (/services/help-desk …), from src/content/services/<slug>.json. The same ServiceCard
-// the picker shows, on its own, plus the call-to-action band. Its JSON-LD is the Service block the Services page
-// also lists, with a three-step breadcrumb.
+// the picker shows, laid out as a page of its own (service-page.css): breadcrumb and title beside the drawing,
+// what's included, a link to the next service, and the call-to-action band. Its JSON-LD is the Service block
+// the Services page also lists, with a three-step breadcrumb.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
-import '../../components/home/hero.css';
 import '../../components/services/pick.css';
-import '../../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+import '../../components/services/service-page.css';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length } }));
+  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length, next: services[(i + 1) % services.length] } }));
 }
-const { service, n, total } = Astro.props;
+const { service, n, total, next } = Astro.props;
 const { id, data: s } = service;
 const url = new URL(`/services/${id}`, Astro.site).href;
 const business = { '@id': `${Astro.site!.href}#business` };
@@ -33,13 +33,35 @@ const ld = {
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
   </Fragment>
-  <section class="hero fold" id="pick" aria-labelledby={`svc-${id}`}>
-    <div class="container picker">
-      <p class="eyebrow picker-title">Services · {n} of {total}</p>
-      <ServiceCard service={service} n={n} total={total} on first />
-      <div class="picker-roster">
-        <a class="link-arrow" href={`/services#${id}`}>Compare all services<Icon name="arrow" /></a>
+  <section class="hero svc-page" aria-labelledby={`svc-${id}`}>
+    <div class="container svc-page-grid">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <ol><li><a href="/services">Services</a></li><li aria-current="page">{s.title}</li></ol>
+      </nav>
+      <ServiceCard service={service} n={n} total={total} on first heading="h1" />
+      <div class="svc-page-cta row">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}>Talk to us about this</a>
+        <a class="link-arrow" href={`/services#${id}`}>Compare all services<Icon name="arrow" /></a>
+      </div>
+    </div>
+  </section>
+  <section class="section page-end" aria-label="More">
+    <div class="container stack-5">
+      <a class="next-link panel" href={`/services/${next.id}`}>
+        <span class="label">Next service</span>
+        <span class="next-title">{next.data.title}</span>
+        <span class="next-line muted">{next.data.card}</span>
+        <Icon name="arrow" />
+      </a>
+      <div class="panel cta-band">
+        <div class="stack">
+          <h2>Not sure it fits?</h2>
+          <p class="lead">Start with the free check-up. We will tell you what you need and what you can skip.</p>
+        </div>
+        <div class="row">
+          <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+          <a class="btn btn--secondary btn--lg" href="tel:+18555550142">1-855-555-0142</a>
+        </div>
       </div>
     </div>
   </section>

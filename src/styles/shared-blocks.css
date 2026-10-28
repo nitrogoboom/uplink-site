@@ -54,3 +54,10 @@
 .faq details[open] summary svg { transform: rotate(45deg); color: var(--c-accent-text); }
 .faq details > div { padding: 0 var(--sp-5) var(--sp-5); max-width: var(--measure-lead); color: var(--c-muted); }
 
+/* desktop (>= 1100 wide and >= 700 tall): FAQ beside its heading; proof and call to action on one screen */
+@media (min-width: 1100px) and (min-height: 700px) {
+  .split .faq { max-width: none; }   /* lines up with the blocks above and below; answers keep their reading width */
+  @media (max-height: 760px) { .faq { gap: var(--sp-2); } }
+  /* proof + call to action share one screen */
+  #proof .cta-band { margin-top: var(--sp-6); }
+}

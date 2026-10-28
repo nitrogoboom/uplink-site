@@ -3,9 +3,7 @@
    Service picker: the tiles show one service at a time.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, html, reduceMotion } = Uplink;
+import { $, $$, html, reduceMotion, registerPicker } from './core.js';
 
 /* ======================================================================
    Services picker (Services page)
@@ -41,7 +39,7 @@ if (svcs.length) {
     if (live) live.textContent = name + ' selected';
     if (opts.focus) tiles[i].focus({ preventScroll: true });
     if (opts.hash !== false && window.history && history.replaceState) {
-      try { history.replaceState(null, '', '#' + svcs[i].id); } catch (e) { /* ignore */ }
+      try { history.replaceState(null, '', '#' + svcs[i].id); } catch { /* ignore */ }
     }
   };
 
@@ -49,7 +47,7 @@ if (svcs.length) {
 
   const fromHash = () => {
     let id = '';
-    try { id = decodeURIComponent(location.hash.slice(1)); } catch (e) { return -1; }
+    try { id = decodeURIComponent(location.hash.slice(1)); } catch { return -1; }
     return svcs.findIndex((s) => s.id === id);
   };
   const start = fromHash();
@@ -64,5 +62,5 @@ if (svcs.length) {
     pickerEl.scrollIntoView({ block: 'start', behavior: reduceMotion.matches ? 'auto' : 'smooth' });
   });
 
-  Uplink.picker = { select, count: svcs.length };
+  registerPicker({ select, count: svcs.length });
 }

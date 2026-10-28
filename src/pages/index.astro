@@ -2,13 +2,12 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
-import Hero, { HERO } from '../components/home/Hero.astro';
+import { HERO, PAGES } from '../lib/site';
+import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
 import Process from '../components/home/Process.astro';
 import Proof from '../components/home/Proof.astro';
-import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
 
 const site = Astro.site!.href;
 const business = {

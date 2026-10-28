@@ -18,7 +18,7 @@ An Astro 7 project. `npm run dev` serves it at http://localhost:4321; `npm run b
 
 A page is `<Base …>` with its sections inside. `layouts/Base.astro` is the shared `<head>`, header, footer, bottom bar, pop-ups and toast region; its props are the page's title, description, which tab is current, its address (for the canonical and Open Graph), robots, and its schema.org type. The five static pages take title and description from `lib/site.ts` (`PAGES`).
 
-Every page's **last** import is `styles/late.css`. CSS order matters: the desktop layout block must come after the sections' CSS, as it did in the old single-file cascade.
+Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700px)`) sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules. There is no last-import rule any more.
 
 ## Shared parts: `components/`
 
@@ -43,7 +43,7 @@ Typed in `content.config.ts`.
 
 ## Styles: `styles/`
 
-`global.css` lists the shared files in cascade order (tokens, fonts, base, layout, type, header, …); `late.css` holds the three that must come last (`desktop.css`, `page-transitions.css`, `motion.css`). Colours, sizes and timings stay in `tokens.css`.
+`global.css` lists the shared files in cascade order (tokens, fonts, base, layout, type, header, …), ending with the blocks more than one page uses (`hero.css`, `svc-cards.css`, `facts.css`, `industries.css`), then `page-transitions.css` and `motion.css`. `fold.css` is the desktop one-section-per-screen rules every page shares. Colours, sizes and timings stay in `tokens.css`. `tools/verify_styles.py` compares every element's computed style between two builds: run it after moving CSS.
 
 ## Scripts: `scripts/`
 

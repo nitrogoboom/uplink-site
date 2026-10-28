@@ -1,10 +1,9 @@
 ---
 // SERVICES · 1. Choose a service (first screen). Every service from the collection is an <article class="svc">
 // here (ServiceCard); services.js shows one at a time and builds the numbered tiles. Without script they all
-// stack. Styles: pick.css, plus the .hero base from home/hero.css. Desktop layout: src/styles/desktop.css.
+// stack. Styles: pick.css, plus .hero (src/styles/hero.css). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import ServiceCard from './ServiceCard.astro';
-import '../home/hero.css';
 import './pick.css';
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 ---

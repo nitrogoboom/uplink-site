@@ -32,7 +32,7 @@ export default {
 async function passwordOk(request, expected) {
   const header = request.headers.get('Authorization') || '';
   if (!header.startsWith('Basic ')) return false;
-  let given = '';
+  let given;
   try {
     const decoded = new TextDecoder().decode(Uint8Array.from(atob(header.slice(6)), (c) => c.charCodeAt(0)));
     given = decoded.slice(decoded.indexOf(':') + 1);

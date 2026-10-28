@@ -3,9 +3,7 @@
    Filters and the project pop-up.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, openDialog, shortcutsOn } = Uplink;
+import { $, $$, openDialog, shortcutsOn } from './core.js';
 
 /* ======================================================================
    Work: filters + project pop-up

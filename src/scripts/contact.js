@@ -3,9 +3,7 @@
    Copy buttons and the queue card.
    ========================================================================== */
 
-import { Uplink } from './core.js';
-
-const { $, $$, toast } = Uplink;
+import { $, $$, toast } from './core.js';
 
 /* ======================================================================
    Copy buttons (phone number, email)

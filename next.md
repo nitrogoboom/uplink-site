@@ -1,5 +1,7 @@
 # Next: the work that needs no launch
 
+**Done (28 Oct 2026), all eight steps, branch `next-no-launch`.** What's left is in `notes.md`. Kept for the record of what each step did and why.
+
 Written 28 Oct 2026, after the Astro move merged (`review.md` has the reasoning; `notes.md` the full open list). Everything below can be done now, on the `workers.dev` address, with placeholder content. Nothing here needs the real domain, real copy, or a form backend. Those wait in `notes.md` under "Before going live".
 
 Do the steps in order; each is one commit on a branch, and the pull request's CI (build, `astro check`) must stay green. Check the result with `npm run build && npm run serve` and `python tools/verify_footer.py out/`, and in the browser. Update `CLAUDE.md` and `notes.md` in the same commit when a step changes a rule or closes an item.

@@ -4,7 +4,7 @@
 <polyline points="1122.5,109.5 1122.5,227.9" fill="none" stroke="{{pal:SKY}}" stroke-width="1.3" stroke-opacity="0.35" stroke-linecap="round"/><polyline class="ob-flow" style="animation-delay:calc(var(--d,0ms) + 560ms),0s" points="1122.5,138.5 1122.5,227.9" fill="none" stroke="{{pal:SKY}}" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/>
 </g>
 <g class="ob-i ob-cloud" data-link="none" style="--d:3020ms">
-<path class="ob-link-base" d="" style="display:none"/><path class="ob-link" d="" style="display:none"/>
+<path class="ob-link-base" d="" display="none"/><path class="ob-link" d="" display="none"/>
 {{CLOUD_SHAPES}}
 </g>
 <g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE" data-s="email, files, chat and sign-in, kept in sync" style="--d:3100ms">

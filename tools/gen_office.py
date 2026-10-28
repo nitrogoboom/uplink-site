@@ -16,7 +16,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
   tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
   tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
-import math, pathlib, re, sys
+import hashlib, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
@@ -721,6 +721,28 @@ def split_flows(body):
     return ''.join(out), '\n'.join(over)
 
 
+def hoist_styles(text):
+    """Every style="" attribute becomes a class named after its declarations (s-<hash>) with one rule, so the CSP can
+    drop 'unsafe-inline' (a hash covers a <style> block, never an attribute). The rule doubles the class so it
+    outranks hero.css's one-class rules whatever order the <style> blocks land in on the page, as the attribute did.
+    The same declarations get the same class in every file, so the hero and its flow layer agree."""
+    rules = {}
+
+    def tag(m):
+        t = m.group(0)
+        st = re.search(r' style="([^"]*)"', t)
+        if not st:
+            return t
+        name = 's-' + hashlib.sha1(st.group(1).encode()).hexdigest()[:6]
+        rules[name] = st.group(1)
+        t = t[:st.start()] + t[st.end():]
+        if ' class="' in t:
+            return t.replace(' class="', f' class="{name} ', 1)
+        return re.sub(r'^(<[\w:-]+)', rf'\1 class="{name}"', t)
+    out = re.sub(r'<[A-Za-z][^>]*>', tag, text)
+    return out, ''.join(f'.{n}.{n}{{{d}}}' for n, d in sorted(rules.items()))
+
+
 def render(v):
     BOXES.clear()
     out = []
@@ -750,11 +772,15 @@ def render(v):
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
         style = '<style>' + part('hero.css') + '</style>'
         # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
-        body += f'\n<circle class="ob-link-end" r="6.5" fill="{pal.ON_AMBER}" stroke="{pal.AMBER}" stroke-width="3" cx="-99" cy="-99" style="display:none"/>'
+        body += f'\n<circle class="ob-link-end" r="6.5" fill="{pal.ON_AMBER}" stroke="{pal.AMBER}" stroke-width="3" cx="-99" cy="-99" display="none"/>'
     if v == 'hero':
         body, over = split_flows(body)
+        over, over_css = hoist_styles(over)
         HERO_FLOWS[:] = ['<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',
-                         over, '</svg>']
+                         f'<style>{over_css}</style>', over, '</svg>']
+    body, css = hoist_styles(body)
+    if css:
+        style += f'\n<style>{css}</style>'
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 

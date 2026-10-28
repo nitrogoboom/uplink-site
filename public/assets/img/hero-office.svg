@@ -31,7 +31,8 @@
 .ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}
 .ob-over{pointer-events:none;will-change:transform}</style>
-<g class="ob-i ob-fade" style="--d:0ms">
+<style>.s-06ced6.s-06ced6{--d:650ms;animation-duration:450ms}.s-06f54a.s-06f54a{animation-delay:-1800ms}.s-08f53e.s-08f53e{--d:1200ms}.s-0b14bc.s-0b14bc{--d:850ms}.s-0e19e8.s-0e19e8{animation-delay:-1400ms}.s-0ea1ec.s-0ea1ec{--d:2370ms}.s-1037e7.s-1037e7{--d:1700ms}.s-11cb60.s-11cb60{--d:2880ms}.s-12f558.s-12f558{--d:1580ms}.s-1ae774.s-1ae774{--d:950ms;animation-duration:450ms}.s-209c88.s-209c88{--d:1500ms}.s-28ae57.s-28ae57{--d:2620ms}.s-29ba3b.s-29ba3b{--d:420ms;animation-duration:480ms}.s-2f3a54.s-2f3a54{--d:3040ms}.s-2f7a5b.s-2f7a5b{animation-delay:-2400ms}.s-3059f0.s-3059f0{--d:2800ms}.s-30c871.s-30c871{--d:2830ms}.s-35bd73.s-35bd73{--d:300ms;animation-duration:480ms}.s-44a1f9.s-44a1f9{--d:2970ms}.s-46499d.s-46499d{animation-delay:-800ms}.s-4b80cd.s-4b80cd{--d:2490ms}.s-5080ff.s-5080ff{--d:1750ms}.s-519563.s-519563{--d:3020ms}.s-527abf.s-527abf{animation-delay:-1600ms}.s-52c4cb.s-52c4cb{--d:2420ms}.s-5b78ad.s-5b78ad{--d:0ms}.s-6384b1.s-6384b1{--d:2390ms}.s-639bb4.s-639bb4{--d:1500ms;animation-duration:520ms}.s-677b67.s-677b67{--d:2300ms}.s-68a6e9.s-68a6e9{--d:1400ms}.s-72891e.s-72891e{animation-delay:-2100ms}.s-732bc9.s-732bc9{--d:2430ms}.s-77bf19.s-77bf19{--d:1100ms}.s-7cfb68.s-7cfb68{--d:2690ms}.s-800090.s-800090{animation-duration:3840ms;animation-delay:-1060ms}.s-863493.s-863493{--d:1700ms;animation-duration:450ms}.s-91e731.s-91e731{--d:2500ms}.s-94299e.s-94299e{--d:700ms}.s-9d0722.s-9d0722{animation-delay:-1100ms}.s-9d93b9.s-9d93b9{--d:3120ms}.s-9dab80.s-9dab80{--d:2560ms}.s-a20b5c.s-a20b5c{animation-delay:-1300ms}.s-a28275.s-a28275{animation-duration:2800ms;animation-delay:0ms}.s-a74e52.s-a74e52{--d:2960ms}.s-aa3aab.s-aa3aab{--d:1650ms}.s-b3ea33.s-b3ea33{--d:2440ms}.s-b42c1d.s-b42c1d{animation-delay:-1900ms}.s-b63a17.s-b63a17{--d:1980ms}.s-bfd857.s-bfd857{--d:2060ms}.s-c490be.s-c490be{--d:1000ms}.s-cd0a41.s-cd0a41{--d:2450ms}.s-cfedf0.s-cfedf0{--d:3100ms}.s-cff6e6.s-cff6e6{--d:2760ms}.s-d2a7b6.s-d2a7b6{animation-duration:350ms}.s-d31185.s-d31185{--d:2360ms}.s-d434b7.s-d434b7{--d:2250ms}.s-dd5a4f.s-dd5a4f{--d:2900ms}.s-e11bb9.s-e11bb9{--d:2320ms}.s-e12697.s-e12697{animation-duration:3580ms;animation-delay:-2120ms}.s-ebed3d.s-ebed3d{--d:775ms}.s-faa3e5.s-faa3e5{--d:1900ms}</style>
+<g class="s-5b78ad ob-i ob-fade">
 <polygon points="251.0,463.8 786.9,773.2 786.9,760.5 251.0,451.2" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1152.3,562.3 786.9,773.2 786.9,760.5 1152.3,549.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="616.4,240.2 1152.3,549.6 786.9,760.5 251.0,451.2" fill="#182431" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -41,7 +42,7 @@
 <polyline points="494.6,584.8 519.0,584.8 519.0,598.8" fill="none" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.55" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="500.7,581.2 525.1,581.2 525.1,595.3" fill="none" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.55" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms">
+<g class="s-35bd73 ob-i ob-grow">
 <polygon points="610.3,243.7 1146.2,553.1 1146.2,426.5 610.3,117.1" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1152.3,549.6 1146.2,553.1 1146.2,426.5 1152.3,423.0" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="616.4,113.6 1152.3,423.0 1146.2,426.5 610.3,117.1" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -52,7 +53,7 @@
 <polyline points="872.2,352.7 872.2,289.4" fill="none" stroke="#97C8EA" stroke-width="0.7" stroke-opacity="0.4" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="945.2,394.9 945.2,331.6" fill="none" stroke="#97C8EA" stroke-width="0.7" stroke-opacity="0.4" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms">
+<g class="s-29ba3b ob-i ob-grow">
 <polygon points="251.0,451.2 257.1,454.7 257.1,328.1 251.0,324.6" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="616.4,247.2 257.1,454.7 257.1,328.1 616.4,120.7" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="610.3,117.1 616.4,120.7 257.1,328.1 251.0,324.6" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -61,7 +62,7 @@
 <polygon points="391.1,335.1 336.3,366.8 336.3,324.6 391.1,292.9" fill="#FFAD51" fill-opacity="0.14" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.95" stroke-linejoin="round"/>
 <g transform="matrix(24.359 -14.063 0 28.127 336.27 324.58)"><rect x="0.1" y="0.1" width="0.975" height="0.6" rx="0.05" fill="#283440"/><circle cx="0.5875" cy="0.33" r="0.1" fill="#97C8EA" fill-opacity="0.85"/><path d="M0.4175 0.66a0.17 0.15 0 0 1 0.34 0z" fill="#97C8EA" fill-opacity="0.85"/><rect x="1.175" y="0.1" width="0.975" height="0.6" rx="0.05" fill="#283440"/><circle cx="1.663" cy="0.33" r="0.1" fill="#FFAD51" fill-opacity="0.85"/><path d="M1.493 0.66a0.17 0.15 0 0 1 0.34 0z" fill="#FFAD51" fill-opacity="0.85"/><rect x="0.1" y="0.8" width="0.975" height="0.6" rx="0.05" fill="#283440"/><circle cx="0.5875" cy="1.03" r="0.1" fill="#97C8EA" fill-opacity="0.85"/><path d="M0.4175 1.36a0.17 0.15 0 0 1 0.34 0z" fill="#97C8EA" fill-opacity="0.85"/><rect x="1.175" y="0.8" width="0.975" height="0.6" rx="0.05" fill="#283440"/><circle cx="1.663" cy="1.03" r="0.1" fill="#97C8EA" fill-opacity="0.85"/><path d="M1.493 1.36a0.17 0.15 0 0 1 0.34 0z" fill="#97C8EA" fill-opacity="0.85"/></g>
 </g>
-<g class="ob-i" style="--d:775ms">
+<g class="s-ebed3d ob-i">
 <polygon points="537.2,292.9 561.6,307.0 561.6,268.3 537.2,254.3" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="622.5,271.8 561.6,307.0 561.6,268.3 622.5,233.2" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="598.1,219.1 622.5,233.2 561.6,268.3 537.2,254.3" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -78,7 +79,7 @@
 <polygon points="522.0,280.6 540.3,291.2 522.0,301.7 503.7,291.2" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="522.0,284.1 534.2,291.2 522.0,298.2 509.8,291.2" fill="#E6ECF2" fill-opacity="0.8" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:850ms">
+<g class="s-0b14bc ob-i">
 <polygon points="445.9,345.7 470.2,359.7 470.2,324.6 445.9,310.5" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="512.9,335.1 470.2,359.7 470.2,324.6 512.9,300.0" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="488.5,285.9 512.9,300.0 470.2,324.6 445.9,310.5" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -90,7 +91,7 @@
 <polygon points="470.2,310.5 464.2,314.0 464.2,307.0 470.2,303.5" fill="#B1B9C0" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="464.2,300.0 470.2,303.5 464.2,307.0 458.1,303.5" fill="#E6ECF2" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1000ms">
+<g class="s-c490be ob-i">
 <polygon points="738.2,352.7 799.1,387.9 799.1,352.7 738.2,317.5" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="829.5,370.3 799.1,387.9 799.1,352.7 829.5,335.1" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="768.6,300.0 829.5,335.1 799.1,352.7 738.2,317.5" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -130,7 +131,7 @@
 <polygon points="756.5,361.5 753.4,363.3 753.4,342.2 756.5,340.4" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="738.2,329.9 756.5,340.4 753.4,342.2 735.1,331.6" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1100ms">
+<g class="s-77bf19 ob-i">
 <polygon points="811.3,394.9 872.2,430.1 872.2,394.9 811.3,359.7" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="902.6,412.5 872.2,430.1 872.2,394.9 902.6,377.3" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="841.7,342.2 902.6,377.3 872.2,394.9 811.3,359.7" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -170,7 +171,7 @@
 <polygon points="829.5,403.7 826.5,405.4 826.5,384.4 829.5,382.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="811.3,372.0 829.5,382.6 826.5,384.4 808.2,373.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1200ms">
+<g class="s-08f53e ob-i">
 <polygon points="884.3,437.1 945.2,472.2 945.2,437.1 884.3,401.9" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="975.7,454.7 945.2,472.2 945.2,437.1 975.7,419.5" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="914.8,384.4 975.7,419.5 945.2,437.1 884.3,401.9" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -210,10 +211,10 @@
 <polygon points="902.6,445.9 899.6,447.6 899.6,426.5 902.6,424.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="884.3,414.2 902.6,424.8 899.6,426.5 881.3,416.0" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms">
+<g class="s-863493 ob-i ob-fade">
 <polygon points="1048.8,496.9 975.7,539.0 975.7,426.5 1048.8,384.4" fill="#97C8EA" fill-opacity="0.09" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.5" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-grow" style="--d:1500ms;animation-duration:520ms">
+<g class="s-639bb4 ob-i ob-grow">
 <polygon points="1011.0,532.7 1037.8,548.2 1037.8,484.9 1011.0,469.4" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="1069.5,529.9 1037.8,548.2 1037.8,484.9 1069.5,466.6" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="1042.7,451.2 1069.5,466.6 1037.8,484.9 1011.0,469.4" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
@@ -222,20 +223,20 @@
 <polyline points="1013.4,502.5 1035.4,515.1" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="1013.4,491.9 1035.4,504.6" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="1013.4,481.4 1035.4,494.0" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
-<circle class="ob-led" style="animation-duration:2800ms;animation-delay:0ms" cx="1032.3" cy="539.8" r="1.8" fill="#A9E9C3"/>
+<circle class="s-a28275 ob-led" cx="1032.3" cy="539.8" r="1.8" fill="#A9E9C3"/>
 <circle cx="1032.3" cy="529.2" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3840ms;animation-delay:-1060ms" cx="1032.3" cy="518.7" r="1.8" fill="#FFF5EC"/>
+<circle class="s-800090 ob-led" cx="1032.3" cy="518.7" r="1.8" fill="#FFF5EC"/>
 <circle cx="1032.3" cy="508.1" r="1.8" fill="#A9E9C3"/>
-<circle class="ob-led" style="animation-duration:3580ms;animation-delay:-2120ms" cx="1032.3" cy="497.6" r="1.8" fill="#FFF5EC"/>
+<circle class="s-e12697 ob-led" cx="1032.3" cy="497.6" r="1.8" fill="#FFF5EC"/>
 <circle cx="1032.3" cy="487.0" r="1.8" fill="#FFF5EC"/>
 </g>
-<g class="ob-i" style="--d:1580ms">
+<g class="s-12f558 ob-i">
 <polygon points="1048.8,553.1 1070.1,565.4 1070.1,537.3 1048.8,525.0" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1094.4,551.4 1070.1,565.4 1070.1,537.3 1094.4,523.2" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1073.1,510.9 1094.4,523.2 1070.1,537.3 1048.8,525.0" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <circle cx="1059.4" cy="538.2" r="1.8" fill="#A9E9C3"/>
 </g>
-<g class="ob-i" style="--d:1400ms">
+<g class="s-68a6e9 ob-i">
 <polygon points="713.8,451.2 774.7,486.3 774.7,451.2 713.8,416.0" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="805.2,468.7 774.7,486.3 774.7,451.2 805.2,433.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="744.3,398.4 805.2,433.6 774.7,451.2 713.8,416.0" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -275,7 +276,7 @@
 <polygon points="732.1,459.9 729.1,461.7 729.1,440.6 732.1,438.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="713.8,428.3 732.1,438.8 729.1,440.6 710.8,430.1" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1500ms">
+<g class="s-209c88 ob-i">
 <polygon points="786.9,493.3 847.8,528.5 847.8,493.3 786.9,458.2" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="878.3,510.9 847.8,528.5 847.8,493.3 878.3,475.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="817.4,440.6 878.3,475.8 847.8,493.3 786.9,458.2" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -315,14 +316,14 @@
 <polygon points="805.2,502.1 802.1,503.9 802.1,482.8 805.2,481.0" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="786.9,470.5 805.2,481.0 802.1,482.8 783.9,472.2" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms">
+<g class="s-863493 ob-i ob-fade">
 <polygon points="975.7,539.0 1073.1,595.3 1073.1,482.8 975.7,426.5" fill="#97C8EA" fill-opacity="0.09" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.5" stroke-linejoin="round"/>
 <polyline points="975.7,539.0 975.7,426.5" fill="none" stroke="#97C8EA" stroke-width="1.6" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-fade" style="--d:650ms;animation-duration:450ms">
+<g class="s-06ced6 ob-i ob-fade">
 <polygon points="439.8,349.2 616.4,451.2 616.4,338.6 439.8,236.7" fill="#97C8EA" fill-opacity="0.09" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.5" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:700ms">
+<g class="s-94299e ob-i">
 <polygon points="336.3,409.0 354.5,419.5 354.5,384.4 336.3,373.8" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="409.4,387.9 354.5,419.5 354.5,384.4 409.4,352.7" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="391.1,342.2 409.4,352.7 354.5,384.4 336.3,373.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -435,12 +436,12 @@
 <polygon points="537.2,456.4 519.0,467.0 519.0,445.9 537.2,435.3" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="534.2,433.6 537.2,435.3 519.0,445.9 515.9,444.1" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-fade" style="--d:950ms;animation-duration:450ms">
+<g class="s-1ae774 ob-i ob-fade">
 <polygon points="616.4,451.2 433.7,556.6 433.7,444.1 616.4,338.6" fill="#97C8EA" fill-opacity="0.09" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.5" stroke-linejoin="round"/>
 <polygon points="500.7,518.0 476.3,532.0 476.3,447.6 500.7,433.6" fill="#97C8EA" fill-opacity="0.12" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.85" stroke-linejoin="round"/>
 <polyline points="616.4,451.2 616.4,338.6" fill="none" stroke="#97C8EA" stroke-width="1.6" stroke-opacity="0.7" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1650ms">
+<g class="s-aa3aab ob-i">
 <polygon points="933.1,574.2 951.3,584.8 951.3,567.2 933.1,556.6" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="969.6,574.2 951.3,584.8 951.3,567.2 969.6,556.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="951.3,546.1 969.6,556.6 951.3,567.2 933.1,556.6" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -463,7 +464,7 @@
 <polygon points="957.4,560.1 951.3,563.7 951.3,539.0 957.4,535.5" fill="#35654B" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.22" stroke-linejoin="round"/>
 <polygon points="951.3,532.0 957.4,535.5 951.3,539.0 945.2,535.5" fill="#5FB586" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.22" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:1700ms">
+<g class="s-1037e7 ob-i">
 <polygon points="701.7,595.3 719.9,605.9 719.9,602.3 701.7,591.8" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="738.2,595.3 719.9,605.9 719.9,602.3 738.2,591.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="719.9,581.2 738.2,591.8 719.9,602.3 701.7,591.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -503,7 +504,7 @@
 <polygon points="713.8,579.5 716.9,581.2 707.7,586.5 704.7,584.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g transform="matrix(24.359 14.063 -24.359 14.063 713.83 581.24)"><rect x="0.18" y="0.04" width="0.27" height="0.1" rx="0.015" fill="#97C8EA" fill-opacity="0.85"/><circle cx="0.235" cy="0.2" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.315" cy="0.2" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.395" cy="0.2" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.235" cy="0.255" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.315" cy="0.255" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.395" cy="0.255" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.235" cy="0.31" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.315" cy="0.31" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/><circle cx="0.395" cy="0.31" r="0.016" fill="#E6ECF2" fill-opacity="0.5"/></g>
 </g>
-<g class="ob-i" style="--d:1750ms">
+<g class="s-5080ff ob-i">
 <polygon points="829.5,623.4 853.9,637.5 853.9,623.4 829.5,609.4" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="890.4,616.4 853.9,637.5 853.9,623.4 890.4,602.3" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="866.1,588.3 890.4,602.3 853.9,623.4 829.5,609.4" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -520,130 +521,130 @@
 <polygon points="957.4,634.0 884.3,676.2 884.3,637.5 957.4,595.3" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="945.2,588.3 957.4,595.3 884.3,637.5 872.2,630.5" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-n" style="--d:1900ms">
+<g class="s-faa3e5 ob-i ob-n">
 <path class="ob-cable" pathLength="100" d="M1040.2,468.0 L1040.2,410.0 L947.7,356.6 L796.0,444.1 L796.0,438.8" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>
 
 </g>
-<g class="ob-i ob-n" style="--d:1980ms">
+<g class="s-b63a17 ob-i ob-n">
 <path class="ob-cable" pathLength="100" d="M1040.2,468.0 L1040.2,410.0 L873.4,506.4 L873.4,501.1" fill="none" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>
 
 </g>
-<g class="ob-i ob-n" style="--d:2060ms">
+<g class="s-bfd857 ob-i ob-n">
 <path class="ob-cable" pathLength="100" d="M1040.2,468.0 L1040.2,410.0 L734.5,233.5 L436.8,405.4 L436.8,400.2" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/>
 
 </g>
-<g class="ob-i ob-ring" style="--d:2420ms">
-<g class="ob-pulse" style="animation-delay:-1800ms">
+<g class="s-52c4cb ob-i ob-ring">
+<g class="s-06f54a ob-pulse">
 <ellipse cx="796.0" cy="438.8" rx="112.0" ry="64.6" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.36"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2490ms">
-<g class="ob-pulse" style="animation-delay:-1300ms">
+<g class="s-4b80cd ob-i ob-ring">
+<g class="s-a20b5c ob-pulse">
 <ellipse cx="873.4" cy="501.1" rx="61.6" ry="35.6" fill="none" stroke="#97C8EA" stroke-width="1.1" stroke-opacity="0.36"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2560ms">
-<g class="ob-pulse" style="animation-delay:-800ms">
+<g class="s-9dab80 ob-i ob-ring">
+<g class="s-46499d ob-pulse">
 <ellipse cx="436.8" cy="400.2" rx="112.0" ry="64.6" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.36"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2360ms">
-<g class="ob-pulse" style="animation-delay:-2100ms">
+<g class="s-d31185 ob-i ob-ring">
+<g class="s-72891e ob-pulse">
 <ellipse cx="796.0" cy="438.8" rx="77.5" ry="44.7" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.58"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2430ms">
-<g class="ob-pulse" style="animation-delay:-1600ms">
+<g class="s-732bc9 ob-i ob-ring">
+<g class="s-527abf ob-pulse">
 <ellipse cx="873.4" cy="501.1" rx="42.6" ry="24.6" fill="none" stroke="#97C8EA" stroke-width="1.1" stroke-opacity="0.58"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2500ms">
-<g class="ob-pulse" style="animation-delay:-1100ms">
+<g class="s-91e731 ob-i ob-ring">
+<g class="s-9d0722 ob-pulse">
 <ellipse cx="436.8" cy="400.2" rx="77.5" ry="44.7" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.58"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2300ms">
-<g class="ob-pulse" style="animation-delay:-2400ms">
+<g class="s-677b67 ob-i ob-ring">
+<g class="s-2f7a5b ob-pulse">
 <ellipse cx="796.0" cy="438.8" rx="43.1" ry="24.9" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.8"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2370ms">
-<g class="ob-pulse" style="animation-delay:-1900ms">
+<g class="s-0ea1ec ob-i ob-ring">
+<g class="s-b42c1d ob-pulse">
 <ellipse cx="873.4" cy="501.1" rx="23.7" ry="13.7" fill="none" stroke="#97C8EA" stroke-width="1.1" stroke-opacity="0.8"/>
 </g>
 </g>
-<g class="ob-i ob-ring" style="--d:2440ms">
-<g class="ob-pulse" style="animation-delay:-1400ms">
+<g class="s-b3ea33 ob-i ob-ring">
+<g class="s-0e19e8 ob-pulse">
 <ellipse cx="436.8" cy="400.2" rx="43.1" ry="24.9" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.8"/>
 </g>
 </g>
-<g class="ob-i" style="--d:2250ms">
+<g class="s-d434b7 ob-i">
 <polygon points="780.8,438.8 796.0,447.6 796.0,444.1 780.8,435.3" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="811.3,438.8 796.0,447.6 796.0,444.1 811.3,435.3" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="796.0,426.5 811.3,435.3 796.0,444.1 780.8,435.3" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:2320ms">
+<g class="s-e11bb9 ob-i">
 <polygon points="858.2,501.1 873.4,509.9 873.4,506.4 858.2,497.6" fill="#3382B2" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="888.6,501.1 873.4,509.9 873.4,506.4 888.6,497.6" fill="#276C96" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="873.4,488.8 888.6,497.6 873.4,506.4 858.2,497.6" fill="#97C8EA" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 </g>
-<g class="ob-i" style="--d:2390ms">
+<g class="s-6384b1 ob-i">
 <polygon points="421.5,400.2 436.8,409.0 436.8,405.4 421.5,396.7" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="452.0,400.2 436.8,409.0 436.8,405.4 452.0,396.7" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="436.8,387.9 452.0,396.7 436.8,405.4 421.5,396.7" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-n" style="--d:2450ms">
-<path class="ob-cable" style="animation-duration:350ms" pathLength="100" d="M1040.2,468.0 L1040.2,314.0" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>
+<g class="s-cd0a41 ob-i ob-n">
+<path class="s-d2a7b6 ob-cable" pathLength="100" d="M1040.2,468.0 L1040.2,314.0" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>
 
 </g>
-<g class="ob-i" style="--d:2500ms">
+<g class="s-91e731 ob-i">
 <polygon points="904.4,235.6 1065.2,328.4 1065.2,317.2 904.4,224.4" fill="#2F3B47" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 <polygon points="1176.0,264.5 1065.2,328.4 1065.2,317.2 1176.0,253.2" fill="#25313D" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 <polygon points="1015.3,160.4 1176.0,253.2 1065.2,317.2 904.4,224.4" fill="#3F4A56" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-tile" data-tile="mail" style="--d:2620ms">
+<g class="s-28ae57 ob-i ob-tile" data-tile="mail">
 <polygon class="f-l" points="973.9,195.5 1015.3,219.5 1015.3,213.8 973.9,189.9" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon class="f-r" points="1056.7,195.5 1015.3,219.5 1015.3,213.8 1056.7,189.9" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon class="f-t" points="1015.3,166.0 1056.7,189.9 1015.3,213.8 973.9,189.9" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 172.3)" fill="none" stroke="#0E1A27" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-tile" data-tile="files" style="--d:2690ms">
+<g class="s-7cfb68 ob-i ob-tile" data-tile="files">
 <polygon class="f-l" points="1023.8,224.4 1065.2,248.3 1065.2,242.7 1023.8,218.8" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-r" points="1106.6,224.4 1065.2,248.3 1065.2,242.7 1106.6,218.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-t" points="1065.2,194.8 1106.6,218.8 1065.2,242.7 1023.8,218.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1065.2 201.2)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z" vector-effect="non-scaling-stroke"/><path d="M14 3v4h4M9 13h6M9 17h4" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-tile" data-tile="meet" style="--d:2760ms">
+<g class="s-cff6e6 ob-i ob-tile" data-tile="meet">
 <polygon class="f-l" points="1073.7,253.2 1115.1,277.1 1115.1,271.5 1073.7,247.6" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-r" points="1156.6,253.2 1115.1,277.1 1115.1,271.5 1156.6,247.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-t" points="1115.1,223.7 1156.6,247.6 1115.1,271.5 1073.7,247.6" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1115.1 230.0)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="12" height="10" rx="2" vector-effect="non-scaling-stroke"/><path d="M15 11l6-3v8l-6-3z" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-tile" data-tile="chat" style="--d:2830ms">
+<g class="s-30c871 ob-i ob-tile" data-tile="chat">
 <polygon class="f-l" points="923.9,224.4 965.3,248.3 965.3,242.7 923.9,218.8" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-r" points="1006.7,224.4 965.3,248.3 965.3,242.7 1006.7,218.8" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-t" points="965.3,194.8 1006.7,218.8 965.3,242.7 923.9,218.8" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 965.3 201.2)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H10l-6 4z" vector-effect="non-scaling-stroke"/><path d="M8 10h8" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-tile" data-tile="cal" style="--d:2900ms">
+<g class="s-dd5a4f ob-i ob-tile" data-tile="cal">
 <polygon class="f-l" points="973.9,253.2 1015.3,277.1 1015.3,271.5 973.9,247.6" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-r" points="1056.7,253.2 1015.3,277.1 1015.3,271.5 1056.7,247.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-t" points="1015.3,223.7 1056.7,247.6 1015.3,271.5 973.9,247.6" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 230.0)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M3 10h18M8 3v4M16 3v4" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-tile" data-tile="secure" style="--d:2970ms">
+<g class="s-44a1f9 ob-i ob-tile" data-tile="secure">
 <polygon class="f-l" points="1023.8,282.0 1065.2,305.9 1065.2,300.3 1023.8,276.4" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-r" points="1106.6,282.0 1065.2,305.9 1065.2,300.3 1106.6,276.4" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon class="f-t" points="1065.2,252.5 1106.6,276.4 1065.2,300.3 1023.8,276.4" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1065.2 258.8)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" vector-effect="non-scaling-stroke"/><path d="M9 12l2 2 4-4" vector-effect="non-scaling-stroke"/></g>
 </g>
-<g class="ob-i ob-fade ob-sync" style="--d:2960ms">
+<g class="s-a74e52 ob-i ob-fade ob-sync">
 <polyline points="958.0,14.5 958.0,199.1" fill="none" stroke="#97C8EA" stroke-width="1.3" stroke-opacity="0.35" stroke-linecap="round"/>
 <polyline points="1040.2,62.0 1040.2,180.4" fill="none" stroke="#97C8EA" stroke-width="1.3" stroke-opacity="0.35" stroke-linecap="round"/>
 <polyline points="1122.5,109.5 1122.5,227.9" fill="none" stroke="#97C8EA" stroke-width="1.3" stroke-opacity="0.35" stroke-linecap="round"/>
 </g>
-<g class="ob-i ob-cloud" data-link="none" style="--d:3020ms">
-<path class="ob-link-base" d="" style="display:none"/><path class="ob-link" d="" style="display:none"/>
+<g class="s-519563 ob-i ob-cloud" data-link="none">
+<path class="ob-link-base" d="" display="none"/><path class="ob-link" d="" display="none"/>
 <defs><linearGradient id="hc-f" gradientUnits="userSpaceOnUse" x1="0" y1="-81.3" x2="0" y2="141.5"><stop offset="0" stop-color="#3D4853"/><stop offset="1" stop-color="#2C3844"/></linearGradient></defs>
 <path d="M900.19,-48.02L901.78,-47.67L903.50,-47.14L906.17,-46.05L906.93,-45.94L907.27,-45.99L907.73,-46.19L956.44,-74.32L956.41,-74.38L955.74,-74.09L955.07,-74.06L954.70,-74.15L952.03,-75.23L950.31,-75.76L948.71,-76.12L947.24,-76.33L945.63,-76.42L944.15,-76.36L942.82,-76.17L941.46,-75.83L940.09,-75.32L938.87,-74.71L890.16,-46.58L890.20,-46.50L891.63,-47.23L892.99,-47.74L894.34,-48.07L895.67,-48.26L897.13,-48.32L898.73,-48.23Z" fill="#4D5763" stroke="#4D5763" stroke-width="0.7" stroke-linejoin="round"/>
 <path d="M938.47,-75.97L941.33,-75.32L944.06,-74.48L946.92,-73.38L949.90,-71.99L952.70,-70.48L955.60,-68.70L958.48,-66.71L961.37,-64.50L1009.96,-92.55L1007.04,-94.80L1004.15,-96.79L1001.25,-98.57L998.44,-100.08L995.45,-101.47L992.59,-102.57L989.86,-103.41L986.98,-104.07L984.26,-104.45L981.62,-104.59L979.05,-104.48L976.67,-104.15L974.23,-103.54L971.98,-102.70L969.86,-101.63L921.15,-73.50L921.19,-73.43L923.52,-74.61L925.76,-75.44L928.19,-76.05L930.57,-76.38L933.12,-76.49L935.76,-76.35Z" fill="#4D5763" stroke="#4D5763" stroke-width="0.7" stroke-linejoin="round"/>
@@ -751,7 +752,7 @@
 <path d="M890.37,-46.70L889.29,-46.00L888.23,-45.12L887.20,-44.06L886.37,-42.99L885.58,-41.75L884.85,-40.31L884.26,-38.84L883.81,-37.37L883.42,-35.71L883.14,-33.86L882.98,-32.15L882.92,-30.26L882.98,-28.18L883.14,-26.29L883.40,-24.24L883.78,-22.14L884.29,-19.89L884.88,-17.75L885.53,-15.73L886.36,-13.45L887.19,-11.43L888.16,-9.31L889.28,-7.08L890.42,-5.02L891.57,-3.12L892.93,-1.04L894.29,0.86L895.71,2.69L897.09,4.35L898.61,6.02L900.26,7.69L901.86,9.17L903.39,10.47L905.13,11.80L906.79,12.95L908.43,13.96L1123.42,138.08L1125.16,139.02L1126.72,139.74L1128.37,140.38L1130.09,140.91L1131.60,141.25L1133.16,141.48L1134.68,141.57L1136.16,141.51L1137.66,141.30L1139.02,140.96L1140.31,140.47L1141.46,139.90L1189.96,111.89L1191.17,111.10L1192.17,110.27L1193.14,109.27L1194.08,108.07L1194.86,106.82L1195.55,105.46L1196.14,103.99L1196.59,102.52L1196.99,100.76L1197.26,99.01L1197.42,97.30L1197.47,95.41L1197.42,93.33L1197.25,91.32L1196.98,89.26L1196.62,87.29L1196.11,85.04L1195.52,82.90L1194.87,80.88L1194.04,78.60L1193.15,76.46L1192.24,74.46L1191.18,72.36L1189.98,70.17L1188.83,68.27L1187.54,66.30L1186.11,64.29L1184.69,62.46L1183.31,60.80L1181.70,59.03L1180.23,57.55L1178.64,56.06L1175.57,53.50L1174.87,52.68L1174.43,51.97L1174.07,51.22L1173.81,50.46L1173.07,46.32L1172.40,43.37L1171.55,40.26L1170.59,37.27L1169.49,34.28L1168.32,31.42L1166.97,28.47L1165.50,25.55L1163.85,22.55L1162.15,19.75L1160.36,17.02L1158.47,14.37L1156.59,11.93L1154.45,9.38L1152.34,7.06L1150.17,4.86L1147.95,2.81L1145.79,0.98L1143.40,-0.86L1141.09,-2.45L1138.77,-3.87L1136.55,-5.07L1133.91,-6.33L1132.95,-7.10L1132.26,-7.93L1131.95,-8.39L1131.46,-9.38L1131.19,-10.14L1130.06,-16.51L1128.93,-21.49L1127.51,-26.65L1125.89,-31.71L1124.04,-36.76L1122.03,-41.67L1119.75,-46.66L1117.20,-51.72L1114.52,-56.57L1111.73,-61.19L1108.71,-65.81L1105.53,-70.28L1102.12,-74.70L1098.66,-78.83L1095.09,-82.75L1091.42,-86.46L1087.77,-89.85L1083.86,-93.16L1079.99,-96.12L1076.09,-98.81L1072.17,-101.22L1068.36,-103.28L1064.36,-105.13L1060.49,-106.62L1056.68,-107.80L1053.02,-108.63L1049.35,-109.15L1045.69,-109.35L1042.23,-109.21L1038.98,-108.75L1035.79,-107.96L1032.76,-106.84L1029.83,-105.36L1008.96,-93.32L1007.04,-94.80L1004.15,-96.79L1001.25,-98.57L998.44,-100.08L995.45,-101.47L992.59,-102.57L989.86,-103.41L986.98,-104.07L984.26,-104.45L981.62,-104.59L979.05,-104.48L976.67,-104.15L974.23,-103.54L971.98,-102.70L969.86,-101.63L921.36,-73.63L919.44,-72.37L917.59,-70.84L915.90,-69.09L914.36,-67.13L912.99,-64.97L911.78,-62.61L910.76,-60.06L910.16,-58.13Z" fill="none" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 <path d="M905.06,-46.59L903.52,-47.18L901.80,-47.71L900.20,-48.07L898.74,-48.28L897.13,-48.37L895.66,-48.31L894.33,-48.12L892.97,-47.78L891.61,-47.28L890.40,-46.66L889.32,-45.96L888.27,-45.09L887.24,-44.02L886.41,-42.96L885.62,-41.72L884.89,-40.29L884.31,-38.82L883.85,-37.35L883.47,-35.70L883.19,-33.86L883.03,-32.15L882.97,-30.26L883.03,-28.19L883.19,-26.30L883.45,-24.24L883.83,-22.15L884.34,-19.91L884.93,-17.77L885.58,-15.74L886.41,-13.47L887.24,-11.45L888.20,-9.33L889.32,-7.11L890.47,-5.05L891.61,-3.15L892.97,-1.07L894.33,0.83L895.75,2.66L897.13,4.31L898.64,5.99L900.30,7.66L901.89,9.13L903.42,10.43L905.16,11.76L906.82,12.91L908.46,13.91L1123.44,138.04L1125.18,138.97L1126.74,139.69L1128.39,140.33L1130.10,140.86L1131.60,141.20L1133.16,141.43L1134.68,141.52L1136.15,141.46L1137.65,141.25L1139.01,140.91L1140.29,140.43L1141.44,139.85L1142.64,139.06L1143.64,138.24L1144.61,137.24L1145.54,136.04L1146.32,134.80L1147.01,133.44L1147.59,131.97L1148.05,130.50L1148.45,128.75L1148.72,127.01L1148.87,125.30L1148.93,123.41L1148.87,121.34L1148.70,119.33L1148.43,117.27L1148.07,115.30L1147.56,113.06L1146.97,110.92L1146.32,108.89L1145.49,106.62L1144.61,104.48L1143.70,102.48L1142.64,100.38L1141.44,98.20L1140.29,96.30L1139.01,94.33L1137.57,92.32L1136.15,90.49L1134.77,88.84L1133.16,87.07L1131.70,85.58L1130.10,84.10L1128.48,82.72L1127.41,81.89L1127.03,81.54L1126.67,81.14L1126.34,80.70L1125.89,79.99L1125.53,79.24L1125.26,78.47L1125.15,77.97L1125.03,77.12L1124.52,74.33L1123.85,71.38L1123.00,68.28L1122.04,65.29L1120.95,62.30L1119.78,59.44L1118.43,56.49L1116.96,53.57L1115.31,50.58L1113.61,47.77L1111.82,45.04L1109.94,42.40L1108.05,39.96L1105.92,37.41L1103.81,35.09L1101.64,32.90L1099.42,30.85L1097.26,29.02L1094.87,27.19L1092.57,25.59L1090.25,24.17L1088.03,22.98L1085.78,21.93L1085.39,21.72L1084.80,21.29L1084.42,20.93L1084.06,20.54L1083.72,20.10L1083.41,19.63L1083.14,19.14L1082.91,18.64L1082.65,17.87L1082.53,17.37L1082.38,16.29L1081.52,11.50L1080.38,6.52L1078.97,1.36L1077.35,-3.69L1075.50,-8.74L1073.48,-13.65L1071.21,-18.64L1068.66,-23.70L1065.98,-28.54L1063.19,-33.16L1060.17,-37.78L1056.99,-42.25L1053.58,-46.67L1050.12,-50.79L1046.56,-54.72L1042.89,-58.42L1039.24,-61.81L1035.33,-65.12L1031.46,-68.08L1027.57,-70.77L1023.65,-73.18L1019.84,-75.23L1015.84,-77.09L1011.98,-78.58L1008.17,-79.75L1004.51,-80.58L1000.85,-81.11L997.19,-81.30L993.74,-81.16L990.50,-80.71L987.31,-79.91L984.28,-78.80L981.35,-77.32L978.68,-75.56L976.20,-73.50L973.92,-71.13L971.90,-68.55L970.05,-65.64L968.43,-62.45L968.13,-61.71L967.94,-61.42L967.71,-61.18L967.29,-60.94L966.97,-60.86L966.62,-60.84L966.24,-60.90L965.86,-61.02L965.46,-61.20L965.07,-61.44L964.68,-61.74L964.20,-62.17L961.38,-64.56L958.51,-66.75L955.62,-68.75L952.72,-70.53L949.92,-72.04L946.94,-73.42L944.08,-74.53L941.35,-75.37L938.47,-76.02L935.76,-76.40L933.12,-76.54L930.56,-76.43L928.18,-76.10L925.74,-75.49L923.50,-74.66L921.39,-73.58L919.47,-72.33L917.63,-70.80L915.94,-69.06L914.40,-67.10L913.03,-64.94L911.83,-62.59L910.80,-60.04L909.96,-57.33L909.28,-54.34L908.81,-51.31L908.49,-47.61L908.33,-47.04L908.17,-46.71L907.96,-46.44L907.71,-46.24L907.26,-46.04L906.92,-45.99L906.56,-46.01L906.18,-46.10Z" fill="none" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>
 </g>
-<g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE" data-s="email, files, chat and sign-in, kept in sync" style="--d:3100ms">
+<g class="s-cfedf0 ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE" data-s="email, files, chat and sign-in, kept in sync">
 <polyline class="lt" points="950.1,-36.0 894.7,-82.0 854.7,-82.0" fill="none" stroke="#97C8EA" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="950.1" cy="-36.0" r="6" fill="#97C8EA" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="842.7" y="-74.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end">CLOUD WORKSPACE</text>
@@ -762,40 +763,40 @@
 </g>
 
 </g>
-<g class="ob-i ob-lab co lbl" data-t="FIREWALL RACK" data-s="core switch + backups" style="--d:2800ms">
+<g class="s-3059f0 ob-i ob-lab co lbl" data-t="FIREWALL RACK" data-s="core switch + backups">
 <polyline class="lt" points="1035.4,531.6 1052.0,760.0 1012.0,760.0" fill="none" stroke="#FFAD51" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="1035.4" cy="531.6" r="6" fill="#FFAD51" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="1000.0" y="768.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#FFAD51" text-anchor="end">FIREWALL RACK</text>
 <text class="lt" x="1000.0" y="796.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end">core switch + backups</text>
 
 </g>
-<g class="ob-i ob-lab co lbl" data-t="WI-FI ACCESS POINT" data-s="Wi-Fi 6E, no dead spots" style="--d:2880ms">
+<g class="s-11cb60 ob-i ob-lab co lbl" data-t="WI-FI ACCESS POINT" data-s="Wi-Fi 6E, no dead spots">
 <polyline class="lt" points="796.0,435.3 796.0,60.0 756.0,60.0" fill="none" stroke="#FFAD51" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="796.0" cy="435.3" r="6" fill="#FFAD51" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="744.0" y="68.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#FFAD51" text-anchor="end">WI-FI ACCESS POINT</text>
 <text class="lt" x="744.0" y="96.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end">Wi-Fi 6E, no dead spots</text>
 
 </g>
-<g class="ob-i ob-lab co lbl" data-t="WORKSTATIONS" data-s="managed + patched" style="--d:2960ms">
+<g class="s-a74e52 ob-i ob-lab co lbl" data-t="WORKSTATIONS" data-s="managed + patched">
 <polyline class="lt" points="726.0,416.0 527.7,640.0 487.7,640.0" fill="none" stroke="#97C8EA" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="726.0" cy="416.0" r="6" fill="#97C8EA" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="475.7" y="648.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end">WORKSTATIONS</text>
 <text class="lt" x="475.7" y="676.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end">managed + patched</text>
 
 </g>
-<g class="ob-i ob-lab co lbl" data-t="TEAMS ROOM" data-s="one-touch meeting join" style="--d:3040ms">
+<g class="s-2f3a54 ob-i ob-lab co lbl" data-t="TEAMS ROOM" data-s="one-touch meeting join">
 <polyline class="lt" points="336.3,345.7 290.0,345.7 250.0,345.7" fill="none" stroke="#97C8EA" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="336.3" cy="345.7" r="6" fill="#97C8EA" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="238.0" y="353.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end">TEAMS ROOM</text>
 <text class="lt" x="238.0" y="381.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end">one-touch meeting join</text>
 
 </g>
-<g class="ob-i ob-lab co lbl" data-t="GUEST WI-FI" data-s="separate from staff" style="--d:3120ms">
+<g class="s-9d93b9 ob-i ob-lab co lbl" data-t="GUEST WI-FI" data-s="separate from staff">
 <polyline class="lt" points="873.4,497.6 650.0,750.0 610.0,750.0" fill="none" stroke="#97C8EA" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
 <circle class="lt" cx="873.4" cy="497.6" r="6" fill="#97C8EA" stroke="#0E1A27" stroke-width="3"/>
 <text class="lt" x="598.0" y="758.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end">GUEST WI-FI</text>
 <text class="lt" x="598.0" y="786.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end">separate from staff</text>
 
 </g>
-<circle class="ob-link-end" r="6.5" fill="#0E1A27" stroke="#FFAD51" stroke-width="3" cx="-99" cy="-99" style="display:none"/>
+<circle class="ob-link-end" r="6.5" fill="#0E1A27" stroke="#FFAD51" stroke-width="3" cx="-99" cy="-99" display="none"/>
 </svg>

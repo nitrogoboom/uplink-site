@@ -1,7 +1,7 @@
 /*--- The shared CSS, in cascade order. Imported once by src/layouts/Base.astro; Vite joins these into one
-   hashed file. Order matters: later files win a tie. desktop.css, page-transitions.css and motion.css are in
-   late.css, which every page imports last, after its sections' CSS. Colours, sizes and timings come from tokens.css.
-   A section's own CSS sits next to its component (src/components/<page>/*.css) and is imported there. ---*/
+   hashed file. Order matters: later files win a tie. Colours, sizes and timings come from tokens.css.
+   A section's own CSS, desktop layout included, sits next to its component (src/components/<page>/*.css) and is
+   imported there; a block more than one page uses lives here. ---*/
 @import './tokens.css';
 @import './fonts.css';
 @import './base.css';
@@ -17,5 +17,13 @@
 @import './footer.css';
 @import './bottom-nav.css';
 @import './shared-blocks.css';
+@import './fold.css';
 @import './fold-foot.css';
 @import './compact-cuts.css';
+@import './hero.css';
+@import './svc-cards.css';
+@import './facts.css';
+@import './industries.css';
+@import './detail-pages.css';
+@import './page-transitions.css';
+@import './motion.css';

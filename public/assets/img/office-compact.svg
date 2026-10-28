@@ -2,6 +2,7 @@
 <title>Isometric office floor plan with desks, server racks, Wi-Fi and a cloud workspace hub for Microsoft 365 and Google Workspace</title>
 <style>@font-face{font-family:Barlow;font-weight:400;src:url(data:font/woff2;base64,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) format('woff2')}@font-face{font-family:Barlow;font-weight:600;src:url(data:font/woff2;base64,d09GMgABAAAAAAToAA4AAAAACgwAAASVAAFocgAAAAAAAAAAAAAAAAAAAAAAAAAAGhwbgkwcKgZgAHQRCAqLMIkUATYCJAM8CyAABCAFBgcgG90HIB6FTVlfeFGvyXD8JqNnhZyCp2+s/ZndU2mHWb6MuEU85I1IjB4vQjIJiUdIc1Rn1WTSQXdWRKCl/Jrc/oLXAXQB/P/8pfK7bFuLkgMKaCgasCXyl2SurjnAWlvDCtajjjWIUuCC1bYljYo+bZLqqdVjpyBAGgDQbu8RomSRj0CSNqrocFxKDuifVPa0gT4e4Mcx4ri2qw14oDDhUb8871AegA08wjsgxMHevX7Tx0ba/rHiPVkwwncee/m9uKCwXztXvcUavPOHfbFvKvf/9sei/LN9mMV3/2Y1h0HocYoam/f7pLQ4cSHWCBAD392RJkLysOAIAKKqOAmVkmkWokTdVBAtBoWz63TtoEtmOYGEvGJWASDQS1YLTB0quxAswQDEKM7Cg5YXZYVwABxZcy8sEvw6/ISZxHTP8CYcoMDyZRyi8ey/J4/D08QAcuJIJIV0csi3YAClLZk0sv6m/T74wP333nP3nbcTCBVezMgxBhrG5kH+gc4cPgItV6SBcvKtFezt62boZ+FurO+mF2vvM2uep8UCxjRHjTGjtSjXEaIyK9VAwPiR9I3mRVrGtODqtWsUNXn9OlFdvQoTapzDUJPXMHMFIFwlquvUJMlVeQlfuYK/q7GAAQIhOoIOYoVIj5hbtBSa1M1p4QHlJuFCVyKQgDdPVDVp0FjUS90hmBaozQr37WfGXqY5agC/0O8j+jokcYnVaTu3IWX2NavV6Kiic9PzLb3+TH3rzJoXaXdN7qjsSgKzo9CrI/a4TE1ewjgoy0+CEItp36mka5HJTDQcK93PwMTak7lXg2bx91uSeYammTubl5lPEqKqq1UWxTqhxLREfTOo+QuegR+9mppMaB5tMr7SC9dw8sxvLPbCo9jr5mKK5pMap8vodNSsLo1m07Vp8JzbGS1sjPse15/TGZWc1BkhrJWjOlTMFpCYhHihMDE+5n/0xDw4IS6GCIppVMtWCOuQxiRw3u2ci9BuhJ76+FMWxLaigxGUq/AfKpIl+RRwcnCY47cf4RKk6KA/Q56oX1Si+w996CAjOjiP34C5tOsTSxfjr2NmFBc38uOPhoS5Juaa0Fe8auMRSs+4Yg98b6m/LcQRDteNA9nUxYies78CPMErfnesqD3xSYK4rSs2OWVBbEPCk0RxexuQIqpOTpW8lL4xsagopS8lBYugFjntYMIeQMg24o+aCEuDQ0pilXEVj1gm1BxnExaPVJjmo+MRpA1cERCwMlALH9zuIFGh0GoDxOv5/pmx8cLLXrbm75/HWeX7RafFFIzXNid3hYhLhEaoDhUtVyABKRJFxFlv+6//ZBZx1jk+sUCBopnGbrC6rkOptXYHQnFbQWwJ2ogMV3zOZa+tS2g+qSJencdZbFbLcS9cISq6TwxuP+FFSvV91yzhCiJePXdYgXT7HS9c8Bu9rRx0KX0TJOUGsV95XPoFAC/cPzoW6e56ECv75vJZRwBiKAACP9qYOwPIKbA5kZ6Tk2MANQA9h3qtgEjNgEQNgQnhsP6WD2Jgrr/VDLXd08Fb5eActL8AOboTTkuWKA5ftlUVAAA=) format('woff2')}</style>
 <style>svg:target .lbl{display:none}</style>
+<style>.s-140ce2.s-140ce2{animation-duration:2800ms;animation-delay:-760ms}.s-4a6890.s-4a6890{animation-duration:3320ms;animation-delay:-3180ms}.s-608f41.s-608f41{animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse}.s-800090.s-800090{animation-duration:3840ms;animation-delay:-1060ms}.s-a28275.s-a28275{animation-duration:2800ms;animation-delay:0ms}.s-ae093e.s-ae093e{animation-duration:3060ms;animation-delay:-2500ms}.s-b98143.s-b98143{animation-duration:3840ms;animation-delay:-780ms}.s-c31dcd.s-c31dcd{animation-duration:3060ms;animation-delay:-1180ms}.s-c64517.s-c64517{animation-duration:3320ms;animation-delay:-1440ms}.s-d2a7b6.s-d2a7b6{animation-duration:350ms}.s-d925ab.s-d925ab{animation-duration:3580ms;animation-delay:-2100ms}.s-e12697.s-e12697{animation-duration:3580ms;animation-delay:-2120ms}</style>
 <g>
 <polygon points="251.0,463.8 786.9,773.2 786.9,760.5 251.0,451.2" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1152.3,562.3 786.9,773.2 786.9,760.5 1152.3,549.6" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -327,15 +328,15 @@
 <polyline points="1013.4,463.2 1035.4,475.9" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="1013.4,453.1 1035.4,465.8" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="1013.4,443.0 1035.4,455.7" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
-<circle class="ob-led" style="animation-duration:2800ms;animation-delay:0ms" cx="1032.3" cy="540.0" r="1.8" fill="#A9E9C3"/>
+<circle class="s-a28275 ob-led" cx="1032.3" cy="540.0" r="1.8" fill="#A9E9C3"/>
 <circle cx="1032.3" cy="529.8" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3840ms;animation-delay:-1060ms" cx="1032.3" cy="519.7" r="1.8" fill="#FFF5EC"/>
+<circle class="s-800090 ob-led" cx="1032.3" cy="519.7" r="1.8" fill="#FFF5EC"/>
 <circle cx="1032.3" cy="509.6" r="1.8" fill="#A9E9C3"/>
-<circle class="ob-led" style="animation-duration:3580ms;animation-delay:-2120ms" cx="1032.3" cy="499.5" r="1.8" fill="#FFF5EC"/>
+<circle class="s-e12697 ob-led" cx="1032.3" cy="499.5" r="1.8" fill="#FFF5EC"/>
 <circle cx="1032.3" cy="489.3" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3320ms;animation-delay:-3180ms" cx="1032.3" cy="479.2" r="1.8" fill="#A9E9C3"/>
+<circle class="s-4a6890 ob-led" cx="1032.3" cy="479.2" r="1.8" fill="#A9E9C3"/>
 <circle cx="1032.3" cy="469.1" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3060ms;animation-delay:-1180ms" cx="1032.3" cy="459.0" r="1.8" fill="#FFF5EC"/>
+<circle class="s-c31dcd ob-led" cx="1032.3" cy="459.0" r="1.8" fill="#FFF5EC"/>
 <circle cx="1032.3" cy="448.8" r="1.8" fill="#A9E9C3"/>
 </g>
 <g>
@@ -432,15 +433,15 @@
 <polyline points="1052.4,475.6 1074.3,488.3" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <polyline points="1052.4,465.5 1074.3,478.2" fill="none" stroke="#89571A" stroke-width="0.9" stroke-opacity="0.45" stroke-linecap="round" stroke-linejoin="round"/>
 <circle cx="1071.3" cy="562.5" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3320ms;animation-delay:-1440ms" cx="1071.3" cy="552.3" r="1.8" fill="#FFF5EC"/>
+<circle class="s-c64517 ob-led" cx="1071.3" cy="552.3" r="1.8" fill="#FFF5EC"/>
 <circle cx="1071.3" cy="542.2" r="1.8" fill="#A9E9C3"/>
-<circle class="ob-led" style="animation-duration:3060ms;animation-delay:-2500ms" cx="1071.3" cy="532.1" r="1.8" fill="#FFF5EC"/>
+<circle class="s-ae093e ob-led" cx="1071.3" cy="532.1" r="1.8" fill="#FFF5EC"/>
 <circle cx="1071.3" cy="522.0" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:2800ms;animation-delay:-760ms" cx="1071.3" cy="511.8" r="1.8" fill="#A9E9C3"/>
+<circle class="s-140ce2 ob-led" cx="1071.3" cy="511.8" r="1.8" fill="#A9E9C3"/>
 <circle cx="1071.3" cy="501.7" r="1.8" fill="#FFF5EC"/>
-<circle class="ob-led" style="animation-duration:3840ms;animation-delay:-780ms" cx="1071.3" cy="491.6" r="1.8" fill="#FFF5EC"/>
+<circle class="s-b98143 ob-led" cx="1071.3" cy="491.6" r="1.8" fill="#FFF5EC"/>
 <circle cx="1071.3" cy="481.5" r="1.8" fill="#A9E9C3"/>
-<circle class="ob-led" style="animation-duration:3580ms;animation-delay:-2100ms" cx="1071.3" cy="471.3" r="1.8" fill="#FFF5EC"/>
+<circle class="s-d925ab ob-led" cx="1071.3" cy="471.3" r="1.8" fill="#FFF5EC"/>
 </g>
 <g>
 <polygon points="920.9,542.6 1042.7,612.9 1042.7,500.4 920.9,430.1" fill="#97C8EA" fill-opacity="0.09" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.5" stroke-linejoin="round"/>
@@ -541,8 +542,8 @@
 <polygon points="381.9,324.6 397.2,333.4 381.9,342.2 366.7,333.4" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 </g>
 <g>
-<path class="ob-cable" style="animation-duration:350ms" pathLength="100" d="M1040.2,430.1 L1040.2,250.0" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>
-<polyline class="ob-flow" style="animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse" points="1040.2,430.1 1040.2,250.0" fill="none" stroke="#FFAD51" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"/>
+<path class="s-d2a7b6 ob-cable" pathLength="100" d="M1040.2,430.1 L1040.2,250.0" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>
+<polyline class="s-608f41 ob-flow" points="1040.2,430.1 1040.2,250.0" fill="none" stroke="#FFAD51" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"/>
 </g>
 <g>
 <polygon points="904.4,235.6 1065.2,328.4 1065.2,317.2 904.4,224.4" fill="#2F3B47" stroke="#97C8EA" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>

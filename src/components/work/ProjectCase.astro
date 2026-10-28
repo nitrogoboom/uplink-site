@@ -2,7 +2,7 @@
 // One project in full: the <article class="case-src"> in the Work page's details list (work.js copies it into
 // the pop-up), and the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
 import type { CollectionEntry } from 'astro:content';
-interface Props { project: CollectionEntry<'projects'>; heading?: 'h2' | 'h3' }
+interface Props { project: CollectionEntry<'projects'>; heading?: 'h1' | 'h2' | 'h3' }
 const { project, heading: Heading = 'h3' } = Astro.props;
 const { id, data: p } = project;
 const big = p.image === 'office';   // the office plan is drawn at 1200×800; the rest at 640×480

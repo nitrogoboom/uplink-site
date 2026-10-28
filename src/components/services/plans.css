@@ -23,3 +23,8 @@
 .no { color: var(--c-muted); }
 .yes svg, .no svg { width: var(--sp-4); height: var(--sp-4); }
 
+/* desktop (>= 1100 wide and >= 700 tall): tighter rows */
+@media (min-width: 1100px) and (min-height: 700px) {
+  .plans th, .plans td { padding-block: var(--sp-2); }
+  .plans thead th { padding-block: var(--sp-3); }
+}

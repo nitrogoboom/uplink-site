@@ -1,7 +1,7 @@
 ---
 // WORK · 1. Projects (first screen): intro, filter buttons and one card per project from the collection.
 // A card links to the project's own page; with script on, clicking it opens CasePopup instead (work.js reads
-// data-case). Styles: projects.css. Desktop layout: src/styles/desktop.css.
+// data-case). Styles: projects.css. Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import './projects.css';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);

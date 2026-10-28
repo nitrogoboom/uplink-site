@@ -1,4 +1,4 @@
-/*--- HOME · 2. Services cards. Desktop layout: src/styles/desktop.css. ---*/
+/*--- Service cards: Home (Services) and Contact (help cards). ---*/
 /* services overview grid */
 .svc-cards { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
 @media (min-width: 700px) { .svc-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -14,8 +14,7 @@
 @media (min-width: 700px) and (max-width: 1099px) {
   .svc-cards > li:last-child:nth-child(odd) { grid-column: 1 / -1; }
   .svc-cards > li:last-child:nth-child(odd) .card { flex-direction: row; align-items: center; gap: var(--sp-5); }
-  .svc-cards > li:last-child:nth-child(odd) .card-media { flex: none; width: 36%; }
-  .svc-cards > li:last-child:nth-child(odd) .card-media { align-self: stretch; aspect-ratio: auto; }
+  .svc-cards > li:last-child:nth-child(odd) .card-media { flex: none; width: 36%; align-self: stretch; aspect-ratio: auto; }
   .svc-cards > li:last-child:nth-child(odd) .card-body { padding: var(--sp-4) var(--sp-5) var(--sp-4) 0; }
 }
 @media (min-width: 1100px) {
@@ -23,3 +22,20 @@
   .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: 14%; }
 }
 
+/* desktop (>= 1100 wide and >= 700 tall): wide, short cards */
+@media (min-width: 1100px) and (min-height: 700px) {
+  /* services overview: wide, short cards */
+  .svc-cards .card { flex-direction: row; align-items: stretch; }
+  .svc-cards .card-media { flex: none; width: 48%; aspect-ratio: auto; }
+  .svc-cards .card-body { justify-content: center; padding: var(--sp-5); }
+  .help-cards .card { flex-direction: column; align-items: flex-start; }
+  /* one row, however many services, from 16:9 up. The centred block (tokens.css) keeps
+     each card the same size at 1920 x 1080 and 3440 x 1440. */
+  @media (min-aspect-ratio: 16/9) {
+    .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sp-4); }
+    .svc-cards > li:last-child:nth-child(3n+1) { grid-column: auto; }
+    .svc-cards .card { flex-direction: column; }
+    .svc-cards .card-media, .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: auto; aspect-ratio: 4 / 3; }
+    .svc-cards .card-body { justify-content: flex-start; padding: var(--sp-4); }
+  }
+}
