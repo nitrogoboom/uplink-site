@@ -1,0 +1,22 @@
+---
+// PAGE NOT FOUND. Cloudflare serves 404.html for any missing address, at any depth; every link on the site is
+// root-relative, so nothing special is needed here. No canonical or Open Graph (no `path`). Styles: shared (.page-intro).
+import Base from '../layouts/Base.astro';
+import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+---
+<Base title="Page not found · Uplink Technology"
+      description="There is no page at this address."
+      page="notfound" robots="noindex">
+  <section class="page-intro" aria-labelledby="nf-title">
+    <div class="container">
+      <p class="eyebrow">Error 404</p>
+      <h1 id="nf-title">Page not found</h1>
+      <p class="lead">There is no page at this address. It may have moved, or the link has a typo.</p>
+      <div class="row">
+        <a class="btn btn--primary" href="/">Back to home</a>
+        <a class="btn btn--secondary" href="/services">See our services</a>
+        <a class="btn btn--secondary" href="/contact">Contact</a>
+      </div>
+    </div>
+  </section>
+</Base>

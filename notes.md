@@ -3,7 +3,9 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Astro move (plan: `review.md`)
-- [ ] Do the move in the order in `review.md` "Order of work" (branch `astro`). Step 1 done 28 Oct: scaffold, `Base.astro`, shared components, Home page, structurally identical to the old `site/index.html`. Next: step 2, the other five pages from `src/legacy/pages/`; then content collections with one page per service and project, generated files (sitemap, llms.txt, JSON-LD from data), CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`), `src/legacy/` and `site/`.
+- [ ] Do the move in the order in `review.md` "Order of work" (branch `astro`). Steps 1 and 2 done 28 Oct: every page builds, structurally identical to `site/*.html`, zero computed-style differences at phone, 1440 and 3440. Next: step 3, content collections with one page per service and project, generated files (sitemap, llms.txt, JSON-LD from data), CSP hashes + Workers config + CI, then delete the Python build (`build_pages.py`, `stamp.py`, `build_footer.py`, `verify_css_split.py`, `serve.py`, `deploy.py`), `src/legacy/` and `site/`.
+- [ ] Services JSON-LD: the FAQ `mainEntity` and the seven `Service` entries are not written yet (the old build scraped them from the HTML); they come from the content collections at step 3. The page and breadcrumb blocks are there.
+- [ ] Astro inlines CSS under 4 KB as a `<style>` (Work, About, Contact get one); fine, but it must be hashed when the CSP drops `'unsafe-inline'` (step 5), or set `build.inlineStylesheets: 'never'`.
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
 - [ ] `tools/verify_footer.py` and `tools/pagespeed.py` still expect port 8765 and `site/sitemap.xml`; repoint at the Astro dev server / `dist/`.
 - [ ] `src/scripts/*.js` keep `window.Uplink` beside the `Uplink` export so the page scripts share the picker slot; move to proper imports once every page is converted.

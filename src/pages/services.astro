@@ -1,0 +1,18 @@
+---
+// SERVICES. Sections in page order; each is one component in src/components/services/.
+import Base from '../layouts/Base.astro';
+import Picker from '../components/services/Picker.astro';
+import Plans from '../components/services/Plans.astro';
+import Faq from '../components/services/Faq.astro';
+import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+---
+<Base title="Services · Uplink Technology"
+      description="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses."
+      page="services" path="/services" type="FAQPage">
+  <Picker />
+  <Plans />
+  <Faq />
+</Base>
+<script>
+  import '../scripts/services.js';
+</script>
