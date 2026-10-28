@@ -30,7 +30,7 @@ if (fc) {
   const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
   const win = (quad) => {
     const lit = rnd() < 0.3, blink = lit && rnd() < 0.5;
-    return `<polygon class="win${lit ? ' lit' : ''}${blink ? ' blink' : ''}"${blink ? ` style="animation-delay:${-(rnd() * 4).toFixed(2)}s"` : ''} points="${pts(quad)}"/>`;
+    return `<polygon class="win${lit ? ' lit' : ''}${blink ? ' blink' : ''}"${blink ? ` data-delay="${-(rnd() * 4).toFixed(2)}s"` : ''} points="${pts(quad)}"/>`;
   };
   // windows on the front-left wall (y = const) and front-right wall (x = const)
   const winsY = (x0, x1, y, z0, z1, cols, rows) => {
@@ -51,7 +51,7 @@ if (fc) {
   };
   const led = (x, y, z, cls = '') => {
     const [cx, cy] = pr(x, y, z);
-    return `<circle class="led${cls}" style="animation-delay:${-(rnd() * 3).toFixed(2)}s" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="1.7"/>`;
+    return `<circle class="led${cls}" data-delay="${-(rnd() * 3).toFixed(2)}s" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="1.7"/>`;
   };
   const dot = (x, y, z) => { const [cx, cy] = pr(x, y, z); return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.5" class="dot"/>`; };
   const tree = (x, y, s = 0.5) => box(x, y, 0, s, s, s * 1.1, 'tree');
@@ -64,7 +64,7 @@ if (fc) {
         winsY(6.9, 9.1, 9.1, 0.8, 5.6, 3, 6) + winsX(9.1, 6.9, 9.1, 0.8, 5.6, 3, 6) +
         box(7.25, 7.25, 5.85, 1.5, 1.5, 0.35) +
         `<line x1="${pr(8, 8, 6.2)[0].toFixed(1)}" y1="${pr(8, 8, 6.2)[1].toFixed(1)}" x2="${pr(8, 8, 7.2)[0].toFixed(1)}" y2="${pr(8, 8, 7.2)[1].toFixed(1)}" class="mast"/>` +
-        `<polyline class="beacon" points="${circ(8, 8, 7.2, 0.7)}"/><polyline class="beacon" style="animation-delay:-1.2s" points="${circ(8, 8, 7.2, 0.7)}"/>` +
+        `<polyline class="beacon" points="${circ(8, 8, 7.2, 0.7)}"/><polyline class="beacon" data-delay="-1.2s" points="${circ(8, 8, 7.2, 0.7)}"/>` +
         dot(8, 8, 7.2) },
     services: { name: 'Server farm', sub: 'monitored around the clock', at: [12.8, 3.5], top: [12.8, 3.5, 2.4], r: 2.4, zoom: 1.35,
       route: [[10, 7.6], [12.9, 7.6], [12.9, 4.4]],
@@ -84,7 +84,7 @@ if (fc) {
       route: [[6, 7.2], [2.5, 7.2]],
       draw: () => box(1.5, 6.5, 0, 1, 1, 0.4) + box(1.85, 6.85, 0.4, 0.3, 0.3, 2.6) +
         box(1.7, 6.7, 3.0, 0.6, 0.6, 0.12) + box(1.85, 6.85, 3.12, 0.3, 0.3, 1.88) +
-        [0, -0.9, -1.8].map((d) => `<polyline class="sig" style="animation-delay:${d}s" points="${circ(2, 7, 5.0, 0.9)}"/>`).join('') +
+        [0, -0.9, -1.8].map((d) => `<polyline class="sig" data-delay="${d}s" points="${circ(2, 7, 5.0, 0.9)}"/>`).join('') +
         dot(2, 7, 5.0) },
     company: { name: 'The crew', sub: 'in-house, never outsourced', at: [3.6, 12.4], top: [3.6, 12.4, 2.3], r: 2.3, zoom: 1.35,
       route: [[7, 10], [7, 12.3], [5, 12.3]],
@@ -94,7 +94,7 @@ if (fc) {
       route: [[10, 9.2], [12.7, 9.2]],
       draw: () => box(12.7, 8.3, 0, 2, 1.9, 2.1) + winsY(12.7, 14.7, 10.2, 0.2, 2.0, 3, 2) + winsX(14.7, 8.3, 10.2, 0.2, 2.0, 3, 2) +
         [[2.8, 1, 0], [3.35, 2, -0.6], [3.9, 3, -1.2]].map(([z, n, d]) =>
-          `<g class="bob" style="animation-delay:${d}s">${box(13.15, 8.75, z, 1.1, 1.0, 0.12, 'tk tk-' + n)}</g>`).join('') },
+          `<g class="bob" data-delay="${d}s">${box(13.15, 8.75, z, 1.1, 1.0, 0.12, 'tk tk-' + n)}</g>`).join('') },
     industries: { name: 'Client offices', sub: '120+ teams supported', at: [9.6, 13.6], top: [10.45, 12.9, 2.7], r: 2.4, zoom: 1.35,
       route: [[9, 10], [9, 12.6]],
       draw: () => box(8.2, 12.6, 0, 1.2, 1.2, 1.8) + winsY(8.2, 9.4, 13.8, 0.2, 1.7, 2, 3) +
@@ -133,6 +133,8 @@ if (fc) {
   const mapBox = $('[data-fc-map]', fc);
   const hud = $('.fc-hud', fc);
   mapBox.insertAdjacentHTML('afterbegin', html(buildMap()));
+  // delays go in through the CSSOM: the CSP blocks style="" attributes, not el.style
+  $$('[data-delay]', mapBox).forEach((el) => { el.style.animationDelay = el.dataset.delay; });
   const svg = $('svg.fc-w', mapBox), marker = $('.mk', svg), ring = $('.ring', svg);
   let vb = VB0.slice(), mk = [0, 0], raf = 0;
 

@@ -6,7 +6,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Cloudflare Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host, so the beacon loads (the canonical host matches now) but Cloudflare may refuse its reports. In Web Analytics, add `uplink-site.johnoreilly.workers.dev` to that site (or make a new site and swap the token), and again for the real domain at launch.
 - [ ] The new service and project pages reuse the picker's and the details list's CSS; they have no layout of their own yet (the service page's "Compare all services" link sits in the roster slot). Give each a quick pass once the content is final, and decide whether the home cards should keep going to `/services/<slug>` (now) or back to the picker.
 - [ ] `work/[slug]` JSON-LD uses `Article`; `CreativeWork` or a plain `WebPage` may fit a case study better. Decide at launch.
-- [ ] Astro inlines CSS under 4 KB as a `<style>` (Work, About, Contact get one); fine, but it must be hashed when the CSP drops `'unsafe-inline'` (step 5), or set `build.inlineStylesheets: 'never'`.
 - [ ] Astro emits `dist/_astro/grow-tower.*.svg` and `hero-flows.*.svg` as files as well as inlining them. Harmless orphans; see if an import form avoids it.
 - [ ] `tools/pagespeed.py` now reads the live sitemap (18 pages × 2 = 36 tests, about two minutes); add a `--sample` that tests Home plus one service and one project.
 - [ ] Sitemap `lastmod` comes from `git log`; a CI build must clone with history (`fetch-depth: 0`) or every page reads the same date.
@@ -35,8 +34,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
-- [ ] The hero's moving dashes (`hero-flows.svg`) carry 11 inline `style="--d:…"` / `animation-delay` attributes; move them into CSS (needed before the CSP can drop `'unsafe-inline'`).
-- [ ] CSP `style-src` needs `'unsafe-inline'` because of `style=""` attributes, which hashes can't cover: 67 in the hero drawing (`tools/gen_office.py` writes `style="--d:…"` and animation timings on the animated parts), 11 in `hero-flows.svg`, 12 in `office-compact.svg`, and `footer.js` writes `animation-delay` the same way. To drop it: the generator writes one `<style>` block with id rules instead of attributes (and `scripts/headers.mjs` hashes `<style>` blocks, including the fetched hero's), and `footer.js` sets delays with `el.style.animationDelay` after insertion. A job of its own.
 - [ ] The Worker is live at https://uplink-site.johnoreilly.workers.dev (first deploy 28 Oct, from the `astro` branch). Compare it with the Pages site, then add the real domain to it.
 - [ ] Early Hints: the `Link` header is sent, but no 103 arrives on `workers.dev` (Early Hints is a zone setting, and `workers.dev` has no zone of yours). Check again with `curl -I --http2` once the real domain is on the Worker and the zone's Early Hints setting is on.
 - [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.
