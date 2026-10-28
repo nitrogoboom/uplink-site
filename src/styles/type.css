@@ -28,6 +28,7 @@ h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line
   text-transform: uppercase;
   color: var(--c-muted);
 }
+h2.label, h3.label { font-family: var(--font-body); font-style: normal; line-height: var(--lh-body); text-wrap: wrap; }   /* a label that is also a heading */
 .muted { color: var(--c-muted); }
 .small { font-size: var(--fs-2); }
 .accent { color: var(--c-accent-text); }

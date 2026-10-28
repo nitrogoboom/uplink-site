@@ -5,10 +5,11 @@
 //   n, total  its place ("Service 03 of 07"; services.js writes the same text when the picker is on)
 //   on        the one the picker shows first
 //   first     the first drawing on the page loads eagerly; the rest lazily
-//   heading   h2 in the picker; h1 on the service's own page
+//   heading   h2 in the picker; h1 on the service's own page. "What's included" and "Best for" are one level down.
 import type { CollectionEntry } from 'astro:content';
 interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
 const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
+const Sub = Heading === 'h1' ? 'h2' : 'h3';
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
 ---
@@ -28,12 +29,12 @@ const two = (k: number) => String(k).padStart(2, '0');
     </div>
   </div>
   <div class="picker-detail">
-    <span class="label">What's included</span>
+    <Sub class="label">What's included</Sub>
     <ul class="feat-list">
       {s.features.map((f, i) => (
         <li class="feat"><span class="icon-tile" aria-hidden="true">{i + 1}</span><span><span class="feat-t">{f.title}</span><span class="feat-d">{f.detail}</span></span></li>
       ))}
     </ul>
-    <p class="row"><span class="label">Best for</span><span>{s.bestFor}</span></p>
+    <div class="row"><Sub class="label">Best for</Sub><p>{s.bestFor}</p></div>
   </div>
 </article>
