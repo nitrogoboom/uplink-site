@@ -15,21 +15,26 @@
   padding: var(--sp-6);
 }
 @media (min-width: 1100px) { .cta-band { grid-template-columns: minmax(0, 1fr) auto; padding: var(--sp-7); } }
-.cta-band .row { gap: var(--sp-3); }
+.cta-band .row { gap: var(--sp-2); }
+.cta-band .row > .btn { flex: 1 1 12rem; }   /* stacked on phones: same width; side by side: same height, shared evenly */
+@media (min-width: 1100px) { .cta-band .row > .btn { flex: 0 0 auto; } }
 
 /* numbered steps (real sequence) */
 .steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; counter-reset: step; }
 @media (min-width: 700px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1100px) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-.step { display: flex; flex-direction: column; gap: var(--sp-3); padding: var(--sp-5); }
+/* number and title on one line, text under both */
+.step { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--sp-3) var(--sp-4); padding: var(--sp-5); }
+.step > :not(.step-n) { grid-column: 1 / -1; }
+.step > .step-n + * { grid-column: 2; }
 .step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent); }
 .step:first-child .step-n { background: var(--c-accent); color: var(--c-on-accent); }
 
 /* stat tiles */
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); list-style: none; }
 @media (min-width: 1100px) { .stats--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-4); } }
-.stat { display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-3); padding: var(--sp-5); }
-.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-7); line-height: 1; font-variant-numeric: tabular-nums; }
+.stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-5); }
+.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: clamp(var(--fs-7), 30cqi, var(--fs-8)); line-height: 1; font-variant-numeric: tabular-nums; }   /* big, but never wider than its tile */
 
 /* FAQ */
 .faq { display: flex; flex-direction: column; gap: var(--sp-3); max-width: 55rem; }

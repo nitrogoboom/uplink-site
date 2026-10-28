@@ -102,9 +102,9 @@
   --sp-9: 6rem;
 
   /* ---- shape ----------------------------------------------------------- */
-  --r-1: 0.375rem;    /* key caps, tiny tags */
-  --r-2: 0.75rem;    /* buttons, inputs, tiles, image wells */
-  --r-3: 1.25rem;    /* panels, cards, dialogs */
+  --r-1: 0.125rem;   /* key caps, tiny tags */
+  --r-2: 0.25rem;    /* buttons, inputs, tiles, image wells */
+  --r-3: 0.5rem;     /* panels, cards, dialogs */
   --r-pill: 999px;
 
   /* ---- sizes ----------------------------------------------------------- */
@@ -155,7 +155,8 @@
 @media (min-width: 1100px) and (min-height: 700px) {
   html { font-size: clamp(14px, min(1.1111vw, 1.7778vh), 40px); }
   :root {
-    --container: none;  /* full width, no narrow centred column */
+    --container: calc(94rem + 2 * var(--gutter));  /* one centred block: the full width at 16:9, side margin on wider screens.
+                                                       The header, hero and footer stage and base bar run full width. */
     --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
   }
 }

@@ -17,6 +17,7 @@ body {
   font-family: var(--font-body);
   font-size: var(--fs-3);
   line-height: var(--lh-body);
+  overflow-wrap: break-word;   /* long emails and links wrap instead of pushing the page sideways */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

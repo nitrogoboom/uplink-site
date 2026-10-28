@@ -10,6 +10,7 @@
   border-bottom: 1px solid var(--c-line);
 }
 .site-header .container {
+  max-width: none;   /* pinned to the screen edges, even on ultrawide */
   display: flex;
   align-items: center;
   gap: var(--sp-5);
@@ -29,15 +30,15 @@
 .brand-name { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; font-size: var(--fs-5); line-height: 1; }
 .brand-sub { font-size: var(--fs-1); line-height: 1; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
 
-.tabs { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; gap: var(--sp-1); }
-.tabs ul { display: flex; align-items: center; gap: var(--sp-1); list-style: none; }
+.tabs { flex: 1; align-self: stretch; min-width: 0; display: flex; align-items: stretch; justify-content: center; gap: var(--sp-1); }
+.tabs ul { display: flex; align-items: stretch; gap: var(--sp-1); list-style: none; }
+.tabs li { display: flex; }
 .tab {
   position: relative;
   display: flex;
   align-items: center;
-  height: var(--tap);
-  padding-inline: var(--sp-4);
-  border-radius: var(--r-2);
+  min-height: var(--tap);
+  padding-inline: var(--sp-5);
   font-family: var(--font-display);
   font-weight: 600;
   font-style: italic;
@@ -54,9 +55,8 @@
 .tab[aria-current="page"]::after {
   content: "";
   position: absolute;
-  left: var(--sp-4); right: var(--sp-4); bottom: var(--sp-1);
-  height: 3px;
-  border-radius: var(--r-pill);
+  left: 0; right: 0; bottom: -1px;   /* on the header's bottom line */
+  height: var(--sp-1);
   background: var(--c-accent);
 }
 

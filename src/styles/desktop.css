@@ -16,16 +16,18 @@
   /* hero: its desktop layout lives in src/pages/home/1-hero.css */
 
   /* services overview: wide, short cards */
-  .svc-cards .card { flex-direction: row; align-items: center; gap: var(--sp-4); }
-  .svc-cards .card-media { flex: none; width: 48%; }
-  .svc-cards .card-body { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; }
+  .svc-cards .card { flex-direction: row; align-items: stretch; }
+  .svc-cards .card-media { flex: none; width: 48%; aspect-ratio: auto; }
+  .svc-cards .card-body { justify-content: center; padding: var(--sp-5); }
   .help-cards .card { flex-direction: column; align-items: flex-start; }
-  @media (min-aspect-ratio: 2/1) {
-    .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }   /* one row, however many services */
+  /* one row, however many services, from 16:9 up. The centred block (tokens.css) keeps
+     each card the same size at 1920 x 1080 and 3440 x 1440. */
+  @media (min-aspect-ratio: 16/9) {
+    .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sp-4); }
     .svc-cards > li:last-child:nth-child(3n+1) { grid-column: auto; }
-    .svc-cards .card { flex-direction: column; align-items: stretch; }
-    .svc-cards .card-media, .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: auto; }
-    .svc-cards .card-body { padding: 0 var(--sp-3) var(--sp-3); }
+    .svc-cards .card { flex-direction: column; }
+    .svc-cards .card-media, .svc-cards > li:last-child:nth-child(3n+1) .card-media { width: auto; aspect-ratio: 4 / 3; }
+    .svc-cards .card-body { justify-content: flex-start; padding: var(--sp-4); }
   }
 
   /* growth: building pinned on the left, each step is one screen */
@@ -78,6 +80,7 @@
   /* heading beside its content */
   .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: var(--sp-8); align-items: start; }
   .split > .section-head { margin-bottom: 0; }
+  .split .faq { max-width: none; }   /* lines up with the blocks above and below; answers keep their reading width */
   .split > .fold-foot { grid-column: 1 / -1; }
   .fold-foot { margin-top: var(--sp-6); }
 

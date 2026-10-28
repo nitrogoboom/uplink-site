@@ -149,6 +149,7 @@ a.fc-cl:hover { color: var(--c-accent); }
 /* base bar */
 .fc-base { background: var(--c-bg-band); }
 .fc-base .container {
+  max-width: none;
   display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-6);
   padding-block: var(--sp-2) var(--sp-3);
   border-top: 1px solid var(--c-line);

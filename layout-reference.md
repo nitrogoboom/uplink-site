@@ -4,7 +4,7 @@ What to take from the screenshots in `RAW Screenshots/` (git ignores that folder
 
 What we want is the **layout**: how the boxes sit, their corners, the spacing, the sizes, and how one design fills a 21:9 screen and a 1080p screen without breaking. We're **not** taking their colours or backgrounds. We **are** taking how they place one strong image. We're **not** taking the slanted tabs or skewed boxes (see "Skip").
 
-Nothing here is built yet.
+Applied site-wide on 28 Oct 2026: small corners, straight header tab, centred ~94rem block on desktop, edge-to-edge pictures on service cards, bigger stat numbers, steps with the number beside the title.
 
 ## How it fits every screen
 
