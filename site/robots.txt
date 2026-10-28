@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://uplink-site-4p8.pages.dev/sitemap.xml

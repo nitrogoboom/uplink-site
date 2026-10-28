@@ -1,6 +1,6 @@
 """PageSpeed check: ask Google's PageSpeed Insights (its servers, its Lighthouse) to test every page in the
 sitemap, phone and desktop, and report if Home scores under the bar. A tool to run when you want it;
-deploy.py doesn't run it.
+CI doesn't run it.
 
     python tools/pagespeed.py https://uplink-site-4p8.pages.dev             # the live site
     python tools/pagespeed.py https://<hash>.uplink-site-4p8.pages.dev      # a one-off deploy
@@ -11,7 +11,7 @@ It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or 
 The key lives in Google Cloud, project uplink-site, APIs & Services > Credentials > pagespeed-gate
 (limited to the PageSpeed Insights API).
 
-Pages come from site/sitemap.xml. Home (GATED) must reach the bar on both; the other pages are drafts for
+Pages come from the live site's sitemap.xml (18 now). Home (GATED) must reach the bar on both; the other pages are drafts for
 now, so they are shown but don't fail the check unless --strict.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
@@ -50,8 +50,9 @@ def api_key():
     return key
 
 
-def pages():
-    xml = (ROOT / 'site' / 'sitemap.xml').read_text(encoding='utf-8')
+def pages(base):
+    """The paths in the live site's sitemap (18 pages now: five static, one per service and project)."""
+    xml = urllib.request.urlopen(f'{base}/sitemap.xml', timeout=30).read().decode('utf-8')
     return [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', xml)]
 
 
@@ -106,12 +107,13 @@ def main():
         sys.exit(__doc__)
     base = args[0].rstrip('/')
     bar = int(args[args.index('--min') + 1]) if '--min' in args else 100
-    gated = pages() if '--strict' in args else GATED
+    paths = pages(base)
+    gated = paths if '--strict' in args else GATED
     key = api_key()
     OUT.mkdir(parents=True, exist_ok=True)
-    for p in pages():
+    for p in paths:
         warm(base + p)
-    jobs = [(p, s) for p in pages() for s in STRATEGIES]
+    jobs = [(p, s) for p in paths for s in STRATEGIES]
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(jobs)) as pool:
         results = list(pool.map(lambda j: test(base, j[0], j[1], key, bar), jobs))
     failed = []

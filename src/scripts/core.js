@@ -35,7 +35,7 @@ const store = {
 };
 
 /* ---------- Trusted Types ---------------------------------------------- */
-// The CSP (site/_headers) lets only this policy write HTML into the page (innerHTML and the like).
+// The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like).
 // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
 // The one script it may load from elsewhere is the analytics beacon (BEACON, below).
 const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
