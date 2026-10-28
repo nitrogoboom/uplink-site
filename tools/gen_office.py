@@ -5,6 +5,8 @@
   site/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
 usage: python tools/gen_office.py site
 Edit the numbers below and run again; don't hand-edit any of the three.
+The hero has its own floor layout for now ('hero layout' below: desk rows, lounge, guest Wi-Fi, reception, entrance);
+the other three still draw the plan above. To move them over, send them through hero_groups() too.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
 Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
 to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
@@ -17,7 +19,7 @@ import math, pathlib, re, subprocess, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
-from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect
+from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
 
@@ -97,6 +99,72 @@ COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
     (LABELS[0][0], (760.0, 675.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 'right'),
     (LABELS[2][0], (651.8, 683.0), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
+# ---- hero layout (hero only for now; office, build and compact keep the plan above) ------------
+# Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 2-wide aisle, set right so the meeting
+# room's glass doesn't hide them; a utility wall on the left (filing cabinet, printer, coffee counter); a small
+# network closet (4 x 3) round the rack and UPS in the back-right corner.
+# Front half, left to right: the meeting room (7.25 x 7.5, glass on its two inner sides with a door, 7 seats facing
+# the screen); the entrance mat; reception beside it, facing the door; the waiting area beside reception.
+# Three Wi-Fi points hung from the ceiling, each on its own cable run at ceiling height from the server closet.
+HERO_WIN = ((6.75, 9.75, 12.75), 2.0, 0, 1.5, 3.75)   # back wall window starts (one centred over each desk of row A), width, -, sill, head
+HERO_LEFT_WIN = ((12.25,), 1.5, 0, 1.5, 3.75)   # left wall: one window in the meeting room, past the table
+HERO_DESKS = {(6.5, 0.25): 1000, (9.5, 0.25): 1100, (12.5, 0.25): 1200}    # row A, flush to the back wall
+HERO_DESKS_B = {(9.5, 4.25): 1400, (12.5, 4.25): 1500}   # row B: two desks (a walkway by the meeting room); aisle y 2.5..4.25
+PRINTER = [(0.375, 1.375, 4.25, 5.25, 0, 0.875), (0.5, 1.25, 4.375, 5.125, 0.875, 1.0)]   # body, lid: print nook, below the cabinet
+PAPER = (0.625, 1.125, 4.5, 5.0)                # a sheet on the printer lid (x0 x1 y0 y1)
+COFFEE = [(0.25, 1.25, 5.5, 7.25, 0, 1.25), (0.375, 0.875, 5.75, 6.375, 1.25, 1.875), (0.5, 0.75, 6.75, 7.0, 1.25, 1.5)]   # counter on the left wall, machine, mug
+MUG = ('#C9D3DF', '#AEB9C6', '#E5ECF3')
+HERO_APS = [(15.25, 7.875), (RACKS[0][0] + RACK[0] / 2, 8.5), (6.5, 13.875)]
+# The desks' and meeting room's points: on screen a ceiling AP shows 4.5 back-left of where it hangs, so these read
+# as over the desks (10.75, 3.375) and the middle of the meeting room's box (centred left to right on screen).
+# The guest point hangs at the true ceiling centre above the sofa and table, in line with the rack, so its blue
+# cable runs out of the closet in one straight line.
+GUEST_AP = 1                                    # index in HERO_APS drawn blue (guest network), rings at GUEST_RINGS of the staff size
+GUEST_RINGS = 0.55
+MEET_GLASS = (7.5, 7.5, 15.0, 4)                # meeting room glass: x = 7.5 side (out to the outer edge), y = 7.5 back; height
+HERO_GLASS = (18.0, 3.25, 4)                    # network closet glass: x = 18 from the back wall to y = 3.25, then to the right edge
+HERO_RACK = (2.25, 6)                           # one short rack (height, slots) on rack 1's footprint: the tray stays put
+UPS = (20.0, 20.875, 1.25, 2.25, 0, 1.0)        # battery backup beside the rack
+MEET_TV = (9.5, 11.75, 1.5, 3.0)                # on the left wall: y0, y1, z0, z1
+CREDENZA = (0.25, 1.0, 9.5, 11.75, 0, 1.25)     # low cabinet under the screen
+MEET_TABLE = (1.75, 5.75, 9.75, 11.5, 1.25)     # x0 x1 y0 y1 h: points at the screen
+MEET_CHAIRS = ([(x, 9.25, '+y') for x in (2.5, 3.75, 5.0)] + [(x, 12.0, '-y') for x in (2.5, 3.75, 5.0)]
+               + [(6.5, 10.625, '-x')])          # far side, near side, the end facing the screen (0.25 apart: no doubled edges)
+RUG = ((17.375, 21.125, 6.625, 10.375), '#33455F')  # waiting area, flat (x0 x1 y0 y1, fill), edges off the floor grid lines
+MAT = ((9.0, 11.5, 13.875, 14.875), '#3B4F6B')    # entrance, flat; chevrons point in
+SOFA = [(19.75, 20.5, 7.0, 7.25, 0, 1.0), (19.75, 20.5, 7.25, 9.75, 0, 0.75),     # far arm, seat,
+        (19.75, 20.5, 9.75, 10.0, 0, 1.0), (20.5, 21.0, 7.0, 10.0, 0, 1.375)]     # near arm, back: faces -x, towards reception
+LOW_TABLE = (18.0, 19.0, 7.75, 9.25, 0, 0.5)
+PLANT_AT = (18.75, 5.0)                         # pot centre: the waiting area's back corner, by the closet, out of the doorway
+POT = [(0.375, 0, 0.625), (0.5, 0.625, 0.75)]   # pot, rim: half width, z0, z1
+BLADES = [(-0.375, -0.375, 1.75), (0.125, -0.375, 2.125), (-0.125, -0.125, 2.5), (-0.375, 0.125, 2.0), (0.125, 0.125, 1.625)]   # leaf blades: cell corner (0.25 square), top z
+LEAF = ('#3C7C60', '#2F6650', '#58B58C')
+LEAF_EDGE = 'stroke="#D9E4F0" stroke-width="1" stroke-opacity="0.22"'
+RECEPTION_CHAIR = (14.75, 10.5)                 # faces +y, behind the counter
+COUNTER = (13.0, 16.5, 11.25, 12.25, 0, 1.25)   # beside the mat, facing the door
+COUNTER_TOP = (12.75, 16.75, 11.0, 12.5, 1.25, 1.375)
+RECEPTION_MON = (13.75, 12.125)                 # monitor: left end, at the back of the counter (an arm's length off), screen face y
+RECEPTION_PHONE = (15.875, 11.75)               # desk phone on the counter, turned to the receptionist
+MEET_DOOR = (12.25, 13.25, 3.0)                 # door in the meeting room's side glass: y0, y1, head
+# Leaders run straight from the object and the tail carries on the same way to the words (no kinks, no doubling
+# back): WI-FI straight up; GUEST and WORKSTATIONS on one shared diagonal (LEADER_SLOPE, dx per dy); TEAMS ROOM
+# straight across; FIREWALL RACK near-straight down past the open front edge.
+LEADER_SLOPE = (650.0 - 873.4) / (750.0 - 497.6)
+
+
+def _along(dot, y):
+    """Elbow at screen height y on the shared diagonal from the world point dot."""
+    x0, y0 = w.p(*dot)
+    return (x0 + LEADER_SLOPE * (y - y0), y)
+
+
+_TV_DOT = (WALL_T, MEET_TV[1], (MEET_TV[2] + MEET_TV[3]) / 2)   # the screen's left edge, so the call tiles stay clear
+HERO_LABELS = [((19.5, 2.3, 0.54), (1052.0, 760.0), '#F4A340', 'FIREWALL RACK', 'core switch + backups', 2800, 'left'),
+               ((*HERO_APS[0], 4.625), (w.p(*HERO_APS[0], 4.625)[0], 60.0), '#F4A340', 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
+               ((9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), '#7DB9E8', 'WORKSTATIONS', 'managed + patched', 2960),
+               (_TV_DOT, (290.0, w.p(*_TV_DOT)[1]), '#7DB9E8', 'TEAMS ROOM', 'one-touch meeting join', 3040),
+               ((*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), '#7DB9E8', 'GUEST WI-FI', 'separate from staff', 3120)]
+
 HALO = 'stroke="#151E2C" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
 BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
@@ -192,7 +260,7 @@ def solids():
     return out
 
 
-def floor(v):
+def floor(v, zone=ZONE):
     X, Y = FLOOR
     out = box((0, X, 0, Y, -SLAB, 0), ('#313F54', '#283447', '#1E2938'))
     segs = [(w.p(k, 0), w.p(k, Y)) for k in range(X + 1)] + [(w.p(0, k), w.p(X, k)) for k in range(Y + 1)]
@@ -200,29 +268,48 @@ def floor(v):
         mask = unary_union([silhouette(w, *b) for b in solids()] + (compact_gaps() if v == 'compact' else []))
         segs = [s for p, q in segs for s in clip_out(p, q, mask)]
     out.append(seg_path(segs, f'fill="none" stroke="#2C3849" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))
-    out.append(line(ZONE, f'stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
+    if zone:
+        out.append(line(zone, f'stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
     return out
 
 
-def windows(n, plane):
-    first, width, pitch, sill, head = WIN
+def windows(n, plane, win=WIN):
+    """n windows from first at pitch; or, when first is a tuple, one window at each start in it (n unused)."""
+    first, width, pitch, sill, head = win
+    starts = first if isinstance(first, tuple) else [first + i * pitch for i in range(n)]
     out, mullions = [], []
-    for i in range(n):
-        a = first + i * pitch
+    for a in starts:
         out.append(poly(plane(a, a + width, sill, head), 'fill="#1E2938" fill-opacity="0.55" stroke="#7DB9E8" stroke-width="0.9" stroke-opacity="0.5"'))
         m = plane(a + width / 2, a + width / 2, sill, head)
         mullions.append(line([m[0], m[3]], f'stroke="#7DB9E8" stroke-width="0.7" stroke-opacity="0.4" {ROUND}'))
     return out + mullions
 
 
-def back_wall():
-    return box((0, FLOOR[0], 0, WALL_T, 0, WALL_H)) + windows(BACK_WINDOWS, lambda a, b, z0, z1: wall_y(WALL_T, a, b, z0, z1))
+def back_wall(n=BACK_WINDOWS, win=WIN):
+    return box((0, FLOOR[0], 0, WALL_T, 0, WALL_H)) + windows(n, lambda a, b, z0, z1: wall_y(WALL_T, a, b, z0, z1), win)
 
 
-def left_wall():
-    out = box((0, WALL_T, WALL_T, FLOOR[1], 0, WALL_H)) + windows(LEFT_WINDOWS, lambda a, b, z0, z1: wall_x(WALL_T, a, b, z0, z1))
-    y0, y1, z0, z1 = TV
-    return out + [poly(wall_x(WALL_T, y0, y1, z0, z1), 'fill="#F4A340" fill-opacity="0.14" stroke="#F4A340" stroke-width="1.4" stroke-opacity="0.95"')]
+def left_wall(n=LEFT_WINDOWS, win=WIN, tv=TV, call=False):
+    out = box((0, WALL_T, WALL_T, FLOOR[1], 0, WALL_H)) + windows(n, lambda a, b, z0, z1: wall_x(WALL_T, a, b, z0, z1), win)
+    y0, y1, z0, z1 = tv
+    out.append(poly(wall_x(WALL_T, y0, y1, z0, z1), 'fill="#F4A340" fill-opacity="0.14" stroke="#F4A340" stroke-width="1.4" stroke-opacity="0.95"'))
+    return out + ([call_tiles(tv)] if call else [])
+
+
+def call_tiles(tv):
+    """A meeting on the screen: 2 x 2 people tiles (head and shoulders), the one speaking lit orange."""
+    y0, y1, z0, z1 = tv
+    m = 0.1
+    tw, th = (y1 - y0 - 3 * m) / 2, (z1 - z0 - 3 * m) / 2
+    out = []
+    for k in range(4):
+        u, v = m + (k % 2) * (tw + m), m + (k // 2) * (th + m)
+        cx, cy = u + tw / 2, v + th / 2
+        lit = k == 1
+        out.append(rect(u, v, tw, th, '#26324A', 0.05))
+        out.append(f'<circle cx="{cx:.4g}" cy="{cy - 0.07:.4g}" r="0.1" fill="{"#F4A340" if lit else "#7DB9E8"}" fill-opacity="0.85"/>')
+        out.append(f'<path d="M{cx - 0.17:.4g} {v + th - 0.04:.4g}a0.17 0.15 0 0 1 0.34 0z" fill="{"#F4A340" if lit else "#7DB9E8"}" fill-opacity="0.85"/>')
+    return f'<g transform="{on_side(w, WALL_T, y1, z1)}">' + ''.join(out) + '</g>'
 
 
 def desk(cx, cy):
@@ -253,10 +340,10 @@ def meeting():
     return out
 
 
-def cabinet():
+def cabinet(c=CABINET):
     """Filing cabinet with drawer lines on its front (x1) face."""
-    x0, x1, y0, y1, z0, z1 = CABINET
-    out = box(CABINET)
+    x0, x1, y0, y1, z0, z1 = c
+    out = box(c)
     step = (z1 - z0) / DRAWERS
     for k in range(1, DRAWERS):
         out.append(line([(x1, y1 - 0.25, z0 + k * step), (x1, y0 + 0.25, z0 + k * step)], f'stroke="#D9E4F0" stroke-width="0.8" stroke-opacity="0.35" {ROUND}'))
@@ -266,25 +353,25 @@ def cabinet():
     return out
 
 
-def glass_back():
-    x, y, h = GLASS
+def glass_back(g=GLASS):
+    x, y, h = g
     return [poly(wall_x(x, WALL_T, y, 0, h), 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"')]
 
 
-def glass_front():
-    x, y, h = GLASS
+def glass_front(g=GLASS):
+    x, y, h = g
     return [poly(wall_y(y, x, FLOOR[0], 0, h), 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"'),
             line([(x, y, 0), (x, y, h)], f'stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.7" {ROUND}')]
 
 
-def rack(x0, v):
-    rw, y0, y1, h = RACK
-    slot = h / RACK_SLOTS
+def rack(x0, v, h=RACK[3], slots=RACK_SLOTS):
+    rw, y0, y1, _h = RACK
+    slot = h / slots
     out = box((x0, x0 + rw, y0, y1, 0, h), HIGH, HIGH_EDGE)
-    for k in range(1, RACK_SLOTS):             # vents between slots, bottom up
+    for k in range(1, slots):                  # vents between slots, bottom up
         z = k * slot
         out.append(line([(x0 + VENT[0], y1, z), (x0 + VENT[1], y1, z)], f'stroke="#8A561C" stroke-width="0.9" stroke-opacity="0.45" {ROUND}'))
-    for k, c in enumerate(LEDS[x0]):
+    for k, c in enumerate(LEDS[x0][:slots]):
         X, Y = w.p(x0 + LED_X, y1, slot * (k + 0.5))
         anim = LED_ANIM[x0].get(k)
         pre = f'class="ob-led" style="animation-duration:{anim[0]}ms;animation-delay:{anim[1]}ms" ' if anim and v != 'office' else ''
@@ -292,15 +379,15 @@ def rack(x0, v):
     return out
 
 
-def rack_top(i=0):
+def rack_top(i=0, h=RACK[3]):
     x0 = RACKS[i][0]
-    return (x0 + RACK[0] / 2, (RACK[1] + RACK[2]) / 2, RACK[3])
+    return (x0 + RACK[0] / 2, (RACK[1] + RACK[2]) / 2, h)
 
 
-def cable_pair(pts, v, base_style='', flow_style='', join=True):
+def cable_pair(pts, v, base_style='', flow_style='', join=True, colour='#F4A340'):
     j = ' stroke-linejoin="round"' if join else ''
-    base = f'stroke="#F4A340" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"{j}'
-    flow = f'stroke="#F4A340" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"{j}'
+    base = f'stroke="{colour}" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"{j}'
+    flow = f'stroke="{colour}" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"{j}'
     if v == 'office':
         return [line(pts, base), line(pts, flow + ' stroke-dasharray="2 7"')]
     bs = f'style="{base_style}" ' if base_style else ''
@@ -308,25 +395,36 @@ def cable_pair(pts, v, base_style='', flow_style='', join=True):
     return [line(pts, base, f'class="ob-cable" {bs}pathLength="100" '), line(pts, flow, f'class="ob-flow" {fs}')]
 
 
-def cable(ap, v):
-    x, y, z = rack_top()
+def cable(ap, v, rack_h=RACK[3], colour='#F4A340'):
+    """Up from the rack to the ceiling, along x (the back wall) then out along y to the AP (straight out when the AP
+    is in line with the rack)."""
+    x, y, z = rack_top(0, rack_h)
     ax, ay = ap
-    return cable_pair([(x, y, z), (x, y, CABLE_Z), (ax, y, CABLE_Z), (ax, ay, CABLE_Z), (ax, ay, AP[2])], v)   # last bit up into the AP
+    pts = [(x, y, z), (x, y, CABLE_Z)] + ([(ax, y, CABLE_Z)] if ax != x else []) + [(ax, ay, CABLE_Z), (ax, ay, AP[2])]   # last bit up into the AP
+    return cable_pair(pts, v, colour=colour)
 
 
-def ring(ap, r, op):
-    return [ellipse(r, *ap, AP[2], f'stroke="#F4A340" stroke-width="1.1" stroke-opacity="{op}"')]
+GUEST = ('#3F7FB5', '#336A99', '#7DB9E8')       # guest Wi-Fi: blue where staff is orange
 
 
-def access_point(ap):
+def ring(ap, r, op, colour='#F4A340'):
+    return [ellipse(r, *ap, AP[2], f'stroke="{colour}" stroke-width="1.1" stroke-opacity="{op}"')]
+
+
+def access_point(ap, cols=HIGH):
     s, t, z = AP
     x, y = ap
-    return box((x - s / 2, x + s / 2, y - s / 2, y + s / 2, z, z + t), HIGH, HIGH_EDGE)
+    return box((x - s / 2, x + s / 2, y - s / 2, y + s / 2, z, z + t), cols, HIGH_EDGE)
 
 
-def uplink(v):
-    x, y, z = rack_top()
-    return cable_pair([(x, y, z), (x, y, TRAY_Z)], v, 'animation-duration:350ms',
+def uplink(v, rack_h=RACK[3]):
+    """Straight up from the rack to the tray. In the hero the flow dashes sit on a layer above everything, so the
+    line stops where it meets the tray's front-bottom edge on screen (tray depth / 2 below its underside): it still
+    reads as plugged in, and nothing runs across the tray or its tiles."""
+    x, y, z = rack_top(0, rack_h)
+    _x0, _x1, y0, y1, _z0, _z1 = tray_box()
+    top = TRAY_Z - (y1 - y0) / 2 if v == 'hero' else TRAY_Z
+    return cable_pair([(x, y, z), (x, y, top)], v, 'animation-duration:350ms',
                       'animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse', join=False)
 
 
@@ -352,6 +450,113 @@ def tile(i, v):
     out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{"#1B2130" if lit else "#F1F4F8"}" '
                f'stroke-width="2.0" {ROUND}>{ICONS[TILES[i]]}</g>')   # vector-effect sits on each icon shape (it isn't inherited)
     return out
+
+
+def entrance():
+    """Rug under the lounge and the entrance mat, flat on the floor, with two chevrons pointing in."""
+    out = [poly([(x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0)], f'fill="{fill}" {LEAF_EDGE}')
+           for (x0, x1, y0, y1), fill in (RUG, MAT)]
+    cx = (MAT[0][0] + MAT[0][1]) / 2
+    for y in (14.75, 14.5):
+        out.append(line([(cx - 0.5, y, 0), (cx, y - 0.5, 0), (cx + 0.5, y, 0)], f'stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.55" {ROUND}'))
+    return out
+
+
+def lounge():
+    """Waiting area: the low table, then the sofa (arm, seat, arm, back: each split so the draw order is plain)."""
+    out = []
+    for b in [LOW_TABLE] + SOFA:
+        out += box(b)
+    return out
+
+
+def nook():
+    """Print nook on the left wall: the filing cabinet, then the printer in front of it."""
+    out = cabinet()
+    for b in PRINTER:
+        out += box(b)
+    x0, x1, y0, y1 = PAPER
+    z = PRINTER[-1][5]
+    return out + [poly([(x0, y0, z), (x1, y0, z), (x1, y1, z), (x0, y1, z)], 'fill="#E5ECF3" fill-opacity="0.8"')]
+
+
+def coffee():
+    """Coffee counter: the counter, the machine (a lit button on its front), a mug."""
+    counter, machine, mug = COFFEE
+    out = box(counter) + box(machine)
+    X, Y = w.p((machine[0] + machine[1]) / 2, machine[3], machine[5] - 0.25)
+    return out + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="#F4A340"/>'] + box(mug, MUG)
+
+
+def hero_meeting():
+    """Teams room: the low cabinet under the screen, far chairs, the table, near chairs."""
+    x0, x1, y0, y1, h = MEET_TABLE
+    out = box(CREDENZA)                        # plain: drawer lines would crowd the chairs in front of it
+    for x, y, f in [c for c in MEET_CHAIRS if c[2] == '+y']:
+        for _n, b in chair(x, y, f, s=PROP_S):
+            out += box(b)
+    out += box((x0, x1, y0, y1, 0, h))
+    for x, y, f in [c for c in MEET_CHAIRS if c[2] != '+y']:
+        for _n, b in chair(x, y, f, s=PROP_S):
+            out += box(b)
+    return out
+
+
+GLASS_STYLE = 'fill="#7DB9E8" fill-opacity="0.09" stroke="#7DB9E8" stroke-width="1" stroke-opacity="0.5"'
+
+
+def meeting_glass_back():
+    """The meeting room's back glass wall (y = y0): behind the room, so drawn before it."""
+    x, y0, _y1, h = MEET_GLASS
+    return [poly(wall_y(y0, WALL_T, x, 0, h), GLASS_STYLE)]
+
+
+def meeting_glass_front():
+    """Its side glass wall (x, out to y1) with the door, and the corner post: in front of the room. A front pane
+    is drawn only when y1 stops short of the floor's open edge."""
+    x, y0, y1, h = MEET_GLASS
+    post = f'stroke="#7DB9E8" stroke-width="1.6" stroke-opacity="0.7" {ROUND}'
+    d0, d1, dh = MEET_DOOR
+    front = [poly(wall_y(y1, WALL_T, x, 0, h), GLASS_STYLE)] if y1 < FLOOR[1] else []
+    return front + [poly(wall_x(x, y0, y1, 0, h), GLASS_STYLE),
+            poly(wall_x(x, d0, d1, 0, dh), 'fill="#7DB9E8" fill-opacity="0.12" stroke="#7DB9E8" stroke-width="1.4" stroke-opacity="0.85"'),
+            line([(x, y0, 0), (x, y0, h)], post)] + ([line([(x, y1, 0), (x, y1, h)], post)] if front else [])
+
+
+def plant(at):
+    """Pot with a rim, then upright leaf blades of different heights (a snake plant), back to front."""
+    cx, cy = at
+    out = []
+    for h, z0, z1 in POT:
+        out += box((cx - h, cx + h, cy - h, cy + h, z0, z1))
+    top = POT[-1][2]
+    for dx, dy, z1 in sorted(BLADES, key=lambda b: b[0] + b[1]):
+        out += box((cx + dx, cx + dx + 0.25, cy + dy, cy + dy + 0.25, top, z1), LEAF, LEAF_EDGE)
+    return out
+
+
+def ups():
+    """Battery backup beside the rack: a dark box with a lit status LED on its front."""
+    x0, x1, y0, y1, z0, z1 = UPS
+    X, Y = w.p((x0 + x1) / 2, y1, z1 - 0.25)
+    return box(UPS) + [f'<circle cx="{fmt(X)}" cy="{fmt(Y)}" r="1.8" fill="#6FD3A0"/>']
+
+
+def reception():
+    """Receptionist's chair, the counter and its top, then a monitor and a desk phone on it."""
+    out = []
+    for _n, b in chair(*RECEPTION_CHAIR, '+y', s=PROP_S):
+        out += box(b)
+    out += box(COUNTER) + box(COUNTER_TOP)
+    top = COUNTER_TOP[5]
+    mon, scr = monitor(*RECEPTION_MON, top, '+y', s=PROP_S, width=MON[2], height=MON[3])
+    for _n, b in mon:
+        out += box(b)
+    out.append(screen_glass(w, scr, screen_ui(scr)))
+    ph, ph_top = desk_phone(*RECEPTION_PHONE, top, '-y', s=PROP_S)
+    for _n, b in ph:
+        out += box(b)
+    return out + [phone_face(w, ph_top)]
 
 
 def card(v):
@@ -414,8 +619,34 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
 
 
 # ---- assembly -------------------------------------------------------------------
+def hero_groups(v):
+    """The hero's own layout (see 'hero layout' above), back to front; the air above it is shared with groups()."""
+    G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v, None) + entrance()),
+         ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall(0, HERO_WIN)),
+         ('class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms"', left_wall(0, HERO_LEFT_WIN, MEET_TV, call=True)),
+         ('class="ob-i" style="--d:775ms"', nook()),
+         ('class="ob-i" style="--d:850ms"', coffee())]
+    for (cx, cy), d in HERO_DESKS.items():
+        G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
+    G += [('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_back(HERO_GLASS)),
+          ('class="ob-i ob-grow" style="--d:1500ms;animation-duration:520ms"', rack(RACKS[0][0], v, *HERO_RACK)),
+          ('class="ob-i" style="--d:1580ms"', ups())]
+    for (cx, cy), d in HERO_DESKS_B.items():
+        G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
+    G += [('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_front(HERO_GLASS)),
+          ('class="ob-i ob-fade" style="--d:650ms;animation-duration:450ms"', meeting_glass_back()),   # rows A, B are behind the room
+          ('class="ob-i" style="--d:700ms"', hero_meeting()),
+          ('class="ob-i ob-fade" style="--d:950ms;animation-duration:450ms"', meeting_glass_front()),
+          ('class="ob-i" style="--d:1650ms"', plant(PLANT_AT)),
+          ('class="ob-i" style="--d:1700ms"', reception()),
+          ('class="ob-i" style="--d:1750ms"', lounge())]
+    return air(v, G, HERO_APS, HERO_LABELS, HERO_RACK[0], GUEST_AP)
+
+
 def groups(v):
     """(wrapper attrs for the animated versions, shapes) in draw order, back to front."""
+    if v == 'hero':
+        return hero_groups(v)
     G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v)),
          ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall()),
          ('class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms"', left_wall()),
@@ -432,14 +663,21 @@ def groups(v):
         else:
             (cx, cy), d = item
             G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
-    for i, ap in enumerate(APS):
-        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v)))
+    return air(v, G, APS, LABELS)
+
+
+def air(v, G, aps, labels, rack_h=RACK[3], guest=None):
+    """Everything above the floor plan, appended to G: a cable to each AP, Wi-Fi (aps[guest] in blue, smaller rings),
+    uplink, tray and tiles, the cloud or card, labels."""
+    for i, ap in enumerate(aps):
+        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v, rack_h, GUEST[2] if i == guest else '#F4A340')))
     for k, (r, op) in enumerate(RINGS):
-        for i, ap in enumerate(APS):
-            G.append(((f'class="ob-i ob-ring" style="--d:{RING_D[k][i]}ms"', f'class="ob-pulse" style="animation-delay:{RING_PULSE[k][i]}ms"'), ring(ap, r, op)))
-    for i, ap in enumerate(APS):
-        G.append((f'class="ob-i" style="--d:{2250 + 70 * i}ms"', access_point(ap)))
-    G.append(('class="ob-i ob-n" style="--d:2450ms"', uplink(v)))
+        for i, ap in enumerate(aps):
+            G.append(((f'class="ob-i ob-ring" style="--d:{RING_D[k][i]}ms"', f'class="ob-pulse" style="animation-delay:{RING_PULSE[k][i]}ms"'),
+                      ring(ap, r * GUEST_RINGS, op, GUEST[2]) if i == guest else ring(ap, r, op)))
+    for i, ap in enumerate(aps):
+        G.append((f'class="ob-i" style="--d:{2250 + 70 * i}ms"', access_point(ap, GUEST if i == guest else HIGH)))
+    G.append(('class="ob-i ob-n" style="--d:2450ms"', uplink(v, rack_h)))
     G.append(('class="ob-i" style="--d:2500ms"', box(tray_box(), TRAY_FACES, TRAY_EDGE)))
     for i, name in enumerate(TILES):
         attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v == 'hero' else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
@@ -453,7 +691,7 @@ def groups(v):
         return G
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
-    for dot, elbow, colour, title, sub, d, *side in LABELS:
+    for dot, elbow, colour, title, sub, d, *side in labels:
         G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
     return G
 

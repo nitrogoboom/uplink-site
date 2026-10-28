@@ -3,7 +3,6 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Tools
-- [ ] `tools/gen_office.py` is behind the hero: `src/pages/home/1-hero-office.svg` and `1-hero-flows.svg` were copied from the live build (GUEST WI-FI label, new desk layout, new timings). Running `gen_office.py` puts the old hero back. Bring the script up to match those files before running it again.
 - [ ] Delete `tools/retired/` (13 old hand-fix tools, see its README). Nothing uses them.
 
 ## Drawings

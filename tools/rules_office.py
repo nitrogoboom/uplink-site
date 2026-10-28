@@ -14,6 +14,8 @@ def _left(b):
 
 
 _known = [(_left(b), b) for b in gen_office.BOXES]
+gen_office.render('hero')                      # the hero has its own layout; know its boxes too
+_known += [(_left(b), b) for b in gen_office.BOXES]
 
 
 def _find(b):
