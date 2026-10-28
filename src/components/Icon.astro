@@ -1,0 +1,38 @@
+---
+// One inline SVG icon by name, drawn with the current text colour. Stroke width and caps are per icon so each
+// one looks exactly as it did when the markup was written by hand. Add an icon: one line in ICONS.
+//   <Icon name="arrow" />   <Icon name="close" class="x" />
+type Def = { d: string; box?: string; sw?: number; cap?: boolean; join?: boolean };
+const ICONS = {
+  arrow:    { d: '<path d="M5 12h14M13 6l6 6-6 6"/>', sw: 2 },
+  chevronL: { d: '<path d="M15 6l-6 6 6 6"/>', sw: 2.2 },
+  chevronR: { d: '<path d="M9 6l6 6-6 6"/>', sw: 2.2 },
+  check:    { d: '<path d="M5 12l5 5 9-10"/>', sw: 3 },
+  minus:    { d: '<path d="M6 12h12"/>', sw: 2, join: false },
+  plus:     { d: '<path d="M12 5v14M5 12h14"/>', sw: 2, join: false },
+  close:    { d: '<path d="M3 3l10 10M13 3L3 13"/>', box: '0 0 16 16', sw: 2, join: false },
+  mark:     { d: '<path d="M5 14l7-7 7 7"/><path d="M8.5 19l3.5-3.5 3.5 3.5"/>', sw: 2.6 },
+  phone:    { d: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>' },
+  mail:     { d: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>' },
+  pin:      { d: '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' },
+  clock:    { d: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+  bubble:   { d: '<path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/>' },
+  grid:     { d: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>' },
+  building: { d: '<path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18M8.5 8h3M8.5 12h3M8.5 16h3"/>' },
+  headset:  { d: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>' },
+  book:     { d: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 7h7"/>' },
+  signal:   { d: '<path d="M5 13a7 7 0 0 1 14 0M8.5 13a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="17" r="1.5"/>' },
+  person:   { d: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>' },
+  play:     { d: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/>' },
+  people:   { d: '<circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c1-3.5 3.5-5 6-5s5 1.5 6 5M15 15.5c2.5 0 4.5 1.2 5.5 4"/>' },
+  camera:   { d: '<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/>' },
+  chat:     { d: '<path d="M4 5h16v11H10l-6 4z"/><path d="M8 9h8M8 12h5"/>' },
+} satisfies Record<string, Def>;
+export type IconName = keyof typeof ICONS;
+interface Props { name: IconName; class?: string }
+const { name, class: cls } = Astro.props;
+const i: Def = ICONS[name];
+---
+<svg class={cls} viewBox={i.box ?? '0 0 24 24'} fill="none" stroke="currentColor" stroke-width={i.sw ?? 1.8}
+     stroke-linecap={i.cap === false ? undefined : 'round'} stroke-linejoin={i.join === false ? undefined : 'round'}
+     aria-hidden="true" set:html={i.d} />

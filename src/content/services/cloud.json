@@ -1,0 +1,28 @@
+{
+  "order": 3,
+  "title": "Cloud workspace",
+  "chip": "Build",
+  "tile": "Cloud",
+  "tag": "Project",
+  "image": "cloud",
+  "alt": "Server, laptop and phone syncing to a cloud workspace hub",
+  "lead": "Microsoft 365 or Google Workspace: email, files and meetings set up properly, licensed right, and backed up.",
+  "card": "Microsoft 365 or Google Workspace, set up properly and licensed right.",
+  "footerLabel": "Microsoft 365 & Google",
+  "optionLabel": "Cloud workspace (Microsoft 365 or Google)",
+  "features": [
+    {
+      "title": "Migrations",
+      "detail": "Off old servers, or between Microsoft and Google"
+    },
+    {
+      "title": "Licence clean-up",
+      "detail": "Pay only for what you actually use"
+    },
+    {
+      "title": "Files people can find",
+      "detail": "SharePoint or Google shared drives, laid out clearly"
+    }
+  ],
+  "bestFor": "Old servers, messy licences, or a mix of both"
+}

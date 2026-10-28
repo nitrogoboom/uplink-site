@@ -2,6 +2,7 @@
 // SHARED · "Book your free check-up" pop-up (every page)
 // Opened by any link with data-open="book-dialog". Mockup: sends nothing.
 // Styles: src/styles/dialogs.css, src/styles/forms.css.
+import ServiceOptions from './ServiceOptions.astro';
 ---
 <dialog class="dialog" id="book-dialog" aria-labelledby="book-title">
   <form data-validate="book" method="dialog">
@@ -39,13 +40,7 @@
           <label for="book-service">Main interest</label>
           <select class="input" id="book-service" name="service">
             <option>Not sure yet</option>
-            <option>Managed help desk</option>
-            <option>Cybersecurity</option>
-            <option value="Cloud workspace">Cloud workspace (Microsoft 365 or Google)</option>
-            <option>Networks &amp; Wi-Fi</option>
-            <option>Phones &amp; Teams calling</option>
-            <option>Backup &amp; recovery</option>
-            <option>IT strategy &amp; planning</option>
+            <ServiceOptions />
           </select>
         </div>
       </div>

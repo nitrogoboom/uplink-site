@@ -1,5 +1,6 @@
 ---
-// WORK · 4. Industries: industry chips, then the call-to-action band. Styles: industries.css.
+// WORK · 4. Industries: the chips from src/data/industries.json, then the call-to-action band. Styles: industries.css.
+import industries from '../../data/industries.json';
 import './industries.css';
 ---
 <section class="section section--band fold" id="industries" aria-labelledby="ind-title">
@@ -10,14 +11,7 @@ import './industries.css';
       <p class="lead">Most of our clients are offices where nobody's job title says IT. These are the fields we know best.</p>
     </div>
     <ul class="industries">
-      <li><span class="chip">Law offices</span></li>
-      <li><span class="chip">Accounting</span></li>
-      <li><span class="chip">Health clinics</span></li>
-      <li><span class="chip">Non-profits</span></li>
-      <li><span class="chip">Manufacturing</span></li>
-      <li><span class="chip">Engineering firms</span></li>
-      <li><span class="chip">Property management</span></li>
-      <li><span class="chip">Schools and daycares</span></li>
+      {industries.map((name) => <li><span class="chip">{name}</span></li>)}
     </ul>
     <div class="panel cta-band fold-foot" id="start">
       <div class="stack">

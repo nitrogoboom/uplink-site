@@ -10,13 +10,14 @@ const { $, $$, openDialog, shortcutsOn } = Uplink;
 /* ======================================================================
    Work: filters + project pop-up
    ====================================================================== */
-// Each card links to its project's <article> further down the page; the
-// pop-up copies that article's text in, so the HTML stays the only source.
+// Each card names its project (data-case); the <article id="case-<name>"> further down the page holds the
+// full story and the pop-up copies that article's text in, so the HTML stays the only source. The card's
+// href is the project's own page, where the link goes without script.
 const workGrid = $('[data-work-grid]');
 if (workGrid) {
   const items = $$('[data-tags]', workGrid);
-  const cards = items.map((li) => $('a[href^="#"]', li));
-  const sources = cards.map((a) => a && document.getElementById(a.hash.slice(1)));
+  const cards = items.map((li) => $('a[data-case]', li));
+  const sources = cards.map((a) => a && document.getElementById('case-' + a.dataset.case));
   const filters = $$('[data-filter]');
   const liveCount = $('[data-work-live]');
   const empty = $('[data-work-empty]');
@@ -50,6 +51,8 @@ if (workGrid) {
     if (im && srcImg) { im.src = srcImg.getAttribute('src'); im.alt = srcImg.alt; }
     const cut = $('[data-case-src]', dlg);   // the compact cut used on smaller screens
     if (cut && srcImg && srcImg.dataset.compact) cut.srcset = srcImg.dataset.compact;   // stamped link, from 2-details.html
+    const link = $('[data-case-link]', dlg);
+    if (link) link.href = '/work/' + cards[i].dataset.case;
     const list = visible();
     const pos = $('[data-case-pos]', dlg);
     if (pos) pos.textContent = (list.indexOf(i) + 1) + ' of ' + list.length;

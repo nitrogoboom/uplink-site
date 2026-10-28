@@ -1,0 +1,26 @@
+{
+  "order": 4,
+  "title": "Networks & Wi-Fi",
+  "chip": "Build",
+  "tile": "Network",
+  "tag": "Project",
+  "image": "network",
+  "alt": "Server rack with firewall, cabling to desks and a Wi-Fi access point",
+  "lead": "Fast, secure networks with firewalls and Wi-Fi that reach every corner of the office.",
+  "card": "Firewalls and Wi-Fi that reach every corner of the office.",
+  "features": [
+    {
+      "title": "Firewall management",
+      "detail": "Patched, watched and documented"
+    },
+    {
+      "title": "Wi-Fi design",
+      "detail": "Coverage mapped before anything is installed"
+    },
+    {
+      "title": "Multi-site links",
+      "detail": "Several offices that work like one"
+    }
+  ],
+  "bestFor": "Offices that are moving or growing"
+}

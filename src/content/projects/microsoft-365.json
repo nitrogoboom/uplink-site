@@ -1,0 +1,12 @@
+{
+  "order": 4,
+  "name": "Move to Microsoft 365",
+  "tag": "Build",
+  "client": "Accounting firm, 25 staff",
+  "clientShort": "Accounting firm · 25 staff",
+  "services": "Cloud workspace",
+  "result": "Old server retired, files on any device",
+  "image": "cloud",
+  "alt": "Server, laptop and phone syncing to a cloud workspace hub",
+  "story": "Files lived on an ageing server in a closet. We moved email and files to Microsoft 365, cleaned up licences, and set up Teams so staff could work from anywhere."
+}

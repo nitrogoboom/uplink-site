@@ -42,14 +42,13 @@ Python 3.10+ and Node 18+.
 - `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec (roles for `tokens.css` and `tools/palette.py`); the rest is the record of how it was chosen. See its README.
 - `review.md` – the developer review of 28 Oct 2026 and the plan for the Astro move. `notes.md` – open items.
 
-## Adding a service
+## Adding a service (branch `astro`)
 
-The services list is open-ended: counts, tiles and the number-key hint come from the page.
-1. `src/pages/services/1-pick.html`: add one `<article class="svc" id="..." data-svc data-tile="Short name">` (copy an existing one; its chip `<span class="chip" data-svc-n>` is filled in for you).
-2. `src/pages/home/2-services.html`: add one card to `.svc-cards` (image `NAME-compact.svg?card#plain`).
-3. `tools/build_footer.py`: add one line to the services links, then `python tools/build_footer.py`.
-4. Add an `<option>` to the "What do you need?" lists (`src/pages/contact/1-message.html` and `src/components/BookDialog.html`), then `python tools/build_pages.py`.
-5. Drawing: a `tools/gen_NAME.py` writing `NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`).
+1. `src/content/services/<slug>.json`: copy an existing one (the fields are typed in `src/content.config.ts`). The slug is the page address, `/services/<slug>`.
+2. Drawing: a `tools/gen_NAME.py` writing `public/assets/img/NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`); `image` in the JSON is NAME.
+3. `npm run build`. The picker, the home card, the footer link, the "What do you need?" options, the service's own page, the sitemap and the JSON-LD all come from the file.
+
+A project is the same with `src/content/projects/<slug>.json` (`/work/<slug>`). FAQ, plans, team, industries and footer lists are `src/data/*.json`.
 
 ## Footer (hero select)
 

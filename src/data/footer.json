@@ -1,0 +1,191 @@
+{
+  "contact": {
+    "eyebrow": "Managed IT · Ontario",
+    "title": "Ready when <em>you are</em>",
+    "lead": "Start with a free 30-minute check-up. We look first, then quote."
+  },
+  "panels": [
+    {
+      "id": "services",
+      "map": "services",
+      "title": "Services",
+      "lead": "Everything your office runs on, looked after by one team.",
+      "icon": "grid",
+      "tile": "Services",
+      "more": {
+        "label": "Compare all services",
+        "href": "/services"
+      }
+    },
+    {
+      "id": "company",
+      "map": "company",
+      "title": "Company",
+      "lead": "The people behind the screen, and how we work.",
+      "icon": "building",
+      "tile": "Company",
+      "links": [
+        {
+          "label": "About us",
+          "href": "/about"
+        },
+        {
+          "label": "Our work",
+          "href": "/work"
+        },
+        {
+          "label": "Team",
+          "href": "/about#team"
+        },
+        {
+          "label": "Our story",
+          "href": "/about#story"
+        },
+        {
+          "label": "Careers",
+          "href": "/soon#careers"
+        }
+      ],
+      "more": {
+        "label": "Meet the team",
+        "href": "/about#team"
+      }
+    },
+    {
+      "id": "support",
+      "map": "support",
+      "title": "Support",
+      "lead": "Already a client? Get help or check on a ticket.",
+      "icon": "headset",
+      "tile": "Support",
+      "links": [
+        {
+          "label": "Client portal",
+          "href": "/soon#client-portal"
+        },
+        {
+          "label": "Remote support",
+          "href": "/soon#remote-support"
+        },
+        {
+          "label": "System status",
+          "href": "/soon#system-status"
+        },
+        {
+          "label": "Contact the help desk",
+          "href": "/contact#support"
+        }
+      ],
+      "more": {
+        "label": "Get support now",
+        "href": "/contact#support"
+      }
+    },
+    {
+      "id": "resources",
+      "map": "resources",
+      "title": "Resources",
+      "lead": "Guides and checklists we hand our own clients.",
+      "icon": "book",
+      "tile": "Resources",
+      "links": [
+        {
+          "label": "Blog",
+          "href": "/soon#blog"
+        },
+        {
+          "label": "Windows 10 guide",
+          "href": "/soon#windows-10-guide"
+        },
+        {
+          "label": "Security checklist",
+          "href": "/soon#security-checklist"
+        },
+        {
+          "label": "Questions and answers",
+          "href": "/services#faq"
+        }
+      ],
+      "more": {
+        "label": "Browse the blog",
+        "href": "/soon#blog"
+      }
+    }
+  ],
+  "follow": {
+    "title": "Follow <em>Uplink</em>",
+    "lead": "Short fixes, security alerts and the odd office tour.",
+    "icon": "signal",
+    "tile": "Follow",
+    "socials": [
+      {
+        "name": "LinkedIn",
+        "handle": "/company/uplinkit",
+        "href": "/soon#social",
+        "icon": "person"
+      },
+      {
+        "name": "YouTube",
+        "handle": "@uplinkit",
+        "href": "/soon#social",
+        "icon": "play"
+      },
+      {
+        "name": "Facebook",
+        "handle": "/uplinkit",
+        "href": "/soon#social",
+        "icon": "people"
+      },
+      {
+        "name": "Instagram",
+        "handle": "@uplink.it",
+        "href": "/soon#social",
+        "icon": "camera"
+      },
+      {
+        "name": "X",
+        "handle": "@uplinkit",
+        "href": "/soon#social",
+        "icon": "chat"
+      }
+    ],
+    "newsletter": {
+      "name": "The Monthly Patch",
+      "note": "One email a month. Threats to watch and fixes that matter."
+    }
+  },
+  "phone": {
+    "display": "1-855-555-0142",
+    "href": "tel:+18555550142"
+  },
+  "email": "hello@uplinkit.ca",
+  "office": {
+    "city": "Toronto",
+    "street": "100 King St W, Suite 4200"
+  },
+  "hours": {
+    "line": "7 am to 7 pm ET",
+    "days": "Monday to Friday"
+  },
+  "legal": [
+    {
+      "label": "Privacy",
+      "href": "/soon#privacy"
+    },
+    {
+      "label": "Terms",
+      "href": "/soon#terms"
+    },
+    {
+      "label": "Accessibility",
+      "href": "/soon#accessibility"
+    },
+    {
+      "label": "Français",
+      "href": "/soon#francais",
+      "lang": "fr"
+    }
+  ],
+  "copyright": "© 2026 Uplink Technology Inc.",
+  "status": "All systems normal · Help desk open 7 am to 7 pm ET"
+}

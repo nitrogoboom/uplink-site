@@ -1,6 +1,9 @@
 ---
-// ABOUT · 3. Team: one card per person, then the call-to-action band. Styles: team.css.
+// ABOUT · 3. Team: one card per person from src/data/team.json, then the call-to-action band. Styles: team.css.
+import { getCollection } from 'astro:content';
+import { byOrder } from '../../content.config';
 import './team.css';
+const team = (await getCollection('team')).sort(byOrder);
 ---
 <section class="section fold" id="team" aria-labelledby="team-title">
   <div class="container">
@@ -9,10 +12,9 @@ import './team.css';
       <h2 id="team-title">The people who pick up</h2>
     </div>
     <ul class="team">
-      <li class="person panel"><span class="avatar" aria-hidden="true">MR</span><span class="stack-2"><span class="person-name">Maya Roy</span><span class="small muted">Founder and CEO</span></span></li>
-      <li class="person panel"><span class="avatar" aria-hidden="true">DL</span><span class="stack-2"><span class="person-name">Daniel Lavoie</span><span class="small muted">Help desk lead</span></span></li>
-      <li class="person panel"><span class="avatar" aria-hidden="true">PS</span><span class="stack-2"><span class="person-name">Priya Shah</span><span class="small muted">Security lead</span></span></li>
-      <li class="person panel"><span class="avatar" aria-hidden="true">TO</span><span class="stack-2"><span class="person-name">Tom Okafor</span><span class="small muted">Network engineer</span></span></li>
+      {team.map(({ data: t }) => (
+        <li class="person panel"><span class="avatar" aria-hidden="true">{t.initials}</span><span class="stack-2"><span class="person-name">{t.name}</span><span class="small muted">{t.role}</span></span></li>
+      ))}
     </ul>
     <div class="panel cta-band fold-foot" id="start">
       <div class="stack">

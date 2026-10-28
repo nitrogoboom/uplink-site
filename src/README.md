@@ -1,6 +1,6 @@
 # src/ – the site in parts
 
-**Branch `astro` (28 Oct 2026):** this folder is becoming an Astro project. Astro reads `pages/*.astro`, `layouts/`, `components/`, `styles/`, `scripts/`. Every page is converted (`pages/*.astro`, `components/<page>/`). The old parts described below live in `legacy/` for reference until step 3 turns their content into collections; nothing reads them. The old build commands below do not run on this branch.
+**Branch `astro` (28 Oct 2026):** this folder is becoming an Astro project. Astro reads `pages/*.astro`, `layouts/`, `components/`, `styles/`, `scripts/`. Every page is converted (`pages/*.astro`, `components/<page>/`), and the content is data: `content/services/*.json`, `content/projects/*.json` (one page each: `pages/services/[slug].astro`, `pages/work/[slug].astro`), `data/*.json` for the smaller lists, typed in `content.config.ts`. The old parts described below live in `legacy/` for reference only; nothing reads them. The old build commands below do not run on this branch.
 
 ---
 

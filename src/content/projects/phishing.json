@@ -1,0 +1,12 @@
+{
+  "order": 2,
+  "name": "Phishing lockdown",
+  "tag": "Protect",
+  "client": "Law office, 18 staff",
+  "clientShort": "Law office · 18 staff",
+  "services": "Cybersecurity",
+  "result": "Fake invoices stopped before they land",
+  "image": "security",
+  "alt": "Office building inside a security perimeter",
+  "story": "After a near-miss with a fake invoice email, we added multi-factor sign-in, email filtering and short staff training, then watched every account around the clock."
+}

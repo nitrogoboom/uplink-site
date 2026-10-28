@@ -3,6 +3,7 @@
 // Styles: message.css, plus .facts (work/details.css). Desktop layout: src/styles/desktop.css.
 import '../work/details.css';
 import './message.css';
+import ServiceOptions from '../ServiceOptions.astro';
 ---
 <section class="page-intro fold" id="message" aria-labelledby="contact-title">
   <div class="container">
@@ -56,13 +57,7 @@ import './message.css';
                 <label for="c-topic">What do you need?</label>
                 <select class="input" id="c-topic" name="topic">
                   <option>Free IT check-up</option>
-                  <option>Managed help desk</option>
-                  <option>Cybersecurity</option>
-                  <option value="Cloud workspace">Cloud workspace (Microsoft 365 or Google)</option>
-                  <option>Networks &amp; Wi-Fi</option>
-                  <option>Phones &amp; Teams calling</option>
-                  <option>Backup &amp; recovery</option>
-                  <option>IT strategy &amp; planning</option>
+                  <ServiceOptions />
                   <option>Something else</option>
                 </select>
               </div>

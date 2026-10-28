@@ -1,14 +1,26 @@
 ---
-// SERVICES. Sections in page order; each is one component in src/components/services/.
+// SERVICES. Sections in page order; each is one component in src/components/services/. The JSON-LD lists the
+// FAQ and every Service (each pointing at its own page) from the collections.
+import { getCollection } from 'astro:content';
+import { byOrder } from '../content.config';
 import Base from '../layouts/Base.astro';
 import Picker from '../components/services/Picker.astro';
 import Plans from '../components/services/Plans.astro';
 import Faq from '../components/services/Faq.astro';
 import '../styles/late.css';   // last: the desktop layout block wins a tie against the sections' CSS
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const faq = (await getCollection('faq')).sort(byOrder);
+const business = { '@id': `${Astro.site!.href}#business` };
+const mainEntity = faq.map(({ data: f }) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }));
+const serviceNodes = services.map(({ id, data: s }) => {
+  const url = new URL(`/services/${id}`, Astro.site).href;
+  return { '@type': 'Service', '@id': url, url, name: s.title, description: s.lead, provider: business, areaServed: 'Ontario' };
+});
 ---
 <Base title="Services · Uplink Technology"
       description="Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses."
-      page="services" path="/services" type="FAQPage">
+      page="services" path="/services" type="FAQPage" ldPage={{ mainEntity }} ldGraph={serviceNodes}>
   <Picker />
   <Plans />
   <Faq />

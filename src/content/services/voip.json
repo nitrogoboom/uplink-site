@@ -1,0 +1,26 @@
+{
+  "order": 5,
+  "title": "Phones & Teams calling",
+  "chip": "Connect",
+  "tile": "Phones",
+  "tag": "Project",
+  "image": "voip",
+  "alt": "Desk with a Teams call on screen, a desk phone, a headset and a mobile",
+  "lead": "Your business numbers on desk phones, laptops and mobiles. We set it up, move it and support it.",
+  "card": "Your numbers on desk phones, laptops and mobiles.",
+  "features": [
+    {
+      "title": "Teams Phone or VoIP",
+      "detail": "Calls from the desk, the laptop or the road"
+    },
+    {
+      "title": "Keep your numbers",
+      "detail": "We move them over with no gap in service"
+    },
+    {
+      "title": "Desk phones and headsets",
+      "detail": "Picked, set up and swapped when they fail"
+    }
+  ],
+  "bestFor": "Teams that live on the phone"
+}

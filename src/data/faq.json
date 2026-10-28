@@ -1,0 +1,26 @@
+[
+  {
+    "q": "Do we have to sign a long contract?",
+    "a": "No. Plans run month to month after a short onboarding period. We would rather keep you by doing good work."
+  },
+  {
+    "q": "Can you work with the IT person we already have?",
+    "a": "Yes. Many clients keep an internal IT lead. We take the day-to-day tickets and the after-hours watch so they can focus on projects."
+  },
+  {
+    "q": "How fast do you answer?",
+    "a": "During business hours a technician picks up the phone directly. Our average first response on tickets is 12 minutes."
+  },
+  {
+    "q": "What happens during the free check-up?",
+    "a": "We scan your network, devices and Microsoft 365 or Google accounts, then walk you through what we found in a 30-minute call. You keep the report either way."
+  },
+  {
+    "q": "Do you work with Google Workspace?",
+    "a": "Yes. We run Microsoft 365 and Google Workspace every day, and can move you from one to the other. Not sure which fits? We lay out the trade-offs plainly."
+  },
+  {
+    "q": "Do you support French-speaking staff?",
+    "a": "Yes. Our help desk takes calls and tickets in English and French."
+  }
+]

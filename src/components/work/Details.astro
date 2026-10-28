@@ -1,112 +1,14 @@
 ---
-// WORK · 2. Project details: the full story of every project, in the HTML. With script on, this list is hidden
-// and work.js copies one project at a time into CasePopup. Styles: details.css.
+// WORK · 2. Project details: the full story of every project (ProjectCase), in the HTML. With script on, this
+// list is hidden and work.js copies one project at a time into CasePopup. Styles: details.css.
+import { getCollection } from 'astro:content';
+import ProjectCase from './ProjectCase.astro';
 import './details.css';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section class="section cases-list" id="details" aria-labelledby="details-title">
   <div class="container stack-5">
     <h2 id="details-title">Project details</h2>
-    <article class="case-src" id="case-office-move" aria-labelledby="case-office-move-t">
-      <h3 id="case-office-move-t" data-case-field="name">Office move in a weekend</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/office.svg" data-compact="/assets/img/office-compact.svg" alt="Floor plan of the new office with desks, server rack and Wi-Fi" width="1200" height="800" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Build</span>
-          <p class="muted" data-case-field="story">A growing firm moved floors on a Friday. We planned the network, Wi-Fi and desks in advance, cabled over the weekend, and tested every seat on Sunday night.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Professional services firm, 40 staff</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">Networks &amp; Wi-Fi, help desk</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Staff logged in Monday like nothing happened</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
-    <article class="case-src" id="case-phishing" aria-labelledby="case-phishing-t">
-      <h3 id="case-phishing-t" data-case-field="name">Phishing lockdown</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/security.svg" data-compact="/assets/img/security-compact.svg" alt="Office building inside a security perimeter" width="640" height="480" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Protect</span>
-          <p class="muted" data-case-field="story">After a near-miss with a fake invoice email, we added multi-factor sign-in, email filtering and short staff training, then watched every account around the clock.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Law office, 18 staff</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">Cybersecurity</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Fake invoices stopped before they land</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
-    <article class="case-src" id="case-clinic-network" aria-labelledby="case-clinic-network-t">
-      <h3 id="case-clinic-network-t" data-case-field="name">Clinic network refresh</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/network.svg" data-compact="/assets/img/network-compact.svg" alt="Server rack with cabling to desks and a Wi-Fi access point" width="640" height="480" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Build</span>
-          <p class="muted" data-case-field="story">Old switches and patchy Wi-Fi were slowing down patient check-in. We replaced the core network, split guest and staff Wi-Fi, and documented every port.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Health clinic, 2 locations</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">Networks &amp; Wi-Fi</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Faster check-in, guest Wi-Fi kept separate</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
-    <article class="case-src" id="case-microsoft-365" aria-labelledby="case-microsoft-365-t">
-      <h3 id="case-microsoft-365-t" data-case-field="name">Move to Microsoft 365</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/cloud.svg" data-compact="/assets/img/cloud-compact.svg" alt="Server, laptop and phone syncing to a cloud workspace hub" width="640" height="480" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Build</span>
-          <p class="muted" data-case-field="story">Files lived on an ageing server in a closet. We moved email and files to Microsoft 365, cleaned up licences, and set up Teams so staff could work from anywhere.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Accounting firm, 25 staff</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">Cloud workspace</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Old server retired, files on any device</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
-    <article class="case-src" id="case-backups" aria-labelledby="case-backups-t">
-      <h3 id="case-backups-t" data-case-field="name">Ransomware-ready backups</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/backup.svg" data-compact="/assets/img/backup-compact.svg" alt="Backup drives with a restore loop and an offsite copy" width="640" height="480" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Protect</span>
-          <p class="muted" data-case-field="story">Production could not afford to lose a day. We set up daily backups with an offsite copy, and we run a test restore every quarter.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Manufacturer, 60 staff</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">Backup &amp; recovery</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Restores proven, not just promised</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
-    <article class="case-src" id="case-roadmap" aria-labelledby="case-roadmap-t">
-      <h3 id="case-roadmap-t" data-case-field="name">Three-year IT roadmap</h3>
-      <div class="case">
-        <div class="case-fig">
-          <div class="case-img well"><img src="/assets/img/strategy.svg" data-compact="/assets/img/strategy-compact.svg" alt="Rising budget bars and a quarterly roadmap" width="640" height="480" loading="lazy"></div>
-        </div>
-        <div class="stack">
-          <span class="chip chip--sky" data-case-field="tag">Plan</span>
-          <p class="muted" data-case-field="story">Tech spending was one surprise after another. We mapped every device and licence, then built a three-year roadmap and budget the board could approve.</p>
-          <dl class="facts">
-            <div><dt>Client</dt><dd data-case-field="client">Non-profit, 30 staff</dd></div>
-            <div><dt>Services</dt><dd data-case-field="services">IT strategy &amp; planning</dd></div>
-            <div><dt>Result</dt><dd class="accent" data-case-field="result">Budget approved a year ahead</dd></div>
-          </dl>
-        </div>
-      </div>
-    </article>
+    {projects.map((p) => <ProjectCase project={p} />)}
   </div>
 </section>

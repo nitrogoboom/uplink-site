@@ -1,0 +1,7 @@
+---
+// The service <option>s for a "What do you need?" list, from the collection. The contact form and the booking
+// pop-up each wrap these in their own first and last options.
+import { getCollection } from 'astro:content';
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+---
+{services.map(({ data: s }) => s.optionLabel ? <option value={s.title}>{s.optionLabel}</option> : <option>{s.title}</option>)}
