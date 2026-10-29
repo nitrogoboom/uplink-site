@@ -14,6 +14,8 @@ const services = defineCollection({
     tile: z.string(),                  // short name on the picker tile
     tag: z.string(),                   // second chip on the drawing ("Starts day one")
     image: z.string(),                 // drawing name in public/assets/img/ (NAME.svg and NAME-compact.svg)
+    icon: z.string(),                  // <Icon> name for the short home tile (src/components/Icon.astro)
+    featured: z.boolean().optional(),  // one of the three tall cards on the home page; the rest are short tiles
     alt: z.string(),
     lead: z.string(),
     card: z.string(),                  // one line on the home page card

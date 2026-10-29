@@ -5,6 +5,8 @@
   "tile": "Security",
   "tag": "Always on",
   "image": "security",
+  "icon": "shield",
+  "featured": true,
   "alt": "Office building inside a security perimeter with threats blocked",
   "lead": "Layered protection for devices, email and accounts, watched around the clock by people, not just software.",
   "card": "Devices, email and accounts watched around the clock.",

@@ -5,6 +5,8 @@
   "tile": "Help desk",
   "tag": "Starts day one",
   "image": "helpdesk",
+  "icon": "headset",
+  "featured": true,
   "alt": "Help desk workstation with support tickets moving to resolved",
   "lead": "Real people who pick up, fix it, and explain it in plain words. Phone, email, chat or the client portal.",
   "card": "Real people who pick up and fix it, by phone, email or chat.",
