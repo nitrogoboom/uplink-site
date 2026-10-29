@@ -36,6 +36,14 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] PageSpeed mobile Performance reads 99 on some runs: simulated LCP 1.9–2.0 s on the phone hero picture (`office-compact.svg`), right on the 99/100 line. Real load is ~0.4 s.
 - [ ] PageSpeed mobile Home lists "Forced reflow: [unattributed] 36 ms" (unscored; score stays 100). Not reproducible locally (live site, beacon on and off, CPU slowed 6x), and no script reads layout at load on phones. Recheck now and then; act only if it starts naming a source.
 
+## Spacing pass (rules and findings: `spacing.md`)
+- [ ] Every page: reset button padding and the `dl.facts` margin; section head to content `--sp-6` at all sizes; line heights as tokens (A1–A6).
+- [ ] Home: one card-grid gap; grow and step title-to-text gaps (H1–H3).
+- [ ] Services: plans table head line height (S1).
+- [ ] About: profile top gaps, profile and person cards, team and stats grids, timeline (B1–B5).
+- [ ] Contact: channel row padding (C1).
+- [ ] Service and project pages: H3 in the write-up, next-link padding, 22px lead line height (D1–D3).
+
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.

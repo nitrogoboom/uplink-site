@@ -18,6 +18,14 @@
     "property-no-deprecated": null,
     "font-family-name-quotes": null,
     "length-zero-no-unit": [true, { "ignoreFunctions": ["env"] }],
+    "declaration-property-value-disallowed-list": [
+      {
+        "/^(margin|padding|gap|row-gap|column-gap|scroll-margin|scroll-padding)/": [
+          "/(?<![\\w.])(?:\\d*\\.\\d+|[1-9]\\d*)(?:px|rem|em)\\b/"
+        ]
+      },
+      { "message": "Off-scale spacing: use a --sp-* token (spacing.md)" }
+    ],
     "value-keyword-case": [
       "lower",
       { "camelCaseSvgKeywords": true, "ignoreKeywords": ["optimizeLegibility", "Roboto", "Helvetica", "Arial"] }

@@ -83,7 +83,9 @@
   --fs-7: clamp(2rem, 1.35rem + 2.2vw, 2.75rem);   /* 32-44  section headings */
   --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
 
-  --lh-display: 0.95;
+  --lh-display: 0.95;  /* page and section headings */
+  --lh-tight:   1;     /* one line in a fixed-height box: buttons, key caps, tiles */
+  --lh-title:   1.1;   /* display-font titles that can wrap: card titles, h3, h4 */
   --lh-snug:    1.3;
   --lh-body:    1.6;
   --tracking-1: 0.02em;     /* display headings, tags */
