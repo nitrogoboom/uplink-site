@@ -86,15 +86,15 @@ Measured on every page at phone (390×844), tablet (820×1180), 1440×900 and 34
 
 | # | Rule | Problem | Where |
 |---|---|---|---|
-| W1 | R0 | Facts list margin (A2). | `facts.css` |
+| W1 | R0 | Facts list margin. Fixed with A2; no Work PR needed. | `facts.css` |
 
 ### About
 
 | # | Rule | Problem | Where |
 |---|---|---|---|
 | B1 | R3, R4 | Eyebrow to H1 and H1 to lead are 24px. Every other page top uses 16px. | `profile.css:10` |
-| B2 | R5 | Profile card padding is 16px; other cards are 24px. | `profile.css:5` |
-| B3 | R4, R5 | Person card: name to role is 16px, the same as the gap between cards. Name and role read as separate items. | `team.css:5` |
+| B2 | — | Not a problem: the profile card is a picture card. The picture sits 16px in and the text 24px, which fits R5. | `profile.css:5` |
+| B3 | R4, R5 | Person card: name and role are 8px apart, but at 1.6 line height they look 16px apart, the same as the gap between cards. Name and role read as separate items. | `team.css:5` |
 | B4 | R6 | Team grid is 16px apart; stats 12px. | `team.css:2`, `shared-blocks.css:34` |
 | B5 | R4 | Timeline title to text is 4px; other card titles get 8 to 12px. | `story.css:8` |
 
