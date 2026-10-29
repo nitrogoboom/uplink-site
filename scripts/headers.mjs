@@ -3,8 +3,8 @@
 //   {script-hashes}   a 'sha256-…' for every inline <script> in the built pages (today: the one-line
 //                     classList.add('js') in every head). Change that line and the hash follows.
 //   {style-hashes}    the same for every inline <style>: Astro's inlined CSS, the drawings inlined in the home
-//                     page, and the <style> blocks in the hero drawing (home.js inserts that SVG into the page,
-//                     so its styles count as the page's). style-src has no 'unsafe-inline'.
+//                     page, and the <style> blocks in the hero drawings (home.js inserts those SVGs into the page,
+//                     so their styles count as the page's). style-src has no 'unsafe-inline'.
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
 //                     before the HTML. The font list is FIRST_FONTS below and must match Base.astro's preloads.
 // It refuses to finish if a page or the hero drawing has a style="" attribute: no hash covers one, so the CSP
@@ -14,7 +14,8 @@ import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 const DIST = 'dist';
-const INSERTED = ['assets/img/hero-office.svg'];   // drawings a script puts into the page (home.js)
+// drawings a script puts into the page (home.js: the hero's three cuts, HERO in src/lib/site.ts, and the phone cut's dashes)
+const INSERTED = ['assets/img/hero-office.svg', 'assets/img/hero-office-tablet.svg', 'assets/img/office-compact-build.svg', 'assets/img/office-compact-flows.svg'];
 const FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-400', 'barlow-600'];
 const HINT = FIRST_FONTS.map((f) => `</assets/fonts/${f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 

@@ -4,12 +4,24 @@
 //               title and description from here, so the sitemap and llms.txt say the same thing.
 //   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
-//   HERO        the home hero drawing's address (Hero.astro fetches it; index.astro preloads it).
+//   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 import { execFileSync } from 'node:child_process';
 import { getCollection } from 'astro:content';
 
-// written by tools/gen_office.py
-export const HERO = '/assets/img/hero-office.svg';
+// written by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
+// 440-680px wide there). phone: the still phone cut, animated, with its dashes in their own file; with reduced
+// motion phones keep the still (office-compact.svg).
+export const HERO = {
+  full: '/assets/img/hero-office.svg',
+  tablet: '/assets/img/hero-office-tablet.svg',
+  phone: '/assets/img/office-compact-build.svg',
+  phoneFlows: '/assets/img/office-compact-flows.svg',
+  media: {
+    phone: '(max-width: 599px)',
+    tablet: '(min-width: 600px) and (max-width: 1299px) and (max-height: 1099px)',
+    full: '(min-width: 1300px), (min-width: 600px) and (min-height: 1100px)',
+  },
+};
 
 export const PAGES = {
   home: { path: '/', name: 'Home', title: 'Uplink Technology · Managed IT for Ontario businesses',
