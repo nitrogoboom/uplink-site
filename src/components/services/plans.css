@@ -4,8 +4,8 @@
 .plans { width: 100%; min-width: 40rem; border-collapse: collapse; font-size: var(--fs-3); }
 .plans th, .plans td { padding: var(--sp-4) var(--sp-5); text-align: left; border-bottom: 1px solid var(--c-line); vertical-align: middle; }
 .plans tbody tr:last-child > * { border-bottom: 0; }
-.plans thead th { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); text-transform: uppercase; vertical-align: bottom; }
-.plans thead th small { display: block; margin-top: var(--sp-1); font-family: var(--font-body); font-style: normal; font-weight: 400; font-size: var(--fs-2); text-transform: none; color: var(--c-muted); }
+.plans thead th { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); line-height: var(--lh-title); text-transform: uppercase; vertical-align: bottom; }
+.plans thead th small { display: block; margin-top: var(--sp-1); font-family: var(--font-body); font-style: normal; font-weight: 400; font-size: var(--fs-2); line-height: var(--lh-snug); text-transform: none; color: var(--c-muted); }
 .plans tbody th { font-weight: 600; }
 .plans .col-hi { background: var(--c-accent-faint); }
 .plans td { color: var(--c-muted); }
