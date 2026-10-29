@@ -52,10 +52,10 @@ ICONS = [
 ]
 
 LABELS = [  # dot (world), elbow (screen), text x, anchor, title, subline
-    ((-3.25, 3.0, 2.5), (-96.6, 8.4), -123.6, 'end', 'OLD SERVER', 'migrated, then retired'),       # middle of the server's front
+    ((-4.0, 2.5, 5.0), (-100.0, -80.0), -127.0, 'end', 'OLD SERVER', 'migrated, then retired'),      # server's top, left of the sync line
     ((4.625, -0.375, 1.625), (130.0, 86.0), 157.0, 'start', 'ANY DEVICE', 'same files everywhere'),   # the phone's right edge
 ]
-LABEL_GAPS = [box_shape(-1e4, -5.1, -118.6, 35.9), box_shape(152.0, 72.5, 1e4, 113.5)]   # floor clears round the text
+LABEL_GAPS = [box_shape(-1e4, -93.5, -122.0, -52.5), box_shape(152.0, 72.5, 1e4, 113.5)]   # floor clears round the text
 TAIL_PAD = 5                          # and round each leader's level tail
 # compact phone cut (isogen.doc crop): framed close on the devices and slab, both labels at 1.81x with wrapped
 # sublines; OLD SERVER moves into the empty space above-left of the server. The card is left out: at a readable
@@ -63,7 +63,7 @@ TAIL_PAD = 5                          # and round each leader's level tail
 # Crop is in page coordinates (keep it 4:3); elbow and text are in group coordinates (page minus translate).
 # tw/sw: unscaled title/subline widths (px) for the floor gaps.
 COMPACT = dict(crop=(42, 46, 564, 423), scale=1.81, labels=[
-    dict(dot=(-3.25, 3.0, 4.25), elbow=(-68.8, -110.6), x=-117.7, anchor='end', title='OLD SERVER', sub='migrated,\nthen retired', tw=80, sw=62),
+    dict(dot=(-4.0, 2.5, 5.0), elbow=(-68.8, -110.6), x=-117.7, anchor='end', title='OLD SERVER', sub='migrated,\nthen retired', tw=80, sw=62),
     dict(dot=(4.625, -0.375, 1.625), elbow=(97.2, 17.4), x=146.1, anchor='start', title='ANY DEVICE', sub='same files\neverywhere', tw=77, sw=55),
 ])
 
@@ -139,8 +139,8 @@ def phone():
     ui = [f'<circle cx="{wd / 2:.4g}" cy="0.6" r="0.24" fill="{BLUE}" fill-opacity="0.8"/>',
           rect(wd / 2 - 0.3, 0.98, 0.6, 0.09, LINE, 0.045, ' fill-opacity="0.6"'),
           rect(wd / 2 - 0.2, 1.15, 0.4, 0.07, LINE, 0.035, ' fill-opacity="0.3"'),
-          f'<circle cx="{wd * 0.3:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="{pal.RED_DOT}"/>',
-          f'<circle cx="{wd * 0.7:.4g}" cy="{ht - 0.32:.4g}" r="0.13" fill="{GREEN}"/>']
+          f'<circle cx="{wd * 0.25:.4g}" cy="{ht - 0.36:.4g}" r="0.19" fill="{pal.RED_DOT}"/>',
+          f'<circle cx="{wd * 0.75:.4g}" cy="{ht - 0.36:.4g}" r="0.19" fill="{GREEN}"/>']
     scr = ('+y', (x0 + inset, y1, z1 - inset), wd, ht)
     out.append(screen_glass(w, scr, ''.join(ui), glow=GREEN))
     return out

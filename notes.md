@@ -17,7 +17,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
 - [ ] Office plan: ~153 one-grid-step near-miss flags because the furniture is half size there. Not visible; tidy if the props get a half-size grid.
 - [ ] Office phone cut: the FIREWALL RACK title runs over the room's front edge (outlined to stay readable), and its leader doubles back.
-- [ ] Cloud: the phone's call buttons are small; the OLD SERVER dot crowds the server front.
 - [ ] Backup: the drive bays turn to texture at phone size; the OFFSITE COPY leader points at the wall, not the lock.
 - [ ] Strategy: the IT BUDGET leader is long and steep.
 
