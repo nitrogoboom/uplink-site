@@ -76,8 +76,10 @@
   .svc-menu {
     display: flex;
     gap: var(--sp-3);
-    margin-inline: calc(-1 * var(--gutter));
-    padding: var(--sp-4) 0 var(--sp-6);
+    /* a scroller clips its cards' shadows at its edges, so the row reaches up to the heading (over its margin)
+       and down to the section's edge (under the dots and the section's padding); --shadow-front fades out inside that */
+    margin: calc(-1 * var(--sp-6)) calc(-1 * var(--gutter)) 0;
+    padding: calc(var(--sp-4) + var(--sp-6)) 0 calc(var(--sp-6) + var(--sp-8));
     overflow-x: auto;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
@@ -128,7 +130,7 @@
     .svc-menu > .is-centre .svc-tile { z-index: 1; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-front); }
     .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) { opacity: 1; }
   }
-  .svc-hint { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * var(--sp-4)); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
+  .svc-hint { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * (var(--sp-4) + var(--sp-8))); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
   /* "Swipe" fades once they have swiped (home.js); the dots stay */
   .svc-swipe { display: flex; align-items: center; gap: var(--sp-2); transition: opacity var(--dur-2) var(--ease); }
   .svc-swipe svg { width: var(--sp-4); height: var(--sp-4); }
