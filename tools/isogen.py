@@ -115,7 +115,7 @@ def number_badges(body):
 
 def key_group(title, sub=''):
     """Opening tag for one label; data-t / data-s keep its words with it."""
-    return f'<g class="lbl" data-t="{html.escape(title)}" data-s="{html.escape((sub or "").replace(chr(10), " "))}">'
+    return f'<g class="lbl" data-t="{html.escape(title.replace(chr(10), " "))}" data-s="{html.escape((sub or "").replace(chr(10), " "))}">'
 
 
 def key_css(_width=None):
@@ -127,16 +127,19 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
     """Leader dot + free-angle diagonal to elbow + 20px level tail, then caps title and grey subline.
     Leaders are annotation, not geometry, so the diagonal can take any angle.
     dot, elbow are screen points; the tail runs from elbow towards text_x and stops 7px short.
-    scale enlarges text, dot and gaps together (the compact phone cut uses about 1.6)."""
+    scale enlarges text, dot and gaps together (the compact phone cut uses about 1.6).
+    A '\n' in title or sub wraps it; the subline moves down to clear a wrapped title."""
     (dx, dy), (ex, ey) = dot, elbow
     k = scale
     tail = text_x - 7 * k if anchor == 'start' else text_x + 7 * k
     ty = ey + 4.5 * k if title_y is None else title_y
-    sy = ty + 15 * k if sub_y is None else sub_y
+    titles = title.split('\n')
+    sy = ty + 15 * k * len(titles) if sub_y is None else sub_y
     out = [key_group(title, sub) + f'<g class="co lt"><polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tail)},{fmt(ey)}" '
            f'fill="none" stroke="{colour}" stroke-width="{1.2 * k:.3g}" stroke-opacity="0.55"/>'
            f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="{3 * k:.3g}" fill="{colour}" stroke="{INK}" stroke-width="{1.5 * k:.3g}"/></g>',
-           f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty)}" font-size="{13 * k:.3g}" font-weight="600" letter-spacing="{0.78 * k:.3g}" fill="{colour}" text-anchor="{anchor}">{title}</text>']
+           *(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty + n * 15 * k)}" font-size="{13 * k:.3g}" font-weight="600" letter-spacing="{0.78 * k:.3g}" fill="{colour}" text-anchor="{anchor}">{line}</text>'
+             for n, line in enumerate(titles))]
     for n, line in enumerate((sub or '').split('\n') if sub else []):   # a '\n' in sub wraps it (compact cuts)
         out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{line}</text>')
     out.append('</g>')

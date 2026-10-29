@@ -8,6 +8,7 @@ import sys
 from shapely.geometry import box as box_shape, Polygon
 from iso import W, fmt
 from isogen import FACES, HIGH, ORANGE, INK, EDGE, silhouette, floor_grid, disc_arcs, label, doc, write
+from isoprops import tree
 import palette as pal
 
 w = W(0, 63, 18)                      # inside the group's translate(275.4,218.1)
@@ -30,8 +31,7 @@ HVAC = (-2.5, -0.75, -2.5, -0.75, 0.75)    # roof unit: x0, x1, y0, y1, height
 FAN = (-2.25, -1.0, -2.25, -1.0, 0.125)    # grille on top of it
 MAST = (1.5, -1.5, 0.5, 2.5)          # x, y, base size, pole height above the roof
 WIFI = [(8, 0.85), (14, 0.55), (20, 0.3)]   # signal arcs round the mast top: radius px, opacity
-TREES = [(7.0, 3.0, 1.0), (-3.0, 6.25, 1.0)]      # centre x, y, scale: front-right on open ground, left of the path (tower drawing's tree)
-TREE = [(0.5, 1.0), (1.5, 1.25), (1.0, 0.75)]   # trunk, canopy, top: width, height
+TREES = [(6.5, 3.25), (-3.0, 6.25)]    # centre x, y (isoprops.tree, as the tower): front-right on open ground, left of the path
 GREEN = (pal.GREEN_MID, pal.GREEN_DARK, pal.GREEN)
 GREEN_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
 AWNING_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
@@ -41,11 +41,11 @@ DISC_R = 9                            # floor disc radius; grid every 1 unit, of
 DOT = (HALF, -1.0, STOREY * LIT + 1.125)   # leader dot: lit floor's right wall, between two windows
 TEXT_X, TITLE_Y = 137.6, 56.2
 GAP = (124.0, 40.8, 79.0)             # floor lines stop at x >= GAP[0], GAP[1] <= y <= GAP[2] (label clearance)
-# compact phone cut (isogen.doc crop): the same scene framed closer, the label at 1.75x on the open ground left of
-# the building. Crop is in page coordinates (keep it 4:3); elbow and text are in the drawing's group coordinates
-# (page minus the translate). Title 118.3px and subline 94.3px wide at 1x (measured).
-COMPACT = dict(crop=(-88, 45.5, 488, 366), scale=1.75, label=dict(
-    dot=(-1.0, HALF, STOREY * LIT + 1.125), elbow=(-115.4, -18.1), x=-147.65, tw=118.3, sw=94.3))
+# compact phone cut (isogen.doc crop): the same scene framed closer with the building in the middle, the label
+# wrapped onto four lines in the open air right of it. Crop is in page coordinates (keep it 4:3); elbow and text are
+# in the drawing's group coordinates (page minus the translate). Widest line ("HELP DESK") is 72.2px at 1x (measured).
+COMPACT = dict(crop=(36, 45.5, 488, 366), scale=1.4, label=dict(
+    dot=(HALF, -3.0, STOREY * LIT + 1.125), elbow=(120, -10), x=136, tw=72.2))
 TITLE = 'Three-storey office building with the help desk floor highlighted'
 
 BOXES = []                            # every box drawn, in order (rules_hq.py reads it for painter.py)
@@ -63,9 +63,9 @@ def flat(pts, fill, extra=''):
 def label_gap(compact=False):
     if not compact:
         return box_shape(GAP[0], GAP[1], 10_000, GAP[2])
-    L, k = COMPACT['label'], COMPACT['scale']        # the compact label's text and tail (end-anchored, left of the building)
-    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
-    return box_shape(x - L['tw'] * k - 5, ty - 15 * k, ex + 4, ty + 3).union(box_shape(x - L['sw'] * k - 5, sy - 12 * k, x + 5, sy + 5))
+    L, k = COMPACT['label'], COMPACT['scale']        # the compact label's tail and its four lines of text
+    ex, ey = L['elbow']; ty = ey + 4.5 * k
+    return box_shape(ex - 4, ty - 15 * k, L['x'] + L['tw'] * k + 5, ty + (15 * 2 + 13) * k + 5)
 
 
 def path_shape():
@@ -73,13 +73,8 @@ def path_shape():
     return [(x0, HALF + STEP[2], 0), (x1, HALF + STEP[2], 0), (x1, y1, 0), (x0, y1, 0)]
 
 
-def tree_boxes(cx, cy, s):
-    out, z = [], 0
-    for size, h in TREE:
-        r = size * s / 2
-        out.append((cx - r, cx + r, cy - r, cy + r, z, z + h * s))
-        z += h * s
-    return out
+def tree_boxes(cx, cy):
+    return [b for _n, b in tree(cx, cy)]
 
 
 def hidden(compact=False):
@@ -171,7 +166,7 @@ def build(compact=False):
     body += trees()
     if compact:
         L = COMPACT['label']
-        body += label(w.p(*L['dot']), L['elbow'], L['x'], 'HELP DESK FLOOR', 'your team\'s first call', anchor='end', scale=COMPACT['scale'])
+        body += label(w.p(*L['dot']), L['elbow'], L['x'], 'HELP DESK\nFLOOR', 'your team\'s\nfirst call', scale=COMPACT['scale'])
         return doc(TITLE, body, translate=(275.4, 218.1), crop=COMPACT['crop'])
     body += label(w.p(*DOT), (TEXT_X - 27, TITLE_Y - 4.5), TEXT_X, 'HELP DESK FLOOR', 'your team\'s first call')
     return doc(TITLE, body, translate=(275.4, 218.1))

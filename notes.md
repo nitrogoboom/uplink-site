@@ -24,8 +24,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Cloud: the phone's call buttons are small; the OLD SERVER dot crowds the server front.
 - [ ] Backup: the drive bays turn to texture at phone size; the OFFSITE COPY leader points at the wall, not the lock.
 - [ ] Strategy: the IT BUDGET leader is long and steep.
-- [ ] HQ phone cut: the building sits right of centre to make room for the label.
-- [ ] Trees are coded twice (tower and hq). Move one tree into `tools/isoprops.py`.
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
