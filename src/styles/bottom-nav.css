@@ -39,8 +39,9 @@
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
+/* portrait tablets: icon-only header buttons (their names stay for screen readers); words back from 900px */
+@media (min-width: 700px) and (max-width: 899px) { .hdr-actions .hbtn-text { display: none; } }
 @media (min-width: 700px) and (max-width: 1099px) {
-  .hdr-actions .hbtn-text { display: none; }
   .brand-sub { display: none; }
   .site-header .container { gap: var(--sp-3); }
   .tab { padding-inline: var(--sp-3); }

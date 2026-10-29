@@ -11,7 +11,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
 ## Drawings
-- [ ] Hero on phones: the build animation plays, but the 3D cloud doesn't fit the phone cut (it floats above the room; with it the drawing gets too small or too tall). A small cloud badge on the tray could stand in.
+- [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
+- [ ] Hero phone cut: room for more words later. It has the cloud, Workstations and Firewall rack. Wi-Fi, Guest Wi-Fi and Teams room are on desktop only; adding one means a bigger crop or a smaller `PHONE_K`.
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).

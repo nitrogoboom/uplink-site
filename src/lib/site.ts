@@ -9,8 +9,8 @@ import { execFileSync } from 'node:child_process';
 import { getCollection } from 'astro:content';
 
 // written by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
-// 440-680px wide there). phone: the still phone cut, animated, with its dashes in their own file; with reduced
-// motion phones keep the still (office-compact.svg).
+// 440-680px wide there). phone: the hero scene framed closer for phones, with its dashes in their own file; with
+// reduced motion phones keep the still (office-compact.svg).
 export const HERO = {
   full: '/assets/img/hero-office.svg',
   tablet: '/assets/img/hero-office-tablet.svg',

@@ -33,22 +33,14 @@
 }
 .mi:hover { background: var(--c-surface-2); }
 @media (hover: hover) { .mi:hover { transform: translateX(var(--sp-1)); } }
-.mi--on { background: var(--c-surface-2); }
-.mi--on .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .mi .icon-tile { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
 .mi:hover .icon-tile, .mi:focus-visible .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .mi:focus-visible { background: var(--c-surface-2); }
-.menu:hover .mi--on:not(:hover),
-.menu:focus-within .mi--on:not(:focus-visible) { background: transparent; }
-.menu:hover .mi--on:not(:hover) .icon-tile,
-.menu:focus-within .mi--on:not(:focus-visible) .icon-tile { background: var(--c-surface-2); color: var(--c-text); }
-.menu:hover .mi--on:not(:hover) .mi-go,
-.menu:focus-within .mi--on:not(:focus-visible) .mi-go { opacity: 0; }
 .mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
 .mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); line-height: var(--lh-tight); text-transform: uppercase; }
 .mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
 .mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
-.mi:hover .mi-go, .mi:focus-visible .mi-go, .mi--on .mi-go { opacity: 1; }
+.mi:hover .mi-go, .mi:focus-visible .mi-go { opacity: 1; }
 
 .hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
 @media (min-width: 700px) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -64,12 +56,24 @@
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
 @media (min-width: 700px) and (orientation: portrait) {
-  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 34rem) * 40 / 31))); margin-inline: auto; }
+  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
 }
 
 /* phone: the still drawing (office-compact.svg, compact-cuts.css) is 4:3,
    so its box is too; no empty bands above and below it */
 @media (max-width: 599px) { .hero-art .stage { aspect-ratio: 4 / 3; } }
+
+/* phones (under the bottom bar's 700px): headline and text, the office, then the button and the news cards.
+   .hero-menu and .hero-art step aside so their parts place on this grid. The office is never taller than the
+   screen leaves after the text and the button, so "Get started" lands on the first screen. */
+@media (max-width: 699px) {
+  .hero-grid { grid-template-areas: "top" "stage" "cta" "dock"; gap: var(--sp-5); }
+  .hero-menu, .hero-art { display: contents; }
+  .hero-top { grid-area: top; }
+  .hero-art .stage { grid-area: stage; width: min(100%, max(12rem, calc((var(--fold-h) - 28rem) * 4 / 3))); margin-inline: auto; }
+  .hero-cta { grid-area: cta; }
+  .hero-dock { grid-area: dock; }
+}
 
 /* ---- two columns: landscape tablets, short laptops and desktops ---------
    Text on the left, the office on the right, sized so both fit the first
@@ -78,10 +82,13 @@
 @media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
   .hero-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: calc(var(--hero-h) - 2 * var(--sp-5)) auto;
+    /* one screen with the news cards in it: the office row takes what the cards leave (the hero's padding here
+       is --sp-5 above, --sp-7 below, src/styles/hero.css), and grows past it only if the text needs more */
+    min-height: calc(var(--hero-h) - var(--sp-5) - var(--sp-7));
+    grid-template-rows: 1fr auto;
     grid-template-areas: "menu stage" "dock dock";
     column-gap: var(--sp-7);
-    row-gap: var(--sp-5);
+    row-gap: var(--sp-6);
   }
   .hero-menu { grid-area: menu; justify-content: center; gap: var(--sp-6); }
   .hero-cta { flex-wrap: wrap; }
@@ -103,11 +110,13 @@
     /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
     height: min(calc(var(--fold-h) - 2 * var(--sp-5)), 56rem);
+    min-height: 0;
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "menu stage" "menu dock";
     column-gap: var(--sp-8);
-    row-gap: var(--sp-3);
+    /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
+    row-gap: var(--sp-6);
   }
   .hero-menu { min-height: 0; }
   .hero-menu nav { display: block; margin-top: var(--sp-6); }
