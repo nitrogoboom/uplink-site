@@ -37,7 +37,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] PageSpeed mobile Home lists "Forced reflow: [unattributed] 36 ms" (unscored; score stays 100). Not reproducible locally (live site, beacon on and off, CPU slowed 6x), and no script reads layout at load on phones. Recheck now and then; act only if it starts naming a source.
 
 ## Spacing pass (rules and findings: `spacing.md`)
-- [ ] About: profile top gaps, profile and person cards, team and stats grids, timeline (B1–B5).
 - [ ] Contact: channel row padding (C1).
 - [ ] Service and project pages: H3 in the write-up, next-link padding, 22px lead line height (D1–D3).
 
