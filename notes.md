@@ -17,7 +17,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
 - [ ] Office plan: ~153 one-grid-step near-miss flags because the furniture is half size there. Not visible; tidy if the props get a half-size grid.
 - [ ] Office phone cut: the FIREWALL RACK title runs over the room's front edge (outlined to stay readable), and its leader doubles back.
-- [ ] Strategy: the IT BUDGET leader is long and steep.
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
