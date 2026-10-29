@@ -108,7 +108,7 @@ Measured on every page at phone (390×844), tablet (820×1180), 1440×900 and 34
 
 | # | Rule | Problem | Where |
 |---|---|---|---|
-| D1 | R4 | H3 in the write-up has 16px above and 16px below, so it floats between paragraphs. | `.prose > * + *` in `type.css`; `detail-pages.css:10` |
+| D1 | R4 | H3 in the write-up: 32px above but 16px below, the same as between paragraphs. Should be closer to its text. | `detail-pages.css:11` |
 | D2 | R5 | Next link pads 24px top and bottom, 32px sides. | `detail-pages.css:20` |
 | D3 | R7 | The service lead and the project intro are 22px at 1.6 line height. | `service-page.css:14`, `project-page.css:16` |
 

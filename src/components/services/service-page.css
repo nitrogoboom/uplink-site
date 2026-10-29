@@ -11,7 +11,7 @@
 .svc-page .svc { display: contents; }
 .svc-page .crumbs { grid-area: crumbs; }
 .svc-page-cta { grid-area: cta; gap: var(--sp-5); }
-.svc-page .picker-head .lead { font-size: var(--fs-5); }
+.svc-page .picker-head .lead { font-size: var(--fs-5); line-height: var(--lh-snug); }
 .svc-page .picker-art { aspect-ratio: 4 / 3; flex: none; }
 .svc-page .picker-detail { gap: var(--sp-5); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
 .svc-page .feat-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
