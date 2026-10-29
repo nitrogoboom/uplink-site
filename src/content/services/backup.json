@@ -5,6 +5,8 @@
   "tile": "Backup",
   "tag": "Always on",
   "image": "backup",
+  "icon": "stack",
+  "featured": true,
   "alt": "Backup drives with a restore loop and an offsite copy",
   "lead": "Copies of your data kept safe offsite, and tested so a restore actually works when you need it.",
   "card": "Offsite copies, tested every quarter so a restore works.",

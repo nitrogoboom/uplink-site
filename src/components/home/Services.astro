@@ -1,12 +1,26 @@
 ---
-// HOME · 2. Services: one card per service from the collection, each linking to the service's own page.
-// Styles: src/styles/svc-cards.css (shared with Contact). Desktop layout: at the end of its CSS.
+// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, the rest short tiles.
+// Desktop and tablet hold SLOTS short tiles; with more services than that, the last tile becomes "+N more" and
+// names the rest. Phones get every service in one swipe row (home.js lights the dots).
+// Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
-import Icon from '../Icon.astro';
+import Icon, { type IconName } from '../Icon.astro';
+import './services.css';
+const SLOTS = 3;
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const big = services.filter((s) => s.data.featured);
+const rest = services.filter((s) => !s.data.featured);
+const fits = rest.length <= SLOTS;
+const small = fits ? rest : rest.slice(0, SLOTS - 1);
+const extra = fits ? [] : rest.slice(SLOTS - 1);
+const tiles = [
+  ...big.map((s) => ({ ...s, size: 'big' })),
+  ...small.map((s) => ({ ...s, size: 'small' })),
+  ...extra.map((s) => ({ ...s, size: 'small svc-extra' })),
+];
 ---
 <section class="section section--band fold" id="services" aria-labelledby="services-title">
-  <div class="container">
+  <div class="container svc-wrap">
     <div class="section-head section-head--split">
       <div>
         <p class="eyebrow">What we run</p>
@@ -14,13 +28,24 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
       </div>
       <a class="link-arrow" href="/services">Compare all services<Icon name="arrow" /></a>
     </div>
-    <ul class="svc-cards">
-      {services.map(({ id, data: s }) => (
-        <li><a class="card" href={`/services/${id}`}>
-          <span class="card-media well"><img src={`/assets/img/${s.image}-compact.svg?card#plain`} alt="" width="640" height="480" loading="lazy"></span>
-          <span class="card-body"><span class="chip">{s.chip}</span><span class="card-title">{s.title}</span><span class="muted">{s.card}</span></span>
+    <ul class="svc-menu" aria-label="Services">
+      {tiles.map(({ id, size, data: s }) => (
+        <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
+          <span class="svc-art"><img src={`/assets/img/${s.image}-compact.svg?card#plain`} alt="" width="640" height="480" loading="lazy"></span>
+          <span class="svc-icon"><Icon name={s.icon as IconName} /></span>
+          <span class="svc-text"><span class="chip">{s.chip}</span><span class="svc-title">{s.title}</span><span class="svc-line">{s.card}</span></span>
+          <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
         </a></li>
       ))}
+      <li class="svc-small svc-more"><a class="svc-tile" href="/services">
+        <span class="svc-icon"><Icon name="grid" /></span>
+        <span class="svc-text">
+          <span class="svc-title">{extra.length > 0 && <span class="desk-only">+{extra.length} more</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>All {services.length} services</span></span>
+          <span class="svc-line">{extra.length > 0 && <span class="desk-only">{extra.map((s) => s.data.title).join(', ')}.</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>Compare every service and plan.</span></span>
+        </span>
+        <span class="svc-go" aria-hidden="true">All services<Icon name="chevronR" /></span>
+      </a></li>
     </ul>
+    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{[...tiles, null].map(() => <i />)}</span>Swipe<Icon name="arrow" /></p>
   </div>
 </section>

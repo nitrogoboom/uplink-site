@@ -1,0 +1,147 @@
+/*--- Home services: a game-mode menu. Tall cards for the featured services, short tiles for the rest. ---*/
+.svc-menu { display: grid; gap: var(--sp-4); list-style: none; }
+.svc-menu > li { display: flex; min-width: 0; }
+.svc-tile {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-3);
+  color: var(--c-text);
+  text-align: center;
+  text-decoration: none;
+  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+}
+.svc-art { position: relative; flex: 1; width: 100%; min-height: 0; }
+.svc-art img { position: absolute; inset: var(--sp-5) var(--sp-5) 0; width: calc(100% - 2 * var(--sp-5)); height: calc(100% - var(--sp-5)); object-fit: contain; }
+.svc-icon { display: none; color: var(--c-accent-text); }
+.svc-icon svg { width: var(--sp-7); height: var(--sp-7); }
+.svc-text { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }
+.svc-text .chip { align-self: center; }
+.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-style: italic; font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
+.svc-line { max-width: 32ch; color: var(--c-muted); }
+/* the bar along the bottom of the card you point at */
+.svc-go {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--sp-1);
+  height: var(--control-h);
+  margin-top: auto;
+  padding-inline: var(--sp-5);
+  background: var(--c-bg);
+  border-top: 1px solid var(--c-line);
+  color: var(--c-accent-text);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+.svc-go svg { width: var(--sp-4); height: var(--sp-4); }
+.svc-small .svc-art { display: none; }
+.svc-small .svc-icon { display: block; }
+.svc-more .svc-line { font-size: var(--fs-2); }
+.phone-only { display: none; }
+.svc-hint { display: none; }
+
+/* tablet and up: big cards in a row, short tiles under them; short tiles show their icon and name */
+@media (min-width: 700px) {
+  .svc-menu { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .svc-menu > .svc-extra { display: none; }
+  .svc-big .svc-art { flex: none; aspect-ratio: 4 / 3; }
+  .svc-small .svc-tile { justify-content: center; padding-top: var(--sp-5); }
+  .svc-small .svc-text { padding: var(--sp-3) var(--sp-5) var(--sp-5); }
+  .svc-small .svc-text .chip { display: none; }
+  .svc-small .svc-title { font-size: var(--fs-5); font-style: normal; }
+  /* the line stays for screen readers */
+  .svc-small:not(.svc-more) .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
+/* a pointer: the card under it lifts, outlines in amber and slides its bar up */
+@media (hover: hover) and (min-width: 700px) {
+  .svc-go { position: absolute; inset: auto 0 0; transform: translateY(100%); transition: transform var(--dur-2) var(--ease); }
+  .svc-big .svc-text { padding-bottom: calc(var(--control-h) + var(--sp-4)); }
+  .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); box-shadow: var(--shadow-2); }
+  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { transform: none; }
+}
+
+/* phone: one swipe row. The middle card is full size and sits just over the edges of the two beside it,
+   which peek in smaller and dimmer. Size and shade follow the swipe (scroll-driven animation); browsers
+   without it get a class from home.js instead. */
+@media (max-width: 699px) {
+  .svc-menu {
+    display: flex;
+    gap: var(--sp-3);
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--sp-4) 0 var(--sp-6);
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .svc-menu::-webkit-scrollbar { display: none; }
+  /* spacers, so the first and last card can sit in the middle */
+  .svc-menu::before, .svc-menu::after { content: ""; flex: 0 0 calc(16vw - var(--sp-3)); }
+  .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; scroll-snap-stop: always; }
+  .desk-only { display: none; }
+  .phone-only { display: inline; }
+  .svc-small .svc-art { display: block; }
+  .svc-small .svc-icon { display: none; }
+  .svc-more .svc-icon { display: block; margin-top: auto; }
+  .svc-art { flex: none; aspect-ratio: 16 / 11; }
+  .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
+  .svc-more .svc-text { flex: none; }
+  .svc-title { font-size: var(--fs-5); }
+  .svc-line { font-size: var(--fs-2); line-height: var(--lh-snug); }
+  /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
+  .svc-tile { background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band); transition: none; }
+  /* the timeline sits in its own rule: the minifier folds a longhand next to `animation` into the shorthand,
+     which can't hold a timeline, and the browser then drops the whole declaration */
+  @supports (animation-timeline: view()) {
+    .svc-tile { animation: svc-centre linear both; }
+    .svc-art, .svc-icon, .svc-go { animation: svc-dim linear both; }
+    .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: view(inline); }
+  }
+  @supports not (animation-timeline: view()) {
+    .svc-tile { transform: scale(0.88); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease); }
+    .svc-art, .svc-icon, .svc-go { opacity: 0.4; transition: opacity var(--dur-2) var(--ease); }
+    .svc-menu > .is-centre .svc-tile { z-index: 1; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-2); }
+    .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) { opacity: 1; }
+  }
+  .svc-hint { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * var(--sp-4)); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
+  .svc-hint > svg { width: var(--sp-4); height: var(--sp-4); }
+  .svc-dots { display: flex; gap: var(--sp-1); margin-right: var(--sp-2); }
+  .svc-dots i { width: var(--sp-2); height: var(--sp-2); background: var(--c-surface-2); border-radius: var(--r-pill); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease); }
+  .svc-dots i.on { width: var(--sp-5); background: var(--c-accent); }
+}
+/* a neighbour sits about 85% of the way to the edge keyframes, so 18% puts the middle card a few px over it */
+@keyframes svc-centre {
+  0% { z-index: 0; transform: translateX(-18%) scale(0.88); box-shadow: none; }
+  50% { z-index: 2; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-2); }
+  100% { z-index: 0; transform: translateX(18%) scale(0.88); box-shadow: none; }
+}
+@keyframes svc-dim {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+/* reduced motion: a plain row, nothing scales or moves with the swipe */
+@media (prefers-reduced-motion: reduce) {
+  .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
+  .svc-menu > li > .svc-tile, .svc-tile:hover, .svc-tile:focus-visible { transform: none; }
+  .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
+}
+
+/* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of short tiles */
+@media (min-width: 1100px) and (min-height: 700px) {
+  .svc-wrap { display: flex; flex-direction: column; height: var(--fold-inner); }
+  .svc-menu { flex: 1; min-height: 0; gap: var(--sp-5); grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .svc-big { grid-row: 1 / -1; }
+  .svc-small { grid-column: 4; }
+  .svc-big .svc-art { flex: 1; aspect-ratio: auto; }
+  .svc-big .svc-line { font-size: var(--fs-4); }
+  .svc-small .svc-tile { padding-top: 0; }
+}

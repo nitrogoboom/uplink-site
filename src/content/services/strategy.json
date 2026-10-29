@@ -5,6 +5,7 @@
   "tile": "Strategy",
   "tag": "Quarterly",
   "image": "strategy",
+  "icon": "chart",
   "alt": "Rising budget bars and a quarterly IT roadmap",
   "lead": "A yearly roadmap and budget, so tech spending is planned instead of a surprise.",
   "card": "A yearly roadmap and budget, reviewed every quarter.",
