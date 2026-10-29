@@ -365,9 +365,12 @@ if (stage) {
    Services on phones: light the dot for the card in the middle (Home).
    The row swipes and snaps with no script; browsers without
    scroll-driven animation also get the middle card marked (services.css).
+   A tap on a side card brings it to the middle; a tap on the middle card
+   opens it. "Swipe" fades once they have left the first card.
    ====================================================================== */
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots i');
+const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length) {
   const phone = window.matchMedia('(max-width: 699px)');
   let queued = false;
@@ -383,9 +386,19 @@ if (svcRow && svcDots.length) {
     });
     cards.forEach((li, i) => li.classList.toggle('is-centre', i === best));
     svcDots.forEach((dot, i) => dot.classList.toggle('on', i === best));
+    if (best > 0) svcHint?.classList.add('is-swiped');
   };
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(mark); } };
   svcRow.addEventListener('scroll', queue, { passive: true });
+  // detail is 0 for Enter on a focused card, which focus has already scrolled to the middle
+  svcRow.addEventListener('click', (e) => {
+    const li = e.target.closest('.svc-menu > li');
+    if (!phone.matches || !li || e.detail === 0) return;
+    mark();
+    if (li.classList.contains('is-centre')) return;
+    e.preventDefault();
+    li.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion.matches ? 'instant' : 'smooth' });
+  });
   phone.addEventListener('change', queue);
   queue();
 }
