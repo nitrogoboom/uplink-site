@@ -265,11 +265,13 @@ $$('form[data-validate]').forEach((form) => {
 // Marks el with .is-idle while none of it is on screen (site.css pauses
 // its looping animations) and tells onChange(onScreen) about each change.
 function whenOnScreen(el, onChange) {
-  if (!el || !('IntersectionObserver' in window)) return;
-  new IntersectionObserver(([en]) => {
+  if (!el || !('IntersectionObserver' in window)) return null;
+  const io = new IntersectionObserver(([en]) => {
     el.classList.toggle('is-idle', !en.isIntersecting);
     if (onChange) onChange(en.isIntersecting);
-  }).observe(el);
+  });
+  io.observe(el);
+  return io;
 }
 
 /* ---------- Cloudflare Web Analytics ----------------------------------- */

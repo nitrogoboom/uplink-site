@@ -29,8 +29,11 @@ const business = {
       page="home" path="/">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(business, null, 1).replace(/<\//g, '<\\/')} />
-    <link rel="preload" href="/assets/img/office-compact.svg" as="image" media="(max-width: 599px)" fetchpriority="high">
-    <link rel="preload" href={HERO} as="fetch" crossorigin media="(min-width: 600px)">
+    <link rel="preload" href="/assets/img/office-compact.svg" as="image" media={`${HERO.media.phone} and (prefers-reduced-motion: reduce)`} fetchpriority="high">
+    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>
+    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>
+    <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet}>
+    <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full}>
   </Fragment>
   <Hero />
   <Services />

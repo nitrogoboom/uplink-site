@@ -67,9 +67,9 @@
   .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 34rem) * 40 / 31))); margin-inline: auto; }
 }
 
-/* phone: the still drawing (office-compact.svg, compact-cuts.css) is 3:2,
+/* phone: the still drawing (office-compact.svg, compact-cuts.css) is 4:3,
    so its box is too; no empty bands above and below it */
-@media (max-width: 599px) { .hero-art .stage { aspect-ratio: 3 / 2; } }
+@media (max-width: 599px) { .hero-art .stage { aspect-ratio: 4 / 3; } }
 
 /* ---- two columns: landscape tablets, short laptops and desktops ---------
    Text on the left, the office on the right, sized so both fit the first

@@ -1,8 +1,9 @@
 ---
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
-// Drawing: public/assets/img/hero-office.svg (HERO, in src/lib/site.ts), fetched by home.js on screens 600px and wider, plus its moving
-// dashes on their own layer in hero-flows.svg, inlined here. Both are written by tools/gen_office.py; don't edit by hand.
-// Without script, office.svg shows. Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
+// Drawing: one of three cuts (HERO, in src/lib/site.ts), fetched by home.js for the screen it's on: hero-office.svg, or its tablet
+// cut hero-office-tablet.svg, both under the moving dashes' own layer in hero-flows.svg, inlined here; phones get the animated
+// phone cut office-compact-build.svg with its own dashes. All written by tools/gen_office.py; don't edit by hand.
+// Without script, office.svg shows (office-compact.svg on phones). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
 import Flows from './hero-flows.svg';
 import './hero.css';
 import { HERO } from '../../lib/site';
@@ -55,12 +56,13 @@ import { HERO } from '../../lib/site';
     </div>
 
     <div class="hero-art">
-      <div class="stage" data-hero={HERO}>
-        <noscript><img class="hero-nojs" src="/assets/img/office.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></noscript>
+      <div class="stage" data-hero={HERO.full} data-hero-tablet={HERO.tablet} data-hero-phone={HERO.phone} data-hero-phone-flows={HERO.phoneFlows} data-tablet={HERO.media.tablet}>
+        <noscript><picture><source media={HERO.media.phone} srcset="/assets/img/office-compact.svg"><img class="hero-nojs" src="/assets/img/office.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture></noscript>
         <Flows />
-        <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still.
-             It is the phone's largest paint, so it is preloaded in page.html and asked for first. -->
-        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture>
+        <!-- phones with reduced motion only (compact-cuts.css): other screens get a 1px blank instead, so they don't
+             download the still (phones with motion get the animated cut from home.js). Where it shows it is the largest
+             paint, so index.astro preloads it there and it is asked for first. -->
+        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><source media="(prefers-reduced-motion: no-preference)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="900"></picture>
       </div>
       <div class="hero-dock">
         <a class="card news" href="/contact#message" data-open="book-dialog">
