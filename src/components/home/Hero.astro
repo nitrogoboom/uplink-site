@@ -2,8 +2,9 @@
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
 // Drawing: public/assets/img/hero-office.svg (HERO, in src/lib/site.ts), fetched by home.js on screens 600px and wider, plus its moving
 // dashes on their own layer in hero-flows.svg, inlined here. Both are written by tools/gen_office.py; don't edit by hand.
+// The dashes come in as text (?raw): a plain import would also write a copy to dist/_astro that nothing uses.
 // Without script, office.svg shows. Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
-import Flows from './hero-flows.svg';
+import flows from './hero-flows.svg?raw';
 import './hero.css';
 import { HERO } from '../../lib/site';
 ---
@@ -57,7 +58,7 @@ import { HERO } from '../../lib/site';
     <div class="hero-art">
       <div class="stage" data-hero={HERO}>
         <noscript><img class="hero-nojs" src="/assets/img/office.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></noscript>
-        <Flows />
+        <Fragment set:html={flows} />
         <!-- phones only (compact-cuts.css): wider screens get a 1px blank instead, so they don't download the still.
              It is the phone's largest paint, so it is preloaded in page.html and asked for first. -->
         <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture>
