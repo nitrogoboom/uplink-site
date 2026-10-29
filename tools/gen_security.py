@@ -8,7 +8,7 @@ import math, sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isoprops import on_front
+from isoprops import on_front, on_side, rect
 from isogen import FACES, ORANGE, BLUE, INK, faces, ellipse, label, doc, write, silhouette, floor_grid, disc_arcs
 import palette as pal
 
@@ -19,12 +19,15 @@ HALF = 3                              # building is 6 x 6
 HEIGHT = 9
 CAP = (0.25, 0.25)                    # roof cap: overhang each side, thickness
 HVAC = (0.75, 2.25, -2.25, -1.0, 0.625)   # roof unit, back right: x0 x1 y0 y1, height above the cap
+FAN_R = 0.375                         # round fan grille on the unit's top, with two blades across it
+LOUVRES = (0.125, [0.15, 0.3, 0.45], 0.07)   # slats on the unit's two front faces: inset from the ends, tops (down from its top), height
 WIN_SPANS = [(-2.25, -1.25), (-0.5, 0.5), (1.25, 2.25)]   # along each wall
 WIN_ROWS = [0.5, 2.75, 4.75, 6.75]    # sill heights, ground floor first; each window is WIN_H tall
 WIN_H = 1.25
 LIT = {('r', 3, 0), ('l', 3, 0), ('r', 1, 1), ('l', 2, 2)}   # (wall, row, span) lit from inside; the two top outer ones carry labels
 DOOR = (-0.75, 0.75, 1.75)            # on the left wall (y = HALF), ground floor: x from, x to, height
 AWNING = (-1.0, 1.0, 0.5, 2.0, 0.125)  # over the door: x from, x to, depth out, z, thickness
+STEP = (-1.0, 1.0, 0.5, 0.125)        # under the door: x from, x to, depth out, height (as wide as the awning)
 
 DISC_R = 9.5                          # floor disc radius; grid every 1 unit, offset 0.5
 FENCE_R = 8.3                         # dashed blue perimeter
@@ -56,7 +59,7 @@ GAP = (30.0, 175.5, 213.7)            # floor lines stop at x >= GAP[0], GAP[1] 
 # Crop is page coordinates, 4:3; elbows and text are group coordinates. Text sits above the floor disc, so no floor gaps.
 COMPACT = dict(crop=(65.33, 20, 509.33, 382), scale=1.65, labels=[
     ((-1.75, HALF, TOP_WIN), (-40.0, -203.4), -85.0, 'EMAIL FILTER', 'phishing blocked', BLUE, 'end'),
-    ((HALF, -1.75, TOP_WIN), (40.0, -203.4), 85.0, 'MFA + EDR', 'every login,\nevery device', BLUE, 'start'),
+    ((HALF, -1.75, TOP_WIN), (44.0, -203.4), 89.0, 'MFA + EDR', 'every login,\nevery device', BLUE, 'start'),
 ])
 TITLE = 'Office building inside a security perimeter with blocked threats and a shield'
 
@@ -77,8 +80,14 @@ def awning_box():
     return (a0, a1, HALF, HALF + d, z, z + t)
 
 
+def step_box():
+    s0, s1, d, h = STEP
+    return (s0, s1, HALF, HALF + d, 0, h)
+
+
 def outline():
-    return unary_union([silhouette(w, -HALF, HALF, -HALF, HALF, 0, HEIGHT), silhouette(w, *cap_box()), silhouette(w, *awning_box())])
+    return unary_union([silhouette(w, -HALF, HALF, -HALF, HALF, 0, HEIGHT), silhouette(w, *cap_box()), silhouette(w, *awning_box()),
+                        silhouette(w, *step_box())])
 
 
 def gap():
@@ -122,6 +131,19 @@ def windows():
     return out
 
 
+def roof_unit():
+    """The unit's box, slats on its two front faces, and a round fan on top."""
+    x0, x1, y0, y1, z0, z1 = hvac_box()
+    out = faces(w, x0, x1, y0, y1, z0, z1)
+    inset, tops, sh = LOUVRES
+    for tf, length in ((on_front(w, x0, y1, z1), x1 - x0), (on_side(w, x1, y1, z1), y1 - y0)):
+        out.append(f'<g transform="{tf}">' + ''.join(rect(inset, v, length - 2 * inset, sh, pal.SCREEN, 0, ' fill-opacity="0.7"') for v in tops) + '</g>')
+    cx, cy, r = (x0 + x1) / 2, (y0 + y1) / 2, FAN_R
+    out.append(ellipse(w, r, cx, cy, z1, f'fill="{pal.SCREEN}" stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.3"'))
+    blades = ''.join(f'M{w.pts(a)}L{w.pts(b)}' for a, b in (((cx - r, cy, z1), (cx + r, cy, z1)), ((cx, cy - r, z1), (cx, cy + r, z1))))
+    return out + [f'<path d="{blades}" fill="none" stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.45"/>']
+
+
 def shield_path(wd, ht):
     """Shield outline in a face's local units: u right, v down, tip at the bottom centre."""
     hw = wd / 2
@@ -163,7 +185,7 @@ def build(compact=False):
     body += threats()
     body += faces(w, -HALF, HALF, -HALF, HALF, 0, HEIGHT, FACES)
     body += windows()
-    body += faces(w, *cap_box()) + faces(w, *hvac_box()) + faces(w, *awning_box())
+    body += faces(w, *cap_box()) + roof_unit() + faces(w, *awning_box()) + faces(w, *step_box())
     body += shield()
     if compact:
         for dot, elbow, tx, title, sub, colour, anchor in COMPACT['labels']:
