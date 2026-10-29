@@ -61,14 +61,16 @@ if (tower && growSteps.length) {
    line runs from the cloud to that app's tile in the floating tray.
    It steps through the apps on a timer; hovering a tile or a bar
    segment picks one. Reduced motion: no timer, no line animation.
-   Phones get the still picture instead (below 600px, compact-cuts.css).
-   The animated drawing is its own file (assets/img/hero-office.svg, in the
-   stage's data-hero, preloaded on wide screens), so phones never download
-   it: screens 600px and wider fetch it, put it in ahead of the dashes'
-   layer (svg.ob-over), then start the cloud.
+   The drawing comes in three cuts, each its own file named on the stage
+   (HERO in src/lib/site.ts, preloaded for the same screens), so a screen
+   downloads only its own: the full hero; the tablet cut (fewer, bigger
+   labels) where the hero shows narrow (data-tablet); and on phones the
+   phone cut, animated, with its dashes in a second file. Phones with
+   reduced motion fetch nothing and keep the still picture (compact-cuts.css).
+   The hero cuts go in ahead of the dashes' layer (svg.ob-over), then the
+   cloud starts. A turn or resize that changes the cut swaps the file.
    ------------------------------------------------------------------ */
 const stage = $('.hero-art .stage[data-hero]');
-const heroShown = window.matchMedia('(min-width: 600px)');
 const startCloud = (cloud) => {
   const svg = cloud.ownerSVGElement;
   const APPS = [
@@ -155,28 +157,61 @@ const startCloud = (cloud) => {
     h.addEventListener('pointerenter', () => pick(h.dataset.app));
     h.addEventListener('pointerleave', start);
   });
-  document.addEventListener('visibilitychange', () => (document.hidden ? stop() : start()));
+  const onVisible = () => (document.hidden ? stop() : start());
+  document.addEventListener('visibilitychange', onVisible);
   reduceMotion.addEventListener('change', start);
   // off screen: no timer, and the looping animations pause
-  whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
-  whenOnScreen(document.querySelector('svg.ob-over'));   // the moving dashes' own layer (1-hero-flows.svg)
+  const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   show(0);
   start();
-};
-const loadHero = () => {
-  window.fetch(stage.dataset.hero)
-    .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
-    .then((text) => {
-      stage.insertAdjacentHTML('afterbegin', html(text));
-      const cloud = $('svg.ob .ob-cloud', stage);
-      if (cloud) startCloud(cloud);
-    })
-    .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
+  return () => {   // the cut is swapped out: let go of the timers and listeners
+    stop();
+    window.clearTimeout(swap);
+    document.removeEventListener('visibilitychange', onVisible);
+    reduceMotion.removeEventListener('change', start);
+    if (seen) seen.disconnect();
+  };
 };
 if (stage) {
-  if (heroShown.matches) loadHero();
-  else {
-    const later = () => { if (!heroShown.matches) return; heroShown.removeEventListener('change', later); loadHero(); };
-    heroShown.addEventListener('change', later);
-  }
+  const phone = window.matchMedia('(max-width: 599px)');
+  const tablet = window.matchMedia(stage.dataset.tablet);
+  const files = {
+    full: [stage.dataset.hero],
+    tablet: [stage.dataset.heroTablet],
+    phone: [stage.dataset.heroPhone, stage.dataset.heroPhoneFlows]
+  };
+  let shown = null;
+  let added = [];
+  let observers = [];
+  let stopCloud = null;
+  const clear = () => {
+    if (stopCloud) stopCloud();
+    stopCloud = null;
+    observers.forEach((io) => io && io.disconnect());
+    observers = [];
+    added.forEach((n) => n.remove());
+    added = [];
+  };
+  const load = () => {
+    const cut = phone.matches ? (reduceMotion.matches ? null : 'phone') : (tablet.matches ? 'tablet' : 'full');
+    if (cut === shown) return;
+    shown = cut;
+    clear();
+    if (!cut) return;
+    Promise.all(files[cut].map((url) => window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))))
+      .then((texts) => {
+        if (cut !== shown) return;   // the screen changed while it loaded
+        const before = stage.children.length;
+        stage.insertAdjacentHTML('afterbegin', html(texts.join('')));
+        added = Array.from(stage.children).slice(0, stage.children.length - before);
+        // looping animations pause off screen: the drawing, and the dashes' layer (the cut's own on phones)
+        const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
+        observers = layers.map((el) => whenOnScreen(el));
+        const cloud = $('svg.ob .ob-cloud', stage);
+        if (cloud) stopCloud = startCloud(cloud);
+      })
+      .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
+  };
+  load();
+  [phone, tablet, reduceMotion].forEach((m) => m.addEventListener('change', load));
 }
