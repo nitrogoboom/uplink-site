@@ -65,6 +65,9 @@ jobs:
     needs: build
     if: github.event_name == 'pull_request' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     environment: cloudflare
     steps:
       - uses: actions/checkout@v5
@@ -77,7 +80,25 @@ jobs:
         with:
           name: dist
           path: dist
-      - run: npx wrangler versions upload
+      # the alias is the branch name, so every push to a branch keeps the same address
+      - id: upload
+        run: |
+          alias=$(printf '%s' "$BRANCH" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9' '-' | sed 's/--*/-/g; s/^-//; s/-$//' | cut -c1-30 | sed 's/-$//')
+          npx wrangler versions upload --preview-alias "$alias" | tee upload.log
+          echo "version=$(grep -o 'https://[^ ]*workers\.dev' upload.log | grep -v "^https://$alias-" | head -1)" >> "$GITHUB_OUTPUT"
+          echo "branch=$(grep -o "https://$alias-[^ ]*workers\.dev" upload.log | head -1)" >> "$GITHUB_OUTPUT"
         env:
+          BRANCH: ${{ github.head_ref }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      # one comment on the pull request with the address, updated on each push
+      - run: |
+          body=$(printf '**Preview:** %s\n\nThis push only: %s\n' "${BRANCH_URL:-$VERSION_URL}" "$VERSION_URL")
+          echo "$body" >> "$GITHUB_STEP_SUMMARY"
+          gh pr comment "$PR" --body "$body" --edit-last --create-if-none
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          BRANCH_URL: ${{ steps.upload.outputs.branch }}
+          VERSION_URL: ${{ steps.upload.outputs.version }}
