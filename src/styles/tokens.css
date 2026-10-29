@@ -133,6 +133,19 @@
   /* ---- depth ----------------------------------------------------------- */
   --shadow-1: 0 12px 32px -12px rgb(0 0 0 / 0.55);
   --shadow-2: 0 32px 64px -24px rgb(0 0 0 / 0.65);
+  /* the card in front of its neighbours (Home services, phone). Faint layers, each about twice the last,
+     tinted to the page's navy: they add up to one soft, even falloff, with no ring and little banding.
+     The last two have no drop and reach out sideways onto the cards beside it */
+  --shadow-ink: 212deg 60% 3%;
+  --shadow-front:
+    0 1px 1px hsl(var(--shadow-ink) / 0.14),
+    0 2px 4px hsl(var(--shadow-ink) / 0.14),
+    0 4px 10px -2px hsl(var(--shadow-ink) / 0.16),
+    0 10px 22px -4px hsl(var(--shadow-ink) / 0.2),
+    0 22px 48px -8px hsl(var(--shadow-ink) / 0.24),
+    0 40px 88px -12px hsl(var(--shadow-ink) / 0.3),
+    0 0 24px 2px hsl(var(--shadow-ink) / 0.16),
+    0 0 56px 6px hsl(var(--shadow-ink) / 0.16);
   --blur: 14px;
 
   /* ---- motion ---------------------------------------------------------- */
