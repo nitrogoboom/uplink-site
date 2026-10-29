@@ -19,6 +19,7 @@ from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_
 from svgfont import font_style
 from isoprops import on_front, on_side, rect, tree
 import palette as pal
+import hero_cloud
 
 w = W(262, 283.2, 24)
 
@@ -75,9 +76,9 @@ OFFICE = (16.0, 15.0, 9.0, 1.25, 2)   # slab back corner x, y; slab size; buildi
 OFFICE_AT = 2.15
 OFFICE_WIN = [(1.0, 2.5), (4.0, 5.5)] # along each wall, from the building's corner
 RING = (0.75, 1.6)                    # security ring: gap round the tower's slab, at
-CLOUD = (2.0, 8.0, -6.0, -2.0, 13.0, 0.375, 2.35)   # platform x0, x1, y0, y1, z, thickness, at
-RACKS = [(2.5, 3.75), (4.375, 5.625), (6.25, 7.5)]  # server racks on the platform, x from, x to
-RACK = (-5.25, -2.75, 2.25)           # rack y from, y to, height
+CLOUD = (2.0, -2.0, 12.5, 7.0, 2.35)  # the hero's cloud (tools/hero_cloud.py), scaled down: face's bottom-left x, y, z
+                                      # (the face looks down +y, the slab runs back along -y), width, at
+CLOUD_GID = 'gc'                      # its gradient id prefix (the hero's own cloud uses 'hc' on the same page)
 CABLES = [(1.35, [(11.75, 4.25), (15.5, 4.25)]),                            # at, path at z = 0
           (1.55, [(4.25, 11.75), (4.25, 15.5)]),
           (2.3, [(11.75, 9.0), (13.75, 9.0), (13.75, 19.5), (16.0, 19.5)]),
@@ -109,13 +110,11 @@ STYLE = f'''<style>.tg-floor,.tg-roof{{transition:opacity .6s ease,transform .6s
 .tg-flow{{fill:none;stroke:{pal.AMBER};stroke-width:1.6;stroke-linecap:round;stroke-dasharray:4 8;animation:tg-dash 1.2s linear infinite}}
 .tg-up{{fill:none;stroke:{pal.SKY};stroke-opacity:.7;stroke-width:1.2;stroke-dasharray:2 6;animation:tg-dash 1.6s linear infinite}}
 .tg-float{{animation:tg-float 5s ease-in-out infinite}}
-.tg-led{{animation:tg-blink 2.4s steps(2) infinite}}
 .tg-a{{fill:none}}
 .tg-live .tg-floor,.tg-live .tg-roof,.tg-live .tg-p{{transition:none}}
 @keyframes tg-dash{{to{{stroke-dashoffset:-12}}}}
 @keyframes tg-float{{50%{{transform:translateY(-6px)}}}}
-@keyframes tg-blink{{50%{{opacity:.3}}}}
-@media (prefers-reduced-motion:reduce){{.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{{transition:none!important}}.tg-ring,.tg-flow,.tg-up,.tg-float,.tg-led{{animation:none}}}}</style>'''
+@media (prefers-reduced-motion:reduce){{.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{{transition:none!important}}.tg-ring,.tg-flow,.tg-up,.tg-float{{animation:none}}}}</style>'''
 
 
 def box(x0, x1, y0, y1, z0, z1, cols=FACES, edge=EDGE):
@@ -333,23 +332,34 @@ def cable(path):
     return [f'<path class="tg-cable" d="{d}" pathLength="1"/>', f'<path class="tg-flow" d="{d}"/>']
 
 
+def cloud_fit():
+    """World size of one hero-cloud plane unit, and the face's u span, v height and depth (plane units)."""
+    u0, _v0, u1, v1 = hero_cloud.face().bounds
+    return CLOUD[3] / (u1 - u0), u0, u1, v1, hero_cloud.DEPTH
+
+
 def cloud():
-    """Floating platform with three server racks, LEDs on their front-left faces."""
-    x0, x1, y0, y1, z, t, _at = CLOUD
-    ry0, ry1, rh = RACK
-    out = box(x0, x1, y0, y1, z - t, z)
-    for k, (a, b) in enumerate(RACKS):
-        out += box(a, b, ry0, ry1, z, z + rh)
-        for j, v in enumerate((0.5, 1.0, 1.5)):
-            led = w.pts((a + 0.25, ry1, z + v), (a + 0.75, ry1, z + v), (a + 0.75, ry1, z + v + 0.125), (a + 0.25, ry1, z + v + 0.125))
-            out.append(f'<polygon class="tg-led" points="{led}" fill="{pal.LED if (j + k) % 2 else pal.AMBER}"/>')
-    return out
+    """The hero's cloud, scaled and moved into this world (a uniform scale keeps it true isometric)."""
+    x0, y0, z0, _width, _at = CLOUD
+    k, u0, _u1, _v1, _d = cloud_fit()
+    tx, ty = w.p(x0 - u0 * k, y0, z0)                 # where the face's u = 0, v = 0 lands
+    ox, oy = hero_cloud.ORIGIN
+    hero_cloud.GID = CLOUD_GID
+    return [f'<g transform="translate({fmt(tx)} {fmt(ty)}) scale({k * w.u:.4f}) translate({-ox:.1f} {-oy:.1f})">',
+            hero_cloud.cloud_shapes(), '</g>']
+
+
+def cloud_box():
+    """The cloud's world box (x0, x1, y0, y1, z0, z1)."""
+    x0, y0, z0, width, _at = CLOUD
+    k, _u0, _u1, v1, d = cloud_fit()
+    return x0, x0 + width, y0 - d * k, y0, z0, z0 + v1 * k
 
 
 def uplinks():
-    """Dashed line from the cloud's left corner down to the tower's mast top (the roof is in place by then)."""
-    x0, _x1, _y0, y1, z, t, _at = CLOUD
-    fx, fy = w.p(x0, y1, z - t)
+    """Dashed line from under the cloud's left side down to the tower's mast top (the roof is in place by then)."""
+    x0, x1, _y0, y1, z0, _z1 = cloud_box()
+    fx, fy = w.p(x0 + (x1 - x0) / 4, y1, z0)
     tx, ty = w.p(MAST[0], MAST[0], FLOORS * FLOOR + ROOF[2] + MAST[1])
     return [f'<path class="tg-up" d="M{fmt(fx)},{fmt(fy)} L{fmt(tx)},{fmt(ty)}"/>']
 
@@ -364,7 +374,7 @@ def anchors():
              'ring': (GROUND + g, GROUND + g, -GROUND_T),
              'home-a': ((hx0 + hx1) / 2, ym, zr + 0.75),
              'office': (x0 + size / 2, y0 + size / 2, n * FLOOR + ROOF[2] + 0.875),
-             'cloud': ((CLOUD[0] + CLOUD[1]) / 2, (RACK[0] + RACK[1]) / 2, CLOUD[4] + RACK[2])}
+             'cloud': ((cloud_box()[0] + cloud_box()[1]) / 2, CLOUD[1], cloud_box()[5])}
     out = []
     for name, (x, y, z) in spots.items():
         X, Y = w.p(x, y, z)
@@ -397,8 +407,9 @@ def cameras():
         if OFFICE_AT < L:
             x0, y0, size, _i, n = OFFICE
             P += [w.p(x, y, z) for x in (x0, x0 + size) for y in (y0, y0 + size) for z in (-GROUND_T, n * FLOOR + 2)]
-        if CLOUD[6] < L:
-            P += [w.p(x, y, z) for x in CLOUD[:2] for y in CLOUD[2:4] for z in (CLOUD[4] - CLOUD[5], CLOUD[4] + RACK[2])]
+        if CLOUD[4] < L:
+            x0, x1, y0, y1, z0, z1 = cloud_box()
+            P += [w.p(x, y, z) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]
         xs, ys = [q[0] for q in P], [q[1] for q in P]
         cams.append((min(xs) - CAM_PAD, min(ys) - CAM_PAD, max(xs) - min(xs) + 2 * CAM_PAD, max(ys) - min(ys) + 2 * CAM_PAD))
     return cams
@@ -413,7 +424,7 @@ def build(embed_font):
     body = piece(RING[1], ring())
     for at, path in CABLES:
         body += piece(at, cable(path), 'tg-p tg-c')
-    body += piece(CLOUD[6], ['<g class="tg-float">', *cloud(), '</g>'])
+    body += piece(CLOUD[4], ['<g class="tg-float">', *cloud(), '</g>'])
     body += ['<g class="tg-ground">', *ground(floor_mask()), '</g>']
     for f in range(1, FLOORS + 1):
         body += [f'<g class="tg-floor" data-f="{f}" data-at="{FLOOR_AT[f]:g}">', *storey(f), '</g>']

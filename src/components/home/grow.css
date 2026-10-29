@@ -22,14 +22,25 @@
   .grow-art svg { max-height: calc(var(--fold-h) - var(--sp-7)); }
   .grow-steps { grid-column: 2; grid-row: 2; gap: 30vh; padding-block: 8vh 24vh; }
 }
-/* phone + tablet, once home.js runs (.is-live): one stage, exactly the screen between the header and the bottom
-   nav (--fold-h, in svh so the address bar can't make it jump), holds still for 2.7 more screens. On it, top to
-   bottom: the level HUD, the picture, the active step. The HUD and the step box have fixed heights (home.js sets
+/* once home.js runs (.is-live; every screen but a short desktop one): the section is one stage, a screen tall, that
+   holds still for 2.7 more screens while the scroll builds each level. The page snaps softly to each finished level
+   (the .grow-snap marks, placed by home.js). On the stage: the level HUD over the picture, and the active step (the
+   steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
+html:has(.grow.is-live) { scroll-snap-type: y proximity; }
+.grow.is-live .grow-snap { scroll-snap-align: start; }
+.grow.is-live .grow-art { grid-template-rows: auto minmax(0, 1fr); gap: var(--sp-4); place-items: stretch; background: none; border-radius: 0; }
+.grow.is-live .grow-art svg,
+.grow.is-live .grow-tags { grid-area: 2 / 1; width: 100%; height: 100%; max-width: none; max-height: none; min-height: 0; }
+.grow.is-live .grow-hud { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--sp-3) var(--sp-4); }
+.grow.is-live .grow-tags { display: block; position: relative; pointer-events: none; }
+.grow.is-live .grow-step { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-2) var(--ease); }
+.grow.is-live .grow-step[data-active] { opacity: 1; }
+.grow.is-live :is(.tg-tl, .tg-td, .tg-tb, .tg-tt) { display: none; }   /* the HUD and tags replace the drawing's floor labels */
+/* phone + tablet: the stage is exactly the screen between the header and the bottom nav (--fold-h, in svh so the
+   address bar can't make it jump). Top to bottom: HUD, picture, step. The step box has a fixed height (home.js sets
    --grow-cap to the tallest step), so only the picture flexes and nothing moves when the text swaps. The picture
-   and the step are two sticky blocks in the same tall grid cell, pinned one above the other. The page snaps softly
-   to each finished level (the .grow-snap marks, placed by home.js). Without script: the picture, then the steps. */
+   and the step are two sticky blocks in the same tall grid cell, pinned one above the other. */
 @media (max-width: 1099px) {
-  html:has(.grow.is-live) { scroll-snap-type: y proximity; }
   .grow.is-live {
     --grow-stage: var(--fold-h);
     --grow-cap: 9rem;
@@ -39,23 +50,13 @@
     gap: 0;
   }
   .grow.is-live .section-head { grid-area: head; padding-bottom: var(--sp-5); }
-  .grow.is-live .grow-snap { scroll-snap-align: start; }
   .grow.is-live .grow-art {
     grid-area: stage;
     position: sticky;
     top: var(--grow-top);
     height: calc(var(--grow-stage) - var(--grow-cap));
-    grid-template-rows: auto minmax(0, 1fr);
-    gap: var(--sp-4);
-    place-items: stretch;
     padding: var(--sp-4) 0 0;
-    background: none;
-    border-radius: 0;
   }
-  .grow.is-live .grow-art svg,
-  .grow.is-live .grow-tags { grid-area: 2 / 1; width: 100%; height: 100%; max-width: none; min-height: 0; }
-  .grow.is-live .grow-hud { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--sp-3) var(--sp-4); }
-  .grow.is-live .grow-tags { display: block; position: relative; pointer-events: none; }
   .grow.is-live .grow-steps {
     grid-area: stage;
     position: sticky;
@@ -66,13 +67,10 @@
     margin-top: calc(var(--grow-stage) - var(--grow-cap));
     padding-block: var(--sp-3) var(--sp-4);
   }
-  .grow.is-live .grow-step { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-2) var(--ease); }
-  .grow.is-live .grow-step[data-active] { opacity: 1; }
   .grow.is-live .grow-card,
   .grow.is-live .grow-step[data-active] .grow-card { gap: var(--sp-2); padding: 0; background: none; border: 0; box-shadow: none; }
   .grow.is-live .grow-card .chip,
-  .grow.is-live .grow-card ul,
-  .grow.is-live :is(.tg-tl, .tg-td, .tg-tb, .tg-tt) { display: none; }   /* the HUD and tags replace the drawing's floor labels */
+  .grow.is-live .grow-card ul { display: none; }
 }
 /* phone: the bottom nav floats, so the stage stops a step above it */
 @media (max-width: 699px) {
@@ -130,4 +128,20 @@
   .grow-steps { grid-column: 2; grid-row: 1; gap: 0; padding-block: 0; }
   .grow-step { min-height: calc(var(--fold-h) * 0.7); display: flex; align-items: center; }
   .grow-card { width: 100%; max-width: 38rem; }
+}
+/* desktop, live: the stage is the whole section. Left: heading, HUD and picture; right: the active step, centred.
+   Both pin for 2.7 more screens, the same timing as phone. */
+@media (min-width: 1100px) and (min-height: 700px) {
+  .grow.is-live { grid-template-rows: calc(var(--fold-h) * 3.7); }
+  .grow.is-live .grow-art { display: grid; }
+  .grow.is-live .grow-art svg { position: static; }
+  .grow.is-live .grow-steps {
+    position: sticky;
+    top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
+    align-self: start;
+    display: grid;
+    align-content: center;
+    height: var(--fold-h);
+  }
+  .grow.is-live .grow-step { min-height: 0; }
 }

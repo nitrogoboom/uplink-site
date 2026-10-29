@@ -12,15 +12,19 @@ import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 // pulls back over .08-.25, the new pieces build over .25-.75 (level 1: .05-.65), then it holds and the tags show.
 // That gives p, 0 to 3, the drawing's own growth scale: every storey and piece starts at its data-at (written by
 // tools/gen_tower.py) and builds over 0.4 (storeys 0.55). q is eased toward the scroll so a flick can't make the
-// floors jitter. Phone and tablet: the stage holds still for RUN of a screen per level (grow.css: 1 + 3 x RUN = 3.7)
-// and snaps softly to each hold. Desktop: q follows the steps down the right-hand column.
+// floors jitter. Every screen but a short desktop one: the stage holds still for RUN of a screen per level
+// (grow.css: 1 + 3 x RUN = 3.7) and snaps softly to each hold. Short desktop screens: q follows the steps down the
+// right-hand column. Each level's camera (data-cam1..3) is widened to the picture's shape, and zoomed out to at
+// most ZOOM times the level 3 scale per level, so the pull-back stays gentle and the tower never shrinks much.
 const tower = $('.grow svg.tg');
 const grow = tower && tower.closest('.grow');
 if (grow && 'IntersectionObserver' in window) {
   const LEAD = 0.3;   // level 1 starts building this much of a level before the stage pins
-  const RUN = 0.9;    // screens of scroll per level, phone and tablet
+  const RUN = 0.9;    // screens of scroll per level
   const HOLD = 0.87;  // where in a level the snap mark sits
-  const stageMode = window.matchMedia('(max-width: 1099px)');
+  const ZOOM = 1.25;  // most a level's camera may zoom in on the next one's
+  const liveMode = window.matchMedia('(max-width: 1099px), (min-height: 700px)');
+  const wide = window.matchMedia('(min-width: 1100px)');
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
   const amt = (p, at, d) => ease(clamp((p - at) / d));
@@ -35,6 +39,7 @@ if (grow && 'IntersectionObserver' in window) {
   $$('.tg-a', tower).forEach((c) => { spots[c.dataset.a] = [Number(c.getAttribute('cx')), Number(c.getAttribute('cy'))]; });
   const tags = $$('.grow-tag', grow).map((el) => ({ el, l: Number(el.dataset.l), at: spots[el.dataset.a], w: 0, h: 0 }));
   const steps = $$('.grow-step', grow);
+  const side = $('.grow-side', grow);
   const head = $('.section-head', grow);
   const art = $('.grow-art', grow);
   const list = $('.grow-steps', grow);
@@ -44,26 +49,47 @@ if (grow && 'IntersectionObserver' in window) {
   const bars = $$('.grow-bar i', grow);
 
   tower.classList.add('tg-live');
-  let live = false, stageH = 0, pinTop = 0, stem = 0;
+  let live = false, stageH = 0, stageTop = 0, pinTop = 0, stem = 0, views = cams;
   let qd = null, drawn = null, last = 0, level = 0, shown = '', lit = '', frame = 0;
 
+  // each camera, grown to the picture's shape and capped in zoom
+  const fit = () => {
+    const r = tower.getBoundingClientRect();
+    if (!r.width || !r.height) { views = cams; return; }
+    const scale = (c) => Math.min(r.width / c[2], r.height / c[3]);
+    const far = scale(cams[2]);
+    views = cams.map((c, i) => {
+      const s = Math.min(scale(c), far * ZOOM ** (2 - i));
+      const w = r.width / s, h = r.height / s;
+      return [c[0] + c[2] / 2 - w / 2, c[1] + c[3] / 2 - h / 2, w, h];
+    });
+  };
+
   const measure = () => {
-    live = stageMode.matches;
+    live = liveMode.matches;
     grow.classList.toggle('is-live', live);
-    if (!live) return;
-    grow.style.setProperty('--grow-cap', list.offsetHeight + 'px');
-    stageH = art.offsetHeight + list.offsetHeight;
-    pinTop = parseFloat(getComputedStyle(art).top) || 0;
-    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-    const headEnd = head.offsetTop + head.offsetHeight;
-    snaps.forEach((s, i) => { s.style.top = Math.round(headEnd - pinTop + (i + HOLD - LEAD) * RUN * stageH + pad) + 'px'; });
-    tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
-    if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
     drawn = null;
+    if (live) {
+      if (wide.matches) {
+        stageH = side.offsetHeight;
+        pinTop = parseFloat(getComputedStyle(side).top) || 0;
+        stageTop = 0;
+      } else {
+        grow.style.setProperty('--grow-cap', list.offsetHeight + 'px');
+        stageH = art.offsetHeight + list.offsetHeight;
+        pinTop = parseFloat(getComputedStyle(art).top) || 0;
+        stageTop = head.offsetTop + head.offsetHeight;
+      }
+      const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+      snaps.forEach((s, i) => { s.style.top = Math.round(stageTop - pinTop + (i + HOLD - LEAD) * RUN * stageH + pad) + 'px'; });
+      tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
+      if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
+    }
+    fit();
   };
 
   const target = () => {
-    if (live) return (pinTop - head.getBoundingClientRect().bottom) / (RUN * stageH) + LEAD;
+    if (live) return (pinTop - grow.getBoundingClientRect().top - stageTop) / (RUN * stageH) + LEAD;
     const first = steps[0].getBoundingClientRect();
     return (window.innerHeight * 0.85 - first.top) / steps[0].offsetHeight;
   };
@@ -74,7 +100,7 @@ if (grow && 'IntersectionObserver' in window) {
     const b0 = L === 1 ? 0.05 : 0.25, b1 = L === 1 ? 0.65 : 0.75;
     const p = L - 1 + clamp((u - b0) / (b1 - b0));
     const k = L === 1 ? 0 : ease(clamp((u - 0.08) / 0.17));
-    const from = cams[Math.max(0, L - 2)], to = cams[L - 1];
+    const from = views[Math.max(0, L - 2)], to = views[L - 1];
     const vb = from.map((v, i) => v + (to[i] - v) * k);
     tower.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
 
@@ -145,7 +171,8 @@ if (grow && 'IntersectionObserver' in window) {
   qd = Math.min(3, Math.max(0, target()));
   draw(qd);
   window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
-  stageMode.addEventListener('change', measure);
+  liveMode.addEventListener('change', measure);
+  wide.addEventListener('change', measure);
   window.addEventListener('resize', measure);
   if (document.fonts) document.fonts.ready.then(measure);
   whenOnScreen(grow, (on) => { if (on) start(); else stop(); });

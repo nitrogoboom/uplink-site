@@ -17,8 +17,8 @@ async def main():
         await (await pg.query_selector('.ob-tile[data-tile="files"]')).hover(force=True); await pg.wait_for_timeout(500)
         rep.append(f"hero tile hover: {before} -> {await pg.eval_on_selector('.ob-app','e=>e.textContent')}")
         steps=await pg.eval_on_selector_all('.grow-step[data-floors]','s=>s.map(x=>x.dataset.floors)'); seen=[]
-        for f in steps:
-            await pg.eval_on_selector(f'.grow-step[data-floors="{f}"]',"e=>e.scrollIntoView({block:'center'})"); await pg.wait_for_timeout(700)
+        for i, f in enumerate(steps):   # the stage pins, so go to each level's snap mark (one per finished level)
+            await pg.evaluate("i=>{const s=document.querySelectorAll('.grow-snap')[i],pad=parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||0;window.scrollTo({top:s.getBoundingClientRect().top+scrollY-pad,behavior:'instant'})}", i); await pg.wait_for_timeout(1200)
             seen.append(await pg.eval_on_selector('svg.tg','e=>e.getAttribute("data-floors")'))
         rep.append(f"tower floors {','.join(steps)} -> {','.join(seen)}")
         # footer behaviour on home at 1440
