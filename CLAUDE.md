@@ -18,6 +18,7 @@ Static mockup site (fake content) for a made-up IT company. Overwatch 2–inspir
 - Illustrations are true isometric. Follow "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it.
 - After layout changes: `npm run build && npm run serve`, then `python tools/verify_footer.py out/` (no sideways scroll at phone, tablet, 1440×900 and 3440×1440, footer one screen tall, hero and tower working, and an axe pass on every page that fails on anything serious or critical).
 - Cloudflare: the `cloudflare:*` skills cover Workers and Wrangler. Hosting details are in README under "Hosting".
+- A link to test on a phone ("preview", "link for my phone"): push a branch and open a PR. CI uploads a preview version (secrets are already set) and comments the address on the PR: `https://<branch>-uplink-site.johnoreilly.workers.dev` (branch name lowercased, non-letters to `-`, max 30 chars), the same on every push. Get it with `gh pr view <n> --comments`, or wait for the `preview` job with `gh pr checks <n>`. It never touches the live Worker.
 - Style: no "AI slop" tells. No left-side border accents on cards.
 - Copy: short, plain sentences.
 - Open items (bugs, fixes, polish, copy to confirm) live in `notes.md`. Add new ones there and remove a line when it is done. `review.md` holds the reasoning behind the bigger ones and `next.md` the order to do them in; don't add to-do lines to `review.md`.

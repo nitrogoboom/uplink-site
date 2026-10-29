@@ -86,7 +86,8 @@
   .svc-menu::-webkit-scrollbar { display: none; }
   /* spacers, so the first and last card can sit in the middle */
   .svc-menu::before, .svc-menu::after { content: ""; flex: 0 0 calc(16vw - var(--sp-3)); }
-  .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; scroll-snap-stop: always; }
+  /* no snap-stop: a hard flick can pass several cards and still lands one in the middle */
+  .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; }
   .desk-only { display: none; }
   .phone-only { display: inline; }
   .svc-small .svc-art { display: block; }
@@ -100,11 +101,26 @@
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
   .svc-tile { background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band); transition: none; }
   /* the timeline sits in its own rule: the minifier folds a longhand next to `animation` into the shorthand,
-     which can't hold a timeline, and the browser then drops the whole declaration */
+     which can't hold a timeline, and the browser then drops the whole declaration.
+     Only transform and opacity move with the swipe, so Chrome keeps it off the main thread. The middle card's
+     shadow and lighter border are a layer over the card (li::after) that moves with it and fades in;
+     stacking is its own animation on the li. */
   @supports (animation-timeline: view()) {
+    .svc-menu > li { position: relative; animation: svc-layer linear both; view-timeline: --svc inline; }
+    .svc-menu > li::after {
+      content: "";
+      animation: svc-centre linear both, svc-lift linear both;
+      position: absolute;
+      inset: 0;
+      border: 1px solid var(--c-line-2);
+      border-radius: var(--r-3);
+      box-shadow: var(--shadow-2);
+      opacity: 0;
+      pointer-events: none;
+    }
     .svc-tile { animation: svc-centre linear both; }
     .svc-art, .svc-icon, .svc-go { animation: svc-dim linear both; }
-    .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: view(inline); }
+    .svc-menu > li, .svc-menu > li::after, .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: --svc; }
   }
   @supports not (animation-timeline: view()) {
     .svc-tile { transform: scale(0.88); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease); }
@@ -113,16 +129,27 @@
     .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) { opacity: 1; }
   }
   .svc-hint { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * var(--sp-4)); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
-  .svc-hint > svg { width: var(--sp-4); height: var(--sp-4); }
+  /* "Swipe" fades once they have swiped (home.js); the dots stay */
+  .svc-swipe { display: flex; align-items: center; gap: var(--sp-2); transition: opacity var(--dur-2) var(--ease); }
+  .svc-swipe svg { width: var(--sp-4); height: var(--sp-4); }
+  .svc-hint.is-swiped .svc-swipe { opacity: 0; }
   .svc-dots { display: flex; gap: var(--sp-1); margin-right: var(--sp-2); }
   .svc-dots i { width: var(--sp-2); height: var(--sp-2); background: var(--c-surface-2); border-radius: var(--r-pill); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease); }
   .svc-dots i.on { width: var(--sp-5); background: var(--c-accent); }
 }
 /* a neighbour sits about 85% of the way to the edge keyframes, so 18% puts the middle card a few px over it */
 @keyframes svc-centre {
-  0% { z-index: 0; transform: translateX(-18%) scale(0.88); box-shadow: none; }
-  50% { z-index: 2; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-2); }
-  100% { z-index: 0; transform: translateX(18%) scale(0.88); box-shadow: none; }
+  0% { transform: translateX(-18%) scale(0.88); }
+  50% { transform: none; }
+  100% { transform: translateX(18%) scale(0.88); }
+}
+@keyframes svc-layer {
+  0%, 100% { z-index: 0; }
+  50% { z-index: 2; }
+}
+@keyframes svc-lift {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
 }
 @keyframes svc-dim {
   0%, 100% { opacity: 0.4; }
@@ -130,7 +157,7 @@
 }
 /* reduced motion: a plain row, nothing scales or moves with the swipe */
 @media (prefers-reduced-motion: reduce) {
-  .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
+  .svc-menu > li, .svc-menu > li::after, .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
   .svc-menu > li > .svc-tile, .svc-tile:hover, .svc-tile:focus-visible { transform: none; }
   .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
 }
