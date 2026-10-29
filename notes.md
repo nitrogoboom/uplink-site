@@ -12,7 +12,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
 ## Drawings
-- [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
 - [ ] Hero labels: sublines are 21 units now, but on 1024–1180px-wide screens they still render at about 9.5–10px (the drawing is narrow there). Bigger fix: a tablet cut with fewer, larger labels.
 - [ ] Hero 3D cloud (`tools/hero_cloud.py`): `check.py` reports ~400 SNAP near-misses where its side-wall strips meet. Seams look clean on screen; quiet them if the checker learns about curved surfaces.
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
