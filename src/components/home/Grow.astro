@@ -1,8 +1,9 @@
 ---
 // HOME · 3. Growing with you. Scroll story: the building gets taller as the steps scroll past (home.js).
-// Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand.
+// Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand. Inlined as text (?raw): a plain
+// import would also write a copy to dist/_astro that nothing uses.
 // Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
-import Tower from './grow-tower.svg';
+import tower from './grow-tower.svg?raw';
 import './grow.css';
 ---
 <section class="section grow-section" id="grow" aria-labelledby="grow-title">
@@ -15,7 +16,7 @@ import './grow.css';
           <p class="lead">Start with the basics and add more as your team grows. Same people, same help desk, the whole way.</p>
         </div>
         <div class="grow-art">
-          <Tower />
+          <Fragment set:html={tower} />
         </div>
       </div>
       <ol class="grow-steps">
