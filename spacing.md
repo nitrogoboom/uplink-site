@@ -36,7 +36,7 @@ Pixel values below are at the 1440×900 reference (16px root). On bigger desktop
 - Inside a card, gaps are smaller than its padding. Related lines (R4) sit closer than separate blocks.
 
 **R6. Grid gaps.**
-- Card grids: `--sp-4` on phone, `--sp-5` from 700px. Every card grid on a page uses the same gap.
+- Card grids: `--sp-4`, `--sp-5` from 1100px (as `.svc-cards` and `.work-grid` do). Every card grid on a page uses the same gap.
 - Text beside a picture or a second column (`.split`, page grids): `--sp-8` column gap on desktop.
 - Form fields: `--sp-4`.
 
@@ -74,7 +74,7 @@ Measured on every page at phone (390×844), tablet (820×1180), 1440×900 and 34
 |---|---|---|---|
 | H1 | R6 | Card grids differ on one page: service cards 24px apart, steps and stats 16px. | `shared-blocks.css:23,35` |
 | H2 | R4 | Grow card title to text is 12px. | `grow.css:65` |
-| H3 | R4 | Step title to text reads 20px (12px row gap plus centring on the number tile). Off scale on screen. | `shared-blocks.css:27` |
+| H3 | — | Not a problem: step text sits 12px under the number tile (on scale). The 20px was measured from the title, which is centred on the taller tile. | `shared-blocks.css:27` |
 
 ### Services
 

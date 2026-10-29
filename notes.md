@@ -37,7 +37,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] PageSpeed mobile Home lists "Forced reflow: [unattributed] 36 ms" (unscored; score stays 100). Not reproducible locally (live site, beacon on and off, CPU slowed 6x), and no script reads layout at load on phones. Recheck now and then; act only if it starts naming a source.
 
 ## Spacing pass (rules and findings: `spacing.md`)
-- [ ] Home: one card-grid gap; grow and step title-to-text gaps (H1–H3).
 - [ ] Services: plans table head line height (S1).
 - [ ] About: profile top gaps, profile and person cards, team and stats grids, timeline (B1–B5).
 - [ ] Contact: channel row padding (C1).
