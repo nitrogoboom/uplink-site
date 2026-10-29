@@ -3,7 +3,7 @@
   public/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
   public/assets/img/hero-office.svg  the hero, fetched by home.js on screens 600px and wider (page fonts apply)
   src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro
-  public/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
+  public/assets/img/office-compact.svg  phone cut: static, cropped 4:3 closer on the room, two big labels, no card or badges
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of the three.
 The hero has its own floor layout for now ('hero layout' below: desk rows, lounge, guest Wi-Fi, reception, entrance);
@@ -98,14 +98,16 @@ LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side:
     ((13.25, 9.25, 1.25), (634.1, 695.7), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
     ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
-# compact phone cut ('compact'): a 3:2 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
-# titles render >= 14px and sublines >= 12px. Text sits where nothing stands: WORKSTATIONS below the room's
-# front-left edge, FIREWALL RACK on the open floor right of the desks and past the front-right edge.
-COMPACT_CROP = (220, 114, 990, 660)    # the whole room and tray, no card
-COMPACT_K = 1.85
+# compact phone cut ('compact'): a 4:3 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
+# titles render >= 14px and sublines >= 12px. Text sits outside the room, under its front-left edge, stepped down
+# it: WORKSTATIONS first, FIREWALL RACK below and to the right of it. Both leaders run down-left and their tails
+# carry on left to the words; FIREWALL RACK's crosses the open floor and leaves the room clear of the front corner.
+# 4:3 rather than 3:2 so the band under the room holds both labels at full size.
+COMPACT_CROP = (220, 114, 992, 744)    # the whole room and tray, no card, a band below the room for the labels
+COMPACT_K = 1.86
 COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
-    (LABELS[0][0], (760.0, 675.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 'right'),
-    (LABELS[2][0], (651.8, 683.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
+    (LABELS[0][0], (730.0, 783.1), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 'left'),
+    (LABELS[2][0], (640.3, 682.1), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
 # ---- hero layout (hero only for now; office, build and compact keep the plan above) ------------
 # Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 2-wide aisle, set right so the meeting
@@ -760,7 +762,7 @@ def render(v):
     title = TITLES['office' if v == 'compact' else v]
     if v == 'compact':
         crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="800" role="img" aria-label="{title}">'
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="900" role="img" aria-label="{title}">'
         style = font_style(body) + '\n<style>svg:target .lbl{display:none}</style>'
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'

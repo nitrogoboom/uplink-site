@@ -6,6 +6,7 @@ The face is a union of circles on a plane that runs along the room's x axis (u a
 u * (cos30, 0.5) + v * (0, -1). The slab runs back along -y, which on screen is DEPTH * (cos30, -0.5).
 Each outline segment sweeps one strip of the side wall; strips are shaded by their normal and merged when the shade
 repeats, so the wall is one smooth ramp with no seams, and the face carries its own soft gradient.
+The strips sit in <g class="curve">, so check.py doesn't read their 2px outline steps as near-misses.
 """
 import math
 from shapely.geometry import Point, Polygon, box
@@ -110,7 +111,7 @@ def cloud_shapes():
             f'<stop offset="0" stop-color="{FACE_TOP}"/><stop offset="1" stop-color="{FACE_BOT}"/></linearGradient></defs>')
     rim = f'fill="none" stroke="{RIM}" stroke-width="{RIM_W}" stroke-opacity="{RIM_OP}" stroke-linejoin="round"'
     return '\n'.join([
-        defs, *out,
+        defs, '<g class="curve">', *out, '</g>',
         f'<path d="{path(face_s.exterior.coords)}" fill="url(#{GID}-f)"/>',
         f'<path d="{path(sil.exterior.coords)}" {rim}/>',
         f'<path d="{path(face_s.exterior.coords)}" {rim}/>',
