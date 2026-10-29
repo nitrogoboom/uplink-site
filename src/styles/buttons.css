@@ -13,7 +13,7 @@
   font-weight: 700;
   font-size: var(--fs-4);
   letter-spacing: var(--tracking-2);
-  line-height: 1;
+  line-height: var(--lh-tight);
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
@@ -52,7 +52,7 @@
   font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: var(--tracking-3);
-  line-height: 1;
+  line-height: var(--lh-tight);
   text-transform: uppercase;
   white-space: nowrap;
 }

@@ -5,7 +5,6 @@
 @media (min-width: 1100px) and (min-height: 700px) {
   html { scroll-padding-top: var(--header-h); }
   .fold { padding-block: var(--sp-7); }
-  .section-head { margin-bottom: var(--sp-6); }
   /* height-led layouts: big pictures take the room that is left, never more */
   :root { --fold-inner: calc(var(--fold-h) - 2 * var(--sp-7)); }
   /* short laptop screens: a little less air around each section */
