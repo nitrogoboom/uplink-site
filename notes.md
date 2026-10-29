@@ -12,6 +12,9 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
+- [ ] Grow world (phone and tablet, "level up"): tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `HOLD` and the phase points); `RUN` must match the `3.7` in `grow.css`. Check the soft snap feels right and never traps the scroll.
+- [ ] Grow world on desktop: at level 3 the world is tall and narrow, so it sits small in the wide left column. Try a wider layout for the level 3 pieces, or a desktop-only camera.
+- [ ] Grow tags, copy to confirm: the six short tags in `Grow.astro` (`tags`) are placeholders.
 - [ ] Hero on phones, copy to confirm: the short line under the headline (`lead-short` in `Hero.astro`, "We run your IT: help desk, security, cloud, network and phones.") is a placeholder. More office captions: add a label to `HERO_LABELS` and its index to `PHONE_ITEMS` in `gen_office.py`.
 
 ## Site

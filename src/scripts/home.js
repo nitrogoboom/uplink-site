@@ -1,59 +1,154 @@
 /* ==========================================================================
    Uplink Technology · Home page
-   Growing tower and hero cloud.
+   Growing world and hero cloud.
    ========================================================================== */
 
 import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 
 /* ======================================================================
-   Growth story: the building gains floors as you scroll (Home)
+   Growth story: the world grows as you scroll (Home)
    ====================================================================== */
+// The scroll sets q, 0 to 3, one unit per level. Inside a level (u, 0 to 1): the step text swaps at 0, the camera
+// pulls back over .08-.25, the new pieces build over .25-.75 (level 1: .05-.65), then it holds and the tags show.
+// That gives p, 0 to 3, the drawing's own growth scale: every storey and piece starts at its data-at (written by
+// tools/gen_tower.py) and builds over 0.4 (storeys 0.55). q is eased toward the scroll so a flick can't make the
+// floors jitter. Phone and tablet: the stage holds still for RUN of a screen per level (grow.css: 1 + 3 x RUN = 3.7)
+// and snaps softly to each hold. Desktop: q follows the steps down the right-hand column.
 const tower = $('.grow svg.tg');
-const growSteps = $$('.grow-step[data-floors]');
-if (tower && growSteps.length) {
-  // Every screen size: the building stays put (CSS sticky). Desktop: the
-  // step whose top passes 60% of the screen sets the floors. Phone and
-  // tablet: the cards pass over the building, so it grows as soon as the
-  // next card peeks in at the bottom, while the building is still in view.
-  // The browser reports when a step crosses the line (IntersectionObserver),
-  // so nothing is measured on scroll or during page load.
-  const wide = window.matchMedia('(min-width: 1100px)');
-  const passed = new Set();
-  let shown = null;
-  // The first pick shows at once: no fade on load (colour fades are not GPU work,
-  // and nobody is watching yet). Fades come back two frames later.
-  const grow = tower.closest('.grow');
-  if (grow) grow.classList.add('no-trans');
-  const update = () => {
-    let pick = growSteps[0];
-    growSteps.forEach((s) => { if (passed.has(s)) pick = s; });
-    if (pick === shown) return;
-    shown = pick;
-    tower.setAttribute('data-floors', pick.dataset.floors);
-    growSteps.forEach((s) => { if (s === pick) s.setAttribute('data-active', ''); else s.removeAttribute('data-active'); });
-    if (grow && grow.classList.contains('no-trans')) {
-      window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
+const grow = tower && tower.closest('.grow');
+if (grow && 'IntersectionObserver' in window) {
+  const LEAD = 0.3;   // level 1 starts building this much of a level before the stage pins
+  const RUN = 0.9;    // screens of scroll per level, phone and tablet
+  const HOLD = 0.87;  // where in a level the snap mark sits
+  const stageMode = window.matchMedia('(max-width: 1099px)');
+  const clamp = (v) => Math.min(1, Math.max(0, v));
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+  const amt = (p, at, d) => ease(clamp((p - at) / d));
+  const people = (p) => Math.round(p <= 1 ? 1 + 9 * p : p <= 2 ? 10 + 40 * (p - 1) : 50 + 100 * (p - 2));
+
+  const storey = Number(tower.dataset.storey);
+  const cams = [1, 2, 3].map((k) => tower.dataset['cam' + k].split(' ').map(Number));
+  const floors = $$('.tg-floor', tower).map((el) => ({ el, at: Number(el.dataset.at) }));
+  const roof = $('.tg-roof', tower);
+  const pieces = $$('.tg-p', tower).map((el) => ({ el, at: Number(el.dataset.at), line: $('.tg-cable', el), flow: $('.tg-flow', el) }));
+  const spots = {};
+  $$('.tg-a', tower).forEach((c) => { spots[c.dataset.a] = [Number(c.getAttribute('cx')), Number(c.getAttribute('cy'))]; });
+  const tags = $$('.grow-tag', grow).map((el) => ({ el, l: Number(el.dataset.l), at: spots[el.dataset.a], w: 0, h: 0 }));
+  const steps = $$('.grow-step', grow);
+  const head = $('.section-head', grow);
+  const art = $('.grow-art', grow);
+  const list = $('.grow-steps', grow);
+  const snaps = $$('.grow-snap', grow);
+  const lvl = $('.grow-lvl', grow);
+  const num = $('.grow-num', grow);
+  const bars = $$('.grow-bar i', grow);
+
+  tower.classList.add('tg-live');
+  let live = false, stageH = 0, pinTop = 0, stem = 0;
+  let qd = null, drawn = null, last = 0, level = 0, shown = '', lit = '', frame = 0;
+
+  const measure = () => {
+    live = stageMode.matches;
+    grow.classList.toggle('is-live', live);
+    if (!live) return;
+    grow.style.setProperty('--grow-cap', list.offsetHeight + 'px');
+    stageH = art.offsetHeight + list.offsetHeight;
+    pinTop = parseFloat(getComputedStyle(art).top) || 0;
+    const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+    const headEnd = head.offsetTop + head.offsetHeight;
+    snaps.forEach((s, i) => { s.style.top = Math.round(headEnd - pinTop + (i + HOLD - LEAD) * RUN * stageH + pad) + 'px'; });
+    tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
+    if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
+    drawn = null;
+  };
+
+  const target = () => {
+    if (live) return (pinTop - head.getBoundingClientRect().bottom) / (RUN * stageH) + LEAD;
+    const first = steps[0].getBoundingClientRect();
+    return (window.innerHeight * 0.85 - first.top) / steps[0].offsetHeight;
+  };
+
+  const draw = (q) => {
+    const L = Math.min(3, Math.floor(q) + 1);
+    const u = q >= 3 ? 1 : q - (L - 1);
+    const b0 = L === 1 ? 0.05 : 0.25, b1 = L === 1 ? 0.65 : 0.75;
+    const p = L - 1 + clamp((u - b0) / (b1 - b0));
+    const k = L === 1 ? 0 : ease(clamp((u - 0.08) / 0.17));
+    const from = cams[Math.max(0, L - 2)], to = cams[L - 1];
+    const vb = from.map((v, i) => v + (to[i] - v) * k);
+    tower.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+
+    let built = 0, top = 0;
+    floors.forEach((f, i) => {
+      const a = amt(p, f.at, 0.55);
+      built += a;
+      if (a > 0.85) top = i + 1;
+      f.el.style.opacity = a;
+      f.el.style.transform = `translateY(${(-30 * (1 - a)).toFixed(1)}px)`;
+    });
+    roof.style.opacity = clamp(amt(p, 0, 0.55) * 2);
+    roof.style.transform = `translateY(${((floors.length - built) * storey).toFixed(1)}px)`;
+    const floorsNow = String(Math.max(1, top));
+    if (floorsNow !== lit) { lit = floorsNow; tower.setAttribute('data-floors', lit); }
+    pieces.forEach((pc) => {
+      const a = amt(p, pc.at, 0.4);
+      if (pc.line) {
+        pc.el.style.opacity = a > 0 ? 1 : 0;
+        pc.line.style.strokeDashoffset = (1 - a).toFixed(3);
+        pc.flow.style.opacity = a > 0.98 ? 1 : 0;
+      } else {
+        pc.el.style.opacity = a;
+        pc.el.style.transform = `translateY(${(-24 * (1 - a)).toFixed(1)}px)`;
+      }
+    });
+
+    if (L !== level) {
+      level = L;
+      steps.forEach((s, i) => { if (i === L - 1) s.setAttribute('data-active', ''); else s.removeAttribute('data-active'); });
+      if (lvl) lvl.textContent = L;
     }
+    const n = String(people(p));
+    if (num && n !== shown) { shown = n; num.textContent = n; }
+    bars.forEach((b, i) => { b.style.setProperty('--fill', clamp(p - i).toFixed(3)); });
+
+    if (!live) return;
+    const r = tower.getBoundingClientRect();
+    const s = Math.min(r.width / vb[2], r.height / vb[3]);
+    const ox = (r.width - vb[2] * s) / 2, oy = (r.height - vb[3] * s) / 2;
+    const fade = clamp((u - 0.72) / 0.1);
+    tags.forEach((t) => {
+      if (t.l !== L || !t.at) { t.el.style.opacity = 0; return; }
+      const half = t.w / 2;
+      const x = Math.min(r.width - half - 8, Math.max(half + 8, ox + (t.at[0] - vb[0]) * s));
+      const y = oy + (t.at[1] - vb[1]) * s;
+      t.el.style.transform = `translate(${(x - half).toFixed(1)}px, ${(y - t.h - stem).toFixed(1)}px)`;
+      t.el.style.opacity = fade;
+    });
   };
-  let io = null;
-  const watch = () => {
-    if (io) io.disconnect();
-    passed.clear();
-    // the watched area runs from far above the screen down to the line,
-    // so "intersecting" means the step's top is above the line, even after a fast scroll
-    const below = wide.matches ? '-40%' : '-12%';
-    io = new IntersectionObserver((entries) => {
-      entries.forEach((en) => { if (en.isIntersecting) passed.add(en.target); else passed.delete(en.target); });
-      update();
-    }, { rootMargin: '100000px 0px ' + below + ' 0px' });
-    growSteps.forEach((s) => io.observe(s));
+
+  const tick = (now) => {
+    frame = 0;
+    const q = Math.min(3, Math.max(0, target()));
+    const dt = last ? Math.min(64, now - last) : 16;
+    last = now;
+    qd = qd === null || reduceMotion.matches ? q : qd + (q - qd) * (1 - Math.exp(-dt / 110));
+    if (Math.abs(q - qd) < 0.0005) qd = q;
+    if (qd !== drawn) { drawn = qd; draw(qd); }   // nothing to do while the scroll is still
+    frame = window.requestAnimationFrame(tick);
   };
-  if ('IntersectionObserver' in window) {
-    watch();
-    wide.addEventListener('change', watch);
-  } else {
-    update();
-  }
+  const start = () => { if (!frame) { last = 0; frame = window.requestAnimationFrame(tick); } };
+  const stop = () => { if (frame) window.cancelAnimationFrame(frame); frame = 0; };
+
+  // The first picture shows at once: no step fade on load. Fades come back two frames later.
+  grow.classList.add('no-trans');
+  measure();
+  qd = Math.min(3, Math.max(0, target()));
+  draw(qd);
+  window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
+  stageMode.addEventListener('change', measure);
+  window.addEventListener('resize', measure);
+  if (document.fonts) document.fonts.ready.then(measure);
+  whenOnScreen(grow, (on) => { if (on) start(); else stop(); });
 }
 
 /* ------------------------------------------------------------------
