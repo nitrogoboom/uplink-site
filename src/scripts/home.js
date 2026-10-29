@@ -71,16 +71,16 @@ if (tower && growSteps.length) {
    cloud starts. A turn or resize that changes the cut swaps the file.
    ------------------------------------------------------------------ */
 const stage = $('.hero-art .stage[data-hero]');
+const APPS = [
+  { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
+  { id: 'files',  name: 'Files',    state: 'Synced',  detail: 'OneDrive and Drive backed up' },
+  { id: 'meet',   name: 'Meetings', state: 'Ready',   detail: 'Teams and Meet, one-click join' },
+  { id: 'chat',   name: 'Chat',     state: 'Online',  detail: 'Every channel watched' },
+  { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
+  { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
+];
 const startCloud = (cloud) => {
   const svg = cloud.ownerSVGElement;
-  const APPS = [
-    { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
-    { id: 'files',  name: 'Files',    state: 'Synced',  detail: 'OneDrive and Drive backed up' },
-    { id: 'meet',   name: 'Meetings', state: 'Ready',   detail: 'Teams and Meet, one-click join' },
-    { id: 'chat',   name: 'Chat',     state: 'Online',  detail: 'Every channel watched' },
-    { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
-    { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
-  ];
   const focus = svg.querySelector('.ob-focus');
   const appText = svg.querySelector('.ob-app');
   const stateText = svg.querySelector('.ob-state');
@@ -172,6 +172,150 @@ const startCloud = (cloud) => {
     if (seen) seen.disconnect();
   };
 };
+
+/* ------------------------------------------------------------------
+   Hero captions on phones. The phone cut has no words of its own; two
+   captions sit in its free corners at one size on every phone: the
+   cloud's (top left: its line to the cloud, the app it names lit on the
+   tray) and the office's (bottom left: its line to one item at a time).
+   Each changes every 4.4s, 2.2s after the other, so one line draws at a
+   time. Tapping the drawing moves the office one on. Words and points
+   come from the drawing (data-cloud, data-items: tools/gen_office.py);
+   sizes from hero.css (--cap-*), turned into drawing units here.
+   ------------------------------------------------------------------ */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const make = (tag, cls, parent) => {
+  const el = document.createElementNS(SVG_NS, tag);
+  el.setAttribute('class', cls);
+  parent.append(el);
+  return el;
+};
+const restart = (el, cls) => { el.classList.remove(cls); void el.getBoundingClientRect(); el.classList.add(cls); };
+const startCaptions = (svg) => {
+  const vb = svg.viewBox.baseVal;
+  const [cloudX, cloudY] = svg.dataset.cloud.split(',').map(Number);
+  const items = JSON.parse(svg.dataset.items);
+  const css = window.getComputedStyle(svg);
+  const rootPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+  const px = (name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
+  const size = { t: px('--cap-title'), s: px('--cap-sub'), edge: px('--cap-edge'), gap: px('--cap-gap'), line: px('--cap-line'), dot: px('--cap-dot'), halo: px('--cap-halo') };
+  const spot = (name) => {
+    const g = make('g', 'ob-cap ob-cap-' + name, svg);
+    const lead = make('path', 'ob-cap-lead', g);
+    const ring = make('circle', 'ob-cap-ring', g);
+    const end = make('circle', 'ob-cap-end', g);
+    const words = make('g', 'ob-cap-words', g);
+    return { g, lead, ring, end, t: make('text', 'ob-cap-t', words), s: make('text', 'ob-cap-s', words) };
+  };
+  const spots = { cloud: spot('cloud'), office: spot('office') };
+  const at = { cloud: -1, office: -1 };
+  // words: cloud hangs from the drawing's top edge, office stands on its bottom edge
+  const place = (sp, top) => {
+    const shown = svg.getBoundingClientRect().width;
+    if (!shown) return null;   // not laid out (hidden, or mid-swap): the next step or resize places it
+    const k = vb.width / shown;   // drawing units per screen px
+    const tf = size.t * k, sf = size.s * k, x = vb.x + size.edge * k;
+    [[sp.t, tf], [sp.s, sf]].forEach(([el, f]) => {
+      el.setAttribute('font-size', f.toFixed(1));
+      el.setAttribute('x', x.toFixed(1));
+      el.style.strokeWidth = (size.halo * k).toFixed(1) + 'px';
+    });
+    let ty, sy;
+    if (top) { ty = vb.y + size.edge * k + tf * 0.76; sy = ty + size.gap * k + sf * 1.05; }
+    else { sy = vb.y + vb.height - size.edge * k - sf * 0.28; ty = sy - size.gap * k - sf * 1.05; }
+    sp.t.setAttribute('y', ty.toFixed(1));
+    sp.s.setAttribute('y', sy.toFixed(1));
+    return { k, x, ty, tf, tw: sp.t.getComputedTextLength(), sw: sp.s.getComputedTextLength() };
+  };
+  const draw = (sp, d, colour, x, y, k) => {
+    sp.lead.setAttribute('d', d);
+    sp.lead.setAttribute('stroke', colour);
+    sp.lead.setAttribute('stroke-width', (size.line * k).toFixed(1));
+    const len = sp.lead.getTotalLength();
+    sp.lead.style.strokeDasharray = len;
+    sp.lead.style.setProperty('--len', len);
+    [sp.end, sp.ring].forEach((c) => { c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', (size.dot * k).toFixed(1)); });
+    sp.end.setAttribute('fill', colour);
+    sp.end.setAttribute('stroke-width', (size.dot * 0.6 * k).toFixed(1));
+    sp.ring.setAttribute('stroke', colour);
+    sp.ring.setAttribute('stroke-width', (size.line * k).toFixed(1));
+    restart(sp.lead, 'is-draw');
+    restart(sp.end, 'is-in');
+    restart(sp.ring, 'is-in');
+  };
+  const write = {
+    cloud: () => {
+      const sp = spots.cloud, app = APPS[at.cloud];
+      sp.t.textContent = 'Cloud workspace';
+      const name = document.createElementNS(SVG_NS, 'tspan');
+      name.setAttribute('class', 'ob-cap-app');
+      name.textContent = app.name;
+      sp.s.replaceChildren(name, ' · ' + app.detail);
+      const L = place(sp, true);
+      if (!L) return;
+      const x0 = L.x + L.tw + size.gap * 2 * L.k, y0 = L.ty - L.tf * 0.32;   // a level tail from the title, then to the cloud
+      draw(sp, `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`, window.getComputedStyle(sp.t).fill, cloudX, cloudY, L.k);
+      svg.querySelectorAll('.ob-tile').forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
+    },
+    office: () => {
+      const sp = spots.office, it = items[at.office];
+      sp.t.textContent = it.t;
+      sp.t.setAttribute('fill', it.c);
+      sp.s.textContent = it.s;
+      const L = place(sp, false);
+      if (!L) return;
+      const top = L.ty - L.tf * 0.76 - size.gap * 2 * L.k;   // the line rises from just above the words to the item
+      const x0 = Math.min(Math.max(it.x, L.x + size.gap * L.k), L.x + Math.max(L.tw, L.sw) - size.gap * L.k);
+      draw(sp, `M${x0.toFixed(1)},${top.toFixed(1)} L${it.x},${it.y}`, it.c, it.x, it.y, L.k);
+    }
+  };
+  let swap = 0;
+  const step = (name, animate) => {
+    at[name] = (at[name] + 1) % (name === 'cloud' ? APPS.length : items.length);
+    const sp = spots[name];
+    if (!animate || reduceMotion.matches) { write[name](); return; }
+    sp.g.classList.add('is-out');
+    swap = window.setTimeout(() => {
+      sp.g.classList.add('is-pre');
+      sp.g.classList.remove('is-out');
+      write[name]();
+      void sp.g.getBoundingClientRect();
+      sp.g.classList.remove('is-pre');
+    }, 170);
+  };
+  let timer = 0, turn = 0, onScreen = true, begun = false;
+  const stop = () => { window.clearInterval(timer); timer = 0; };
+  const start = () => {
+    stop();
+    if (!begun || reduceMotion.matches || document.hidden || !onScreen) return;
+    timer = window.setInterval(() => step(turn++ % 2 ? 'office' : 'cloud', true), 2200);
+  };
+  const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
+  svg.addEventListener('click', tap);
+  const relayout = () => { if (begun) { write.cloud(); write.office(); } };
+  window.addEventListener('resize', relayout);
+  const onVisible = () => (document.hidden ? stop() : start());
+  document.addEventListener('visibilitychange', onVisible);
+  reduceMotion.addEventListener('change', start);
+  const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
+  // first words once the drawing has built (about 3.2s; at once with reduced motion), the office's 1.1s after
+  const quick = reduceMotion.matches;
+  const first = window.setTimeout(() => {
+    begun = true;
+    step('cloud', !quick);
+    swap = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : 1100);
+  }, quick ? 0 : 3300);
+  return () => {   // the cut is swapped out: let go of the timers and listeners
+    stop();
+    window.clearTimeout(first);
+    window.clearTimeout(swap);
+    svg.removeEventListener('click', tap);
+    window.removeEventListener('resize', relayout);
+    document.removeEventListener('visibilitychange', onVisible);
+    reduceMotion.removeEventListener('change', start);
+    if (seen) seen.disconnect();
+  };
+};
 if (stage) {
   const phone = window.matchMedia('(max-width: 599px)');
   const tablet = window.matchMedia(stage.dataset.tablet);
@@ -208,7 +352,8 @@ if (stage) {
         const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
         observers = layers.map((el) => whenOnScreen(el));
         const cloud = $('svg.ob .ob-cloud', stage);
-        if (cloud) stopCloud = startCloud(cloud);
+        if (cut === 'phone') { if (added[0].dataset.items) stopCloud = startCaptions(added[0]); }
+        else if (cloud) stopCloud = startCloud(cloud);
       })
       .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
   };

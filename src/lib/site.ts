@@ -6,16 +6,23 @@
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { getCollection } from 'astro:content';
 
+// Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
+// page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file instead
+// (?v=), and a changed drawing is a new address.
+const fresh = (path: string) => `${path}?v=${createHash('sha1').update(readFileSync(`public${path}`)).digest('hex').slice(0, 8)}`;
+
 // written by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
-// 440-680px wide there). phone: the hero scene framed closer for phones, with its dashes in their own file; with
-// reduced motion phones keep the still (office-compact.svg).
+// 440-680px wide there). phone: the hero scene framed closer for phones, no words (home.js writes its captions),
+// with its dashes in their own file; with reduced motion phones keep the still (office-compact.svg).
 export const HERO = {
-  full: '/assets/img/hero-office.svg',
-  tablet: '/assets/img/hero-office-tablet.svg',
-  phone: '/assets/img/office-compact-build.svg',
-  phoneFlows: '/assets/img/office-compact-flows.svg',
+  full: fresh('/assets/img/hero-office.svg'),
+  tablet: fresh('/assets/img/hero-office-tablet.svg'),
+  phone: fresh('/assets/img/office-compact-build.svg'),
+  phoneFlows: fresh('/assets/img/office-compact-flows.svg'),
   media: {
     phone: '(max-width: 599px)',
     tablet: '(min-width: 600px) and (max-width: 1299px) and (max-height: 1099px)',

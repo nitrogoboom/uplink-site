@@ -59,20 +59,55 @@
   .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
 }
 
-/* phone: the still drawing (office-compact.svg, compact-cuts.css) is 4:3,
-   so its box is too; no empty bands above and below it */
-@media (max-width: 599px) { .hero-art .stage { aspect-ratio: 4 / 3; } }
+/* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP); with reduced
+   motion the 4:3 still sits in it with thin bands above and below */
+@media (max-width: 599px) {
+  .hero-art .stage { aspect-ratio: 962 / 900; }
+  .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+}
 
-/* phones (under the bottom bar's 700px): headline and text, the office, then the button and the news cards.
-   .hero-menu and .hero-art step aside so their parts place on this grid. The office is never taller than the
-   screen leaves after the text and the button, so "Get started" lands on the first screen. */
+/* phones (under the bottom bar's 700px): headline and the short line, the office full width, then the button
+   and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. No eyebrow and the
+   short line, so "Get started" lands on the first screen under a full-width office. */
+.lead-short { display: none; }
 @media (max-width: 699px) {
-  .hero-grid { grid-template-areas: "top" "stage" "cta" "dock"; gap: var(--sp-5); }
+  .hero.fold { padding-top: var(--sp-5); }
+  .hero-grid { grid-template-areas: "top" "stage" "cta" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
-  .hero-top { grid-area: top; }
-  .hero-art .stage { grid-area: stage; width: min(100%, max(12rem, calc((var(--fold-h) - 28rem) * 4 / 3))); margin-inline: auto; }
+  .hero-top { grid-area: top; gap: var(--sp-3); }
+  .hero-menu h1 { font-size: var(--fs-hero-phone); }
+  .hero-top .eyebrow, .lead-long { display: none; }
+  .lead-short { display: inline; }
+  .hero-art .stage { grid-area: stage; }
   .hero-cta { grid-area: cta; }
   .hero-dock { grid-area: dock; }
+}
+
+/* phone captions, written by home.js over the phone cut: the drawings' own label look (caps title in its colour,
+   grey subline), at the sizes in tokens.css (--cap-*). Words fade out and up, then in from below; the line draws
+   once they have settled, its dot pops in at the end and its ring pulses. */
+.ob-cap-t { font-family: var(--font-body); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
+.ob-cap-cloud .ob-cap-t { fill: var(--c-sky); }
+.ob-cap-s { font-family: var(--font-body); font-weight: 400; fill: var(--c-muted); }
+.ob-cap-app { fill: var(--c-text); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
+.ob-cap-t, .ob-cap-s { paint-order: stroke; stroke: var(--c-bg); stroke-linejoin: round; }
+.ob-cap-words { transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); }
+.ob-cap.is-out .ob-cap-words { opacity: 0; transform: translateY(calc(-1 * var(--sp-4))); transition-duration: var(--dur-1); }
+.ob-cap.is-pre .ob-cap-words { opacity: 0; transform: translateY(var(--sp-4)); transition: none; }
+.ob-cap-lead { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 0.6; }
+.ob-cap.is-out :is(.ob-cap-lead, .ob-cap-end, .ob-cap-ring) { opacity: 0; transition: opacity var(--dur-1) var(--ease); }
+.ob-cap-lead.is-draw { animation: cap-draw var(--dur-3) var(--ease) both; }
+@keyframes cap-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+.ob-cap-end { stroke: var(--c-bg); opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.ob-cap-end.is-in { animation: cap-pop var(--dur-2) var(--ease) var(--dur-3) both; }
+@keyframes cap-pop { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+.ob-cap-ring { fill: none; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.ob-cap-ring.is-in { animation: cap-ring var(--dur-pulse) ease-out calc(var(--dur-3) + var(--dur-2)) infinite; }
+@keyframes cap-ring { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(2.8); } }
+@media (prefers-reduced-motion: reduce) {
+  .ob-cap-words { transition: none; }
+  .ob-cap-lead.is-draw, .ob-cap-end.is-in, .ob-cap-ring.is-in { animation: none; }
+  .ob-cap-end { opacity: 1; }
 }
 
 /* ---- two columns: landscape tablets, short laptops and desktops ---------

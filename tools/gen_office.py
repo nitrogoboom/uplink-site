@@ -5,8 +5,8 @@
   public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
   src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
   public/assets/img/office-compact.svg  phone cut: static, cropped 4:3 closer on the room, two big labels, no card or badges
-  public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, a smaller
-                                         cloud, three labels big (PHONE_*); fetched by home.js on phones (page fonts apply)
+  public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, no words;
+                                         home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply)
   public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of them.
@@ -20,7 +20,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
   tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
   tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
-import hashlib, math, pathlib, re, sys
+import hashlib, html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
@@ -188,17 +188,13 @@ TABLET_LABELS = [(HERO_LABELS[0][0], (1052.0, 728.0), *HERO_LABELS[0][2:]),
                  (HERO_LABELS[2][0], _along(HERO_LABELS[2][0], 640.0), *HERO_LABELS[2][2:])]
 TABLET_CLOUD = (842.7, -82.0)          # the cloud label's text scales about this point (its right edge, at the tail)
 
-# phone cut ('phone'): screens under 600px wide show the hero 192-398px wide in a 4:3 box (hero.css). Same scene and
-# animation, framed on the room with the labels round it. The cloud shrinks by PHONE_CLOUD_S about PHONE_CLOUD_AT so
-# it sits low over the tray (its sync lines keep their feet on the tray and stop at its new underside). Three labels
-# and the cloud's at PHONE_K: titles 14px and sublines 12px at 358px wide.
-PHONE_CROP = (88, 18, 1127, 845.25)    # x, y, width, height: 4:3, the cloud's top to the labels under the front corner
-PHONE_K = 1.85
-PHONE_CLOUD_S = 0.55
-PHONE_CLOUD_AT = (1040.2, 191.0)       # x of the middle sync line, so that line stays put
-PHONE_CLOUD_ELBOW = (946.0, 40.0)      # the cloud label's leader: dot, up-left to here, then level to the words
-PHONE_LABELS = [(HERO_LABELS[0][0], (1035.4, 790.0), *HERO_LABELS[0][2:]),             # straight down, under the front corner
-                (HERO_LABELS[2][0], _along(HERO_LABELS[2][0], 640.0), *HERO_LABELS[2][2:])]
+# phone cut ('phone'): the whole hero scene, cloud full size, framed close (PHONE_CROP), with no words drawn in it.
+# home.js writes two captions over it at a fixed on-screen size: CLOUD top left (its line to the cloud, the app it
+# names lit on the tray) and OFFICE bottom left (its line to each item in PHONE_ITEMS in turn). Their data rides on
+# the <svg> as data-cloud and data-items (data- attributes survive SVGO; empty <text> would not).
+PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab, room for a caption in each free corner
+PHONE_CLOUD_DOT = (950.1, -36.0)       # the cloud label's dot in office_parts/hero_cloud.svg
+PHONE_ITEMS = [HERO_LABELS[i] for i in (1, 2, 3, 4, 0)]   # Wi-Fi, workstations, Teams room, guest Wi-Fi, firewall rack
 HERO_CUTS = ('hero', 'tablet', 'phone')   # the animated hero layout's three cuts
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
@@ -679,40 +675,21 @@ def hero_groups(v):
     if v == 'tablet':
         return air(v, G, HERO_APS, TABLET_LABELS, HERO_RACK[0], GUEST_AP, TABLET_K)
     if v == 'phone':
-        return air(v, G, HERO_APS, PHONE_LABELS, HERO_RACK[0], GUEST_AP, PHONE_K)
+        return air(v, G, HERO_APS, [], HERO_RACK[0], GUEST_AP)
     return air(v, G, HERO_APS, HERO_LABELS, HERO_RACK[0], GUEST_AP)
 
 
-def phone_cloud(cloud, k):
-    """The hero cloud part for the phone cut: the cloud scaled down about PHONE_CLOUD_AT, its sync lines cut to meet
-    its new underside, and its label's leader and words moved to PHONE_CLOUD_ELBOW, the words at k."""
-    s, (cx, cy) = PHONE_CLOUD_S, PHONE_CLOUD_AT
-    T = lambda x, y: (cx + s * (x - cx), cy + s * (y - cy))
-    # sync lines: each runs straight up from the tray to the cloud's underside, an iso line (slope tan 30) that
-    # scales into the same line through the scaled points; the moving dashes start 29px below it, as before
-    under = T(1040.2, 62.0)[1]
-    for x, top in ((958.0, 14.5), (1040.2, 62.0), (1122.5, 109.5)):
-        new = under + (x - 1040.2) * math.tan(math.radians(30))
-        cloud = cloud.replace(f'points="{x:.1f},{top:.1f} ', f'points="{fmt(x)},{fmt(new)} ', 1)
-        cloud = cloud.replace(f'points="{x:.1f},{top + 29:.1f} ', f'points="{fmt(x)},{fmt(new + 29)} ', 1)
-    # the scale goes inside the cloud's group: on the group itself the drop-in animation's transform would replace
-    # it (SVGO's moveGroupAttrsToElems moves a wrapper's transform onto its one child)
-    a = cloud.index('>', cloud.index('<g class="ob-i ob-cloud"')) + 1
-    b = cloud.rindex('</g>', 0, cloud.index('<g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE"'))
-    cloud = (cloud[:a] + f'\n<g transform="matrix({s:g} 0 0 {s:g} {fmt(cx * (1 - s))} {fmt(cy * (1 - s))})">'
-             + cloud[a:b] + '</g>\n' + cloud[b:])
-    dx, dy = T(950.1, -36.0)
-    ex, ey = PHONE_CLOUD_ELBOW
-    # leader and dot as heavy as the other phone labels' (label(), k != 1)
-    cloud = re.sub(r'points="950\.1,-36\.0 894\.7,-82\.0 854\.7,-82\.0"(.*?)stroke-width="1\.8" stroke-opacity="0\.6"',
-                   lambda m: f'points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(ex - TAIL)},{fmt(ey)}"{m.group(1)}stroke-width="2.6" stroke-opacity="0.65"', cloud)
-    cloud = re.sub(r'cx="950\.1" cy="-36\.0" r="6"(.*?)stroke-width="3"',
-                   lambda m: f'cx="{fmt(dx)}" cy="{fmt(dy)}" r="8"{m.group(1)}stroke-width="3.5"', cloud, count=1)
-    a = cloud.index('<text class="lt"', cloud.index('data-t="CLOUD WORKSPACE"'))
-    b = cloud.index('<g class="num">', a)
-    (ax, ay), (bx, by) = TABLET_CLOUD, (ex - TAIL - 12 * k, ey)   # the words' right edge at the tail moves to the new tail
-    return (cloud[:a] + f'<g transform="matrix({k:g} 0 0 {k:g} {fmt(bx - k * ax)} {fmt(by - k * ay)})">\n'
-            + cloud[a:b] + '</g>\n' + cloud[b:])
+def phone_data():
+    """The phone captions' data, for the <svg>'s data-cloud and data-items: screen points and words."""
+    items = [dict(t=title, s=sub, c=colour, x=round(w.p(*dot)[0], 1), y=round(w.p(*dot)[1], 1))
+             for dot, _elbow, colour, title, sub, *_rest in PHONE_ITEMS]
+    return f'{PHONE_CLOUD_DOT[0]:g},{PHONE_CLOUD_DOT[1]:g}', html.escape(json.dumps(items, separators=(',', ':')))
+
+
+def phone_cloud(cloud):
+    """The hero cloud part for the phone cut: the cloud and its sync lines as they are, without its label (home.js
+    writes the phone's cloud caption)."""
+    return cloud[:cloud.index('<g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE"')]
 
 
 def groups(v):
@@ -757,7 +734,7 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None, scale=1.0):
     if v in HERO_CUTS:
         hero_cloud = part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes())
         if v == 'phone':
-            hero_cloud = phone_cloud(hero_cloud, scale)
+            hero_cloud = phone_cloud(hero_cloud)
         elif scale != 1.0:                   # the cloud label's words grow about their tail end; leader and dot stay
             a = hero_cloud.index('<text class="lt"', hero_cloud.index('data-t="CLOUD WORKSPACE"'))
             b = hero_cloud.index('<g class="num">', a)
@@ -837,7 +814,9 @@ def render(v):
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="900" role="img" aria-label="{title}">'
         style = font_style(body) + '\n<style>svg:target .lbl{display:none}</style>'
     elif v == 'phone':                      # inlined in the page like the hero: page fonts, hero.css for the motion and the tiles
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob ob-phone" viewBox="{phone_crop}" width="1200" height="900" role="img" aria-label="{title}">'
+        cloud_at, items = phone_data()
+        head = (f'<svg xmlns="http://www.w3.org/2000/svg" class="ob ob-phone" viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" '
+                f'role="img" aria-label="{title}" data-cloud="{cloud_at}" data-items="{items}">')
         style = '<style>' + part('hero.css') + '</style>'
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
@@ -854,7 +833,7 @@ def render(v):
     if v in HERO_CUTS + ('phone',):
         body, over = split_flows(body)
         over, over_css = hoist_styles(over)
-        size = f'viewBox="{phone_crop}" width="1200" height="900"' if v == 'phone' else 'viewBox="0 -130 1200 930" width="1200" height="930"'
+        size = f'viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}"' if v == 'phone' else 'viewBox="0 -130 1200 930" width="1200" height="930"'
         cls = 'ob-over ob-phone' if v == 'phone' else 'ob-over'   # ob-phone: compact-cuts.css shows these on phones only
         flows = [f'<svg xmlns="http://www.w3.org/2000/svg" class="{cls}" {size} aria-hidden="true" focusable="false">',
                  f'<style>{over_css}</style>', over, '</svg>']

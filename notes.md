@@ -12,7 +12,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
-- [ ] Hero phone cut: room for more words later. It has the cloud, Workstations and Firewall rack. Wi-Fi, Guest Wi-Fi and Teams room are on desktop only; adding one means a bigger crop or a smaller `PHONE_K`.
+- [ ] Hero on phones, copy to confirm: the short line under the headline (`lead-short` in `Hero.astro`, "We run your IT: help desk, security, cloud, network and phones.") is a placeholder. More office captions: add a label to `HERO_LABELS` and its index to `PHONE_ITEMS` in `gen_office.py`.
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).

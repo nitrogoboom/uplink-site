@@ -1,10 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" class="ob-over ob-phone" viewBox="88 18 1127 845.25" width="1200" height="900" aria-hidden="true" focusable="false">
+<svg xmlns="http://www.w3.org/2000/svg" class="ob-over ob-phone" viewBox="240 -118 962 900" width="962" height="900" aria-hidden="true" focusable="false">
 <style>.s-0af673.s-0af673{animation-delay:calc(var(--d,0ms) + 470ms),0s}.s-542bd3.s-542bd3{animation-delay:calc(var(--d,0ms) + 380ms),0s}.s-608f41.s-608f41{animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse}.s-75ceaa.s-75ceaa{animation-delay:calc(var(--d,0ms) + 560ms),0s}.s-a74e52.s-a74e52{--d:2960ms}.s-b63a17.s-b63a17{--d:1980ms}.s-bfd857.s-bfd857{--d:2060ms}.s-cd0a41.s-cd0a41{--d:2450ms}.s-faa3e5.s-faa3e5{--d:1900ms}</style>
 <g class="s-faa3e5 ob-i ob-n"><polyline class="ob-flow" points="1040.2,468.0 1040.2,410.0 947.7,356.6 796.0,444.1 796.0,438.8" fill="none" stroke="#FFAD51" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/></g>
 <g class="s-b63a17 ob-i ob-n"><polyline class="ob-flow" points="1040.2,468.0 1040.2,410.0 873.4,506.4 873.4,501.1" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/></g>
 <g class="s-bfd857 ob-i ob-n"><polyline class="ob-flow" points="1040.2,468.0 1040.2,410.0 734.5,233.5 436.8,405.4 436.8,400.2" fill="none" stroke="#FFAD51" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/></g>
 <g class="s-cd0a41 ob-i ob-n"><polyline class="s-608f41 ob-flow" points="1040.2,468.0 1040.2,314.0" fill="none" stroke="#FFAD51" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"/></g>
-<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-542bd3 ob-flow" points="958.0,101.6 958.0,199.1" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
-<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-0af673 ob-flow" points="1040.2,149.1 1040.2,180.4" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
-<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-75ceaa ob-flow" points="1122.5,196.6 1122.5,227.9" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
+<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-542bd3 ob-flow" points="958.0,43.5 958.0,199.1" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
+<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-0af673 ob-flow" points="1040.2,91.0 1040.2,180.4" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
+<g class="s-a74e52 ob-i ob-fade ob-sync"><polyline class="s-75ceaa ob-flow" points="1122.5,138.5 1122.5,227.9" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.9" stroke-linecap="round"/></g>
 </svg>
