@@ -14,10 +14,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Drawings
 - [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
 - [ ] Hero labels: sublines are 21 units now, but on 1024–1180px-wide screens they still render at about 9.5–10px (the drawing is narrow there). Bigger fix: a tablet cut with fewer, larger labels.
-- [ ] Hero 3D cloud (`tools/hero_cloud.py`): `check.py` reports ~400 SNAP near-misses where its side-wall strips meet. Seams look clean on screen; quiet them if the checker learns about curved surfaces.
 - [ ] Hero on phones is a still picture (`office-compact.svg`): no build animation, no cloud.
-- [ ] Office plan: ~153 one-grid-step near-miss flags because the furniture is half size there. Not visible; tidy if the props get a half-size grid.
-- [ ] Office phone cut: the FIREWALL RACK title runs over the room's front edge (outlined to stay readable), and its leader doubles back.
 - [ ] Network phone cut: the VOIP PHONES leader crosses the back monitor.
 - [ ] Network: the access point's ceiling rod barely shows, so it can read as sitting low.
 - [ ] Security: the roof unit could use a fan or vent; the door could use a step.
