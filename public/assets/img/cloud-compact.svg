@@ -22,7 +22,7 @@
 <polygon points="72.4,58.1 90.1,68.3 90.1,23.4 72.4,13.3" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="93.6,66.3 90.1,68.3 90.1,23.4 93.6,21.4" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="75.9,11.2 93.6,21.4 90.1,23.4 72.4,13.3" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
-<g transform="matrix(14.125 8.155 0 16.31 73.285 14.783)"><rect x="0" y="0" width="1.125" height="2.625" rx="0.0375" fill="#182430" stroke="#A9E9C3" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"/><circle cx="0.5625" cy="0.6" r="0.24" fill="#97C8EA" fill-opacity="0.8"/><rect x="0.2625" y="0.98" width="0.6" height="0.09" rx="0.045" fill="#E6ECF2" fill-opacity="0.6"/><rect x="0.3625" y="1.15" width="0.4" height="0.07" rx="0.035" fill="#E6ECF2" fill-opacity="0.3"/><circle cx="0.3375" cy="2.305" r="0.13" fill="#F57D6E"/><circle cx="0.7875" cy="2.305" r="0.13" fill="#A9E9C3"/></g>
+<g transform="matrix(14.125 8.155 0 16.31 73.285 14.783)"><rect x="0" y="0" width="1.125" height="2.625" rx="0.0375" fill="#182430" stroke="#A9E9C3" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"/><circle cx="0.5625" cy="0.6" r="0.24" fill="#97C8EA" fill-opacity="0.8"/><rect x="0.2625" y="0.98" width="0.6" height="0.09" rx="0.045" fill="#E6ECF2" fill-opacity="0.6"/><rect x="0.3625" y="1.15" width="0.4" height="0.07" rx="0.035" fill="#E6ECF2" fill-opacity="0.3"/><circle cx="0.2812" cy="2.265" r="0.19" fill="#F57D6E"/><circle cx="0.8438" cy="2.265" r="0.19" fill="#A9E9C3"/></g>
 <polyline points="-49.4,-57.1 -49.4,-114.4" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-dasharray="5 5"/>
 <polyline points="30.0,5.1 30.0,-68.5" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-dasharray="5 5"/>
 <polyline points="83.0,17.3 83.0,-80.8" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-dasharray="5 5"/>
@@ -57,7 +57,7 @@
 <polygon points="74.2,-104.0 45.9,-87.7 45.9,-91.7 74.2,-108.1" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="45.9,-124.4 74.2,-108.1 45.9,-91.7 17.7,-108.1" fill="#4D5863" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
 <g transform="matrix(0.9 0.5 -0.9 0.5 45.9 -120.3)" fill="none" stroke="#F2F7FC" stroke-width="1.6" vector-effect="non-scaling-stroke"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/></g>
-<g class="lbl" data-t="OLD SERVER" data-s="migrated, then retired"><g class="co lt"><polyline points="-67.1,-34.7 -68.8,-110.6 -105.0,-110.6" fill="none" stroke="#97C8EA" stroke-width="2.17" stroke-opacity="0.55"/><circle cx="-67.1" cy="-34.7" r="5.43" fill="#97C8EA" stroke="#0E1A27" stroke-width="2.71"/></g>
+<g class="lbl" data-t="OLD SERVER" data-s="migrated, then retired"><g class="co lt"><polyline points="-70.6,-57.1 -68.8,-110.6 -105.0,-110.6" fill="none" stroke="#97C8EA" stroke-width="2.17" stroke-opacity="0.55"/><circle cx="-70.6" cy="-57.1" r="5.43" fill="#97C8EA" stroke="#0E1A27" stroke-width="2.71"/></g>
 <text class="lt" x="-117.7" y="-102.5" font-size="23.5" font-weight="600" letter-spacing="1.41" fill="#97C8EA" text-anchor="end">OLD SERVER</text>
 <text class="lt" x="-117.7" y="-75.3" font-size="19.9" font-weight="400" fill="#BBC2C9" text-anchor="end">migrated,</text>
 <text class="lt" x="-117.7" y="-51.8" font-size="19.9" font-weight="400" fill="#BBC2C9" text-anchor="end">then retired</text>

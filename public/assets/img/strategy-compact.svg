@@ -26,10 +26,10 @@
 <g class="lbl" data-t="Q2 UPGRADE" data-s=""><text class="lt" x="-26.0" y="103.8" font-size="20.2" font-weight="600" letter-spacing="1.21" fill="#FFAD51" text-anchor="middle">Q2</text><text class="lt" x="-26.0" y="131.8" font-size="17.1" font-weight="600" letter-spacing="1.02" fill="#F2F7FC" text-anchor="middle">UPGRADE</text></g>
 <g class="lbl" data-t="Q3 SECURE" data-s=""><text class="lt" x="77.9" y="123.8" font-size="20.2" font-weight="600" letter-spacing="1.21" fill="#FFAD51" text-anchor="middle">Q3</text><text class="lt" x="77.9" y="151.8" font-size="17.1" font-weight="600" letter-spacing="1.02" fill="#F2F7FC" text-anchor="middle">SECURE</text></g>
 <g class="lbl" data-t="Q4 REVIEW" data-s=""><text class="lt" x="181.9" y="143.8" font-size="20.2" font-weight="600" letter-spacing="1.21" fill="#FFAD51" text-anchor="middle">Q4</text><text class="lt" x="181.9" y="171.8" font-size="17.1" font-weight="600" letter-spacing="1.02" fill="#F2F7FC" text-anchor="middle">REVIEW</text></g>
-<g class="lbl" data-t="IT BUDGET" data-s="planned, not surprised"><g class="co lt"><polyline points="108.3,-52.5 136.0,-96.0 167.0,-96.0" fill="none" stroke="#FFAD51" stroke-width="1.86" stroke-opacity="0.55"/><circle cx="108.3" cy="-52.5" r="4.65" fill="#FFAD51" stroke="#0E1A27" stroke-width="2.33"/></g>
-<text class="lt" x="177.8" y="-89.0" font-size="20.2" font-weight="600" letter-spacing="1.21" fill="#FFAD51" text-anchor="start">IT BUDGET</text>
-<text class="lt" x="177.8" y="-65.8" font-size="17.1" font-weight="400" fill="#BBC2C9" text-anchor="start">planned,</text>
-<text class="lt" x="177.8" y="-45.6" font-size="17.1" font-weight="400" fill="#BBC2C9" text-anchor="start">not surprised</text>
+<g class="lbl" data-t="IT BUDGET" data-s="planned, not surprised"><g class="co lt"><polyline points="108.3,-52.5 132.0,-72.0 163.0,-72.0" fill="none" stroke="#FFAD51" stroke-width="1.86" stroke-opacity="0.55"/><circle cx="108.3" cy="-52.5" r="4.65" fill="#FFAD51" stroke="#0E1A27" stroke-width="2.33"/></g>
+<text class="lt" x="173.8" y="-65.0" font-size="20.2" font-weight="600" letter-spacing="1.21" fill="#FFAD51" text-anchor="start">IT BUDGET</text>
+<text class="lt" x="173.8" y="-41.8" font-size="17.1" font-weight="400" fill="#BBC2C9" text-anchor="start">planned,</text>
+<text class="lt" x="173.8" y="-21.6" font-size="17.1" font-weight="400" fill="#BBC2C9" text-anchor="start">not surprised</text>
 </g>
 </g>
 </svg>

@@ -12,17 +12,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
 ## Drawings
-- [ ] VoIP: the headset is still small and tucked against the monitor (mic boom about 10px); the desk phone's handset sits flat rather than raised in a cradle.
 - [ ] Hero on phones: the build animation plays, but the 3D cloud doesn't fit the phone cut (it floats above the room; with it the drawing gets too small or too tall). A small cloud badge on the tray could stand in.
-- [ ] Network phone cut: the VOIP PHONES leader crosses the back monitor.
-- [ ] Network: the access point's ceiling rod barely shows, so it can read as sitting low.
-- [ ] Security: the roof unit could use a fan or vent; the door could use a step.
-- [ ] Cloud: the phone's call buttons are small; the OLD SERVER dot crowds the server front.
-- [ ] Backup: the drive bays turn to texture at phone size; the OFFSITE COPY leader points at the wall, not the lock.
-- [ ] Strategy: the IT BUDGET leader is long and steep.
-- [ ] Tower: trees and bushes are plain stacked cubes; the rooftop unit is a plain box.
-- [ ] HQ phone cut: the building sits right of centre to make room for the label.
-- [ ] Trees are coded twice (tower and hq). Move one tree into `tools/isoprops.py`.
 
 ## Site
 - [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
