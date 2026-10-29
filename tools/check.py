@@ -1,10 +1,17 @@
 """Generic geometry checks.
-usage: python check.py <svgfile> [startline endline]   (lines for inline svg inside html)
+usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
 Reports:
   ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
   SNAP   vertices of different shapes that almost (not exactly) coincide
   TJOIN  vertices that almost (not exactly) touch another shape's edge
   DOT    leader dots (.co circles) and what filled faces they sit on
+Two narrow exceptions, both opt-in by the drawing:
+  <g class="curve">  a curved surface cut into flat strips (the hero cloud's side wall). Its strips are not iso
+                     edges (no ANGLE) and their outline points sit a couple of px apart by design, so SNAP and TJOIN
+                     skip pairs where both shapes are in curve groups. Pairs with any other shape are still checked.
+  --step PX          the drawing's props sit on a grid whose step renders under 2px (office: 0.0625 x 28.127 =
+                     1.758px), so parts one step apart look like near-misses. A SNAP pair exactly one step apart
+                     along an iso axis (within the 0.1px rounding of the file) is counted, not listed.
 """
 import sys, math
 from iso import load, classify
@@ -30,19 +37,35 @@ def is_leader(sh):
     p = sh.el.getparent()
     return p is not None and 'co' in (p.get('class') or '').split()
 
+def is_curve(sh):
+    p = sh.el.getparent()
+    return p is not None and 'curve' in (p.get('class') or '').split()
+
+def one_step(p, q, step):
+    # q - p is one grid step along an iso axis: vertical, or 30 deg either side of horizontal
+    dx, dy = q[0] - p[0], q[1] - p[1]
+    for ax, ay in ((0, 1), (math.cos(math.pi / 6), 0.5), (math.cos(math.pi / 6), -0.5)):
+        along, across = dx * ax + dy * ay, dx * ay - dy * ax
+        if abs(abs(along) - step) < 0.15 and abs(across) < 0.15:
+            return True
+    return False
+
 def is_free(sh):
     # class="mark" (arrowheads, 2D markers) or class="free" (parts tilted on purpose, like a laptop lid)
     return bool({'mark', 'free'} & set((sh.a.get('class') or '').split()))
 
 def main():
-    text = get_text(sys.argv)
-    off = int(sys.argv[2]) - 1 if len(sys.argv) > 3 else 0
+    argv, step = list(sys.argv), None
+    if '--step' in argv:
+        i = argv.index('--step'); step = float(argv[i + 1]); del argv[i:i + 2]
+    text = get_text(argv)
+    off = int(argv[2]) - 1 if len(argv) > 3 else 0
     _, shapes = load(text)
     geo = [s for s in shapes if s.subs and not is_ui(s)]
     out = []
     # ANGLE
     for s in geo:
-        if is_leader(s) or is_free(s): continue   # leaders, markers and tilted parts are off-axis by design
+        if is_leader(s) or is_free(s) or is_curve(s): continue   # leaders, markers, tilted parts and curves are off-axis by design
         for p, q in s.edges():
             k, d, o, ln = classify(p, q)
             if k is None or ln < 3: continue
@@ -57,7 +80,7 @@ def main():
     grid = {}
     for v in verts:
         grid.setdefault((int(v[0][0]//3), int(v[0][1]//3)), []).append(v)
-    seen = set()
+    seen = set(); stepped = 0
     for (gx, gy), vs in grid.items():
         cand = []
         for dx in (-1, 0, 1):
@@ -65,18 +88,21 @@ def main():
         for a in vs:
             for b in cand:
                 if a[1] == b[1] or geo[a[1]].line == geo[b[1]].line: continue
+                if is_curve(geo[a[1]]) and is_curve(geo[b[1]]): continue
                 d = math.dist(a[0], b[0])
                 if 0.15 < d < 2.0:
                     key = tuple(sorted([(round(a[0][0],1), round(a[0][1],1)), (round(b[0][0],1), round(b[0][1],1))]))
                     if key in seen: continue
                     seen.add(key)
+                    if step and one_step(a[0], b[0], step):
+                        stepped += 1; continue
                     out.append(f'SNAP  L{geo[a[1]].line+off}/L{geo[b[1]].line+off} d={d:.2f} {a[0][0]:.1f},{a[0][1]:.1f} vs {b[0][0]:.1f},{b[0][1]:.1f}')
     # TJOIN (vertex near other shape's edge)
     for i, s in enumerate(geo):
         for sub in s.subs:
             for p in sub:
                 for j, t in enumerate(geo):
-                    if j == i: continue
+                    if j == i or (is_curve(s) and is_curve(t)): continue
                     for a, b in t.edges():
                         ln = math.dist(a, b)
                         if ln < 4: continue
@@ -101,6 +127,6 @@ def main():
                 except Exception: pass
             out.append(f'DOT   L{s.line+off} at {s.c[0]:.1f},{s.c[1]:.1f} on: {hits[-3:]}')
     print('\n'.join(out))
-    print(f'-- {len(geo)} geometric shapes, {len(out)} findings', file=sys.stderr)
+    print(f'-- {len(geo)} geometric shapes, {len(out)} findings' + (f', {stepped} SNAP pairs one {step}px step apart (not listed)' if step else ''), file=sys.stderr)
 
 main()

@@ -39,8 +39,10 @@ CHAIR_X = 30                          # chair centre, out from the desk's front 
 PORTS_AT = [(30, 40, 15, 25), (5, 15, 5, 15)]   # floor port per desk: x from, x to (from the desk's back edge), y from, y to (out from its left side)
 PORT_H = 5
 RUN_X = [50, 40]                      # each run leaves the rack's left wall at this x, then one turn along the floor to its port
-AP_Z = 160                            # ceiling height: the access point hangs from it on a short rod
+AP_Z = 200                            # ceiling height, well above the rack: the access point hangs from it on a rod
 AP = (305, 330, 200, 225, 140, 145)   # over open floor front-right of the front desk: box, rod and floor below are clear of everything on screen
+ROD = (315, 320, 210, 215, 145, AP_Z) # solid rod from the access point's middle up to the ceiling plate
+PLATE = (310, 325, 205, 220, AP_Z, AP_Z + 2.5)   # ceiling mount
 RINGS = [(22, 0.8), (38, 0.6), (55, 0.4)]   # halo radius, opacity (55 keeps the outer ring inside the floor disc)
 
 DISC = (120, 60, 185)                # floor disc centre x, y and radius; grid every 20
@@ -51,14 +53,14 @@ MIN_STUB = 3                          # drop floor-line scraps shorter than this
 LABELS = [
     dict(name='firewall', elbow=(-45, -170), x=-72, title='FIREWALL', sub='managed and patched', tw=66, sw=101, anchor='end', colour=ORANGE),
     dict(name='phone', elbow=(-100, 165), x=-127, title='VOIP PHONES', sub='calls over your network', tw=88, sw=119, anchor='end', colour=BLUE),
-    dict(name='ap', elbow=(165, 150), x=192, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='start', colour=ORANGE),
+    dict(name='ap', elbow=(166, 146), x=193, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='start', colour=ORANGE),
 ]
 # compact phone cut (isogen.doc crop): the same scene framed closer, labels at 1.76x so titles come out >= 14px
 # and sublines >= 12px at 340px wide. Crop is in page coordinates (4:3); dots, elbows and text are in group coordinates.
 COMPACT = dict(crop=(41, 39, 547, 410.25), scale=1.76, labels=[
     dict(name='firewall', elbow=(-35, -150), x=-72, title='FIREWALL', sub='managed\nand patched', tw=66, sw=60, anchor='end', colour=ORANGE),
-    dict(name='phone back', elbow=(138, -110), x=165, title='VOIP PHONES', sub='calls over\nyour network', tw=88, sw=66, anchor='start', colour=BLUE),
-    dict(name='ap', elbow=(60, 200), x=33, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='end', colour=ORANGE),   # under the front desk: open floor
+    dict(name='phone back', elbow=(70, -60), x=150, title='VOIP PHONES', sub='calls over\nyour network', tw=88, sw=66, anchor='start', colour=BLUE),   # up the left of the back monitor, tail over its top
+    dict(name='ap left', elbow=(66, 202), x=39, title='ACCESS POINT', sub='coverage-planned Wi-Fi', tw=98, sw=115, anchor='end', colour=ORANGE),   # under the front desk: open floor
 ])
 TITLE = 'Server rack with firewall, two workstations with VoIP desk phones on the same network, and a Wi-Fi access point'
 
@@ -83,7 +85,7 @@ def solids():
     for y0 in DESK_Y:
         parts, _s, _t, seat = workstation(y0)
         out += [b for _n, b in parts + seat] + [port(y0)]
-    return out + [AP]
+    return out + [AP, ROD, PLATE]
 
 
 def label_gaps(L):
@@ -135,12 +137,6 @@ def floor_runs():
     return out
 
 
-def ap_run():
-    """The access point's rod, straight up to the ceiling (a long ceiling run would cross the rack or a desk on screen)."""
-    ax, ay = (AP[0] + AP[1]) / 2, (AP[2] + AP[3]) / 2
-    return f'<polyline points="{w.pts((ax, ay, AP[5]), (ax, ay, AP_Z))}" fill="none" stroke="{ORANGE}" stroke-width="1.2" stroke-opacity="0.7" stroke-dasharray="2 4"/>'
-
-
 def rack():
     out = faces(w, *RACK, cols=HIGH)
     y = RACK[3]
@@ -171,7 +167,7 @@ def access_point():
     x0, x1, y0, y1, z0, z1 = AP
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     out = [ellipse(w, r, cx, cy, z0, f'fill="none" stroke="{ORANGE}" stroke-width="1" stroke-opacity="{o}" stroke-dasharray="4 5"') for r, o in RINGS]
-    return out + faces(w, *AP, cols=HIGH)
+    return out + faces(w, *AP, cols=HIGH) + faces(w, *ROD) + faces(w, *PLATE)   # rod straight up to the ceiling plate
 
 
 def dots():
@@ -182,14 +178,14 @@ def dots():
     _p, _s, back, _c = workstation(DESK_Y[0])
     bx0, by0, bz, bw, bd, *_ = back
     return {'firewall': (fx, fx, FIREWALL[5]), 'phone': (px0 + pw / 2, py0 + pd / 2, pz), 'phone back': (bx0 + bw / 2, by0 + bd / 2, bz),
-            'ap': (ax, ay, AP[5])}
+            'ap': (AP[1] - 5, AP[2] + 5, AP[5]), 'ap left': (AP[0] + 5, AP[3] - 5, AP[5])}   # top's right or left corner, clear of the rod
 
 
 def build(compact=False):
     mask = floor_mask(compact)
     body = [floor_grid(w, DISC[:2], DISC[2], mask, step=GRID, phase=DISC[:2], min_seg=MIN_STUB)
             + disc_arcs(w, DISC[2], *DISC[:2], mask=unary_union(text_gaps(compact)))]
-    body += floor_runs() + rack() + [ap_run()]
+    body += floor_runs() + rack()
     for y0 in DESK_Y:
         body += desk(y0)
     body += access_point()

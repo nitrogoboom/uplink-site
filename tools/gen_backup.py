@@ -17,11 +17,11 @@ w = W(0, 0, 16.46)
 TRANSLATE = (268.6, 214.6)            # puts the whole picture (labels included) in the middle of the 640 x 480 frame
 GREEN, BAY, SLOT = pal.GREEN, pal.GLASS, pal.EDGE
 
-# backup unit: three stacked appliances, each with four drive bays on its right face and a status panel on its left
+# backup unit: three stacked appliances, each with three drive bays on its right face and a status panel on its left
 UNIT = (5, 4, 1.375)                  # x, y, height of one appliance
 UNITS = 3
 UNIT_GAP = 0.125                      # air between stacked appliances
-BAYS = 4                              # drive bays across the right face (x = UNIT x)
+BAYS = 3                              # drive bays across the right face (x = UNIT x): three, so they still read at phone size
 BAY_MARGIN, BAY_GAP, BAY_V = 0.25, 0.125, (0.25, 1.125)   # bay inset from the face's sides, gap between bays, top/bottom (down from the top)
 BUSY = {(2, 0), (1, 2)}               # (appliance, bay) with the orange "writing" light; the rest are green
 
@@ -49,7 +49,7 @@ SX0, SX1, SY0, SY1, SH = SITE
 # labels: (dot in world or 'ring:deg', elbow offset from the dot in px, text side, title, subline, colour)
 LABELS = [
     (('unit', 1.0, DY, (UNITS - 1) * (DH + UNIT_GAP) + DH / 2), (-58, -58), 'left', 'DAILY BACKUPS', 'servers + Microsoft 365', BLUE),
-    (('site', SX1, (SY0 + SY1) / 2, SH * 0.5), (30, -66), 'right', 'OFFSITE COPY', 'a separate, locked site', ORANGE),   # on the lock
+    (('site', SX1, (SY0 + SY1) / 2, SH * 0.8), (30, -58), 'right', 'OFFSITE COPY', 'a separate, locked site', ORANGE),   # just above the lock
     (('ring', 105), (40, 48), 'right', 'TESTED RESTORES', 'we prove it works', ORANGE),
 ]
 TITLE_W, SUB_W = 8.4, 5.4             # rough px per character, for the floor-line gap round each label
@@ -59,7 +59,7 @@ TITLE_W, SUB_W = 8.4, 5.4             # rough px per character, for the floor-li
 COMPACT = dict(crop=(106, 56, 440, 330), scale=1.5, labels=[
     # (dot spec as in LABELS, elbow, text x, anchor, title, subline, colour)
     (('unit', 1.0, DY, (UNITS - 1) * (DH + UNIT_GAP) + DH / 2), (228, 86), 255, 'start', 'DAILY BACKUPS', 'servers + Microsoft 365', BLUE),
-    (('site', SX0 + 0.5, SY1, 0.5), (389, 322), 407, 'start', 'OFFSITE COPY', 'a separate,\nlocked site', ORANGE),
+    (('site', SX1, (SY0 + SY1) / 2, SH * 0.2), (452, 316), 430, 'end', 'OFFSITE COPY', 'a separate,\nlocked site', ORANGE),   # just below the lock, text below the building
     (('ring', 5), (324, 345), 297, 'end', 'TESTED RESTORES', 'we prove it works', ORANGE),
 ])
 LEADER_CLEAR = 3                      # px of floor kept clear either side of a leader line
@@ -165,9 +165,9 @@ def bays(i, z0):
     for k in range(BAYS):
         u = BAY_MARGIN + k * (bw + BAY_GAP)
         light = ORANGE if (i, k) in BUSY else GREEN
-        out += [rect(u, v0, bw, v1 - v0, BAY, 0.06, f' stroke="{pal.EDGE}" stroke-opacity="0.18" stroke-width="1" vector-effect="non-scaling-stroke"'),
-                rect(u + 0.15, v0 + 0.2, bw - 0.3, 0.08, SLOT, 0.04, ' fill-opacity="0.35"'),
-                f'<circle cx="{u + bw - 0.18:.4g}" cy="{v1 - 0.17:.4g}" r="0.07" fill="{light}"/>']
+        out += [rect(u, v0, bw, v1 - v0, BAY, 0.08, f' stroke="{pal.EDGE}" stroke-opacity="0.4" stroke-width="1" vector-effect="non-scaling-stroke"'),
+                rect(u + 0.15, v0 + 0.2, bw - 0.3, 0.12, SLOT, 0.06, ' fill-opacity="0.45"'),
+                f'<circle cx="{u + bw - 0.22:.4g}" cy="{v1 - 0.22:.4g}" r="0.11" fill="{light}"/>']
     return f'<g transform="{on_side(w, DX, DY, z1)}">' + ''.join(out) + '</g>'
 
 

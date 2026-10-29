@@ -140,14 +140,26 @@ PHONE = [  # local, facing -y: body, handset resting flush on its left; screen a
     ('body', (-0.5, 0.5, -0.25, 0.5, 0, 0.25)),
     ('handset', (-0.5, -0.25, -0.25, 0.5, 0.25, 0.375)),
 ]
+CRADLE = [  # cradle=True: two hooks on the body's left strip, the handset lying across them with a gap below
+    ('hook back', (-0.5, -0.25, 0.25, 0.5, 0.25, 0.5)),
+    ('hook front', (-0.5, -0.25, -0.25, 0.0, 0.25, 0.5)),
+    ('handset', (-0.5, -0.25, -0.25, 0.5, 0.5, 0.625)),
+]
 
 
-def desk_phone(x, y, top, facing='-y', s=1.0):
+def desk_phone(x, y, top, facing='-y', s=1.0, cradle=False):
     """VoIP desk phone centred on (x, y) on a desk at z = top. Returns (parts back to front, top_face) where
-    top_face = (x0, y0, z, width_x, depth_y) of the body's top for phone_face()."""
-    parts = dict(place(PHONE, x, y, top, facing, s))
+    top_face = (x0, y0, z, width_x, depth_y) of the body's top for phone_face().
+    cradle=True raises the handset on two hooks (for a drawing where the phone shows big)."""
+    if cradle:
+        parts = dict(place(PHONE[:1] + CRADLE, x, y, top, facing, s))
+        hooks = back_to_front([(n, parts[n]) for n in ('hook back', 'hook front')])
+        order = [('body', parts['body'])] + hooks + [('handset', parts['handset'])]
+    else:
+        parts = dict(place(PHONE, x, y, top, facing, s))
+        order = [('body', parts['body']), ('handset', parts['handset'])]
     bx0, bx1, by0, by1, _bz0, bz1 = parts['body']
-    return [('body', parts['body']), ('handset', parts['handset'])], (bx0, by0, bz1, bx1 - bx0, by1 - by0, facing, s)
+    return order, (bx0, by0, bz1, bx1 - bx0, by1 - by0, facing, s)
 
 
 def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
@@ -173,3 +185,30 @@ def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
     else:
         tf = on_top(w, x0, y0, z) + f' matrix(0 1 1 0 0 0) translate({u_len:.4g} {v_len:.4g}) scale(-1 -1)'
     return f'<g transform="{tf}">{content}</g>'
+
+
+# ---- tree ---------------------------------------------------------------------------------------
+TREES = {  # local, centred on (0, 0): trunk, then a crown that is narrow at the bottom and top and notched at the corners
+    'big': [('trunk', (-0.25, 0.25, -0.25, 0.25, 0, 0.75)),
+            ('crown base', (-0.5, 0.5, -0.5, 0.5, 0.75, 1.0)),
+            ('crown -x', (-1.0, -0.75, -0.5, 0.5, 1.125, 2.0)),
+            ('crown -y', (-0.5, 0.5, -1.0, -0.75, 1.125, 2.0)),
+            ('crown', (-0.75, 0.75, -0.75, 0.75, 1.0, 2.375)),
+            ('crown +x', (0.75, 1.0, -0.5, 0.5, 1.125, 2.0)),
+            ('crown +y', (-0.5, 0.5, 0.75, 1.0, 1.125, 2.0)),
+            ('crown top', (-0.5, 0.5, -0.5, 0.5, 2.375, 2.75))],
+    'small': [('trunk', (-0.25, 0.25, -0.25, 0.25, 0, 0.625)),
+              ('crown base', (-0.25, 0.25, -0.25, 0.25, 0.625, 0.75)),
+              ('crown -x', (-0.75, -0.5, -0.25, 0.25, 0.875, 1.5)),
+              ('crown -y', (-0.25, 0.25, -0.75, -0.5, 0.875, 1.5)),
+              ('crown', (-0.5, 0.5, -0.5, 0.5, 0.75, 1.75)),
+              ('crown +x', (0.5, 0.75, -0.25, 0.25, 0.875, 1.5)),
+              ('crown +y', (-0.25, 0.25, 0.5, 0.75, 0.875, 1.5)),
+              ('crown top', (-0.25, 0.25, -0.25, 0.25, 1.75, 2.0))],
+}
+
+
+def tree(x, y, kind='big', z=0):
+    """Tree centred on (x, y): a trunk under a rounded, blocky crown. Parts come back to front; the trunk is the
+    only one named 'trunk' (draw it in the box faces, the rest in greens). No facing: it looks the same each way."""
+    return place(TREES[kind], x, y, z, '-y', 1.0)

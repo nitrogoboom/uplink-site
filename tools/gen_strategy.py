@@ -29,13 +29,13 @@ MILESTONES = [(0, 'Q1 AUDIT', 58), (2, 'Q2 UPGRADE', 78), (4, 'Q3 SECURE', 68), 
 TEXT_RISE = 15                        # px: text baseline above the marker centre
 PAD = 5                               # floor lines stop this far from milestone text
 
-BUDGET_ELBOW = (150.0, -96.0)         # IT BUDGET leader: elbow (screen); text starts 27px past it
+BUDGET_ELBOW = (140.0, -66.0)         # IT BUDGET leader: elbow (screen), a short gentle rise from the bar top; text starts 27px past it
 
 # compact phone cut (isogen.doc crop): the same scene framed close, labels at 1.55x. Crop is in page coordinates,
 # kept 4:3; elbows are in the drawing's group coordinates. Each quarter becomes two short lines (Q1 over AUDIT)
 # so the four still fit side by side at the bigger size.
 COMPACT = dict(crop=(88, 50, 473, 354.75), scale=1.55, budget_sub='planned,\nnot surprised',
-               budget_elbow=(136.0, -96.0))    # IT BUDGET a little left of the full one, clear of the frame
+               budget_elbow=(132.0, -72.0))    # IT BUDGET a little left of the full one, clear of the frame
 GREY = pal.GREY
 
 WHITE = pal.WHITE

@@ -1,11 +1,14 @@
 """Draws the office floor plan from one world-space description, in three versions that share every shape:
   public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
   public/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
-  public/assets/img/hero-office.svg  the hero, fetched by home.js on screens 600px and wider (page fonts apply)
-  src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro
-  public/assets/img/office-compact.svg  phone cut: static, cropped 3:2 closer on the room, two big labels, no card or badges
+  public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
+  public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
+  src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
+  public/assets/img/office-compact.svg  phone cut: static, cropped 4:3 closer on the room, two big labels, no card or badges
+  public/assets/img/office-compact-build.svg  the phone cut, animated: fetched by home.js on phones (page fonts apply)
+  public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
 usage: python tools/gen_office.py public
-Edit the numbers below and run again; don't hand-edit any of the three.
+Edit the numbers below and run again; don't hand-edit any of them.
 The hero has its own floor layout for now ('hero layout' below: desk rows, lounge, guest Wi-Fi, reception, entrance);
 the other three still draw the plan above. To move them over, send them through hero_groups() too.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
@@ -98,14 +101,16 @@ LABELS = [  # dot (world), elbow (screen), colour, title, subline, delay[, side:
     ((13.25, 9.25, 1.25), (634.1, 695.7), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
     ((WALL_T, (TV[0] + TV[1]) / 2, (TV[2] + TV[3]) / 2), (290.0, 523.7), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
 ]
-# compact phone cut ('compact'): a 3:2 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
-# titles render >= 14px and sublines >= 12px. Text sits where nothing stands: WORKSTATIONS below the room's
-# front-left edge, FIREWALL RACK on the open floor right of the desks and past the front-right edge.
-COMPACT_CROP = (220, 114, 990, 660)    # the whole room and tray, no card
-COMPACT_K = 1.85
+# compact phone cut ('compact'): a 4:3 crop in page coordinates and two labels at COMPACT_K, so at 340px wide
+# titles render >= 14px and sublines >= 12px. Text sits outside the room, under its front-left edge, stepped down
+# it: WORKSTATIONS first, FIREWALL RACK below and to the right of it. Both leaders run down-left and their tails
+# carry on left to the words; FIREWALL RACK's crosses the open floor and leaves the room clear of the front corner.
+# 4:3 rather than 3:2 so the band under the room holds both labels at full size.
+COMPACT_CROP = (220, 114, 992, 744)    # the whole room and tray, no card, a band below the room for the labels
+COMPACT_K = 1.86
 COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
-    (LABELS[0][0], (760.0, 675.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 'right'),
-    (LABELS[2][0], (651.8, 683.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
+    (LABELS[0][0], (730.0, 783.1), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 'left'),
+    (LABELS[2][0], (640.3, 682.1), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
 # ---- hero layout (hero only for now; office, build and compact keep the plan above) ------------
 # Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 2-wide aisle, set right so the meeting
@@ -172,6 +177,16 @@ HERO_LABELS = [((19.5, 2.3, 0.54), (1052.0, 760.0), pal.AMBER, 'FIREWALL RACK', 
                ((9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
                (_TV_DOT, (290.0, w.p(*_TV_DOT)[1]), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
                ((*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), pal.SKY, 'GUEST WI-FI', 'separate from staff', 3120)]
+
+# tablet cut ('tablet'): screens 600-1299px wide and under 1100px tall show the hero 440-680px wide, where 21-unit
+# sublines read 8-12px. Same scene, the three main labels at TABLET_K (sublines 19 x 1.5 units: 12-13px at
+# 1024-1180 wide) and the cloud's label text scaled by the same factor about its tail end.
+TABLET_K = 1.5
+TABLET_LABELS = [(HERO_LABELS[0][0], (1052.0, 728.0), *HERO_LABELS[0][2:]),
+                 (HERO_LABELS[1][0], (HERO_LABELS[1][1][0], 70.0), *HERO_LABELS[1][2:6], 'left'),
+                 (HERO_LABELS[2][0], _along(HERO_LABELS[2][0], 640.0), *HERO_LABELS[2][2:])]
+TABLET_CLOUD = (842.7, -82.0)          # the cloud label's text scales about this point (its right edge, at the tail)
+HERO_CUTS = ('hero', 'tablet')         # the animated hero layout's two cuts
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
@@ -431,7 +446,7 @@ def uplink(v, rack_h=RACK[3]):
     reads as plugged in, and nothing runs across the tray or its tiles."""
     x, y, z = rack_top(0, rack_h)
     _x0, _x1, y0, y1, _z0, _z1 = tray_box()
-    top = TRAY_Z - (y1 - y0) / 2 if v == 'hero' else TRAY_Z
+    top = TRAY_Z - (y1 - y0) / 2 if v in HERO_CUTS else TRAY_Z
     return cable_pair([(x, y, z), (x, y, top)], v, 'animation-duration:350ms',
                       'animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse', join=False)
 
@@ -449,12 +464,12 @@ def tile(i, v):
     x0, y0 = tx0 + TRAY_M + col * (TILE + TILE_GAP), ty0 + TRAY_M + row * (TILE + TILE_GAP)
     lit = TILES[i] == 'mail'
     out = box((x0, x0 + TILE, y0, y0 + TILE, tz1, tz1 + TILE_T), HIGH if lit else FACES, HIGH_EDGE if lit else EDGE,
-              ('f-l', 'f-r', 'f-t') if v == 'hero' else ('', '', ''))
+              ('f-l', 'f-r', 'f-t') if v in HERO_CUTS else ('', '', ''))
     m = (TILE - ICON) / 2
     ox, oy = w.p(x0 + m, y0 + m, tz1 + TILE_T)
     s = ICON / 24
     a, b = math.cos(math.radians(30)) * w.u * s, w.u / 2 * s
-    cls = 'class="f-ic" ' if v == 'hero' else ''
+    cls = 'class="f-ic" ' if v in HERO_CUTS else ''
     out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{pal.ON_AMBER if lit else pal.WHITE}" '
                f'stroke-width="2.0" {ROUND}>{ICONS[TILES[i]]}</g>')   # vector-effect sits on each icon shape (it isn't inherited)
     return out
@@ -648,12 +663,14 @@ def hero_groups(v):
           ('class="ob-i" style="--d:1650ms"', plant(PLANT_AT)),
           ('class="ob-i" style="--d:1700ms"', reception()),
           ('class="ob-i" style="--d:1750ms"', lounge())]
+    if v == 'tablet':
+        return air(v, G, HERO_APS, TABLET_LABELS, HERO_RACK[0], GUEST_AP, TABLET_K)
     return air(v, G, HERO_APS, HERO_LABELS, HERO_RACK[0], GUEST_AP)
 
 
 def groups(v):
     """(wrapper attrs for the animated versions, shapes) in draw order, back to front."""
-    if v == 'hero':
+    if v in HERO_CUTS:
         return hero_groups(v)
     G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v)),
          ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall()),
@@ -674,9 +691,9 @@ def groups(v):
     return air(v, G, APS, LABELS)
 
 
-def air(v, G, aps, labels, rack_h=RACK[3], guest=None):
+def air(v, G, aps, labels, rack_h=RACK[3], guest=None, scale=1.0):
     """Everything above the floor plan, appended to G: a cable to each AP, Wi-Fi (aps[guest] in blue, smaller rings),
-    uplink, tray and tiles, the cloud or card, labels."""
+    uplink, tray and tiles, the cloud or card, labels (at size scale)."""
     for i, ap in enumerate(aps):
         G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v, rack_h, GUEST[2] if i == guest else pal.AMBER)))
     for k, (r, op) in enumerate(RINGS):
@@ -688,23 +705,30 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None):
     G.append(('class="ob-i ob-n" style="--d:2450ms"', uplink(v, rack_h)))
     G.append(('class="ob-i" style="--d:2500ms"', box(tray_box(), TRAY_FACES, TRAY_EDGE)))
     for i, name in enumerate(TILES):
-        attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v == 'hero' else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
+        attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v in HERO_CUTS else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
         G.append((attrs, tile(i, v)))
-    if v == 'hero':
-        hero_cloud = part('hero_cloud.svg')
-        G.append((None, [hero_cloud.replace('{{CLOUD_SHAPES}}', cloud_shapes())]))
-    elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
-        for dot, elbow, colour, title, sub, side in COMPACT_LABELS:
-            G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
+    if v in HERO_CUTS:
+        hero_cloud = part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes())
+        if scale != 1.0:                     # the cloud label's words grow about their tail end; leader and dot stay
+            a = hero_cloud.index('<text class="lt"', hero_cloud.index('data-t="CLOUD WORKSPACE"'))
+            b = hero_cloud.index('<g class="num">', a)
+            cx, cy = TABLET_CLOUD
+            hero_cloud = (hero_cloud[:a] + f'<g transform="matrix({scale:g} 0 0 {scale:g} {fmt(cx * (1 - scale))} {fmt(cy * (1 - scale))})">\n'
+                          + hero_cloud[a:b] + '</g>\n' + hero_cloud[b:])
+        G.append((None, [hero_cloud]))
+    elif v in ('compact', 'phone'):          # no cloud card: the tray and its tiles read on their own
+        for (dot, elbow, colour, title, sub, side), d in zip(COMPACT_LABELS, (2800, 2960)):
+            G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
         return G
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
     for dot, elbow, colour, title, sub, d, *side in labels:
-        G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
+        G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side, k=scale)))
     return G
 
 
-HERO_FLOWS = []                          # the hero's flow layer, filled by render('hero'); written to 1-hero-flows.svg
+HERO_FLOWS = []                          # the hero's flow layer, filled by render('hero'); written to hero-flows.svg
+PHONE_FLOWS = []                         # the animated phone cut's, filled by render('phone'); office-compact-flows.svg
 
 
 def split_flows(body):
@@ -757,11 +781,14 @@ def render(v):
             open_, close = f'<g {attrs}>', '</g>'
         out += [open_, *shapes, close]
     body = number_badges('\n'.join(out))
-    title = TITLES['office' if v == 'compact' else v]
+    title = TITLES['office' if v == 'compact' else 'build' if v in ('phone', 'tablet') else v]
+    crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
     if v == 'compact':
-        crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="800" role="img" aria-label="{title}">'
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="900" role="img" aria-label="{title}">'
         style = font_style(body) + '\n<style>svg:target .lbl{display:none}</style>'
+    elif v == 'phone':                      # inlined in the page like the hero: page fonts, build.css for the motion
+        head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob ob-phone" viewBox="{crop}" width="1200" height="900" role="img" aria-label="{title}">'
+        style = '<style>' + part('build.css') + '</style>'
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
         style = font_style(body) + '\n' + key_css(KEY_WIDTH)
@@ -773,11 +800,20 @@ def render(v):
         style = '<style>' + part('hero.css') + '</style>'
         # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
         body += f'\n<circle class="ob-link-end" r="6.5" fill="{pal.ON_AMBER}" stroke="{pal.AMBER}" stroke-width="3" cx="-99" cy="-99" display="none"/>'
-    if v == 'hero':
+    flows = []
+    if v in HERO_CUTS + ('phone',):
         body, over = split_flows(body)
         over, over_css = hoist_styles(over)
-        HERO_FLOWS[:] = ['<svg xmlns="http://www.w3.org/2000/svg" class="ob-over" viewBox="0 -130 1200 930" width="1200" height="930" aria-hidden="true" focusable="false">',
-                         f'<style>{over_css}</style>', over, '</svg>']
+        size = f'viewBox="{crop}" width="1200" height="900"' if v == 'phone' else 'viewBox="0 -130 1200 930" width="1200" height="930"'
+        cls = 'ob-over ob-phone' if v == 'phone' else 'ob-over'   # ob-phone: compact-cuts.css shows these on phones only
+        flows = [f'<svg xmlns="http://www.w3.org/2000/svg" class="{cls}" {size} aria-hidden="true" focusable="false">',
+                 f'<style>{over_css}</style>', over, '</svg>']
+        if v == 'hero':
+            HERO_FLOWS[:] = flows
+        elif v == 'phone':
+            PHONE_FLOWS[:] = flows
+        elif v == 'tablet':                 # the page inlines one flow layer for both hero cuts, so they must agree
+            assert flows == HERO_FLOWS, 'tablet and hero dashes differ: render hero first and keep the scene the same'
     body, css = hoist_styles(body)
     if css:
         style += f'\n<style>{css}</style>'
@@ -789,5 +825,7 @@ if __name__ == '__main__':
     for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent
-    (site / 'assets/img/hero-office.svg').write_text(render('hero') + '\n', encoding='utf-8', newline='\n')
+    for v, name in (('hero', 'hero-office.svg'), ('tablet', 'hero-office-tablet.svg'), ('phone', 'office-compact-build.svg')):
+        (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     (root / 'src/components/home/hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
+    (site / 'assets/img/office-compact-flows.svg').write_text('\n'.join(PHONE_FLOWS) + '\n', encoding='utf-8', newline='\n')
