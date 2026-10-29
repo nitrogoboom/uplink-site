@@ -66,6 +66,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-cl span { overflow-wrap: anywhere; line-height: 1.3; }
 .fc-cl small { display: block; font-size: var(--fs-2); color: var(--c-muted); }
 .fc-cl--two { align-items: flex-start; padding-block: var(--sp-1); }
+/* stylelint-disable-next-line declaration-property-value-disallowed-list -- optical nudge: icon onto the first text line */
 .fc-cl--two svg { margin-top: 0.15rem; }
 .fc-follow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-4); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
 .fc-socials { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }

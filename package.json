@@ -11,6 +11,7 @@
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "python tools/verify_footer.py out",
+    "verify:spacing": "python tools/verify_spacing.py",
     "serve": "wrangler dev",
     "deploy": "wrangler deploy"
   },
