@@ -31,7 +31,7 @@
 }
 .next-link:hover { border-color: var(--c-line-2); transform: translateY(-2px); }
 .next-link .label { grid-area: label; }
-.next-title { grid-area: title; font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-7); line-height: 1; text-transform: uppercase; }
+.next-title { grid-area: title; font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-7); line-height: var(--lh-display); text-transform: uppercase; }
 .next-line { grid-area: line; font-size: var(--fs-2); }
 .next-link svg { grid-area: go; width: var(--sp-6); height: var(--sp-6); color: var(--c-accent-text); transition: transform var(--dur-1) var(--ease); }
 .next-link:hover svg { transform: translateX(var(--sp-1)); }

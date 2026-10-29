@@ -46,14 +46,14 @@ h1, h2, h3, h4 {
 }
 h1 { font-size: var(--fs-8); }
 h2 { font-size: var(--fs-7); }
-h3 { font-size: var(--fs-5); line-height: var(--lh-snug); }
-h4 { font-size: var(--fs-4); line-height: var(--lh-snug); }
+h3 { font-size: var(--fs-5); line-height: var(--lh-title); }
+h4 { font-size: var(--fs-4); line-height: var(--lh-title); }
 h3, h4 { font-style: normal; }   /* italic is for page and section titles (h1, h2); sub-headings stand upright */
 
 p { margin: 0; text-wrap: pretty; }
 ul, ol { margin: 0; padding: 0; }
 button, input, select, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; }
+button { padding: 0; cursor: pointer; }
 
 a { color: var(--c-text); text-decoration-color: var(--c-line-2); text-underline-offset: 0.2em; }
 a:hover { text-decoration-color: currentColor; }

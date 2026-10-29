@@ -1,5 +1,5 @@
 /*--- Facts list (label left, value right): project details, About, Contact. ---*/
-.facts { display: flex; flex-direction: column; font-size: var(--fs-2); }
+.facts { display: flex; flex-direction: column; margin-block: 0; font-size: var(--fs-2); }
 .facts > div { display: flex; justify-content: space-between; gap: var(--sp-4); padding-block: var(--sp-3); border-bottom: 1px solid var(--c-line); }
 .facts > div:last-child { border-bottom: 0; }
 .facts dt { color: var(--c-muted); }

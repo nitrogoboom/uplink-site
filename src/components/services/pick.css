@@ -45,7 +45,7 @@ html:not(.js) .roster-wrap { display: none; }
 }
 .tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); }
 .tile[aria-pressed="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
-.tile-n { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: 1; }
+.tile-n { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-6); line-height: var(--lh-tight); }
 .tile[aria-pressed="true"] .tile-n { color: var(--c-accent-text); }
 .tile-t { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); text-transform: uppercase; color: var(--c-muted); }
 .feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
