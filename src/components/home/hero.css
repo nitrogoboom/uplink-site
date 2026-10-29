@@ -33,22 +33,14 @@
 }
 .mi:hover { background: var(--c-surface-2); }
 @media (hover: hover) { .mi:hover { transform: translateX(var(--sp-1)); } }
-.mi--on { background: var(--c-surface-2); }
-.mi--on .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .mi .icon-tile { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
 .mi:hover .icon-tile, .mi:focus-visible .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .mi:focus-visible { background: var(--c-surface-2); }
-.menu:hover .mi--on:not(:hover),
-.menu:focus-within .mi--on:not(:focus-visible) { background: transparent; }
-.menu:hover .mi--on:not(:hover) .icon-tile,
-.menu:focus-within .mi--on:not(:focus-visible) .icon-tile { background: var(--c-surface-2); color: var(--c-text); }
-.menu:hover .mi--on:not(:hover) .mi-go,
-.menu:focus-within .mi--on:not(:focus-visible) .mi-go { opacity: 0; }
 .mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
 .mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); line-height: var(--lh-tight); text-transform: uppercase; }
 .mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
 .mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
-.mi:hover .mi-go, .mi:focus-visible .mi-go, .mi--on .mi-go { opacity: 1; }
+.mi:hover .mi-go, .mi:focus-visible .mi-go { opacity: 1; }
 
 .hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
 @media (min-width: 700px) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -64,12 +56,59 @@
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
 @media (min-width: 700px) and (orientation: portrait) {
-  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 34rem) * 40 / 31))); margin-inline: auto; }
+  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
 }
 
-/* phone: the still drawing (office-compact.svg, compact-cuts.css) is 4:3,
-   so its box is too; no empty bands above and below it */
-@media (max-width: 599px) { .hero-art .stage { aspect-ratio: 4 / 3; } }
+/* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP); with reduced
+   motion the 4:3 still sits in it with thin bands above and below */
+@media (max-width: 599px) {
+  .hero-art .stage { aspect-ratio: 962 / 900; }
+  .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+}
+
+/* phones (under the bottom bar's 700px): headline and the short line, the office full width, then the button
+   and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. No eyebrow and the
+   short line, so "Get started" lands on the first screen under a full-width office. */
+.lead-short { display: none; }
+@media (max-width: 699px) {
+  .hero.fold { padding-top: var(--sp-5); }
+  .hero-grid { grid-template-areas: "top" "stage" "cta" "dock"; gap: var(--sp-3); }
+  .hero-menu, .hero-art { display: contents; }
+  .hero-top { grid-area: top; gap: var(--sp-3); }
+  .hero-menu h1 { font-size: var(--fs-hero-phone); }
+  .hero-top .eyebrow, .lead-long { display: none; }
+  .lead-short { display: inline; }
+  .hero-art .stage { grid-area: stage; }
+  .hero-cta { grid-area: cta; }
+  .hero-dock { grid-area: dock; }
+}
+
+/* phone captions, written by home.js over the phone cut: the drawings' own label look (caps title in its colour,
+   grey subline), at the sizes in tokens.css (--cap-*). Words fade out and up, then in from below; the line draws
+   once they have settled, its dot pops in at the end and its ring pulses. */
+.ob-cap-t { font-family: var(--font-body); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
+.ob-cap-cloud .ob-cap-t { fill: var(--c-sky); }
+.ob-cap-s { font-family: var(--font-body); font-weight: 400; fill: var(--c-muted); }
+.ob-cap-app { fill: var(--c-text); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
+.ob-cap-t, .ob-cap-s { paint-order: stroke; stroke: var(--c-bg); stroke-linejoin: round; }
+.ob-cap-words { transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); }
+.ob-cap.is-out .ob-cap-words { opacity: 0; transform: translateY(calc(-1 * var(--sp-4))); transition-duration: var(--dur-1); }
+.ob-cap.is-pre .ob-cap-words { opacity: 0; transform: translateY(var(--sp-4)); transition: none; }
+.ob-cap-lead { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 0.6; }
+.ob-cap.is-out :is(.ob-cap-lead, .ob-cap-end, .ob-cap-ring) { opacity: 0; transition: opacity var(--dur-1) var(--ease); }
+.ob-cap-lead.is-draw { animation: cap-draw var(--dur-3) var(--ease) both; }
+@keyframes cap-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+.ob-cap-end { stroke: var(--c-bg); opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.ob-cap-end.is-in { animation: cap-pop var(--dur-2) var(--ease) var(--dur-3) both; }
+@keyframes cap-pop { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+.ob-cap-ring { fill: none; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.ob-cap-ring.is-in { animation: cap-ring var(--dur-pulse) ease-out calc(var(--dur-3) + var(--dur-2)) infinite; }
+@keyframes cap-ring { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(2.8); } }
+@media (prefers-reduced-motion: reduce) {
+  .ob-cap-words { transition: none; }
+  .ob-cap-lead.is-draw, .ob-cap-end.is-in, .ob-cap-ring.is-in { animation: none; }
+  .ob-cap-end { opacity: 1; }
+}
 
 /* ---- two columns: landscape tablets, short laptops and desktops ---------
    Text on the left, the office on the right, sized so both fit the first
@@ -78,10 +117,13 @@
 @media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
   .hero-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: calc(var(--hero-h) - 2 * var(--sp-5)) auto;
+    /* one screen with the news cards in it: the office row takes what the cards leave (the hero's padding here
+       is --sp-5 above, --sp-7 below, src/styles/hero.css), and grows past it only if the text needs more */
+    min-height: calc(var(--hero-h) - var(--sp-5) - var(--sp-7));
+    grid-template-rows: 1fr auto;
     grid-template-areas: "menu stage" "dock dock";
     column-gap: var(--sp-7);
-    row-gap: var(--sp-5);
+    row-gap: var(--sp-6);
   }
   .hero-menu { grid-area: menu; justify-content: center; gap: var(--sp-6); }
   .hero-cta { flex-wrap: wrap; }
@@ -103,11 +145,13 @@
     /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
     height: min(calc(var(--fold-h) - 2 * var(--sp-5)), 56rem);
+    min-height: 0;
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "menu stage" "menu dock";
     column-gap: var(--sp-8);
-    row-gap: var(--sp-3);
+    /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
+    row-gap: var(--sp-6);
   }
   .hero-menu { min-height: 0; }
   .hero-menu nav { display: block; margin-top: var(--sp-6); }

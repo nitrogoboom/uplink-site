@@ -140,6 +140,18 @@
   --dur-1: 150ms;
   --dur-2: 250ms;
   --dur-3: 600ms;
+  --dur-pulse: 1.8s;   /* a dot's ring, looping */
+
+  /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
+  --fs-hero-phone: 2.5rem;    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */
+  --cap-title: var(--fs-4);
+  --cap-sub: var(--fs-2);
+  --cap-edge: var(--sp-3);    /* words to the drawing's edge */
+  --cap-gap: var(--sp-1);     /* title to subline; line to words */
+  --cap-line: 1.75px;
+  --cap-dot: 4.5px;
+  --cap-halo: 4px;            /* page-colour edge round the words, so lines under them break cleanly */
+  --cap-tracking: 0.06em;     /* as the drawings' own labels (tools/gen_*.py) */
 
   /* ---- layers ---------------------------------------------------------- */
   --z-header: 30;
