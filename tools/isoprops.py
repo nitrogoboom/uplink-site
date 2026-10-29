@@ -173,3 +173,30 @@ def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
     else:
         tf = on_top(w, x0, y0, z) + f' matrix(0 1 1 0 0 0) translate({u_len:.4g} {v_len:.4g}) scale(-1 -1)'
     return f'<g transform="{tf}">{content}</g>'
+
+
+# ---- tree ---------------------------------------------------------------------------------------
+TREES = {  # local, centred on (0, 0): trunk, then a crown that is narrow at the bottom and top and notched at the corners
+    'big': [('trunk', (-0.25, 0.25, -0.25, 0.25, 0, 0.75)),
+            ('crown base', (-0.5, 0.5, -0.5, 0.5, 0.75, 1.0)),
+            ('crown -x', (-1.0, -0.75, -0.5, 0.5, 1.125, 2.0)),
+            ('crown -y', (-0.5, 0.5, -1.0, -0.75, 1.125, 2.0)),
+            ('crown', (-0.75, 0.75, -0.75, 0.75, 1.0, 2.375)),
+            ('crown +x', (0.75, 1.0, -0.5, 0.5, 1.125, 2.0)),
+            ('crown +y', (-0.5, 0.5, 0.75, 1.0, 1.125, 2.0)),
+            ('crown top', (-0.5, 0.5, -0.5, 0.5, 2.375, 2.75))],
+    'small': [('trunk', (-0.25, 0.25, -0.25, 0.25, 0, 0.625)),
+              ('crown base', (-0.25, 0.25, -0.25, 0.25, 0.625, 0.75)),
+              ('crown -x', (-0.75, -0.5, -0.25, 0.25, 0.875, 1.5)),
+              ('crown -y', (-0.25, 0.25, -0.75, -0.5, 0.875, 1.5)),
+              ('crown', (-0.5, 0.5, -0.5, 0.5, 0.75, 1.75)),
+              ('crown +x', (0.5, 0.75, -0.25, 0.25, 0.875, 1.5)),
+              ('crown +y', (-0.25, 0.25, 0.5, 0.75, 0.875, 1.5)),
+              ('crown top', (-0.25, 0.25, -0.25, 0.25, 1.75, 2.0))],
+}
+
+
+def tree(x, y, kind='big', z=0):
+    """Tree centred on (x, y): a trunk under a rounded, blocky crown. Parts come back to front; the trunk is the
+    only one named 'trunk' (draw it in the box faces, the rest in greens). No facing: it looks the same each way."""
+    return place(TREES[kind], x, y, z, '-y', 1.0)

@@ -11,9 +11,9 @@ import pathlib, sys
 from shapely.ops import unary_union
 from shapely.geometry import Polygon
 from iso import W, fmt
-from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_out, seg_path
+from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_out, seg_path, ellipse
 from svgfont import font_style
-from isoprops import on_front, rect
+from isoprops import on_front, on_side, rect, tree
 import palette as pal
 
 w = W(262, 283.2, 24)
@@ -43,15 +43,15 @@ LABELS = [('1–10 people', 117.7), ('11–50 people', 125.8), ('51–150 people
 ROOF = (1.75, 8.75, 0.375)            # roof slab: from, to (x and y), thickness (0.5 in from the walls)
 HVAC = (2.25, 4.75, 5.75, 7.75, 1.0)  # x0, x1, y0, y1, height (on the roof)
 FAN = (3.0, 4.0, 6.25, 7.25, 0.25)    # centred on top of the HVAC unit
+FAN_R = 0.375                         # round grille on the fan's top, with two blades across it
+LOUVRES = (0.25, [0.25, 0.4375, 0.625], 0.09)   # slats on the HVAC's two front faces: inset from the ends, tops (down from its top), height
 PLANTER = (5.5, 7.0, 2.5, 4.0, 0.5)   # on the roof
 MAST = (7.5, 3.25)                    # at x = y = MAST[0], height above the roof
 WIFI = [(9, 0.8), (16, 0.5)]          # signal arcs round the mast top: radius px, opacity
-TREES = [(1.0, 10.5, 'big'), (10.5, 10.5, 'small')]   # centre x, y, kind: front-left corner and front corner
-TREE = {'big': [(0.5, 1.0), (1.5, 1.25), (1.0, 0.75)],      # trunk, canopy, top: width, height
-        'small': [(0.5, 0.75), (1.0, 1.0), (0.5, 0.5)]}
-BUSH = (0.75, 0.5)                    # width, height
-BUSHES = [(2.25, 10.0), (3.25, 10.0), (6.5, 10.0), (7.5, 10.0),       # back corner x, y: a row each side of the path,
-          (10.0, 2.5), (10.0, 3.5), (10.0, 6.25), (10.0, 7.25)]       # and two pairs along the right wall
+TREES = [(1.0, 10.5, 'big'), (10.5, 10.5, 'small')]   # centre x, y, kind (isoprops.tree): front-left corner and front corner
+BUSH = [(0, 1.0, 0.375), (0.25, 0.5, 0.25)]   # a low mound and a smaller one on top: inset, width, height
+BUSHES = [(2.0, 10.0), (3.25, 10.0), (6.25, 10.0), (7.5, 10.0),       # back corner x, y: a row each side of the path,
+          (10.0, 2.25), (10.0, 3.5), (10.0, 6.0), (10.0, 7.25)]       # and two pairs along the right wall
 
 GREEN = (pal.GREEN_MID, pal.GREEN_DARK, pal.GREEN)
 GREEN_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
@@ -91,16 +91,15 @@ def flat(pts, attrs):
 
 
 def tree_boxes(cx, cy, kind):
+    return [b for _n, b in tree(cx, cy, kind)]
+
+
+def bush_boxes(x0, y0):
     out, z = [], 0
-    for size, h in TREE[kind]:
-        r = size / 2
-        out.append((cx - r, cx + r, cy - r, cy + r, z, z + h))
+    for inset, size, h in BUSH:
+        out.append((x0 + inset, x0 + inset + size, y0 + inset, y0 + inset + size, z, z + h))
         z += h
     return out
-
-
-def bush_box(x0, y0):
-    return (x0, x0 + BUSH[0], y0, y0 + BUSH[0], 0, BUSH[1])
 
 
 def door_boxes():
@@ -180,8 +179,15 @@ def roof():
     out = box(r0, r1, r0, r1, top, z)
     x0, x1, y0, y1, h = HVAC
     out += box(x0, x1, y0, y1, z, z + h)
+    inset, tops, sh = LOUVRES
+    for tf, length in ((on_front(w, x0, y1, z + h), x1 - x0), (on_side(w, x1, y1, z + h), y1 - y0)):
+        out.append(f'<g transform="{tf}">' + ''.join(rect(inset, v, length - 2 * inset, sh, pal.SCREEN, 0, ' fill-opacity="0.7"') for v in tops) + '</g>')
     fx0, fx1, fy0, fy1, fh = FAN
     out += box(fx0, fx1, fy0, fy1, z + h, z + h + fh)
+    cx, cy, cz = (fx0 + fx1) / 2, (fy0 + fy1) / 2, z + h + fh
+    out.append(ellipse(w, FAN_R, cx, cy, cz, f'fill="{pal.SCREEN}" stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.3"'))
+    blades = ''.join(f'M{w.pts(a)}L{w.pts(b)}' for a, b in (((cx - FAN_R, cy, cz), (cx + FAN_R, cy, cz)), ((cx, cy - FAN_R, cz), (cx, cy + FAN_R, cz))))
+    out.append(f'<path d="{blades}" fill="none" stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.45"/>')
     px0, px1, py0, py1, ph = PLANTER
     out += box(px0, px1, py0, py1, z, z + ph, GREEN, GREEN_EDGE)
     m, mh = MAST
@@ -196,12 +202,12 @@ def roof():
 
 def front():
     """Trees and bushes, back to front (by footprint centre x + y); a tree is trunk, canopy, top."""
-    plants = [(t[0] + t[1], tree_boxes(*t)) for t in TREES]
-    plants += [(p[0] + p[1] + BUSH[0], [bush_box(*p)]) for p in BUSHES]
+    plants = [(t[0] + t[1], tree_boxes(*t), True) for t in TREES]
+    plants += [(p[0] + p[1] + BUSH[0][1], bush_boxes(*p), False) for p in BUSHES]
     out = []
-    for _d, boxes in sorted(plants, key=lambda q: q[0]):
+    for _d, boxes, trunk in sorted(plants, key=lambda q: q[0]):
         for k, bx in enumerate(boxes):
-            out += box(*bx) if len(boxes) > 1 and k == 0 else box(*bx, GREEN, GREEN_EDGE)
+            out += box(*bx) if trunk and k == 0 else box(*bx, GREEN, GREEN_EDGE)
     return out
 
 
@@ -212,7 +218,7 @@ def floor_mask():
     shapes = [silhouette(w, B0, B1, B0, B1, 0, FLOOR), silhouette(w, B0 - o, B1 + o, B0 - o, B1 + o, FLOOR - CORNICE[1], FLOOR)]
     shapes += [silhouette(w, *b) for b in door_boxes()]
     shapes += [silhouette(w, *bx) for t in TREES for bx in tree_boxes(*t)]
-    shapes += [silhouette(w, *bush_box(*p)) for p in BUSHES]
+    shapes += [silhouette(w, *bx) for p in BUSHES for bx in bush_boxes(*p)]
     shapes.append(Polygon([w.p(WALK[0], B1), w.p(WALK[1], B1), w.p(WALK[1], GROUND), w.p(WALK[0], GROUND)]))
     return unary_union(shapes)
 
