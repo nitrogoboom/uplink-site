@@ -9,6 +9,7 @@
 .detail-body .prose { font-size: var(--fs-4); }
 .detail-body .prose h3 { color: var(--c-text); }
 .detail-body .prose > * + h3 { margin-top: var(--sp-6); }
+.detail-body .prose > h3 + * { margin-top: var(--sp-3); }   /* closer below than above: a heading sits with its text */
 .detail-body .prose :is(ol, ul) { display: flex; flex-direction: column; gap: var(--sp-3); padding-left: var(--sp-5); }
 .detail-body .prose li { padding-left: var(--sp-1); }
 .detail-body .prose li::marker { color: var(--c-accent-text); font-weight: 600; }
@@ -24,7 +25,7 @@
   align-items: center;
   column-gap: var(--sp-5);
   row-gap: var(--sp-2);
-  padding: var(--sp-5) var(--sp-6);
+  padding: var(--sp-5);
   color: var(--c-text);
   text-decoration: none;
   transition: border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
