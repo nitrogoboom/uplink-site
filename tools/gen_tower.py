@@ -1,10 +1,14 @@
-"""Draws the growing tower (home page "grow" section) from a world-space description.
+"""Draws the growing world (home page "grow" section) from a world-space description: the office tower, plus the
+remote homes, security ring, second office, cloud and cables that join as the business grows.
 Writes the inline <svg class="tg"> (src/components/home/grow-tower.svg, inlined by Grow.astro) and the reference
 copy public/assets/img/tower-grow.svg.
 Edit the numbers below and run again; don't hand-edit either copy.
 usage: python tools/gen_tower.py public
 World: 1 unit = 24px, W(262, 283.2, 24). Origin = back corner of the ground slab's top. x runs right-down, y left-down, z up.
-home.js only sets data-floors on the <svg>; the <style> inside hides upper floors and drops the roof.
+Without script the whole world shows (all three storeys, viewBox = the level 3 camera). home.js scrubs it with the
+scroll: it sets each storey's and piece's opacity and drop from its data-at (the point on the 0-3 growth scale where
+it starts), moves the roof (data-storey px per missing storey), and moves the viewBox between the cameras on the <svg> (data-cam1..3, one per level).
+It still sets data-floors, which picks the lit storey's colours. Tag anchors: <circle class="tg-a" data-a="...">.
 Keep the classes (tg-ground, tg-floor + data-f, tg-roof, tg-front, tg-w/wl/wr/on, tg-tl/td/tb/tt) and group order.
 """
 import pathlib, sys
@@ -15,6 +19,7 @@ from isogen import FACES, HIGH, BLUE, ORANGE, INK, EDGE, FONT, silhouette, clip_
 from svgfont import font_style
 from isoprops import on_front, on_side, rect, tree
 import palette as pal
+import hero_cloud
 
 w = W(262, 283.2, 24)
 
@@ -57,7 +62,30 @@ GREEN = (pal.GREEN_MID, pal.GREEN_DARK, pal.GREEN)
 GREEN_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
 AWNING_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
 WALL_LINE = f'fill="none" stroke="{pal.EDGE}" stroke-width="0.8" stroke-opacity="0.3"'
-TITLE = 'Isometric office building that grows from one to three storeys as a company grows'
+TITLE = 'Isometric office that grows from one to three storeys, then gains remote staff, a second office and a cloud'
+
+# The rest of the world, outside the tower's slab. Each piece has its own slab (PAD thick, like the ground) and an
+# `at`: where it starts on the growth scale (0-1 level 1, 1-2 level 2, 2-3 level 3). home.js builds each in over
+# 0.4 of a level, storeys over 0.55, so every level is finished by its whole number.
+FLOOR_AT = {1: 0, 2: 1, 3: 2}         # storey -> at
+HOME = (4.5, 2.75, 2.0, 1.75)         # slab size, house size (square, centred), wall height, roof rise (steep enough that no roof edge runs near an iso axis)
+HOME_WIN = (0.75, 2.0, 0.75, 1.5)     # front-left window: x from, x to (from the house's x0), sill, head
+HOMES = [(15.5, 2.0, 1.2, 'home-a'), (2.0, 15.5, 1.4, 'home-b'),          # slab back corner x, y; at; anchor name
+         (29.5, 15.75, 2.4, None), (18.25, 27.5, 2.45, None)]
+OFFICE = (16.0, 15.0, 9.0, 1.25, 2)   # slab back corner x, y; slab size; building inset; storeys
+OFFICE_AT = 2.15
+OFFICE_WIN = [(1.0, 2.5), (4.0, 5.5)] # along each wall, from the building's corner
+RING = (0.75, 1.6)                    # security ring: gap round the tower's slab, at
+CLOUD = (2.0, -2.0, 12.5, 7.0, 2.35)  # the hero's cloud (tools/hero_cloud.py), scaled down: face's bottom-left x, y, z
+                                      # (the face looks down +y, the slab runs back along -y), width, at
+CLOUD_GID = 'gc'                      # its gradient id prefix (the hero's own cloud uses 'hc' on the same page)
+CABLES = [(1.35, [(11.75, 4.25), (15.5, 4.25)]),                            # at, path at z = 0
+          (1.55, [(4.25, 11.75), (4.25, 15.5)]),
+          (2.3, [(11.75, 9.0), (13.75, 9.0), (13.75, 19.5), (16.0, 19.5)]),
+          (2.5, [(25.0, 18.0), (29.5, 18.0)]),
+          (2.55, [(20.5, 24.0), (20.5, 27.5)])]
+UPLINK_AT = 2.6                       # dashed line from the cloud down to the tower's mast
+CAM_PAD = 24                          # px round each level's camera
 
 STYLE = f'''<style>.tg-floor,.tg-roof{{transition:opacity .6s ease,transform .6s ease}}
 .tg-w{{fill:{pal.GLASS};transition:fill .6s ease,fill-opacity .6s ease}}
@@ -77,7 +105,16 @@ STYLE = f'''<style>.tg-floor,.tg-roof{{transition:opacity .6s ease,transform .6s
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-td,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-td,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-td,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-td{{fill:{pal.AMBER}}}
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tb,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tb,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tb,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tb{{stroke:{pal.AMBER};stroke-opacity:.9}}
 .tg[data-floors="1"] .tg-floor[data-f="1"] .tg-tt,.tg[data-floors="2"] .tg-floor[data-f="2"] .tg-tt,.tg[data-floors="3"] .tg-floor[data-f="3"] .tg-tt,.tg:not([data-floors]) .tg-floor[data-f="3"] .tg-tt{{fill:{pal.AMBER}}}
-@media (prefers-reduced-motion:reduce){{.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{{transition:none!important}}}}</style>'''
+.tg-ring{{fill:{pal.AMBER};fill-opacity:.05;stroke:{pal.AMBER};stroke-opacity:.6;stroke-width:1.4;stroke-dasharray:6 7;animation:tg-dash 2.6s linear infinite}}
+.tg-cable{{fill:none;stroke:{pal.AMBER};stroke-opacity:.22;stroke-width:4;stroke-linecap:round;stroke-dasharray:1 1}}
+.tg-flow{{fill:none;stroke:{pal.AMBER};stroke-width:1.6;stroke-linecap:round;stroke-dasharray:4 8;animation:tg-dash 1.2s linear infinite}}
+.tg-up{{fill:none;stroke:{pal.SKY};stroke-opacity:.7;stroke-width:1.2;stroke-dasharray:2 6;animation:tg-dash 1.6s linear infinite}}
+.tg-float{{animation:tg-float 5s ease-in-out infinite}}
+.tg-a{{fill:none}}
+.tg-live .tg-floor,.tg-live .tg-roof,.tg-live .tg-p{{transition:none}}
+@keyframes tg-dash{{to{{stroke-dashoffset:-12}}}}
+@keyframes tg-float{{50%{{transform:translateY(-6px)}}}}
+@media (prefers-reduced-motion:reduce){{.tg-floor,.tg-roof,.tg-w,.tg-tl,.tg-td,.tg-tb,.tg-tt{{transition:none!important}}.tg-ring,.tg-flow,.tg-up,.tg-float{{animation:none}}}}</style>'''
 
 
 def box(x0, x1, y0, y1, z0, z1, cols=FACES, edge=EDGE):
@@ -223,15 +260,188 @@ def floor_mask():
     return unary_union(shapes)
 
 
+def flat3(pts, attrs):
+    return f'<polygon points="{w.pts(*pts)}" {attrs}/>'
+
+
+def pad(x0, y0, size):
+    """A piece's own slab: the ground's faces and lawn tint, top at z = 0."""
+    x1, y1, i = x0 + size, y0 + size, LAWN_INSET
+    out = box(x0, x1, y0, y1, -GROUND_T, 0, (FACES[0], FACES[1], GROUND_TOP))
+    out.append(flat([(x0 + i, y0 + i), (x1 - i, y0 + i), (x1 - i, y1 - i), (x0 + i, y1 - i)], f'fill="{pal.GREEN}" fill-opacity="0.13"'))
+    return out
+
+
+def home_parts(x0, y0):
+    """House walls x0, x1, y0, y1, wall top, ridge height, ridge y."""
+    size, hs, wall, rise = HOME
+    hx0, hy0 = x0 + (size - hs) / 2, y0 + (size - hs) / 2
+    return hx0, hx0 + hs, hy0, hy0 + hs, wall, wall + rise, hy0 + hs / 2
+
+
+def home(x0, y0):
+    """A remote worker's house: slab, walls, a gable roof (ridge along x, no overhang, so every roof corner is a wall
+    corner), one lit window, an online dot over the ridge."""
+    hx0, hx1, hy0, hy1, zt, zr, ym = home_parts(x0, y0)
+    out = pad(x0, y0, HOME[0]) + box(hx0, hx1, hy0, hy1, 0, zt)
+    out.append(flat3([(hx0, hy0, zt), (hx1, hy0, zt), (hx1, ym, zr), (hx0, ym, zr)], f'fill="{pal.TOP}" {EDGE}'))
+    out.append(flat3([(hx1, hy0, zt), (hx1, ym, zr), (hx1, hy1, zt)], f'fill="{pal.RIGHT}" {EDGE}'))
+    out.append(flat3([(hx0, ym, zr), (hx1, ym, zr), (hx1, hy1, zt), (hx0, hy1, zt)], f'fill="{pal.LEFT}" {EDGE}'))
+    a, b, lo, hi = HOME_WIN
+    pts = w.pts((hx0 + a, hy1, lo), (hx0 + b, hy1, lo), (hx0 + b, hy1, hi), (hx0 + a, hy1, hi))
+    out += [f'<polygon points="{pts}" {WALL_LINE}/>', f'<polygon points="{pts}" fill="{pal.HI_TOP}"/>']
+    dx, dy = w.p((hx0 + hx1) / 2, ym, zr + 0.75)
+    out.append(f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="4" fill="{ORANGE}" stroke="{INK}" stroke-width="2"/>')
+    return out
+
+
+def office():
+    """The second office: two storeys with a cornice each, windows on both walls, roof slab and one HVAC unit."""
+    x0, y0, size, inset, n = OFFICE
+    b0x, b1x, b0y, b1y = x0 + inset, x0 + size - inset, y0 + inset, y0 + size - inset
+    o, d = CORNICE
+    out = pad(x0, y0, size)
+    for f in range(n):
+        z0 = f * FLOOR
+        out += box(b0x, b1x, b0y, b1y, z0, z0 + FLOOR - d)
+        out += box(b0x - o, b1x + o, b0y - o, b1y + o, z0 + FLOOR - d, z0 + FLOOR)
+        lo, hi = z0 + WIN_Z[0], z0 + WIN_Z[1]
+        for i, (a, b) in enumerate(OFFICE_WIN):
+            for side, pts in (('l', w.pts((b0x + a, b1y, lo), (b0x + b, b1y, lo), (b0x + b, b1y, hi), (b0x + a, b1y, hi))),
+                              ('r', w.pts((b1x, b0y + a, lo), (b1x, b0y + b, lo), (b1x, b0y + b, hi), (b1x, b0y + a, hi)))):
+                lit = (f + i + (side == 'r')) % 2 == 0
+                fill = f'fill="{pal.SKY}" fill-opacity="{0.6 if side == "l" else 0.42}"' if lit else f'fill="{pal.GLASS}"'
+                out += [f'<polygon points="{pts}" {WALL_LINE}/>', f'<polygon points="{pts}" {fill}/>']
+    top = n * FLOOR
+    out += box(b0x + 0.5, b1x - 0.5, b0y + 0.5, b1y - 0.5, top, top + ROOF[2])
+    z = top + ROOF[2]
+    out += box(b0x + 1.0, b0x + 2.75, b0y + 1.0, b0y + 2.5, z, z + 0.875)
+    return out
+
+
+def ring():
+    """Security ring round the tower's slab, at the slab's foot."""
+    g, z = RING[0], -GROUND_T
+    pts = w.pts((-g, -g, z), (GROUND + g, -g, z), (GROUND + g, GROUND + g, z), (-g, GROUND + g, z))
+    return [f'<polygon class="tg-ring" points="{pts}"/>']
+
+
+def cable(path):
+    """A ground-level link: a soft line home.js draws in (pathLength 1), and moving dashes on top."""
+    d = 'M' + ' L'.join(w.s(x, y, 0) for x, y in path)
+    return [f'<path class="tg-cable" d="{d}" pathLength="1"/>', f'<path class="tg-flow" d="{d}"/>']
+
+
+def cloud_fit():
+    """World size of one hero-cloud plane unit, and the face's u span, v height and depth (plane units)."""
+    u0, _v0, u1, v1 = hero_cloud.face().bounds
+    return CLOUD[3] / (u1 - u0), u0, u1, v1, hero_cloud.DEPTH
+
+
+def cloud():
+    """The hero's cloud, scaled and moved into this world (a uniform scale keeps it true isometric)."""
+    x0, y0, z0, _width, _at = CLOUD
+    k, u0, _u1, _v1, _d = cloud_fit()
+    tx, ty = w.p(x0 - u0 * k, y0, z0)                 # where the face's u = 0, v = 0 lands
+    ox, oy = hero_cloud.ORIGIN
+    hero_cloud.GID = CLOUD_GID
+    return [f'<g transform="translate({fmt(tx)} {fmt(ty)}) scale({k * w.u:.4f}) translate({-ox:.1f} {-oy:.1f})">',
+            hero_cloud.cloud_shapes(), '</g>']
+
+
+def cloud_box():
+    """The cloud's world box (x0, x1, y0, y1, z0, z1)."""
+    x0, y0, z0, width, _at = CLOUD
+    k, _u0, _u1, v1, d = cloud_fit()
+    return x0, x0 + width, y0 - d * k, y0, z0, z0 + v1 * k
+
+
+def uplinks():
+    """Dashed line from under the cloud's left side down to the tower's mast top (the roof is in place by then)."""
+    x0, x1, _y0, y1, z0, _z1 = cloud_box()
+    fx, fy = w.p(x0 + (x1 - x0) / 4, y1, z0)
+    tx, ty = w.p(MAST[0], MAST[0], FLOORS * FLOOR + ROOF[2] + MAST[1])
+    return [f'<path class="tg-up" d="M{fmt(fx)},{fmt(fy)} L{fmt(tx)},{fmt(ty)}"/>']
+
+
+def anchors():
+    """Where the phone tags point (home.js reads cx, cy)."""
+    hx0, hx1, _y0, _y1, _zt, zr, ym = home_parts(*HOMES[0][:2])
+    x0, y0, size, _inset, n = OFFICE
+    g = RING[0]
+    spots = {'door': ((DOOR[0] + DOOR[1]) / 2, B1 + AWNING[2] / 2, AWNING[3] + AWNING[4]),
+             'mast1': (MAST[0], MAST[0], FLOOR + ROOF[2] + MAST[1]),
+             'ring': (GROUND + g, GROUND + g, -GROUND_T),
+             'home-a': ((hx0 + hx1) / 2, ym, zr + 0.75),
+             'office': (x0 + size / 2, y0 + size / 2, n * FLOOR + ROOF[2] + 0.875),
+             'cloud': ((cloud_box()[0] + cloud_box()[1]) / 2, CLOUD[1], cloud_box()[5])}
+    out = []
+    for name, (x, y, z) in spots.items():
+        X, Y = w.p(x, y, z)
+        out.append(f'<circle class="tg-a" data-a="{name}" cx="{fmt(X)}" cy="{fmt(Y)}" r="0"/>')
+    return out
+
+
+def cameras():
+    """One viewBox per level: everything standing at the end of that level, plus CAM_PAD."""
+    cams = []
+    for L in (1, 2, 3):
+        P = [w.p(x, y, z) for x in (0, GROUND) for y in (0, GROUND) for z in (-GROUND_T, 0)]
+        top = L * FLOOR + ROOF[2]
+        P += [w.p(x, y, top + HVAC[4] + FAN[4]) for x in (B0, B1) for y in (B0, B1)]
+        tx, ty = w.p(MAST[0], MAST[0], top + MAST[1])
+        P += [(tx, ty - WIFI[1][0])]
+        P += [w.p(t[0], t[1], 5.0) for t in TREES]
+        for f in range(1, L + 1):
+            dx, dy = w.p(LABEL_DOT[0], LABEL_DOT[1], (f - 1) * FLOOR + LABEL_DOT[2])
+            P += [(dx + LABEL_GAP + LABELS[f - 1][1], dy - PILL_H / 2), (dx, dy + PILL_H / 2)]
+        if RING[1] < L:
+            g = RING[0]
+            P += [w.p(x, y, -GROUND_T) for x in (-g, GROUND + g) for y in (-g, GROUND + g)]
+        for x0, y0, at, _a in HOMES:
+            if at < L:
+                hx0, hx1, _y0, _y1, _zt, zr, ym = home_parts(x0, y0)
+                P += [w.p(x, y, z) for x in (x0, x0 + HOME[0]) for y in (y0, y0 + HOME[0]) for z in (-GROUND_T, 0)]
+                dx, dy = w.p((hx0 + hx1) / 2, ym, zr + 0.75)
+                P += [(dx, dy - 6)]
+        if OFFICE_AT < L:
+            x0, y0, size, _i, n = OFFICE
+            P += [w.p(x, y, z) for x in (x0, x0 + size) for y in (y0, y0 + size) for z in (-GROUND_T, n * FLOOR + 2)]
+        if CLOUD[4] < L:
+            x0, x1, y0, y1, z0, z1 = cloud_box()
+            P += [w.p(x, y, z) for x in (x0, x1) for y in (y0, y1) for z in (z0, z1)]
+        xs, ys = [q[0] for q in P], [q[1] for q in P]
+        cams.append((min(xs) - CAM_PAD, min(ys) - CAM_PAD, max(xs) - min(xs) + 2 * CAM_PAD, max(ys) - min(ys) + 2 * CAM_PAD))
+    return cams
+
+
+def piece(at, parts, cls='tg-p'):
+    return [f'<g class="{cls}" data-at="{at:g}">', *parts, '</g>']
+
+
 def build(embed_font):
     BOXES.clear()
-    body = ['<g class="tg-ground">', *ground(floor_mask()), '</g>']
+    body = piece(RING[1], ring())
+    for at, path in CABLES:
+        body += piece(at, cable(path), 'tg-p tg-c')
+    body += piece(CLOUD[4], ['<g class="tg-float">', *cloud(), '</g>'])
+    body += ['<g class="tg-ground">', *ground(floor_mask()), '</g>']
     for f in range(1, FLOORS + 1):
-        body += [f'<g class="tg-floor" data-f="{f}">', *storey(f), '</g>']
+        body += [f'<g class="tg-floor" data-f="{f}" data-at="{FLOOR_AT[f]:g}">', *storey(f), '</g>']
     body += ['<g class="tg-roof">', *roof(), '</g>', '<g class="tg-front">', *front(), '</g>']
+    for x0, y0, at, _a in sorted(HOMES[:2], key=lambda h: h[0] + h[1]):
+        body += piece(at, home(x0, y0))
+    body += piece(OFFICE_AT, office())
+    for x0, y0, at, _a in sorted(HOMES[2:], key=lambda h: h[0] + h[1]):
+        body += piece(at, home(x0, y0))
+    body += piece(UPLINK_AT, uplinks())
+    body += anchors()
     text = '\n'.join(body)
+    cams = cameras()
+    vb = ' '.join(fmt(v) for v in cams[2])
+    data = ' '.join(f'data-cam{k + 1}="{" ".join(fmt(v) for v in c)}"' for k, c in enumerate(cams))
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" class="tg" data-floors="3" viewBox="0 0 640 640" width="640" height="640" role="img" aria-label="{TITLE}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" class="tg" data-floors="3" viewBox="{vb}" width="{round(cams[2][2])}" height="{round(cams[2][3])}" {data} data-storey="{FLOOR * w.u:g}" role="img" aria-label="{TITLE}">',
         f'<title>{TITLE}</title>',
         STYLE.replace('DROP1', f'{FLOOR * w.u:g}').replace('DROP2', f'{2 * FLOOR * w.u:g}')   # roof drops one storey per missing floor
         + (font_style(text) if embed_font else ''),

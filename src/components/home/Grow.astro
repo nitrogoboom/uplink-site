@@ -1,10 +1,23 @@
 ---
-// HOME · 3. Growing with you. Scroll story: the building gets taller as the steps scroll past (home.js).
+// HOME · 3. Growing with you. Scroll story: the world grows as you scroll (home.js): floors, then remote staff and a
+// security ring, then a second office and a cloud. Phone and tablet: the picture, a level HUD and the active step hold
+// still for about three screens while the scroll builds each level (soft snap to each finished one). Desktop: the
+// picture stays put beside the steps.
 // Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand. Inlined as text (?raw): a plain
 // import would also write a copy to dist/_astro that nothing uses.
+// Tags point at the drawing's anchors (<circle class="tg-a" data-a="…">); data-l is the level they show on.
 // Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
 import tower from './grow-tower.svg?raw';
 import './grow.css';
+
+const tags = [
+  { l: 1, a: 'door', t: 'Help desk' },
+  { l: 1, a: 'mast1', t: 'Backed up' },
+  { l: 2, a: 'ring', t: '24/7 watch' },
+  { l: 2, a: 'home-a', t: 'Remote staff' },
+  { l: 3, a: 'office', t: 'Second office' },
+  { l: 3, a: 'cloud', t: 'Cloud' },
+];
 ---
 <section class="section grow-section" id="grow" aria-labelledby="grow-title">
   <div class="container">
@@ -16,7 +29,15 @@ import './grow.css';
           <p class="lead">Start with the basics and add more as your team grows. Same people, same help desk, the whole way.</p>
         </div>
         <div class="grow-art">
+          <div class="grow-hud" aria-hidden="true" data-md-skip>
+            <span class="chip chip--accent">Level <span class="grow-lvl">1</span></span>
+            <span class="grow-count"><span class="grow-num">1</span> people</span>
+            <span class="grow-bar"><i></i><i></i><i></i></span>
+          </div>
           <Fragment set:html={tower} />
+          <div class="grow-tags" aria-hidden="true" data-md-skip>
+            {tags.map((g) => <span class="grow-tag" data-l={g.l} data-a={g.a}>{g.t}</span>)}
+          </div>
         </div>
       </div>
       <ol class="grow-steps">
@@ -51,6 +72,7 @@ import './grow.css';
           </ul>
         </div></li>
       </ol>
+      <span class="grow-snap" aria-hidden="true"></span><span class="grow-snap" aria-hidden="true"></span><span class="grow-snap" aria-hidden="true"></span>
     </div>
   </div>
 </section>
