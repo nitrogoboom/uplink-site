@@ -133,6 +133,8 @@
   /* ---- depth ----------------------------------------------------------- */
   --shadow-1: 0 12px 32px -12px rgb(0 0 0 / 0.55);
   --shadow-2: 0 32px 64px -24px rgb(0 0 0 / 0.65);
+  /* shadow-2 plus a shadow off each side: the card in front of its neighbours (Home services, phone) */
+  --shadow-front: var(--shadow-2), -20px 0 32px -12px rgb(0 0 0 / 0.7), 20px 0 32px -12px rgb(0 0 0 / 0.7);
   --blur: 14px;
 
   /* ---- motion ---------------------------------------------------------- */
