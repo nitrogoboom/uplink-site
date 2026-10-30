@@ -6,7 +6,9 @@
 //   on        the one the picker shows first
 //   first     the first drawing on the page loads eagerly; the rest lazily
 //   heading   h2 in the picker; h1 on the service's own page. "What's included" and "Best for" are one level down.
+//             In the picker the card also links to the service's own page.
 import type { CollectionEntry } from 'astro:content';
+import Icon from '../Icon.astro';
 interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
 const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
 const Sub = Heading === 'h1' ? 'h2' : 'h3';
@@ -36,5 +38,6 @@ const two = (k: number) => String(k).padStart(2, '0');
       ))}
     </ul>
     <div class="row"><Sub class="label">Best for</Sub><p>{s.bestFor}</p></div>
+    {Heading === 'h2' && <a class="link-arrow" href={`/services/${id}`}>More about {s.title}<Icon name="arrow" /></a>}
   </div>
 </article>
