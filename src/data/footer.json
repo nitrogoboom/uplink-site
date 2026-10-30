@@ -14,7 +14,7 @@
       "tile": "Services",
       "more": {
         "label": "Compare all services",
-        "href": "/services"
+        "href": "/services#plans"
       }
     },
     {
