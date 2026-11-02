@@ -4,6 +4,7 @@
 // swipe row (home.js lights the dots). Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import Icon, { type IconName } from '../Icon.astro';
+import Pause from '../Pause.astro';
 import './services.css';
 const SLOTS = 4;
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -30,7 +31,7 @@ const tiles = [
         <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
           <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
           <span class="svc-icon"><Icon name={s.icon as IconName} /></span>
-          <span class="svc-text"><span class="chip">{s.chip}</span><span class="svc-title">{s.title}</span><span class="svc-line">{s.card}</span></span>
+          <span class="svc-text"><span class="chip" aria-hidden="true">{s.chip}</span><span class="svc-title">{s.title}</span><Pause /><span class="svc-line">{s.card}</span></span>
           <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
         </a></li>
       ))}

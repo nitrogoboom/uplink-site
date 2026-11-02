@@ -144,6 +144,10 @@ $$('dialog').forEach((dlg) => {
   });
 });
 
+// With script, these open a pop-up instead of going to their page, so screen readers say so ("has pop-up dialog").
+// Without script they are plain links again, and nothing claims otherwise.
+$$('[data-open]').forEach((el) => { if (document.getElementById(el.dataset.open)) el.setAttribute('aria-haspopup', 'dialog'); });
+
 document.addEventListener('click', (e) => {
   const opener = e.target.closest('[data-open]');
   if (opener) {

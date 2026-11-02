@@ -41,12 +41,12 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 ## Home Services (review 2 Nov 2026; card cuts, swipe, taps, hover shadow, featured-count guard done)
 - [ ] Desktop zoom barely enlarges text: the root font follows the window (`tokens.css`, `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`), so at 110-125% zoom the window shrinks in CSS px and the text with it (about +9%). 150% and up drops below 1100px and behaves normally, so WCAG 1.4.4 passes. A floor of `1rem` would fix zoom but makes text up to 14% bigger at 100% on laptops under 1440 x 900 (1366 x 768, 1536 x 864), which can push one-screen sections past the screen. Decide, then check with `verify_styles.py`.
 
-## Unused and hidden weight (review 2 Nov 2026)
-- [ ] The tower drawing is inlined into Home (`Grow.astro`, `grow-tower.svg?raw`) and never goes through SVGO (`scripts/svgo.mjs` only shrinks `dist/assets/img/`). It is about 60% of Home's HTML: 69.5 KB raw, 12.4 KB gzipped, about 8.7 KB after SVGO. Run SVGO on it (keep `removeHiddenElems: false`: the `r="0"` anchor circles must survive).
-- [ ] Reference files deployed but never used: `tower-grow.svg` (gen_tower.py), `office-build.svg` (gen_office.py), `hq-card.svg` (isogen.write writes a card for every compact cut; About uses hq.svg and hq-compact.svg). Have the generators write the first two outside `public/` and skip the hq card.
-- [ ] The footer map (`footer.js`, `buildMap()`) builds about 27 KB of SVG at load on every page. Build it when the footer comes near the screen instead. No bytes saved, less start-up work.
-- [ ] Small: dead selectors `.dialog--wide` (`dialogs.css`) and `.display` (`type.css`); Home-only hero rules in the shared `compact-cuts.css`; the services observer also runs at 700px and up; pretty-printed JSON-LD.
-- [ ] Phones hide the "Level 1 · 1 to 10 people" chips and the checklists in "We grow with you" (`grow.css`), so screen readers on phones don't get them either. Keep them hidden, or hide them only visually. See `screen-reader-home.md`.
+## Unused and hidden weight (review 2 Nov 2026; tower SVGO, unused files, footer map on demand, dead selectors done)
+- [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
+
+## Screen readers (Home done 2 Nov 2026: `Pause.astro` between a card's title and its line, `Sep.astro` for the " · " separators)
+- [ ] Do the same pass on the other pages: Services, each service page, Work, each case study, About, Contact, soon and 404. Card links: `<Pause />` after the title, category chips `aria-hidden`, a link's name stays its visible text (no `aria-label` that drops words: axe fails it), " · " through `<Sep />`, plain picture descriptions, then read the page out (`aria_snapshot` in Playwright) and write it up like `screen-reader-home.md`.
+- [ ] Hero "Main menu" repeats the header tabs (same five pages, same screen on tall desktops), kept for now for its look. Later: give it its own links (book a check-up, get help now, two key services), remove it, or at least drop its `<nav>` landmark so screen readers list one main menu.
 
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.

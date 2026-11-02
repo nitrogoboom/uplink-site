@@ -130,11 +130,19 @@ if (fc) {
 
   const mapBox = $('[data-fc-map]', fc);
   const hud = $('.fc-hud', fc);
-  mapBox.insertAdjacentHTML('afterbegin', html(buildMap()));
-  // delays go in through the CSSOM: the CSP blocks style="" attributes, not el.style
-  $$('[data-delay]', mapBox).forEach((el) => { el.style.animationDelay = el.dataset.delay; });
-  const svg = $('svg.fc-w', mapBox), marker = $('.mk', svg), ring = $('.ring', svg);
+  // The map (about 27 KB of SVG, 330-odd shapes) is built when the footer comes within a screen or so of view,
+  // not at load: most visits never reach the footer. Its box keeps its size in CSS, so nothing moves when it lands.
+  let svg = null, marker = null, ring = null, shown = 'hq';
   let vb = VB0.slice(), mk = [0, 0], raf = 0;
+  const build = () => {
+    mapBox.insertAdjacentHTML('afterbegin', html(buildMap()));
+    // delays go in through the CSSOM: the CSP blocks style="" attributes, not el.style
+    $$('[data-delay]', mapBox).forEach((el) => { el.style.animationDelay = el.dataset.delay; });
+    svg = $('svg.fc-w', mapBox); marker = $('.mk', svg); ring = $('.ring', svg);
+    focusMap(shown, true);
+    // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
+    whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
+  };
 
   const aim = (k) => {
     const d = D[k], top = pr(...d.top), ground = pr(d.at[0], d.at[1], 0);
@@ -149,10 +157,12 @@ if (fc) {
   };
   const focusMap = (key, instant) => {
     const k = D[key] ? key : 'hq', d = D[k];
+    shown = k;
+    hud.innerHTML = html(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">${MARK}</svg><span><b>${d.name}</b><small>${d.sub}</small></span>`);
+    if (!svg) return;   // not built yet: build() shows this spot when it is
     $$('.dist', svg).forEach((g) => g.classList.toggle('on', g.dataset.k === k));
     $$('.route, .flow', svg).forEach((g) => g.classList.toggle('on', g.dataset.k === k));
     ring.setAttribute('points', circ(d.at[0], d.at[1], 0.02, d.r));
-    hud.innerHTML = html(`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true">${MARK}</svg><span><b>${d.name}</b><small>${d.sub}</small></span>`);
     const t = aim(k);
     window.cancelAnimationFrame(raf);
     if (instant || reduceMotion.matches) { vb = t.vb; mk = t.mk; paint(); return; }
@@ -216,10 +226,11 @@ if (fc) {
     toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
   });
 
-  // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
-  whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
-
   // the CSS keys on html.js (set in each page's head, before paint); fc-js only says this script ran
   fc.classList.add('fc-js');
   select(cur, { instant: true });
+  if ('IntersectionObserver' in window) {
+    const near = new IntersectionObserver(([en]) => { if (en.isIntersecting) { near.disconnect(); build(); } }, { rootMargin: '100% 0px' });
+    near.observe(mapBox);
+  } else build();
 }

@@ -69,8 +69,9 @@ html:has(.grow.is-live) { scroll-snap-type: y proximity; }
   }
   .grow.is-live .grow-card,
   .grow.is-live .grow-step[data-active] .grow-card { gap: var(--sp-2); padding: 0; background: none; border: 0; box-shadow: none; }
+  /* hidden on screen to keep the stage short, but still read by screen readers (the same clip as .sr-only) */
   .grow.is-live .grow-card .chip,
-  .grow.is-live .grow-card ul { display: none; }
+  .grow.is-live .grow-card ul { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 /* phone: the bottom nav floats, so the stage stops a step above it */
 @media (max-width: 699px) {

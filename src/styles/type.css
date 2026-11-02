@@ -32,5 +32,4 @@ h2.label, h3.label { font-family: var(--font-body); font-style: normal; line-hei
 .muted { color: var(--c-muted); }
 .small { font-size: var(--fs-2); }
 .accent { color: var(--c-accent-text); }
-.display { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; line-height: var(--lh-display); }
 
