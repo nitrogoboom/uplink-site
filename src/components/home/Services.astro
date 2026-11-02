@@ -1,22 +1,14 @@
 ---
-// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, the rest short tiles.
-// Desktop and tablet hold SLOTS short tiles; with more services than that, the last tile becomes "+N more" and
-// names the rest. Phones get every service in one swipe row (home.js lights the dots).
+// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, the rest short tiles,
+// every service shown. Phones get every service in one swipe row (home.js lights the dots).
 // Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import Icon, { type IconName } from '../Icon.astro';
 import './services.css';
-const SLOTS = 3;
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-const big = services.filter((s) => s.data.featured);
-const rest = services.filter((s) => !s.data.featured);
-const fits = rest.length <= SLOTS;
-const small = fits ? rest : rest.slice(0, SLOTS - 1);
-const extra = fits ? [] : rest.slice(SLOTS - 1);
 const tiles = [
-  ...big.map((s) => ({ ...s, size: 'big' })),
-  ...small.map((s) => ({ ...s, size: 'small' })),
-  ...extra.map((s) => ({ ...s, size: 'small svc-extra' })),
+  ...services.filter((s) => s.data.featured).map((s) => ({ ...s, size: 'big' })),
+  ...services.filter((s) => !s.data.featured).map((s) => ({ ...s, size: 'small' })),
 ];
 ---
 <section class="section section--band fold" id="services" aria-labelledby="services-title">
@@ -37,15 +29,7 @@ const tiles = [
           <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
         </a></li>
       ))}
-      <li class="svc-small svc-more"><a class="svc-tile" href="/services">
-        <span class="svc-icon"><Icon name="grid" /></span>
-        <span class="svc-text">
-          <span class="svc-title">{extra.length > 0 && <span class="desk-only">+{extra.length} more</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>All {services.length} services</span></span>
-          <span class="svc-line">{extra.length > 0 && <span class="desk-only">{extra.map((s) => s.data.title).join(', ')}.</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>See every service on one page.</span></span>
-        </span>
-        <span class="svc-go" aria-hidden="true">All services<Icon name="chevronR" /></span>
-      </a></li>
     </ul>
-    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{[...tiles, null].map(() => <i />)}</span><span class="svc-swipe">Swipe<Icon name="arrow" /></span></p>
+    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{tiles.map(() => <i />)}</span><span class="svc-swipe">Swipe<Icon name="arrow" /></span></p>
   </div>
 </section>

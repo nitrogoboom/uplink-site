@@ -30,6 +30,12 @@
 .step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent-text); }
 .step:first-child .step-n { background: var(--c-accent); color: var(--c-on-accent); }
 
+/* a row of up to three project cards: a service's page and Home */
+.card-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+.card-row > li { display: flex; }
+.card-row .card { flex: 1; width: 100%; }
+@media (min-width: 700px) { .card-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
+
 /* stat tiles */
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); list-style: none; }
 @media (min-width: 1100px) { .stats { gap: var(--sp-5); } }

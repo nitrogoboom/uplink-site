@@ -83,7 +83,7 @@ const ld = {
         <p class="eyebrow">Our work</p>
         <h2 id="projects-title">Where we've done this</h2>
       </div>
-      <ul class="svc-projects">
+      <ul class="card-row">
         {projects.map(({ id: pid, data: p }) => (
           <li><a class="card" href={`/work/${pid}`}>
             <span class="card-media well"><img src={`/assets/img/${p.image}-compact.svg?card#plain`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} loading="lazy"><span class="chip">{p.tag}</span></span>

@@ -10,11 +10,12 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] CI: build + checks on every push, deploy on `main`, preview per PR. Then `site/` leaves git.
 
 ## Page structure (agreed page by page, then built)
-Built on branch `page-structure` (2 Nov 2026): Services is the managed IT hub (intro, seven service cards, questions, closing band); a service page is top, how it works, questions, then "where we've done this" (projects whose `services` list names it); Work is intro, filter and cards that open each case study; a case study is top and how it went, its services linking to their pages. The picker, plans table, project pop-up, industries row, next links and those pages' closing bands are gone. About is who we are (with the stats), how we work (moved from Home), team, closing band; the story timeline is gone. Home lost its how-we-work steps and its stats ("By the numbers"), so it is now hero, services, grow, check-up band.
+Built on branch `page-structure` (2 Nov 2026): Services is the managed IT hub (intro, seven service cards, questions, closing band); a service page is top, how it works, questions, then "where we've done this" (projects whose `services` list names it); Work is intro, filter and cards that open each case study; a case study is top and how it went, its services linking to their pages. The picker, plans table, project pop-up, industries row, next links and those pages' closing bands are gone. About is who we are (with the stats), how we work (moved from Home), team, closing band; the story timeline is gone. Home is hero, services (all seven, no "+2 more" tile), grow, our work (three case studies), check-up band; its how-we-work steps and stats moved to About.
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop. Decide: a check-up card in the eighth slot, or a different column count.
 - [ ] Closing call to action, site-wide: Services, Home, About and Contact still end with a band right before the footer's "Ready when you are". Service pages, case studies and Work now end with the footer alone.
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
-- [ ] Still to agree: Home (the rest of it), Contact.
+- [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
+- [ ] Still to agree: Contact.
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
@@ -24,7 +25,7 @@ Built on branch `page-structure` (2 Nov 2026): Services is the managed IT hub (i
 - [ ] Hero on phones, copy to confirm: the short line under the headline (`lead-short` in `Hero.astro`, "We run your IT: help desk, security, cloud, network and phones.") is a placeholder. More office captions: add a label to `HERO_LABELS` and its index to `PHONE_ITEMS` in `gen_office.py`.
 
 ## Site
-- [ ] Home hero: remove the "Windows 10 support has ended" news card (kept for now, 26 Oct 2026).
+- [ ] Home hero: the "Windows 10 support has ended" card stays as the slot for an article; change its old title when the first real article exists.
 - [ ] The Worker is live at https://uplink-site.johnoreilly.workers.dev (first deploy 28 Oct, from the `astro` branch). Compare it with the Pages site, then add the real domain to it.
 - [ ] Early Hints: the `Link` header is sent, but no 103 arrives on `workers.dev` (Early Hints is a zone setting, and `workers.dev` has no zone of yours). Check again with `curl -I --http2` once the real domain is on the Worker and the zone's Early Hints setting is on.
 - [ ] W3C HTML checker reports 8 CSS errors per page: all are the page-transition rules (`@view-transition`, `view-transition-name`, `::view-transition-*`), which the checker doesn't know yet. Valid CSS; recheck when the checker catches up.

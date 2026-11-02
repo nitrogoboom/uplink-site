@@ -45,21 +45,20 @@
 .svc-go svg { width: var(--sp-4); height: var(--sp-4); }
 .svc-small .svc-art { display: none; }
 .svc-small .svc-icon { display: block; }
-.svc-more .svc-line { font-size: var(--fs-2); }
-.phone-only { display: none; }
 .svc-hint { display: none; }
 
-/* tablet and up: big cards in a row, short tiles under them; short tiles show their icon and name */
+/* tablet and up: big cards three to a row, short tiles four to a row under them (12 columns); short tiles show their icon and name */
 @media (min-width: 700px) {
-  .svc-menu { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .svc-menu > .svc-extra { display: none; }
+  .svc-menu { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .svc-big { grid-column: span 4; }
+  .svc-small { grid-column: span 3; }
   .svc-big .svc-art { flex: none; aspect-ratio: 4 / 3; }
   .svc-small .svc-tile { justify-content: center; padding-top: var(--sp-5); }
   .svc-small .svc-text { padding: var(--sp-3) var(--sp-5) var(--sp-5); }
   .svc-small .svc-text .chip { display: none; }
   .svc-small .svc-title { font-size: var(--fs-5); font-style: normal; }
   /* the line stays for screen readers */
-  .svc-small:not(.svc-more) .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up */
 @media (hover: hover) and (min-width: 700px) {
@@ -90,14 +89,10 @@
   .svc-menu::before, .svc-menu::after { content: ""; flex: 0 0 calc(16vw - var(--sp-3)); }
   /* no snap-stop: a hard flick can pass several cards and still lands one in the middle */
   .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; }
-  .desk-only { display: none; }
-  .phone-only { display: inline; }
   .svc-small .svc-art { display: block; }
   .svc-small .svc-icon { display: none; }
-  .svc-more .svc-icon { display: block; margin-top: auto; }
   .svc-art { flex: none; aspect-ratio: 16 / 11; }
   .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
-  .svc-more .svc-text { flex: none; }
   .svc-title { font-size: var(--fs-5); }
   .svc-line { font-size: var(--fs-2); line-height: var(--lh-snug); }
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
@@ -164,11 +159,11 @@
   .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
 }
 
-/* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of short tiles */
+/* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of four short tiles */
 @media (min-width: 1100px) and (min-height: 700px) {
   .svc-wrap { display: flex; flex-direction: column; height: var(--fold-inner); }
-  .svc-menu { flex: 1; min-height: 0; gap: var(--sp-5); grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
-  .svc-big { grid-row: 1 / -1; }
+  .svc-menu { flex: 1; min-height: 0; gap: var(--sp-5); grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }
+  .svc-big { grid-column: auto; grid-row: 1 / -1; }
   .svc-small { grid-column: 4; }
   .svc-big .svc-art { flex: 1; aspect-ratio: auto; }
   .svc-big .svc-line { font-size: var(--fs-4); }
