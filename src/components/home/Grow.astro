@@ -1,7 +1,7 @@
 ---
 // HOME · 3. Growing with you. Scroll story: the world grows as you scroll (home.js): floors, then remote staff and a
 // security ring, then a second office and a cloud. Phone and tablet: the picture, a level HUD and the active step hold
-// still for about three screens while the scroll builds each level (soft snap to each finished one). Desktop: the
+// still for about three screens while the scroll builds each level. Desktop: the
 // picture stays put beside the steps.
 // Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand. Inlined as text (?raw): a plain
 // import would also write a copy to dist/_astro that nothing uses.
@@ -79,7 +79,6 @@ const tower = optimize(raw, SVGO).data.replace(/<style>[\s\S]*?<\/style>/g, (css
           </ul>
         </div></li>
       </ol>
-      <span class="grow-snap" aria-hidden="true"></span><span class="grow-snap" aria-hidden="true"></span><span class="grow-snap" aria-hidden="true"></span>
     </div>
   </div>
 </section>
