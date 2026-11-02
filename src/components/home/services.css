@@ -45,7 +45,6 @@
 .svc-go svg { width: var(--sp-4); height: var(--sp-4); }
 .svc-small .svc-art { display: none; }
 .svc-small .svc-icon { display: block; }
-.svc-more .svc-line { font-size: var(--fs-2); }
 .svc-hint { display: none; }
 
 /* tablet and up: big cards three to a row, short tiles four to a row under them (12 columns); short tiles show their icon and name */
@@ -59,7 +58,7 @@
   .svc-small .svc-text .chip { display: none; }
   .svc-small .svc-title { font-size: var(--fs-5); font-style: normal; }
   /* the line stays for screen readers */
-  .svc-small:not(.svc-more) .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up */
 @media (hover: hover) and (min-width: 700px) {
