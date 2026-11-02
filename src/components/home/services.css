@@ -91,8 +91,10 @@
   .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; }
   .svc-small .svc-art { display: block; }
   .svc-small .svc-icon { display: none; }
+  .svc-more .svc-icon { display: block; margin-top: auto; }
   .svc-art { flex: none; aspect-ratio: 16 / 11; }
   .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
+  .svc-more .svc-text { flex: none; }
   .svc-title { font-size: var(--fs-5); }
   .svc-line { font-size: var(--fs-2); line-height: var(--lh-snug); }
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
@@ -159,7 +161,7 @@
   .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
 }
 
-/* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of four short tiles */
+/* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of four short tiles (the last is All services) */
 @media (min-width: 1100px) and (min-height: 700px) {
   .svc-wrap { display: flex; flex-direction: column; height: var(--fold-inner); }
   .svc-menu { flex: 1; min-height: 0; gap: var(--sp-5); grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(0, 1fr)); }

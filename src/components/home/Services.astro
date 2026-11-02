@@ -1,14 +1,15 @@
 ---
-// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, the rest short tiles,
-// every service shown. Phones get every service in one swipe row (home.js lights the dots).
-// Styles: services.css (imported here). Desktop layout: at the end of its CSS.
+// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, then SLOTS short tiles;
+// the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
+// swipe row (home.js lights the dots). Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import Icon, { type IconName } from '../Icon.astro';
 import './services.css';
+const SLOTS = 4;
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const tiles = [
   ...services.filter((s) => s.data.featured).map((s) => ({ ...s, size: 'big' })),
-  ...services.filter((s) => !s.data.featured).map((s) => ({ ...s, size: 'small' })),
+  ...services.filter((s) => !s.data.featured).slice(0, SLOTS - 1).map((s) => ({ ...s, size: 'small' })),
 ];
 ---
 <section class="section section--band fold" id="services" aria-labelledby="services-title">
@@ -29,7 +30,12 @@ const tiles = [
           <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
         </a></li>
       ))}
+      <li class="svc-small svc-more"><a class="svc-tile" href="/services">
+        <span class="svc-icon"><Icon name="grid" /></span>
+        <span class="svc-text"><span class="svc-title">All services</span></span>
+        <span class="svc-go" aria-hidden="true">View services<Icon name="chevronR" /></span>
+      </a></li>
     </ul>
-    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{tiles.map(() => <i />)}</span><span class="svc-swipe">Swipe<Icon name="arrow" /></span></p>
+    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{[...tiles, null].map(() => <i />)}</span><span class="svc-swipe">Swipe<Icon name="arrow" /></span></p>
   </div>
 </section>
