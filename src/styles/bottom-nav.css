@@ -35,13 +35,13 @@
     color: var(--c-muted);
   }
   .bn svg { width: var(--icon); height: var(--icon); }
-  .bn[aria-current="page"] { background: var(--c-surface-2); color: var(--c-text); }
-  .bn[aria-current="page"] svg { color: var(--c-accent-text); }
+  .bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
+  .bn[aria-current] svg { color: var(--c-accent-text); }
   body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
-/* portrait tablets: icon-only header buttons (their names stay for screen readers); words back from 900px */
+/* portrait tablets: icon-only header buttons (each link carries its name in aria-label, Header.astro); words back from 900px */
 @media (min-width: 700px) and (max-width: 899px) { .hdr-actions .hbtn-text { display: none; } }
 @media (min-width: 700px) and (max-width: 1099px) {
   .brand-sub { display: none; }

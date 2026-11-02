@@ -8,7 +8,7 @@
 .ob-n{animation:none}
 .ob-cable{stroke-dasharray:100;animation:ob-draw 450ms ease-out var(--d,0ms) both}
 .ob-flow{stroke-dasharray:2 7;animation:ob-fade 300ms ease-out calc(var(--d,0ms) + 480ms) both,ob-flow 1.6s steps(18) infinite}
-.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s ease-in-out infinite}
+.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s steps(13) infinite}
 .ob-led{animation:ob-led 3.2s step-end infinite}
 @keyframes ob-drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ob-fade{from{opacity:0}to{opacity:1}}
@@ -28,7 +28,7 @@
 .ob-link{stroke-dasharray:3 12;animation:ob-flow .9s steps(18) infinite}
 .ob-link-base.is-draw{animation:ob-link-draw .55s cubic-bezier(.3,.6,.2,1) both}
 @keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
-.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
+.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s steps(10) infinite}
 @media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}
 .ob-over{pointer-events:none;will-change:transform}</style>
 <style>.s-06ced6.s-06ced6{--d:650ms;animation-duration:450ms}.s-06f54a.s-06f54a{animation-delay:-1800ms}.s-08f53e.s-08f53e{--d:1200ms}.s-0b14bc.s-0b14bc{--d:850ms}.s-0e19e8.s-0e19e8{animation-delay:-1400ms}.s-0ea1ec.s-0ea1ec{--d:2370ms}.s-1037e7.s-1037e7{--d:1700ms}.s-12f558.s-12f558{--d:1580ms}.s-1ae774.s-1ae774{--d:950ms;animation-duration:450ms}.s-209c88.s-209c88{--d:1500ms}.s-28ae57.s-28ae57{--d:2620ms}.s-29ba3b.s-29ba3b{--d:420ms;animation-duration:480ms}.s-2f7a5b.s-2f7a5b{animation-delay:-2400ms}.s-30c871.s-30c871{--d:2830ms}.s-35bd73.s-35bd73{--d:300ms;animation-duration:480ms}.s-44a1f9.s-44a1f9{--d:2970ms}.s-46499d.s-46499d{animation-delay:-800ms}.s-4b80cd.s-4b80cd{--d:2490ms}.s-5080ff.s-5080ff{--d:1750ms}.s-519563.s-519563{--d:3020ms}.s-527abf.s-527abf{animation-delay:-1600ms}.s-52c4cb.s-52c4cb{--d:2420ms}.s-5b78ad.s-5b78ad{--d:0ms}.s-6384b1.s-6384b1{--d:2390ms}.s-639bb4.s-639bb4{--d:1500ms;animation-duration:520ms}.s-677b67.s-677b67{--d:2300ms}.s-68a6e9.s-68a6e9{--d:1400ms}.s-72891e.s-72891e{animation-delay:-2100ms}.s-732bc9.s-732bc9{--d:2430ms}.s-77bf19.s-77bf19{--d:1100ms}.s-7cfb68.s-7cfb68{--d:2690ms}.s-800090.s-800090{animation-duration:3840ms;animation-delay:-1060ms}.s-863493.s-863493{--d:1700ms;animation-duration:450ms}.s-91e731.s-91e731{--d:2500ms}.s-94299e.s-94299e{--d:700ms}.s-9d0722.s-9d0722{animation-delay:-1100ms}.s-9dab80.s-9dab80{--d:2560ms}.s-a20b5c.s-a20b5c{animation-delay:-1300ms}.s-a28275.s-a28275{animation-duration:2800ms;animation-delay:0ms}.s-a74e52.s-a74e52{--d:2960ms}.s-aa3aab.s-aa3aab{--d:1650ms}.s-b3ea33.s-b3ea33{--d:2440ms}.s-b42c1d.s-b42c1d{animation-delay:-1900ms}.s-b63a17.s-b63a17{--d:1980ms}.s-bfd857.s-bfd857{--d:2060ms}.s-c490be.s-c490be{--d:1000ms}.s-cd0a41.s-cd0a41{--d:2450ms}.s-cff6e6.s-cff6e6{--d:2760ms}.s-d2a7b6.s-d2a7b6{animation-duration:350ms}.s-d31185.s-d31185{--d:2360ms}.s-d434b7.s-d434b7{--d:2250ms}.s-dd5a4f.s-dd5a4f{--d:2900ms}.s-e11bb9.s-e11bb9{--d:2320ms}.s-e12697.s-e12697{animation-duration:3580ms;animation-delay:-2120ms}.s-ebed3d.s-ebed3d{--d:775ms}.s-faa3e5.s-faa3e5{--d:1900ms}</style>

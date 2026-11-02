@@ -50,8 +50,8 @@
   transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
 }
 .tab:hover { color: var(--c-text); background: var(--c-surface); }
-.tab[aria-current="page"] { color: var(--c-text); background: var(--c-surface-2); }
-.tab[aria-current="page"]::after {
+.tab[aria-current] { color: var(--c-text); background: var(--c-surface-2); }
+.tab[aria-current]::after {
   content: "";
   position: absolute;
   left: 0; right: 0; bottom: -1px;   /* on the header's bottom line */

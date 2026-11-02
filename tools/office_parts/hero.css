@@ -6,7 +6,7 @@
 .ob-n{animation:none}
 .ob-cable{stroke-dasharray:100;animation:ob-draw 450ms ease-out var(--d,0ms) both}
 .ob-flow{stroke-dasharray:2 7;animation:ob-fade 300ms ease-out calc(var(--d,0ms) + 480ms) both,ob-flow 1.6s steps(18) infinite}
-.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s ease-in-out infinite}
+.ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s steps(13) infinite}
 .ob-led{animation:ob-led 3.2s step-end infinite}
 @keyframes ob-drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
 @keyframes ob-fade{from{opacity:0}to{opacity:1}}
@@ -26,6 +26,6 @@
 .ob-link{stroke-dasharray:3 12;animation:ob-flow .9s steps(18) infinite}
 .ob-link-base.is-draw{animation:ob-link-draw .55s cubic-bezier(.3,.6,.2,1) both}
 @keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
-.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s ease-in-out infinite}
+.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s steps(10) infinite}
 @media (prefers-reduced-motion:reduce){.ob-link,.ob-link-end,.ob-link-base.is-draw{animation:none!important}}
 .ob-over{pointer-events:none;will-change:transform}
