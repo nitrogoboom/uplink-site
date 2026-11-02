@@ -1,4 +1,5 @@
-# Build and check on every push and pull request; deploy to the Cloudflare Worker on main.
+# Build and check on every push and pull request (types, lint, build, then the built site in a browser:
+# tools/verify_footer.py); deploy to the Cloudflare Worker on main only if all of that passed.
 # Deploying needs two secrets in the "cloudflare" environment: CLOUDFLARE_API_TOKEN (a token with
 # "Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID. Until both are set, the deploy and preview jobs are
 # skipped (the run stays green and says "skipped"); the build still tells you if the site is sound.
@@ -33,6 +34,29 @@ jobs:
       - run: npm run check
       - run: npm run lint
       - run: npm run build
+      # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
+      # deploys: tools/verify_footer.py fails on a script error, a CSP block, a dead hero or tower, sideways scroll,
+      # or a serious axe finding
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - name: Check the built site in a browser
+        run: |
+          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
+          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
+          mkdir -p out && python tools/verify_footer.py out/
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - if: failure()
+        uses: actions/upload-artifact@v5
+        with:
+          name: site-check
+          path: |
+            out/*.png
+            wrangler.log
+          retention-days: 7
       - uses: actions/upload-artifact@v5
         with:
           name: dist

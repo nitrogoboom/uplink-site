@@ -1,26 +1,51 @@
-# Site checks: hero, tower, footer and sideways scroll at every size, against the built site, then an axe
+# Site checks against the built site: hero, tower, footer and sideways scroll at every size, then an axe
 # accessibility pass on every page at phone and desktop (axe-core from node_modules: run npm install first).
-# Exits 1 if axe finds anything serious or critical.
+# Pages: every address in the served sitemap.xml, plus soon and the 404 page.
+# Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
+# doesn't answer hover, a tower that doesn't grow, sideways scroll, or anything serious or critical from axe.
+# CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port]
-import asyncio, sys
+import asyncio, re, sys, urllib.request
 from playwright.async_api import async_playwright
 base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.argv[1]
 AXE='node_modules/axe-core/axe.min.js'
-PAGES=['index','services','work','about','contact','soon','404','services/help-desk','work/office-move']
+MISSING='no-such-page'   # any missing address gets the 404 page
+sitemap=urllib.request.urlopen(base+'/sitemap.xml').read().decode()
+PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]+['soon',MISSING]
+SIZES=[['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]
+url=lambda page: f"{base}/{'' if page=='index' else page}"
+fails=[]
+
+def watch(pg, where, errs):
+    # Chromium reports a CSP or Trusted Types block as a console error, and a script crash as a page error
+    def console(m):
+        if m.type!='error': return
+        # the 404 page's own status is the point of that page, not an error
+        if where.startswith(MISSING) and m.location.get('url','').rstrip('/').endswith(MISSING) and 'status of 404' in m.text: return
+        errs.append(f'{where}: console: {m.text}')
+    pg.on('console',console)
+    pg.on('pageerror',lambda e: errs.append(f'{where}: page error: {e}'))
+
 async def main():
     async with async_playwright() as p:
-        b=await p.chromium.launch(); rep=[]
-        pg=await b.new_page(viewport={'width':1440,'height':900})
-        errs=[]; pg.on('pageerror',lambda e: errs.append(str(e))); pg.on('console',lambda m: m.type=='error' and errs.append(m.text))
+        b=await p.chromium.launch(); rep=[]; errs=[]
+        pg=await b.new_page(viewport={'width':1440,'height':900}); watch(pg,'index 1440 (hero, tower, footer)',errs)
         await pg.goto(base+'/'); await pg.wait_for_timeout(5500)
+        # hover a tile three along from the one showing, so the cloud's own timer can't have got there first
+        tiles=await pg.eval_on_selector_all('.ob-tile','t=>t.map(x=>[x.dataset.tile,x.classList.contains("is-on")])')
+        on=next((i for i,(_,o) in enumerate(tiles) if o),0); want=tiles[(on+3)%len(tiles)][0]
         before=await pg.eval_on_selector('.ob-app','e=>e.textContent')
-        await (await pg.query_selector('.ob-tile[data-tile="files"]')).hover(force=True); await pg.wait_for_timeout(500)
-        rep.append(f"hero tile hover: {before} -> {await pg.eval_on_selector('.ob-app','e=>e.textContent')}")
+        await (await pg.query_selector(f'.ob-tile[data-tile="{want}"]')).hover(force=True); await pg.wait_for_timeout(500)
+        after=await pg.eval_on_selector('.ob-app','e=>e.textContent')
+        lit=await pg.eval_on_selector(f'.ob-tile[data-tile="{want}"]','e=>e.classList.contains("is-on")')
+        rep.append(f"hero tile hover ({want}): {before} -> {after}")
+        if not lit or after==before: fails.append(f'hero: hovering the {want} tile did not show it ({before} -> {after})')
         steps=await pg.eval_on_selector_all('.grow-step[data-floors]','s=>s.map(x=>x.dataset.floors)'); seen=[]
         for i, f in enumerate(steps):   # the stage pins, so go to each level's snap mark (one per finished level)
             await pg.evaluate("i=>{const s=document.querySelectorAll('.grow-snap')[i],pad=parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||0;window.scrollTo({top:s.getBoundingClientRect().top+scrollY-pad,behavior:'instant'})}", i); await pg.wait_for_timeout(1200)
             seen.append(await pg.eval_on_selector('svg.tg','e=>e.getAttribute("data-floors")'))
         rep.append(f"tower floors {','.join(steps)} -> {','.join(seen)}")
+        if seen!=steps: fails.append(f"tower: floors {','.join(seen)}, expected {','.join(steps)}")
         # footer behaviour on home at 1440
         await pg.eval_on_selector('#footer','e=>e.scrollIntoView()'); await pg.wait_for_timeout(400)
         tabs=await pg.eval_on_selector_all('.fc-tile','t=>t.map(x=>x.id)')
@@ -32,32 +57,37 @@ async def main():
             await pg.screenshot(path=f'{out}/f-1440-{i}.png')
         await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(300)
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
-        rep.append(f"console errors: {errs or 'none'}")
         await pg.close()
         for page in PAGES:
-            for n,w,h in [['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]:
-                q=await b.new_page(viewport={'width':w,'height':h}); e2=[]; q.on('pageerror',lambda e: e2.append(str(e)))
-                await q.goto(f"{base}/{'' if page=='index' else page}"); await q.wait_for_timeout(700)
+            for n,w,h in SIZES:
+                q=await b.new_page(viewport={'width':w,'height':h}); watch(q,f'{page} {n}',errs)
+                await q.goto(url(page)); await q.wait_for_timeout(700)
                 await q.eval_on_selector('#footer','e=>e.scrollIntoView()'); await q.wait_for_timeout(500)
                 r=await q.evaluate("""()=>{const f=document.getElementById('footer'); const s=document.querySelector('.fc-panels');
                   return [document.documentElement.scrollWidth-innerWidth, f.offsetHeight, s.scrollHeight-s.clientHeight, f.classList.contains('fc-js')]}""")
-                rep.append(f"{page:18} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]} {e2 or ''}")
+                rep.append(f"{page:22} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]}")
+                if r[0]>0: fails.append(f'{page} {n}: {r[0]}px sideways scroll')
                 if page in ('soon','index'): await q.screenshot(path=f'{out}/f-{page}-{n}.png')
                 await q.close()
+        rep.append(f"script errors: {len(errs) or 'none'}")
+        fails.extend(errs)
         # axe: the page's CSP blocks an injected script, so this context bypasses it (the site's own scripts still run)
-        bad=0; ctx=await b.new_context(bypass_csp=True)
+        ctx=await b.new_context(bypass_csp=True)
         for page in PAGES:
             for n,w,h in [['phone',390,844],['1440',1440,900]]:
                 q=await ctx.new_page(); await q.set_viewport_size({'width':w,'height':h})
-                await q.goto(f"{base}/{'' if page=='index' else page}"); await q.wait_for_timeout(1500)
+                await q.goto(url(page)); await q.wait_for_timeout(1500)
                 await q.add_script_tag(path=AXE)
                 v=await q.evaluate("""async()=>(await axe.run(document,{resultTypes:['violations']})).violations.map(v=>({id:v.id,impact:v.impact,help:v.help,
                   nodes:v.nodes.slice(0,4).map(x=>x.target.join(' ')+(x.any[0]?' · '+x.any[0].message:''))}))""")
-                serious=[x for x in v if x['impact'] in ('serious','critical')]; bad+=len(serious)
-                rep.append(f"axe {page:18} {n:6} {len(v)} violation(s), {len(serious)} serious/critical")
+                serious=[x for x in v if x['impact'] in ('serious','critical')]
+                fails.extend(f"axe {page} {n}: [{x['impact']}] {x['id']}" for x in serious)
+                rep.append(f"axe {page:22} {n:6} {len(v)} violation(s), {len(serious)} serious/critical")
                 for x in v: rep.append(f"    [{x['impact']}] {x['id']}: {x['help']}\n      "+'\n      '.join(x['nodes']))
                 await q.close()
         await ctx.close()
         print('\n'.join(rep)); await b.close()
-        if bad: print(f'axe: {bad} serious/critical'); sys.exit(1)
+        if fails:
+            print(f'\nFAILED ({len(fails)}):\n  '+'\n  '.join(fails)); sys.exit(1)
+        print('\nall checks passed')
 asyncio.run(main())

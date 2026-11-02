@@ -473,6 +473,7 @@ if (stage) {
   let added = [];
   let observers = [];
   let stopCloud = null;
+  let ticket = 0;   // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
   const clear = () => {
     if (stopCloud) stopCloud();
     stopCloud = null;
@@ -485,11 +486,12 @@ if (stage) {
     const cut = phone.matches ? (reduceMotion.matches ? null : 'phone') : (tablet.matches ? 'tablet' : 'full');
     if (cut === shown) return;
     shown = cut;
+    const mine = ++ticket;
     clear();
     if (!cut) return;
     Promise.all(files[cut].map((url) => window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))))
       .then((texts) => {
-        if (cut !== shown) return;   // the screen changed while it loaded
+        if (mine !== ticket) return;   // the screen changed while it loaded (even if it has changed back since)
         const before = stage.children.length;
         stage.insertAdjacentHTML('afterbegin', html(texts.join('')));
         added = Array.from(stage.children).slice(0, stage.children.length - before);

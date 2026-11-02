@@ -139,8 +139,10 @@ $$('dialog').forEach((dlg) => {
   let downOnBackdrop = false;
   dlg.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === dlg; });
   dlg.addEventListener('click', (e) => { if (e.target === dlg && downOnBackdrop) dlg.close(); downOnBackdrop = false; });
-  // return focus to whatever opened it
+  // return focus to whatever opened it; a toast still in it goes too (a closed pop-up never plays the toast's
+  // fade-out, so the toast would wait there and flash up the next time the pop-up opens)
   dlg.addEventListener('close', () => {
+    $$(':scope > .toasts > .toast', dlg).forEach((t) => t.remove());
     const back = dlg._opener;
     dlg._opener = null;
     if (back && document.contains(back) && typeof back.focus === 'function') back.focus();
@@ -153,6 +155,8 @@ $$('[data-open]').forEach((el) => { if (document.getElementById(el.dataset.open)
 
 document.addEventListener('click', (e) => {
   const opener = e.target.closest('[data-open]');
+  // Ctrl, Cmd, Shift or Alt on a link means a new tab, a new window or a download: let the link do that
+  if (opener && opener.matches('a[href]') && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) return;
   if (opener) {
     if (opener.dataset.open === 'book-dialog') presetService(opener.dataset.service || '');
     if (openDialog(opener.dataset.open, opener)) e.preventDefault();
