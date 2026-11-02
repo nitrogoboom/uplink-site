@@ -162,5 +162,25 @@ def doc(title, body, translate=None, view=(640, 480), crop=None):
         body, '</g>', '</svg>', ''])
 
 
+def card(svg):
+    """The card cut (NAME-card.svg): the compact cut with its labels taken out, and so the letters they needed.
+    Cards show a drawing small and wordless; NAME-compact.svg#plain only hid the labels and still carried the font."""
+    parts, pos = [], 0
+    while m := re.compile(r'<g class="(?:[^"]* )?lbl[ "]').search(svg, pos):   # "lbl", or "co lbl" (gen_office)
+        start = m.start()
+        parts.append(svg[pos:start])
+        depth = 0
+        for t in re.finditer(r'<g[\s>]|</g>', svg[start:]):
+            depth += -1 if t.group() == '</g>' else 1
+            if depth == 0:
+                pos = start + t.end()
+                break
+    svg = ''.join(parts) + svg[pos:]
+    svg = svg.replace(PLAIN_CSS + '\n', '').replace(PLAIN_CSS, '')
+    return re.sub(r'<style>@font-face.*?</style>', lambda _m: font_style(svg), svg, count=1, flags=re.S)
+
+
 def write(path, text):
     open(path, 'w', encoding='utf-8', newline='\n').write(text)
+    if str(path).endswith('-compact.svg'):
+        write(str(path).replace('-compact.svg', '-card.svg'), card(text))

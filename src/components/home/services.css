@@ -14,7 +14,7 @@
   color: var(--c-text);
   text-align: center;
   text-decoration: none;
-  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
 .svc-art { position: relative; flex: 1; width: 100%; min-height: 0; }
 .svc-art img { position: absolute; inset: var(--sp-5) var(--sp-5) 0; width: calc(100% - 2 * var(--sp-5)); height: calc(100% - var(--sp-5)); object-fit: contain; }
@@ -60,12 +60,26 @@
   /* the line stays for screen readers */
   .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
-/* a pointer: the card under it lifts, outlines in amber and slides its bar up */
+/* a pointer: the card under it lifts, outlines in amber and slides its bar up. Its shadow is a layer on the li
+   that only fades and scales with it, so the big blur is drawn once, not on every frame of the lift. */
 @media (hover: hover) and (min-width: 700px) {
   .svc-go { position: absolute; inset: auto 0 0; transform: translateY(100%); transition: transform var(--dur-2) var(--ease); }
   .svc-big .svc-text { padding-bottom: calc(var(--control-h) + var(--sp-4)); }
-  .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); box-shadow: var(--shadow-2); }
+  .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); }
   .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { transform: none; }
+  .svc-menu > li { position: relative; }
+  .svc-menu > li::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--r-3);
+    box-shadow: var(--shadow-2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+  }
+  .svc-menu > li:hover::after, .svc-menu > li:has(> .svc-tile:focus-visible)::after { opacity: 1; transform: scale(1.03); }
 }
 
 /* phone: one swipe row. The middle card is full size and sits just over the edges of the two beside it,
@@ -102,10 +116,11 @@
   /* the timeline sits in its own rule: the minifier folds a longhand next to `animation` into the shorthand,
      which can't hold a timeline, and the browser then drops the whole declaration.
      Only transform and opacity move with the swipe, so Chrome keeps it off the main thread. The middle card's
-     shadow and lighter border are a layer over the card (li::after) that moves with it and fades in;
-     stacking is its own animation on the li. */
+     shadow and lighter border are a layer over the card (li::after) that moves with it and fades in.
+     Which card sits on top is .is-centre (home.js), set as a card crosses the middle, not every frame. */
   @supports (animation-timeline: view()) {
-    .svc-menu > li { position: relative; animation: svc-layer linear both; view-timeline: --svc inline; }
+    .svc-menu > li { position: relative; view-timeline: --svc inline; }
+    .svc-menu > .is-centre { z-index: 2; }
     .svc-menu > li::after {
       content: "";
       animation: svc-centre linear both, svc-lift linear both;
@@ -119,7 +134,7 @@
     }
     .svc-tile { animation: svc-centre linear both; }
     .svc-art, .svc-icon, .svc-go { animation: svc-dim linear both; }
-    .svc-menu > li, .svc-menu > li::after, .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: --svc; }
+    .svc-menu > li::after, .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: --svc; }
   }
   @supports not (animation-timeline: view()) {
     .svc-tile { transform: scale(0.88); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease); }
@@ -142,10 +157,6 @@
   50% { transform: none; }
   100% { transform: translateX(18%) scale(0.88); }
 }
-@keyframes svc-layer {
-  0%, 100% { z-index: 0; }
-  50% { z-index: 2; }
-}
 @keyframes svc-lift {
   0%, 100% { opacity: 0; }
   50% { opacity: 1; }
@@ -156,7 +167,7 @@
 }
 /* reduced motion: a plain row, nothing scales or moves with the swipe */
 @media (prefers-reduced-motion: reduce) {
-  .svc-menu > li, .svc-menu > li::after, .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
+  .svc-menu > li::after, .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
   .svc-menu > li > .svc-tile, .svc-tile:hover, .svc-tile:focus-visible { transform: none; }
   .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
 }

@@ -23,7 +23,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
 import hashlib, html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges
+from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges, card as card_cut
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -853,6 +853,8 @@ if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
     for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
+    # the card cut: the compact one without its labels or their letters (isogen.card)
+    (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent
     for v, name in (('hero', 'hero-office.svg'), ('tablet', 'hero-office-tablet.svg'), ('phone', 'office-compact-build.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')

@@ -16,7 +16,7 @@ const services = (await getCollection('services')).sort((a, b) => a.data.order -
     <ul class="svc-grid" aria-label="Services">
       {services.map(({ id, data: s }) => (
         <li><a class="card" href={`/services/${id}`}>
-          <span class="card-media well"><img src={`/assets/img/${s.image}-compact.svg?card#plain`} alt="" width="640" height="480" loading="lazy"><span class="chip">{s.chip}</span></span>
+          <span class="card-media well"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"><span class="chip">{s.chip}</span></span>
           <span class="card-body"><span class="card-title">{s.title}</span><span class="muted small">{s.card}</span></span>
         </a></li>
       ))}

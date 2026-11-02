@@ -57,7 +57,7 @@ OG = HEAD + f'''<style>
 <div class="brand"><span class="mark">{MARK}</span><div><div class="name">Uplink</div><div class="sub">Technology management</div></div></div>
 <div class="copy"><p class="eyebrow">Managed IT · Ontario</p><h1>Your IT team, <em>always online</em></h1>
 <p class="lead">Help desk, security, cloud, networks and phones.</p></div>
-<img class="art" src="{assets}/img/office-compact.svg?card#plain" alt="">'''
+<img class="art" src="{assets}/img/office-card.svg" alt="">'''
 
 ICON = HEAD + f'''<style>
   body {{ width: 180px; height: 180px; }}

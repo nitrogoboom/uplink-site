@@ -493,43 +493,26 @@ if (stage) {
 }
 
 /* ======================================================================
-   Services on phones: light the dot for the card in the middle (Home).
-   The row swipes and snaps with no script; browsers without
-   scroll-driven animation also get the middle card marked (services.css).
-   A tap on a side card brings it to the middle; a tap on the middle card
-   opens it. "Swipe" fades once they have left the first card.
+   Services on phones: mark the card in the middle (Home).
+   The row swipes and snaps with no script. The card crossing a thin strip
+   down the middle of the row gets .is-centre: it sits over its neighbours
+   (and, without scroll-driven animation, is the one drawn full size;
+   services.css) and lights its dot. The observer only reports a card
+   entering or leaving the strip, so nothing runs while the row scrolls.
+   A tap on any card opens it. "Swipe" fades once they have left the first card.
    ====================================================================== */
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots i');
 const svcHint = $('.svc-hint');
-if (svcRow && svcDots.length) {
-  const phone = window.matchMedia('(max-width: 699px)');
-  let queued = false;
-  const mark = () => {
-    queued = false;
-    if (!phone.matches) return;
-    const cards = Array.from(svcRow.children);
-    const mid = svcRow.scrollLeft + svcRow.clientWidth / 2;
-    let best = 0, gap = Infinity;
-    cards.forEach((li, i) => {
-      const d = Math.abs(li.offsetLeft + li.offsetWidth / 2 - mid);
-      if (d < gap) { gap = d; best = i; }
-    });
+if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
+  const cards = Array.from(svcRow.children);
+  const centre = (best) => {
     cards.forEach((li, i) => li.classList.toggle('is-centre', i === best));
     svcDots.forEach((dot, i) => dot.classList.toggle('on', i === best));
     if (best > 0) svcHint?.classList.add('is-swiped');
   };
-  const queue = () => { if (!queued) { queued = true; requestAnimationFrame(mark); } };
-  svcRow.addEventListener('scroll', queue, { passive: true });
-  // detail is 0 for Enter on a focused card, which focus has already scrolled to the middle
-  svcRow.addEventListener('click', (e) => {
-    const li = e.target.closest('.svc-menu > li');
-    if (!phone.matches || !li || e.detail === 0) return;
-    mark();
-    if (li.classList.contains('is-centre')) return;
-    e.preventDefault();
-    li.scrollIntoView({ inline: 'center', block: 'nearest', behavior: reduceMotion.matches ? 'instant' : 'smooth' });
-  });
-  phone.addEventListener('change', queue);
-  queue();
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) centre(cards.indexOf(en.target)); });
+  }, { root: svcRow, rootMargin: '0px -49% 0px -49%' });
+  cards.forEach((li) => io.observe(li));
 }
