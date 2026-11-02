@@ -31,8 +31,9 @@
 .js .fc-panel.is-in { animation: fc-in 360ms var(--ease); }
 @keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
 .fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
-.fc-head h2 { font-size: var(--fs-8); line-height: var(--lh-display); }
-.fc-head h2 em { color: var(--c-accent-text); }
+/* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
+.fc-head h3 { font-size: var(--fs-8); font-style: italic; line-height: var(--lh-display); }
+.fc-head h3 em { color: var(--c-accent-text); }
 .fc-lead { max-width: 46ch; margin-top: var(--sp-4); font-size: var(--fs-4); color: var(--c-muted); }
 .fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-6); }
 
@@ -74,7 +75,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface); color: var(--c-text);
   transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
 }
-.fc-soc:hover { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); transform: translateY(-2px); }
+@media (hover: hover) { .fc-soc:hover { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); transform: translateY(-2px); } }
 .fc-soc svg { width: var(--icon); height: var(--icon); }
 
 /* follow */
@@ -109,7 +110,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   display: flex; align-items: center; gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
   border: 1px solid var(--c-line-2); border-radius: var(--r-2);
-  background: var(--c-glass-2); -webkit-backdrop-filter: blur(var(--blur)); backdrop-filter: blur(var(--blur));
+  background: var(--c-glass-2);   /* 92% solid: a blur behind it would hardly show, and the map under it moves */
   box-shadow: var(--shadow-1);
 }
 .fc-hud:empty { display: none; }
@@ -130,7 +131,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); color: var(--c-text);
   transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
-.fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); }
+@media (hover: hover) { .fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }   /* real pointers only: on touch a tap leaves :hover stuck */
 .fc-tile[aria-selected="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
 .fc-tile .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
 .fc-tile[aria-selected="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
@@ -193,22 +194,24 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-w .ring2 { fill: none; stroke: var(--iso-hi-left); stroke-width: 1; stroke-opacity: 0.35; stroke-dasharray: 4 5; }
 .fc-w .sig { fill: none; stroke: var(--c-sky); stroke-width: 1.2; }
 .fc-w .beacon { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.2; }
-.fc-w .shadow { fill: var(--iso-shadow); opacity: 0.35; }
+.fc-w .shadow { fill: url("#fc-shade"); opacity: 0.35; }   /* a soft gradient (footer.js), not a blur filter redrawn as the camera flies */
+.fc-w .shade { stop-color: var(--iso-shadow); }
 .fc-w .mk-line { stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-dasharray: 2 4; }
 .fc-w .mk-d { fill: var(--iso-hi-left); stroke: var(--c-bg); stroke-width: 3; }
 .fc-w .mk-i { fill: var(--c-on-accent); }
 .fc-w .dot { fill: var(--iso-hi-left); }
 .fc-w .mast { stroke: var(--iso-hi-left); stroke-width: 1.6; }
 @media (prefers-reduced-motion: no-preference) {
-  /* the dashes redraw every frame (not GPU work), so they start only once the map has been on screen (footer.js) */
-  .fc-w.is-seen .flow { animation: fc-flow 1.2s linear infinite; }
+  /* SVG parts animate on the main thread and repaint the map, so every loop steps at about 12 frames a second
+     (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen. */
+  .fc-w.is-seen .flow { animation: fc-flow 1.2s steps(14) infinite; }
   .fc-w .lit.blink, .fc-w .led { animation: fc-blink 4s step-end infinite; }
-  .fc-w .bob { animation: fc-bob 3s ease-in-out infinite; }
-  .fc-w .mk-bob { animation: fc-bob 2.2s ease-in-out infinite; }
+  .fc-w .bob { animation: fc-bob 3s steps(18) infinite; }
+  .fc-w .mk-bob { animation: fc-bob 2.2s steps(13) infinite; }
   .fc-w .ring, .fc-w .beacon, .fc-w .sig { transform-box: fill-box; transform-origin: 50% 50%; }
-  .fc-w .ring { animation: fc-ring 2.4s ease-out infinite; }
-  .fc-w .beacon { animation: fc-ping 2.4s ease-out infinite; }
-  .fc-w .sig { animation: fc-ping 2.8s ease-out infinite; }
+  .fc-w .ring { animation: fc-ring 2.4s steps(29) infinite; }
+  .fc-w .beacon { animation: fc-ping 2.4s steps(29) infinite; }
+  .fc-w .sig { animation: fc-ping 2.8s steps(34) infinite; }
 }
 @keyframes fc-flow { to { stroke-dashoffset: -24; } }
 @keyframes fc-blink { 0%, 62% { opacity: 1; } 70%, 82% { opacity: 0.25; } 88%, 100% { opacity: 1; } }
@@ -218,13 +221,15 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 
 /* desktop: stage beside the map, the footer is exactly one screen */
 @media (min-width: 1100px) {
+  .fc-dock { order: 1; }   /* first in the markup (Footer.astro), under the panels on screen */
+  .fc-base { order: 2; }
   .fc-stage { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--sp-8); align-items: stretch; }
   .fc-map { aspect-ratio: auto; min-height: 26rem; }
   .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
 }
 /* tablet + phone: roster on top, then the map, then the text */
 @media (max-width: 1099px) {
-  .fc-dock { order: -1; border-top: 0; border-bottom: 1px solid var(--c-line); }
+  .fc-dock { border-top: 0; border-bottom: 1px solid var(--c-line); }
   .fc-dock .container { justify-content: flex-start; padding-inline: 0; }
   .fc-roster { padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
   .fc-rk { display: none; }
@@ -242,7 +247,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .js .fc { height: var(--fold-h); min-height: 40rem; }
   .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .js .fc-panels { padding-top: var(--sp-2); }
-  .fc-head h2 { font-size: min(var(--fs-8), 8.2svh); }
+  .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
   .js .fc-map { min-height: 0; height: 100%; }
   @media (max-height: 820px) {
     .js .fc-stage { padding-top: var(--sp-6); }

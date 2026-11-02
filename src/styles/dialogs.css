@@ -1,6 +1,7 @@
 /*--- Pop-ups (native <dialog>). ---*/
 /* ---------- 9. dialogs (native <dialog>) -------------------------------- */
 .dialog {
+  overscroll-behavior: contain;   /* scrolling past the dialog's end doesn't scroll the page behind (iOS) */
   width: min(100% - 2 * var(--sp-4), 37.5rem);
   max-height: calc(100dvh - 2 * var(--sp-6));
   padding: 0;
@@ -11,7 +12,7 @@
   box-shadow: var(--shadow-2);
   overflow: auto;
 }
-.dialog::backdrop { background: var(--c-backdrop); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.dialog::backdrop { background: var(--c-backdrop); -webkit-backdrop-filter: blur(var(--blur-backdrop)); backdrop-filter: blur(var(--blur-backdrop)); }
 .dialog[open] { animation: dlg-in var(--dur-2) var(--ease); }
 @keyframes dlg-in { from { opacity: 0; transform: translateY(var(--sp-3)); } }
 

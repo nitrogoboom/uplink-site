@@ -26,7 +26,8 @@
    holds still for 2.7 more screens while the scroll builds each level. The page snaps softly to each finished level
    (the .grow-snap marks, placed by home.js). On the stage: the level HUD over the picture, and the active step (the
    steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
-html:has(.grow.is-live) { scroll-snap-type: y proximity; }
+/* no pull toward each level for reduced motion: the snap is motion the visitor didn't make */
+@media (prefers-reduced-motion: no-preference) { html:has(.grow.is-live) { scroll-snap-type: y proximity; } }
 .grow.is-live .grow-snap { scroll-snap-align: start; }
 .grow.is-live .grow-art { grid-template-rows: auto minmax(0, 1fr); gap: var(--sp-4); place-items: stretch; background: none; border-radius: 0; }
 .grow.is-live .grow-art svg,
@@ -36,6 +37,8 @@ html:has(.grow.is-live) { scroll-snap-type: y proximity; }
 .grow.is-live .grow-step { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-2) var(--ease); }
 .grow.is-live .grow-step[data-active] { opacity: 1; }
 .grow.is-live :is(.tg-tl, .tg-td, .tg-tb, .tg-tt) { display: none; }   /* the HUD and tags replace the drawing's floor labels */
+/* a piece not built yet keeps its looping dashes, ring and float paused (home.js sets .is-off) */
+.tg-live .tg-p.is-off, .tg-live .tg-p.is-off * { animation-play-state: paused; }
 /* phone + tablet: the stage is exactly the screen between the header and the bottom nav (--fold-h, in svh so the
    address bar can't make it jump). Top to bottom: HUD, picture, step. The step box has a fixed height (home.js sets
    --grow-cap to the tallest step), so only the picture flexes and nothing moves when the text swaps. The picture
@@ -45,6 +48,9 @@ html:has(.grow.is-live) { scroll-snap-type: y proximity; }
     --grow-stage: var(--fold-h);
     --grow-cap: 9rem;
     --grow-top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
+    /* the picture's height: what the step leaves, but never under 12rem (a landscape phone or large text can
+       make the step nearly a screen tall, and the picture would vanish) */
+    --grow-pic: max(calc(2 * var(--sp-9)), calc(var(--grow-stage) - var(--grow-cap)));
     grid-template-areas: "head" "stage";
     grid-template-rows: auto calc(var(--grow-stage) * 3.7);
     gap: 0;
@@ -54,17 +60,17 @@ html:has(.grow.is-live) { scroll-snap-type: y proximity; }
     grid-area: stage;
     position: sticky;
     top: var(--grow-top);
-    height: calc(var(--grow-stage) - var(--grow-cap));
+    height: var(--grow-pic);
     padding: var(--sp-4) 0 0;
   }
   .grow.is-live .grow-steps {
     grid-area: stage;
     position: sticky;
-    top: calc(var(--grow-top) + var(--grow-stage) - var(--grow-cap));
+    top: calc(var(--grow-top) + var(--grow-pic));
     align-self: start;
     display: grid;
     gap: 0;
-    margin-top: calc(var(--grow-stage) - var(--grow-cap));
+    margin-top: var(--grow-pic);
     padding-block: var(--sp-3) var(--sp-4);
   }
   .grow.is-live .grow-card,

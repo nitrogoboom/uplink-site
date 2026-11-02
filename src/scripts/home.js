@@ -49,12 +49,13 @@ if (grow && 'IntersectionObserver' in window) {
   const bars = $$('.grow-bar i', grow);
 
   tower.classList.add('tg-live');
-  let live = false, stageH = 0, stageTop = 0, pinTop = 0, stem = 0, views = cams;
-  let qd = null, drawn = null, last = 0, level = 0, shown = '', lit = '', frame = 0;
+  let live = false, stageH = 0, stageTop = 0, pinTop = 0, stem = 0, views = cams, boxW = 0, boxH = 0;
+  let qd = null, drawn = null, last = 0, level = 0, shown = '', lit = '', frame = 0, vbNow = '', onScreen = false;
 
   // each camera, grown to the picture's shape and capped in zoom
   const fit = () => {
     const r = tower.getBoundingClientRect();
+    boxW = r.width; boxH = r.height;   // the drawing's box: viewBox changes never move it, so draw() reuses these
     if (!r.width || !r.height) { views = cams; return; }
     const scale = (c) => Math.min(r.width / c[2], r.height / c[3]);
     const far = scale(cams[2]);
@@ -86,6 +87,7 @@ if (grow && 'IntersectionObserver' in window) {
       if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
     }
     fit();
+    if (onScreen) start();   // redraw for the new size
   };
 
   const target = () => {
@@ -99,10 +101,12 @@ if (grow && 'IntersectionObserver' in window) {
     const u = q >= 3 ? 1 : q - (L - 1);
     const b0 = L === 1 ? 0.05 : 0.25, b1 = L === 1 ? 0.65 : 0.75;
     const p = L - 1 + clamp((u - b0) / (b1 - b0));
-    const k = L === 1 ? 0 : ease(clamp((u - 0.08) / 0.17));
+    // the camera pulls back as a level starts; with reduced motion it cuts straight to the level's view
+    const k = L === 1 ? 0 : reduceMotion.matches ? 1 : ease(clamp((u - 0.08) / 0.17));
     const from = views[Math.max(0, L - 2)], to = views[L - 1];
     const vb = from.map((v, i) => v + (to[i] - v) * k);
-    tower.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+    const vbs = vb.map((v) => v.toFixed(1)).join(' ');
+    if (vbs !== vbNow) { vbNow = vbs; tower.setAttribute('viewBox', vbs); }   // between pull-backs the camera rests
 
     let built = 0, top = 0;
     floors.forEach((f, i) => {
@@ -118,6 +122,9 @@ if (grow && 'IntersectionObserver' in window) {
     if (floorsNow !== lit) { lit = floorsNow; tower.setAttribute('data-floors', lit); }
     pieces.forEach((pc) => {
       const a = amt(p, pc.at, 0.4);
+      // a piece's looping parts (dashes, ring, floating cloud) wait, paused, until it shows (grow.css .is-off)
+      const off = pc.line ? a <= 0.98 : a === 0;
+      if (off !== pc.off) { pc.off = off; pc.el.classList.toggle('is-off', off); }
       if (pc.line) {
         pc.el.style.opacity = a > 0 ? 1 : 0;
         pc.line.style.strokeDashoffset = (1 - a).toFixed(3);
@@ -138,14 +145,13 @@ if (grow && 'IntersectionObserver' in window) {
     bars.forEach((b, i) => { b.style.setProperty('--fill', clamp(p - i).toFixed(3)); });
 
     if (!live) return;
-    const r = tower.getBoundingClientRect();
-    const s = Math.min(r.width / vb[2], r.height / vb[3]);
-    const ox = (r.width - vb[2] * s) / 2, oy = (r.height - vb[3] * s) / 2;
+    const s = Math.min(boxW / vb[2], boxH / vb[3]);
+    const ox = (boxW - vb[2] * s) / 2, oy = (boxH - vb[3] * s) / 2;
     const fade = clamp((u - 0.72) / 0.1);
     tags.forEach((t) => {
       if (t.l !== L || !t.at) { t.el.style.opacity = 0; return; }
       const half = t.w / 2;
-      const x = Math.min(r.width - half - 8, Math.max(half + 8, ox + (t.at[0] - vb[0]) * s));
+      const x = Math.min(boxW - half - 8, Math.max(half + 8, ox + (t.at[0] - vb[0]) * s));
       const y = oy + (t.at[1] - vb[1]) * s;
       t.el.style.transform = `translate(${(x - half).toFixed(1)}px, ${(y - t.h - stem).toFixed(1)}px)`;
       t.el.style.opacity = fade;
@@ -159,10 +165,11 @@ if (grow && 'IntersectionObserver' in window) {
     last = now;
     qd = qd === null || reduceMotion.matches ? q : qd + (q - qd) * (1 - Math.exp(-dt / 110));
     if (Math.abs(q - qd) < 0.0005) qd = q;
-    if (qd !== drawn) { drawn = qd; draw(qd); }   // nothing to do while the scroll is still
-    frame = window.requestAnimationFrame(tick);
+    if (qd !== drawn) { drawn = qd; draw(qd); }
+    // settled on the scroll: stop until the next scroll (or resize) starts it again, so a still page costs nothing
+    if (qd !== q) frame = window.requestAnimationFrame(tick);
   };
-  const start = () => { if (!frame) { last = 0; frame = window.requestAnimationFrame(tick); } };
+  function start() { if (!frame) { last = 0; frame = window.requestAnimationFrame(tick); } }
   const stop = () => { if (frame) window.cancelAnimationFrame(frame); frame = 0; };
 
   // The first picture shows at once: no step fade on load. Fades come back two frames later.
@@ -173,9 +180,16 @@ if (grow && 'IntersectionObserver' in window) {
   window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
   liveMode.addEventListener('change', measure);
   wide.addEventListener('change', measure);
-  window.addEventListener('resize', measure);
+  // Phones fire resize each time the address bar slides; the layout here follows the width and the small viewport
+  // height (svh), which don't change then, so measure only when one of those does (each measure forces layouts).
+  let size = window.innerWidth + 'x' + document.documentElement.clientHeight;
+  window.addEventListener('resize', () => {
+    const now = window.innerWidth + 'x' + document.documentElement.clientHeight;
+    if (now !== size) { size = now; measure(); }
+  });
   if (document.fonts) document.fonts.ready.then(measure);
-  whenOnScreen(grow, (on) => { if (on) start(); else stop(); });
+  window.addEventListener('scroll', () => { if (onScreen) start(); }, { passive: true });
+  whenOnScreen(grow, (on) => { onScreen = on; if (on) start(); else stop(); });
 }
 
 /* ------------------------------------------------------------------

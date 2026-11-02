@@ -9,6 +9,7 @@ import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
 import '../../components/services/pick.css';
 import '../../components/services/service-page.css';
+import { cardSize } from '../../lib/site';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -86,7 +87,7 @@ const ld = {
       <ul class="card-row">
         {projects.map(({ id: pid, data: p }) => (
           <li><a class="card" href={`/work/${pid}`}>
-            <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} loading="lazy"><span class="chip">{p.tag}</span></span>
+            <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} loading="lazy"><span class="chip">{p.tag}</span></span>
             <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
           </a></li>
         ))}
