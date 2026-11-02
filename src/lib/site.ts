@@ -7,6 +7,7 @@
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 //   NAV         the main tabs in order: the header, the phone tab bar and the home hero's menu all read it.
 //   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
+//   cardSize()  a card drawing's own width and height, read from the file, for the <img> that shows it.
 import type { IconName } from '../components/Icon.astro';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -62,6 +63,14 @@ export const tabCurrent = (tab: keyof typeof PAGES, current: string, pathname: s
   if (tab !== current) return undefined;
   const bare = (p: string) => p.replace(/(\/index)?(\.html)?\/?$/, '');   // the build sees /index.html, /services.html
   return bare(pathname) === bare(PAGES[tab].path) ? 'page' : 'true';
+};
+
+// A card drawing's size from its own <svg> tag (NAME-card.svg, written by the generators), so an <img> never
+// guesses it from the drawing's name.
+export const cardSize = (image: string) => {
+  const head = readFileSync(`public/assets/img/${image}-card.svg`, 'utf-8').slice(0, 400);
+  const n = (k: string) => Number(head.match(new RegExp(` ${k}="([0-9.]+)"`))?.[1]);
+  return { width: n('width'), height: n('height') };
 };
 
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out

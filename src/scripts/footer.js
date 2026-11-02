@@ -107,8 +107,9 @@ if (fc) {
   const buildMap = () => {
     seed = 7;
     let s = `<svg class="fc-w" viewBox="${VB0.join(' ')}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of the Uplink campus. The spot for the footer section you pick is lit up.">`;
-    s += '<defs><filter id="fc-blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="18"/></filter></defs>';
-    s += `<ellipse class="shadow" cx="0" cy="${(pr(16, 16)[1] + 34).toFixed(1)}" rx="430" ry="38" filter="url(#fc-blur)"/>`;
+    // the platform's soft shadow: a gradient that fades out at the edge, the size the old blurred ellipse spread to
+    s += '<defs><radialGradient id="fc-shade"><stop offset="0.45" class="shade"/><stop offset="1" class="shade" stop-opacity="0"/></radialGradient></defs>';
+    s += `<ellipse class="shadow" cx="0" cy="${(pr(16, 16)[1] + 34).toFixed(1)}" rx="466" ry="74"/>`;
     s += box(0, 0, -0.7, 16, 16, 0.7, 'plat') + '<g class="grid">';
     for (let k = 1; k < 16; k++) {
       const a = pr(k, 0), b = pr(k, 16), c = pr(0, k), d = pr(16, k);
@@ -195,8 +196,8 @@ if (fc) {
     if (opts.focus) t.focus({ preventScroll: true });
     focusMap(panels[cur].dataset.map, opts.instant);
   };
-  // the panels sit above the tiles, so Tab from a tile would skip them; Enter or Space (a click with
-  // detail 0) moves focus into the chosen panel instead
+  // Tab from the tiles goes on into the chosen panel (the tabs come first in the markup); Enter or Space (a click
+  // with detail 0) jumps straight there too
   tabs.forEach((t, i) => t.addEventListener('click', (e) => {
     select(i);
     if (e.detail === 0) panels[i].focus();
@@ -211,6 +212,14 @@ if (fc) {
 
   // newsletter (prototype: nothing is sent)
   const nl = $('[data-fc-nl]', fc);
+  const note = nl ? $('[data-fc-nl-msg]', nl).textContent : '';
+  // once marked wrong, the address clears its error as soon as it reads right, not on the next submit
+  if (nl) $('input', nl).addEventListener('input', (e) => {
+    if (e.target.getAttribute('aria-invalid') && e.target.checkValidity()) {
+      e.target.removeAttribute('aria-invalid');
+      $('[data-fc-nl-msg]', nl).textContent = note;
+    }
+  });
   if (nl) nl.addEventListener('submit', (e) => {
     e.preventDefault();
     const input = $('input', nl), msg = $('[data-fc-nl-msg]', nl);

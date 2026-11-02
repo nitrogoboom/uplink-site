@@ -19,7 +19,7 @@
   white-space: nowrap;
   transition: transform var(--dur-1) var(--ease), filter var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
 }
-.btn:hover { transform: translateY(-1px); }
+@media (hover: hover) { .btn:hover { transform: translateY(-1px); } }   /* real pointers only: on touch a tap leaves :hover stuck */
 .btn:active { transform: none; }
 .btn svg { width: var(--icon); height: var(--icon); flex: none; }
 .btn--primary { background: var(--c-accent); color: var(--c-on-accent); box-shadow: var(--shadow-1); }

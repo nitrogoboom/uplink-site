@@ -120,12 +120,15 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 /* ======================================================================
    Dialogs (native <dialog>: focus is held inside, Esc closes)
    ====================================================================== */
+// On touch screens the first field would bring the keyboard up over the sheet before it is read, so there focus
+// starts on the close button (a screen reader still reads the dialog's title) and a tap on a field brings the keyboard.
+const coarse = window.matchMedia('(pointer: coarse)');
 function openDialog(id, opener) {
   const dlg = document.getElementById(id);
   if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
   dlg._opener = opener || document.activeElement;
   dlg.showModal();
-  const first = $('[autofocus]', dlg) || $('input, select, textarea', dlg) || $('[data-close]', dlg);
+  const first = (coarse.matches ? null : $('[autofocus]', dlg) || $('input, select, textarea', dlg)) || $('[data-close]', dlg);
   if (first) first.focus({ preventScroll: true });
   dlg.scrollTop = 0;
   return true;

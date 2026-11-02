@@ -148,6 +148,7 @@
     0 0 24px 2px hsl(var(--shadow-ink) / 0.16),
     0 0 40px 4px hsl(var(--shadow-ink) / 0.18);
   --blur: 14px;
+  --blur-backdrop: 6px;   /* behind an open dialog */
 
   /* ---- motion ---------------------------------------------------------- */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
