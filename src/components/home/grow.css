@@ -14,7 +14,6 @@
 }
 .grow-art svg { width: 100%; max-width: 32.5rem; height: auto; }
 .grow-hud, .grow-tags { display: none; }
-.grow-snap { position: absolute; top: 0; left: 0; width: 1px; height: 1px; pointer-events: none; }
 @media (min-width: 1100px) {
   .grow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sp-7); }
   .grow-side .section-head { grid-column: 1 / -1; }
@@ -23,12 +22,9 @@
   .grow-steps { grid-column: 2; grid-row: 2; gap: 30vh; padding-block: 8vh 24vh; }
 }
 /* once home.js runs (.is-live; every screen but a short desktop one): the section is one stage, a screen tall, that
-   holds still for 2.7 more screens while the scroll builds each level. The page snaps softly to each finished level
-   (the .grow-snap marks, placed by home.js). On the stage: the level HUD over the picture, and the active step (the
-   steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
-/* no pull toward each level for reduced motion: the snap is motion the visitor didn't make */
-@media (prefers-reduced-motion: no-preference) { html:has(.grow.is-live) { scroll-snap-type: y proximity; } }
-.grow.is-live .grow-snap { scroll-snap-align: start; }
+   holds still for 2.7 more screens while the scroll builds each level. No scroll snap: it pulled the page about 200px
+   either way around each level and fought the visitor. On the stage: the level HUD over the picture, and the active
+   step (the steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
 .grow.is-live .grow-art { grid-template-rows: auto minmax(0, 1fr); gap: var(--sp-4); place-items: stretch; background: none; border-radius: 0; }
 .grow.is-live .grow-art svg,
 .grow.is-live .grow-tags { grid-area: 2 / 1; width: 100%; height: 100%; max-width: none; max-height: none; min-height: 0; }

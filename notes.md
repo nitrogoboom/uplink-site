@@ -20,7 +20,7 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
-- [ ] Grow world ("level up", every screen but short desktop ones): tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `HOLD`, `ZOOM` and the phase points); `RUN` must match the `3.7` in `grow.css`. Check the soft snap feels right and never traps the scroll.
+- [ ] Grow world ("level up", every screen but short desktop ones): tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `ZOOM` and the phase points); `RUN` must match the `3.7` in `grow.css`.
 - [ ] Grow world on desktop: the world is taller than wide, so at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
 - [ ] Grow tags, copy to confirm: the six short tags in `Grow.astro` (`tags`) are placeholders.
 - [ ] Hero on phones, copy to confirm: the short line under the headline (`lead-short` in `Hero.astro`, "We run your IT: help desk, security, cloud, network and phones.") is a placeholder. More office captions: add a label to `HERO_LABELS` and its index to `PHONE_ITEMS` in `gen_office.py`.

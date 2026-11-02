@@ -40,10 +40,12 @@ async def main():
         lit=await pg.eval_on_selector(f'.ob-tile[data-tile="{want}"]','e=>e.classList.contains("is-on")')
         rep.append(f"hero tile hover ({want}): {before} -> {after}")
         if not lit or after==before: fails.append(f'hero: hovering the {want} tile did not show it ({before} -> {after})')
-        steps=await pg.eval_on_selector_all('.grow-step[data-floors]','s=>s.map(x=>x.dataset.floors)'); seen=[]
-        for i, f in enumerate(steps):   # the stage pins, so go to each level's snap mark (one per finished level)
-            await pg.evaluate("i=>{const s=document.querySelectorAll('.grow-snap')[i],pad=parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop)||0;window.scrollTo({top:s.getBoundingClientRect().top+scrollY-pad,behavior:'instant'})}", i); await pg.wait_for_timeout(1200)
-            seen.append(await pg.eval_on_selector('svg.tg','e=>e.getAttribute("data-floors")'))
+        steps=await pg.eval_on_selector_all('.grow-step[data-floors]','s=>s.map(x=>x.dataset.floors)')
+        # the stage pins, so walk down the section a little at a time and note each floor count the tower reaches
+        seen=await pg.evaluate("""async()=>{const g=document.querySelector('.grow'),top=g.getBoundingClientRect().top+scrollY,seen=[];
+          for(let y=top-innerHeight;y<top+g.offsetHeight;y+=60){window.scrollTo({top:y,behavior:'instant'});await new Promise(r=>setTimeout(r,120));
+            const f=document.querySelector('svg.tg').getAttribute('data-floors');if(f&&f!==seen[seen.length-1])seen.push(f)}
+          return seen}""")
         rep.append(f"tower floors {','.join(steps)} -> {','.join(seen)}")
         if seen!=steps: fails.append(f"tower: floors {','.join(seen)}, expected {','.join(steps)}")
         # footer behaviour on home at 1440

@@ -13,7 +13,7 @@ import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 // That gives p, 0 to 3, the drawing's own growth scale: every storey and piece starts at its data-at (written by
 // tools/gen_tower.py) and builds over 0.4 (storeys 0.55). q is eased toward the scroll so a flick can't make the
 // floors jitter. Every screen but a short desktop one: the stage holds still for RUN of a screen per level
-// (grow.css: 1 + 3 x RUN = 3.7) and snaps softly to each hold. Short desktop screens: q follows the steps down the
+// (grow.css: 1 + 3 x RUN = 3.7). Short desktop screens: q follows the steps down the
 // right-hand column. Each level's camera (data-cam1..3) is widened to the picture's shape, and zoomed out to at
 // most ZOOM times the level 3 scale per level, so the pull-back stays gentle and the tower never shrinks much.
 const tower = $('.grow svg.tg');
@@ -21,7 +21,6 @@ const grow = tower && tower.closest('.grow');
 if (grow && 'IntersectionObserver' in window) {
   const LEAD = 0.3;   // level 1 starts building this much of a level before the stage pins
   const RUN = 0.9;    // screens of scroll per level
-  const HOLD = 0.87;  // where in a level the snap mark sits
   const ZOOM = 1.25;  // most a level's camera may zoom in on the next one's
   const liveMode = window.matchMedia('(max-width: 1099px), (min-height: 700px)');
   const wide = window.matchMedia('(min-width: 1100px)');
@@ -43,7 +42,6 @@ if (grow && 'IntersectionObserver' in window) {
   const head = $('.section-head', grow);
   const art = $('.grow-art', grow);
   const list = $('.grow-steps', grow);
-  const snaps = $$('.grow-snap', grow);
   const lvl = $('.grow-lvl', grow);
   const num = $('.grow-num', grow);
   const bars = $$('.grow-bar i', grow);
@@ -81,8 +79,6 @@ if (grow && 'IntersectionObserver' in window) {
         pinTop = parseFloat(getComputedStyle(art).top) || 0;
         stageTop = head.offsetTop + head.offsetHeight;
       }
-      const pad = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
-      snaps.forEach((s, i) => { s.style.top = Math.round(stageTop - pinTop + (i + HOLD - LEAD) * RUN * stageH + pad) + 'px'; });
       tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
       if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
     }
