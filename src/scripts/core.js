@@ -5,7 +5,7 @@
    project is in the HTML, the full building is drawn).
 
    Files (each page script imports core.js, so core always runs first):
-     core.js      every page   helpers, toasts, pop-ups, forms, shortcuts;
+     core.js      every page   helpers, toasts, pop-ups, forms, shortcuts, tab bar;
                                exports the helpers the page scripts import
      footer.js    every page   footer roster + campus map
      home.js      Home         growing tower, hero cloud
@@ -247,6 +247,29 @@ $$('form[data-validate]').forEach((form) => {
     form.dispatchEvent(new CustomEvent('uplink:sent', { bubbles: true }));
   });
 });
+
+/* ---------- phone tab bar: out of the way while reading ----------------- */
+// Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
+// It always shows at the top and the end of the page and while one of its links has focus.
+// The header stays put: the home tower pins under it.
+const botnav = $('.botnav');
+if (botnav) {
+  const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
+  let lastY = window.scrollY;
+  let queued = false;
+  const show = (on) => botnav.classList.toggle('is-hidden', !on);
+  const update = () => {
+    queued = false;
+    const y = window.scrollY;
+    const end = root.scrollHeight - window.innerHeight - STEP;
+    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) { show(true); lastY = y; return; }
+    if (Math.abs(y - lastY) < STEP) return;
+    show(y < lastY);
+    lastY = y;
+  };
+  window.addEventListener('scroll', () => { if (!queued) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
+  botnav.addEventListener('focusin', () => show(true));
+}
 
 /* ---------- off-screen pause ------------------------------------------ */
 // Marks el with .is-idle while none of it is on screen (site.css pauses
