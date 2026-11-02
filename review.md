@@ -177,7 +177,7 @@ PageSpeed is 100 on Home. These are for real visitors, not the score.
 
 - The design tokens in one file, the drawing rules, the iso tools, the plain-JS no-library stance, the no-script fallbacks, the `README` tone. These are what make the site better than its peers.
 - Don't add a client-side router, a UI framework or Tailwind. The site needs none of them, and each one costs the CSP, the no-script story or the size.
-- The `js` class from the `<head>` line stays the switch for the script layouts (footer tabs, service picker). With script off, every page reads in full (tested 2 Nov 2026: same text on all pages, footer panels stacked, still hero picture). If script is on but the page bundle never arrives (a dropped connection, a network or extension blocking scripts), the footer shows only its Contact panel and the home hero is blank. Decided 2 Nov 2026: that is the visitor's setup failing, not the site, so no fallback timer. Our own script errors are caught before deploy (`verify_footer.py` fails on console errors).
+- The `js` class from the `<head>` line stays the switch for the script layouts (footer tabs, service picker). With script off, every page reads in full (tested 2 Nov 2026: same text on all pages, footer panels stacked, still hero picture). If script is on but the page bundle never arrives (a dropped connection, a network or extension blocking scripts), the footer shows only its Contact panel and the home hero is blank. Decided 2 Nov 2026: that is the visitor's setup failing, not the site, so no fallback timer. A script error of our own would break the same parts; today only `verify_footer.py`, run by hand, lists console errors (it doesn't fail on them, and CI doesn't run it). Closing that gap is in `notes.md`.
 
 ## Sources
 
