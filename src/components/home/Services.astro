@@ -7,8 +7,12 @@ import Icon, { type IconName } from '../Icon.astro';
 import './services.css';
 const SLOTS = 4;
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+// services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
+// different count stops the build here instead of leaving a broken grid
+const featured = services.filter((s) => s.data.featured);
+if (featured.length !== 3) throw new Error(`Home services: ${featured.length} services have "featured": true; the layout takes exactly 3 (src/content/services/*.json)`);
 const tiles = [
-  ...services.filter((s) => s.data.featured).map((s) => ({ ...s, size: 'big' })),
+  ...featured.map((s) => ({ ...s, size: 'big' })),
   ...services.filter((s) => !s.data.featured).slice(0, SLOTS - 1).map((s) => ({ ...s, size: 'small' })),
 ];
 ---
@@ -24,7 +28,7 @@ const tiles = [
     <ul class="svc-menu" aria-label="Services">
       {tiles.map(({ id, size, data: s }) => (
         <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
-          <span class="svc-art"><img src={`/assets/img/${s.image}-compact.svg?card#plain`} alt="" width="640" height="480" loading="lazy"></span>
+          <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
           <span class="svc-icon"><Icon name={s.icon as IconName} /></span>
           <span class="svc-text"><span class="chip">{s.chip}</span><span class="svc-title">{s.title}</span><span class="svc-line">{s.card}</span></span>
           <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>

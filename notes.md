@@ -38,6 +38,9 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 - [ ] Safe area: `header.css` sets `top: env(safe-area-inset-top)` on the sticky header, but `scroll-padding-top` (`base.css`) doesn't add the inset. Only shows in landscape or from the home screen. Check on an iPhone.
 - [ ] Hero motion never stops (cloud every 3.2s, phone captions every 2.2s, pulses). WCAG 2.2.2 asks for a pause control; reduced motion alone may not satisfy an audit. Decide whether to add one.
 
+## Home Services (review 2 Nov 2026; card cuts, swipe, taps, hover shadow, featured-count guard done)
+- [ ] Desktop zoom barely enlarges text: the root font follows the window (`tokens.css`, `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`), so at 110-125% zoom the window shrinks in CSS px and the text with it (about +9%). 150% and up drops below 1100px and behaves normally, so WCAG 1.4.4 passes. A floor of `1rem` would fix zoom but makes text up to 14% bigger at 100% on laptops under 1440 x 900 (1366 x 768, 1536 x 864), which can push one-screen sections past the screen. Decide, then check with `verify_styles.py`.
+
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.

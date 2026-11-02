@@ -23,7 +23,7 @@ const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
     <ul class="work-grid" data-work-grid>
       {projects.map(({ id, data: p }, i) => (
         <li data-tags={p.tag.toLowerCase()}><a class="card" href={`/work/${id}`}>
-          <span class="card-media well"><img src={`/assets/img/${p.image}-compact.svg?card#plain`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} fetchpriority={i === 0 ? 'high' : undefined} loading={i === 0 ? undefined : 'lazy'}><span class="chip">{p.tag}</span></span>
+          <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} fetchpriority={i === 0 ? 'high' : undefined} loading={i === 0 ? undefined : 'lazy'}><span class="chip">{p.tag}</span></span>
           <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
         </a></li>
       ))}
