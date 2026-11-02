@@ -7,7 +7,8 @@
 // Without script, office.svg shows (office-compact.svg on phones). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
 import flows from './hero-flows.svg?raw';
 import './hero.css';
-import { HERO } from '../../lib/site';
+import Icon from '../Icon.astro';
+import { HERO, NAV, PAGES } from '../../lib/site';
 ---
 <section class="hero fold" id="top" aria-labelledby="hero-title">
   <div class="container hero-grid">
@@ -21,37 +22,18 @@ import { HERO } from '../../lib/site';
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Get started<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <span class="small muted">Free check-up. No contract to look.</span>
       </div>
-      <nav aria-label="Home page menu">
-        <p class="label menu-label">Main menu</p>
+      <nav aria-labelledby="hero-menu-label">
+        <p class="label menu-label" id="hero-menu-label">Main menu</p>
         <ul class="menu">
-          <li>
-            <a class="mi" href="/services">
-              <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg></span>
-              <span class="mi-text"><span class="mi-title">Services</span><span class="mi-sub">Help desk, security, cloud, networks, phones</span></span>
-              <svg class="mi-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </a>
-          </li>
-          <li>
-            <a class="mi" href="/work">
-              <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/></svg></span>
-              <span class="mi-text"><span class="mi-title">Our work</span><span class="mi-sub">Setups we built and still run</span></span>
-              <svg class="mi-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </a>
-          </li>
-          <li>
-            <a class="mi" href="/about">
-              <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18M8.5 8h3M8.5 12h3M8.5 16h3"/></svg></span>
-              <span class="mi-text"><span class="mi-title">About</span><span class="mi-sub">The people behind the screen</span></span>
-              <svg class="mi-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </a>
-          </li>
-          <li>
-            <a class="mi" href="/contact">
-              <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/></svg></span>
-              <span class="mi-text"><span class="mi-title">Contact</span><span class="mi-sub">Talk to a real person</span></span>
-              <svg class="mi-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-            </a>
-          </li>
+          {NAV.filter((t) => t.sub).map(({ page, icon, sub }) => (
+            <li>
+              <a class="mi" href={PAGES[page].path}>
+                <span class="icon-tile" aria-hidden="true"><Icon name={icon} /></span>
+                <span class="mi-text"><span class="mi-title">{PAGES[page].name}</span><span class="mi-sub">{sub}</span></span>
+                <Icon name="chevronR" class="mi-go" />
+              </a>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>

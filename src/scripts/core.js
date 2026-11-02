@@ -251,15 +251,17 @@ $$('form[data-validate]').forEach((form) => {
 /* ---------- phone tab bar: out of the way while reading ----------------- */
 // Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
 // It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put: the home tower pins under it.
+// The header stays put: the home tower pins under it. Wider screens hide the bar, so the listener does nothing there.
 const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
+  const phone = window.matchMedia('(max-width: 699px)');   // as bottom-nav.css
   let lastY = window.scrollY;
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
+    if (!phone.matches) { show(true); return; }
     const y = window.scrollY;
     const end = root.scrollHeight - window.innerHeight - STEP;
     if (y <= 0 || y >= end || botnav.contains(document.activeElement)) { show(true); lastY = y; return; }
@@ -267,7 +269,8 @@ if (botnav) {
     show(y < lastY);
     lastY = y;
   };
-  window.addEventListener('scroll', () => { if (!queued) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener('scroll', () => { if (!queued && phone.matches) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
+  phone.addEventListener('change', () => { lastY = window.scrollY; show(true); });
   botnav.addEventListener('focusin', () => show(true));
 }
 

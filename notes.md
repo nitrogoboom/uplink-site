@@ -33,6 +33,11 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 - [ ] PageSpeed mobile: phones with motion now get the animated phone cut (an inline SVG, not an LCP candidate), so LCP moved from the still picture (simulated 1.7–2.0 s) to the hero text (1.1 s locally). Confirm with `python tools/pagespeed.py` after this deploys. Phones with reduced motion still paint the picture as LCP.
 - [ ] PageSpeed mobile Home lists "Forced reflow: [unattributed] 36 ms" (unscored; score stays 100). Not reproducible locally (live site, beacon on and off, CPU slowed 6x), and no script reads layout at load on phones. Recheck now and then; act only if it starts naming a source.
 
+## Top of Home (review 2 Nov 2026; captions, header button names, pulse timing, shared tab list, tab marking done)
+- [ ] Header and phone bar blur: the glass is 88% / 92% solid, so the 14px `backdrop-filter` barely shows, but it is redrawn on every scroll frame (costly on low-end Android). Decide: drop the blur and keep the solid colour, or keep it.
+- [ ] Safe area: `header.css` sets `top: env(safe-area-inset-top)` on the sticky header, but `scroll-padding-top` (`base.css`) doesn't add the inset. Only shows in landscape or from the home screen. Check on an iPhone.
+- [ ] Hero motion never stops (cloud every 3.2s, phone captions every 2.2s, pulses). WCAG 2.2.2 asks for a pause control; reduced motion alone may not satisfy an audit. Decide whether to add one.
+
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.

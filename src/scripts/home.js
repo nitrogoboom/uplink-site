@@ -414,8 +414,17 @@ const startCaptions = (svg) => {
   };
   const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
   svg.addEventListener('click', tap);
-  const relayout = () => { if (begun) { write.cloud(); write.office(); } };
-  window.addEventListener('resize', relayout);
+  // Re-place the words only when the drawing's width changes. Phones fire `resize` each time the address bar
+  // shows or hides, which would replay the line and dot mid-scroll; the drawing keeps its width then.
+  let width = 0;
+  const relayout = (w) => {
+    if (Math.abs(w - width) < 0.5) return;
+    width = w;
+    if (begun) { write.cloud(); write.office(); }
+  };
+  const onResize = () => relayout(svg.getBoundingClientRect().width);
+  const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
+  if (sized) sized.observe(svg); else window.addEventListener('resize', onResize);
   const onVisible = () => (document.hidden ? stop() : start());
   document.addEventListener('visibilitychange', onVisible);
   reduceMotion.addEventListener('change', start);
@@ -432,7 +441,7 @@ const startCaptions = (svg) => {
     window.clearTimeout(first);
     window.clearTimeout(swap);
     svg.removeEventListener('click', tap);
-    window.removeEventListener('resize', relayout);
+    if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisible);
     reduceMotion.removeEventListener('change', start);
     if (seen) seen.disconnect();
