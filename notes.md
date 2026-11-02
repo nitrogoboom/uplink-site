@@ -48,6 +48,24 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 - [ ] Do the same pass on the other pages: Services, each service page, Work, each case study, About, Contact, soon and 404. Card links: `<Pause />` after the title, category chips `aria-hidden`, a link's name stays its visible text (no `aria-label` that drops words: axe fails it), " · " through `<Sep />`, plain picture descriptions, then read the page out (`aria_snapshot` in Playwright) and write it up like `screen-reader-home.md`.
 - [ ] Hero "Main menu" repeats the header tabs (same five pages, same screen on tall desktops), kept for now for its look. Later: give it its own links (book a check-up, get help now, two key services), remove it, or at least drop its `<nav>` landmark so screen readers list one main menu.
 
+## Grow (review 2 Nov 2026)
+- [ ] The tower loops 8 animations forever (`tg-flow` ×5, `tg-ring`, `tg-up`, `tg-float`, in `gen_tower.py`'s style), even on pieces not built yet (opacity 0), and each frame repaints the whole SVG. Pause a piece's animation until it is built (`home.js` draw() already knows each piece's amount).
+- [ ] `home.js` grow loop: runs every frame while on screen even when nothing scrolls, and calls `getBoundingClientRect()` each frame (`target()`, and in `draw()` after writing styles: a forced layout). Start it from scroll/measure and stop once settled; cache the tower's rect in `fit()`; write `viewBox` only when it changes.
+- [ ] `resize` calls `measure()` unthrottled (iOS fires it on every toolbar show/hide): about three forced layouts each. Use a ResizeObserver or skip when width and height haven't changed.
+- [ ] Reduced motion still plays the camera zoom pull-back; jump straight to each level's view.
+- [ ] Root scroll snap (`grow.css`) stays on under reduced motion and can pull nearby anchor scrolls (see the grow world line above).
+- [ ] Landscape phones or large text: `--grow-stage` minus `--grow-cap` can go to zero or below and the picture vanishes. Add a `max()` floor.
+
+## Our work, check-up band, footer, dialogs (review 2 Nov 2026)
+- [ ] Newsletter form (`Footer.astro`) has no `method`, so without script it submits as GET and puts the email in the address (history, logs). Give it `method="post"` (the form is a mockup either way).
+- [ ] The footer's live region (`.fc-hud`, `aria-live="polite"`) reads the map caption after every tab switch, and may at load. The map is decorative: turn the live region off.
+- [ ] Footer panels hide on `html.js` (`footer.css`), so if the page script fails, 5 of 6 panels stay hidden behind dead tabs. Weigh keying on `.fc-js` (only a footer shift).
+- [ ] Tablet and phone: the roster and map show above the panels (`order: -1`) but come after them in tab order.
+- [ ] Book pop-up focuses the Name field on open, which raises the phone keyboard over the sheet at once. Focus the dialog itself on touch.
+- [ ] Footer map: the ring, beacons, signals, tickets and marker repaint every frame while on screen; the HUD's `backdrop-filter` sits over that; the blurred shadow ellipse re-renders during a camera flight.
+- [ ] Small: footer panel headings are `h2` under the "Site footer" `h2` (should be `h3`); newsletter error not cleared while typing; dialog backdrop blur hard-coded `6px` (not a token); dialogs lack `overscroll-behavior: contain`; hover lifts on `.card`, `.fc-tile`, `.btn` not wrapped in `(hover: hover)`; `Work.astro` picks image size by `p.image === 'office'`.
+- [ ] Check the desktop footer at 1100 × 700 with `verify_footer.py`: the Services panel (7 links) has no overflow guard in the fixed-height footer.
+
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.
