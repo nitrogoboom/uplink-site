@@ -48,9 +48,6 @@ Merged to `main` (PR #25, 2 Nov 2026): Services is the managed IT hub (intro, se
 - [ ] Do the same pass on the other pages: Services, each service page, Work, each case study, About, Contact, soon and 404. Card links: `<Pause />` after the title, category chips `aria-hidden`, a link's name stays its visible text (no `aria-label` that drops words: axe fails it), " · " through `<Sep />`, plain picture descriptions, then read the page out (`aria_snapshot` in Playwright) and write it up like `screen-reader-home.md`.
 - [ ] Hero "Main menu" repeats the header tabs (same five pages, same screen on tall desktops), kept for now for its look. Later: give it its own links (book a check-up, get help now, two key services), remove it, or at least drop its `<nav>` landmark so screen readers list one main menu.
 
-## Footer (review 2 Nov 2026; the rest of that review and the Grow review done)
-- [ ] Footer panels hide on `html.js` (`footer.css`), so if the page script fails, 5 of 6 panels stay hidden behind dead tabs. Kept on purpose for now: keying on `.fc-js` instead would show every panel stacked until footer.js runs, a visible jump on short pages (soon, 404) where the footer is on the first screen. Revisit if the script ever fails in the field (CSP reports would show it).
-
 ## Before going live
 - [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Each needs a page or no link. The `Français` link is gone (28 Oct 2026): it pointed `hreflang="fr"` at a placeholder. Add it back with a real French page.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain of the real domain is HTTPS, then submit to hstspreload.org. Not before.
