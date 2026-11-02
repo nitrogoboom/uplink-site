@@ -2,7 +2,6 @@
   "order": 3,
   "title": "Cloud workspace",
   "chip": "Build",
-  "tile": "Cloud",
   "tag": "Project",
   "image": "cloud",
   "icon": "cloud",
@@ -34,7 +33,6 @@
       "Moves happen over a weekend or after hours. Email, calendars and files come across, staff sign in on Monday, and we stay close for the first week to answer questions.",
       "Afterwards, files sit in shared drives with clear folders and the right permissions. Every account has multi-factor sign-in, and everything is backed up outside Microsoft or Google."
     ],
-    "plans": "Microsoft 365 or Google backup in every plan. Moves and clean-ups are quoted as a project.",
     "faq": [
       {
         "q": "Microsoft 365 or Google Workspace?",

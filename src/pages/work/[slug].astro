@@ -1,27 +1,27 @@
 ---
-// One page per project (/work/office-move …), from src/content/projects/<slug>.json: the same ProjectCase the
-// Work page lists, laid out as a page of its own (project-page.css): breadcrumb and title beside the drawing, the
-// story and facts, then the full case study (the project's `page` fields), a link to the next project, and the
-// call-to-action band.
-import { getCollection } from 'astro:content';
+// One page per project (/work/office-move …), from src/content/projects/<slug>.json: ProjectCase laid out as a
+// page (project-page.css): breadcrumb and title beside the drawing, the story and facts (its services link to
+// their pages), then the full case study (the project's `page` fields).
+import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
-import Icon from '../../components/Icon.astro';
 import '../../components/work/details.css';
 import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
-  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-  return projects.map((project, i) => ({ params: { slug: project.id }, props: { project, next: projects[(i + 1) % projects.length] } }));
+  const projects = await getCollection('projects');
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
 }
-const { project, next } = Astro.props;
+const { project } = Astro.props;
 const { id, data: p } = project;
 const url = new URL(`/work/${id}`, Astro.site).href;
+const services = await getEntries(p.services);
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
     { '@type': 'Article', '@id': url, url, headline: p.name, description: p.story, inLanguage: 'en-CA',
-      publisher: { '@id': `${Astro.site!.href}#business` }, about: p.services,
+      publisher: { '@id': `${Astro.site!.href}#business` },
+      about: services.map((s) => ({ '@id': new URL(`/services/${s.id}`, Astro.site).href })),
       articleBody: [...p.page.challenge, ...p.page.steps.map((t) => `${t.title}. ${t.detail}`), ...p.page.results].join('\n\n') },
     { '@type': 'BreadcrumbList', itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
@@ -56,26 +56,6 @@ const ld = {
           <ol>{p.page.steps.map((t) => <li><strong>{t.title}.</strong> {t.detail}</li>)}</ol>
           <h3>The result</h3>
           <ul>{p.page.results.map((t) => <li>{t}</li>)}</ul>
-        </div>
-      </div>
-    </div>
-  </section>
-  <section class="section page-end" aria-label="More">
-    <div class="container stack-5">
-      <a class="next-link panel" href={`/work/${next.id}`}>
-        <span class="label">Next project</span>
-        <span class="next-title">{next.data.name}</span>
-        <span class="next-line muted">{next.data.clientShort}</span>
-        <Icon name="arrow" />
-      </a>
-      <div class="panel cta-band">
-        <div class="stack">
-          <h2>Want a result like this?</h2>
-          <p class="lead">Start with the free check-up. We look first, then quote.</p>
-        </div>
-        <div class="row">
-          <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
-          <a class="btn btn--secondary btn--lg" href="/work">All projects</a>
         </div>
       </div>
     </div>

@@ -4,7 +4,7 @@
   "tag": "Plan",
   "client": "Non-profit, 30 staff",
   "clientShort": "Non-profit · 30 staff",
-  "services": "IT strategy & planning",
+  "services": ["strategy"],
   "result": "Budget approved a year ahead",
   "image": "strategy",
   "alt": "Rising budget bars and a quarterly roadmap",

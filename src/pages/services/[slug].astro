@@ -1,9 +1,8 @@
 ---
-// One page per service (/services/help-desk …), from src/content/services/<slug>.json. The same ServiceCard
-// the picker shows, laid out as a page of its own (service-page.css): breadcrumb and title beside the drawing,
-// what's included, then how it works and its questions (the service's `page` fields), a link to the next service,
-// and the call-to-action band. Its JSON-LD is the Service block the Services page also lists, its questions as a
-// FAQPage, and a three-step breadcrumb.
+// One page per service (/services/help-desk …), from src/content/services/<slug>.json. ServiceCard laid out as a
+// page (service-page.css): breadcrumb and title beside the drawing, what's included, then how it works and its
+// questions (the service's `page` fields), then the projects that used it (their `services` list). Its JSON-LD is
+// the Service block the Services page also lists, its questions as a FAQPage, and a three-step breadcrumb.
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
@@ -13,9 +12,11 @@ import '../../components/services/service-page.css';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length, next: services[(i + 1) % services.length] } }));
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length,
+    projects: projects.filter((p) => p.data.services.some((r) => r.id === service.id)).slice(0, 3) } }));
 }
-const { service, n, total, next } = Astro.props;
+const { service, n, total, projects } = Astro.props;
 const { id, data: s } = service;
 const url = new URL(`/services/${id}`, Astro.site).href;
 const business = { '@id': `${Astro.site!.href}#business` };
@@ -45,7 +46,6 @@ const ld = {
       <ServiceCard service={service} n={n} total={total} on first heading="h1" />
       <div class="svc-page-cta row">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}>Talk to us about this</a>
-        <a class="link-arrow" href="/services#plans">Compare all services<Icon name="arrow" /></a>
       </div>
     </div>
   </section>
@@ -57,10 +57,6 @@ const ld = {
       </div>
       <div class="stack-5 detail-body">
         <div class="prose">{s.page.body.map((t) => <p>{t}</p>)}</div>
-        <dl class="facts">
-          <div><dt>Plans</dt><dd>{s.page.plans}</dd></div>
-          <div><dt>Price</dt><dd>Quoted after the free check-up</dd></div>
-        </dl>
       </div>
     </div>
   </section>
@@ -80,24 +76,22 @@ const ld = {
       </div>
     </div>
   </section>
-  <section class="section page-end" aria-label="More">
+  {projects.length > 0 && (
+  <section class="section section--band" id="projects" aria-labelledby="projects-title">
     <div class="container stack-5">
-      <a class="next-link panel" href={`/services/${next.id}`}>
-        <span class="label">Next service</span>
-        <span class="next-title">{next.data.title}</span>
-        <span class="next-line muted">{next.data.card}</span>
-        <Icon name="arrow" />
-      </a>
-      <div class="panel cta-band">
-        <div class="stack">
-          <h2>Not sure it fits?</h2>
-          <p class="lead">Start with the free check-up. We will tell you what you need and what you can skip.</p>
-        </div>
-        <div class="row">
-          <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
-          <a class="btn btn--secondary btn--lg" href="tel:+18555550142">1-855-555-0142</a>
-        </div>
+      <div class="section-head">
+        <p class="eyebrow">Our work</p>
+        <h2 id="projects-title">Where we've done this</h2>
       </div>
+      <ul class="svc-projects">
+        {projects.map(({ id: pid, data: p }) => (
+          <li><a class="card" href={`/work/${pid}`}>
+            <span class="card-media well"><img src={`/assets/img/${p.image}-compact.svg?card#plain`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} loading="lazy"><span class="chip">{p.tag}</span></span>
+            <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
+          </a></li>
+        ))}
+      </ul>
     </div>
   </section>
+  )}
 </Base>

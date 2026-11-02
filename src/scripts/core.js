@@ -9,15 +9,12 @@
                                exports the helpers the page scripts import
      footer.js    every page   footer roster + campus map
      home.js      Home         growing tower, hero cloud
-     services.js  Services     service picker
-     work.js      Our work     filters + project pop-up
+     work.js      Our work     filters
      contact.js   Contact      copy buttons, queue card
      soon.js      soon.html    names the missing page
 
    Keyboard map (single keys, can be switched off in the shortcuts panel):
-     1 - 7      pick a service                Services page
      ?          open the shortcuts panel      all pages
-     Left/Right previous / next project       inside the project pop-up
      Esc        close the open pop-up         native <dialog> behaviour
    Single keys never fire while typing in a field, while a pop-up is open,
    or when Ctrl / Cmd / Alt is held.
@@ -196,23 +193,13 @@ function isTyping(el) {
   return false;
 }
 
-// the Services picker, once services.js registers it: the number keys (1 to 9) pick a service
-let picker = null;
-export const registerPicker = (p) => { picker = p; };
-
 document.addEventListener('keydown', (e) => {
   if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
   if (!shortcutsOn()) return;
   if (isTyping(e.target)) return;
   if (document.querySelector('dialog[open]')) return;
 
-  if (e.key === '?') { e.preventDefault(); openDialog('shortcuts-dialog'); return; }
-  if (e.shiftKey) return;
-
-  if (/^[1-9]$/.test(e.key) && picker) {
-    const n = Number(e.key) - 1;
-    if (n < picker.count) { e.preventDefault(); picker.select(n, { focus: true }); }
-  }
+  if (e.key === '?') { e.preventDefault(); openDialog('shortcuts-dialog'); }
 });
 
 /* ======================================================================

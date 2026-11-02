@@ -4,7 +4,7 @@
   "tag": "Protect",
   "client": "Manufacturer, 60 staff",
   "clientShort": "Manufacturer · 60 staff",
-  "services": "Backup & recovery",
+  "services": ["backup"],
   "result": "Restores proven, not just promised",
   "image": "backup",
   "alt": "Backup drives with a restore loop and an offsite copy",

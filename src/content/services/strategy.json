@@ -2,7 +2,6 @@
   "order": 7,
   "title": "IT strategy & planning",
   "chip": "Plan",
-  "tile": "Strategy",
   "tag": "Quarterly",
   "image": "strategy",
   "icon": "chart",
@@ -32,7 +31,6 @@
       "Every quarter we meet for an hour. We look at what changed, what is coming up, and any risks we have spotted. You leave with a short list of decisions, not a pile of jargon.",
       "We also help with cyber insurance forms and vendor quotes, so you can compare options with someone on your side."
     ],
-    "plans": "Quarterly IT review in Business and Complete. The yearly roadmap and budget in Complete.",
     "faq": [
       {
         "q": "Is this a virtual CIO service?",

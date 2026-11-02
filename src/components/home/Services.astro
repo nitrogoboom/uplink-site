@@ -26,7 +26,7 @@ const tiles = [
         <p class="eyebrow">What we run</p>
         <h2 id="services-title">Everything your office runs on</h2>
       </div>
-      <a class="link-arrow" href="/services#plans">Compare all services<Icon name="arrow" /></a>
+      <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
     </div>
     <ul class="svc-menu" aria-label="Services">
       {tiles.map(({ id, size, data: s }) => (
@@ -41,7 +41,7 @@ const tiles = [
         <span class="svc-icon"><Icon name="grid" /></span>
         <span class="svc-text">
           <span class="svc-title">{extra.length > 0 && <span class="desk-only">+{extra.length} more</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>All {services.length} services</span></span>
-          <span class="svc-line">{extra.length > 0 && <span class="desk-only">{extra.map((s) => s.data.title).join(', ')}.</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>Compare every service and plan.</span></span>
+          <span class="svc-line">{extra.length > 0 && <span class="desk-only">{extra.map((s) => s.data.title).join(', ')}.</span>}<span class={extra.length > 0 ? 'phone-only' : undefined}>See every service on one page.</span></span>
         </span>
         <span class="svc-go" aria-hidden="true">All services<Icon name="chevronR" /></span>
       </a></li>

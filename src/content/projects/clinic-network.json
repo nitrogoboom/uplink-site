@@ -4,7 +4,7 @@
   "tag": "Build",
   "client": "Health clinic, 2 locations",
   "clientShort": "Health clinic · 2 locations",
-  "services": "Networks & Wi-Fi",
+  "services": ["network"],
   "result": "Faster check-in, guest Wi-Fi kept separate",
   "image": "network",
   "alt": "Server rack with cabling to desks and a Wi-Fi access point",

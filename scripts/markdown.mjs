@@ -3,7 +3,7 @@
 // each page links to its copy with <link rel="alternate" type="text/markdown"> (Base.astro), and llms.txt lists them.
 // Only <main> is converted, so the header, footer and pop-ups stay out. Left out as well: drawings, buttons, chips,
 // eyebrows, breadcrumbs and anything aria-hidden. Kept: headings, prose, lists, the facts lists, the FAQ (question in bold,
-// answer under it) and the plans table. Links become full addresses.
+// answer under it). Links become full addresses.
 // Home is skipped: its Markdown is written by hand (src/data/index.md, served by src/pages/index.md.ts).
 // 404 and soon are skipped: they are not pages anyone should cite.
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';

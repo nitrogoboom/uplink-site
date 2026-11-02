@@ -2,7 +2,6 @@
   "order": 1,
   "title": "Managed help desk",
   "chip": "Support",
-  "tile": "Help desk",
   "tag": "Starts day one",
   "image": "helpdesk",
   "icon": "headset",
@@ -33,7 +32,6 @@
       "We also handle the routine work that falls between the cracks. New hires get a laptop, accounts and access ready on their first morning. When someone leaves, their access is closed the same day and their files are handed to the right person.",
       "Support covers everyone on your team and every device they use for work. We do not count tickets or charge by the call."
     ],
-    "plans": "Every plan. On-site visits are included in Business and Complete, and billed per visit on Essentials.",
     "faq": [
       {
         "q": "What hours is the help desk open?",

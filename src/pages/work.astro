@@ -3,16 +3,10 @@
 import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
 import Projects from '../components/work/Projects.astro';
-import Details from '../components/work/Details.astro';
-import CasePopup from '../components/work/CasePopup.astro';
-import Industries from '../components/work/Industries.astro';
 ---
 <Base title={PAGES.work.title} description={PAGES.work.description}
       page="work" path="/work" type="CollectionPage">
   <Projects />
-  <Details />
-  <CasePopup />
-  <Industries />
 </Base>
 <script>
   import '../scripts/work.js';

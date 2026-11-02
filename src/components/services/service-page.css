@@ -24,6 +24,11 @@
 @media (min-width: 700px) {
   .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* the projects that used this service: up to three cards */
+.svc-projects { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+.svc-projects > li { display: flex; }
+.svc-projects .card { flex: 1; width: 100%; }
+@media (min-width: 700px) { .svc-projects { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
 @media (min-width: 900px) {
   .svc-page-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);

@@ -1,7 +1,4 @@
-/*--- WORK · 2. Project details (and the pop-up that shows them). ---*/
-/* project details: the full story of each card lives here in the HTML.
-   With script it is hidden and each card opens it in the pop-up instead. */
-.js .cases-list { display: none; }
+/*--- WORK · one project in full (ProjectCase), placed by project-page.css. ---*/
 .case-src { display: flex; flex-direction: column; gap: var(--sp-4); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
 
 .case { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); }
@@ -9,6 +6,4 @@
 .case-fig { min-width: 0; }
 .case-img { aspect-ratio: 4 / 3; max-width: 100%; display: grid; place-items: center; }
 .case-img img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-4); }
-.case-nav { display: flex; align-items: center; gap: var(--sp-2); margin-right: auto; }
-.pos { font-size: var(--fs-2); color: var(--c-muted); }
 

@@ -1,21 +1,19 @@
 ---
-// One service, in full: the <article class="svc"> the Services picker shows one at a time, and the whole of a
-// service's own page (/services/<slug>). The content comes from src/content/services/<slug>.json.
+// One service, in full: the top of a service's own page (/services/<slug>). The content comes from
+// src/content/services/<slug>.json.
 //   service   the collection entry
-//   n, total  its place ("Service 03 of 07"; services.js writes the same text when the picker is on)
-//   on        the one the picker shows first
-//   first     the first drawing on the page loads eagerly; the rest lazily
-//   heading   h2 in the picker; h1 on the service's own page. "What's included" and "Best for" are one level down.
-//             In the picker the card also links to the service's own page.
+//   n, total  its place ("Service 03 of 07")
+//   on        shown (kept from the picker's styles in pick.css)
+//   first     the drawing loads eagerly
+//   heading   h1 on the service's own page. "What's included" and "Best for" are one level down.
 import type { CollectionEntry } from 'astro:content';
-import Icon from '../Icon.astro';
 interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
 const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
 const Sub = Heading === 'h1' ? 'h2' : 'h3';
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
 ---
-<article class:list={['svc', { 'is-on': on }]} id={id} data-svc data-tile={s.tile} aria-labelledby={`svc-${id}`}>
+<article class:list={['svc', { 'is-on': on }]} id={id} aria-labelledby={`svc-${id}`}>
   <div class="picker-head">
     <span class="chip chip--sky">{s.chip}</span>
     <Heading id={`svc-${id}`}>{s.title}</Heading>
@@ -23,7 +21,7 @@ const two = (k: number) => String(k).padStart(2, '0');
   </div>
   <div class="picker-prev panel">
     <div class="picker-art">
-      <div class="tags"><span class="chip" data-svc-n>Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span></div>
+      <div class="tags"><span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span></div>
       <picture>
         <source media="(max-width: 1199px)" srcset={`/assets/img/${s.image}-compact.svg`}>
         <img src={`/assets/img/${s.image}.svg`} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'} alt={s.alt} width="640" height="480">
@@ -38,6 +36,5 @@ const two = (k: number) => String(k).padStart(2, '0');
       ))}
     </ul>
     <div class="row"><Sub class="label">Best for</Sub><p>{s.bestFor}</p></div>
-    {Heading === 'h2' && <a class="link-arrow" href={`/services/${id}`}>More about {s.title}<Icon name="arrow" /></a>}
   </div>
 </article>

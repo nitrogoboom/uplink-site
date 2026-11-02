@@ -30,7 +30,7 @@ For the drawing and check tools (optional): `pip install -r requirements.txt` an
 - `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec; see its README.
 - `layout-reference.md` – layout patterns from Overwatch 2 menus, applied on 28 Oct 2026.
 
-Links between pages are root-relative and have no `.html` (`/services`, `/work#industries`). Cloudflare serves `services.html` at `/services` and redirects the `.html` form. The site's address is `SITE_URL` in the environment (default in `astro.config.mjs`); it goes into canonicals, Open Graph, the sitemap and JSON-LD. Set the real domain at launch.
+Links between pages are root-relative and have no `.html` (`/services`, `/contact#message`). Cloudflare serves `services.html` at `/services` and redirects the `.html` form. The site's address is `SITE_URL` in the environment (default in `astro.config.mjs`); it goes into canonicals, Open Graph, the sitemap and JSON-LD. Set the real domain at launch.
 
 Content lives in the HTML, not in script: every service and project is on its page in full. Script only shows one at a time; the pages read and work without it.
 
@@ -38,9 +38,9 @@ Content lives in the HTML, not in script: every service and project is on its pa
 
 1. `src/content/services/<slug>.json`: copy an existing one (the fields are typed in `src/content.config.ts`). The slug is the page address, `/services/<slug>`.
 2. Drawing: a `tools/gen_NAME.py` writing `public/assets/img/NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`); `image` in the JSON is NAME.
-3. `npm run build`. The picker, the home card, the footer link, the "What do you need?" options, the service's own page, the sitemap, `llms.txt` and the JSON-LD all come from the file.
+3. `npm run build`. The Services page card, the home card, the footer link, the "What do you need?" options, the service's own page, the sitemap, `llms.txt` and the JSON-LD all come from the file.
 
-A project is the same with `src/content/projects/<slug>.json` (`/work/<slug>`). FAQ, plans, team, industries and footer lists are `src/data/*.json`.
+A project is the same with `src/content/projects/<slug>.json` (`/work/<slug>`). Its `services` field lists service slugs: the case study links them, and each service page shows the projects that name it. FAQ, team and footer lists are `src/data/*.json`.
 
 ## Footer (hero select)
 
@@ -73,7 +73,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `gen_tower.py public` – the growing tower: `tower-grow.svg` and the inline `src/components/home/grow-tower.svg`.
 - `palette.py` – every drawing colour, by name (`pal.AMBER`, `pal.EDGE`, `pal.SCREEN`…). Roles are read from `tokens.css`; shades with no DESIGN.md role are worked out there from the palette. Change a colour in `tokens.css`, then rerun the gen scripts. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`.
 - `isoprops.py` – shared kit: office chair, monitor on a stand (with `screen_glass` / `app_window` for its screen), VoIP desk phone, and `on_front` / `on_side` / `on_top` for drawing flat details exactly on an iso face. Props sit on a grid (x, y in 0.25s, z in 0.125s) so their parts can never nearly-touch; keep the scene around them on the same grid.
-- Compact cuts: every `gen_*.py` (except the tower) also writes `NAME-compact.svg`, the same scene framed closer with fewer, bigger labels (its `COMPACT` settings; `isogen.doc(crop=)`, `label(scale=)`, a newline in a subline wraps it). Pages swap it in with `<picture>` where the drawing shows small (Services below 1200px wide, About and the Work pop-up below 1600px), cards always use `NAME-compact.svg?card#plain` (no labels; the `?card` keeps the browser from reusing the label-less copy elsewhere, since it caches an SVG by address without the `#`), and on phones the home hero plays the hero scene's phone cut (`office-compact-build.svg`), or shows the still `office-compact.svg` (still the older plan) with reduced motion. When you change a drawing's labels or layout, check its compact cut too.
+- Compact cuts: every `gen_*.py` (except the tower) also writes `NAME-compact.svg`, the same scene framed closer with fewer, bigger labels (its `COMPACT` settings; `isogen.doc(crop=)`, `label(scale=)`, a newline in a subline wraps it). Pages swap it in with `<picture>` where the drawing shows small (a service's page below 1200px wide, About below 1600px), cards always use `NAME-compact.svg?card#plain` (no labels; the `?card` keeps the browser from reusing the label-less copy elsewhere, since it caches an SVG by address without the `#`), and on phones the home hero plays the hero scene's phone cut (`office-compact-build.svg`), or shows the still `office-compact.svg` (still the older plan) with reduced motion. When you change a drawing's labels or layout, check its compact cut too.
 - `svgfont.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically. Needs `pip install fonttools brotli`.
 - `check.py file.svg` – edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on. Two opt-in exceptions: `<g class="curve">` holds a curved surface cut into flat strips (the hero cloud's side wall), whose strips are not checked against each other; `--step PX` counts, rather than lists, vertex pairs exactly one grid step apart along an iso axis, for drawings whose props sit on a grid finer than 2px on screen (office: `--step 1.758`, 0.0625 × 28.127)
 - `painter.py` – finds boxes drawn in the wrong order or poking into each other. Each drawing has a `rules_<name>.py`; its first lines give the exact command

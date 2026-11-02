@@ -1,4 +1,4 @@
-/*--- Breadcrumb, "next" link and closing section: a service's page and a project's page. ---*/
+/*--- Breadcrumb and write-up: a service's page and a project's page. ---*/
 .crumbs ol { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
 .crumbs li + li::before { content: "/" / ""; margin-right: var(--sp-2); color: var(--c-line-2); }
 .crumbs a { color: var(--c-accent-text); text-decoration: none; }
@@ -16,23 +16,3 @@
 .detail-body .prose strong { color: var(--c-text); font-weight: 600; }
 .detail-body .facts { max-width: var(--measure); font-size: var(--fs-3); }
 
-.page-end { padding-block: var(--sp-7) var(--sp-8); }
-.section:not(.section--band) + .page-end { padding-top: 0; }   /* no band between them: one gap, not two */
-.next-link {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: "label go" "title go" "line go";
-  align-items: center;
-  column-gap: var(--sp-5);
-  row-gap: var(--sp-2);
-  padding: var(--sp-5);
-  color: var(--c-text);
-  text-decoration: none;
-  transition: border-color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
-}
-.next-link:hover { border-color: var(--c-line-2); transform: translateY(-2px); }
-.next-link .label { grid-area: label; }
-.next-title { grid-area: title; font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-7); line-height: var(--lh-display); text-transform: uppercase; }
-.next-line { grid-area: line; font-size: var(--fs-2); }
-.next-link svg { grid-area: go; width: var(--sp-6); height: var(--sp-6); color: var(--c-accent-text); transition: transform var(--dur-1) var(--ease); }
-.next-link:hover svg { transform: translateX(var(--sp-1)); }

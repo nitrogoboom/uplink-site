@@ -2,7 +2,6 @@
   "order": 5,
   "title": "Phones & Teams calling",
   "chip": "Connect",
-  "tile": "Phones",
   "tag": "Project",
   "image": "voip",
   "icon": "phone",
@@ -32,7 +31,6 @@
       "Your existing numbers come with you. We handle the transfer with your old provider and schedule the cut-over so there is no gap in service.",
       "Desk phones and headsets are picked to suit how each person works. When one fails, we swap it."
     ],
-    "plans": "Included in Complete. An add-on for Essentials and Business. Phone system moves are quoted as a project.",
     "faq": [
       {
         "q": "Can we keep our phone numbers?",

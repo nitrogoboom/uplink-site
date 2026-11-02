@@ -1,10 +1,11 @@
 ---
 // One project in full: the <article class="case-src"> in the Work page's details list (work.js copies it into
 // the pop-up), and the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
-import type { CollectionEntry } from 'astro:content';
+import { getEntries, type CollectionEntry } from 'astro:content';
 interface Props { project: CollectionEntry<'projects'>; heading?: 'h1' | 'h2' | 'h3' }
 const { project, heading: Heading = 'h3' } = Astro.props;
 const { id, data: p } = project;
+const services = await getEntries(p.services);   // each links to the service's own page
 const big = p.image === 'office';   // the office plan is drawn at 1200×800; the rest at 640×480
 ---
 <article class="case-src" id={`case-${id}`} aria-labelledby={`case-${id}-t`}>
@@ -18,7 +19,7 @@ const big = p.image === 'office';   // the office plan is drawn at 1200×800; th
       <p class="muted" data-case-field="story">{p.story}</p>
       <dl class="facts">
         <div><dt>Client</dt><dd data-case-field="client">{p.client}</dd></div>
-        <div><dt>Services</dt><dd data-case-field="services">{p.services}</dd></div>
+        <div><dt>Services</dt><dd data-case-field="services">{services.map(({ id: sid, data: s }, i) => <>{i > 0 && ', '}<a href={`/services/${sid}`}>{s.title}</a></>)}</dd></div>
         <div><dt>Timeline</dt><dd data-case-field="timeline">{p.page.timeline}</dd></div>
         <div><dt>Result</dt><dd class="accent" data-case-field="result">{p.result}</dd></div>
       </dl>

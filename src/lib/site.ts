@@ -47,8 +47,8 @@ export const PAGES = {
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
   home: ['src/pages/index.astro', 'src/components/home', 'src/content/services'],
-  services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json', 'src/data/plans.json'],
-  work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects', 'src/data/industries.json'],
+  services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json'],
+  work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects'],
   about: ['src/pages/about.astro', 'src/components/about', 'src/data/team.json'],
   contact: ['src/pages/contact.astro', 'src/components/contact'],
 };
