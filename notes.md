@@ -12,10 +12,9 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Page structure (agreed page by page, then built)
 Built on branch `page-structure` (2 Nov 2026): Services is the managed IT hub (intro, seven service cards, questions, closing band); a service page is top, how it works, questions, then "where we've done this" (projects whose `services` list names it); Work is intro, filter and cards that open each case study; a case study is top and how it went, its services linking to their pages. The picker, plans table, project pop-up, industries row, next links and those pages' closing bands are gone. About is who we are (with the stats), how we work (moved from Home), team, closing band; the story timeline is gone. Home is hero, services (all seven, no "+2 more" tile), grow, our work (three case studies), check-up band; its how-we-work steps and stats moved to About.
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop. Decide: a check-up card in the eighth slot, or a different column count.
-- [ ] Closing call to action, site-wide: Services, Home, About and Contact still end with a band right before the footer's "Ready when you are". Service pages, case studies and Work now end with the footer alone.
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
 - [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
-- [ ] Still to agree: Contact.
+- [ ] Contact, agreed 2 Nov 2026: structure stays (new visitors first, then "Get help now" for clients). The footer's first panel is now plain contact info ("Reach us") on every page, so the page bands are the only closing call to action. Later: "Open a ticket" and "Start a remote session" go to the coming-soon page; the hours card's "1 day, reply within" needs a label that says it is for new messages (About's 12 min is the client help desk).
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. The animated phone cut moved to the hero scene on 29 Oct 2026. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
