@@ -1,8 +1,8 @@
 {
   "contact": {
-    "eyebrow": "Managed IT · Ontario",
-    "title": "Ready when <em>you are</em>",
-    "lead": "Start with a free 30-minute check-up. We look first, then quote."
+    "eyebrow": "Contact",
+    "title": "Reach <em>us</em>",
+    "lead": "Call, email or drop by. The help desk is open 7 am to 7 pm ET, Monday to Friday."
   },
   "panels": [
     {
@@ -13,8 +13,8 @@
       "icon": "grid",
       "tile": "Services",
       "more": {
-        "label": "Compare all services",
-        "href": "/services#plans"
+        "label": "See all services",
+        "href": "/services"
       }
     },
     {
@@ -36,10 +36,6 @@
         {
           "label": "Team",
           "href": "/about#team"
-        },
-        {
-          "label": "Our story",
-          "href": "/about#story"
         },
         {
           "label": "Careers",

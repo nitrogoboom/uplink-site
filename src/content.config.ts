@@ -2,7 +2,7 @@
 // page address: src/content/services/help-desk.json → /services/help-desk). Smaller lists are one file each
 // in src/data/. Every page, card, footer link and JSON-LD block reads from here, so a service or project is
 // added in one place.
-import { defineCollection, z } from 'astro:content';
+import { defineCollection, reference, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
 
 const services = defineCollection({
@@ -11,7 +11,6 @@ const services = defineCollection({
     order: z.number(),
     title: z.string(),                 // "Managed help desk"
     chip: z.enum(['Support', 'Protect', 'Build', 'Connect', 'Plan']),
-    tile: z.string(),                  // short name on the picker tile
     tag: z.string(),                   // second chip on the drawing ("Starts day one")
     image: z.string(),                 // drawing name in public/assets/img/ (NAME.svg and NAME-compact.svg)
     icon: z.string(),                  // <Icon> name for the short home tile (src/components/Icon.astro)
@@ -26,7 +25,6 @@ const services = defineCollection({
     page: z.object({                   // only on the service's own page (/services/<slug>)
       heading: z.string(),             // "How it works" section title
       body: z.array(z.string()).min(2),   // its paragraphs
-      plans: z.string(),               // which plans include it
       faq: z.array(z.object({ q: z.string(), a: z.string() })).min(2),
     }),
   }),
@@ -40,7 +38,7 @@ const projects = defineCollection({
     tag: z.enum(['Build', 'Protect', 'Plan']),   // the filter on the Work page is its lower-case form
     client: z.string(),                 // "Law office, 18 staff"
     clientShort: z.string(),            // "Law office · 18 staff" (card)
-    services: z.string(),
+    services: z.array(reference('services')).min(1),   // service slugs: ["network", "help-desk"]; the case study links them, the service page lists the project
     result: z.string(),
     image: z.string(),
     alt: z.string(),

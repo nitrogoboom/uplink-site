@@ -4,7 +4,7 @@
   "tag": "Protect",
   "client": "Law office, 18 staff",
   "clientShort": "Law office · 18 staff",
-  "services": "Cybersecurity",
+  "services": ["security"],
   "result": "Fake invoices stopped before they land",
   "image": "security",
   "alt": "Office building inside a security perimeter",

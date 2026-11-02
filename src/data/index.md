@@ -19,20 +19,6 @@ Same people and the same help desk at every size.
 - 11 to 50 people: round-the-clock threat monitoring, email and phishing defence, staff security training.
 - 51 to 150 people: multi-site networks, quarterly IT reviews, a yearly roadmap and budget.
 
-## How we work
-
-1. Look first: a free check-up of your network, devices and accounts.
-2. Straight answers: what is covered, what is not, and what it costs.
-3. Fix the basics: we close the biggest gaps before anything else.
-4. Run it for you: day-to-day support, plus a review every quarter.
-
-## Numbers the site states
-
-- 120+ clients supported
-- 12 minutes average first response
-- 3,400 devices looked after
-- Help desk is in-house
-
 ## Contact
 
 - Phone: [1-855-555-0142](tel:+18555550142)

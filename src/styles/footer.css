@@ -56,7 +56,6 @@
 .fc-link:hover svg, .fc-link:focus-visible svg { opacity: 1; transform: none; }
 
 /* contact */
-.fc-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-5); }
 .fc-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5); }
 .fc-facts > div { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
 .fc-facts .label { margin-bottom: var(--sp-1); }
@@ -233,7 +232,6 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 }
 @media (max-width: 699px) {
   .fc-rows--two, .fc-facts { grid-template-columns: minmax(0, 1fr); }
-  .fc-acts .btn { width: 100%; }
   .fc-tile { width: calc(var(--sp-9) + var(--sp-4)); height: calc(var(--sp-8) + var(--sp-5)); }
   .fc-map { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 4 / 3; }
   .fc-hud { position: relative; }

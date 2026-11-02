@@ -80,7 +80,7 @@ Measured on every page at phone (390×844), tablet (820×1180), 1440×900 and 34
 
 | # | Rule | Problem | Where |
 |---|---|---|---|
-| S1 | R7 | Plans table column heads are 22px display titles at 1.6 line height: 35px lines. Their sublines are 14px at 1.6. | `plans.css:7` |
+| S1 | R7 | Done: the plans table was removed (2 Nov 2026). | |
 
 ### Work
 

@@ -7,9 +7,9 @@ An Astro 7 project. `npm run dev` serves it at http://localhost:4321; `npm run b
 | File | Address | Sections (one component each, in `components/<page>/`) |
 |---|---|---|
 | `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ tower drawing) · Process · Proof |
-| `services.astro` | `/services` | Picker · Plans · Faq |
+| `services.astro` | `/services` | Overview · Faq |
 | `services/[slug].astro` | `/services/<slug>` | one page per service, from `content/services/<slug>.json` |
-| `work.astro` | `/work` | Projects · Details · CasePopup · Industries |
+| `work.astro` | `/work` | Projects |
 | `work/[slug].astro` | `/work/<slug>` | one page per project, from `content/projects/<slug>.json` |
 | `about.astro` | `/about` | Profile · Story · Team |
 | `contact.astro` | `/contact` | Message · Support |
@@ -28,7 +28,7 @@ Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700p
 - `ServiceOptions.astro` – the service `<option>`s for the two "What do you need?" lists
 - `Icon.astro` – every inline icon by name; add new ones there
 
-Section components live in `components/<page>/`, with their CSS beside them (`hero.css` next to `Hero.astro`) and imported at the top of the component. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full, on the list page and on its own page.
+Section components live in `components/<page>/`, with their CSS beside them (`hero.css` next to `Hero.astro`) and imported at the top of the component. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full on its own page.
 
 Drawings: `components/home/hero-flows.svg` and `grow-tower.svg` are written by `tools/gen_office.py` and `tools/gen_tower.py` and inlined as components. Don't edit them by hand.
 
@@ -36,9 +36,9 @@ Drawings: `components/home/hero-flows.svg` and `grow-tower.svg` are written by `
 
 Typed in `content.config.ts`.
 
-- `content/services/<slug>.json` – one per service. The slug is its address. Fields: order, title, chip, tile, tag, image (drawing name in `public/assets/img/`), alt, lead, card, features (3), bestFor, and optional footerLabel / optionLabel.
-- `content/projects/<slug>.json` – one per project: order, name, tag, client, clientShort, services, result, image, alt, story.
-- `data/faq.json`, `plans.json`, `team.json`, `industries.json`, `footer.json` – the smaller lists. Lists keep file order through `byOrder`.
+- `content/services/<slug>.json` – one per service. The slug is its address. Fields: order, title, chip, tag, image (drawing name in `public/assets/img/`), alt, lead, card, features (3), bestFor, and optional footerLabel / optionLabel.
+- `content/projects/<slug>.json` – one per project: order, name, tag, client, clientShort, services (service slugs), result, image, alt, story.
+- `data/faq.json`, `team.json`, `footer.json` – the smaller lists. Lists keep file order through `byOrder`.
 - `data/index.md`, `data/agents.md` – hand-written Markdown for AI agents; `{site}` and `{services}` are filled in by their endpoints.
 
 ## Styles: `styles/`
@@ -47,4 +47,4 @@ Typed in `content.config.ts`.
 
 ## Scripts: `scripts/`
 
-ES modules, bundled by Astro. `core.js` (helpers, toasts, pop-ups, forms, shortcuts, Trusted Types) and `footer.js` run on every page from `Base.astro`; `home.js`, `services.js`, `work.js`, `contact.js`, `soon.js` are imported by their page. Every page script imports `core.js`, so it always runs first. The keyboard map is at the top of `core.js`.
+ES modules, bundled by Astro. `core.js` (helpers, toasts, pop-ups, forms, shortcuts, Trusted Types) and `footer.js` run on every page from `Base.astro`; `home.js`, `work.js`, `contact.js`, `soon.js` are imported by their page. Every page script imports `core.js`, so it always runs first. The keyboard map is at the top of `core.js`.

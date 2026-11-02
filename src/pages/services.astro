@@ -5,8 +5,7 @@ import { getCollection } from 'astro:content';
 import { byOrder } from '../content.config';
 import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
-import Picker from '../components/services/Picker.astro';
-import Plans from '../components/services/Plans.astro';
+import Overview from '../components/services/Overview.astro';
 import Faq from '../components/services/Faq.astro';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -20,10 +19,6 @@ const serviceNodes = services.map(({ id, data: s }) => {
 ---
 <Base title={PAGES.services.title} description={PAGES.services.description}
       page="services" path="/services" type="FAQPage" ldPage={{ mainEntity }} ldGraph={serviceNodes}>
-  <Picker />
-  <Plans />
+  <Overview />
   <Faq />
 </Base>
-<script>
-  import '../scripts/services.js';
-</script>

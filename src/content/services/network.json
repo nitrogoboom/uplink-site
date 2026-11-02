@@ -2,7 +2,6 @@
   "order": 4,
   "title": "Networks & Wi-Fi",
   "chip": "Build",
-  "tile": "Network",
   "tag": "Project",
   "image": "network",
   "icon": "signal",
@@ -32,7 +31,6 @@
       "Installs happen after hours. Every cable and port is labelled and documented, so the next fix takes minutes instead of an afternoon of tracing wires.",
       "Once it is in, we keep the firewall patched, watch the network for faults, and replace hardware before it fails. Several offices can be joined so they work like one."
     ],
-    "plans": "Day-to-day support in every plan. Multi-site management in Complete. New installs are quoted as a project.",
     "faq": [
       {
         "q": "Can you reuse our existing equipment?",

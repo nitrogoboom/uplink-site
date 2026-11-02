@@ -2,7 +2,6 @@
   "order": 6,
   "title": "Backup & recovery",
   "chip": "Protect",
-  "tile": "Backup",
   "tag": "Always on",
   "image": "backup",
   "icon": "stack",
@@ -33,7 +32,6 @@
       "We also write a short disaster plan with you: who to call, which systems come back first, and how long each step takes. It fits on two pages and lives somewhere you can reach without your network.",
       "If something does go wrong, we restore the files or the whole machine and tell you what happened."
     ],
-    "plans": "Microsoft 365 or Google backup in every plan. Server and offsite backup in Business and Complete.",
     "faq": [
       {
         "q": "How far back can we restore?",

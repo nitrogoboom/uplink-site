@@ -2,7 +2,6 @@
   "order": 2,
   "title": "Cybersecurity",
   "chip": "Protect",
-  "tile": "Security",
   "tag": "Always on",
   "image": "security",
   "icon": "shield",
@@ -33,7 +32,6 @@
       "Staff get a short lesson each month and the odd practice phishing email. People who click get a quick explainer, not a lecture. Over a few months, the click rate drops.",
       "Each quarter you get a plain report: what we blocked, what we fixed, and what still needs a decision from you."
     ],
-    "plans": "Email and phishing defence in every plan. 24/7 monitoring and staff training in Business and Complete.",
     "faq": [
       {
         "q": "Will this help with cyber insurance?",

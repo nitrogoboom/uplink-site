@@ -1,0 +1,10 @@
+/*--- SERVICES · 1. Overview: intro, then a grid of service cards. Desktop layout at the end. ---*/
+.svc-overview { display: flex; flex-direction: column; gap: var(--sp-6); }
+.svc-overview-head { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 44rem; }
+.svc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+.svc-grid > li { display: flex; }
+.svc-grid .card { flex: 1; width: 100%; }
+@media (min-width: 700px) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* desktop: four across */
+@media (min-width: 1100px) { .svc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); } }

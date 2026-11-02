@@ -22,9 +22,8 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     <div class="fc-panels" id="fc-panels">
 <section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq">
 <div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h2 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
-  <div class="fc-acts"><a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up<Icon name="arrow" /></a></div>
   <div class="fc-facts">
-    <div><p class="label">Reach us</p>
+    <div><p class="label">Call or email</p>
       <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
       <a class="fc-cl" href={`mailto:${f.email}`}><Icon name="mail" /><span>{f.email}</span></a></div>
     <div><p class="label">Office</p>

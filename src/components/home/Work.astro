@@ -1,0 +1,27 @@
+---
+// HOME · 4. Our work: the first three projects from the collection, each linking to its case study, and a link to
+// all of them. A placeholder until this spot's real section is decided (notes.md).
+// Styles: shared (.card-row in src/styles/shared-blocks.css).
+import { getCollection } from 'astro:content';
+import Icon from '../Icon.astro';
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+---
+<section class="section section--band" id="work" aria-labelledby="work-title">
+  <div class="container stack-5">
+    <div class="section-head section-head--split">
+      <div>
+        <p class="eyebrow">Our work</p>
+        <h2 id="work-title">Setups we built and still run</h2>
+      </div>
+      <a class="link-arrow" href="/work">See all work<Icon name="arrow" /></a>
+    </div>
+    <ul class="card-row">
+      {projects.map(({ id, data: p }) => (
+        <li><a class="card" href={`/work/${id}`}>
+          <span class="card-media well"><img src={`/assets/img/${p.image}-compact.svg?card#plain`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} loading="lazy"><span class="chip">{p.tag}</span></span>
+          <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
+        </a></li>
+      ))}
+    </ul>
+  </div>
+</section>

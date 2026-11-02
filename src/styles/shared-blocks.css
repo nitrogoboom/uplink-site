@@ -30,10 +30,15 @@
 .step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent-text); }
 .step:first-child .step-n { background: var(--c-accent); color: var(--c-on-accent); }
 
+/* a row of up to three project cards: a service's page and Home */
+.card-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+.card-row > li { display: flex; }
+.card-row .card { flex: 1; width: 100%; }
+@media (min-width: 700px) { .card-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
+
 /* stat tiles */
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); list-style: none; }
 @media (min-width: 1100px) { .stats { gap: var(--sp-5); } }
-@media (min-width: 1100px) { .stats--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-5); }
 .stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: clamp(var(--fs-7), 30cqi, var(--fs-8)); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; }   /* big, but never wider than its tile */
 
@@ -55,10 +60,8 @@
 .faq details[open] summary svg { transform: rotate(45deg); color: var(--c-accent-text); }
 .faq details > div { padding: 0 var(--sp-5) var(--sp-5); max-width: var(--measure-lead); color: var(--c-muted); }
 
-/* desktop (>= 1100 wide and >= 700 tall): FAQ beside its heading; proof and call to action on one screen */
+/* desktop (>= 1100 wide and >= 700 tall): FAQ beside its heading */
 @media (min-width: 1100px) and (min-height: 700px) {
   .split .faq { max-width: none; }   /* lines up with the blocks above and below; answers keep their reading width */
   @media (max-height: 760px) { .faq { gap: var(--sp-2); } }
-  /* proof + call to action share one screen */
-  #proof .cta-band { margin-top: var(--sp-6); }
 }

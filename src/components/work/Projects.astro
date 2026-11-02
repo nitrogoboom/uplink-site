@@ -1,7 +1,6 @@
 ---
-// WORK · 1. Projects (first screen): intro, filter buttons and one card per project from the collection.
-// A card links to the project's own page; with script on, clicking it opens CasePopup instead (work.js reads
-// data-case). Styles: projects.css. Desktop layout: at the end of its CSS.
+// WORK · 1. Projects (first screen): intro, filter buttons (work.js) and one card per project from the
+// collection, each linking to the project's own page. Styles: projects.css. Desktop layout: at the end of its CSS.
 import { getCollection } from 'astro:content';
 import './projects.css';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -13,7 +12,7 @@ const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
     <div class="work-side">
       <p class="eyebrow">Our work</p>
       <h1 id="work-title">Setups we built and still run</h1>
-      <p class="lead">Every project here is a client we still look after today. Pick one to see what we found, what we did and how it turned out.</p>
+      <p class="lead">Every project here is a client we still look after today. Open one to see what we found, what we did and how it turned out.</p>
       <ul class="filters" aria-label="Filter projects">
         <li><button class="filter" type="button" data-filter="all" aria-pressed="true">All<span class="count">{projects.length}</span></button></li>
         {tags.map((t) => <li><button class="filter" type="button" data-filter={t.toLowerCase()} aria-pressed="false">{t}<span class="count">{count(t)}</span></button></li>)}
@@ -23,7 +22,7 @@ const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
     <div class="work-main">
     <ul class="work-grid" data-work-grid>
       {projects.map(({ id, data: p }, i) => (
-        <li data-tags={p.tag.toLowerCase()}><a class="card" href={`/work/${id}`} data-case={id} aria-haspopup="dialog">
+        <li data-tags={p.tag.toLowerCase()}><a class="card" href={`/work/${id}`}>
           <span class="card-media well"><img src={`/assets/img/${p.image}-compact.svg?card#plain`} alt="" width={p.image === 'office' ? 1200 : 640} height={p.image === 'office' ? 800 : 480} fetchpriority={i === 0 ? 'high' : undefined} loading={i === 0 ? undefined : 'lazy'}><span class="chip">{p.tag}</span></span>
           <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
         </a></li>
