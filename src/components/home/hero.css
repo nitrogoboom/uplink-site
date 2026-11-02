@@ -50,7 +50,7 @@
 .news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; overflow: hidden; }
 .news-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
-.news-text .chip { align-self: flex-start; }
+.news-text .chip { order: -1; align-self: flex-start; }   /* after the title in the markup (read second), on top on screen */
 .news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: var(--lh-title); text-transform: uppercase; }
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the

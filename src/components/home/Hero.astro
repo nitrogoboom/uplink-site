@@ -8,13 +8,22 @@
 import flows from './hero-flows.svg?raw';
 import './hero.css';
 import Icon from '../Icon.astro';
+import Sep from '../Sep.astro';
 import { HERO, NAV, PAGES } from '../../lib/site';
+import Pause from '../Pause.astro';
+// the two news cards under the drawing. The chip comes after the title in the markup, so a screen reader says
+// "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
+const news = [
+  { href: '/contact#message', book: true, img: 'security', chip: 'Free', tone: 'accent', title: 'IT and security check-up', line: '30 minutes. We look first, then quote.' },
+  { href: '/soon#windows-10-guide', book: false, img: 'cloud', chip: 'Guide', tone: 'sky', title: 'Windows 10 support has ended', line: 'Your upgrade plan, step by step' },
+];
+const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
 ---
 <section class="hero fold" id="top" aria-labelledby="hero-title">
   <div class="container hero-grid">
     <div class="hero-menu">
       <div class="hero-top">
-        <p class="eyebrow">Managed IT · Ontario</p>
+        <p class="eyebrow"><span>Managed IT<Sep />Ontario</span></p>
         <h1 id="hero-title"><span class="line">Your IT team,</span> <em class="line">always online</em></h1>
       <p class="lead"><span class="lead-long">We run the technology behind your business: help desk, security, cloud, network and phones. You run the business.</span><span class="lead-short">We run your IT: help desk, security, cloud, network and phones.</span></p>
       </div>
@@ -29,7 +38,7 @@ import { HERO, NAV, PAGES } from '../../lib/site';
             <li>
               <a class="mi" href={PAGES[page].path}>
                 <span class="icon-tile" aria-hidden="true"><Icon name={icon} /></span>
-                <span class="mi-text"><span class="mi-title">{PAGES[page].name}</span><span class="mi-sub">{sub}</span></span>
+                <span class="mi-text"><span class="mi-title">{PAGES[page].name}</span><Pause /><span class="mi-sub">{sub}</span></span>
                 <Icon name="chevronR" class="mi-go" />
               </a>
             </li>
@@ -40,22 +49,20 @@ import { HERO, NAV, PAGES } from '../../lib/site';
 
     <div class="hero-art">
       <div class="stage" data-hero={HERO.full} data-hero-tablet={HERO.tablet} data-hero-phone={HERO.phone} data-hero-phone-flows={HERO.phoneFlows} data-tablet={HERO.media.tablet}>
-        <noscript><picture><source media={HERO.media.phone} srcset="/assets/img/office-compact.svg"><img class="hero-nojs" src="/assets/img/office.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="800"></picture></noscript>
+        <noscript><picture><source media={HERO.media.phone} srcset="/assets/img/office-compact.svg"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></noscript>
         <Fragment set:html={flows} />
         <!-- phones with reduced motion only (compact-cuts.css): other screens get a 1px blank instead, so they don't
              download the still (phones with motion get the animated cut from home.js). Where it shows it is the largest
              paint, so index.astro preloads it there and it is asked for first. -->
-        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><source media="(prefers-reduced-motion: no-preference)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt="Office floor plan with desks, a firewall rack, Wi-Fi and a cloud workspace" width="1200" height="900"></picture>
+        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><source media="(prefers-reduced-motion: no-preference)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt={still} width="1200" height="900"></picture>
       </div>
       <div class="hero-dock">
-        <a class="card news" href="/contact#message" data-open="book-dialog">
-          <span class="news-thumb well"><img src="/assets/img/security-card.svg" alt="" width="640" height="480" fetchpriority="low"></span>
-          <span class="news-text"><span class="chip chip--accent">Free</span><span class="news-title">IT and security check-up</span><span class="small muted">30 minutes. We look first, then quote.</span></span>
-        </a>
-        <a class="card news" href="/soon#windows-10-guide">
-          <span class="news-thumb well"><img src="/assets/img/cloud-card.svg" alt="" width="640" height="480" fetchpriority="low"></span>
-          <span class="news-text"><span class="chip chip--sky">Guide</span><span class="news-title">Windows 10 support has ended</span><span class="small muted">Your upgrade plan, step by step</span></span>
-        </a>
+        {news.map((n) => (
+          <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
+            <span class="news-thumb well"><img src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" fetchpriority="low"></span>
+            <span class="news-text"><span class="news-title">{n.title}</span><Pause /><span class={`chip chip--${n.tone}`}>{n.chip}</span><Pause /><span class="small muted">{n.line}</span></span>
+          </a>
+        ))}
       </div>
     </div>
   </div>

@@ -1,6 +1,6 @@
 """Draws the office floor plan from one world-space description, in three versions that share every shape:
   public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
-  public/assets/img/office-build.svg  animated reference copy of the hero (not linked; carries its Barlow letters)
+  out/drawings/office-build.svg       animated reference copy of the hero (not deployed; carries its Barlow letters)
   public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
   public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
   src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
@@ -211,8 +211,9 @@ TRAY_FACES = (pal.TRAY_LEFT, pal.TRAY_RIGHT, pal.TRAY_TOP)
 TRAY_EDGE = f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.75"'
 FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
-TITLES = {'office': 'Isometric office floor plan with desks, server racks, Wi-Fi and a cloud workspace hub for Microsoft 365 and Google Workspace',
-          'build': 'Animated isometric office floor plan assembling itself: desks, server racks, Wi-Fi and a cloud workspace hub for Microsoft 365 and Google Workspace'}
+# what screen readers say for the drawing: plain words, as a person would describe it
+TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace',
+          'build': 'Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
 TITLES['hero'] = TITLES['build']
 
 
@@ -851,8 +852,11 @@ def render(v):
 
 if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
-    for v, name in (('office', 'office.svg'), ('build', 'office-build.svg'), ('compact', 'office-compact.svg')):
+    for v, name in (('office', 'office.svg'), ('compact', 'office-compact.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
+    ref = pathlib.Path(__file__).resolve().parent.parent / 'out/drawings'   # not deployed or tracked: nothing links it
+    ref.mkdir(parents=True, exist_ok=True)
+    (ref / 'office-build.svg').write_text(render('build') + '\n', encoding='utf-8', newline='\n')
     # the card cut: the compact one without its labels or their letters (isogen.card)
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent

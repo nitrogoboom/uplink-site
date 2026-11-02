@@ -174,4 +174,4 @@ def build(compact=False):
 
 if __name__ == '__main__':
     write(sys.argv[1], build())
-    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True))     # phone cut, served by <picture> on small screens
+    write(sys.argv[1].replace('.svg', '-compact.svg'), build(compact=True), card_cut=False)     # phone cut (About); no card shows hq

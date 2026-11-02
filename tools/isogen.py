@@ -180,7 +180,8 @@ def card(svg):
     return re.sub(r'<style>@font-face.*?</style>', lambda _m: font_style(svg), svg, count=1, flags=re.S)
 
 
-def write(path, text):
+def write(path, text, card_cut=True):
+    """Writes a drawing; a compact cut also gets its card cut next to it, unless no card shows it (card_cut=False)."""
     open(path, 'w', encoding='utf-8', newline='\n').write(text)
-    if str(path).endswith('-compact.svg'):
+    if card_cut and str(path).endswith('-compact.svg'):
         write(str(path).replace('-compact.svg', '-card.svg'), card(text))
