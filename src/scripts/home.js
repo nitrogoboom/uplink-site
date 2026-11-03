@@ -5,6 +5,15 @@
 
 import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 
+// Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
+// in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
+// spot (a forced layout). Old browsers: after the next paint, which is clean unless something else ran between.
+const afterLayout = (fn) => {
+  if (!('ResizeObserver' in window)) { window.requestAnimationFrame(() => window.setTimeout(fn, 0)); return; }
+  const ro = new ResizeObserver(() => { ro.disconnect(); fn(); });
+  ro.observe(document.documentElement);
+};
+
 /* ======================================================================
    Growth story: the world grows as you scroll (Home)
    ====================================================================== */
@@ -49,6 +58,7 @@ if (grow && 'IntersectionObserver' in window) {
   tower.classList.add('tg-live');
   let live = false, stageH = 0, stageTop = 0, pinTop = 0, stem = 0, views = cams, boxW = 0, boxH = 0;
   let qd = null, drawn = null, last = 0, level = 0, shown = '', lit = '', frame = 0, vbNow = '', onScreen = false;
+  let ready = false, run = 0, size = '';
 
   // each camera, grown to the picture's shape and capped in zoom
   const fit = () => {
@@ -64,17 +74,15 @@ if (grow && 'IntersectionObserver' in window) {
     });
   };
 
-  const measure = () => {
-    live = liveMode.matches && !reduceMotion.matches;
-    grow.classList.toggle('is-live', live);
-    drawn = null;
+  // Sizes are read only after a layout pass (afterLayout), never straight after is-live or --grow-cap changes; each of
+  // those writes waits one frame. A newer measure drops an older one still waiting (run).
+  const read = () => {
     if (live) {
       if (wide.matches) {
         stageH = side.offsetHeight;
         pinTop = parseFloat(getComputedStyle(side).top) || 0;
         stageTop = 0;
       } else {
-        grow.style.setProperty('--grow-cap', list.offsetHeight + 'px');
         stageH = art.offsetHeight + list.offsetHeight;
         pinTop = parseFloat(getComputedStyle(art).top) || 0;
         stageTop = head.offsetTop + head.offsetHeight;
@@ -82,8 +90,29 @@ if (grow && 'IntersectionObserver' in window) {
       tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
       if (tags[0]) stem = parseFloat(getComputedStyle(tags[0].el, '::after').height) || 0;
     }
+    size = window.innerWidth + 'x' + document.documentElement.clientHeight;
     fit();
-    if (onScreen) start();   // redraw for the new size
+    if (!ready) {   // the first picture shows at once: no step fade on load; fades come back two frames later
+      ready = true;
+      qd = Math.min(3, Math.max(0, target()));
+      draw(qd);
+      window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
+    } else if (onScreen) start();   // redraw for the new size
+  };
+  const measure = () => {
+    const mine = ++run;
+    live = liveMode.matches && !reduceMotion.matches;
+    grow.classList.toggle('is-live', live);
+    drawn = null;
+    afterLayout(() => {
+      if (mine !== run) return;
+      // the step box's height (the tallest step) sizes the picture above it, so the rest waits for that layout
+      const cap = live && !wide.matches ? list.offsetHeight + 'px' : '';
+      if (cap && cap !== grow.style.getPropertyValue('--grow-cap')) {
+        grow.style.setProperty('--grow-cap', cap);
+        afterLayout(() => { if (mine === run) read(); });
+      } else read();
+    });
   };
 
   const target = () => {
@@ -166,26 +195,26 @@ if (grow && 'IntersectionObserver' in window) {
     // settled on the scroll: stop until the next scroll (or resize) starts it again, so a still page costs nothing
     if (qd !== q) frame = window.requestAnimationFrame(tick);
   };
-  function start() { if (!frame) { last = 0; frame = window.requestAnimationFrame(tick); } }
+  function start() { if (ready && !frame) { last = 0; frame = window.requestAnimationFrame(tick); } }
   const stop = () => { if (frame) window.cancelAnimationFrame(frame); frame = 0; };
 
-  // The first picture shows at once: no step fade on load. Fades come back two frames later.
   grow.classList.add('no-trans');
   measure();
-  qd = Math.min(3, Math.max(0, target()));
-  draw(qd);
-  window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
   liveMode.addEventListener('change', measure);
   wide.addEventListener('change', measure);
   reduceMotion.addEventListener('change', measure);
   // Phones fire resize each time the address bar slides; the layout here follows the width and the small viewport
-  // height (svh), which don't change then, so measure only when one of those does (each measure forces layouts).
-  let size = window.innerWidth + 'x' + document.documentElement.clientHeight;
+  // height (svh), which don't change then, so measure only when one of those does (read() keeps the last size).
   window.addEventListener('resize', () => {
     const now = window.innerWidth + 'x' + document.documentElement.clientHeight;
     if (now !== size) { size = now; measure(); }
   });
-  if (document.fonts) document.fonts.ready.then(measure);
+  // A web font arriving (or anything else) that resizes the steps measures again. Not fonts.ready: reading it makes
+  // the browser lay the page out on the spot to see which fonts are pending.
+  if ('ResizeObserver' in window) {
+    let first = true;
+    new ResizeObserver(() => { if (first) first = false; else measure(); }).observe(list);
+  }
   window.addEventListener('scroll', () => { if (onScreen) start(); }, { passive: true });
   whenOnScreen(grow, (on) => { onScreen = on; if (on) start(); else stop(); });
 }
@@ -280,9 +309,7 @@ const startCloud = (cloud) => {
       const len = base.getTotalLength();
       base.style.strokeDasharray = len;
       base.style.setProperty('--len', len);
-      base.classList.remove('is-draw');
-      void base.getBoundingClientRect();
-      base.classList.add('is-draw');
+      replay(base, 'is-draw');
     }
     const write = () => {
       appText.textContent = app.name.toUpperCase();
@@ -338,23 +365,43 @@ const startCloud = (cloud) => {
    time. Tapping the drawing moves the office one on. Words and points
    come from the drawing (data-cloud, data-items: tools/gen_office.py);
    sizes from hero.css (--cap-*), turned into drawing units here.
+   Nothing is measured while the captions run: the drawing's width comes
+   from a ResizeObserver, and each caption's text is measured once per
+   width, all together in a hidden group, after layout (measure()).
    ------------------------------------------------------------------ */
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const CLOUD_TITLE = 'Cloud workspace';
 const make = (tag, cls, parent) => {
   const el = document.createElementNS(SVG_NS, tag);
   el.setAttribute('class', cls);
   parent.append(el);
   return el;
 };
-const restart = (el, cls) => { el.classList.remove(cls); void el.getBoundingClientRect(); el.classList.add(cls); };
+// plays a CSS animation from the start: the first time by adding its class, then by restarting it (no layout)
+const replay = (el, cls) => {
+  if (el.classList.contains(cls)) el.getAnimations().forEach((a) => { a.cancel(); a.play(); });
+  else el.classList.add(cls);
+};
+// a caption line's words; the cloud's names its app first, in a tspan
+const fill = (el, text, app) => {
+  if (!app) { el.textContent = text; return; }
+  const name = document.createElementNS(SVG_NS, 'tspan');
+  name.setAttribute('class', 'ob-cap-app');
+  name.textContent = app;
+  el.replaceChildren(name, text);
+};
 const startCaptions = (svg) => {
   const vb = svg.viewBox.baseVal;
   const [cloudX, cloudY] = svg.dataset.cloud.split(',').map(Number);
   const items = JSON.parse(svg.dataset.items);
-  const css = window.getComputedStyle(svg);
-  const rootPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-  const px = (name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
-  const size = { t: px('--cap-title'), s: px('--cap-sub'), edge: px('--cap-edge'), gap: px('--cap-gap'), line: px('--cap-line'), dot: px('--cap-dot'), halo: px('--cap-halo') };
+  let size = null, width = 0, cloudFill = '';
+  const lengths = new Map();   // each caption text's length in drawing units, at the current width
+  const readSizes = () => {
+    const css = window.getComputedStyle(svg);
+    const rootPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
+    const px = (name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
+    return { t: px('--cap-title'), s: px('--cap-sub'), edge: px('--cap-edge'), gap: px('--cap-gap'), line: px('--cap-line'), dot: px('--cap-dot'), halo: px('--cap-halo') };
+  };
   const spot = (name) => {
     const g = make('g', 'ob-cap ob-cap-' + name, svg);
     const lead = make('path', 'ob-cap-lead', g);
@@ -366,10 +413,9 @@ const startCaptions = (svg) => {
   const spots = { cloud: spot('cloud'), office: spot('office') };
   const at = { cloud: -1, office: -1 };
   // words: cloud hangs from the drawing's top edge, office stands on its bottom edge
-  const place = (sp, top) => {
-    const shown = svg.getBoundingClientRect().width;
-    if (!shown) return null;   // not laid out (hidden, or mid-swap): the next step or resize places it
-    const k = vb.width / shown;   // drawing units per screen px
+  const place = (sp, top, tKey, sKey) => {
+    if (!width || !lengths.has(tKey)) return null;   // not measured yet (hidden, or mid-swap): measure() places it
+    const k = vb.width / width;   // drawing units per screen px
     const tf = size.t * k, sf = size.s * k, x = vb.x + size.edge * k;
     [[sp.t, tf], [sp.s, sf]].forEach(([el, f]) => {
       el.setAttribute('font-size', f.toFixed(1));
@@ -381,7 +427,7 @@ const startCaptions = (svg) => {
     else { sy = vb.y + vb.height - size.edge * k - sf * 0.28; ty = sy - size.gap * k - sf * 1.05; }
     sp.t.setAttribute('y', ty.toFixed(1));
     sp.s.setAttribute('y', sy.toFixed(1));
-    return { k, x, ty, tf, tw: sp.t.getComputedTextLength(), sw: sp.s.getComputedTextLength() };
+    return { k, x, ty, tf, tw: lengths.get(tKey), sw: lengths.get(sKey) };
   };
   const draw = (sp, d, colour, x, y, k) => {
     sp.lead.setAttribute('d', d);
@@ -395,30 +441,27 @@ const startCaptions = (svg) => {
     sp.end.setAttribute('stroke-width', (size.dot * 0.6 * k).toFixed(1));
     sp.ring.setAttribute('stroke', colour);
     sp.ring.setAttribute('stroke-width', (size.line * k).toFixed(1));
-    restart(sp.lead, 'is-draw');
-    restart(sp.end, 'is-in');
-    restart(sp.ring, 'is-in');
+    replay(sp.lead, 'is-draw');
+    replay(sp.end, 'is-in');
+    replay(sp.ring, 'is-in');
   };
   const write = {
     cloud: () => {
       const sp = spots.cloud, app = APPS[at.cloud];
-      sp.t.textContent = 'Cloud workspace';
-      const name = document.createElementNS(SVG_NS, 'tspan');
-      name.setAttribute('class', 'ob-cap-app');
-      name.textContent = app.name;
-      sp.s.replaceChildren(name, ' · ' + app.detail);
-      const L = place(sp, true);
+      fill(sp.t, CLOUD_TITLE);
+      fill(sp.s, ' · ' + app.detail, app.name);
+      const L = place(sp, true, 't:' + CLOUD_TITLE, 'app:' + app.id);
       if (!L) return;
       const x0 = L.x + L.tw + size.gap * 2 * L.k, y0 = L.ty - L.tf * 0.32;   // a level tail from the title, then to the cloud
-      draw(sp, `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`, window.getComputedStyle(sp.t).fill, cloudX, cloudY, L.k);
+      draw(sp, `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`, cloudFill, cloudX, cloudY, L.k);
       svg.querySelectorAll('.ob-tile').forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
     },
     office: () => {
       const sp = spots.office, it = items[at.office];
-      sp.t.textContent = it.t;
+      fill(sp.t, it.t);
       sp.t.setAttribute('fill', it.c);
-      sp.s.textContent = it.s;
-      const L = place(sp, false);
+      fill(sp.s, it.s);
+      const L = place(sp, false, 't:' + it.t, 's:' + it.s);
       if (!L) return;
       const top = L.ty - L.tf * 0.76 - size.gap * 2 * L.k;   // the line rises from just above the words to the item
       const x0 = Math.min(Math.max(it.x, L.x + size.gap * L.k), L.x + Math.max(L.tw, L.sw) - size.gap * L.k);
@@ -434,9 +477,8 @@ const startCaptions = (svg) => {
     swap = window.setTimeout(() => {
       sp.g.classList.add('is-pre');
       sp.g.classList.remove('is-out');
-      write[name]();
-      void sp.g.getBoundingClientRect();
-      sp.g.classList.remove('is-pre');
+      write[name]();   // drawn once below their place (is-pre), the words rise in from the frame after
+      swap = window.requestAnimationFrame(() => { swap = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
     }, 170);
   };
   let timer = 0, turn = 0, onScreen = true, begun = false;
@@ -448,17 +490,48 @@ const startCaptions = (svg) => {
   };
   const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
   svg.addEventListener('click', tap);
-  // Re-place the words only when the drawing's width changes. Phones fire `resize` each time the address bar
-  // shows or hides, which would replay the line and dot mid-scroll; the drawing keeps its width then.
-  let width = 0;
+  // Every caption text, set at this width's sizes in a hidden group and read together after a layout pass: one layout
+  // the browser makes anyway, instead of a forced one for each caption as it changes.
+  let job = 0;
+  const measure = (w) => {
+    const mine = ++job;
+    if (!size) size = readSizes();
+    const k = vb.width / w;
+    const box = make('g', 'ob-cap ob-cap-cloud', svg);
+    box.setAttribute('visibility', 'hidden');
+    const probe = (key, cls, f, text, app) => {
+      const el = make('text', cls, box);
+      el.setAttribute('font-size', (f * k).toFixed(1));
+      fill(el, text, app);
+      return [key, el];
+    };
+    const probes = [
+      probe('t:' + CLOUD_TITLE, 'ob-cap-t', size.t, CLOUD_TITLE),
+      ...APPS.map((a) => probe('app:' + a.id, 'ob-cap-s', size.s, ' · ' + a.detail, a.name)),
+      ...items.flatMap((it) => [probe('t:' + it.t, 'ob-cap-t', size.t, it.t), probe('s:' + it.s, 'ob-cap-s', size.s, it.s)])
+    ];
+    afterLayout(() => {
+      if (mine === job) {
+        lengths.clear();
+        probes.forEach(([key, el]) => lengths.set(key, el.getComputedTextLength()));
+        cloudFill = window.getComputedStyle(probes[0][1]).fill;
+        width = w;
+        if (begun) { write.cloud(); write.office(); }
+      }
+      box.remove();
+    });
+  };
+  // Re-measure only when the drawing's width changes. Phones fire `resize` each time the address bar shows or
+  // hides, which would replay the line and dot mid-scroll; the drawing keeps its width then.
+  let lastW = 0;
   const relayout = (w) => {
-    if (Math.abs(w - width) < 0.5) return;
-    width = w;
-    if (begun) { write.cloud(); write.office(); }
+    if (!w || Math.abs(w - lastW) < 0.5) return;
+    lastW = w;
+    measure(w);
   };
   const onResize = () => relayout(svg.getBoundingClientRect().width);
   const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
-  if (sized) sized.observe(svg); else window.addEventListener('resize', onResize);
+  if (sized) sized.observe(svg); else { window.addEventListener('resize', onResize); afterLayout(onResize); }
   const onVisible = () => (document.hidden ? stop() : start());
   document.addEventListener('visibilitychange', onVisible);
   reduceMotion.addEventListener('change', start);
@@ -475,6 +548,8 @@ const startCaptions = (svg) => {
     stop();
     window.clearTimeout(first);
     window.clearTimeout(swap);
+    window.cancelAnimationFrame(swap);
+    job++;   // a measure still waiting for its paint drops its results
     svg.removeEventListener('click', tap);
     if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisible);
