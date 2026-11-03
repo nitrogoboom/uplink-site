@@ -1,7 +1,7 @@
 """Painter-order + overlap check for box triples in an iso SVG.
 usage: python painter.py file ox oy u rules.py   (rules.py defines z0(box)->float|None to skip, label(box))
 Prints pairs whose screen silhouettes overlap but whose DOM order contradicts 3D depth,
-and pairs whose 3D volumes intersect (poke-through)."""
+and pairs whose 3D volumes intersect (poke-through). Exits 1 on any, or when it finds no boxes."""
 import sys, math, importlib.util
 from iso import load, W, C30
 from shapely.geometry import Polygon
@@ -36,6 +36,10 @@ def main():
     spec = importlib.util.spec_from_file_location('rules', rules); R = importlib.util.module_from_spec(spec); spec.loader.exec_module(R)
     w = W(ox, oy, u)
     bs = boxes(f, w)
+    if not bs:
+        print(f'no box triples found in {f}: check ox, oy and u against the drawing', file=sys.stderr)
+        return 1
+    found = 0
     for b in bs:
         z = R.z0(b)
         b['box'] = None if z is None else resolve(b, z)
@@ -48,6 +52,7 @@ def main():
             inter = all(min(A[2*k+1], B[2*k+1]) - max(A[2*k], B[2*k]) > eps for k in range(3))
             if inter:
                 print(f'INTERSECT L{a["line"]} {R.label(a)} {fmt(A)}  <->  L{b["line"]} {R.label(b)} {fmt(B)}')
+                found += 1
                 continue
             if ov < 0.5: continue
             # separating axis: who is in front (larger coordinate on separated axis)
@@ -57,8 +62,11 @@ def main():
                 if B[2*k+1] <= A[2*k] + eps: front = 'a'; break
             if front == 'a':   # a should be drawn after b, but a comes first in DOM
                 print(f'ORDER  L{a["line"]} {R.label(a)} is in front of L{b["line"]} {R.label(b)} but drawn before it (overlap {ov:.0f}px²)')
+                found += 1
+    print(f'-- {len(bs)} boxes, {found} findings', file=sys.stderr)
+    return 1 if found else 0
 
 def fmt(B): return f'x{B[0]:.2f}-{B[1]:.2f} y{B[2]:.2f}-{B[3]:.2f} z{B[4]:.2f}-{B[5]:.2f}'
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

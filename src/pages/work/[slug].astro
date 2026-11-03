@@ -5,7 +5,7 @@
 import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
-import { PAGES } from '../../lib/site';
+import { PAGES, breadcrumbs, jsonLd } from '../../lib/site';
 import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
@@ -24,16 +24,13 @@ const ld = {
       publisher: { '@id': `${Astro.site!.href}#business` },
       about: services.map((s) => ({ '@id': new URL(`/services/${s.id}`, Astro.site).href })),
       articleBody: [...p.page.challenge, ...p.page.steps.map((t) => `${t.title}. ${t.detail}`), ...p.page.results].join('\n\n') },
-    { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: PAGES.home.name, item: Astro.site!.href },
-      { '@type': 'ListItem', position: 2, name: PAGES.work.name, item: new URL(PAGES.work.path, Astro.site).href },
-      { '@type': 'ListItem', position: 3, name: p.name, item: url } ] },
+    breadcrumbs([[PAGES.home.name, Astro.site!.href], [PAGES.work.name, new URL(PAGES.work.path, Astro.site).href], [p.name, url]]),
   ],
 };
 ---
 <Base title={`${p.name} · Uplink Technology`} description={description} page="work" path={`/work/${id}`}>
   <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
+    <script is:inline type="application/ld+json" set:html={jsonLd(ld)} />
   </Fragment>
   <section class="hero proj-page" aria-labelledby={`case-${id}-t`}>
     <div class="container proj-page-grid">

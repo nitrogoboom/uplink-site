@@ -4,11 +4,11 @@
 import { getCollection } from 'astro:content';
 import { byOrder } from '../content.config';
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
+import { PAGES, getServices } from '../lib/site';
 import Overview from '../components/services/Overview.astro';
 import Faq from '../components/services/Faq.astro';
 
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const services = await getServices();
 const faq = (await getCollection('faq')).sort(byOrder);
 const business = { '@id': `${Astro.site!.href}#business` };
 const mainEntity = faq.map(({ data: f }) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }));

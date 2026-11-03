@@ -11,7 +11,11 @@
   --c-muted:     var(--c-cool-muted);
   position: relative;
   isolation: isolate;
-  padding-block: var(--sp-6) var(--sp-7);
+  /* its padding, named so the home hero can take it off its own height (components/home/hero.css). It wins over
+     .fold's (fold.css) only by coming later in global.css: keep hero.css after fold.css. */
+  --hero-pad-top: var(--sp-6);
+  --hero-pad-bottom: var(--sp-7);
+  padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
 .hero::before {
   content: "";
@@ -26,8 +30,8 @@
 /* two columns (landscape tablets and up): the hero is one screen tall */
 @media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
   .hero { --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)); }
-  .hero, .hero.fold { padding-block: var(--sp-5) var(--sp-7); }
+  .hero, .hero.fold { --hero-pad-top: var(--sp-5); --hero-pad-bottom: var(--sp-7); padding-block: var(--hero-pad-top) var(--hero-pad-bottom); }
 }
 @media (min-width: 1100px) and (min-height: 800px) and (orientation: landscape) {
-  .hero.fold { padding-block: var(--sp-5); }
+  .hero.fold { --hero-pad-bottom: var(--sp-5); padding-block: var(--hero-pad-top) var(--hero-pad-bottom); }
 }

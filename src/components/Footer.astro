@@ -5,11 +5,11 @@
 // collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
-import { getCollection } from 'astro:content';
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
 import f from '../data/footer.json';
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+import { getServices } from '../lib/site';
+const services = await getServices();
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
 type Link = { label: string; href: string };
 const panels = f.panels.map((p) => ({ ...p, links: (p.id === 'services' ? serviceLinks : (p.links as Link[])) }));

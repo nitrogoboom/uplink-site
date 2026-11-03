@@ -1,10 +1,9 @@
 ---
 // WORK · 1. Projects (first screen): intro, filter buttons (work.js) and one card per project from the
 // collection, each linking to the project's own page. Styles: projects.css. Desktop layout: at the end of its CSS.
-import { getCollection } from 'astro:content';
 import './projects.css';
-import { cardSize } from '../../lib/site';
-const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+import { cardSize, getProjects } from '../../lib/site';
+const projects = await getProjects();
 const tags = ['Build', 'Protect', 'Plan'] as const;
 const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
 ---

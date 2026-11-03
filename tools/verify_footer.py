@@ -6,16 +6,12 @@
 # overflows, sideways scroll, anything serious or critical from axe, or a sitemap with fewer than five pages.
 # CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port]
-import asyncio, re, sys, urllib.request
+import asyncio, sys
 from playwright.async_api import async_playwright
+from site_pages import MISSING, SIZES, pages
 base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.argv[1]
 AXE='node_modules/axe-core/axe.min.js'
-MISSING='no-such-page'   # any missing address gets the 404 page
-sitemap=urllib.request.urlopen(base+'/sitemap.xml').read().decode()
-PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]
-if len(PAGES)<5: sys.exit(f'sitemap.xml lists {len(PAGES)} page(s): expected at least the five static pages')
-PAGES+=['soon',MISSING]
-SIZES=[['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]
+PAGES=[p.strip('/') or 'index' for p in pages(base)]   # 'index', 'services', … 'soon', MISSING
 url=lambda page: f"{base}/{'' if page=='index' else page}"
 fails=[]
 

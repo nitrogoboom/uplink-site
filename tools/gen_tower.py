@@ -3,7 +3,7 @@ remote homes, security ring, second office, cloud and cables that join as the bu
 Writes the inline <svg class="tg"> (src/components/home/grow-tower.svg, inlined by Grow.astro) and the reference
 copy out/drawings/tower-grow.svg (for painter.py; out/ is not deployed or tracked).
 Edit the numbers below and run again; don't hand-edit either copy.
-usage: python tools/gen_tower.py public
+usage: python tools/gen_tower.py   (it always writes the two files above)
 World: 1 unit = 24px, W(262, 283.2, 24). Origin = back corner of the ground slab's top. x runs right-down, y left-down, z up.
 Without script the whole world shows (all three storeys, viewBox = the level 3 camera). home.js scrubs it with the
 scroll: it sets each storey's and piece's opacity and drop from its data-at (the point on the 0-3 growth scale where

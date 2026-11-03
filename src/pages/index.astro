@@ -2,7 +2,7 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
-import { HERO, PAGES } from '../lib/site';
+import { HERO, PAGES, jsonLd } from '../lib/site';
 import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
@@ -29,7 +29,7 @@ const business = {
 <Base title={PAGES.home.title} description={PAGES.home.description}
       page="home" path="/">
   <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(business, null, 1).replace(/<\//g, '<\\/')} />
+    <script is:inline type="application/ld+json" set:html={jsonLd(business)} />
     <link rel="preload" href="/assets/img/office-compact.svg" as="image" media={`${HERO.media.phone} and (prefers-reduced-motion: reduce)`} fetchpriority="high">
     <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>
     <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>

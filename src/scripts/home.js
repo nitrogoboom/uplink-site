@@ -262,6 +262,32 @@ const APPS = [
   { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
   { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
 ];
+// A timer that runs tick every `every` ms only while it may: el on screen, the tab showing, motion allowed, the
+// pause button off, and ready() (default: always). It stops and starts itself as those change. start() restarts
+// the count (after a hover or a tap); off() lets go of the timer and every listener, when the cut is swapped out.
+const loopWhileSeen = (el, tick, every, ready = () => true) => {
+  let timer = 0, onScreen = true;
+  const stop = () => { window.clearInterval(timer); timer = 0; };
+  const start = () => {
+    stop();
+    if (!ready() || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
+    timer = window.setInterval(tick, every);
+  };
+  const onVisible = () => (document.hidden ? stop() : start());
+  document.addEventListener('visibilitychange', onVisible);
+  reduceMotion.addEventListener('change', start);
+  held.ev.addEventListener('change', start);
+  // off screen: no timer, and the looping animations pause
+  const seen = whenOnScreen(el, (on) => { onScreen = on; if (on) start(); else stop(); });
+  const off = () => {
+    stop();
+    document.removeEventListener('visibilitychange', onVisible);
+    reduceMotion.removeEventListener('change', start);
+    held.ev.removeEventListener('change', start);
+    if (seen) seen.disconnect();
+  };
+  return { start, stop, off };
+};
 const CLOUD_EVERY = 3200;   // ms each app shows before the next
 const WORDS_SWAP = 180;     // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
 const startCloud = (cloud) => {
@@ -292,7 +318,6 @@ const startCloud = (cloud) => {
     dotSized.observe(stateText.parentNode);
   }
   let index = -1;
-  let timer = 0;
   let swap = 0;
   const show = (i) => {
     i = (i + APPS.length) % APPS.length;
@@ -326,37 +351,21 @@ const startCloud = (cloud) => {
     focus.classList.add('is-out');
     swap = window.setTimeout(write, WORDS_SWAP);
   };
-  let onScreen = true;
-  const stop = () => { window.clearInterval(timer); timer = 0; };
-  const start = () => {
-    stop();
-    if (reduceMotion.matches || document.hidden || !onScreen || held.on) return;
-    timer = window.setInterval(() => show(index + 1), CLOUD_EVERY);
-  };
-  const pick = (id) => { stop(); show(APPS.findIndex((a) => a.id === id)); };
+  const loop = loopWhileSeen(svg, () => show(index + 1), CLOUD_EVERY);
+  const pick = (id) => { loop.stop(); show(APPS.findIndex((a) => a.id === id)); };
   svg.querySelectorAll('.ob-tile').forEach((t) => {
     t.addEventListener('pointerenter', () => pick(t.dataset.tile));
-    t.addEventListener('pointerleave', start);
+    t.addEventListener('pointerleave', loop.start);
   });
   cloud.querySelectorAll('.ob-seg-hit').forEach((h) => {
     h.addEventListener('pointerenter', () => pick(h.dataset.app));
-    h.addEventListener('pointerleave', start);
+    h.addEventListener('pointerleave', loop.start);
   });
-  const onVisible = () => (document.hidden ? stop() : start());
-  document.addEventListener('visibilitychange', onVisible);
-  reduceMotion.addEventListener('change', start);
-  held.ev.addEventListener('change', start);
-  // off screen: no timer, and the looping animations pause
-  const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   show(0);
-  start();
+  loop.start();
   return () => {   // the cut is swapped out: let go of the timers and listeners
-    stop();
+    loop.off();
     window.clearTimeout(swap);
-    document.removeEventListener('visibilitychange', onVisible);
-    reduceMotion.removeEventListener('change', start);
-    held.ev.removeEventListener('change', start);
-    if (seen) seen.disconnect();
     if (dotSized) dotSized.disconnect();
   };
 };
@@ -489,14 +498,9 @@ const startCaptions = (svg) => {
       sw.f = window.requestAnimationFrame(() => { sw.f = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
     }, CAP_SWAP);
   };
-  let timer = 0, turn = 0, onScreen = true, begun = false;
-  const stop = () => { window.clearInterval(timer); timer = 0; };
-  const start = () => {
-    stop();
-    if (!begun || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
-    timer = window.setInterval(() => step(turn++ % 2 ? 'office' : 'cloud', true), CAP_EVERY);
-  };
-  const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
+  let turn = 0, begun = false;
+  const loop = loopWhileSeen(svg, () => step(turn++ % 2 ? 'office' : 'cloud', true), CAP_EVERY, () => begun);
+  const tap = () => { if (!begun) return; step('office', true); turn = 0; loop.start(); };
   svg.addEventListener('click', tap);
   // Every caption text, set at this width's sizes in a hidden group and read together after a layout pass: one layout
   // the browser makes anyway, instead of a forced one for each caption as it changes.
@@ -540,21 +544,16 @@ const startCaptions = (svg) => {
   const onResize = () => relayout(svg.getBoundingClientRect().width);
   const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
   if (sized) sized.observe(svg); else { window.addEventListener('resize', onResize); afterLayout(onResize); }
-  const onVisible = () => (document.hidden ? stop() : start());
-  document.addEventListener('visibilitychange', onVisible);
-  reduceMotion.addEventListener('change', start);
-  held.ev.addEventListener('change', start);
-  const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   // first words once the drawing has built (about 3.2s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
   let second = 0;
   const first = window.setTimeout(() => {
     begun = true;
     step('cloud', !quick);
-    second = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : CAP_SECOND);
+    second = window.setTimeout(() => { step('office', !quick); loop.start(); }, quick ? 0 : CAP_SECOND);
   }, quick ? 0 : CAP_FIRST);
   return () => {   // the cut is swapped out: let go of the timers and listeners
-    stop();
+    loop.off();
     window.clearTimeout(first);
     window.clearTimeout(second);
     cancel(swaps.cloud);
@@ -562,10 +561,6 @@ const startCaptions = (svg) => {
     job++;   // a measure still waiting for its paint drops its results
     svg.removeEventListener('click', tap);
     if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);
-    document.removeEventListener('visibilitychange', onVisible);
-    reduceMotion.removeEventListener('change', start);
-    held.ev.removeEventListener('change', start);
-    if (seen) seen.disconnect();
   };
 };
 if (stage) {
