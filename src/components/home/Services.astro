@@ -2,12 +2,12 @@
 // HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, then SLOTS short tiles;
 // the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
 // swipe row (home.js lights the dots). Styles: services.css (imported here). Desktop layout: at the end of its CSS.
-import { getCollection } from 'astro:content';
 import Icon, { type IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import './services.css';
+import { getServices } from '../../lib/site';
 const SLOTS = 4;
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const services = await getServices();
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
 const featured = services.filter((s) => s.data.featured);

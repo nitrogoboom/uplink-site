@@ -5,10 +5,10 @@
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_spacing.py [BASE_URL] [page ...]
 # Pages default to the sitemap plus /soon and a 404; sizes are verify_footer.py's four. Values print as px at a 16px
 # root, so a fixed 1px reads 0.62px on the 3440 screen (25.6px root).
-import asyncio, re, sys, urllib.request
+import asyncio, re, sys
 from playwright.async_api import async_playwright
+from site_pages import SIZES, pages as site_pages
 
-SIZES = [('phone', 390, 844), ('tablet', 820, 1180), ('1440', 1440, 900), ('3440', 3440, 1440)]
 SCALE = [0] + [float(v) * 16 for v in re.findall(r'--sp-\d:\s*([\d.]+)rem', open('src/styles/tokens.css').read())]
 if len(SCALE) < 2: sys.exit('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern')
 # selector -> why it may sit off the scale. Keep this short; fix the CSS instead where you can.
@@ -43,10 +43,7 @@ async def main():
     base = args.pop(0) if args and args[0].startswith('http') else 'http://localhost:8787'
     pages = args
     if not pages:
-        sm = urllib.request.urlopen(base + '/sitemap.xml').read().decode()
-        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)]
-        if len(pages) < 5: sys.exit(f'sitemap.xml lists {len(pages)} page(s): expected at least the five static pages')
-        pages += ['/soon', '/no-such-page']
+        pages = site_pages(base)
     found = {}   # element -> {property: values}, and the pages and sizes it shows on
     gate = asyncio.Semaphore(6)
     async with async_playwright() as p:

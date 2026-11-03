@@ -5,8 +5,9 @@
 #        python tools/verify_styles.py http://localhost:8790 http://localhost:8787
 # Pages default to the sitemap of AFTER_URL plus /soon and a 404. Animations are frozen (reduced motion) so timing
 # can't show up as a difference; the CSP is bypassed so the probe script can run. Exits 1 on any difference.
-import asyncio, re, sys, urllib.request
+import asyncio, sys
 from playwright.async_api import async_playwright
+from site_pages import pages as site_pages
 
 SIZES = [(390, 844), (1280, 720), (1440, 900), (3440, 1440)]
 # html, body and every element in the body except script/style/link (the head's links change when CSS moves), in
@@ -31,10 +32,7 @@ def props(r):
 async def main():
     a, b, *pages = sys.argv[1:]
     if not pages:
-        sm = urllib.request.urlopen(b + '/sitemap.xml').read().decode()
-        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)]
-        if len(pages) < 5: sys.exit(f'sitemap.xml lists {len(pages)} page(s): expected at least the five static pages')
-        pages += ['/soon', '/no-such-page']
+        pages = site_pages(b)
     diffs = 0
     gate = asyncio.Semaphore(6)   # pages at a time
 

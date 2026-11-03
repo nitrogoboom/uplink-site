@@ -2,6 +2,8 @@
 // index.md, agents.md, and the Early Hints block in _headers).
 //   PAGES       the five static pages: address, name, <title>, description. The .astro pages read their
 //               title and description from here, so the sitemap and llms.txt say the same thing.
+//   getServices(), getProjects()  the collections in their own order.
+//   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
 //   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
@@ -74,6 +76,17 @@ export const svgSize = (file: string) => {
 };
 export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 
+// JSON-LD for a <script type="application/ld+json">: one space per level, and </ escaped so the text can never
+// close the script early.
+export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/<\//g, '<\\/');
+// A BreadcrumbList from [name, address] pairs, Home first.
+export const breadcrumbs = (trail: [string, string][]) => ({ '@type': 'BreadcrumbList',
+  itemListElement: trail.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })) });
+
+// The services and the projects in their own order (each entry's `order`), as every list shows them.
+export const getServices = async () => (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
@@ -97,8 +110,8 @@ export function lastmod(paths: string[]): string | undefined {
 }
 
 export async function allPages(): Promise<SitePage[]> {
-  const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  const services = await getServices();
+  const projects = await getProjects();
   return [
     ...(Object.keys(PAGES) as (keyof typeof PAGES)[]).map((k) => ({ ...PAGES[k], lastmod: lastmod(SOURCES[k]) })),
     ...services.map(({ id, data: s }) => ({ path: `/services/${id}`, name: s.title, description: s.card,

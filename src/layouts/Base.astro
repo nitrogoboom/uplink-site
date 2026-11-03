@@ -19,7 +19,7 @@ import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import ShortcutsDialog from '../components/ShortcutsDialog.astro';
-import { PAGES } from '../lib/site';
+import { PAGES, breadcrumbs, jsonLd } from '../lib/site';
 
 export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'soon' | 'notfound';
 interface Props {
@@ -44,9 +44,7 @@ const jsonld = type && canonical && {
   '@graph': [
     { '@type': type, '@id': canonical, url: canonical, name, description, inLanguage: 'en-CA', publisher: business,
       ...(type === 'AboutPage' ? { about: business } : {}), ...ldPage },
-    { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: PAGES.home.name, item: Astro.site!.href },
-      { '@type': 'ListItem', position: 2, name, item: canonical } ] },
+    breadcrumbs([[PAGES.home.name, Astro.site!.href], [name, canonical]]),
     ...ldGraph,
   ],
 };
@@ -86,7 +84,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
 {fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
 <link rel="preload" href="/assets/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin media="(min-width: 700px)">
 <slot name="head" />
-{jsonld && <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonld, null, 1).replace(/<\//g, '<\\/')} />}
+{jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
 </head>
 <body data-page={page}>
 <a class="skip-link" href="#main">Skip to content</a>

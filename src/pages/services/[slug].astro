@@ -3,16 +3,15 @@
 // page (service-page.css): breadcrumb and title beside the drawing, what's included, then how it works and its
 // questions (the service's `page` fields), then the projects that used it (their `services` list). Its JSON-LD is
 // the Service block the Services page also lists, its questions as a FAQPage, and a three-step breadcrumb.
-import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
 import '../../components/services/service-page.css';
-import { PAGES, cardSize } from '../../lib/site';
+import { PAGES, cardSize, getServices, getProjects, breadcrumbs, jsonLd } from '../../lib/site';
 
 export async function getStaticPaths() {
-  const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  const services = await getServices();
+  const projects = await getProjects();
   return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length,
     projects: projects.filter((p) => p.data.services.some((r) => r.id === service.id)).slice(0, 3) } }));
 }
@@ -27,16 +26,13 @@ const ld = {
       subjectOf: { '@id': `${url}#questions` } },
     { '@type': 'FAQPage', '@id': `${url}#questions`, url, inLanguage: 'en-CA',
       mainEntity: s.page.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
-    { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: PAGES.home.name, item: Astro.site!.href },
-      { '@type': 'ListItem', position: 2, name: PAGES.services.name, item: new URL(PAGES.services.path, Astro.site).href },
-      { '@type': 'ListItem', position: 3, name: s.title, item: url } ] },
+    breadcrumbs([[PAGES.home.name, Astro.site!.href], [PAGES.services.name, new URL(PAGES.services.path, Astro.site).href], [s.title, url]]),
   ],
 };
 ---
 <Base title={`${s.title} · Uplink Technology`} description={s.lead} page="services" path={`/services/${id}`}>
   <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
+    <script is:inline type="application/ld+json" set:html={jsonLd(ld)} />
   </Fragment>
   <section class="hero svc-page" aria-labelledby={`svc-${id}`}>
     <div class="container svc-page-grid">

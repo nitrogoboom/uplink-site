@@ -1,6 +1,7 @@
 """Generic geometry checks.
 usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
 Reports:
+  (exits 1 on any finding; DOT lines only list where each leader dot sits)
   ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
   SNAP   vertices of different shapes that almost (not exactly) coincide
   TJOIN  vertices that almost (not exactly) touch another shape's edge
@@ -127,6 +128,8 @@ def main():
                 except Exception: pass
             out.append(f'DOT   L{s.line+off} at {s.c[0]:.1f},{s.c[1]:.1f} on: {hits[-3:]}')
     print('\n'.join(out))
-    print(f'-- {len(geo)} geometric shapes, {len(out)} findings' + (f', {stepped} SNAP pairs one {step}px step apart (not listed)' if step else ''), file=sys.stderr)
+    found = sum(1 for o in out if not o.startswith('DOT'))   # DOT lines list where each leader dot sits: not findings
+    print(f'-- {len(geo)} geometric shapes, {found} findings' + (f', {stepped} SNAP pairs one {step}px step apart (not listed)' if step else ''), file=sys.stderr)
+    return 1 if found else 0
 
-main()
+sys.exit(main())

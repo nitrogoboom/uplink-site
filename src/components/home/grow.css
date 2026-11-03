@@ -19,6 +19,7 @@
   .grow-side .section-head { grid-column: 1 / -1; }
   .grow-art { grid-column: 1; grid-row: 2; position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-4)); }
   .grow-art svg { max-height: calc(var(--fold-h) - var(--sp-7)); }
+  /* vh, not the space scale: these are scroll distance (how far you scroll per step), not spacing */
   .grow-steps { grid-column: 2; grid-row: 2; gap: 30vh; padding-block: 8vh 24vh; }
 }
 /* once home.js runs (.is-live; every screen but a short desktop one, and never with reduced motion): the section is one stage, a screen tall, that

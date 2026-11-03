@@ -138,9 +138,9 @@
 @media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
   .hero-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    /* one screen with the news cards in it: the office row takes what the cards leave (the hero's padding here
-       is --sp-5 above, --sp-7 below, src/styles/hero.css), and grows past it only if the text needs more */
-    min-height: calc(var(--hero-h) - var(--sp-5) - var(--sp-7));
+    /* one screen with the news cards in it: the office row takes what the cards leave (less the hero's padding,
+       src/styles/hero.css), and grows past it only if the text needs more */
+    min-height: calc(var(--hero-h) - var(--hero-pad-top) - var(--hero-pad-bottom));
     grid-template-rows: 1fr auto;
     grid-template-areas: "menu stage" "dock dock";
     column-gap: var(--sp-7);
@@ -165,7 +165,7 @@
   .hero-grid {
     /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
-    height: min(calc(var(--fold-h) - 2 * var(--sp-5)), 56rem);
+    height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem);
     min-height: 0;
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
