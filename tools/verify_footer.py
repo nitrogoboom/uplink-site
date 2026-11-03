@@ -14,6 +14,7 @@ AXE='node_modules/axe-core/axe.min.js'
 PAGES=[p.strip('/') or 'index' for p in pages(base)]   # 'index', 'services', … 'soon', MISSING
 url=lambda page: f"{base}/{'' if page=='index' else page}"
 fails=[]
+LANES=6   # pages checked at once
 
 def watch(pg, where, errs):
     # Chromium reports a CSP or Trusted Types block as a console error, and a script crash as a page error
@@ -62,33 +63,37 @@ async def main():
         await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(300)
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
         await pg.close()
-        for page in PAGES:
-            for n,w,h in SIZES:
+        # every page at every size, a few at a time (each page gets its own tab, so they can't disturb each other)
+        lim=asyncio.Semaphore(LANES)
+        async def sized(page,n,w,h):
+            async with lim:
                 q=await b.new_page(viewport={'width':w,'height':h}); watch(q,f'{page} {n}',errs)
                 await q.goto(url(page)); await q.wait_for_timeout(700)
                 await q.eval_on_selector('#footer','e=>e.scrollIntoView()'); await q.wait_for_timeout(500)
                 r=await q.evaluate("""()=>{const f=document.getElementById('footer'); const s=document.querySelector('.fc-panels');
                   return [document.documentElement.scrollWidth-innerWidth, f.offsetHeight, s.scrollHeight-s.clientHeight, f.classList.contains('fc-js')]}""")
-                rep.append(f"{page:22} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]}")
                 if r[0]>0: fails.append(f'{page} {n}: {r[0]}px sideways scroll')
                 if page in ('soon','index'): await q.screenshot(path=f'{out}/f-{page}-{n}.png')
                 await q.close()
+                return f"{page:22} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]}"
+        rep.extend(await asyncio.gather(*(sized(page,*s) for page in PAGES for s in SIZES)))
         rep.append(f"script errors: {len(errs) or 'none'}")
         fails.extend(errs)
         # axe: the page's CSP blocks an injected script, so this context bypasses it (the site's own scripts still run)
         ctx=await b.new_context(bypass_csp=True)
-        for page in PAGES:
-            for n,w,h in [['phone',390,844],['1440',1440,900]]:
+        async def axed(page,n,w,h):
+            async with lim:
                 q=await ctx.new_page(); await q.set_viewport_size({'width':w,'height':h})
                 await q.goto(url(page)); await q.wait_for_timeout(1500)
                 await q.add_script_tag(path=AXE)
                 v=await q.evaluate("""async()=>(await axe.run(document,{resultTypes:['violations']})).violations.map(v=>({id:v.id,impact:v.impact,help:v.help,
                   nodes:v.nodes.slice(0,4).map(x=>x.target.join(' ')+(x.any[0]?' · '+x.any[0].message:''))}))""")
+                await q.close()
                 serious=[x for x in v if x['impact'] in ('serious','critical')]
                 fails.extend(f"axe {page} {n}: [{x['impact']}] {x['id']}" for x in serious)
-                rep.append(f"axe {page:22} {n:6} {len(v)} violation(s), {len(serious)} serious/critical")
-                for x in v: rep.append(f"    [{x['impact']}] {x['id']}: {x['help']}\n      "+'\n      '.join(x['nodes']))
-                await q.close()
+                return [f"axe {page:22} {n:6} {len(v)} violation(s), {len(serious)} serious/critical"]+\
+                  [f"    [{x['impact']}] {x['id']}: {x['help']}\n      "+'\n      '.join(x['nodes']) for x in v]
+        for lines in await asyncio.gather(*(axed(page,*s) for page in PAGES for s in [['phone',390,844],['1440',1440,900]])): rep.extend(lines)
         await ctx.close()
         print('\n'.join(rep)); await b.close()
         if fails:
