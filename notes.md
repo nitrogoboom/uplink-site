@@ -4,9 +4,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Forced reflow at load: `measure()` in `home.js` runs at module eval, writes `is-live` and `--grow-cap`, then reads `offsetHeight` and `getComputedStyle` (again on `fonts.ready`). Likely the PageSpeed "Forced reflow: [unattributed] 36 ms" on mobile Home. Fix: run it in a rAF, reads before writes.
-- [ ] Hero drawings and the cache: their `<style>` blocks are hashed into the page CSP, but `/assets/img/*` keeps stable names with `max-age=86400, stale-while-revalidate=604800` (`public/_headers`). After a drawing is regenerated, a returning visitor can get new HTML with an old SVG, and the CSP blocks its styles. Fix: content-hashed names for the four hero files (import `?url`), or `no-cache` on those four.
-- [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Say it's a prototype, like the newsletter toast.
-- [ ] Hero on phones: the drawing sits between the headline and "Get started" (`hero.css`, `"top" "stage" "cta" "dock"`). Move the CTA up to follow the headline.
+- [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 - [ ] Grow section length: 3.7 screens for three short cards. Decide a shorter run (`RUN` in `home.js` and the `3.7` in `grow.css` must match).
 - [ ] Hero motion never stops (cloud every 3.2s, phone captions every 2.2s, pulses). WCAG 2.2.2 asks for a pause control; reduced motion alone may not satisfy an audit. Decide: a pause button, or static captions. The phone drawing's tap-to-advance (`svg` click in `home.js`) has no keyboard equal; fine while it is only a bonus.
 - [ ] Hero "Main menu" repeats the header tabs. Later: give it its own links (book a check-up, get help now, two key services), remove it, or at least drop its `<nav>` landmark so screen readers list one main menu.
