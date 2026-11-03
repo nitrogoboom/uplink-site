@@ -1,11 +1,12 @@
 ---
 // SHARED · "Book your free check-up" pop-up (every page)
-// Opened by any link with data-open="book-dialog". Mockup: sends nothing.
+// Opened by any link with data-open="book-dialog". Posts to /api/book (worker/index.js) through core.js, with
+// Turnstile; the hidden "website" field is the honeypot. Without script the links go to the contact form instead.
 // Styles: src/styles/dialogs.css, src/styles/forms.css.
 import ServiceOptions from './ServiceOptions.astro';
 ---
 <dialog class="dialog" id="book-dialog" aria-labelledby="book-title">
-  <form data-validate="book" method="dialog">
+  <form data-validate="book" action="/api/book" method="post" data-turnstile-form>
     <div class="dlg-head">
       <h2 id="book-title">Book your free check-up</h2>
       <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">Close</span></button>
@@ -44,7 +45,8 @@ import ServiceOptions from './ServiceOptions.astro';
           </select>
         </div>
       </div>
-      <p class="small muted">Prototype form: nothing is sent yet.</p>
+      <div hidden><label for="book-website">Website</label><input id="book-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <div class="turnstile" data-turnstile></div>
     </div>
     <div class="dlg-actions">
       <button class="btn btn--secondary" type="button" data-close>Cancel</button>

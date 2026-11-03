@@ -17,6 +17,7 @@
 .form-head { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-5) var(--sp-5) 0; }
 .form-body { display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); }
 .form-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: 0 var(--sp-5) var(--sp-5); }
+.form-foot .btn { margin-inline-start: auto; }
 @media (min-width: 700px) {
   .form-head { padding: var(--sp-6) var(--sp-6) 0; }
   .form-body { padding: var(--sp-5) var(--sp-6); }

@@ -1,0 +1,21 @@
+---
+// FORM NOT SENT: where a form posted without script lands when worker/index.js refuses it (/not-sent#contact and so
+// on). Without script there is no Turnstile token, so that is every such post today. No canonical; noindex.
+import Base from '../layouts/Base.astro';
+import f from '../data/footer.json';
+---
+<Base title="Not sent · Uplink Technology"
+      description="Your form did not reach Uplink Technology."
+      page="soon" robots="noindex, follow">
+  <section class="page-intro" aria-labelledby="not-sent-title">
+    <div class="container">
+      <p class="eyebrow">Not sent</p>
+      <h1 id="not-sent-title">Your form did not go through</h1>
+      <p class="lead">Our spam check needs JavaScript, or it did not pass. Call or email us instead and a real person will help.</p>
+      <div class="row">
+        <a class="btn btn--primary" href={f.phone.href}>Call {f.phone.display}</a>
+        <a class="btn btn--secondary" href={`mailto:${f.email}`}>Email {f.email}</a>
+      </div>
+    </div>
+  </section>
+</Base>

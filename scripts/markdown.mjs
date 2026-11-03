@@ -5,13 +5,13 @@
 // eyebrows, breadcrumbs and anything aria-hidden. Kept: headings, prose, lists, the facts lists, the FAQ (question in bold,
 // answer under it). Links become full addresses.
 // Home is skipped: its Markdown is written by hand (src/data/index.md, served by src/pages/index.md.ts).
-// 404 and soon are skipped: they are not pages anyone should cite.
+// 404, soon, sent and not-sent are skipped: they are not pages anyone should cite.
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import TurndownService from 'turndown';
 
 const DIST = 'dist';
-const SKIP = ['index.html', '404.html', 'soon.html'];
+const SKIP = ['index.html', '404.html', 'soon.html', 'sent.html', 'not-sent.html'];
 
 const pages = [];
 const walk = (dir) => {

@@ -1,16 +1,24 @@
-// Cloudflare Workers, static assets: the built site in dist/ is served as is, no Worker script.
+// Cloudflare Workers, static assets: the built site in dist/ is served as is. The one script, worker/index.js,
+// answers the forms' posts (/api/*, run_worker_first) and nothing else.
 //   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787), _headers included
 //   npx wrangler deploy   deploy (CI does this on a push to main; see .github/workflows/site.yml)
 // not_found_handling "404-page": a missing address gets dist/404.html with a 404 status (Pages did this on its own).
+// FORMS: the forms' rate limit, 5 posts a minute per visitor address. Secrets (not in this file):
+// TURNSTILE_SECRET and FORM_TO (the inbox), set with `npx wrangler versions secret put NAME`; locally, .dev.vars.
+// Email sending waits for a domain on Cloudflare (notes.md): then add "send_email": [{ "name": "EMAIL" }] and
+// "vars": { "FORM_FROM": "forms@<domain>" }.
 // To put the password lock back, see tools/site-lock/worker.js.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uplink-site",
   "compatibility_date": "2026-10-28",
+  "main": "worker/index.js",
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
+    "run_worker_first": ["/api/*"],
   },
+  "ratelimits": [{ "name": "FORMS", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } }],
   "preview_urls": true,
   "observability": { "enabled": true },
 }

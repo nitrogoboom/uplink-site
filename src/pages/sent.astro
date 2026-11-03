@@ -1,0 +1,20 @@
+---
+// FORM SENT: where a form posted without script lands once worker/index.js has taken it (/sent#contact and so on).
+// With script the forms stay on their page and show a toast instead. No canonical; kept out of search results.
+import Base from '../layouts/Base.astro';
+---
+<Base title="Sent · Uplink Technology"
+      description="Your form reached Uplink Technology."
+      page="soon" robots="noindex, follow">
+  <section class="page-intro" aria-labelledby="sent-title">
+    <div class="container">
+      <p class="eyebrow">Sent</p>
+      <h1 id="sent-title">Thanks, we have it</h1>
+      <p class="lead">A real person replies within one business day.</p>
+      <div class="row">
+        <a class="btn btn--primary" href="/">Back to home</a>
+        <a class="btn btn--secondary" href="/services">Services</a>
+      </div>
+    </div>
+  </section>
+</Base>

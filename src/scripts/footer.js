@@ -3,7 +3,7 @@
    Hero-select roster and campus map.
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
+import { $, $$, html, reduceMotion, toast, whenOnScreen, sendForm, whileSending } from './core.js';
 
 /* ======================================================================
    Footer: hero-select roster + campus map (every page)
@@ -210,19 +210,20 @@ if (fc) {
   });
   $$('[data-fc-step]', fc).forEach((b) => b.addEventListener('click', () => select(cur + Number(b.dataset.fcStep), { focus: false })));
 
-  // newsletter (prototype: nothing is sent)
+  // newsletter: posts to /api/newsletter (core.js sendForm); the address stays until the server has taken it
   const nl = $('[data-fc-nl]', fc);
   const note = nl ? $('[data-fc-nl-msg]', nl).textContent : '';
   // once marked wrong, the address clears its error as soon as it reads right, not on the next submit
-  if (nl) $('input', nl).addEventListener('input', (e) => {
+  if (nl) $('input[type="email"]', nl).addEventListener('input', (e) => {
     if (e.target.getAttribute('aria-invalid') && e.target.checkValidity()) {
       e.target.removeAttribute('aria-invalid');
       $('[data-fc-nl-msg]', nl).textContent = note;
     }
   });
-  if (nl) nl.addEventListener('submit', (e) => {
+  if (nl) nl.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const input = $('input', nl), msg = $('[data-fc-nl-msg]', nl);
+    if (nl.dataset.sending !== undefined) return;
+    const input = $('input[type="email"]', nl), msg = $('[data-fc-nl-msg]', nl);
     if (!input.checkValidity()) {
       input.setAttribute('aria-invalid', 'true');
       msg.textContent = 'Enter an email like name@company.com.';
@@ -230,9 +231,15 @@ if (fc) {
       return;
     }
     input.removeAttribute('aria-invalid');
-    msg.textContent = 'One email a month. Threats to watch and fixes that matter.';
+    try {
+      if (!(await whileSending(nl, () => sendForm(nl)))) return;
+    } catch (err) {
+      msg.textContent = err.message;
+      return;
+    }
+    msg.textContent = note;
     nl.reset();
-    toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
+    toast({ title: 'Subscribed', text: note });
   });
 
   // the CSS keys on html.js (set in each page's head, before paint); fc-js only says this script ran

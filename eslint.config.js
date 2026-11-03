@@ -12,5 +12,6 @@ export default defineConfig(
   ...tseslint.configs.recommended,
   ...astro.configs.recommended,
   { files: ['src/scripts/**/*.js', 'tools/**/*.js'], languageOptions: { globals: globals.browser } },
+  { files: ['worker/**/*.js'], languageOptions: { globals: globals.serviceworker } },
   { files: ['scripts/**/*.mjs', '*.{js,mjs}', 'src/**/*.ts'], languageOptions: { globals: globals.node } },
 );
