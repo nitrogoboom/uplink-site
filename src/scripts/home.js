@@ -205,6 +205,26 @@ if (grow && 'IntersectionObserver' in window) {
    cloud starts. A turn or resize that changes the cut swaps the file.
    ------------------------------------------------------------------ */
 const stage = $('.hero-art .stage[data-hero]');
+// Pause button (Hero.astro): holds every moving part on the page. html.is-held pauses the CSS animations
+// (base.css); the cloud and the phone captions stop their timers while held. The choice is kept for next time.
+const held = { on: false, ev: new EventTarget() };
+const pauseBtn = stage && $('.hero-pause', stage);
+if (pauseBtn) {
+  const set = (on) => {
+    held.on = on;
+    document.documentElement.classList.toggle('is-held', on);
+    pauseBtn.setAttribute('aria-pressed', String(on));
+    held.ev.dispatchEvent(new Event('change'));
+  };
+  const show = () => { pauseBtn.hidden = reduceMotion.matches; };   // nothing moves with reduced motion
+  try { if (window.localStorage.getItem('uplink-held') === '1') set(true); } catch { /* storage blocked: start moving */ }
+  pauseBtn.addEventListener('click', () => {
+    set(!held.on);
+    try { window.localStorage.setItem('uplink-held', held.on ? '1' : '0'); } catch { /* storage blocked: this visit only */ }
+  });
+  show();
+  reduceMotion.addEventListener('change', show);
+}
 const APPS = [
   { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
   { id: 'files',  name: 'Files',    state: 'Synced',  detail: 'OneDrive and Drive backed up' },
@@ -279,7 +299,7 @@ const startCloud = (cloud) => {
   const stop = () => { window.clearInterval(timer); timer = 0; };
   const start = () => {
     stop();
-    if (reduceMotion.matches || document.hidden || !onScreen) return;
+    if (reduceMotion.matches || document.hidden || !onScreen || held.on) return;
     timer = window.setInterval(() => show(index + 1), 3200);
   };
   const pick = (id) => { stop(); show(APPS.findIndex((a) => a.id === id)); };
@@ -294,6 +314,7 @@ const startCloud = (cloud) => {
   const onVisible = () => (document.hidden ? stop() : start());
   document.addEventListener('visibilitychange', onVisible);
   reduceMotion.addEventListener('change', start);
+  held.ev.addEventListener('change', start);
   // off screen: no timer, and the looping animations pause
   const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   show(0);
@@ -303,6 +324,7 @@ const startCloud = (cloud) => {
     window.clearTimeout(swap);
     document.removeEventListener('visibilitychange', onVisible);
     reduceMotion.removeEventListener('change', start);
+    held.ev.removeEventListener('change', start);
     if (seen) seen.disconnect();
   };
 };
@@ -421,7 +443,7 @@ const startCaptions = (svg) => {
   const stop = () => { window.clearInterval(timer); timer = 0; };
   const start = () => {
     stop();
-    if (!begun || reduceMotion.matches || document.hidden || !onScreen) return;
+    if (!begun || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
     timer = window.setInterval(() => step(turn++ % 2 ? 'office' : 'cloud', true), 2200);
   };
   const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
@@ -440,6 +462,7 @@ const startCaptions = (svg) => {
   const onVisible = () => (document.hidden ? stop() : start());
   document.addEventListener('visibilitychange', onVisible);
   reduceMotion.addEventListener('change', start);
+  held.ev.addEventListener('change', start);
   const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   // first words once the drawing has built (about 3.2s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
@@ -456,6 +479,7 @@ const startCaptions = (svg) => {
     if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);
     document.removeEventListener('visibilitychange', onVisible);
     reduceMotion.removeEventListener('change', start);
+    held.ev.removeEventListener('change', start);
     if (seen) seen.disconnect();
   };
 };
