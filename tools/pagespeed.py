@@ -91,14 +91,15 @@ def scores(report):
 
 
 def test(base, path, strategy, key, bar):
-    """Best scores over up to RUNS tests, stopping once all reach the bar."""
+    """The best single run over up to RUNS tests (highest lowest score), stopping once one reaches the bar."""
     name = path.strip('/') or 'home'
     best = None
     for n in range(1, RUNS + 1):
         report = run(base + path, strategy, key)
-        (OUT / f'{name}-{strategy}.json').write_text(json.dumps(report), encoding='utf-8')
         s = scores(report)
-        best = s if best is None else {c: max(best[c], s[c]) for c in CATS}
+        if best is None or min(s.values()) > min(best.values()):   # one run's scores together, never mixed across runs
+            best = s
+            (OUT / f'{name}-{strategy}.json').write_text(json.dumps(report), encoding='utf-8')
         if min(best.values()) >= bar:
             break
     return name, strategy, best, n

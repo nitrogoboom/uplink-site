@@ -2,7 +2,8 @@
 # accessibility pass on every page at phone and desktop (axe-core from node_modules: run npm install first).
 # Pages: every address in the served sitemap.xml, plus soon and the 404 page.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
-# doesn't answer hover, a tower that doesn't grow, sideways scroll, or anything serious or critical from axe.
+# doesn't answer hover, a tower that doesn't grow, a footer tab at 1440x900 that isn't one screen tall or whose panel
+# overflows, sideways scroll, anything serious or critical from axe, or a sitemap with fewer than five pages.
 # CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port]
 import asyncio, re, sys, urllib.request
@@ -11,7 +12,9 @@ base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.a
 AXE='node_modules/axe-core/axe.min.js'
 MISSING='no-such-page'   # any missing address gets the 404 page
 sitemap=urllib.request.urlopen(base+'/sitemap.xml').read().decode()
-PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]+['soon',MISSING]
+PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]
+if len(PAGES)<5: sys.exit(f'sitemap.xml lists {len(PAGES)} page(s): expected at least the five static pages')
+PAGES+=['soon',MISSING]
 SIZES=[['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]
 url=lambda page: f"{base}/{'' if page=='index' else page}"
 fails=[]
@@ -47,15 +50,18 @@ async def main():
             const f=document.querySelector('svg.tg').getAttribute('data-floors');if(f&&f!==seen[seen.length-1])seen.push(f)}
           return seen}""")
         rep.append(f"tower floors {','.join(steps)} -> {','.join(seen)}")
-        if seen!=steps: fails.append(f"tower: floors {','.join(seen)}, expected {','.join(steps)}")
+        if not steps or seen!=steps: fails.append(f"tower: floors {','.join(seen)}, expected {','.join(steps)}")
         # footer behaviour on home at 1440
         await pg.eval_on_selector('#footer','e=>e.scrollIntoView()'); await pg.wait_for_timeout(400)
         tabs=await pg.eval_on_selector_all('.fc-tile','t=>t.map(x=>x.id)')
+        if not tabs: fails.append('footer: no tabs (.fc-tile) found')
         for i,t in enumerate(tabs):
             await pg.click('#'+t); await pg.wait_for_timeout(850)
             info=await pg.evaluate("""()=>{const f=document.getElementById('footer');const p=document.querySelector('.fc-panel.is-on');const s=document.querySelector('.fc-panels');
               return {h:f.offsetHeight, fold:innerHeight-document.querySelector('.site-header').offsetHeight, panel:p.id, map:p.dataset.map, over: s.scrollHeight-s.clientHeight, hud: document.querySelector('.fc-hud b').textContent, vb: document.querySelector('svg.fc-w').getAttribute('viewBox')}}""")
             rep.append(f"tab {t}: {info}")
+            if abs(info['h']-info['fold'])>1: fails.append(f"footer tab {t} at 1440: {info['h']}px tall, the screen below the header is {info['fold']}px")
+            if info['over']>0: fails.append(f"footer tab {t} at 1440: panel overflows by {info['over']}px")
             await pg.screenshot(path=f'{out}/f-1440-{i}.png')
         await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(300)
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))

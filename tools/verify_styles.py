@@ -32,7 +32,9 @@ async def main():
     a, b, *pages = sys.argv[1:]
     if not pages:
         sm = urllib.request.urlopen(b + '/sitemap.xml').read().decode()
-        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)] + ['/soon', '/no-such-page']
+        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)]
+        if len(pages) < 5: sys.exit(f'sitemap.xml lists {len(pages)} page(s): expected at least the five static pages')
+        pages += ['/soon', '/no-such-page']
     diffs = 0
     gate = asyncio.Semaphore(6)   # pages at a time
 

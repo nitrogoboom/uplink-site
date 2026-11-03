@@ -6,6 +6,35 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 - [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
+## Code (whole-project review 2 Nov 2026)
+Scripts:
+- [ ] `home.js:288`: the state-dot ResizeObserver is never disconnected; the cleanup (349-356) leaves one behind on each cut swap.
+- [ ] `home.js` captions: `swap` holds both timeout and frame ids (477, 481, 545), so the cleanup's `clearTimeout`/`cancelAnimationFrame` can hit the wrong one, and a tap mid-step orphans the earlier timeout. Use two variables.
+- [ ] `footer.js:190` restarts the panel animation with `void panels[cur].offsetWidth` (a forced layout); `replay()` in `home.js` does it without one.
+
+Pages and data:
+- [ ] Phone, email and address are typed by hand in `index.astro:20-23` (JSON-LD), `contact/Message.astro`, `contact/Support.astro`, `home/Proof.astro` and `services/Faq.astro`; they are in `footer.json`. Read them from there.
+- [ ] `SOURCES` (`src/lib/site.ts`) misses files pages read: home needs `src/content/projects`, contact needs `src/content/services` and `ServiceOptions.astro`; service pages miss `src/content/projects`, case studies `src/content/services`.
+- [ ] A case study's description is `client. story` on its page (`work/[slug].astro:33`) but `client. result.` in the sitemap list and `llms.txt` (`site.ts`). Pick one.
+- [ ] `work/ProjectCase.astro`: the comment says `work.js` copies it into a pop-up (gone since PR #25); `data-compact` and the `heading` prop are unused; `big = p.image === 'office'` guesses the size that `cardSize` exists for.
+- [ ] Inline SVG icons where `<Icon>` has them: close (`BookDialog.astro`, `ShortcutsDialog.astro`), arrow (`Hero.astro:31`), headset (`Support.astro`), phone and mail (`Message.astro`). Check the stroke widths match after the swap.
+- [ ] Breadcrumb names typed in (`'Services'`, `'Our work'`, `'Home'`) in both `[slug]` pages and `Base.astro`; read them from `PAGES`.
+
+Styles:
+- [ ] Dead CSS left from the picker (PR #25): `.picker`, `.picker-title`, `.picker-roster`, `.roster-wrap` and `.tile` in `services/pick.css` match nothing. `svc-cards.css` styles `.card-media`/`.card-body`, which its only user (`contact/Support.astro`) doesn't have. Remove, then run `verify_styles.py`.
+- [ ] `svc-cards.css:12` card hover lift sits outside `(hover: hover)`, so a tap leaves it stuck on touch (the fix in `surfaces.css:21`).
+- [ ] Page-only files in `src/styles/`: `svc-cards.css` (Contact) and `industries.css` (About; header still says Work). `pick.css` and `details.css` are imported by the `[slug]` pages, not by `ServiceCard`/`ProjectCase` they style. Move or rename.
+- [ ] Raw timings in `footer.css` (31, 173, 189-191, 207-214) and in `home.js`/`footer.js` (3200, 180, 2200, 170, 700); 170 and 180 in `home.js` shadow `--dur-1`. Move to tokens.
+- [ ] Stale headers: old section numbers ("2.", "7.", "14." …) in many CSS files, and "the Services picker" in both `hero.css` files.
+
+Drawings code:
+- [ ] The label-gap helper is copied four times (`compact_gaps` in `gen_cloud.py`, `gen_helpdesk.py`, `gen_network.py`; `text_gaps` in `gen_voip.py`). Move it to `isogen.py`. Same for `box()` (`gen_hq.py`, `gen_tower.py`, `gen_office.py`) and `gen_office.py`'s own copies of `FACES`/`HIGH`/`EDGE`/`FONT`.
+- [ ] Retired `isogen.badge()` and `key_css(_width)` are still called; `BADGE` and `KEY_WIDTH` in `gen_office.py:202-203` feed nothing. Delete them.
+
+Docs:
+- [ ] `src/README.md` is behind: Home sections are Hero, Services, Grow, Work, Proof (not Process); About is Profile, Process, Team (not Story); Base props miss `ldPage`/`ldGraph`; field lists miss `icon`, `featured`, `page`; the CSS order misses `detail-pages.css`.
+- [ ] `README.md`: `gen_og.py` uses `office-card.svg`, not `office-compact.svg`; `scripts/` lists only `headers.mjs`. `CLAUDE.md`: "each script also writes NAME-compact.svg" (not the tower or og); the preview alias keeps digits and trims dashes.
+
 ## Page structure
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
@@ -36,7 +65,7 @@ Forms and content:
 - [ ] Forms (decided 2 Nov 2026: build now, email via Cloudflare Email Service): contact, book-a-call and newsletter send nothing yet. Without script, the contact and newsletter forms go to `/soon` and their fields have no `name`; give the fields names back with the endpoint. Plan: a Worker endpoint (same origin, so `form-action 'self'` holds) with Turnstile, a honeypot field and a rate limit. Email Service sends from a domain on a Cloudflare zone, and `workers.dev` is not one, so the sending domain (the real one, or any domain moved to Cloudflare) comes first. CSP then needs `challenges.cloudflare.com` in `script-src` and `frame-src`, and the Trusted Types policy in `core.js` must allow Turnstile's script.
 - [ ] Service and project copy (how it works, questions, case studies) is sample text, and stays sample (decided 2 Nov 2026) until there is a real client. Then rewrite with real details (each entry's `page` field in `src/content/`).
 - [ ] Copy to confirm: VoIP wording ("Phones & Teams calling" section, card and footer); backup drawing subline "a separate, locked site" (`gen_backup.py`); network label VOIP PHONES "calls over your network" (`gen_network.py`); hero phone line `lead-short` in `Hero.astro`; the six grow tags (`tags` in `Grow.astro`); the "Windows 10 support has ended" hero card (slot for the first real article).
-- [ ] About 25 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
+- [ ] About 24 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
 - [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. "All systems normal" in the footer (`footer.json` `status`) is hard-coded: link it to a real status page or drop the claim.
 
 Domain and hosting:
