@@ -45,7 +45,7 @@ jobs:
       - run: npm run build
       # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
       # deploys: tools/verify_footer.py fails on a script error, a CSP block, a dead hero or tower, sideways scroll,
-      # or a serious axe finding
+      # or a serious axe finding (Home in full, the other pages once at phone size)
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'

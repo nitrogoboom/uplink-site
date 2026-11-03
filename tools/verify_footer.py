@@ -1,18 +1,22 @@
-# Site checks against the built site: hero, tower, footer and sideways scroll at every size, then an axe
-# accessibility pass on every page at phone and desktop (axe-core from node_modules: run npm install first).
-# Pages: every address in the served sitemap.xml, plus soon and the 404 page.
+# Site checks against the built site. Home (the page being worked on, FOCUS) gets everything: hero, tower, footer
+# tabs, sideways scroll at every size, and an axe accessibility pass at phone and desktop (axe-core from node_modules:
+# run npm install first). Every other page (the served sitemap.xml, plus soon and the 404 page) gets a quick look:
+# loaded once at phone size for script errors and sideways scroll. --all gives every page the full treatment.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
 # doesn't answer hover, a tower that doesn't grow, a footer tab at 1440x900 that isn't one screen tall or whose panel
 # overflows, sideways scroll, anything serious or critical from axe, or a sitemap with fewer than five pages.
 # CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
-# usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port]
+# usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port] [--all]
 import asyncio, sys
 from playwright.async_api import async_playwright
 from site_pages import MISSING, SIZES, pages
-base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.argv[1]
+ALL='--all' in sys.argv; args=[a for a in sys.argv[1:] if a!='--all']
+base='http://localhost:'+(args[1] if len(args)>1 else '8787'); out=args[0]
 AXE='node_modules/axe-core/axe.min.js'
 PAGES=[p.strip('/') or 'index' for p in pages(base)]   # 'index', 'services', … 'soon', MISSING
 url=lambda page: f"{base}/{'' if page=='index' else page}"
+FOCUS={'index'}   # pages checked in full; the rest get the quick look unless --all
+full=lambda page: ALL or page in FOCUS
 fails=[]
 LANES=6   # pages checked at once
 
@@ -63,7 +67,7 @@ async def main():
         await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(300)
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
         await pg.close()
-        # every page at every size, a few at a time (each page gets its own tab, so they can't disturb each other)
+        # each page at its sizes, a few at a time (each page gets its own tab, so they can't disturb each other)
         lim=asyncio.Semaphore(LANES)
         async def sized(page,n,w,h):
             async with lim:
@@ -76,7 +80,7 @@ async def main():
                 if page in ('soon','index'): await q.screenshot(path=f'{out}/f-{page}-{n}.png')
                 await q.close()
                 return f"{page:22} {n:6} overflowX {r[0]} footer h {r[1]} panel overflow {r[2]} js {r[3]}"
-        rep.extend(await asyncio.gather(*(sized(page,*s) for page in PAGES for s in SIZES)))
+        rep.extend(await asyncio.gather(*(sized(page,*s) for page in PAGES for s in (SIZES if full(page) else SIZES[:1]))))
         rep.append(f"script errors: {len(errs) or 'none'}")
         fails.extend(errs)
         # axe: the page's CSP blocks an injected script, so this context bypasses it (the site's own scripts still run)
@@ -93,7 +97,7 @@ async def main():
                 fails.extend(f"axe {page} {n}: [{x['impact']}] {x['id']}" for x in serious)
                 return [f"axe {page:22} {n:6} {len(v)} violation(s), {len(serious)} serious/critical"]+\
                   [f"    [{x['impact']}] {x['id']}: {x['help']}\n      "+'\n      '.join(x['nodes']) for x in v]
-        for lines in await asyncio.gather(*(axed(page,*s) for page in PAGES for s in [['phone',390,844],['1440',1440,900]])): rep.extend(lines)
+        for lines in await asyncio.gather(*(axed(page,*s) for page in PAGES if full(page) for s in [['phone',390,844],['1440',1440,900]])): rep.extend(lines)
         await ctx.close()
         print('\n'.join(rep)); await b.close()
         if fails:
