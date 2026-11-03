@@ -1,6 +1,6 @@
 # Site checks against the built site: hero, tower, footer and sideways scroll at every size, then an axe
 # accessibility pass on every page at phone and desktop (axe-core from node_modules: run npm install first).
-# Pages: every address in the served sitemap.xml, plus soon and the 404 page.
+# Pages: every address in the served sitemap.xml, plus soon, sent, not-sent and the 404 page.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
 # doesn't answer hover, a tower that doesn't grow, sideways scroll, or anything serious or critical from axe.
 # CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
@@ -11,7 +11,7 @@ base='http://localhost:'+(sys.argv[2] if len(sys.argv)>2 else '8787'); out=sys.a
 AXE='node_modules/axe-core/axe.min.js'
 MISSING='no-such-page'   # any missing address gets the 404 page
 sitemap=urllib.request.urlopen(base+'/sitemap.xml').read().decode()
-PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]+['soon',MISSING]
+PAGES=[re.sub(r'^https?://[^/]+/?','',u) or 'index' for u in re.findall(r'<loc>([^<]+)</loc>',sitemap)]+['soon','sent','not-sent',MISSING]
 SIZES=[['phone',390,844],['tablet',820,1180],['1440',1440,900],['3440',3440,1440]]
 url=lambda page: f"{base}/{'' if page=='index' else page}"
 fails=[]

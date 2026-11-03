@@ -34,11 +34,13 @@ const store = {
 /* ---------- Trusted Types ---------------------------------------------- */
 // The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like).
 // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
-// The one script it may load from elsewhere is the analytics beacon (BEACON, below).
+// The only scripts it may load from elsewhere are the analytics beacon (BEACON, below) and the forms' spam check
+// (TURNSTILE, below).
 const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
+const TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', {
   createHTML: (s) => s,
-  createScriptURL: (u) => { if (u === BEACON) return u; throw new TypeError('script not allowed: ' + u); }
+  createScriptURL: (u) => { if (u === BEACON || u === TURNSTILE) return u; throw new TypeError('script not allowed: ' + u); }
 }) : null;
 const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
 
@@ -214,8 +216,66 @@ document.addEventListener('keydown', (e) => {
 });
 
 /* ======================================================================
-   Forms: inline validation, then a confirmation toast.
-   This prototype does not send anything anywhere yet.
+   Sending a form (worker/index.js answers /api/*)
+   ====================================================================== */
+// Turnstile, Cloudflare's spam check: its script loads the first time someone starts on a form, and each send gets
+// a fresh token (they work once). It stays invisible unless Cloudflare wants a click; then it shows in the
+// form's [data-turnstile] box. Local addresses use Turnstile's always-pass test key.
+const SITEKEY = /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname) ? '1x00000000000000000000AA' : '0x4AAAAAAFxWBVuyWeqas5P1';
+const NOT_SENT = 'Your message did not go through. Check your connection and try again, or call or email us.';
+let turnstileLoad = null;
+function loadTurnstile() {
+  turnstileLoad ||= new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.async = true;
+    s.src = ttPolicy ? ttPolicy.createScriptURL(TURNSTILE) : TURNSTILE;
+    s.addEventListener('load', () => resolve(window.turnstile));
+    s.addEventListener('error', () => { turnstileLoad = null; s.remove(); reject(new Error(NOT_SENT)); });
+    document.head.append(s);
+  });
+  return turnstileLoad;
+}
+async function turnstileToken(form) {
+  const ts = await loadTurnstile();
+  const box = $('[data-turnstile]', form);
+  if (form._turnstile !== undefined) ts.remove(form._turnstile);
+  return new Promise((resolve, reject) => {
+    const fail = () => { reject(new Error('The spam check did not pass. Try again, or call or email us.')); return true; };
+    form._turnstile = ts.render(box, {
+      sitekey: SITEKEY, appearance: 'interaction-only', 'response-field': false,
+      callback: resolve, 'error-callback': fail, 'timeout-callback': fail
+    });
+  });
+}
+$$('form[data-turnstile-form]').forEach((form) => form.addEventListener('focusin', () => { loadTurnstile().catch(() => {}); }, { once: true }));
+
+// Posts the form to its action and resolves once the server has taken it; otherwise rejects with what to tell the visitor.
+async function sendForm(form) {
+  const data = new FormData(form);
+  data.set('cf-turnstile-response', await turnstileToken(form));
+  let res, out = {};
+  try {
+    res = await fetch(form.action, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+    out = await res.json();
+  } catch { /* offline, or not JSON */ }
+  if (!res || !res.ok || !out.ok) throw new Error(out.error || NOT_SENT);
+}
+
+// The submit button reads "Sending…" while a send is on its way, and a second press does nothing.
+async function whileSending(form, task) {
+  if (form.dataset.sending !== undefined) return false;
+  const btn = $('[type="submit"]', form);
+  const label = btn.textContent;
+  form.dataset.sending = '';
+  btn.setAttribute('aria-disabled', 'true');
+  btn.textContent = 'Sending…';
+  try { await task(); return true; }
+  finally { delete form.dataset.sending; btn.removeAttribute('aria-disabled'); btn.textContent = label; }
+}
+
+/* ======================================================================
+   Forms: inline validation, send, then a confirmation toast.
+   What the visitor typed stays until the server has taken it.
    ====================================================================== */
 $$('form[data-validate]').forEach((form) => {
   form.noValidate = true;
@@ -240,10 +300,18 @@ $$('form[data-validate]').forEach((form) => {
   fields.forEach((el) => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid')) check(el); }));
   fields.forEach((el) => el.addEventListener('blur', () => { if (el.value) check(el); }));
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (form.dataset.sending !== undefined) return;
     const bad = fields.filter((el) => !check(el));
     if (bad.length) { bad[0].focus(); return; }
+
+    try {
+      if (!(await whileSending(form, () => sendForm(form)))) return;
+    } catch (err) {
+      toast({ title: 'Not sent', text: err.message, tone: 'info', timeout: 10000 });
+      return;
+    }
 
     const kind = form.dataset.validate;
     const dlg = form.closest('dialog');
@@ -319,4 +387,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen, sendForm, whileSending };

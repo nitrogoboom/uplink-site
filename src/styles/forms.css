@@ -19,6 +19,8 @@ textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; 
 .input::placeholder { color: var(--c-muted); opacity: 0.7; }
 .input:focus { outline: none; border-color: var(--c-accent-text); box-shadow: 0 0 0 3px var(--c-accent-ring); }
 .input[aria-invalid="true"] { border-color: var(--c-alert); }
+/* Turnstile's box (core.js): empty, and out of the layout, unless Cloudflare asks for a click */
+.turnstile:empty { display: none; }
 
 /* selects: our own arrow, text lined up with the inputs. Browsers with customizable selects (base-select) also get a
    dark list styled like a menu; the others get dark options in their own list. */
