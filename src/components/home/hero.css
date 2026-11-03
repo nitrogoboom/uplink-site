@@ -66,13 +66,14 @@
   .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 }
 
-/* phones (under the bottom bar's 700px): headline and the short line, the office full width, then the button
-   and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. No eyebrow and the
-   short line, so "Get started" lands on the first screen under a full-width office. */
+/* phones (under the bottom bar's 700px): headline and the short line, the button, then the office full width
+   and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. The button sits
+   above the office so it is on the first screen on every phone (under it, a 667px-tall screen put it half under
+   the bottom bar). No eyebrow, and the short line. */
 .lead-short { display: none; }
 @media (max-width: 699px) {
   .hero.fold { padding-top: var(--sp-5); }
-  .hero-grid { grid-template-areas: "top" "stage" "cta" "dock"; gap: var(--sp-3); }
+  .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
   .hero-top { grid-area: top; gap: var(--sp-3); }
   .hero-menu h1 { font-size: var(--fs-hero-phone); }
