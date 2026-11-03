@@ -88,7 +88,9 @@ async def main():
         async def sized(page,n,w,h):
             async with lim:
                 q=await b.new_page(viewport={'width':w,'height':h}); watch(q,f'{page} {n}',errs)
-                await q.goto(url(page)); await q.wait_for_timeout(700)
+                # Home: long enough for the hero's first two captions (about 3.3s and 4.4s in), whose script errors
+                # would otherwise come after the check had moved on
+                await q.goto(url(page)); await q.wait_for_timeout(5000 if page=='index' else 700)
                 await q.eval_on_selector('#footer','e=>e.scrollIntoView()'); await q.wait_for_timeout(500)
                 r=await q.evaluate("""()=>{const f=document.getElementById('footer'); const s=document.querySelector('.fc-panels');
                   return [document.documentElement.scrollWidth-innerWidth, f.offsetHeight, s.scrollHeight-s.clientHeight, f.classList.contains('fc-js')]}""")

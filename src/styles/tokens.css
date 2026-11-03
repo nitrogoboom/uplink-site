@@ -186,6 +186,12 @@
   --z-toast: 60;
 }
 
+/* the hero captions' sizes are read as numbers by home.js. They come from the type tokens, which are calc()s of the
+   text size, so they are registered as lengths: the browser works them out to plain px (an unregistered custom
+   property hands the script the calc() text, which reads as NaN) */
+@property --cap-title { syntax: '<length>'; inherits: true; initial-value: 0; }
+@property --cap-sub { syntax: '<length>'; inherits: true; initial-value: 0; }
+
 /* the visitor's text size (Settings pop-up, core.js): html[data-text] only when it isn't the default */
 :root[data-text="1.25"] { --text: 1.25; }
 :root[data-text="1.5"] { --text: 1.5; }
