@@ -1,5 +1,5 @@
 /*--- SERVICES · a service's own page (/services/<slug>): breadcrumb, title and button beside the drawing, then
-   what's included as three cards. The parts are ServiceCard's (pick.css styles them); this places them.
+   what's included as three cards. The parts are ServiceCard's (service-card.css styles them); this places them.
    Desktop layout at the end. ---*/
 .svc-page { padding-block: var(--sp-6) var(--sp-7); }
 .svc-page-grid {
@@ -13,7 +13,7 @@
 .svc-page-cta { grid-area: cta; gap: var(--sp-5); }
 .svc-page .picker-head .lead { font-size: var(--fs-5); line-height: var(--lh-snug); }
 .svc-page .picker-art { aspect-ratio: 4 / 3; flex: none; }
-/* the drawing in flow, not absolute (pick.css): same box, since the art is overflow: hidden and sized by its aspect
+/* the drawing in flow, not absolute (service-card.css): same box, since the art is overflow: hidden and sized by its aspect
    ratio. Absolute, its late load made Chrome re-lay out the page grid by a shortcut that leaves getComputedStyle
    reporting the grid's auto side margins as 0 (the box itself never moved), so verify_styles saw 0 or 440px. */
 .svc-page .picker-prev img { position: static; display: block; }

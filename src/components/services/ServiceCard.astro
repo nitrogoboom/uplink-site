@@ -3,10 +3,11 @@
 // src/content/services/<slug>.json.
 //   service   the collection entry
 //   n, total  its place ("Service 03 of 07")
-//   on        shown (kept from the picker's styles in pick.css)
+//   on        shown (kept from the picker's styles in service-card.css)
 //   first     the drawing loads eagerly
 //   heading   h1 on the service's own page. "What's included" and "Best for" are one level down.
 import type { CollectionEntry } from 'astro:content';
+import './service-card.css';
 interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
 const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
 const Sub = Heading === 'h1' ? 'h2' : 'h3';

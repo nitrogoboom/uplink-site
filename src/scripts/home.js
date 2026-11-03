@@ -262,6 +262,8 @@ const APPS = [
   { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
   { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
 ];
+const CLOUD_EVERY = 3200;   // ms each app shows before the next
+const WORDS_SWAP = 180;     // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
 const startCloud = (cloud) => {
   const svg = cloud.ownerSVGElement;
   const focus = svg.querySelector('.ob-focus');
@@ -322,14 +324,14 @@ const startCloud = (cloud) => {
     window.clearTimeout(swap);
     if (first || reduceMotion.matches) { write(); return; }
     focus.classList.add('is-out');
-    swap = window.setTimeout(write, 180);
+    swap = window.setTimeout(write, WORDS_SWAP);
   };
   let onScreen = true;
   const stop = () => { window.clearInterval(timer); timer = 0; };
   const start = () => {
     stop();
     if (reduceMotion.matches || document.hidden || !onScreen || held.on) return;
-    timer = window.setInterval(() => show(index + 1), 3200);
+    timer = window.setInterval(() => show(index + 1), CLOUD_EVERY);
   };
   const pick = (id) => { stop(); show(APPS.findIndex((a) => a.id === id)); };
   svg.querySelectorAll('.ob-tile').forEach((t) => {
@@ -373,6 +375,10 @@ const startCloud = (cloud) => {
    width, all together in a hidden group, after layout (measure()).
    ------------------------------------------------------------------ */
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const CAP_EVERY = 2200;     // ms between caption changes, the two captions taking turns (each one every 4.4s)
+const CAP_SWAP = 170;       // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
+const CAP_FIRST = 3300;     // ms before the first caption: the drawing builds first (office_parts/build.css)
+const CAP_SECOND = 1100;    // ms from the first caption to the second
 const CLOUD_TITLE = 'Cloud workspace';
 const make = (tag, cls, parent) => {
   const el = document.createElementNS(SVG_NS, tag);
@@ -481,14 +487,14 @@ const startCaptions = (svg) => {
       sp.g.classList.remove('is-out');
       write[name]();   // drawn once below their place (is-pre), the words rise in from the frame after
       sw.f = window.requestAnimationFrame(() => { sw.f = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
-    }, 170);
+    }, CAP_SWAP);
   };
   let timer = 0, turn = 0, onScreen = true, begun = false;
   const stop = () => { window.clearInterval(timer); timer = 0; };
   const start = () => {
     stop();
     if (!begun || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
-    timer = window.setInterval(() => step(turn++ % 2 ? 'office' : 'cloud', true), 2200);
+    timer = window.setInterval(() => step(turn++ % 2 ? 'office' : 'cloud', true), CAP_EVERY);
   };
   const tap = () => { if (!begun) return; step('office', true); turn = 0; start(); };
   svg.addEventListener('click', tap);
@@ -545,8 +551,8 @@ const startCaptions = (svg) => {
   const first = window.setTimeout(() => {
     begun = true;
     step('cloud', !quick);
-    second = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : 1100);
-  }, quick ? 0 : 3300);
+    second = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : CAP_SECOND);
+  }, quick ? 0 : CAP_FIRST);
   return () => {   // the cut is swapped out: let go of the timers and listeners
     stop();
     window.clearTimeout(first);

@@ -12,6 +12,7 @@ import { $, $$, html, reduceMotion, replay, toast, whenOnScreen } from './core.j
    follow); the camera flies there and lights it up. The map is drawn
    here in true isometric: screen = ((x-y)·cos30·u, (x+y)·u/2 - z·u).
    ====================================================================== */
+const MAP_MOVE = 700;   // ms the map's camera takes to fly to a tab's spot
 const fc = $('.fc');
 if (fc) {
   const C30 = Math.cos(Math.PI / 6), U = 38;
@@ -167,7 +168,7 @@ if (fc) {
     const t = aim(k);
     window.cancelAnimationFrame(raf);
     if (instant || reduceMotion.matches) { vb = t.vb; mk = t.mk; paint(); return; }
-    const v0 = vb.slice(), m0 = mk.slice(), t0 = performance.now(), dur = 700;
+    const v0 = vb.slice(), m0 = mk.slice(), t0 = performance.now(), dur = MAP_MOVE;
     const ease = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
     const step = (now) => {
       const p = Math.min(1, (now - t0) / dur), e = ease(p);

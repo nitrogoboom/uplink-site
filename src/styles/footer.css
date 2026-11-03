@@ -28,7 +28,7 @@
 .js .fc-panels { gap: 0; }
 .js .fc-panel:not(.is-on) { display: none; }
 .fc-panel { display: flex; flex-direction: column; min-width: 0; }
-.js .fc-panel.is-in { animation: fc-in 360ms var(--ease); }
+.js .fc-panel.is-in { animation: fc-in var(--dur-fc-panel) var(--ease); }
 @keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
 .fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
 /* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
@@ -170,7 +170,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .linkbtn:hover { color: var(--c-text); }
 
 /* the campus map itself (built by footer.js) */
-.fc-w polygon { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill 450ms ease, stroke 450ms ease, stroke-opacity 450ms ease; }
+.fc-w polygon { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }
 .fc-w .f-t { fill: var(--iso-top); } .fc-w .f-l { fill: var(--iso-left); } .fc-w .f-r { fill: var(--iso-right); }
 .fc-w .on .b .f-t { fill: var(--iso-hi-top); } .fc-w .on .b .f-l { fill: var(--iso-hi-left); } .fc-w .on .b .f-r { fill: var(--iso-hi-right); }
 .fc-w .on .b polygon { stroke: var(--iso-hi-edge); stroke-opacity: 0.55; }
@@ -186,9 +186,9 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-w .tk-2 .f-t { fill: var(--iso-hi-top); } .fc-w .tk-2 .f-l { fill: var(--iso-hi-left); } .fc-w .tk-2 .f-r { fill: var(--iso-hi-right); }
 .fc-w .tk-3 .f-t { fill: var(--iso-green-top); } .fc-w .tk-3 .f-l { fill: var(--iso-green-mid); } .fc-w .tk-3 .f-r { fill: var(--iso-green-dark); }
 .fc-w .led { fill: var(--iso-led); } .fc-w .led.w2 { fill: var(--iso-light); }
-.fc-w .route { fill: none; stroke: var(--c-sky); stroke-width: 1.3; stroke-opacity: 0.22; stroke-dasharray: 3 6; stroke-linecap: round; stroke-linejoin: round; transition: stroke 400ms ease, stroke-opacity 400ms ease; }
+.fc-w .route { fill: none; stroke: var(--c-sky); stroke-width: 1.3; stroke-opacity: 0.22; stroke-dasharray: 3 6; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--dur-fc-route) ease, stroke-opacity var(--dur-fc-route) ease; }
 .fc-w .route.on { stroke: var(--iso-hi-left); stroke-opacity: 0.55; stroke-dasharray: none; }
-.fc-w .flow { fill: none; stroke: var(--iso-hi-left); stroke-width: 2.4; stroke-dasharray: 2 10; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity 400ms ease; }
+.fc-w .flow { fill: none; stroke: var(--iso-hi-left); stroke-width: 2.4; stroke-dasharray: 2 10; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity var(--dur-fc-route) ease; }
 .fc-w .flow.on { opacity: 1; }
 .fc-w .ring { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-opacity: 0.8; }
 .fc-w .ring2 { fill: none; stroke: var(--iso-hi-left); stroke-width: 1; stroke-opacity: 0.35; stroke-dasharray: 4 5; }
@@ -204,14 +204,14 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 @media (prefers-reduced-motion: no-preference) {
   /* SVG parts animate on the main thread and repaint the map, so every loop steps at about 12 frames a second
      (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen. */
-  .fc-w.is-seen .flow { animation: fc-flow 1.2s steps(14) infinite; }
-  .fc-w .lit.blink, .fc-w .led { animation: fc-blink 4s step-end infinite; }
-  .fc-w .bob { animation: fc-bob 3s steps(18) infinite; }
-  .fc-w .mk-bob { animation: fc-bob 2.2s steps(13) infinite; }
+  .fc-w.is-seen .flow { animation: fc-flow var(--loop-fc-flow) steps(14) infinite; }
+  .fc-w .lit.blink, .fc-w .led { animation: fc-blink var(--loop-fc-blink) step-end infinite; }
+  .fc-w .bob { animation: fc-bob var(--loop-fc-bob) steps(18) infinite; }
+  .fc-w .mk-bob { animation: fc-bob var(--loop-fc-mk-bob) steps(13) infinite; }
   .fc-w .ring, .fc-w .beacon, .fc-w .sig { transform-box: fill-box; transform-origin: 50% 50%; }
-  .fc-w .ring { animation: fc-ring 2.4s steps(29) infinite; }
-  .fc-w .beacon { animation: fc-ping 2.4s steps(29) infinite; }
-  .fc-w .sig { animation: fc-ping 2.8s steps(34) infinite; }
+  .fc-w .ring { animation: fc-ring var(--loop-fc-ring) steps(29) infinite; }
+  .fc-w .beacon { animation: fc-ping var(--loop-fc-ring) steps(29) infinite; }
+  .fc-w .sig { animation: fc-ping var(--loop-fc-sig) steps(34) infinite; }
 }
 @keyframes fc-flow { to { stroke-dashoffset: -24; } }
 @keyframes fc-blink { 0%, 62% { opacity: 1; } 70%, 82% { opacity: 0.25; } 88%, 100% { opacity: 1; } }

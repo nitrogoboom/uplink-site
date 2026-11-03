@@ -43,7 +43,7 @@ Typed in `content.config.ts`.
 
 ## Styles: `styles/`
 
-`global.css` lists the shared files in cascade order (tokens, fonts, base, layout, type, header, …), ending with the blocks more than one page uses (`hero.css`, `svc-cards.css`, `facts.css`, `industries.css`), then `page-transitions.css` and `motion.css`. `fold.css` is the desktop one-section-per-screen rules every page shares. Colours, sizes and timings stay in `tokens.css`. `tools/verify_styles.py` compares every element's computed style between two builds: run it after moving CSS.
+`global.css` lists the shared files in cascade order (tokens, fonts, base, layout, type, header, …), ending with the blocks more than one page uses (`hero.css`, `facts.css`, `detail-pages.css`), then `page-transitions.css` and `motion.css`. `fold.css` is the desktop one-section-per-screen rules every page shares. Colours, sizes and timings stay in `tokens.css`. `tools/verify_styles.py` compares every element's computed style between two builds: run it after moving CSS.
 
 ## Scripts: `scripts/`
 

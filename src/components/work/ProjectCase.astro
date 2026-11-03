@@ -2,6 +2,7 @@
 // One project in full: the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
 import { getEntries, type CollectionEntry } from 'astro:content';
 import { svgSize } from '../../lib/site';
+import './project-case.css';
 interface Props { project: CollectionEntry<'projects'> }
 const { project } = Astro.props;
 const { id, data: p } = project;

@@ -5,6 +5,7 @@
 // its fields have no name, so nothing typed lands in the address bar. Give them names back with a real endpoint.
 import './message.css';
 import ServiceOptions from '../ServiceOptions.astro';
+import Icon from '../Icon.astro';
 import { phone, email } from '../../data/footer.json';
 ---
 <section class="page-intro fold fold-always" id="message" aria-labelledby="contact-title">
@@ -18,17 +19,17 @@ import { phone, email } from '../../data/footer.json';
       <div class="lobby-chan">
         <span class="label">Reach us directly</span>
         <div class="chan panel">
-          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/></svg></span>
+          <span class="icon-tile" aria-hidden="true"><Icon name="phone" /></span>
           <span class="chan-text"><span class="chan-title">Call</span><a class="chan-value" id="tel-val" href={phone.href}>{phone.display}</a></span>
-          <button class="iconbtn copy-btn" type="button" data-copy={phone.display} data-copy-target="tel-val" aria-label="Copy phone number"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button class="iconbtn copy-btn" type="button" data-copy={phone.display} data-copy-target="tel-val" aria-label="Copy phone number"><Icon name="copy" /></button>
         </div>
         <div class="chan panel">
-          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></span>
+          <span class="icon-tile" aria-hidden="true"><Icon name="mail" /></span>
           <span class="chan-text"><span class="chan-title">Email</span><a class="chan-value" id="mail-val" href={`mailto:${email}`}>{email}</a></span>
-          <button class="iconbtn copy-btn" type="button" data-copy={email} data-copy-target="mail-val" aria-label="Copy email address"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+          <button class="iconbtn copy-btn" type="button" data-copy={email} data-copy-target="mail-val" aria-label="Copy email address"><Icon name="copy" /></button>
         </div>
         <a class="chan panel card" href="/contact#message" data-open="book-dialog">
-          <span class="icon-tile" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span>
+          <span class="icon-tile" aria-hidden="true"><Icon name="calendar" /></span>
           <span class="chan-text"><span class="chan-title">Book a check-up</span><span class="chan-value">Free, 30 minutes</span></span>
         </a>
       </div>
