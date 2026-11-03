@@ -4,7 +4,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
-- [ ] Hero motion never stops (cloud every 3.2s, phone captions every 2.2s, pulses). WCAG 2.2.2 asks for a pause control; reduced motion alone may not satisfy an audit. Decide: a pause button, or static captions. The phone drawing's tap-to-advance (`svg` click in `home.js`) has no keyboard equal; fine while it is only a bonus.
 - [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Page structure
