@@ -10,7 +10,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Small, left as they are: `box()` is defined three times (`gen_hq.py`, `gen_tower.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] `verify_spacing.py` flags one off-scale value on `main`: `.svc-hint` on the phone home page has an 80px margin-top (`src/components/home/services.css`).
 - [ ] `tools/check.py` now exits 1 on any finding, and four drawings have some today: `hq.svg` 1 (an ANGLE), `helpdesk.svg` 2, `security.svg` 1, `office.svg` 3 (with `--step 1.758`). Look at each and fix the drawing or accept it.
-- [ ] Pause button (PR #41) was merged before its phone check: try it on a phone.
 
 ## Page structure
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.
