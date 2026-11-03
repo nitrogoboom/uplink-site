@@ -20,6 +20,8 @@
    or when Ctrl / Cmd / Alt is held.
    ========================================================================== */
 
+import { MEDIA } from '../lib/media.js';
+
 const root = document.documentElement;
 const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
@@ -266,7 +268,7 @@ $$('form[data-validate]').forEach((form) => {
 const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
-  const phone = window.matchMedia('(max-width: 699px)');   // as bottom-nav.css
+  const phone = window.matchMedia(MEDIA.phone);
   let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);

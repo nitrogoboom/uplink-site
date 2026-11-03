@@ -2,7 +2,7 @@
    tie against .page-intro's, as it always has. Each section's own desktop layout sits at the end of its CSS. ---*/
 /* desktop (>= 1100 wide and >= 700 tall): one section per screen; the root font scales with the screen (tokens.css), so these keep
    their proportions from a 1280 x 720 laptop up to a 3440 x 1440 ultrawide */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--header-h)); }
   .fold { min-height: var(--fold-h); padding-block: var(--sp-7); }
   /* height-led layouts: big pictures take the room that is left, never more */

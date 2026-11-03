@@ -3,8 +3,9 @@
 //   {script-hashes}   a 'sha256-…' for every inline <script> in the built pages (today: the one-line
 //                     classList.add('js') in every head). Change that line and the hash follows.
 //   {style-hashes}    the same for every inline <style>: Astro's inlined CSS, the drawings inlined in the home
-//                     page, and the <style> blocks in the hero drawings (home.js inserts those SVGs into the page,
-//                     so their styles count as the page's). style-src has no 'unsafe-inline'.
+//                     page, and the <style> blocks in the hero drawings and the footer's campus map (home.js and
+//                     footer.js insert those SVGs into the page, so their styles count as the page's). style-src
+//                     has no 'unsafe-inline'.
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
 //                     before the HTML. The font list is read from the home page's preloads (Base.astro).
 // It refuses to finish if a page or the hero drawing has a style="" attribute: no hash covers one, so the CSP
@@ -15,12 +16,13 @@ import { join, relative, sep } from 'node:path';
 
 const DIST = 'dist';
 // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
-// into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included) and the
-// fonts every screen preloads (Base.astro's preloads with no media).
+// into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included), the one
+// footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's preloads with
+// no media).
 const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
-const INSERTED = [...home.matchAll(/\sdata-hero[a-z-]*="\/([^"?]+)/g)].map((m) => m[1]);
+const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
 const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)].filter((m) => !/\smedia=/.test(m[0])).map((m) => m[1]);
-if (!INSERTED.length || !FIRST_FONTS.length) throw new Error('dist/index.html: no data-hero* drawings or font preloads found');
+if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !FIRST_FONTS.length) throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
 const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
 const pages = [];

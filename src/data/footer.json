@@ -178,5 +178,31 @@
     }
   ],
   "copyright": "© 2026 Uplink Technology Inc.",
-  "status": "All systems normal · Help desk open 7 am to 7 pm ET"
+  "status": "All systems normal · Help desk open 7 am to 7 pm ET",
+  "spots": {
+    "hq": {
+      "name": "Uplink HQ",
+      "sub": "one team, one number"
+    },
+    "services": {
+      "name": "Server farm",
+      "sub": "monitored around the clock"
+    },
+    "resources": {
+      "name": "Archive",
+      "sub": "guides and checklists"
+    },
+    "follow": {
+      "name": "Broadcast",
+      "sub": "news, alerts and how-tos"
+    },
+    "company": {
+      "name": "The crew",
+      "sub": "in-house, never outsourced"
+    },
+    "support": {
+      "name": "Help desk",
+      "sub": "tickets in, fixes out"
+    }
+  }
 }

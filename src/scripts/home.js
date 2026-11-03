@@ -4,6 +4,7 @@
    ========================================================================== */
 
 import { $, $$, html, reduceMotion, replay, whenOnScreen } from './core.js';
+import { MEDIA } from '../lib/media.js';
 
 // Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
 // in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
@@ -31,8 +32,8 @@ if (grow && 'IntersectionObserver' in window) {
   const LEAD = 0.3;   // level 1 starts building this much of a level before the stage pins
   const RUN = 0.5;    // screens of scroll per level
   const ZOOM = 1.25;  // most a level's camera may zoom in on the next one's
-  const liveMode = window.matchMedia('(max-width: 1099px), (min-height: 700px)');
-  const wide = window.matchMedia('(min-width: 1100px)');
+  const liveMode = window.matchMedia(`${MEDIA.belowDesktop}, (min-height: 700px)`);   // all but a short desktop screen
+  const wide = window.matchMedia(MEDIA.desktop);
   const clamp = (v) => Math.min(1, Math.max(0, v));
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
   const amt = (p, at, d) => ease(clamp((p - at) / d));
@@ -564,7 +565,7 @@ const startCaptions = (svg) => {
   };
 };
 if (stage) {
-  const phone = window.matchMedia('(max-width: 599px)');
+  const phone = window.matchMedia(MEDIA.smallPhone);   // HERO.media.phone
   const tablet = window.matchMedia(stage.dataset.tablet);
   const files = {
     full: [stage.dataset.hero],
@@ -628,7 +629,7 @@ const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const cards = Array.from(svcRow.children);
   const steps = $$('.svc-step', svcHint);
-  const row = window.matchMedia('(max-width: 699px)');   // as services.css
+  const row = window.matchMedia(MEDIA.phone);
   let current = 0;
   let aim = null;   // the card a step is sliding to, so a quick second click steps on from there
   const centre = (best) => {

@@ -31,7 +31,7 @@
 .toast--info .toast-ic { background: var(--c-sky); }
 .toast-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); padding-top: var(--sp-1); font-size: var(--fs-2); }
 .toast-text strong { font-size: var(--fs-3); }
-@media (max-width: 699px) {
+@media (--phone) {
   .toasts { left: max(var(--sp-4), env(safe-area-inset-left, 0px)); width: auto; }
 }
 

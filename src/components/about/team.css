@@ -1,7 +1,7 @@
 /*--- ABOUT · 3. Team cards. ---*/
 .team { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
-@media (min-width: 700px) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (min-width: 1100px) { .team { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); } }
+@media (--tablet-up) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (--desktop) { .team { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); } }
 .person { display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); }
 .avatar {
   display: grid; place-items: center;

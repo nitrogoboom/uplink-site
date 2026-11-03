@@ -4,17 +4,17 @@
 .svc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
 .svc-grid > li { display: flex; }
 .svc-grid .card { flex: 1; width: 100%; }
-@media (min-width: 700px) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (--tablet-up) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* a last card that would sit alone (tablet) or leave a hole (desktop) spans two columns as a wide card: the
    drawing beside the words. Seven services today: the seventh, IT strategy. */
-@media (min-width: 700px) and (max-width: 1099px) {
+@media (--tablet) {
   .svc-grid > li:last-child:nth-child(odd) { grid-column: span 2; }
   .svc-grid > li:last-child:nth-child(odd) .card { flex-direction: row; align-items: center; }
   .svc-grid > li:last-child:nth-child(odd) .card-media { flex: 0 0 calc(50% - var(--sp-4)); }
 }
 
 /* desktop: four across */
-@media (min-width: 1100px) {
+@media (--desktop) {
   .svc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); }
   .svc-grid > li:last-child:nth-child(4n+3) { grid-column: span 2; }
   .svc-grid > li:last-child:nth-child(4n+3) .card { flex-direction: row; align-items: center; }

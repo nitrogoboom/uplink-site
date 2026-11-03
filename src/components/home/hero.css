@@ -12,7 +12,7 @@
 .hero-menu .hero-services { display: none; }
 .menu-label { display: block; margin: 0 0 var(--sp-2); }
 .hero-cta .small { text-align: center; }
-@media (min-width: 700px) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
+@media (--tablet-up) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
 .hero-menu h1 .line { display: block; }
 .hero-menu h1 em { font-style: italic; color: var(--c-accent-text); }
 .hero-top .lead { text-wrap: pretty; }
@@ -63,7 +63,7 @@
 .mi:hover .mi-go, .mi:focus-visible .mi-go { opacity: 1; }
 
 .hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
-@media (min-width: 700px) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (--tablet-up) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* thumb and text start on the same top line, so the two chips stay level
    when one title wraps further than the other */
 .news { flex-direction: row; align-items: flex-start; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3); }
@@ -75,13 +75,13 @@
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
-@media (min-width: 700px) and (orientation: portrait) {
+@media (--tablet-up) and (orientation: portrait) {
   .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
 }
 
 /* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP); with reduced
    motion the 4:3 still sits in it with thin bands above and below */
-@media (max-width: 599px) {
+@media (--small-phone) {
   .hero-art .stage { aspect-ratio: 962 / 900; }
   .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 }
@@ -91,7 +91,7 @@
    above the office so it is on the first screen on every phone (under it, a 667px-tall screen put it half under
    the bottom bar). No eyebrow, and the short line. */
 .lead-short { display: none; }
-@media (max-width: 699px) {
+@media (--phone) {
   .hero.fold { padding-top: var(--sp-5); }
   .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
