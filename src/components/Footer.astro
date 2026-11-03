@@ -9,6 +9,7 @@
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
+import HoldButton from './HoldButton.astro';
 import f from '../data/footer.json';
 import { CAMPUS, getServices } from '../lib/site';
 const services = await getServices();
@@ -71,6 +72,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     </div>
     <div class="fc-map" data-fc-map={CAMPUS}>
       <div class="fc-hud" aria-hidden="true"><Icon name="spot" /><span><b>{spot('hq').name}</b><small>{spot('hq').sub}</small></span></div>
+      <HoldButton class="fc-hold" />
     </div>
   </div>
   <div class="fc-base"><div class="container">

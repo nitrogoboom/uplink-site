@@ -21,26 +21,9 @@
 .hero-art .stage { position: relative; aspect-ratio: 40 / 31; max-width: 100%; }
 .hero-art .stage svg, .hero-art .stage .hero-nojs { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero-art .stage .hero-nojs { object-fit: contain; }
-/* pause button, bottom right on the drawing (home.js shows it with script and motion; Hero.astro). The icon is
-   drawn in CSS, so the stage's svg rules can't reach it: two bars, or a play triangle while held. */
-.hero-pause {
-  position: absolute;
-  right: var(--sp-2);
-  bottom: var(--sp-2);
-  display: grid;
-  place-items: center;
-  width: var(--tap);
-  height: var(--tap);
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-pill);
-  background: var(--c-solid);
-  color: var(--c-text);
-  transition: background-color var(--dur-1) var(--ease);
-}
-.hero-pause[hidden] { display: none; }
-.hero-pause:hover { background: var(--c-surface-2); }
-.hero-pause-icon { width: calc(var(--icon) * 0.6); height: calc(var(--icon) * 0.7); border-inline: calc(var(--icon) * 0.2) solid currentColor; }
-.hero-pause[aria-pressed="true"] .hero-pause-icon { border: 0; background: currentColor; clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
+/* pause button (HoldButton.astro; its look is .hold in buttons.css), bottom right on the drawing. Its icon is
+   drawn in CSS, so the stage's svg rules can't reach it. */
+.hero-pause { position: absolute; right: var(--sp-2); bottom: var(--sp-2); }
 
 .menu { display: flex; flex-direction: column; gap: var(--sp-1); list-style: none; }
 .mi {

@@ -3,7 +3,7 @@
    Growing world and hero cloud.
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, replay, whenOnScreen } from './core.js';
+import { $, $$, held, html, reduceMotion, replay, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 
 // Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
@@ -235,26 +235,7 @@ if (grow && 'IntersectionObserver' in window) {
    cloud starts. A turn or resize that changes the cut swaps the file.
    ------------------------------------------------------------------ */
 const stage = $('.hero-art .stage[data-hero]');
-// Pause button (Hero.astro): holds every moving part on the page. html.is-held pauses the CSS animations
-// (base.css); the cloud and the phone captions stop their timers while held. The choice is kept for next time.
-const held = { on: false, ev: new EventTarget() };
-const pauseBtn = stage && $('.hero-pause', stage);
-if (pauseBtn) {
-  const set = (on) => {
-    held.on = on;
-    document.documentElement.classList.toggle('is-held', on);
-    pauseBtn.setAttribute('aria-pressed', String(on));
-    held.ev.dispatchEvent(new Event('change'));
-  };
-  const show = () => { pauseBtn.hidden = reduceMotion.matches; };   // nothing moves with reduced motion
-  try { if (window.localStorage.getItem('uplink-held') === '1') set(true); } catch { /* storage blocked: start moving */ }
-  pauseBtn.addEventListener('click', () => {
-    set(!held.on);
-    try { window.localStorage.setItem('uplink-held', held.on ? '1' : '0'); } catch { /* storage blocked: this visit only */ }
-  });
-  show();
-  reduceMotion.addEventListener('change', show);
-}
+// Pause buttons (HoldButton.astro, wired in core.js): while held, the cloud and the phone captions stop their timers.
 const APPS = [
   { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
   { id: 'files',  name: 'Files',    state: 'Synced',  detail: 'OneDrive and Drive backed up' },
