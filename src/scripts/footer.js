@@ -3,7 +3,7 @@
    Hero-select roster and campus map.
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
+import { $, $$, html, reduceMotion, replay, toast, whenOnScreen } from './core.js';
 
 /* ======================================================================
    Footer: hero-select roster + campus map (every page)
@@ -186,8 +186,8 @@ if (fc) {
   const select = (i, opts = {}) => {
     cur = (i + tabs.length) % tabs.length;
     tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === cur)); t.tabIndex = j === cur ? 0 : -1; });
-    panels.forEach((p, j) => { p.classList.toggle('is-on', j === cur); p.classList.remove('is-in'); });
-    if (!opts.instant) { void panels[cur].offsetWidth; panels[cur].classList.add('is-in'); }
+    panels.forEach((p, j) => { p.classList.toggle('is-on', j === cur); if (j !== cur || opts.instant) p.classList.remove('is-in'); });
+    if (!opts.instant) replay(panels[cur], 'is-in');   // the new panel slides in (again, if it was already showing)
     const roster = $('.fc-roster', fc), t = tabs[cur];
     const centre = () => roster.scrollTo({ left: t.offsetLeft - (roster.clientWidth - t.offsetWidth) / 2, behavior: opts.instant || reduceMotion.matches ? 'auto' : 'smooth' });
     // on page load the first tab is already in view (the roster starts at the left), so nothing to measure;

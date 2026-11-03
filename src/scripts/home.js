@@ -3,7 +3,7 @@
    Growing world and hero cloud.
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
+import { $, $$, html, reduceMotion, replay, whenOnScreen } from './core.js';
 
 // Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
 // in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
@@ -283,9 +283,11 @@ const startCloud = (cloud) => {
   // nothing is measured straight after the text changes (that would force a layout).
   // For SVG it reports only the size, so: the word's right edge (its x) minus its width.
   const dot = svg.querySelector('.ob-state-dot');
+  let dotSized = null;
   if (dot && 'ResizeObserver' in window) {
     const right = +stateText.parentNode.getAttribute('x');
-    new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1))).observe(stateText.parentNode);
+    dotSized = new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1)));
+    dotSized.observe(stateText.parentNode);
   }
   let index = -1;
   let timer = 0;
@@ -353,6 +355,7 @@ const startCloud = (cloud) => {
     reduceMotion.removeEventListener('change', start);
     held.ev.removeEventListener('change', start);
     if (seen) seen.disconnect();
+    if (dotSized) dotSized.disconnect();
   };
 };
 
@@ -376,11 +379,6 @@ const make = (tag, cls, parent) => {
   el.setAttribute('class', cls);
   parent.append(el);
   return el;
-};
-// plays a CSS animation from the start: the first time by adding its class, then by restarting it (no layout)
-const replay = (el, cls) => {
-  if (el.classList.contains(cls)) el.getAnimations().forEach((a) => { a.cancel(); a.play(); });
-  else el.classList.add(cls);
 };
 // a caption line's words; the cloud's names its app first, in a tspan
 const fill = (el, text, app) => {
@@ -468,17 +466,21 @@ const startCaptions = (svg) => {
       draw(sp, `M${x0.toFixed(1)},${top.toFixed(1)} L${it.x},${it.y}`, it.c, it.x, it.y, L.k);
     }
   };
-  let swap = 0;
+  // each caption's pending swap: its timeout, then its frame (a new step on the same caption cancels both first)
+  const swaps = { cloud: { t: 0, f: 0 }, office: { t: 0, f: 0 } };
+  const cancel = (sw) => { window.clearTimeout(sw.t); window.cancelAnimationFrame(sw.f); };
   const step = (name, animate) => {
     at[name] = (at[name] + 1) % (name === 'cloud' ? APPS.length : items.length);
-    const sp = spots[name];
-    if (!animate || reduceMotion.matches) { write[name](); return; }
+    const sp = spots[name], sw = swaps[name];
+    cancel(sw);
+    sp.g.classList.remove('is-pre');
+    if (!animate || reduceMotion.matches) { sp.g.classList.remove('is-out'); write[name](); return; }
     sp.g.classList.add('is-out');
-    swap = window.setTimeout(() => {
+    sw.t = window.setTimeout(() => {
       sp.g.classList.add('is-pre');
       sp.g.classList.remove('is-out');
       write[name]();   // drawn once below their place (is-pre), the words rise in from the frame after
-      swap = window.requestAnimationFrame(() => { swap = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
+      sw.f = window.requestAnimationFrame(() => { sw.f = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
     }, 170);
   };
   let timer = 0, turn = 0, onScreen = true, begun = false;
@@ -539,16 +541,18 @@ const startCaptions = (svg) => {
   const seen = whenOnScreen(svg, (on) => { onScreen = on; if (on) start(); else stop(); });
   // first words once the drawing has built (about 3.2s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
+  let second = 0;
   const first = window.setTimeout(() => {
     begun = true;
     step('cloud', !quick);
-    swap = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : 1100);
+    second = window.setTimeout(() => { step('office', !quick); start(); }, quick ? 0 : 1100);
   }, quick ? 0 : 3300);
   return () => {   // the cut is swapped out: let go of the timers and listeners
     stop();
     window.clearTimeout(first);
-    window.clearTimeout(swap);
-    window.cancelAnimationFrame(swap);
+    window.clearTimeout(second);
+    cancel(swaps.cloud);
+    cancel(swaps.office);
     job++;   // a measure still waiting for its paint drops its results
     svg.removeEventListener('click', tap);
     if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);

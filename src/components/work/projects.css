@@ -1,5 +1,5 @@
 /*--- WORK · 1. Projects: filters and cards. Desktop layout at the end. ---*/
-/* ---------- 17. WORK ----------------------------------------------------- */
+/* ---------- WORK ----------------------------------------------------- */
 .filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
 .filter {
   display: inline-flex; align-items: center; gap: var(--sp-3);

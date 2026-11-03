@@ -8,6 +8,7 @@ import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
 import Work from '../components/home/Work.astro';
 import Proof from '../components/home/Proof.astro';
+import { phone, email, office } from '../data/footer.json';
 
 const site = Astro.site!.href;
 const business = {
@@ -17,9 +18,9 @@ const business = {
   name: 'Uplink Technology',
   url: site,
   description: 'Managed IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.',
-  telephone: '+1-855-555-0142',
-  email: 'hello@uplinkit.ca',
-  address: { '@type': 'PostalAddress', streetAddress: '100 King St W, Suite 4200', addressLocality: 'Toronto', addressRegion: 'ON', addressCountry: 'CA' },
+  telephone: `+${phone.display}`,
+  email,
+  address: { '@type': 'PostalAddress', streetAddress: office.street, addressLocality: office.city, addressRegion: 'ON', addressCountry: 'CA' },
   openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '07:00', closes: '19:00' }],
   areaServed: 'Ontario',
   knowsLanguage: ['en', 'fr'],

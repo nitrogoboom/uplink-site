@@ -23,7 +23,7 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
 import hashlib, html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import silhouette, clip_out, seg_path, badge, key_group, key_css, number_badges, card as card_cut
+from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, card as card_cut
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -199,17 +199,11 @@ HERO_CUTS = ('hero', 'tablet', 'phone')   # the animated hero layout's three cut
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
-BADGE = dict(r=30, size=42)            # numbered dot for small screens; see isogen.badge
-KEY_WIDTH = 425                        # below this rendered width the 24px titles fall under 8.5px (isogen.KEY_PX): numbers instead
 TAIL = 40                              # level tail, px; text starts 12px past it
 
-FACES = (pal.LEFT, pal.RIGHT, pal.TOP)
-HIGH = (pal.HI_LEFT, pal.HI_RIGHT, pal.HI_TOP)
-EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.3"'
 HIGH_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
 TRAY_FACES = (pal.TRAY_LEFT, pal.TRAY_RIGHT, pal.TRAY_TOP)
 TRAY_EDGE = f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.75"'
-FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
 # what screen readers say for the drawing: plain words, as a person would describe it
 TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace',
@@ -605,7 +599,7 @@ def card(v):
         g = f'<g class="lt ob-swap ob-swap-{i}">' if v != 'office' else '<g class="lt">'
         out.append(f'{g}<circle cx="532.2" cy="{cy}" r="6.2" fill="{pal.GREEN}"/><text x="545.9" y="{ty}" font-family="{FONT}" font-size="24" '
                    f'font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{name}</text></g>')
-    out.append(badge(ex, ey, pal.SKY, **BADGE) + '</g>')   # small screens: the card hides, its number sits on the tray corner
+    out.append('</g>')
     return out
 
 
@@ -648,7 +642,7 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
             f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3"/>',
             f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
             f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}">{sub}</text>',
-            badge(dx, dy, colour, **BADGE)]
+            '']   # the blank line the retired badge left, so the drawing stays byte for byte the same
 
 
 # ---- assembly -------------------------------------------------------------------
@@ -821,10 +815,10 @@ def render(v):
         style = '<style>' + part('hero.css') + '</style>'
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body) + '\n' + key_css(KEY_WIDTH)
+        style = font_style(body) + '\n' + key_css()
     elif v == 'build':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" class="ob" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body) + '\n' + key_css(KEY_WIDTH) + '\n<style>' + part('build.css') + '</style>'
+        style = font_style(body) + '\n' + key_css() + '\n<style>' + part('build.css') + '</style>'
     else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
         style = '<style>' + part('hero.css') + '</style>'

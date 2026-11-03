@@ -9,7 +9,7 @@ import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
 import '../../components/services/pick.css';
 import '../../components/services/service-page.css';
-import { cardSize } from '../../lib/site';
+import { PAGES, cardSize } from '../../lib/site';
 
 export async function getStaticPaths() {
   const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -29,8 +29,8 @@ const ld = {
     { '@type': 'FAQPage', '@id': `${url}#questions`, url, inLanguage: 'en-CA',
       mainEntity: s.page.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
     { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
-      { '@type': 'ListItem', position: 2, name: 'Services', item: new URL('/services', Astro.site).href },
+      { '@type': 'ListItem', position: 1, name: PAGES.home.name, item: Astro.site!.href },
+      { '@type': 'ListItem', position: 2, name: PAGES.services.name, item: new URL(PAGES.services.path, Astro.site).href },
       { '@type': 'ListItem', position: 3, name: s.title, item: url } ] },
   ],
 };

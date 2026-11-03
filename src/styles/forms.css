@@ -1,5 +1,5 @@
 /*--- Forms and the toggle switch. ---*/
-/* ---------- 8. forms ----------------------------------------------------- */
+/* ---------- forms ----------------------------------------------------- */
 .field { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
 .field label { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
 .field .opt { font-weight: 400; letter-spacing: 0; text-transform: none; }

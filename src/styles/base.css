@@ -1,5 +1,5 @@
 /*--- Base: reset, page background, focus rings, the phone status-bar band. ---*/
-/* ---------- 1. base ------------------------------------------------------ */
+/* ---------- base ------------------------------------------------------ */
 *, *::before, *::after { box-sizing: border-box; }
 
 html {

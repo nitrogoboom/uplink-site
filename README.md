@@ -25,7 +25,7 @@ For the drawing and check tools (optional): `pip install -r requirements.txt` an
 - `src/` – the site. `src/README.md` maps it: pages, section components, content, styles, scripts.
 - `public/` – files served as they are: `_headers` (the response-header template), fonts, the drawings in `assets/img/`, `og.png`, the favicon.
 - `tools/` – the drawing generators and their checks (Python + Playwright). Run them from the project root.
-- `scripts/headers.mjs` – finishes `dist/_headers` after a build (script hashes, Early Hints).
+- `scripts/` – the build's after-steps: `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), `markdown.mjs` writes each page's Markdown copy, `headers.mjs` finishes `dist/_headers` (script and style hashes, Early Hints).
 - `wrangler.jsonc` – the Cloudflare Worker config. `.github/workflows/site.yml` – CI.
 - `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec; see its README.
 - `layout-reference.md` – layout patterns from Overwatch 2 menus, applied on 28 Oct 2026.
@@ -77,7 +77,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `svgfont.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically. Needs `pip install fonttools brotli`.
 - `check.py file.svg` – edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on. Two opt-in exceptions: `<g class="curve">` holds a curved surface cut into flat strips (the hero cloud's side wall), whose strips are not checked against each other; `--step PX` counts, rather than lists, vertex pairs exactly one grid step apart along an iso axis, for drawings whose props sit on a grid finer than 2px on screen (office: `--step 1.758`, 0.0625 × 28.127)
 - `painter.py` – finds boxes drawn in the wrong order or poking into each other. Each drawing has a `rules_<name>.py`; its first lines give the exact command
-- `gen_og.py public` – the share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Screenshots of a small page made from the site's tokens, fonts and `office-compact.svg`; rerun after changing those.
+- `gen_og.py public` – the share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Screenshots of a small page made from the site's tokens, fonts and `office-card.svg`; rerun after changing those.
 - `verify_footer.py out/` – against `npm run serve`: the hero builds, tiles respond to hover, the tower grows on scroll, every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), every sitemap page plus soon and the 404 at phone, tablet, 1440×900 and 3440×1440 with no sideways scroll, and an axe pass. It fails on any script error (console error, crash, CSP or Trusted Types block), a hero or tower that doesn't respond, sideways scroll, or a serious axe finding. CI runs it before deploy.
 - `pagespeed.py <address>` – Google's PageSpeed Insights on the live site's sitemap pages (see Hosting).
 

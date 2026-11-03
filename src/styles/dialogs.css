@@ -1,5 +1,5 @@
 /*--- Pop-ups (native <dialog>). ---*/
-/* ---------- 9. dialogs (native <dialog>) -------------------------------- */
+/* ---------- dialogs (native <dialog>) -------------------------------- */
 .dialog {
   overscroll-behavior: contain;   /* scrolling past the dialog's end doesn't scroll the page behind (iOS) */
   width: min(100% - 2 * var(--sp-4), 37.5rem);

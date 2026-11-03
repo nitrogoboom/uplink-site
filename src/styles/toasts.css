@@ -1,5 +1,5 @@
 /*--- Toasts (small messages, bottom of the screen). ---*/
-/* ---------- 10. toasts --------------------------------------------------- */
+/* ---------- toasts --------------------------------------------------- */
 .toasts {
   position: fixed;
   z-index: var(--z-toast);

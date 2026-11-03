@@ -286,6 +286,14 @@ if (botnav) {
   botnav.addEventListener('focusin', () => show(true));
 }
 
+/* ---------- replay ----------------------------------------------------- */
+// Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
+// read, so it costs no forced layout (offsetWidth would).
+const replay = (el, cls) => {
+  if (el.classList.contains(cls)) el.getAnimations().forEach((a) => { a.cancel(); a.play(); });
+  else el.classList.add(cls);
+};
+
 /* ---------- off-screen pause ------------------------------------------ */
 // Marks el with .is-idle while none of it is on screen (site.css pauses
 // its looping animations) and tells onChange(onScreen) about each change.
@@ -320,4 +328,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, html, reduceMotion, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, html, reduceMotion, replay, toast, openDialog, shortcutsOn, whenOnScreen };

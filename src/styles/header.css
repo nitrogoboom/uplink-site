@@ -1,5 +1,5 @@
 /*--- Header (src/components/Header.html). ---*/
-/* ---------- 4. header ---------------------------------------------------- */
+/* ---------- header ---------------------------------------------------- */
 .site-header {
   position: sticky;
   top: env(safe-area-inset-top, 0px);

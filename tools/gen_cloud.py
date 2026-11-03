@@ -9,7 +9,7 @@ import sys
 from shapely.geometry import LineString, Polygon, box as box_shape
 from shapely.ops import unary_union
 from iso import W, C30, fmt
-from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, badge, key_group
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, key_group, label_text_gaps
 from isoprops import on_front, on_top, rect, screen_glass, app_window
 import palette as pal
 
@@ -75,20 +75,10 @@ def slab_box():
     return (x0, x0 + W_, y0, y0 + D_, PLAT_Z, PLAT_Z + SLAB_H)
 
 
-def compact_gaps(L, k):
-    """Floor lines stop around a compact label's (bigger, wrapped) text and its tail."""
-    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
-    lines = L['sub'].count('\n') + 1
-    t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
-    s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
-    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
-            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
-
-
 def mask(compact=False):
     if compact:
         k = COMPACT['scale']
-        texts = [g for L in COMPACT['labels'] for g in compact_gaps(L, k)]
+        texts = [g for L in COMPACT['labels'] for g in label_text_gaps(L, k)]
         texts += [LineString([w.p(*L['dot']), L['elbow']]).buffer(4) for L in COMPACT['labels']]   # and clear of each leader
     else:
         texts = list(LABEL_GAPS)
@@ -215,13 +205,13 @@ def card(plat):
         y = CARD['top'] + 37 + n * 19.6
         out.append(f'<g class="lt"><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="{pal.GREEN}"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
                    f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{row}</text></g>')
-    out.append(badge(cx, by, BLUE) + '</g>')            # small: the card hides, its number sits where the riser meets the slab
+    out.append('</g>')
     return out
 
 
 def build(compact=False):
     m = mask(compact)
-    disc_gaps = unary_union([g for L in COMPACT['labels'] for g in compact_gaps(L, COMPACT['scale'])] if compact else LABEL_GAPS)
+    disc_gaps = unary_union([g for L in COMPACT['labels'] for g in label_text_gaps(L, COMPACT['scale'])] if compact else LABEL_GAPS)
     body = [floor_grid(w, (0, 0), DISC_R, m, phase=(0, 0.5)) + disc_arcs(w, DISC_R, mask=disc_gaps)]
     body += server() + laptop() + phone()
     body += sync()                                      # drawn before the slab, so each line disappears into it

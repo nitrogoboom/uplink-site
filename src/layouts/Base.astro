@@ -19,6 +19,7 @@ import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import ShortcutsDialog from '../components/ShortcutsDialog.astro';
+import { PAGES } from '../lib/site';
 
 export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'soon' | 'notfound';
 interface Props {
@@ -44,7 +45,7 @@ const jsonld = type && canonical && {
     { '@type': type, '@id': canonical, url: canonical, name, description, inLanguage: 'en-CA', publisher: business,
       ...(type === 'AboutPage' ? { about: business } : {}), ...ldPage },
     { '@type': 'BreadcrumbList', itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: Astro.site!.href },
+      { '@type': 'ListItem', position: 1, name: PAGES.home.name, item: Astro.site!.href },
       { '@type': 'ListItem', position: 2, name, item: canonical } ] },
     ...ldGraph,
   ],
