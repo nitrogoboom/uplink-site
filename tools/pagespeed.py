@@ -99,7 +99,9 @@ def test(base, path, strategy, key, bar):
         s = scores(report)
         if best is None or min(s.values()) > min(best.values()):   # one run's scores together, never mixed across runs
             best = s
-            (OUT / f'{name}-{strategy}.json').write_text(json.dumps(report), encoding='utf-8')
+            file = OUT / f'{name}-{strategy}.json'   # services/help-desk-mobile.json: the page's folder may not exist yet
+            file.parent.mkdir(parents=True, exist_ok=True)
+            file.write_text(json.dumps(report), encoding='utf-8')
         if min(best.values()) >= bar:
             break
     return name, strategy, best, n
