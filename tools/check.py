@@ -1,7 +1,8 @@
 """Generic geometry checks.
 usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
 Reports:
-  (exits 1 on any finding; DOT lines only list where each leader dot sits)
+  (exits 1 on any finding; DOT lines only list where each leader dot sits; the floor grid, class="floor", is skipped:
+   it is clipped round the objects, so its ends sit a hair from their edges by design)
   ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
   SNAP   vertices of different shapes that almost (not exactly) coincide
   TJOIN  vertices that almost (not exactly) touch another shape's edge
@@ -51,6 +52,10 @@ def one_step(p, q, step):
             return True
     return False
 
+def is_floor(sh):
+    # class="floor": the floor grid, clipped where objects stand, so its ends stop a hair from their edges on purpose
+    return 'floor' in (sh.a.get('class') or '').split()
+
 def is_free(sh):
     # class="mark" (arrowheads, 2D markers) or class="free" (parts tilted on purpose, like a laptop lid)
     return bool({'mark', 'free'} & set((sh.a.get('class') or '').split()))
@@ -62,7 +67,7 @@ def main():
     text = get_text(argv)
     off = int(argv[2]) - 1 if len(argv) > 3 else 0
     _, shapes = load(text)
-    geo = [s for s in shapes if s.subs and not is_ui(s)]
+    geo = [s for s in shapes if s.subs and not is_ui(s) and not is_floor(s)]
     out = []
     # ANGLE
     for s in geo:

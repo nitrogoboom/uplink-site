@@ -294,7 +294,7 @@ def floor(v, zone=ZONE):
     if v in ('office', 'compact'):   # static: floor lines stop where something stands on them (animated versions keep them: things drop in)
         mask = unary_union([silhouette(w, *b) for b in solids()] + (compact_gaps() if v == 'compact' else []))
         segs = [s for p, q in segs for s in clip_out(p, q, mask)]
-    out.append(seg_path(segs, f'fill="none" stroke="{pal.GRID}" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))
+    out.append(seg_path(segs, f'class="floor" fill="none" stroke="{pal.GRID}" stroke-width="0.8" stroke-opacity="0.55" {ROUND}'))   # class: check.py
     if zone:
         out.append(line(zone, f'stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.4" {ROUND} stroke-dasharray="6 4"'))
     return out

@@ -23,11 +23,11 @@ How a visitor moves: line by line (arrow keys or swipe), or jumping by landmark,
 8. "We run the technology behind your business: help desk, security, cloud, network and phones. You run the business."
 9. Link, has pop-up dialog: "Get started".
 10. "Free check-up. No contract to look."
-11. Navigation "Main menu", list of 4 links:
-    - "Services. Help desk, security, cloud, networks, phones"
-    - "Our work. Setups we built and still run"
-    - "About. The people behind the screen"
-    - "Contact. Talk to a real person"
+11. "Services", list of 4 links (a plain list since 3 Nov 2026, not a second navigation):
+    - "Managed help desk. Real people who pick up and fix it, by phone, email or chat."
+    - "Cybersecurity. Devices, email and accounts watched around the clock."
+    - "Backup & recovery. Offsite copies, tested every quarter so a restore works."
+    - "All services. Help desk, security, cloud, networks, phones"
 12. Image: "Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace". The moving captions inside it are never read out.
 13. Link, has pop-up dialog: "IT and security check-up. Free. 30 minutes. We look first, then quote."
 14. Link: "Windows 10 support has ended. Guide. Your upgrade plan, step by step".
@@ -86,7 +86,7 @@ How a visitor moves: line by line (arrow keys or swipe), or jumping by landmark,
 ## Phone: what changes
 
 - **Header:** the logo link has the same name; the top tabs are gone (the bottom bar takes their place). The two header buttons keep their full names.
-- **Hero:** no "Managed IT, Ontario" line and no "Main menu". The short line is read instead: "We run your IT: help desk, security, cloud, network and phones." The picture is described the same way.
+- **Hero:** no "Managed IT, Ontario" line and no "Services" list. The short line is read instead: "We run your IT: help desk, security, cloud, network and phones." The picture is described the same way.
 - **Services and Our work:** the same links, read the same way. The "Swipe" hint and dots are not read.
 - **We grow with you:** the same as desktop. The "Level 1, 1 to 10 people" lines and the checklists are hidden on screen on phones, but screen readers now get them.
 - **Footer:** no "Previous" and "Next footer section" buttons; the tabs still work.
@@ -103,5 +103,4 @@ How a visitor moves: line by line (arrow keys or swipe), or jumping by landmark,
 
 ## Still open
 
-- **The hero "Main menu" repeats the header tabs** on tall desktops. Kept for its look for now (`notes.md`).
 - **The other pages** get the same pass later (`notes.md`).

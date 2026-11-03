@@ -16,6 +16,8 @@ SKIP = {
     '.sr-only': 'the 1px clip',
     '.fc-cl--two svg': 'optical nudge onto the first text line (footer.css)',
     'select.input': 'room for the arrow: --sp-4 + --icon + --sp-2 (forms.css)',
+    '.mi-go': 'margin-left: auto pushes the arrow to the end of its row (home/hero.css)',
+    '.svc-hint': 'pulled up under the swiping cards by their bottom padding: -(--sp-4 + --sp-8) (home/services.css)',
 }
 PROPS = ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap']
 # values above the biggest step are layout (auto margins, a scroll track sized in svh), not spacing

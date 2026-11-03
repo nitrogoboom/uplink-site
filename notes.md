@@ -4,20 +4,15 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
-- [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Code (whole-project review 2 Nov 2026)
 - [ ] Small, left as they are: `box()` is defined three times (`gen_hq.py`, `gen_tower.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
-- [ ] `verify_spacing.py` flags one off-scale value on `main`: `.svc-hint` on the phone home page has an 80px margin-top (`src/components/home/services.css`).
-- [ ] `tools/check.py` now exits 1 on any finding, and four drawings have some today: `hq.svg` 1 (an ANGLE), `helpdesk.svg` 2, `security.svg` 1, `office.svg` 3 (with `--step 1.758`). Look at each and fix the drawing or accept it.
 
 ## Page structure
-- [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
 - [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
-- [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page; the hours card's "1 day, reply within" needs a label that says it is for new messages (About's 12 min is the client help desk).
+- [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page.
 - [ ] Desktop gaps, About next. Rule agreed 2 Nov 2026 (Home done): on desktop a section is one screen (`.fold`) when it has enough to fill it, and a short band (a heading and a button) keeps its own height; below desktop a section takes its own height, except `.fold-always` (the hero, and today every other page's full-screen sections, kept as they were). About: decide "How we work" and Team, then drop `fold-always` where phones don't need a full screen. Classes in `src/styles/layout.css`, desktop rules in `fold.css`.
-- [ ] Ideas, not decided: drawn avatars for the team cards instead of initials; a spot for client quotes somewhere on Home or Work.
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
@@ -25,7 +20,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Grow world on desktop: at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
 
 ## Look and feel
-- [ ] Desktop zoom barely enlarges text: the root font follows the window (`tokens.css`, `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`), so at 110-125% zoom the text grows about 9%. 150% and up behaves normally, so WCAG 1.4.4 passes. A floor of `1rem` would fix zoom but makes text up to 14% bigger at 100% on laptops under 1440 x 900, which can push one-screen sections past the screen. Decide, then check with `verify_styles.py`.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Screen readers (Home done 2 Nov 2026, `screen-reader-home.md`)
@@ -42,6 +36,7 @@ Forms and content:
 - [ ] Service and project copy (how it works, questions, case studies) is sample text, and stays sample (decided 2 Nov 2026) until there is a real client. Then rewrite with real details (each entry's `page` field in `src/content/`).
 - [ ] Copy to confirm: VoIP wording ("Phones & Teams calling" section, card and footer); backup drawing subline "a separate, locked site" (`gen_backup.py`); network label VOIP PHONES "calls over your network" (`gen_network.py`); hero phone line `lead-short` in `Hero.astro`; the six grow tags (`tags` in `Grow.astro`); the "Windows 10 support has ended" hero card (slot for the first real article).
 - [ ] About 24 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
+- [ ] Once there is real content: drawn avatars for the team cards instead of initials; a spot for client quotes on Home or Work.
 - [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. "All systems normal" in the footer (`footer.json` `status`) is hard-coded: link it to a real status page or drop the claim.
 
 Domain and hosting:
@@ -53,4 +48,4 @@ Domain and hosting:
 - [ ] CSP reporting: `Reporting-Endpoints` + `report-to` so blocked scripts on real visitors get seen.
 - [ ] Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host. Add the real domain (and `uplink-site.johnoreilly.workers.dev` until then) to that site in Cloudflare, or make a new site and swap the token.
 - [ ] Search Console: verify the domain, submit the sitemap.
-- [ ] `work/[slug]` JSON-LD type: `Article` today; `CreativeWork` or `WebPage` may fit a case study better. `FAQPage` markup stays but gives no rich result.
+- [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).

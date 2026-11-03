@@ -51,7 +51,7 @@ def floor_grid(w, centre, r, mask, step=1, phase=(0, 0), min_seg=0):
             a, b = ((c, cy - s), (c, cy + s)) if axis == 0 else ((cx - s, c), (cx + s, c))
             segs += clip_out(w.p(*a), w.p(*b), mask)
     segs = [(a, b) for a, b in segs if math.dist(a, b) >= min_seg]
-    return seg_path(segs, f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')
+    return seg_path(segs, f'class="floor" fill="none" stroke="{FLOOR_LINE}" stroke-width="1" stroke-opacity="0.8"')   # class: check.py
 
 
 def disc_arcs(w, r, x=0, y=0, z=0, mask=None, attrs=f'fill="none" stroke="{FLOOR_LINE}" stroke-width="1.2"'):
