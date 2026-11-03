@@ -5,10 +5,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Forced reflow at load: `measure()` in `home.js` runs at module eval, writes `is-live` and `--grow-cap`, then reads `offsetHeight` and `getComputedStyle` (again on `fonts.ready`). Likely the PageSpeed "Forced reflow: [unattributed] 36 ms" on mobile Home. Fix: run it in a rAF, reads before writes.
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
-- [ ] Grow section length: 3.7 screens for three short cards. Decide a shorter run (`RUN` in `home.js` and the `3.7` in `grow.css` must match).
 - [ ] Hero motion never stops (cloud every 3.2s, phone captions every 2.2s, pulses). WCAG 2.2.2 asks for a pause control; reduced motion alone may not satisfy an audit. Decide: a pause button, or static captions. The phone drawing's tap-to-advance (`svg` click in `home.js`) has no keyboard equal; fine while it is only a bonus.
-- [ ] Hero "Main menu" repeats the header tabs. Later: give it its own links (book a check-up, get help now, two key services), remove it, or at least drop its `<nav>` landmark so screen readers list one main menu.
-- [ ] Headline "always online" vs the 7 am to 7 pm help desk in the footer: say what is always on (monitoring), or change the line.
+- [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Page structure
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop. Decide: a check-up card in the eighth slot, or a different column count.
@@ -20,7 +18,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
-- [ ] Grow world: tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `ZOOM` and the phase points); `RUN` must match the `3.7` in `grow.css`.
+- [ ] Grow world: tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `ZOOM` and the phase points); `RUN` must match the `2.5` in `grow.css` (1 + 3 x RUN; shortened from 3.7 on 2 Nov 2026).
 - [ ] Grow world on desktop: at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
 
 ## Look and feel
