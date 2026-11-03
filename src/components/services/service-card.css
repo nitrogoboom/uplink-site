@@ -18,7 +18,7 @@ html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
 .feat-d { display: block; font-size: var(--fs-2); color: var(--c-muted); }
 
 /* desktop (>= 1100 wide and >= 700 tall): the drawing takes the height it is given */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   .picker-prev { min-height: 0; height: 100%; }
   .picker-art { aspect-ratio: auto; flex: 1; min-height: 0; }
 }

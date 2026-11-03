@@ -27,7 +27,7 @@
 .dlg-body { display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-5) var(--sp-6); }
 .dlg-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-3); padding: 0 var(--sp-6) var(--sp-6); }
 
-@media (max-width: 699px) {
+@media (--phone) {
   .dialog {
     width: 100%;
     max-width: 100%;

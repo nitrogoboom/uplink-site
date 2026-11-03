@@ -220,7 +220,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 @keyframes fc-ping { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.5); opacity: 0; } }
 
 /* desktop: stage beside the map, the footer is exactly one screen */
-@media (min-width: 1100px) {
+@media (--desktop) {
   .fc-dock { order: 1; }   /* first in the markup (Footer.astro), under the panels on screen */
   .fc-base { order: 2; }
   .fc-stage { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--sp-8); align-items: stretch; }
@@ -228,14 +228,14 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
 }
 /* tablet + phone: roster on top, then the map, then the text */
-@media (max-width: 1099px) {
+@media (--below-desktop) {
   .fc-dock { border-top: 0; border-bottom: 1px solid var(--c-line); }
   .fc-dock .container { justify-content: flex-start; padding-inline: 0; }
   .fc-roster { padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
   .fc-rk { display: none; }
   .fc-map { order: -1; }
 }
-@media (max-width: 699px) {
+@media (--phone) {
   .fc-rows--two, .fc-facts { grid-template-columns: minmax(0, 1fr); }
   .fc-tile { width: calc(var(--sp-9) + var(--sp-4)); height: calc(var(--sp-8) + var(--sp-5)); }
   .fc-map { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 4 / 3; }
@@ -243,7 +243,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-base-end { margin-left: 0; }
 }
 
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   .js .fc { height: var(--fold-h); min-height: 40rem; }
   .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .js .fc-panels { padding-top: var(--sp-2); }

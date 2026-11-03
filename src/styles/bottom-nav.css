@@ -1,7 +1,7 @@
 /*--- Bottom tab bar on phones (src/components/BottomNav.html). ---*/
 /* ---------- bottom nav (phone) -------------------------------------- */
 .botnav { display: none; }
-@media (max-width: 699px) {
+@media (--phone) {
   .tabs, .hdr-actions .hbtn-text { display: none; }
   .site-header .container { justify-content: space-between; gap: var(--sp-3); }
   .brand-sub { display: none; }
@@ -41,7 +41,7 @@
 }
 /* portrait tablets: icon-only header buttons (each link carries its name in aria-label, Header.astro); words back from 900px */
 @media (min-width: 700px) and (max-width: 899px) { .hdr-actions .hbtn-text { display: none; } }
-@media (min-width: 700px) and (max-width: 1099px) {
+@media (--tablet) {
   .brand-sub { display: none; }
   .site-header .container { gap: var(--sp-3); }
   .tab { padding-inline: var(--sp-3); }

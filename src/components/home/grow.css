@@ -14,7 +14,7 @@
 }
 .grow-art svg { width: 100%; max-width: 32.5rem; height: auto; }
 .grow-hud, .grow-tags { display: none; }
-@media (min-width: 1100px) {
+@media (--desktop) {
   .grow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sp-7); }
   .grow-side .section-head { grid-column: 1 / -1; }
   .grow-art { grid-column: 1; grid-row: 2; position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-4)); }
@@ -40,7 +40,7 @@
    address bar can't make it jump). Top to bottom: HUD, picture, step. The step box has a fixed height (home.js sets
    --grow-cap to the tallest step), so only the picture flexes and nothing moves when the text swaps. The picture
    and the step are two sticky blocks in the same tall grid cell, pinned one above the other. */
-@media (max-width: 1099px) {
+@media (--below-desktop) {
   .grow.is-live {
     --grow-stage: var(--fold-h);
     --grow-cap: 9rem;
@@ -77,7 +77,7 @@
   .grow.is-live .grow-card ul { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
 /* phone: the bottom nav floats, so the stage stops a step above it */
-@media (max-width: 699px) {
+@media (--phone) {
   .grow.is-live { --grow-stage: calc(var(--fold-h) - var(--sp-5)); }
 }
 .grow-count { justify-self: end; font-size: var(--fs-2); color: var(--c-muted); font-variant-numeric: tabular-nums; }
@@ -112,7 +112,7 @@
 .grow-card ul { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); padding-left: var(--sp-5); color: var(--c-muted); }
 
 /* desktop (>= 1100 wide and >= 700 tall): picture pinned on the left, each step is one screen */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   .grow-section { padding-block: 0; }
   .grow { column-gap: var(--sp-8); align-items: start; }
   .grow-side {
@@ -135,7 +135,7 @@
 }
 /* desktop, live: the stage is the whole section. Left: heading, HUD and picture; right: the active step, centred.
    Both pin for 1.5 more screens, the same timing as phone. */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   .grow.is-live { grid-template-rows: calc(var(--fold-h) * 2.5); }
   .grow.is-live .grow-art { display: grid; }
   .grow.is-live .grow-art svg { position: static; }

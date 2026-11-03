@@ -15,6 +15,7 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { getCollection } from 'astro:content';
+import { MEDIA } from './media.js';
 
 // Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
 // page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file instead
@@ -30,7 +31,7 @@ export const HERO = {
   phone: fresh('/assets/img/office-compact-build.svg'),
   phoneFlows: fresh('/assets/img/office-compact-flows.svg'),
   media: {
-    phone: '(max-width: 599px)',
+    phone: MEDIA.smallPhone,
     tablet: '(min-width: 600px) and (max-width: 1299px) and (max-height: 1099px)',
     full: '(min-width: 1300px), (min-width: 600px) and (min-height: 1100px)',
   },

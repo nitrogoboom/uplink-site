@@ -3,7 +3,7 @@
 .panel { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-3); }
 .well { background: var(--c-well); border-radius: var(--r-2); }
 .pad { padding: var(--sp-5); }
-@media (min-width: 700px) { .pad { padding: var(--sp-6); } }
+@media (--tablet-up) { .pad { padding: var(--sp-6); } }
 
 .card {
   display: flex;
@@ -26,7 +26,7 @@
 .card-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); text-transform: uppercase; line-height: var(--lh-title); }
 .card .link-arrow { margin-top: auto; }
 .card.pad { padding: var(--sp-5); }
-@media (min-width: 700px) { .card.pad { padding: var(--sp-6); } }
+@media (--tablet-up) { .card.pad { padding: var(--sp-6); } }
 
 .meter { display: flex; gap: var(--sp-1); }
 .meter > i { flex: 1; height: var(--bar); border-radius: var(--r-pill); background: var(--c-surface-2); }

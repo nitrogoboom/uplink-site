@@ -57,7 +57,7 @@ select.input:hover { border-color: var(--c-text); }
 .field-error { display: none; font-size: var(--fs-2); color: var(--c-alert); }
 .input[aria-invalid="true"] ~ .field-error { display: block; }
 .form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
-@media (min-width: 700px) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .form-grid .span-2 { grid-column: 1 / -1; } }
+@media (--tablet-up) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .form-grid .span-2 { grid-column: 1 / -1; } }
 
 /* toggle switch */
 .switch { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); min-height: var(--tap); }

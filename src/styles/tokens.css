@@ -184,14 +184,14 @@
   --z-toast: 60;
 }
 
-/* breakpoints: phone < 700, tablet 700-1099, desktop >= 1100 */
-@media (max-width: 699px) {
+/* breakpoints: phone < 700, tablet 700-1099, desktop >= 1100 (named in src/lib/media.js) */
+@media (--phone) {
   :root { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
 }
-@media (min-width: 700px) {
+@media (--tablet-up) {
   :root { --gutter: 1.5rem; }
 }
-@media (min-width: 1100px) {
+@media (--desktop) {
   :root { --gutter: 3rem; --section-y: var(--sp-9); }
 }
 
@@ -199,7 +199,7 @@
    Reference screen is 1440 x 900 at a 16px root. A bigger screen scales
    everything up by whichever is smaller, width or height, so a section
    always fits one screen. 3440 x 1440 ends up at about 25.6px. */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   html { font-size: clamp(14px, min(1.1111vw, 1.7778vh), 40px); }
   :root {
     --container: calc(94rem + 2 * var(--gutter));  /* one centred block: the full width at 16:9, side margin on wider screens.

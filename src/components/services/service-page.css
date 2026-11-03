@@ -21,7 +21,7 @@
 .svc-page .feat-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
 .svc-page .feat { align-items: flex-start; padding: var(--sp-4); background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-3); }
 .svc-page .feat-t { font-size: var(--fs-4); }
-@media (min-width: 700px) {
+@media (--tablet-up) {
   .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 900px) {
@@ -36,7 +36,7 @@
 }
 
 /* desktop (>= 1100 wide and >= 700 tall): the drawing never taller than most of the screen */
-@media (min-width: 1100px) and (min-height: 700px) {
+@media (--fold) {
   .svc-page .picker-art { max-height: calc(var(--fold-h) * 0.68); }
   .svc-page-grid { column-gap: var(--sp-8); }
 }
