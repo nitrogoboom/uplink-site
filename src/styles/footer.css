@@ -110,7 +110,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   display: flex; align-items: center; gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
   border: 1px solid var(--c-line-2); border-radius: var(--r-2);
-  background: var(--c-glass-2);   /* 92% solid: a blur behind it would hardly show, and the map under it moves */
+  background: var(--c-glass-2);   /* solid, like the phone bar */
   box-shadow: var(--shadow-1);
 }
 .fc-hud:empty { display: none; }

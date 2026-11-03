@@ -4,7 +4,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: calc(var(--header-h) + var(--sp-5));
+  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-5));   /* the header sits below the notch */
 }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
