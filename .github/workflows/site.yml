@@ -40,7 +40,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - run: pip install "$(grep -i "^playwright==" requirements.txt)" && python -m playwright install --with-deps chromium
       - name: Check the built site in a browser
         run: |
           npx wrangler dev --port 8787 > wrangler.log 2>&1 &
@@ -68,6 +68,7 @@ jobs:
     if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     environment: cloudflare
+    concurrency: deploy # two quick pushes deploy one after the other, in order
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5

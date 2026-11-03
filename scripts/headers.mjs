@@ -6,7 +6,7 @@
 //                     page, and the <style> blocks in the hero drawings (home.js inserts those SVGs into the page,
 //                     so their styles count as the page's). style-src has no 'unsafe-inline'.
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
-//                     before the HTML. The font list is FIRST_FONTS below and must match Base.astro's preloads.
+//                     before the HTML. The font list is read from the home page's preloads (Base.astro).
 // It refuses to finish if a page or the hero drawing has a style="" attribute: no hash covers one, so the CSP
 // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
 import { createHash } from 'node:crypto';
@@ -14,10 +14,14 @@ import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
 const DIST = 'dist';
-// drawings a script puts into the page (home.js: the hero's three cuts, HERO in src/lib/site.ts, and the phone cut's dashes)
-const INSERTED = ['assets/img/hero-office.svg', 'assets/img/hero-office-tablet.svg', 'assets/img/office-compact-build.svg', 'assets/img/office-compact-flows.svg'];
-const FIRST_FONTS = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-400', 'barlow-600'];
-const HINT = FIRST_FONTS.map((f) => `</assets/fonts/${f}.woff2>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
+// Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
+// into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included) and the
+// fonts every screen preloads (Base.astro's preloads with no media).
+const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
+const INSERTED = [...home.matchAll(/\sdata-hero[a-z-]*="\/([^"?]+)/g)].map((m) => m[1]);
+const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)].filter((m) => !/\smedia=/.test(m[0])).map((m) => m[1]);
+if (!INSERTED.length || !FIRST_FONTS.length) throw new Error('dist/index.html: no data-hero* drawings or font preloads found');
+const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
 const pages = [];
 const walk = (dir) => {
@@ -33,7 +37,6 @@ const sha = (text) => "'sha256-" + createHash('sha256').update(text).digest('bas
 const hashes = new Set();
 const styles = new Set();
 const attrs = [];
-const noindex = [];
 const styleBlocks = (file, text) => {
   for (const m of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) styles.add(sha(m[1]));
   const n = [...text.matchAll(/<[a-zA-Z][^>]*\sstyle=["']/g)].length;   // inside a tag, not prose about one
@@ -41,9 +44,12 @@ const styleBlocks = (file, text) => {
 };
 for (const file of pages) {
   const html = readFileSync(file, 'utf-8');
-  for (const m of html.matchAll(/<script(?![^>]*\b(?:src|type)=)[^>]*>([\s\S]*?)<\/script>/g)) hashes.add(sha(m[1]));
+  // every inline script the browser runs: no src, and no type or a script type (JSON-LD and the like run nothing)
+  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+    const type = m[1].match(/\stype=["']?([^"'\s>]+)/)?.[1];
+    if (!/\ssrc=/.test(m[1]) && (!type || /^(module|text\/javascript)$/i.test(type))) hashes.add(sha(m[2]));
+  }
   styleBlocks(file, html);
-  if (/<meta name="robots" content="[^"]*noindex/.test(html)) noindex.push(file);
 }
 for (const f of INSERTED) styleBlocks(join(DIST, f), readFileSync(join(DIST, f), 'utf-8'));
 if (attrs.length) throw new Error(`style="" attributes the CSP would block: ${attrs.join(', ')}`);

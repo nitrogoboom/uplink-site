@@ -10,6 +10,7 @@ from playwright.async_api import async_playwright
 
 SIZES = [('phone', 390, 844), ('tablet', 820, 1180), ('1440', 1440, 900), ('3440', 3440, 1440)]
 SCALE = [0] + [float(v) * 16 for v in re.findall(r'--sp-\d:\s*([\d.]+)rem', open('src/styles/tokens.css').read())]
+if len(SCALE) < 2: sys.exit('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern')
 # selector -> why it may sit off the scale. Keep this short; fix the CSS instead where you can.
 SKIP = {
     '.sr-only': 'the 1px clip',
@@ -43,7 +44,9 @@ async def main():
     pages = args
     if not pages:
         sm = urllib.request.urlopen(base + '/sitemap.xml').read().decode()
-        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)] + ['/soon', '/no-such-page']
+        pages = [re.sub(r'^https?://[^/]+', '', u) or '/' for u in re.findall(r'<loc>([^<]+)</loc>', sm)]
+        if len(pages) < 5: sys.exit(f'sitemap.xml lists {len(pages)} page(s): expected at least the five static pages')
+        pages += ['/soon', '/no-such-page']
     found = {}   # element -> {property: values}, and the pages and sizes it shows on
     gate = asyncio.Semaphore(6)
     async with async_playwright() as p:

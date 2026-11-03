@@ -8,7 +8,7 @@ from shapely.geometry import Polygon
 from shapely.ops import unary_union
 
 def boxes(path, w, text=None):
-    text = text or open(path).read()
+    text = text or open(path, encoding='utf-8').read()
     _, shapes = load(text)
     polys = [s for s in shapes if s.tag == 'polygon' and len(s.subs[0]) == 4]
     out = []; i = 0

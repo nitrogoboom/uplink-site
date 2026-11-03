@@ -1,7 +1,7 @@
-lxml
-shapely
-numpy
-pillow
-playwright
-fonttools
-brotli
+lxml==6.1.1
+shapely==2.2.0
+numpy==2.5.1
+pillow==12.3.0
+playwright==1.58.0
+fonttools==4.67.0
+brotli==1.2.0
