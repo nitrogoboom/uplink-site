@@ -1,7 +1,7 @@
 /*--- HOME · 1. Hero, every screen size. Phone and portrait tablet first, then
    the two-column layouts at the end of this file. The .hero section itself (colour, glow, padding) is
-   src/styles/hero.css, shared with the Services picker and the service pages. ---*/
-/* ---------- 15. HOME ----------------------------------------------------- */
+   src/styles/hero.css, shared with the service pages and the case-study pages. ---*/
+/* ---------- HOME ----------------------------------------------------- */
 /* phone + portrait tablet: one column. */
 .hero-grid { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
 .hero-menu { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }

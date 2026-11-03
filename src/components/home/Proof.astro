@@ -1,6 +1,7 @@
 ---
 // HOME · 5. The "free check-up" call-to-action band. (The stats moved to About on 2 Nov 2026.)
 // Styles: shared (.cta-band in src/styles/shared-blocks.css).
+import { phone } from '../../data/footer.json';
 ---
 <section class="section" id="proof" aria-labelledby="start-title">
   <div class="container">
@@ -11,7 +12,7 @@
       </div>
       <div class="row">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
-        <a class="btn btn--secondary btn--lg" href="tel:+18555550142">1-855-555-0142</a>
+        <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
       </div>
     </div>
   </div>

@@ -10,7 +10,7 @@ from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_top, rect
-from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs
+from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs, label_text_gaps
 import palette as pal
 
 w = W(0, 0, 23)                       # inside the group's translate(265.7,200.9)
@@ -75,19 +75,9 @@ def label_gaps(L):
     return [box_shape(x - L['tw'] - 5, ty - 18, ex + 4, ty - 1), box_shape(x - L['sw'] - 5, sy - 16, x + 5, sy + 8)]
 
 
-def compact_gaps(L, k):
-    """Floor lines stop around a compact label's (bigger, maybe wrapped) text and tail."""
-    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
-    lines = L['sub'].count('\n') + 1
-    t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
-    s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
-    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
-            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
-
-
 def hidden(compact=False):
     """Floor lines skip everything drawn over them: objects and labels."""
-    gaps = ([g for L in COMPACT['labels'] for g in compact_gaps(L, COMPACT['scale'])] if compact
+    gaps = ([g for L in COMPACT['labels'] for g in label_text_gaps(L, COMPACT['scale'])] if compact
             else [g for L in LABELS for g in label_gaps(L)])
     return unary_union([silhouette(w, *b) for b in objects()] + gaps)
 

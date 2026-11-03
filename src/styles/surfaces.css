@@ -1,5 +1,5 @@
 /*--- Surfaces: cards, wells, icon tiles. ---*/
-/* ---------- 7. surfaces -------------------------------------------------- */
+/* ---------- surfaces -------------------------------------------------- */
 .panel { background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-3); }
 .well { background: var(--c-well); border-radius: var(--r-2); }
 .pad { padding: var(--sp-5); }

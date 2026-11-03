@@ -1,7 +1,7 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match README "Drawing rules" and the drawing palette in src/styles/tokens.css."""
 import html, math, re
-from shapely.geometry import LineString, MultiPoint, Point
+from shapely.geometry import LineString, MultiPoint, Point, box as box_shape
 from iso import fmt
 from svgfont import font_style
 import palette as pal
@@ -103,13 +103,8 @@ def seg_path(segs, attrs):
 PLAIN_CSS = '<style>svg:target .lbl{display:none}</style>'   # drawing.svg#plain (cards) hides the labels
 
 
-def badge(*_a, **_k):
-    """Retired: drawings used to swap labels for numbered dots on phones. Phones now get the compact cut."""
-    return ''
-
-
 def number_badges(body):
-    """Retired with badge(); strips any numbered dot still drawn by hand (the hero's cloud piece)."""
+    """Strips any numbered dot still drawn by hand (the hero's cloud piece); phones get the compact cut instead."""
     return re.sub(r'<g class="num">.*?</g>', '', body, flags=re.S)
 
 
@@ -118,8 +113,8 @@ def key_group(title, sub=''):
     return f'<g class="lbl" data-t="{html.escape(title.replace(chr(10), " "))}" data-s="{html.escape((sub or "").replace(chr(10), " "))}">'
 
 
-def key_css(_width=None):
-    """Retired with badge(); only the #plain rule is left."""
+def key_css():
+    """The #plain rule every drawing carries."""
     return PLAIN_CSS
 
 
@@ -144,6 +139,17 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
         out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{line}</text>')
     out.append('</g>')
     return out
+
+
+def label_text_gaps(L, k=1.0):
+    """Where floor lines stop around one label drawn by label(): its title, its (maybe wrapped) subline and its
+    level tail. L is a label dict (elbow, x, anchor, sub, and the measured widths tw and sw); k is its scale."""
+    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
+    lines = L['sub'].count('\n') + 1
+    t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
+    s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
+    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
+            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
 
 
 def doc(title, body, translate=None, view=(640, 480), crop=None):

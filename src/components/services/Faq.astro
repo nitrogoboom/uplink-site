@@ -4,6 +4,7 @@
 import { getCollection } from 'astro:content';
 import { byOrder } from '../../content.config';
 import Icon from '../Icon.astro';
+import { phone } from '../../data/footer.json';
 const faq = (await getCollection('faq')).sort(byOrder);
 ---
 <section class="section fold fold-always" id="faq" aria-labelledby="faq-title">
@@ -27,7 +28,7 @@ const faq = (await getCollection('faq')).sort(byOrder);
       </div>
       <div class="row">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
-        <a class="btn btn--secondary btn--lg" href="tel:+18555550142">1-855-555-0142</a>
+        <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
       </div>
     </div>
   </div>

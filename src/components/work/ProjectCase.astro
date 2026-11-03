@@ -1,18 +1,18 @@
 ---
-// One project in full: the <article class="case-src"> in the Work page's details list (work.js copies it into
-// the pop-up), and the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
+// One project in full: the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
 import { getEntries, type CollectionEntry } from 'astro:content';
-interface Props { project: CollectionEntry<'projects'>; heading?: 'h1' | 'h2' | 'h3' }
-const { project, heading: Heading = 'h3' } = Astro.props;
+import { svgSize } from '../../lib/site';
+interface Props { project: CollectionEntry<'projects'> }
+const { project } = Astro.props;
 const { id, data: p } = project;
 const services = await getEntries(p.services);   // each links to the service's own page
-const big = p.image === 'office';   // the office plan is drawn at 1200×800; the rest at 640×480
+const size = svgSize(`${p.image}.svg`);
 ---
 <article class="case-src" id={`case-${id}`} aria-labelledby={`case-${id}-t`}>
-  <Heading id={`case-${id}-t`} data-case-field="name">{p.name}</Heading>
+  <h1 id={`case-${id}-t`} data-case-field="name">{p.name}</h1>
   <div class="case">
     <div class="case-fig">
-      <div class="case-img well"><img src={`/assets/img/${p.image}.svg`} data-compact={`/assets/img/${p.image}-compact.svg`} alt={p.alt} width={big ? 1200 : 640} height={big ? 800 : 480} loading="lazy"></div>
+      <div class="case-img well"><img src={`/assets/img/${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy"></div>
     </div>
     <div class="stack">
       <span class="chip chip--sky" data-case-field="tag">{p.tag}</span>

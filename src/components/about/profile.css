@@ -1,5 +1,5 @@
 /*--- ABOUT · 1. Who we are. Desktop layout at the end. ---*/
-/* ---------- 18. ABOUT ---------------------------------------------------- */
+/* ---------- ABOUT ---------------------------------------------------- */
 .profile { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "card"; gap: var(--sp-5); }
 @media (min-width: 700px) { .profile { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "card text"; gap: var(--sp-6); } }
 .profile-card { grid-area: card; display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-4); }

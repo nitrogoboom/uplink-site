@@ -6,17 +6,17 @@ An Astro 7 project. `npm run dev` serves it at http://localhost:4321; `npm run b
 
 | File | Address | Sections (one component each, in `components/<page>/`) |
 |---|---|---|
-| `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ tower drawing) · Process · Proof |
+| `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ tower drawing) · Work · Proof |
 | `services.astro` | `/services` | Overview · Faq |
 | `services/[slug].astro` | `/services/<slug>` | one page per service, from `content/services/<slug>.json` |
 | `work.astro` | `/work` | Projects |
 | `work/[slug].astro` | `/work/<slug>` | one page per project, from `content/projects/<slug>.json` |
-| `about.astro` | `/about` | Profile · Story · Team |
+| `about.astro` | `/about` | Profile · Process · Team |
 | `contact.astro` | `/contact` | Message · Support |
 | `soon.astro`, `404.astro` | `/soon`, any missing address | one section each, inline |
 | `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts` | those files | built from the data (`lib/site.ts`, the collections, `data/*.md`) |
 
-A page is `<Base …>` with its sections inside. `layouts/Base.astro` is the shared `<head>`, header, footer, bottom bar, pop-ups and toast region; its props are the page's title, description, which tab is current, its address (for the canonical and Open Graph), robots, and its schema.org type. The five static pages take title and description from `lib/site.ts` (`PAGES`).
+A page is `<Base …>` with its sections inside. `layouts/Base.astro` is the shared `<head>`, header, footer, bottom bar, pop-ups and toast region; its props are the page's title, description, which tab is current (`page`), its address (`path`, for the canonical and Open Graph), `robots`, its schema.org `type`, and JSON-LD extras: `ldPage` (merged into the page's own node) and `ldGraph` (more nodes). The five static pages take title and description from `lib/site.ts` (`PAGES`).
 
 Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700px)`) sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules. There is no last-import rule any more.
 
@@ -36,8 +36,8 @@ Drawings: `components/home/hero-flows.svg` and `grow-tower.svg` are written by `
 
 Typed in `content.config.ts`.
 
-- `content/services/<slug>.json` – one per service. The slug is its address. Fields: order, title, chip, tag, image (drawing name in `public/assets/img/`), alt, lead, card, features (3), bestFor, and optional footerLabel / optionLabel.
-- `content/projects/<slug>.json` – one per project: order, name, tag, client, clientShort, services (service slugs), result, image, alt, story.
+- `content/services/<slug>.json` – one per service. The slug is its address. Fields: order, title, chip, tag, icon, image (drawing name in `public/assets/img/`), alt, lead, card, features (3), bestFor, page (the longer copy only its own page shows: how it works, questions), and optional featured / footerLabel / optionLabel.
+- `content/projects/<slug>.json` – one per project: order, name, tag, client, clientShort, services (service slugs), result, image, alt, story, and page (the case study).
 - `data/faq.json`, `team.json`, `footer.json` – the smaller lists. Lists keep file order through `byOrder`.
 - `data/index.md`, `data/agents.md` – hand-written Markdown for AI agents; `{site}` and `{services}` are filled in by their endpoints.
 

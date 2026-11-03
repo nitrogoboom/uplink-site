@@ -7,33 +7,11 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Code (whole-project review 2 Nov 2026)
-Scripts:
-- [ ] `home.js:288`: the state-dot ResizeObserver is never disconnected; the cleanup (349-356) leaves one behind on each cut swap.
-- [ ] `home.js` captions: `swap` holds both timeout and frame ids (477, 481, 545), so the cleanup's `clearTimeout`/`cancelAnimationFrame` can hit the wrong one, and a tap mid-step orphans the earlier timeout. Use two variables.
-- [ ] `footer.js:190` restarts the panel animation with `void panels[cur].offsetWidth` (a forced layout); `replay()` in `home.js` does it without one.
-
-Pages and data:
-- [ ] Phone, email and address are typed by hand in `index.astro:20-23` (JSON-LD), `contact/Message.astro`, `contact/Support.astro`, `home/Proof.astro` and `services/Faq.astro`; they are in `footer.json`. Read them from there.
-- [ ] `SOURCES` (`src/lib/site.ts`) misses files pages read: home needs `src/content/projects`, contact needs `src/content/services` and `ServiceOptions.astro`; service pages miss `src/content/projects`, case studies `src/content/services`.
 - [ ] A case study's description is `client. story` on its page (`work/[slug].astro:33`) but `client. result.` in the sitemap list and `llms.txt` (`site.ts`). Pick one.
-- [ ] `work/ProjectCase.astro`: the comment says `work.js` copies it into a pop-up (gone since PR #25); `data-compact` and the `heading` prop are unused; `big = p.image === 'office'` guesses the size that `cardSize` exists for.
 - [ ] Inline SVG icons where `<Icon>` has them: close (`BookDialog.astro`, `ShortcutsDialog.astro`), arrow (`Hero.astro:31`), headset (`Support.astro`), phone and mail (`Message.astro`). Check the stroke widths match after the swap.
-- [ ] Breadcrumb names typed in (`'Services'`, `'Our work'`, `'Home'`) in both `[slug]` pages and `Base.astro`; read them from `PAGES`.
-
-Styles:
-- [ ] Dead CSS left from the picker (PR #25): `.picker`, `.picker-title`, `.picker-roster`, `.roster-wrap` and `.tile` in `services/pick.css` match nothing. `svc-cards.css` styles `.card-media`/`.card-body`, which its only user (`contact/Support.astro`) doesn't have. Remove, then run `verify_styles.py`.
-- [ ] `svc-cards.css:12` card hover lift sits outside `(hover: hover)`, so a tap leaves it stuck on touch (the fix in `surfaces.css:21`).
-- [ ] Page-only files in `src/styles/`: `svc-cards.css` (Contact) and `industries.css` (About; header still says Work). `pick.css` and `details.css` are imported by the `[slug]` pages, not by `ServiceCard`/`ProjectCase` they style. Move or rename.
+- [ ] Page-only files in `src/styles/`: `svc-cards.css` (Contact) and `industries.css` (About; header still says Work). `pick.css` and `details.css` are imported by the `[slug]` pages, not by `ServiceCard`/`ProjectCase` they style. Move them; then the CSS order in `src/README.md` (it also misses `detail-pages.css`).
 - [ ] Raw timings in `footer.css` (31, 173, 189-191, 207-214) and in `home.js`/`footer.js` (3200, 180, 2200, 170, 700); 170 and 180 in `home.js` shadow `--dur-1`. Move to tokens.
-- [ ] Stale headers: old section numbers ("2.", "7.", "14." …) in many CSS files, and "the Services picker" in both `hero.css` files.
-
-Drawings code:
-- [ ] The label-gap helper is copied four times (`compact_gaps` in `gen_cloud.py`, `gen_helpdesk.py`, `gen_network.py`; `text_gaps` in `gen_voip.py`). Move it to `isogen.py`. Same for `box()` (`gen_hq.py`, `gen_tower.py`, `gen_office.py`) and `gen_office.py`'s own copies of `FACES`/`HIGH`/`EDGE`/`FONT`.
-- [ ] Retired `isogen.badge()` and `key_css(_width)` are still called; `BADGE` and `KEY_WIDTH` in `gen_office.py:202-203` feed nothing. Delete them.
-
-Docs:
-- [ ] `src/README.md` is behind: Home sections are Hero, Services, Grow, Work, Proof (not Process); About is Profile, Process, Team (not Story); Base props miss `ldPage`/`ldGraph`; field lists miss `icon`, `featured`, `page`; the CSS order misses `detail-pages.css`.
-- [ ] `README.md`: `gen_og.py` uses `office-card.svg`, not `office-compact.svg`; `scripts/` lists only `headers.mjs`. `CLAUDE.md`: "each script also writes NAME-compact.svg" (not the tower or og); the preview alias keeps digits and trims dashes.
+- [ ] Small, left as they are: `box()` is defined three times (`gen_hq.py`, `gen_tower.py`, `gen_office.py`), each a little different; `.sort((a, b) => a.data.order - b.data.order)` repeats across pages; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 
 ## Page structure
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.

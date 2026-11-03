@@ -1,5 +1,5 @@
 /*--- Keyboard hints (Esc, arrows, service numbers): desktop with a mouse, when shortcuts are on. ---*/
-/* ---------- 5. keyboard hints (desktop + mouse only, and only when on) --- */
+/* ---------- keyboard hints (desktop + mouse only, and only when on) --- */
 .kbd {
   display: inline-grid;
   place-items: center;

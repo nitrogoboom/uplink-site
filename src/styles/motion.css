@@ -1,5 +1,5 @@
 /*--- Reduced motion: switches off animation when the system asks. ---*/
-/* ---------- 20. motion preferences -------------------------------------- */
+/* ---------- motion preferences -------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

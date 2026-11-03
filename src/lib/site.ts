@@ -7,7 +7,7 @@
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 //   NAV         the main tabs in order: the header, the phone tab bar and the home hero's menu all read it.
 //   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
-//   cardSize()  a card drawing's own width and height, read from the file, for the <img> that shows it.
+//   svgSize()   a drawing's own width and height, read from the file, for the <img> that shows it (cardSize(): its card cut).
 import type { IconName } from '../components/Icon.astro';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -65,22 +65,23 @@ export const tabCurrent = (tab: keyof typeof PAGES, current: string, pathname: s
   return bare(pathname) === bare(PAGES[tab].path) ? 'page' : 'true';
 };
 
-// A card drawing's size from its own <svg> tag (NAME-card.svg, written by the generators), so an <img> never
-// guesses it from the drawing's name.
-export const cardSize = (image: string) => {
-  const head = readFileSync(`public/assets/img/${image}-card.svg`, 'utf-8').slice(0, 400);
+// A drawing's size from its own <svg> tag (written by the generators), so an <img> never guesses it from the
+// drawing's name. cardSize: the card cut, NAME-card.svg.
+export const svgSize = (file: string) => {
+  const head = readFileSync(`public/assets/img/${file}`, 'utf-8').slice(0, 400);
   const n = (k: string) => Number(head.match(new RegExp(` ${k}="([0-9.]+)"`))?.[1]);
   return { width: n('width'), height: n('height') };
 };
+export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
-  home: ['src/pages/index.astro', 'src/components/home', 'src/content/services'],
+  home: ['src/pages/index.astro', 'src/components/home', 'src/content/services', 'src/content/projects'],
   services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json'],
   work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects'],
   about: ['src/pages/about.astro', 'src/components/about', 'src/data/team.json'],
-  contact: ['src/pages/contact.astro', 'src/components/contact'],
+  contact: ['src/pages/contact.astro', 'src/components/contact', 'src/content/services', 'src/components/ServiceOptions.astro'],
 };
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };
@@ -101,8 +102,8 @@ export async function allPages(): Promise<SitePage[]> {
   return [
     ...(Object.keys(PAGES) as (keyof typeof PAGES)[]).map((k) => ({ ...PAGES[k], lastmod: lastmod(SOURCES[k]) })),
     ...services.map(({ id, data: s }) => ({ path: `/services/${id}`, name: s.title, description: s.card,
-      lastmod: lastmod([`src/content/services/${id}.json`, 'src/components/services/ServiceCard.astro', 'src/pages/services/[slug].astro']) })),
+      lastmod: lastmod([`src/content/services/${id}.json`, 'src/components/services/ServiceCard.astro', 'src/pages/services/[slug].astro', 'src/content/projects']) })),
     ...projects.map(({ id, data: p }) => ({ path: `/work/${id}`, name: p.name, description: `${p.client}. ${p.result}.`,
-      lastmod: lastmod([`src/content/projects/${id}.json`, 'src/components/work/ProjectCase.astro', 'src/pages/work/[slug].astro']) })),
+      lastmod: lastmod([`src/content/projects/${id}.json`, 'src/components/work/ProjectCase.astro', 'src/pages/work/[slug].astro', 'src/content/services']) })),
   ];
 }

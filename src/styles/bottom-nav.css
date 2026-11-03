@@ -1,5 +1,5 @@
 /*--- Bottom tab bar on phones (src/components/BottomNav.html). ---*/
-/* ---------- 13. bottom nav (phone) -------------------------------------- */
+/* ---------- bottom nav (phone) -------------------------------------- */
 .botnav { display: none; }
 @media (max-width: 699px) {
   .tabs, .hdr-actions .hbtn-text { display: none; }
