@@ -1,7 +1,7 @@
 ---
 // HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, then SLOTS short tiles;
 // the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
-// swipe row (home.js lights the dots). Styles: services.css (imported here). Desktop layout: at the end of its CSS.
+// swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it. Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 import Icon, { type IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import './services.css';
@@ -26,7 +26,7 @@ const tiles = [
       </div>
       <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
     </div>
-    <ul class="svc-menu" aria-label="Services">
+    <ul class="svc-menu" id="services-row" aria-label="Services">
       {tiles.map(({ id, size, data: s }) => (
         <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
           <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
@@ -41,6 +41,11 @@ const tiles = [
         <span class="svc-go" aria-hidden="true">View services<Icon name="chevronR" /></span>
       </a></li>
     </ul>
-    <p class="svc-hint" aria-hidden="true" data-md-skip><span class="svc-dots">{[...tiles, null].map(() => <i />)}</span><span class="svc-swipe">Swipe<Icon name="arrow" /></span></p>
+    <div class="svc-hint" data-md-skip>
+      <button class="iconbtn svc-step" type="button" data-step="-1" aria-controls="services-row" aria-label="Previous service"><Icon name="chevronL" /></button>
+      <span class="svc-dots" aria-hidden="true">{[...tiles, null].map(() => <i />)}</span>
+      <button class="iconbtn svc-step" type="button" data-step="1" aria-controls="services-row" aria-label="Next service"><Icon name="chevronR" /></button>
+      <span class="svc-swipe" aria-hidden="true">Swipe<Icon name="arrow" /></span>
+    </div>
   </div>
 </section>

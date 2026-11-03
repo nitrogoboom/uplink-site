@@ -618,19 +618,52 @@ if (stage) {
    services.css) and lights its dot. The observer only reports a card
    entering or leaving the strip, so nothing runs while the row scrolls.
    A tap on any card opens it. "Swipe" fades once they have left the first card.
+   No swipe with a mouse: the arrows step one card, a click on the dots
+   jumps to the nearest dot's card, and Left / Right move focus card to card.
+   A card that takes focus slides to the middle. The snap does the rest.
    ====================================================================== */
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots i');
 const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const cards = Array.from(svcRow.children);
+  const steps = $$('.svc-step', svcHint);
+  const row = window.matchMedia('(max-width: 699px)');   // as services.css
+  let current = 0;
+  let aim = null;   // the card a step is sliding to, so a quick second click steps on from there
   const centre = (best) => {
+    current = best;
+    if (best === aim) aim = null;
     cards.forEach((li, i) => li.classList.toggle('is-centre', i === best));
     svcDots.forEach((dot, i) => dot.classList.toggle('on', i === best));
+    steps.forEach((b) => b.setAttribute('aria-disabled', String(current + +b.dataset.step < 0 || current + +b.dataset.step >= cards.length)));
     if (best > 0) svcHint?.classList.add('is-swiped');
   };
   const io = new IntersectionObserver((entries) => {
     entries.forEach((en) => { if (en.isIntersecting) centre(cards.indexOf(en.target)); });
   }, { root: svcRow, rootMargin: '0px -49% 0px -49%' });
   cards.forEach((li) => io.observe(li));
+  centre(0);
+  // scrolls the row only (scrollIntoView would also move the page); the li itself never transforms, so its box is true
+  const go = (i) => {
+    aim = Math.max(0, Math.min(cards.length - 1, i));
+    const li = cards[aim];
+    const r = li.getBoundingClientRect(), box = svcRow.getBoundingClientRect();
+    svcRow.scrollBy({ left: r.left + r.width / 2 - (box.left + box.width / 2), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    if (aim === current) aim = null;
+  };
+  svcRow.addEventListener('scrollend', () => { aim = null; });
+  steps.forEach((b) => b.addEventListener('click', () => go((aim ?? current) + +b.dataset.step)));
+  $('.svc-dots', svcHint)?.addEventListener('click', (e) => {
+    const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
+    go(near.indexOf(Math.min(...near)));
+  });
+  svcRow.addEventListener('focusin', (e) => { if (row.matches) go(cards.indexOf(e.target.closest('li'))); });
+  svcRow.addEventListener('keydown', (e) => {
+    if (!row.matches || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey) return;
+    const next = cards[cards.indexOf(e.target.closest('li')) + (e.key === 'ArrowLeft' ? -1 : 1)];
+    if (!next) return;
+    e.preventDefault();
+    $('a', next).focus({ preventScroll: true });
+  });
 }
