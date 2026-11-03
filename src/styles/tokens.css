@@ -35,8 +35,8 @@
   --c-sky-tint:     rgb(151 200 234 / 0.16);
   --c-ok-tint:      rgb(169 233 195 / 0.16);
   --c-ink-tint:     rgb(14 26 39 / 0.08);    /* dark chip on accent */
-  --c-glass:        rgb(14 26 39 / 0.88);    /* sticky header */
-  --c-glass-2:      rgb(34 46 58 / 0.92);    /* phone bottom nav */
+  --c-glass:        #0E1A27;  /* sticky header: solid, no blur (a blur behind 88% barely showed and cost every scroll frame) */
+  --c-glass-2:      #202C38;  /* phone bottom nav: the old 92% raised tint over the page, made solid */
   --c-backdrop:     rgb(14 26 39 / 0.62);    /* behind pop-ups */
   --c-glow-accent:  rgb(255 173 81 / 0.07);  /* warm key light behind the hero call to action */
   --c-glow-sky:     rgb(151 200 234 / 0.09); /* cool fill light behind the hero office */
@@ -147,7 +147,6 @@
     0 32px 72px -16px hsl(var(--shadow-ink) / 0.3),
     0 0 24px 2px hsl(var(--shadow-ink) / 0.16),
     0 0 40px 4px hsl(var(--shadow-ink) / 0.18);
-  --blur: 14px;
   --blur-backdrop: 6px;   /* behind an open dialog */
 
   /* ---- motion ---------------------------------------------------------- */
