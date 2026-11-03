@@ -10,7 +10,9 @@
 
 .section { padding-block: var(--section-y); }
 .section--band { background: var(--c-bg-band); border-block: 1px solid var(--c-line); }
-.fold { min-height: var(--fold-h); display: flex; flex-direction: column; justify-content: center; }
+/* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size */
+.fold { display: flex; flex-direction: column; justify-content: center; }
+.fold-always { min-height: var(--fold-h); }
 .fold > .container { width: 100%; }
 
 .section-head {

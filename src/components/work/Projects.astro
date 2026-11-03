@@ -8,7 +8,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 const tags = ['Build', 'Protect', 'Plan'] as const;
 const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
 ---
-<section class="page-intro fold" id="projects" aria-labelledby="work-title">
+<section class="page-intro fold fold-always" id="projects" aria-labelledby="work-title">
   <div class="container work-layout">
     <div class="work-side">
       <p class="eyebrow">Our work</p>

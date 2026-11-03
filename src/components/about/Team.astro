@@ -5,7 +5,7 @@ import { byOrder } from '../../content.config';
 import './team.css';
 const team = (await getCollection('team')).sort(byOrder);
 ---
-<section class="section fold" id="team" aria-labelledby="team-title">
+<section class="section fold fold-always" id="team" aria-labelledby="team-title">
   <div class="container">
     <div class="section-head">
       <p class="eyebrow">Team</p>

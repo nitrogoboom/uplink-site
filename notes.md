@@ -11,7 +11,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
 - [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
 - [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page; the hours card's "1 day, reply within" needs a label that says it is for new messages (About's 12 min is the client help desk).
-- [ ] Desktop gaps (styling, next up): sections with `fold` fill a whole screen and centre their content, so short ones leave big empty bands above and below (Home after the grow section, About around "How we work" and before Team). Decide per section whether it should fill the screen or just take its own height (`.fold` in `src/styles/layout.css`, desktop rules in `fold.css`).
+- [ ] Desktop gaps, About next. Rule agreed 2 Nov 2026 (Home done): on desktop a section is one screen (`.fold`) when it has enough to fill it, and a short band (a heading and a button) keeps its own height; below desktop a section takes its own height, except `.fold-always` (the hero, and today every other page's full-screen sections, kept as they were). About: decide "How we work" and Team, then drop `fold-always` where phones don't need a full screen. Classes in `src/styles/layout.css`, desktop rules in `fold.css`.
 - [ ] Ideas, not decided: drawn avatars for the team cards instead of initials; a spot for client quotes somewhere on Home or Work.
 
 ## Drawings
