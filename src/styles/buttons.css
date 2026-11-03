@@ -56,6 +56,8 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+/* bigger text (Settings): a long chip wraps on a narrow screen instead of running off it */
+:root[data-text] .chip { height: auto; min-height: var(--sp-5); max-width: 100%; padding-block: var(--sp-1); white-space: normal; }
 .chip--accent { background: var(--c-accent); color: var(--c-on-accent); }
 .chip--sky { background: var(--c-sky-tint); color: var(--c-sky); }
 .chip--ok { background: var(--c-ok-tint); color: var(--c-ok); }

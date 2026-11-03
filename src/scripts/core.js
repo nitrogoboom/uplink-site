@@ -130,7 +130,8 @@ function openDialog(id, opener) {
   if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
   dlg._opener = opener || document.activeElement;
   dlg.showModal();
-  const first = (coarse.matches ? null : $('[autofocus]', dlg) || $('input, select, textarea', dlg)) || $('[data-close]', dlg);
+  // a group of options (radios) is entered at its chosen one, as Tab does
+  const first = (coarse.matches ? null : $('[autofocus]', dlg) || $('input:not([type="radio"]), input[type="radio"]:checked, select, textarea', dlg)) || $('[data-close]', dlg);
   if (first) first.focus({ preventScroll: true });
   dlg.scrollTop = 0;
   return true;
@@ -215,6 +216,18 @@ if (scToggle) {
   });
 }
 
+/* ---------- text size (Settings pop-up) -------------------------------- */
+// html[data-text] scales the type tokens (tokens.css). Base.astro's head sets it from storage before the page paints;
+// a choice here applies at once and is saved. The default leaves no attribute and nothing saved.
+const TEXT_KEY = 'uplink.text';
+$$('input[name="text-size"]').forEach((input) => {
+  input.checked = input.value === (root.dataset.text || '1');
+  input.addEventListener('change', () => {
+    if (input.value === '1') { delete root.dataset.text; store.set(TEXT_KEY, ''); }
+    else { root.dataset.text = input.value; store.set(TEXT_KEY, input.value); }
+  });
+});
+
 function isTyping(el) {
   if (!el || el === document.body) return false;
   if (el.isContentEditable) return true;
@@ -284,17 +297,20 @@ $$('form[data-validate]').forEach((form) => {
 /* ---------- phone tab bar: out of the way while reading ----------------- */
 // Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
 // It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put: the home tower pins under it. Wider screens hide the bar, so the listener does nothing there.
+// The header stays put: the home tower pins under it. The bar shows on phones, and on tablets with bigger text
+// (bottom-nav.css); elsewhere it is hidden, so the listener does nothing there.
 const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia(MEDIA.phone);
+  const tablet = window.matchMedia(MEDIA.tablet);
+  const barOn = () => phone.matches || (tablet.matches && root.dataset.text !== undefined);
   let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
-    if (!phone.matches) { show(true); return; }
+    if (!barOn()) { show(true); return; }
     const y = window.scrollY;
     if (lastY === null) lastY = y;
     const end = root.scrollHeight - window.innerHeight - STEP;
@@ -303,8 +319,8 @@ if (botnav) {
     show(y < lastY);
     lastY = y;
   };
-  window.addEventListener('scroll', () => { if (!queued && phone.matches) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
-  phone.addEventListener('change', () => { lastY = window.scrollY; show(true); });
+  window.addEventListener('scroll', () => { if (!queued && barOn()) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
+  [phone, tablet].forEach((m) => m.addEventListener('change', () => { lastY = window.scrollY; show(true); }));
   botnav.addEventListener('focusin', () => show(true));
 }
 

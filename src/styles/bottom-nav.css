@@ -1,49 +1,74 @@
-/*--- Bottom tab bar on phones (src/components/BottomNav.html). ---*/
-/* ---------- bottom nav (phone) -------------------------------------- */
-.botnav { display: none; }
+/*--- Bottom tab bar on phones, and on tablets with bigger text (src/components/BottomNav.astro). ---*/
+/* ---------- bottom nav ---------------------------------------------- */
+/* hidden until a screen switches it on (below); docked to the bottom edge, its glass runs down under the home indicator */
+.botnav {
+  position: fixed;
+  z-index: var(--z-botnav);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  padding: var(--sp-1) max(var(--sp-1), env(safe-area-inset-right, 0px)) calc(var(--sp-1) + env(safe-area-inset-bottom, 0px)) max(var(--sp-1), env(safe-area-inset-left, 0px));
+  border-top: 1px solid var(--c-line-2);
+  background: var(--c-glass-2);
+  transition: transform var(--dur-2) var(--ease);
+}
+/* scrolling down (core.js): slides off the bottom; motion.css makes it instant for reduced motion */
+.botnav.is-hidden { transform: translateY(100%); }
+.botnav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); list-style: none; }
+.bn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+  min-height: calc(var(--botnav-h) - var(--sp-2));
+  border-radius: var(--r-2);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-2);
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--c-muted);
+}
+.bn svg { width: var(--icon); height: var(--icon); }
+.bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
+.bn[aria-current] svg { color: var(--c-accent-text); }
+/* bigger text (Settings): five words don't fit across the bar, so the icons grow with the text and the words stay
+   only as each link's name (the same clip as .sr-only), as the header's buttons do on narrow screens */
+:root[data-text] .bn svg { width: calc(var(--icon) * var(--text)); height: calc(var(--icon) * var(--text)); }
+:root[data-text] .bn-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
 @media (--phone) {
   .tabs, .hdr-actions .hbtn-text { display: none; }
   .site-header .container { justify-content: space-between; gap: var(--sp-3); }
   .brand-sub { display: none; }
-  /* docked to the bottom edge; its glass runs down under the home indicator */
-  .botnav {
-    position: fixed;
-    z-index: var(--z-botnav);
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: block;
-    padding: var(--sp-1) max(var(--sp-1), env(safe-area-inset-right, 0px)) calc(var(--sp-1) + env(safe-area-inset-bottom, 0px)) max(var(--sp-1), env(safe-area-inset-left, 0px));
-    border-top: 1px solid var(--c-line-2);
-    background: var(--c-glass-2);
-    transition: transform var(--dur-2) var(--ease);
-  }
-  /* scrolling down (core.js): slides off the bottom; motion.css makes it instant for reduced motion */
-  .botnav.is-hidden { transform: translateY(100%); }
-  .botnav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); list-style: none; }
-  .bn {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
-    min-height: calc(var(--botnav-h) - var(--sp-2));
-    border-radius: var(--r-2);
-    font-size: var(--fs-1);
-    font-weight: 600;
-    letter-spacing: var(--tracking-2);
-    text-transform: uppercase;
-    text-decoration: none;
-    color: var(--c-muted);
-  }
-  .bn svg { width: var(--icon); height: var(--icon); }
-  .bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
-  .bn[aria-current] svg { color: var(--c-accent-text); }
+  .botnav { display: block; }
   body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
-/* portrait tablets: icon-only header buttons (each link carries its name in aria-label, Header.astro); words back from 900px */
-@media (min-width: 700px) and (max-width: 899px) { .hdr-actions .hbtn-text { display: none; } }
+/* tablets with bigger text (Settings): the five tabs need about 840px across at 200% (they would scroll mostly out
+   of view), so the bar takes them, as on phones. The tagline and the buttons' words already step aside (header.css);
+   --fold-h makes room for the bar (tokens.css), and core.js slides it away while reading */
+@media (--tablet) {
+  :root[data-text] .tabs { display: none; }
+  :root[data-text] .site-header .container { justify-content: space-between; }
+  :root[data-text] .botnav { display: block; }
+  :root[data-text] body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  :root[data-text] { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
+}
+
 @media (--tablet) {
   .brand-sub { display: none; }
   .site-header .container { gap: var(--sp-3); }
   .tab { padding-inline: var(--sp-3); }
 }
-
+/* Tablet header, measured (16px root): logo 99px, five tabs 419px at 12px padding, three icon buttons 154px (318px
+   with their words), gutters and gaps 48px. The room each side of the tabs is (width - 720) / 2 with icon buttons and
+   (width - 884) / 2 with words. verify_footer.py checks it at every 10px; it fails under 8px.
+   Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
+   padding would overlap). */
+@media (min-width: 700px) and (max-width: 779px) {
+  .tab { padding-inline: var(--sp-2); }
+  .site-header .container { gap: var(--sp-2); }
+}
+/* the buttons' words come back where they fit with 24px a side: 884 + 2 x 24 = 932, so from 940px (each button keeps
+   its name in aria-label, Header.astro) */
+@media (min-width: 700px) and (max-width: 939px) { .hdr-actions .hbtn-text { display: none; } }

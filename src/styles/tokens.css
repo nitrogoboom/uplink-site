@@ -73,15 +73,17 @@
   --font-display: 'Barlow Condensed', 'Barlow Condensed Fallback', 'Roboto Condensed', 'Arial Narrow', sans-serif;
   --font-body:    'Barlow', 'Barlow Fallback', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
-  /* 8-step scale */
-  --fs-1: 0.75rem;    /* 12  labels, key caps */
-  --fs-2: 0.875rem;   /* 14  small text, meta */
-  --fs-3: 1rem;       /* 16  body */
-  --fs-4: 1.125rem;   /* 18  lead, buttons */
-  --fs-5: 1.375rem;   /* 22  card titles */
-  --fs-6: 1.75rem;    /* 28  sub-headings, dialog titles, big buttons */
-  --fs-7: clamp(2rem, 1.35rem + 2.2vw, 2.75rem);   /* 32-44  section headings */
-  --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
+  /* 8-step scale, times the visitor's text size (--text: 1 to 2, the Settings pop-up; set before paint in
+     Base.astro's head). Only the text grows: spacing and layout keep the screen's scale (WCAG 1.4.4, technique G178) */
+  --text: 1;
+  --fs-1: calc(0.75rem * var(--text));    /* 12  labels, key caps */
+  --fs-2: calc(0.875rem * var(--text));   /* 14  small text, meta */
+  --fs-3: calc(1rem * var(--text));       /* 16  body */
+  --fs-4: calc(1.125rem * var(--text));   /* 18  lead, buttons */
+  --fs-5: calc(1.375rem * var(--text));   /* 22  card titles */
+  --fs-6: calc(1.75rem * var(--text));    /* 28  sub-headings, dialog titles, big buttons */
+  --fs-7: calc(clamp(2rem, 1.35rem + 2.2vw, 2.75rem) * var(--text));   /* 32-44  section headings */
+  --fs-8: calc(clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem) * var(--text));  /* 44-72  page headings */
 
   --lh-display: 0.95;  /* page and section headings */
   --lh-tight:   1;     /* one line in a fixed-height box: buttons, key caps, tiles */
@@ -168,7 +170,7 @@
   --loop-fc-sig: 2.8s;
 
   /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
-  --fs-hero-phone: 2.5rem;    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */
+  --fs-hero-phone: calc(2.5rem * var(--text));    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */
   --cap-title: var(--fs-4);
   --cap-sub: var(--fs-2);
   --cap-edge: var(--sp-3);    /* words to the drawing's edge */
@@ -184,9 +186,18 @@
   --z-toast: 60;
 }
 
+/* the visitor's text size (Settings pop-up, core.js): html[data-text] only when it isn't the default */
+:root[data-text="1.25"] { --text: 1.25; }
+:root[data-text="1.5"] { --text: 1.5; }
+:root[data-text="1.75"] { --text: 1.75; }
+:root[data-text="2"] { --text: 2; }
+
 /* breakpoints: phone < 700, tablet 700-1099, desktop >= 1100 (named in src/lib/media.js) */
 @media (--phone) {
   :root { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+}
+@media (--tablet) {   /* tablets with bigger text get the tab bar too (bottom-nav.css) */
+  :root[data-text] { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
 }
 @media (--tablet-up) {
   :root { --gutter: 1.5rem; }

@@ -19,6 +19,7 @@ import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import ShortcutsDialog from '../components/ShortcutsDialog.astro';
+import SettingsDialog from '../components/SettingsDialog.astro';
 import { PAGES, breadcrumbs, jsonLd } from '../lib/site';
 import { MEDIA } from '../lib/media.js';
 
@@ -81,7 +82,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
   </Fragment>
 )}
 <meta name="theme-color" content="#0E1A27">
-<script is:inline>document.documentElement.classList.add('js')</script>
+<script is:inline>(function(r){r.classList.add('js');try{const t=localStorage.getItem('uplink.text');if(t)r.dataset.text=t}catch{/* no storage: default size */}})(document.documentElement)</script>
 {fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
 <link rel="preload" href="/assets/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin media={MEDIA.tabletUp}>
 <slot name="head" />
@@ -101,6 +102,8 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
 <BookDialog />
 
 <ShortcutsDialog />
+
+<SettingsDialog />
 
 <div class="toasts" aria-live="polite"></div>
 
