@@ -1,6 +1,6 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match README "Drawing rules" and the drawing palette in src/styles/tokens.css."""
-import html, math, re
+import hashlib, html, math, re
 from shapely.geometry import LineString, MultiPoint, Point, box as box_shape
 from iso import fmt
 from svgfont import font_style
@@ -184,6 +184,28 @@ def card(svg):
     svg = ''.join(parts) + svg[pos:]
     svg = svg.replace(PLAIN_CSS + '\n', '').replace(PLAIN_CSS, '')
     return re.sub(r'<style>@font-face.*?</style>', lambda _m: font_style(svg), svg, count=1, flags=re.S)
+
+
+def hoist_styles(text):
+    """Every style="" attribute becomes a class named after its declarations (s-<hash>) with one rule, so the CSP can
+    drop 'unsafe-inline' (a hash covers a <style> block, never an attribute). The rule doubles the class so it
+    outranks the page CSS's one-class rules whatever order the <style> blocks land in on the page, as the attribute
+    did. The same declarations get the same class in every file, so the hero and its flow layer agree."""
+    rules = {}
+
+    def tag(m):
+        t = m.group(0)
+        st = re.search(r' style="([^"]*)"', t)
+        if not st:
+            return t
+        name = 's-' + hashlib.sha1(st.group(1).encode()).hexdigest()[:6]
+        rules[name] = st.group(1)
+        t = t[:st.start()] + t[st.end():]
+        if ' class="' in t:
+            return t.replace(' class="', f' class="{name} ', 1)
+        return re.sub(r'^(<[\w:-]+)', rf'\1 class="{name}"', t)
+    out = re.sub(r'<[A-Za-z][^>]*>', tag, text)
+    return out, ''.join(f'.{n}.{n}{{{d}}}' for n, d in sorted(rules.items()))
 
 
 def write(path, text, card_cut=True):

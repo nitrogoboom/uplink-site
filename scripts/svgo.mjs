@@ -1,6 +1,7 @@
 // Shrinks the drawings in dist/assets/img/ after `astro build` (npm run build runs it before headers.mjs, which
 // hashes the hero's <style> blocks as they are after this). The sources in public/ stay as the generators wrote
-// them. The settings, and what they keep, are in svgo-config.mjs.
+// them. The settings, and what they keep, are in svgo-config.mjs. campus.svg (the footer map) is left as written:
+// footer.css styles it by element (.fc-w polygon, .grid line), and SVGO turns those shapes into paths.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { optimize } from 'svgo';
@@ -8,7 +9,7 @@ import { SVGO } from './svgo-config.mjs';
 
 const DIR = 'dist/assets/img';
 let before = 0, after = 0;
-for (const name of readdirSync(DIR).filter((f) => f.endsWith('.svg'))) {
+for (const name of readdirSync(DIR).filter((f) => f.endsWith('.svg') && f !== 'campus.svg')) {
   const file = join(DIR, name);
   const src = readFileSync(file, 'utf-8');
   const out = optimize(src, { path: file, ...SVGO }).data;

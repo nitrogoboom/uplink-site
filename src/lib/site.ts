@@ -37,6 +37,9 @@ export const HERO = {
   },
 };
 
+// the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
+export const CAMPUS = fresh('/assets/img/campus.svg');
+
 export const PAGES = {
   home: { path: '/', name: 'Home', title: 'Uplink Technology · Managed IT for Ontario businesses',
     description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.' },

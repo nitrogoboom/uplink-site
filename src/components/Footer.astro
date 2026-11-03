@@ -1,15 +1,18 @@
 ---
 // SHARED · Footer (every page). Hero-select roster and campus map: one panel per section, one roster tile per
-// panel; each panel's data-map names a spot on the map that footer.js draws (hq, services, company, support,
-// resources, follow). The lists come from src/data/footer.json; the Services panel's links from the services
+// panel; each panel's data-map names a spot on the campus map (hq, services, company, support, resources, follow),
+// and data-map-name / data-map-sub the words the map's label shows for it. The map is drawn by tools/gen_campus.py
+// (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near the screen.
+// The lists and the spots' words come from src/data/footer.json; the Services panel's links from the services
 // collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
 import f from '../data/footer.json';
-import { getServices } from '../lib/site';
+import { CAMPUS, getServices } from '../lib/site';
 const services = await getServices();
+const spot = (k: string) => f.spots[k as keyof typeof f.spots];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
 type Link = { label: string; href: string };
 const panels = f.panels.map((p) => ({ ...p, links: (p.id === 'services' ? serviceLinks : (p.links as Link[])) }));
@@ -34,7 +37,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
   </div></div>
   <div class="container fc-stage">
     <div class="fc-panels" id="fc-panels">
-<section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq">
+<section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq" data-map-name={spot('hq').name} data-map-sub={spot('hq').sub}>
 <div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
   <div class="fc-facts">
     <div><p class="label">Call or email</p>
@@ -49,12 +52,12 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 </div>
 </section>
 {panels.map((p) => (
-<section class="fc-panel" id={`fc-p-${p.id}`} role="tabpanel" aria-labelledby={`fc-t-${p.id}`} tabindex="-1" data-map={p.map}>
+<section class="fc-panel" id={`fc-p-${p.id}`} role="tabpanel" aria-labelledby={`fc-t-${p.id}`} tabindex="-1" data-map={p.map} data-map-name={spot(p.map).name} data-map-sub={spot(p.map).sub}>
 <div class="fc-head"><p class="eyebrow">{p.links.length} links</p><h3>{p.title}</h3></div><p class="fc-lead">{p.lead}</p><nav class="fc-body" aria-label={p.title}><ul class="fc-rows fc-rows--two">{p.links.map((l) => (
   <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={p.more.href}>{p.more.label}<Icon name="arrow" /></a></nav>
 </section>
 ))}
-<section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow">
+<section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}>
 <div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((s) => (
     <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><span><b>{s.name}</b><small>{s.handle}</small></span></a></li>))}</ul>
@@ -66,8 +69,8 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 </div>
 </section>
     </div>
-    <div class="fc-map" data-fc-map>
-      <div class="fc-hud" aria-hidden="true"></div>
+    <div class="fc-map" data-fc-map={CAMPUS}>
+      <div class="fc-hud" aria-hidden="true"><Icon name="spot" /><span><b>{spot('hq').name}</b><small>{spot('hq').sub}</small></span></div>
     </div>
   </div>
   <div class="fc-base"><div class="container">

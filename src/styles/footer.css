@@ -113,7 +113,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   background: var(--c-glass-2);   /* solid, like the phone bar */
   box-shadow: var(--shadow-1);
 }
-.fc-hud:empty { display: none; }
+:root:not(.js) .fc-hud { display: none; }   /* the map's label: no map without script */
 .fc-hud svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-accent-text); }
 .fc-hud b { display: block; font-size: var(--fs-2); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; color: var(--c-accent-text); }
 .fc-hud small { display: block; font-size: var(--fs-2); line-height: var(--lh-snug); color: var(--c-muted); }
@@ -169,7 +169,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .linkbtn { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); padding: 0; border: 0; background: none; color: var(--c-muted); font-size: var(--fs-2); }
 .linkbtn:hover { color: var(--c-text); }
 
-/* the campus map itself (built by footer.js) */
+/* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot) */
 .fc-w polygon { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }
 .fc-w .f-t { fill: var(--iso-top); } .fc-w .f-l { fill: var(--iso-left); } .fc-w .f-r { fill: var(--iso-right); }
 .fc-w .on .b .f-t { fill: var(--iso-hi-top); } .fc-w .on .b .f-l { fill: var(--iso-hi-left); } .fc-w .on .b .f-r { fill: var(--iso-hi-right); }
@@ -191,10 +191,11 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-w .flow { fill: none; stroke: var(--iso-hi-left); stroke-width: 2.4; stroke-dasharray: 2 10; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity var(--dur-fc-route) ease; }
 .fc-w .flow.on { opacity: 1; }
 .fc-w .ring { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-opacity: 0.8; }
+.fc-w .ring:not(.on) { display: none; }   /* one ring per spot; the picked spot's shows */
 .fc-w .ring2 { fill: none; stroke: var(--iso-hi-left); stroke-width: 1; stroke-opacity: 0.35; stroke-dasharray: 4 5; }
 .fc-w .sig { fill: none; stroke: var(--c-sky); stroke-width: 1.2; }
 .fc-w .beacon { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.2; }
-.fc-w .shadow { fill: url("#fc-shade"); opacity: 0.35; }   /* a soft gradient (footer.js), not a blur filter redrawn as the camera flies */
+.fc-w .shadow { fill: url("#fc-shade"); opacity: 0.35; }   /* a soft gradient (gen_campus.py), not a blur filter redrawn as the camera flies */
 .fc-w .shade { stop-color: var(--iso-shadow); }
 .fc-w .mk-line { stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-dasharray: 2 4; }
 .fc-w .mk-d { fill: var(--iso-hi-left); stroke: var(--c-bg); stroke-width: 3; }
@@ -203,15 +204,16 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-w .mast { stroke: var(--iso-hi-left); stroke-width: 1.6; }
 @media (prefers-reduced-motion: no-preference) {
   /* SVG parts animate on the main thread and repaint the map, so every loop steps at about 12 frames a second
-     (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen. */
+     (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen.
+     --d: each shape's own delay (gen_campus.py), so the windows, lights and pulses run out of step */
   .fc-w.is-seen .flow { animation: fc-flow var(--loop-fc-flow) steps(14) infinite; }
-  .fc-w .lit.blink, .fc-w .led { animation: fc-blink var(--loop-fc-blink) step-end infinite; }
-  .fc-w .bob { animation: fc-bob var(--loop-fc-bob) steps(18) infinite; }
+  .fc-w .lit.blink, .fc-w .led { animation: fc-blink var(--loop-fc-blink) step-end var(--d, 0s) infinite; }
+  .fc-w .bob { animation: fc-bob var(--loop-fc-bob) steps(18) var(--d, 0s) infinite; }
   .fc-w .mk-bob { animation: fc-bob var(--loop-fc-mk-bob) steps(13) infinite; }
   .fc-w .ring, .fc-w .beacon, .fc-w .sig { transform-box: fill-box; transform-origin: 50% 50%; }
   .fc-w .ring { animation: fc-ring var(--loop-fc-ring) steps(29) infinite; }
-  .fc-w .beacon { animation: fc-ping var(--loop-fc-ring) steps(29) infinite; }
-  .fc-w .sig { animation: fc-ping var(--loop-fc-sig) steps(34) infinite; }
+  .fc-w .beacon { animation: fc-ping var(--loop-fc-ring) steps(29) var(--d, 0s) infinite; }
+  .fc-w .sig { animation: fc-ping var(--loop-fc-sig) steps(34) var(--d, 0s) infinite; }
 }
 @keyframes fc-flow { to { stroke-dashoffset: -24; } }
 @keyframes fc-blink { 0%, 62% { opacity: 1; } 70%, 82% { opacity: 0.25; } 88%, 100% { opacity: 1; } }

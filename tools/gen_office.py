@@ -20,10 +20,10 @@ The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept 
   tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
   tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
-import hashlib, html, json, math, pathlib, re, sys
+import html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, card as card_cut
+from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, card as card_cut
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -764,28 +764,6 @@ def split_flows(body):
         over.append(f'<g class="{cls}" style="{d}">{m.group(0)}</g>')
     out.append(body[last:])
     return ''.join(out), '\n'.join(over)
-
-
-def hoist_styles(text):
-    """Every style="" attribute becomes a class named after its declarations (s-<hash>) with one rule, so the CSP can
-    drop 'unsafe-inline' (a hash covers a <style> block, never an attribute). The rule doubles the class so it
-    outranks hero.css's one-class rules whatever order the <style> blocks land in on the page, as the attribute did.
-    The same declarations get the same class in every file, so the hero and its flow layer agree."""
-    rules = {}
-
-    def tag(m):
-        t = m.group(0)
-        st = re.search(r' style="([^"]*)"', t)
-        if not st:
-            return t
-        name = 's-' + hashlib.sha1(st.group(1).encode()).hexdigest()[:6]
-        rules[name] = st.group(1)
-        t = t[:st.start()] + t[st.end():]
-        if ' class="' in t:
-            return t.replace(' class="', f' class="{name} ', 1)
-        return re.sub(r'^(<[\w:-]+)', rf'\1 class="{name}"', t)
-    out = re.sub(r'<[A-Za-z][^>]*>', tag, text)
-    return out, ''.join(f'.{n}.{n}{{{d}}}' for n, d in sorted(rules.items()))
 
 
 def render(v):
