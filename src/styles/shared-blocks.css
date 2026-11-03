@@ -40,7 +40,7 @@
 .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-4); list-style: none; }
 @media (--desktop) { .stats { gap: var(--sp-5); } }
 .stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-5); }
-.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: clamp(var(--fs-7), 30cqi, var(--fs-8)); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; }   /* big, but never wider than its tile */
+.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: calc(clamp(var(--fs-7) / var(--text), 30cqi, var(--fs-8) / var(--text)) * var(--text)); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; }   /* big, but never wider than its tile (at the default text size: it grows with the visitor's) */
 
 /* FAQ */
 .faq { display: flex; flex-direction: column; gap: var(--sp-3); max-width: 55rem; }

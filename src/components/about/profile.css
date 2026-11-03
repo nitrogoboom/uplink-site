@@ -17,4 +17,9 @@
   .profile-art { aspect-ratio: auto; flex: 1; min-height: 0; }
   .profile-text { justify-content: center; }
   .profile-text .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* bigger text (Settings): the section grows to fit; the picture keeps its own shape; the four stats go two by two */
+  :root[data-text] .profile { height: auto; min-height: var(--fold-inner); }
+  :root[data-text] .profile-art { flex: none; aspect-ratio: 4 / 3; }
+  :root[data-text] .profile-text { justify-content: safe center; }
+  :root[data-text] .profile-text .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

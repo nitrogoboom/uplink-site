@@ -1,0 +1,26 @@
+---
+// SHARED · Settings pop-up (every page), opened by the header's gear. Text size: all the text on every page, up to
+// 200% and back (WCAG 1.4.4, technique G178); the layout keeps its size and the sections grow to fit. More display
+// options go here later (light or dark, English or French). core.js applies a choice at once and remembers it on this
+// device (localStorage uplink.text); Base.astro's head sets it before the page paints. Styles: src/styles/dialogs.css
+// and forms.css (.seg).
+import Icon from './Icon.astro';
+const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
+---
+<dialog class="dialog" id="settings-dialog" aria-labelledby="st-title">
+  <div class="dlg-head">
+    <h2 id="st-title">Settings</h2>
+    <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close</span></button>
+  </div>
+  <div class="dlg-body">
+    <fieldset class="seg-field" aria-describedby="st-text-note">
+      <legend class="label">Text size</legend>
+      <div class="seg">
+        {SIZES.map((v) => (
+          <label class="seg-opt"><input type="radio" name="text-size" value={v} checked={v === '1'}><span>{Number(v) * 100}%</span></label>
+        ))}
+      </div>
+      <p class="small muted" id="st-text-note">Makes the text bigger on every page. Saved on this device.</p>
+    </fieldset>
+  </div>
+</dialog>

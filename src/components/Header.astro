@@ -1,7 +1,8 @@
 ---
-// SHARED · Header (every page): logo, page tabs (NAV, src/lib/site.ts), "Get support" and "Client portal".
+// SHARED · Header (every page): logo, page tabs (NAV, src/lib/site.ts), "Get support", "Client portal" and the
+// Settings gear (opens SettingsDialog.astro; script only, so it hides without script).
 // `current` lights the page's tab: aria-current "page" there, "true" on a page inside its section.
-// The two buttons show icons only on narrow screens, so each carries its full name in aria-label.
+// The three buttons show icons only on narrow screens, so each carries its full name in aria-label.
 // Styles: src/styles/header.css.
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
@@ -35,6 +36,9 @@ const here = Astro.url.pathname;
       <a class="hbtn" href="/soon#client-portal" aria-label="Client portal, sign in">
         <Icon name="person" /><span class="hbtn-text">Client portal</span>
       </a>
+      <button class="hbtn hbtn-settings" type="button" data-open="settings-dialog" aria-label="Settings, text size">
+        <Icon name="gear" /><span class="hbtn-text">Settings</span>
+      </button>
     </div>
   </div>
 </header>

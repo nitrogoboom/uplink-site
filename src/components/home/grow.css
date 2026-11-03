@@ -70,6 +70,9 @@
     margin-top: var(--grow-pic);
     padding-block: var(--sp-3) var(--sp-4);
   }
+  /* bigger text (Settings): the picture's margin is the step box's height, so the two let go of the screen together
+     at the end of the stage; otherwise the step box, pinned lower, slides up over the picture and its HUD first */
+  :root[data-text] .grow.is-live .grow-art { margin-bottom: var(--grow-cap); }
   .grow.is-live .grow-card,
   .grow.is-live .grow-step[data-active] .grow-card { gap: var(--sp-2); padding: 0; background: none; border: 0; box-shadow: none; }
   /* hidden on screen to keep the stage short, but still read by screen readers (the same clip as .sr-only) */

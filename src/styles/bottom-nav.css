@@ -35,6 +35,10 @@
   .bn svg { width: var(--icon); height: var(--icon); }
   .bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
   .bn[aria-current] svg { color: var(--c-accent-text); }
+  /* bigger text (Settings): five words don't fit across a phone, so the icons grow with the text and the words stay
+     only as each link's name (the same clip as .sr-only), as the header's buttons do on narrow screens */
+  :root[data-text] .bn svg { width: calc(var(--icon) * var(--text)); height: calc(var(--icon) * var(--text)); }
+  :root[data-text] .bn-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   body { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }

@@ -1,7 +1,7 @@
 // Finishes dist/_headers after `astro build` (npm run build runs it). public/_headers is the hand-written
 // template; this fills in the parts that depend on the build:
-//   {script-hashes}   a 'sha256-…' for every inline <script> in the built pages (today: the one-line
-//                     classList.add('js') in every head). Change that line and the hash follows.
+//   {script-hashes}   a 'sha256-…' for every inline <script> in the built pages (today: the one line in every
+//                     head that adds html.js and the saved text size). Change that line and the hash follows.
 //   {style-hashes}    the same for every inline <style>: Astro's inlined CSS, the drawings inlined in the home
 //                     page, and the <style> blocks in the hero drawings and the footer's campus map (home.js and
 //                     footer.js insert those SVGs into the page, so their styles count as the page's). style-src
