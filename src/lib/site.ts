@@ -7,7 +7,7 @@
 //   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
-//   NAV         the main tabs in order: the header, the phone tab bar and the home hero's menu all read it.
+//   NAV         the main tabs in order: the header and the phone tab bar read it.
 //   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
 //   svgSize()   a drawing's own width and height, read from the file, for the <img> that shows it (cardSize(): its card cut).
 import type { IconName } from '../components/Icon.astro';
@@ -49,15 +49,14 @@ export const PAGES = {
     description: 'Call, email or book a free IT check-up with Uplink Technology. A real person replies within one business day.' },
 } as const;
 
-// Name and address come from PAGES. short: the phone tab bar's word, where it differs. sub: the line under it in the
-// home hero's menu (Home has none: the hero menu is on Home and leaves it out).
-type Tab = { page: keyof typeof PAGES; icon: IconName; short?: string; sub?: string };
+// Name and address come from PAGES. short: the phone tab bar's word, where it differs.
+type Tab = { page: keyof typeof PAGES; icon: IconName; short?: string };
 export const NAV: readonly Tab[] = [
   { page: 'home', icon: 'home' },
-  { page: 'services', icon: 'grid', sub: 'Help desk, security, cloud, networks, phones' },
-  { page: 'work', icon: 'play', short: 'Work', sub: 'Setups we built and still run' },
-  { page: 'about', icon: 'building', sub: 'The people behind the screen' },
-  { page: 'contact', icon: 'bubble', sub: 'Talk to a real person' },
+  { page: 'services', icon: 'grid' },
+  { page: 'work', icon: 'play', short: 'Work' },
+  { page: 'about', icon: 'building' },
+  { page: 'contact', icon: 'bubble' },
 ];
 
 // A service page or case study keeps its section's tab lit, but only the section page itself is "the current page".

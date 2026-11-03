@@ -9,7 +9,7 @@
 .hero-cta { display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2); }
 /* the top tabs (tablet, desktop) and bottom bar (phone) already hold these
    links, so the menu shows only on desktops tall enough for it (end of file) */
-.hero-menu nav { display: none; }
+.hero-menu .hero-services { display: none; }
 .menu-label { display: block; margin: 0 0 var(--sp-2); }
 .hero-cta .small { text-align: center; }
 @media (min-width: 700px) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
@@ -175,7 +175,7 @@
     row-gap: var(--sp-6);
   }
   .hero-menu { min-height: 0; }
-  .hero-menu nav { display: block; margin-top: var(--sp-6); }
+  .hero-menu .hero-services { display: block; margin-top: var(--sp-6); }
   /* icons and text line up with the headline; the highlight hangs outside */
   .hero-menu .menu { margin-inline: calc(-1 * var(--sp-3)); }
 

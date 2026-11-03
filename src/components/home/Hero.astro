@@ -9,13 +9,21 @@ import flows from './hero-flows.svg?raw';
 import './hero.css';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
-import { HERO, NAV, PAGES } from '../../lib/site';
+import { HERO, PAGES, getServices } from '../../lib/site';
+import type { IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 // the two news cards under the drawing. The chip comes after the title in the markup, so a screen reader says
 // "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
   { href: '/contact#message', book: true, img: 'security', chip: 'Free', tone: 'accent', title: 'IT and security check-up', line: '30 minutes. We look first, then quote.' },
   { href: '/soon#windows-10-guide', book: false, img: 'cloud', chip: 'Guide', tone: 'sky', title: 'Windows 10 support has ended', line: 'Your upgrade plan, step by step' },
+];
+// the menu under the button: the featured services (each its own page), then all of them. A list, not a <nav>:
+// the header holds the one main menu.
+const featured = (await getServices()).filter((s) => s.data.featured);
+const menu = [
+  ...featured.map(({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon as IconName, title: s.title, sub: s.card })),
+  { href: PAGES.services.path, icon: 'grid' as IconName, title: 'All services', sub: 'Help desk, security, cloud, networks, phones' },
 ];
 const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
 ---
@@ -31,20 +39,20 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Get started<Icon name="arrow" /></a>
         <span class="small muted">Free check-up. No contract to look.</span>
       </div>
-      <nav aria-labelledby="hero-menu-label">
-        <p class="label menu-label" id="hero-menu-label">Main menu</p>
-        <ul class="menu">
-          {NAV.filter((t) => t.sub).map(({ page, icon, sub }) => (
+      <div class="hero-services">
+        <p class="label menu-label" id="hero-menu-label">Services</p>
+        <ul class="menu" aria-labelledby="hero-menu-label">
+          {menu.map(({ href, icon, title, sub }) => (
             <li>
-              <a class="mi" href={PAGES[page].path}>
+              <a class="mi" href={href}>
                 <span class="icon-tile" aria-hidden="true"><Icon name={icon} /></span>
-                <span class="mi-text"><span class="mi-title">{PAGES[page].name}</span><Pause /><span class="mi-sub">{sub}</span></span>
+                <span class="mi-text"><span class="mi-title">{title}</span><Pause /><span class="mi-sub">{sub}</span></span>
                 <Icon name="chevronR" class="mi-go" />
               </a>
             </li>
           ))}
         </ul>
-      </nav>
+      </div>
     </div>
 
     <div class="hero-art">
