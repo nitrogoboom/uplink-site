@@ -100,8 +100,8 @@ Every colour has one job. If you need a second job, you need a second role.
 | `edge` | `rgb(242 247 252 / 0.46)` | `rgb(34 46 58 / 0.58)` | border of anything you can click or type in (3:1) |
 | `text` | `#F2F7FC` | `#0E1A27` | body text, headings |
 | `text-muted` | `#BBC2C9` | `#4D5863` | secondary text |
-| `glass` | `rgb(14 26 39 / 0.88)` | `rgb(242 247 252 / 0.86)` | sticky header |
-| `glass-raised` | `rgb(34 46 58 / 0.92)` | `rgb(255 255 255 / 0.92)` | phone bottom bar |
+| `glass` | `#0E1A27` | `rgb(242 247 252 / 0.86)` | sticky header (dark: solid, no blur since 2 Nov 2026) |
+| `glass-raised` | `#202C38` | `rgb(255 255 255 / 0.92)` | phone bottom bar (dark: solid, no blur) |
 | `backdrop` | `rgb(14 26 39 / 0.62)` | `rgb(34 46 58 / 0.4)` | scrim behind pop-ups |
 
 ### 5.2 Action, links and status
@@ -245,7 +245,7 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
   --link: #97C8EA; --link-tint: rgb(151 200 234 / 0.16);
   --success: #A9E9C3; --success-tint: rgb(169 233 195 / 0.16);
   --error: #FF897E;
-  --glass: rgb(14 26 39 / 0.88); --backdrop: rgb(14 26 39 / 0.62);
+  --glass: #0E1A27; --backdrop: rgb(14 26 39 / 0.62);
 }
 :root[data-theme="light"] {
   color-scheme: light;

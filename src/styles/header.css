@@ -5,8 +5,6 @@
   top: env(safe-area-inset-top, 0px);
   z-index: var(--z-header);
   background: var(--c-glass);
-  -webkit-backdrop-filter: blur(var(--blur));
-  backdrop-filter: blur(var(--blur));
   border-bottom: 1px solid var(--c-line);
 }
 .site-header .container {

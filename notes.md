@@ -20,8 +20,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Grow world on desktop: at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
 
 ## Look and feel
-- [ ] Header and phone bar blur: the glass is 88% / 92% solid, so the 14px `backdrop-filter` barely shows, but it is redrawn on every scroll frame (costly on low-end Android). Decide: drop the blur and keep the solid colour, or keep it.
-- [ ] Safe area: `header.css` sets `top: env(safe-area-inset-top)` on the sticky header, but `scroll-padding-top` (`base.css`, `fold.css`) doesn't add the inset. Only shows in landscape or from the home screen. Check on an iPhone.
 - [ ] Desktop zoom barely enlarges text: the root font follows the window (`tokens.css`, `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`), so at 110-125% zoom the text grows about 9%. 150% and up behaves normally, so WCAG 1.4.4 passes. A floor of `1rem` would fix zoom but makes text up to 14% bigger at 100% on laptops under 1440 x 900, which can push one-screen sections past the screen. Decide, then check with `verify_styles.py`.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
