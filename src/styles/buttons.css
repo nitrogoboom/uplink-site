@@ -76,3 +76,21 @@
 .link-arrow svg { width: var(--sp-4); height: var(--sp-4); transition: transform var(--dur-1) var(--ease); }
 .link-arrow:hover svg { transform: translateX(var(--sp-1)); }
 
+
+/* pause button (HoldButton.astro): a round key with two bars, or a play triangle while held. core.js shows it with
+   script and motion; the caller places it (.hero-pause, .fc-hold). */
+.hold {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-solid);
+  color: var(--c-text);
+  transition: background-color var(--dur-1) var(--ease);
+}
+.hold[hidden] { display: none; }
+.hold:hover { background: var(--c-surface-2); }
+.hold-icon { width: calc(var(--icon) * 0.6); height: calc(var(--icon) * 0.7); border-inline: calc(var(--icon) * 0.2) solid currentColor; }
+.hold[aria-pressed="true"] .hold-icon { border: 0; background: currentColor; clip-path: polygon(15% 0, 100% 50%, 15% 100%); }

@@ -12,6 +12,7 @@ import Sep from '../Sep.astro';
 import { HERO, PAGES, getServices } from '../../lib/site';
 import type { IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
+import HoldButton from '../HoldButton.astro';
 // the two news cards under the drawing. The chip comes after the title in the markup, so a screen reader says
 // "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
@@ -63,8 +64,8 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
              download the still (phones with motion get the animated cut from home.js). Where it shows it is the largest
              paint, so index.astro preloads it there and it is asked for first. -->
         <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><source media="(prefers-reduced-motion: no-preference)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt={still} width="1200" height="900"></picture>
-        <!-- stops every moving part on the page (WCAG 2.2.2); home.js wires it, so it shows only with script and motion -->
-        <button class="hero-pause" type="button" hidden aria-pressed="false" aria-label="Pause animations"><span class="hero-pause-icon" aria-hidden="true"></span></button>
+        <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
+        <HoldButton class="hero-pause" />
       </div>
       <div class="hero-dock">
         {news.map((n) => (

@@ -64,8 +64,8 @@ a:hover { text-decoration-color: currentColor; }
   border-radius: var(--r-1);
 }
 
-/* set by script on the hero and footer drawings while they are off screen, and on <html> by the hero's pause
-   button (.is-held). !important because the inline drawings' own <style> comes later. */
+/* set by script on the hero and footer drawings while they are off screen, and on <html> by the pause
+   buttons (.is-held, core.js). !important because the inline drawings' own <style> comes later. */
 .is-idle, .is-idle *, .is-held, .is-held * { animation-play-state: paused !important; }
 .no-trans, .no-trans * { transition: none !important; }   /* a first state that should appear at once (home.js) */
 

@@ -117,6 +117,9 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-hud svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-accent-text); }
 .fc-hud b { display: block; font-size: var(--fs-2); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; color: var(--c-accent-text); }
 .fc-hud small { display: block; font-size: var(--fs-2); line-height: var(--lh-snug); color: var(--c-muted); }
+/* pause button (HoldButton.astro, look in buttons.css), top right, clear of the label; only once the map is in */
+.fc-hold { position: absolute; top: 0; right: 0; }
+.fc-map:not(:has(> svg.fc-w)) .fc-hold { display: none; }
 
 /* dock: the roster */
 .fc-dock { background: var(--c-bg-band); border-top: 1px solid var(--c-line); }

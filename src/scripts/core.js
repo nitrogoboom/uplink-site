@@ -179,6 +179,26 @@ function presetService(name) {
   sel.selectedIndex = opt ? opt.index : 0;
 }
 
+/* ---------- pause (WCAG 2.2.2) ------------------------------------------ */
+// Every pause button (HoldButton.astro: the hero's on Home, the footer map's on every page) holds every moving part
+// on the page. html.is-held pauses the CSS animations (base.css); page scripts stop their timers on held.ev's
+// 'change' (home.js). One choice for the whole site, kept for next time. Nothing moves with reduced motion, so
+// the buttons hide then.
+const HOLD_KEY = 'uplink-held';
+const held = { on: false, ev: new EventTarget() };
+const holdBtns = $$('[data-hold]');
+const setHeld = (on) => {
+  held.on = on;
+  root.classList.toggle('is-held', on);
+  holdBtns.forEach((b) => b.setAttribute('aria-pressed', String(on)));
+  held.ev.dispatchEvent(new Event('change'));
+};
+if (store.get(HOLD_KEY) === '1') setHeld(true);
+const showHold = () => holdBtns.forEach((b) => { b.hidden = reduceMotion.matches; });
+holdBtns.forEach((b) => b.addEventListener('click', () => { setHeld(!held.on); store.set(HOLD_KEY, held.on ? '1' : '0'); }));
+showHold();
+reduceMotion.addEventListener('change', showHold);
+
 /* ======================================================================
    Keyboard shortcuts
    ====================================================================== */
@@ -346,4 +366,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, html, reduceMotion, replay, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, held, html, reduceMotion, replay, toast, openDialog, shortcutsOn, whenOnScreen };
