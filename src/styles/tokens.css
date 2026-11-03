@@ -196,6 +196,9 @@
 @media (--phone) {
   :root { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
 }
+@media (--tablet) {   /* tablets with bigger text get the tab bar too (bottom-nav.css) */
+  :root[data-text] { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); }
+}
 @media (--tablet-up) {
   :root { --gutter: 1.5rem; }
 }

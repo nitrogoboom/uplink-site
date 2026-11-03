@@ -79,9 +79,12 @@
   .grow.is-live .grow-card .chip,
   .grow.is-live .grow-card ul { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
-/* phone: the bottom nav floats, so the stage stops a step above it */
+/* phone (and tablets with bigger text, which get the bar too): the bottom nav floats, so the stage stops a step above it */
 @media (--phone) {
   .grow.is-live { --grow-stage: calc(var(--fold-h) - var(--sp-5)); }
+}
+@media (--tablet) {
+  :root[data-text] .grow.is-live { --grow-stage: calc(var(--fold-h) - var(--sp-5)); }
 }
 .grow-count { justify-self: end; font-size: var(--fs-2); color: var(--c-muted); font-variant-numeric: tabular-nums; }
 .grow-num { font-family: var(--font-display); font-size: var(--fs-6); font-style: italic; font-weight: 800; line-height: var(--lh-tight); color: var(--c-text); }

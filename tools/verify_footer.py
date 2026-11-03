@@ -4,7 +4,9 @@
 # loaded once at phone size for script errors and sideways scroll. --all gives every page the full treatment.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
 # doesn't answer hover, a tower that doesn't grow, a footer tab at 1440x900 that isn't one screen tall or whose panel
-# overflows, sideways scroll, anything serious or critical from axe, or a sitemap with fewer than five pages.
+# overflows, sideways scroll, a header whose tabs come within 8px of the logo or buttons (or scroll) at any width
+# from 320 to 1440 in 10px steps and on wider screens, at the default and 200% text, anything serious or critical
+# from axe, or a sitemap with fewer than five pages.
 # CI runs it on every push and pull request before deploy (.github/workflows/site.yml).
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_footer.py out/ [port] [--all]
 import asyncio, sys
@@ -67,6 +69,20 @@ async def main():
         await pg.keyboard.press('ArrowRight'); await pg.wait_for_timeout(300)
         rep.append('arrow key -> '+await pg.evaluate("document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id"))
         await pg.close()
+        # header fit: at every 10px from 320 to 1440 (and four wider screens), at the default and the biggest text size,
+        # the tabs keep 8px clear of the logo and the buttons and don't scroll, and nothing scrolls sideways. Room for a
+        # new header button has to be made in bottom-nav.css (its measured rules), not found here later.
+        for text in ('','2'):
+            ctx=await b.new_context(); await ctx.add_init_script(f"try{{localStorage.setItem('uplink.text','{text}')}}catch(e){{}}")
+            q=await ctx.new_page(); await q.set_viewport_size({'width':1440,'height':900}); await q.goto(url('about')); worst=None
+            for w in [*range(320,1441,10),1600,1920,2560,3440]:
+                await q.set_viewport_size({'width':w,'height':900}); await q.wait_for_timeout(60)
+                r=await q.evaluate("""()=>{const t=document.querySelector('.tabs'),u=t.querySelector('ul').getBoundingClientRect(),b=document.querySelector('.brand').getBoundingClientRect(),a=document.querySelector('.hdr-actions').getBoundingClientRect();
+                  const on=getComputedStyle(t).display!=='none';return {room:Math.round(on?Math.min(u.left-b.right,a.left-u.right):a.left-b.right),cut:on?t.scrollWidth-t.clientWidth:0,side:document.documentElement.scrollWidth-innerWidth}}""")
+                if worst is None or r['room']<worst[1]: worst=(w,r['room'])
+                if r['room']<8 or r['cut']>0 or r['side']>0: fails.append(f"header at {w}px, text {text or 'default'}: {r['room']}px room, tabs cut {r['cut']}px, sideways {r['side']}px")
+            rep.append(f"header fit, text {text or 'default'}: tightest {worst[1]}px at {worst[0]}px wide")
+            await ctx.close()
         # each page at its sizes, a few at a time (each page gets its own tab, so they can't disturb each other)
         lim=asyncio.Semaphore(LANES)
         async def sized(page,n,w,h):

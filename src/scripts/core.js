@@ -277,17 +277,20 @@ $$('form[data-validate]').forEach((form) => {
 /* ---------- phone tab bar: out of the way while reading ----------------- */
 // Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
 // It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put: the home tower pins under it. Wider screens hide the bar, so the listener does nothing there.
+// The header stays put: the home tower pins under it. The bar shows on phones, and on tablets with bigger text
+// (bottom-nav.css); elsewhere it is hidden, so the listener does nothing there.
 const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia(MEDIA.phone);
+  const tablet = window.matchMedia(MEDIA.tablet);
+  const barOn = () => phone.matches || (tablet.matches && root.dataset.text !== undefined);
   let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
-    if (!phone.matches) { show(true); return; }
+    if (!barOn()) { show(true); return; }
     const y = window.scrollY;
     if (lastY === null) lastY = y;
     const end = root.scrollHeight - window.innerHeight - STEP;
@@ -296,8 +299,8 @@ if (botnav) {
     show(y < lastY);
     lastY = y;
   };
-  window.addEventListener('scroll', () => { if (!queued && phone.matches) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
-  phone.addEventListener('change', () => { lastY = window.scrollY; show(true); });
+  window.addEventListener('scroll', () => { if (!queued && barOn()) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
+  [phone, tablet].forEach((m) => m.addEventListener('change', () => { lastY = window.scrollY; show(true); }));
   botnav.addEventListener('focusin', () => show(true));
 }
 
