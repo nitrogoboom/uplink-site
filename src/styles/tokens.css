@@ -3,7 +3,7 @@
    Every size, colour and timing on the site comes from this file.
    Layout concept: game-client chrome (sticky top bar) around calm scrolling
    sections. Heroes and the header run full width; cards and lists sit in one
-   centred block (--container, 94rem on desktop; layout-reference.md).
+   centred block (--container, 94rem on desktop; docs/layout-reference.md).
    ========================================================================== */
 
 :root {

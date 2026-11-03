@@ -7,9 +7,11 @@ import astro from 'eslint-plugin-astro';
 import globals from 'globals';
 
 export default defineConfig(
-  { ignores: ['dist/', 'out/', 'site/', 'editing-room/', '.astro/', '.wrangler/', 'node_modules/'] },
+  // .claude/ holds the app's git worktrees (whole copies of the repo), which would be linted twice
+  { ignores: ['dist/', 'out/', 'site/', 'editing-room/', '.astro/', '.wrangler/', 'node_modules/', '.claude/'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
+  { languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } } },
   ...astro.configs.recommended,
   { files: ['src/scripts/**/*.js', 'tools/**/*.js'], languageOptions: { globals: globals.browser } },
   { files: ['scripts/**/*.mjs', '*.{js,mjs}', 'src/**/*.ts'], languageOptions: { globals: globals.node } },
