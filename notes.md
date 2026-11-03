@@ -7,7 +7,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Page structure
-- [ ] Services grid: seven cards four across leaves one empty slot on desktop. Decide: a check-up card in the eighth slot, or a different column count.
+- [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
 - [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
 - [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page; the hours card's "1 day, reply within" needs a label that says it is for new messages (About's 12 min is the client help desk).
