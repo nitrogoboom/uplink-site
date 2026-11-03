@@ -14,7 +14,7 @@ import { $, $$, html, reduceMotion, whenOnScreen } from './core.js';
 // tools/gen_tower.py) and builds over 0.4 (storeys 0.55). q is eased toward the scroll so a flick can't make the
 // floors jitter. Every screen but a short desktop one: the stage holds still for RUN of a screen per level
 // (grow.css: 1 + 3 x RUN = 3.7). Short desktop screens: q follows the steps down the
-// right-hand column. Each level's camera (data-cam1..3) is widened to the picture's shape, and zoomed out to at
+// right-hand column. Reduced motion: no stage and no scrub; the steps stack and the drawing shows finished. Each level's camera (data-cam1..3) is widened to the picture's shape, and zoomed out to at
 // most ZOOM times the level 3 scale per level, so the pull-back stays gentle and the tower never shrinks much.
 const tower = $('.grow svg.tg');
 const grow = tower && tower.closest('.grow');
@@ -65,7 +65,7 @@ if (grow && 'IntersectionObserver' in window) {
   };
 
   const measure = () => {
-    live = liveMode.matches;
+    live = liveMode.matches && !reduceMotion.matches;
     grow.classList.toggle('is-live', live);
     drawn = null;
     if (live) {
@@ -87,6 +87,7 @@ if (grow && 'IntersectionObserver' in window) {
   };
 
   const target = () => {
+    if (reduceMotion.matches) return 3;
     if (live) return (pinTop - grow.getBoundingClientRect().top - stageTop) / (RUN * stageH) + LEAD;
     const first = steps[0].getBoundingClientRect();
     return (window.innerHeight * 0.85 - first.top) / steps[0].offsetHeight;
@@ -176,6 +177,7 @@ if (grow && 'IntersectionObserver' in window) {
   window.requestAnimationFrame(() => window.requestAnimationFrame(() => grow.classList.remove('no-trans')));
   liveMode.addEventListener('change', measure);
   wide.addEventListener('change', measure);
+  reduceMotion.addEventListener('change', measure);
   // Phones fire resize each time the address bar slides; the layout here follows the width and the small viewport
   // height (svh), which don't change then, so measure only when one of those does (each measure forces layouts).
   let size = window.innerWidth + 'x' + document.documentElement.clientHeight;

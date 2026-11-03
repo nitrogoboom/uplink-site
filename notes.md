@@ -3,7 +3,6 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
-- [ ] Grow section ignores reduced motion: `liveMode` in `home.js` never checks `reduceMotion`, so it still pins for 3.7 screens and scrubs with the scroll; on phones it also hides each step's chip and bullets. Fix: `live = liveMode.matches && !reduceMotion.matches`, steps stacked at the final frame.
 - [ ] Forced reflow at load: `measure()` in `home.js` runs at module eval, writes `is-live` and `--grow-cap`, then reads `offsetHeight` and `getComputedStyle` (again on `fonts.ready`). Likely the PageSpeed "Forced reflow: [unattributed] 36 ms" on mobile Home. Fix: run it in a rAF, reads before writes.
 - [ ] Hero drawings and the cache: their `<style>` blocks are hashed into the page CSP, but `/assets/img/*` keeps stable names with `max-age=86400, stale-while-revalidate=604800` (`public/_headers`). After a drawing is regenerated, a returning visitor can get new HTML with an old SVG, and the CSP blocks its styles. Fix: content-hashed names for the four hero files (import `?url`), or `no-cache` on those four.
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Say it's a prototype, like the newsletter toast.

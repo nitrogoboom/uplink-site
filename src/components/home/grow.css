@@ -21,7 +21,7 @@
   .grow-art svg { max-height: calc(var(--fold-h) - var(--sp-7)); }
   .grow-steps { grid-column: 2; grid-row: 2; gap: 30vh; padding-block: 8vh 24vh; }
 }
-/* once home.js runs (.is-live; every screen but a short desktop one): the section is one stage, a screen tall, that
+/* once home.js runs (.is-live; every screen but a short desktop one, and never with reduced motion): the section is one stage, a screen tall, that
    holds still for 2.7 more screens while the scroll builds each level. No scroll snap: it pulled the page about 200px
    either way around each level and fought the visitor. On the stage: the level HUD over the picture, and the active
    step (the steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
