@@ -155,6 +155,17 @@
   --dur-2: 250ms;
   --dur-3: 600ms;
   --dur-pulse: 1.8s;   /* a dot's ring, looping */
+  /* footer (footer.css): a panel sliding in, the map's colour and route fades, and the map's loops (each loop's
+     steps() count is its frames, so change the two together) */
+  --dur-fc-panel: 360ms;
+  --dur-fc-fill: 450ms;
+  --dur-fc-route: 400ms;
+  --loop-fc-flow: 1.2s;
+  --loop-fc-blink: 4s;
+  --loop-fc-bob: 3s;
+  --loop-fc-mk-bob: 2.2s;
+  --loop-fc-ring: 2.4s;
+  --loop-fc-sig: 2.8s;
 
   /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
   --fs-hero-phone: 2.5rem;    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */

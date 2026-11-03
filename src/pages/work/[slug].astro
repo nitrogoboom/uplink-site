@@ -6,7 +6,6 @@ import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
 import { PAGES } from '../../lib/site';
-import '../../components/work/details.css';
 import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
@@ -16,11 +15,12 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { id, data: p } = project;
 const url = new URL(`/work/${id}`, Astro.site).href;
+const description = `${p.client}. ${p.result}.`;   // as the sitemap list and llms.txt say it (allPages in src/lib/site.ts)
 const services = await getEntries(p.services);
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Article', '@id': url, url, headline: p.name, description: p.story, inLanguage: 'en-CA',
+    { '@type': 'Article', '@id': url, url, headline: p.name, description, inLanguage: 'en-CA',
       publisher: { '@id': `${Astro.site!.href}#business` },
       about: services.map((s) => ({ '@id': new URL(`/services/${s.id}`, Astro.site).href })),
       articleBody: [...p.page.challenge, ...p.page.steps.map((t) => `${t.title}. ${t.detail}`), ...p.page.results].join('\n\n') },
@@ -31,7 +31,7 @@ const ld = {
   ],
 };
 ---
-<Base title={`${p.name} · Uplink Technology`} description={`${p.client}. ${p.story}`} page="work" path={`/work/${id}`}>
+<Base title={`${p.name} · Uplink Technology`} description={description} page="work" path={`/work/${id}`}>
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={JSON.stringify(ld, null, 1).replace(/<\//g, '<\\/')} />
   </Fragment>

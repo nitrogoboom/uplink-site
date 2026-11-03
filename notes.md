@@ -7,11 +7,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero "Main menu" repeats the header tabs. Decided 2 Nov 2026: it becomes service links (cyber security, help desk and the like) in a later pass; then drop or rename its `<nav>` landmark so screen readers list one main menu.
 
 ## Code (whole-project review 2 Nov 2026)
-- [ ] A case study's description is `client. story` on its page (`work/[slug].astro:33`) but `client. result.` in the sitemap list and `llms.txt` (`site.ts`). Pick one.
-- [ ] Inline SVG icons where `<Icon>` has them: close (`BookDialog.astro`, `ShortcutsDialog.astro`), arrow (`Hero.astro:31`), headset (`Support.astro`), phone and mail (`Message.astro`). Check the stroke widths match after the swap.
-- [ ] Page-only files in `src/styles/`: `svc-cards.css` (Contact) and `industries.css` (About; header still says Work). `pick.css` and `details.css` are imported by the `[slug]` pages, not by `ServiceCard`/`ProjectCase` they style. Move them; then the CSS order in `src/README.md` (it also misses `detail-pages.css`).
-- [ ] Raw timings in `footer.css` (31, 173, 189-191, 207-214) and in `home.js`/`footer.js` (3200, 180, 2200, 170, 700); 170 and 180 in `home.js` shadow `--dur-1`. Move to tokens.
 - [ ] Small, left as they are: `box()` is defined three times (`gen_hq.py`, `gen_tower.py`, `gen_office.py`), each a little different; `.sort((a, b) => a.data.order - b.data.order)` repeats across pages; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
+- [ ] Pause button (PR #41) was merged before its phone check: try it on a phone.
 
 ## Page structure
 - [ ] Services grid: seven cards four across leaves one empty slot on desktop (and the seventh alone on tablet). The Services page is placeholder; left for later (2 Nov 2026). Idea when it comes up: the IT strategy card spanning two columns fills both sizes without new copy; a check-up card would repeat the "Book a check-up" button right above.

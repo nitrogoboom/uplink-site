@@ -1,11 +1,12 @@
 ---
 // SHARED · Keyboard shortcuts pop-up (every page)
 // Opened with ? or the footer's "Keyboard shortcuts" button. Styles: src/styles/dialogs.css.
+import Icon from './Icon.astro';
 ---
 <dialog class="dialog" id="shortcuts-dialog" aria-labelledby="sc-title">
   <div class="dlg-head">
     <h2 id="sc-title">Keyboard shortcuts</h2>
-    <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg><span class="sr-only">Close</span></button>
+    <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close</span></button>
   </div>
   <div class="dlg-body">
     <label class="switch" for="sc-toggle">

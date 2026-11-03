@@ -1,5 +1,5 @@
 /*--- WORK · a project's own page (/work/<slug>): breadcrumb, title, story and facts beside the drawing. The parts
-   are ProjectCase's (details.css styles them); this places them. Desktop layout at the end. ---*/
+   are ProjectCase's (project-case.css styles them); this places them. Desktop layout at the end. ---*/
 .proj-page { padding-block: var(--sp-6) var(--sp-7); }
 .proj-page-grid {
   display: grid;
