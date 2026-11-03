@@ -133,6 +133,8 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 }
 @media (hover: hover) { .fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }   /* real pointers only: on touch a tap leaves :hover stuck */
 .fc-tile[aria-selected="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
+/* bigger text (Settings): a tile grows to fit its name and count (its usual size is the least it takes) */
+:root[data-text] .fc-tile { min-width: calc(var(--sp-9) + var(--sp-6)); width: auto; min-height: calc(var(--sp-9) - var(--sp-1)); height: auto; }
 .fc-tile .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
 .fc-tile[aria-selected="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .fc-tile-n { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: var(--lh-tight); text-transform: uppercase; }
@@ -249,8 +251,11 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .js .fc { height: var(--fold-h); min-height: 40rem; }
   .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .js .fc-panels { padding-top: var(--sp-2); }
-  .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
+  .fc-head h3 { font-size: calc(min(var(--fs-8) / var(--text), 8.2svh) * var(--text)); }   /* the cap grows with the text size too */
   .js .fc-map { min-height: 0; height: 100%; }
+  /* bigger text (Settings): the footer grows past one screen to fit its panels */
+  :root[data-text].js .fc { height: auto; min-height: var(--fold-h); }
+  :root[data-text].js .fc-map { height: auto; min-height: 26rem; }
   @media (max-height: 820px) {
     .js .fc-stage { padding-top: var(--sp-6); }
     .fc-body { margin-top: var(--sp-5); }

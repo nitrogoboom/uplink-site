@@ -43,4 +43,10 @@
   .page-intro .work-layout { display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); column-gap: var(--sp-8); align-items: center; }
   .work-side .filters { flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
   .work-side .filter { width: 100%; justify-content: space-between; border-radius: var(--r-2); }
+  /* bigger text (Settings): the section grows to fit; the cards' pictures keep their own shape */
+  :root[data-text] :is(.work-layout, .work-main, .work-grid) { height: auto; }
+  :root[data-text] .work-layout { min-height: var(--fold-inner); }
+  :root[data-text] .page-intro .work-layout { grid-template-rows: auto; }
+  :root[data-text] .work-grid { grid-template-rows: none; }
+  :root[data-text] .work-grid .card-media { flex: none; }
 }
