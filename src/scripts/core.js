@@ -267,13 +267,14 @@ const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia('(max-width: 699px)');   // as bottom-nav.css
-  let lastY = window.scrollY;
+  let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
     if (!phone.matches) { show(true); return; }
     const y = window.scrollY;
+    if (lastY === null) lastY = y;
     const end = root.scrollHeight - window.innerHeight - STEP;
     if (y <= 0 || y >= end || botnav.contains(document.activeElement)) { show(true); lastY = y; return; }
     if (Math.abs(y - lastY) < STEP) return;
