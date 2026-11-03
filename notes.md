@@ -9,9 +9,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
-- [ ] npm `playwright` and `@axe-core/playwright` are unused: only `tools/verify_footer.py` needs `node_modules/axe-core/axe.min.js`. Run `npm uninstall @axe-core/playwright playwright` then `npm install -D -E axe-core@4.14.0`. Python's Playwright (pip, `requirements.txt`) is the one the checks use.
-- [ ] `tools/verify_*.py` pack several statements per line (about 100 `;` in 400 lines): spread them out with `pip install black` and `black -l 120 tools/verify_*.py`, then `npm run ci`.
-- [ ] Run the release checklist in `docs/sop.md` once now as a baseline; save it as `docs/releases/2026-11-DD.md`. Failures become lines here.
+- [ ] Finish the by-hand parts of the baseline, `docs/releases/2026-11-03.md` (browsers and phones, keyboard, screen reader, contrast, motion, forms, HTML validator). The scripted parts pass.
 - [ ] Have `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (it was written from memory).
 - [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 

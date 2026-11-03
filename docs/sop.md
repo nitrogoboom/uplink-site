@@ -48,9 +48,9 @@ On every push, the build fails if any of these break:
 - Types and Astro errors (`astro check`); lint on JS, TS, Astro, CSS and JSON/YAML.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page.
-- No sideways scroll from 320px to 3440px, at normal and 200% text.
+- No sideways scroll on any page at phone size, and on Home at four sizes. The header fits at every width from 320px to 3440px, at normal and 200% text.
 - Hero, tower and footer work; the footer is one screen tall at 1440×900.
-- **axe-core finds nothing serious or critical** (Home at phone and desktop, every other page at phone).
+- **axe-core finds nothing serious or critical on Home** (phone and desktop). Other pages get axe only with `--all`, which the release checklist runs.
 
 axe catches only a third to a half of WCAG problems, and only in Chromium. Everything else is in the checklist below.
 
@@ -63,6 +63,7 @@ Do it on the live site (or the PR preview for a first launch). Tick each box, an
 ### A. Build and hosting (5 min)
 
 - [ ] CI green on the commit that's live. Proof: link to the Actions run.
+- [ ] Full browser check passes on every page: `npm run build`, `npm run serve`, then `python tools/verify_footer.py out/ --all` (axe on every page) and `python tools/verify_text.py` (200% text). Proof: the last lines of each.
 - [ ] `npx wrangler deployments list` shows that commit's version live.
 - [ ] Response headers present (`curl -sI <address>`: HSTS, CSP, X-Content-Type-Options). Proof: paste the header lines.
 - [ ] 404 page shows for a made-up address, with a 404 status.

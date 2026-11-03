@@ -13,6 +13,7 @@
 import asyncio, sys
 from playwright.async_api import async_playwright
 from site_pages import SIZES, pages
+
 args = sys.argv[1:]
 TEXT = args[args.index('--text') + 1] if '--text' in args else '2'
 port = next((a for a in args if a.isdigit() and a != TEXT), '8787')
@@ -90,20 +91,28 @@ async def main():
                 ctx = await b.new_context(viewport={'width': w, 'height': h})
                 await ctx.add_init_script(f"try {{ localStorage.setItem('uplink.text', '{TEXT}') }} catch (e) {{}}")
                 pg = await ctx.new_page()
-                await pg.goto(base + path, wait_until='networkidle'); await pg.wait_for_timeout(600)
+                await pg.goto(base + path, wait_until='networkidle')
+                await pg.wait_for_timeout(600)
                 r = await pg.evaluate(PROBE)
                 # the home tower is a scroll story: its tags and steps show only part way down, so read it there too
-                stops = await pg.evaluate("(() => { const g = document.querySelector('.grow'); if (!g) return []; const t = g.getBoundingClientRect().top + scrollY; return [0.1, 0.3, 0.5, 0.7, 0.85, 0.92, 0.97].map((f) => t + g.offsetHeight * f - innerHeight * 0.3); })()")
+                stops = await pg.evaluate(
+                    "(() => { const g = document.querySelector('.grow'); if (!g) return []; const t = g.getBoundingClientRect().top + scrollY; return [0.1, 0.3, 0.5, 0.7, 0.85, 0.92, 0.97].map((f) => t + g.offsetHeight * f - innerHeight * 0.3); })()"
+                )
                 for y in stops:
-                    await pg.evaluate(f'window.scrollTo(0, {y})'); await pg.wait_for_timeout(700)
+                    await pg.evaluate(f'window.scrollTo(0, {y})')
+                    await pg.wait_for_timeout(700)
                     s = await pg.evaluate(PROBE)
                     for k in ('clip', 'over'):
                         r[k] += [f'(scrolled to the tower) {x}' for x in s[k] if x not in r[k]]
                 await ctx.close()
-                found = [f'{len(r[k])} {k}' for k in ('clip', 'over', 'away') if r[k]] + ([f'{r["sideways"]}px sideways'] if r['sideways'] > 0 else [])
+                found = [f'{len(r[k])} {k}' for k in ('clip', 'over', 'away') if r[k]] + (
+                    [f'{r["sideways"]}px sideways'] if r['sideways'] > 0 else []
+                )
                 lines = [f'{path:28} {n:6} ' + (', '.join(found) if found else 'ok')]
                 for k in ('clip', 'over', 'away'):
-                    lines += [f'    {k}: {x}' for x in r[k][:4]] + ([f'    {k}: … {len(r[k]) - 4} more'] if len(r[k]) > 4 else [])
+                    lines += [f'    {k}: {x}' for x in r[k][:4]] + (
+                        [f'    {k}: … {len(r[k]) - 4} more'] if len(r[k]) > 4 else []
+                    )
                 return lines, bool(found)
 
         results = await asyncio.gather(*(one(path, *s) for path in paths for s in SIZES))
@@ -112,5 +121,6 @@ async def main():
     bad = sum(f for _, f in results)
     print(f'\n{bad} of {len(results)} page sizes with findings' if bad else '\nall clear')
     sys.exit(1 if bad else 0)
+
 
 asyncio.run(main())
