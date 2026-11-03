@@ -6,7 +6,7 @@ import { byOrder } from '../../content.config';
 import Icon from '../Icon.astro';
 const faq = (await getCollection('faq')).sort(byOrder);
 ---
-<section class="section fold" id="faq" aria-labelledby="faq-title">
+<section class="section fold fold-always" id="faq" aria-labelledby="faq-title">
   <div class="container split">
     <div class="section-head">
       <p class="eyebrow">Questions</p>

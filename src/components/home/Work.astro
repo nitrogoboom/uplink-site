@@ -9,7 +9,7 @@ import Sep from '../Sep.astro';
 import { cardSize } from '../../lib/site';
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 ---
-<section class="section section--band" id="work" aria-labelledby="work-title">
+<section class="section section--band fold" id="work" aria-labelledby="work-title">
   <div class="container stack-5">
     <div class="section-head section-head--split">
       <div>
