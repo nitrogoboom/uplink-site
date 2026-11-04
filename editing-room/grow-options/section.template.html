@@ -113,8 +113,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .steps { display: grid; gap: var(--sp-3); min-width: 0; }
 .pill .num, .pill .ic, .pill .sub { display: none; }
 .hud { display: none; }
-.ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); pointer-events: none; }
-.ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 138.2; stroke-dashoffset: 138.2; }
+/* the timer is the play/pause button's own outline: an amber line runs round its edge, over the grey border */
+.pause .ring { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); transform: rotate(-90deg); pointer-events: none; overflow: visible; }
+.pause .ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; vector-effect: non-scaling-stroke; }
 [data-nav="pills"] .ring { display: none; }
 [data-nav]:not([data-nav="pills"]) .pill .fill { display: none; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
@@ -184,7 +185,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } .scene [stroke-dasharray], .scene .dome-rim { animation: none; } }
 
 /* mockup controls, not part of the design */
-.mock { position: fixed; right: 12px; bottom: calc(12px + var(--botnav-h)); z-index: 30; background: var(--c-solid); border: 1px solid var(--c-line-2); border-radius: 12px; padding: 8px 12px; font: 400 13px/1.3 'Barlow', sans-serif; color: var(--c-muted); max-width: calc(100vw - 24px); }
+.mock { position: fixed; left: 12px; bottom: calc(12px + var(--botnav-h)); z-index: 30; background: var(--c-solid); border: 1px solid var(--c-line-2); border-radius: 12px; padding: 8px 12px; font: 400 13px/1.3 'Barlow', sans-serif; color: var(--c-muted); max-width: calc(100vw - 24px); }
 @media (min-width: 700px) { .mock { bottom: 12px; } }
 .mock summary { cursor: pointer; font-weight: 600; color: var(--c-text); }
 .mock .ctl { display: grid; gap: 6px; margin-top: 8px; }
@@ -211,8 +212,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   <div class="ctl">
     <span id="cam-l">Camera</span>
     <div class="seg" role="group" aria-labelledby="cam-l"><button type="button" data-k="camera" data-v="still" aria-pressed="false">Still</button><button type="button" data-k="camera" data-v="follow" aria-pressed="true">Follows growth</button></div>
-    <span id="lot-l">Future lots</span>
-    <div class="seg" role="group" aria-labelledby="lot-l"><button type="button" data-k="lots" data-v="1" aria-pressed="true">Show</button><button type="button" data-k="lots" data-v="0" aria-pressed="false">Hide</button></div>
   </div>
 </details>
 
@@ -268,7 +267,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       </div>
       <div class="card" aria-live="polite"></div>
       <div class="stage"><div class="scene on"><span class="s-title"></span><span class="step-n"></span>${WORLD}${TAGS.map((tags, i) => tags.map((t, k) => `<span class="tag" data-step="${i}" data-k="${k}"><span class="ico">!</span><span class="tx">${esc(t.r)}</span></span>`).join('')).join('')}</div>
-        <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg><svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22"/></svg></button></div>
+        <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="100"/></svg></button></div>
     </div>`;
     if (host.dataset.layout !== 'desk') {   // phone and tablet order: heading, picture, pills, card
       const inn = host.querySelector('.in');
@@ -387,7 +386,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       hudName.textContent = PLACES[Math.max(0, i)].pill;
       prev.disabled = i <= 0; next.disabled = i >= PLACES.length - 1;
       // the timer: a ring round play/pause fills over the step while it plays
-      ring.style.transition = 'none'; ring.style.strokeDashoffset = '138.2';
+      ring.style.transition = 'none'; ring.style.strokeDashoffset = '100';
       if (timed && i >= 0) requestAnimationFrame(() => requestAnimationFrame(() => { ring.style.transition = `stroke-dashoffset ${DWELL}ms linear`; ring.style.strokeDashoffset = '0'; }));
     };
     const setIcon = (d, label) => { pause.setAttribute('aria-label', label); pause.querySelector('path').setAttribute('d', d); };
@@ -433,7 +432,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     opts[k] = k === 'lots' ? b.dataset.v === '1' : b.dataset.v;
     $$(`.mock .ctl button[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     screens.forEach((s) => s.refresh());
-    if (k === 'lots') { stop(); go(-1, false); play(); }   // lots only show on ground not built yet: replay so the difference shows
   }));
   if (reduce) go(LAST, false); else go(-1, false);
   icon();

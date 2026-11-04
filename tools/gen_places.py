@@ -41,6 +41,7 @@ class Scene:
         self.name, self.title, self.disc = name, title, disc     # disc = (x, y, r)
         self.ops, self.ground, self.points, self.anchors = [], [], [], {}
         self.step = None                                         # the growing world: which step a part arrives on
+        self.whole_grid = False                                  # True: floor lines run under everything (the growing world)
 
     def group(self, o):
         s = f' data-s="{self.step}"' if self.step else ''
@@ -317,13 +318,8 @@ def world():
     on; nothing moves or rebuilds, later steps only add. Drawn back to front whatever the step (painter order).
     The ring lies on the ground under everything, and everything stands inside it."""
     s = Scene('world', 'A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it', (0, 0, 9))
+    s.whole_grid = True
     st = lambda n: setattr(s, 'step', n)
-    # lots: faint dashed footprints where the business will grow (the page shows a step's lot until that step is built)
-    LOTS = [(2, [(-5.75, -3.25, 2.75, 5.25)]), (3, [(0.0, 5.0, 4.0, 6.25), (3.75, 5.75, 1.5, 3.5)]), (4, [(2.25, 5.25, -5.75, -2.75)])]
-    for n, rects in LOTS:
-        polys = ''.join(f'<polygon points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="{pal.SKY}" fill-opacity="0.09" '
-                        f'stroke="{pal.SKY}" stroke-width="1.75" stroke-opacity="0.75" stroke-dasharray="6 5"/>' for x0, x1, y0, y1 in rects)
-        s.raw(f'<g class="lot" data-s="{n}">{polys}</g>')
     # on the ground, under everything: the ring, then the cables and the road
     st(5); ring(s, RING, 0)
     st(2); link(s, [(-1.5, 0.0), (-4.5, 0.0), (-4.5, 2.75)], 1)
@@ -375,7 +371,9 @@ SCENES = {'office': office, 'home': home, 'road': road_scene, 'second': second, 
 def render(s):
     BOXES.clear()
     cx, cy, r = s.disc
-    mask = unary_union(s.ground) if s.ground else None
+    # floor lines stop under what stands on them, except in the growing world: there parts arrive one step at a time,
+    # so a cut-out would show as a blank patch until its part is built; they're opaque and cover the lines anyway
+    mask = Polygon() if s.whole_grid or not s.ground else unary_union(s.ground)
     body = [floor_grid(w, (cx, cy), r, mask, phase=(0.5, 0.5)) + disc_arcs(w, r, cx, cy)]
     for op in s.ops:
         if op[0] == 'raw':
