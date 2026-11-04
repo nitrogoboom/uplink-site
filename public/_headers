@@ -13,7 +13,8 @@
 # Reporting-Endpoints / report-to csp (and report-uri for browsers without the Reporting API): every CSP block a
 # visitor's browser hits is posted to /api/report (worker/index.js), which logs it. Same origin, so nothing new to allow.
 # X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
-# robots.txt still allows crawling, so search engines can read this. At launch, delete the line.
+# robots.txt still allows crawling, so search engines can read this, and names no sitemap (src/pages/robots.txt.ts).
+# At launch, delete the line and put the Sitemap line back in robots.txt (notes.md, "Before going live").
 /*
   X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000
@@ -29,6 +30,15 @@
 # first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
 # @early-hints (written by scripts/headers.mjs; edit FIRST_FONTS there, not these lines)
 # @end early-hints
+
+# Cloudflare sends .md and .txt as text/markdown and text/plain with no charset, and browsers then read them as
+# windows-1252 ("doesnâ€™t"). The files are UTF-8: say so.
+/*.md
+  ! Content-Type
+  Content-Type: text/markdown; charset=utf-8
+/*.txt
+  ! Content-Type
+  Content-Type: text/plain; charset=utf-8
 
 # Astro names every bundled CSS and JS file by its content hash (/_astro/x.ab12cd34.css), so a year is safe.
 /_astro/*

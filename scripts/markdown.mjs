@@ -39,7 +39,9 @@ const md = (site, page) => {
     filter: (node) => DROP.includes(node.nodeName.toUpperCase()) || node.getAttribute?.('aria-hidden') === 'true'
       || node.hasAttribute?.('data-md-skip') || node.hasAttribute?.('hidden') || cls(node, 'tags', 'kbd', 'roster-wrap')
       || (cls(node, 'eyebrow') && !/^H[1-6]$/.test(node.nodeName))   // Services' h1 is styled as an eyebrow
-      || (cls(node, 'chip') && node.parentNode?.nodeName !== 'LI'),
+      || (cls(node, 'chip') && node.parentNode?.nodeName !== 'LI')
+      // a <Pause /> after a label: the label rule's ": " already separates ("Office move: Law office", not ": .")
+      || (cls(node, 'sr-only') && !!node.previousElementSibling && cls(node.previousElementSibling, 'label', 'chan-title', 'card-title')),
     replacement: () => '',
   });
   td.addRule('feature', { filter: (node) => cls(node, 'feat-d'), replacement: (content) => `: ${content.trim()}` });

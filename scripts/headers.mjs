@@ -8,6 +8,9 @@
 //                     has no 'unsafe-inline'.
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
 //                     before the HTML. The font list is read from the home page's preloads (Base.astro).
+// It also writes dist/_redirects: the other spellings of each page's address (/services/, /services.html,
+// /index.html) to the one address, as 308 (permanent). Cloudflare's own html_handling sends those as 307
+// (temporary), which caches and crawlers don't keep; a _redirects line wins over it.
 // It refuses to finish if a page or the hero drawing has a style="" attribute: no hash covers one, so the CSP
 // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
 import { createHash } from 'node:crypto';
@@ -64,6 +67,10 @@ const paths = pages
   .sort();
 const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
+// every page, plus /404 (served at its own name too, by the Worker): its trailing-slash and .html spellings
+const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html / 308'] : [`${p}/ ${p} 308`, `${p}.html ${p} 308`]));
+writeFileSync(join(DIST, '_redirects'), redirects.join('\n') + '\n');
+
 const src = readFileSync(join(DIST, '_headers'), 'utf-8');
 if (!src.includes('{script-hashes}') || !src.includes('{style-hashes}') || !/# @early-hints[^\n]*\n[\s\S]*?# @end early-hints\n/.test(src)) {
   throw new Error('public/_headers needs the {script-hashes} and {style-hashes} placeholders and the @early-hints block');
@@ -77,4 +84,4 @@ writeFileSync(join(DIST, '_headers'), out);
 const rules = out.split('\n').filter((l) => /^\S/.test(l) && !l.startsWith('#')).length;
 const longest = Math.max(...out.split('\n').map((l) => l.length));
 if (rules > 100 || longest > 2000) throw new Error(`_headers over Cloudflare's limits: ${rules} rules (max 100), longest line ${longest} (max 2000)`);
-console.log(`_headers: ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${rules} rules, longest line ${longest}`);
+console.log(`_headers: ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`);

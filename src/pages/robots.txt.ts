@@ -1,6 +1,8 @@
-// /robots.txt: everything may be crawled; the sitemap is at the site's own address. (While the site is a test
-// build it is kept out of results by the X-Robots-Tag header in public/_headers, not here.)
+// /robots.txt: everything may be crawled. While the site is a test build it is kept out of results by the
+// X-Robots-Tag noindex header in public/_headers; crawling stays allowed so search engines can read that header.
+// No Sitemap line meanwhile: offering a sitemap of pages that all say noindex mixes the signals.
+// At launch (notes.md, "Before going live"): take `({ site })` again and add `\nSitemap: ${new URL('/sitemap.xml', site).href}\n`.
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = ({ site }) =>
-  new Response(`User-agent: *\nAllow: /\n\nSitemap: ${new URL('/sitemap.xml', site).href}\n`, { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+export const GET: APIRoute = () =>
+  new Response('User-agent: *\nAllow: /\n', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });

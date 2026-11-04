@@ -65,6 +65,10 @@ test('headers.mjs: hashes every inline script and style, skips JSON-LD, writes E
     assert.match(out, /^\/services\n {2}Link:/m, 'every page gets a rule');
     assert.ok(!out.includes('wide.woff2'), 'a font preloaded only for some screens is left out');
     assert.ok(!/^\/404/m.test(out), 'no rule for the 404 page');
+    const redirects = readFileSync(join(dir, '_redirects'), 'utf-8').split('\n');
+    for (const line of ['/index.html / 308', '/services/ /services 308', '/services.html /services 308', '/404.html /404 308']) {
+      assert.ok(redirects.includes(line), `redirect: ${line}`);
+    }
   } finally { rmSync(dir, { recursive: true }); }
 });
 

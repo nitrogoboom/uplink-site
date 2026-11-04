@@ -1,5 +1,5 @@
 // The site's one Worker script. Everything else is the built site in dist/, served as static assets: wrangler.jsonc
-// sends only /api/* here first (run_worker_first).
+// sends only /api/* and /404 here first (run_worker_first).
 //
 // POST /api/report: problems real visitors' browsers hit, so we hear about them.
 //   CSP blocks       the browser posts these itself (public/_headers: report-to csp, report-uri for older browsers)
@@ -62,10 +62,18 @@ async function report(request) {
   return new Response(null, { status: 204 });
 }
 
+// /404 itself: the not-found page is a built file (dist/404.html), so asked for by name it would come back 200.
+// wrangler.jsonc sends /404 here too; the same page goes back with the status it describes.
+async function notFoundPage(request, env) {
+  const page = await env.ASSETS.fetch(request);
+  return new Response(page.body, { status: 404, headers: page.headers });
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const { pathname } = new URL(request.url);
     if (pathname === '/api/report') return report(request);
+    if (pathname === '/404') return notFoundPage(request, env);
     return new Response('Not found', { status: 404 });
   },
 };

@@ -21,7 +21,7 @@ import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import ShortcutsDialog from '../components/ShortcutsDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
-import { PAGES, breadcrumbs, jsonLd } from '../lib/site';
+import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { MEDIA } from '../lib/media.js';
 
 export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -48,6 +48,7 @@ const jsonld = type && canonical && {
     { '@type': type, '@id': canonical, url: canonical, name, description, inLanguage: 'en-CA', publisher: business,
       ...(type === 'AboutPage' ? { about: business } : {}), ...ldPage },
     breadcrumbs([[PAGES.home.name, Astro.site!.href], [name, canonical]]),
+    businessNode(Astro.site!),
     ...ldGraph,
   ],
 };
@@ -83,7 +84,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
   </Fragment>
 )}
 <meta name="theme-color" content="#0E1A27">
-<script is:inline>(function(r){r.classList.add('js');try{const t=localStorage.getItem('uplink.text');if(t)r.dataset.text=t}catch{/* no storage: default size */}})(document.documentElement)</script>
+<script is:inline>(function(r){r.classList.add('js');try{const t=localStorage.getItem('uplink.text');if(/^(1\.25|1\.5|1\.75|2)$/.test(t))r.dataset.text=t}catch{/* no storage: default size */}})(document.documentElement)</script>
 {fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
 <link rel="preload" href="/assets/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin media={MEDIA.tabletUp}>
 <slot name="head" />

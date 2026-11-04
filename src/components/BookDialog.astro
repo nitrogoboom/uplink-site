@@ -21,7 +21,7 @@ import Icon from './Icon.astro';
         </div>
         <div class="field">
           <label for="book-email">Work email</label>
-          <input class="input" id="book-email" name="email" type="email" autocomplete="email" placeholder="you@company.com" required>
+          <input class="input" id="book-email" name="email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" autocomplete="email" placeholder="you@company.com" required>
           <span class="field-error" id="book-email-err">Enter an email like name@company.com.</span>
         </div>
         <div class="field">

@@ -47,3 +47,11 @@ test('refuses what it should: other methods, other paths, junk, oversize', async
   assert.equal(res.status, 204);
   assert.equal(lines.length, 0, 'an unknown shape logs nothing');
 });
+
+test('/404 by name answers 404 with the page', async () => {
+  const env = { ASSETS: { fetch: async () => new Response('<h1>Not found</h1>', { status: 200, headers: { 'Content-Type': 'text/html' } }) } };
+  const res = await worker.fetch(new Request('https://example.test/404'), env);
+  assert.equal(res.status, 404);
+  assert.equal(res.headers.get('Content-Type'), 'text/html');
+  assert.equal(await res.text(), '<h1>Not found</h1>');
+});

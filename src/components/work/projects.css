@@ -1,6 +1,7 @@
 /*--- WORK · 1. Projects: filters and cards. Desktop layout at the end. ---*/
 /* ---------- WORK ----------------------------------------------------- */
 .filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
+:root:not(.js) .filters { display: none; }   /* filtering needs script (work.js); without it every project shows */
 .filter {
   display: inline-flex; align-items: center; gap: var(--sp-3);
   min-height: var(--tap);
