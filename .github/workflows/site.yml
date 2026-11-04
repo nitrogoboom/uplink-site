@@ -35,10 +35,10 @@ jobs:
     steps:
       - id: cf
         run: echo "ready=${{ secrets.CLOUDFLARE_API_TOKEN != '' && secrets.CLOUDFLARE_ACCOUNT_ID != '' }}" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # the sitemap's lastmod dates come from git history
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
@@ -50,7 +50,7 @@ jobs:
       # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
       # deploys: tools/verify_footer.py fails on a script error, a CSP block, a dead hero or Grow section, sideways scroll,
       # or a serious axe finding (Home in full, the other pages once at phone size)
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.12'
       - run: pip install "$(grep -i "^playwright==" requirements.txt)" "$(grep -i "^pillow==" requirements.txt)" && python -m playwright install --with-deps chromium
@@ -71,7 +71,7 @@ jobs:
           WRANGLER_SEND_METRICS: 'false'
           EVENT: ${{ github.event_name }}
       - if: failure()
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: site-check
           path: |
@@ -79,12 +79,12 @@ jobs:
             wrangler.log
           retention-days: 7
       - if: github.event_name == 'pull_request' && hashFiles('out/visual/*.png') != ''
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: visual-diff
           path: out/visual
           retention-days: 14
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist
           path: dist
@@ -98,14 +98,14 @@ jobs:
     environment: cloudflare
     concurrency: deploy # two quick pushes deploy one after the other, in order
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
       # only wrangler is needed here, at the version in package-lock.json, so no full npm ci
       - run: echo "WRANGLER=wrangler@$(node -p "require('./package-lock.json').packages['node_modules/wrangler'].version")" >> "$GITHUB_ENV"
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist
@@ -124,13 +124,13 @@ jobs:
       pull-requests: write
     environment: cloudflare
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
           cache: npm
       - run: echo "WRANGLER=wrangler@$(node -p "require('./package-lock.json').packages['node_modules/wrangler'].version")" >> "$GITHUB_ENV"
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist
           path: dist
