@@ -95,7 +95,7 @@ Go easy on W3C: it's a free service that limits requests per address, and a day 
 What a machine can't judge. Where it's built, it's in brackets.
 
 **Real phones** (from the PR preview link)
-- [ ] iPhone, Safari: Home, one service page, Contact. The bottom bar, the notch area, nothing hidden under the address bar, the Grow section plays, and its player stays put while the words scroll under it.
+- [ ] iPhone, Safari: Home, one service page, Contact. The bottom bar, the notch area, nothing hidden under the address bar, the Grow section plays, and its card sits under the picture.
 - [ ] Android, Chrome: the same three pages.
 
 **Listen** (NVDA on Windows, free, or VoiceOver on iPhone; 5 minutes)

@@ -117,21 +117,10 @@
   .grow-stage [stroke-dasharray], .grow-stage .dome-rim { animation: none; }
 }
 
-/* phones: the player sticks under the header while the words scroll up below it at normal speed, so the picture is
-   on screen above whatever you're reading; past the section it leaves with it (nothing pins the page). What sits
-   round the picture scales with the width (sized for a 390-wide phone, smaller below). */
+/* phones: the player scrolls with the page and the card sits under it. What sits round the picture scales with the
+   width (sized for a 390-wide phone, smaller below). */
 @media (--phone) {
   .grow { row-gap: var(--sp-3); }
-  .grow-player {
-    position: sticky;
-    top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
-    z-index: 5;
-    margin-inline: calc(-1 * var(--gutter));
-    padding: var(--sp-2) var(--gutter) var(--sp-1);
-    border-bottom: 1px solid var(--c-line);
-    background: var(--c-bg);
-  }
-  .grow-stage { aspect-ratio: auto; height: clamp(12rem, 36svh, calc(100vw - 2 * var(--gutter))); }
   .grow-tag, .grow-place, .grow-team { font-size: clamp(0.6rem, 2.75vw, 0.75rem); }
   .grow-play { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); }
   .grow-card { gap: var(--sp-2); padding-bottom: var(--sp-6); }
