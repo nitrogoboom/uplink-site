@@ -1,6 +1,6 @@
 // The site's page table and the helpers the generated files share (sitemap.xml, robots.txt, llms.txt,
 // index.md, agents.md, and the Early Hints block in _headers).
-//   PAGES       the five static pages: address, name, <title>, description. The .astro pages read their
+//   PAGES       the static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The .astro pages read their
 //               title and description from here, so the sitemap and llms.txt say the same thing.
 //   getServices(), getProjects()  the collections in their own order.
 //   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
@@ -51,6 +51,10 @@ export const PAGES = {
     description: 'Uplink Technology is an in-house team of 22 technicians running IT for Ontario businesses since 2011.' },
   contact: { path: '/contact', name: 'Contact', title: 'Contact · Uplink Technology',
     description: 'Call, email or book a free IT check-up with Uplink Technology. A real person replies within one business day.' },
+  privacy: { path: '/privacy', name: 'Privacy', title: 'Privacy · Uplink Technology',
+    description: 'What this website collects, why, who handles it and where, how long it is kept, and your rights under Canadian law.' },
+  accessibility: { path: '/accessibility', name: 'Accessibility', title: 'Accessibility · Uplink Technology',
+    description: 'How this website meets WCAG 2.0 AA under Ontario law, its built-in aids, known limits, and how to ask for another format.' },
 } as const;
 
 // Name and address come from PAGES. short: the phone tab bar's word, where it differs.
@@ -98,6 +102,8 @@ const SOURCES: Record<keyof typeof PAGES, string[]> = {
   work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects'],
   about: ['src/pages/about.astro', 'src/components/about', 'src/data/team.json'],
   contact: ['src/pages/contact.astro', 'src/components/contact', 'src/content/services', 'src/components/ServiceOptions.astro'],
+  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md'],
+  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md'],
 };
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };

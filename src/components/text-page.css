@@ -1,0 +1,15 @@
+/*--- A reading page (privacy, accessibility): the Markdown's headings, lists and links at reading width. ---*/
+.text-page .prose { font-size: var(--fs-4); }
+.text-page .prose :is(h2, h3) { color: var(--c-text); }
+.text-page .prose > * + h2 { margin-top: var(--sp-7); }
+.text-page .prose > * + h3 { margin-top: var(--sp-6); }
+.text-page .prose > :is(h2, h3) + * { margin-top: var(--sp-3); }   /* a heading sits with its text */
+.text-page .prose :is(ol, ul) { display: flex; flex-direction: column; gap: var(--sp-2); padding-left: var(--sp-5); }
+.text-page .prose li { padding-left: var(--sp-1); }
+.text-page .prose li::marker { color: var(--c-accent-text); }
+.text-page .prose strong { color: var(--c-text); font-weight: 600; }
+.text-page .prose a { color: var(--c-accent-text); overflow-wrap: anywhere; }
+/* tables fit the column at any text size (200% on a phone included): fixed columns, long words wrap */
+.text-page .prose table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--fs-3); overflow-wrap: anywhere; }
+.text-page .prose :is(th, td) { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--c-line); }
+.text-page .prose th { color: var(--c-text); font-weight: 600; }
