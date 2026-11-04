@@ -17,6 +17,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { getCollection } from 'astro:content';
 import { MEDIA } from './media.js';
+import { byOrder } from '../content.config';
 
 // Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
 // page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file instead
@@ -97,6 +98,7 @@ export const breadcrumbs = (trail: [string, string][]) => ({ '@type': 'Breadcrum
 // The services and the projects in their own order (each entry's `order`), as every list shows them.
 export const getServices = async () => (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data);   // in file order
 
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page.

@@ -13,8 +13,10 @@ import raw from './grow-world.svg?raw';
 import { optimize } from 'svgo';
 import { SVGO } from '../../../scripts/svgo-config.mjs';
 import Icon from '../Icon.astro';
-import steps from '../../data/grow.json';
+import { getGrow } from '../../lib/site';
 import './grow.css';
+
+const steps = await getGrow();   // src/data/grow.json, typed in content.config.ts
 
 const world = optimize(raw, SVGO).data.replace(/<style>[\s\S]*?<\/style>/g, '').replace(' id="plain"', '');
 const last = steps.length - 1;

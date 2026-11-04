@@ -67,4 +67,18 @@ const team = defineCollection({
   schema: z.object({ initials: z.string(), name: z.string(), role: z.string() }),
 });
 
-export const collections = { services, projects, faq, team };
+// Home "We grow with you": one entry a step, in the order they play. `at` names the drawing's anchor a tag sits on
+// (a .tg-a circle in grow-world.svg, tools/gen_grow.py).
+const grow = defineCollection({
+  loader: file('./src/data/grow.json', { parser: numbered }),
+  schema: z.object({
+    place: z.string(),                 // "Your office" (top left of the picture, and the dot's label)
+    title: z.string(),                 // the card's heading
+    watch: z.string(),                 // "Watch for"
+    handle: z.string(),                // "We handle"
+    team: z.number().int().positive(), // "Team of 8"
+    tags: z.array(z.object({ at: z.string().regex(/^s\d+[a-z]$/), risk: z.string(), fix: z.string() })).min(1),
+  }),
+});
+
+export const collections = { services, projects, faq, team, grow };

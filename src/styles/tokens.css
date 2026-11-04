@@ -128,7 +128,8 @@
   --chevron-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
   --bar:        0.375rem;   /* meter bars */
   --container:  80rem;
-  --gutter:     1rem;   /* 1.5rem tablet, 3rem desktop */
+  --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on desktop (grow.css) */
+  --gutter:    1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
   --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
   --wheel-step: 100px;   /* one mouse-wheel notch in Chrome and Edge on Windows (3 lines, 100% zoom), measured 4 Nov 2026 */
@@ -170,6 +171,14 @@
   --loop-fc-mk-bob: 2.2s;
   --loop-fc-ring: 2.4s;
   --loop-fc-sig: 2.8s;
+  /* Home "We grow with you" (grow.css): a part fading and dropping in (grow.js staggers them 500ms a step), the data
+     running along the cables (one dash period a loop: office links, cloud cables, the ring) and the dome's rim */
+  --dur-grow-fade: 500ms;
+  --dur-grow-drop: 700ms;
+  --loop-grow-link: 0.9s;
+  --loop-grow-cable: 0.7s;
+  --loop-grow-ring: 3s;
+  --loop-grow-rim: 2.4s;
 
   /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
   --fs-hero-phone: calc(2.5rem * var(--text));    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */

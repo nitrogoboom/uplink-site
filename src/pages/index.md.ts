@@ -4,12 +4,12 @@
 // from the data.
 import type { APIRoute } from 'astro';
 import source from '../data/index.md?raw';
-import { getServices } from '../lib/site';
-import grow from '../data/grow.json';
+import { getGrow, getServices } from '../lib/site';
 
 export const GET: APIRoute = async ({ site }) => {
   const base = site!.href.replace(/\/$/, '');
   const services = await getServices();
+  const grow = await getGrow();
   const list = services.map(({ id, data: s }) => `- [${s.title}](${base}/services/${id}): ${s.card}`).join('\n');
   const steps = grow.map((s) => `- ${s.place}: ${s.title}. Watch for: ${s.watch} We handle: ${s.handle}`).join('\n');
   const text = source.replace(/<!--.*?-->\n/s, '').replaceAll('{site}', base).replace('{services}', list).replace('{grow}', steps);

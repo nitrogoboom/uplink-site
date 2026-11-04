@@ -98,8 +98,8 @@
 :root:not(.js) :is(.grow-nav, .grow-play, .grow-tag) { display: none; }
 
 /* the drawing's parts: a step's parts drop in and glow; .pre places them at once (first draw, pause) */
-.grow-stage .pc { transition: opacity 0.5s var(--ease), transform 0.7s var(--ease); }
-.grow-stage .pc.hide { opacity: 0; transform: translateY(-16px); }
+.grow-stage .pc { transition: opacity var(--dur-grow-fade) var(--ease), transform var(--dur-grow-drop) var(--ease); }
+.grow-stage .pc.hide { opacity: 0; transform: translateY(calc(-1 * var(--sp-4))); }
 .grow-stage .pc.pre { transition: none; }
 .grow-stage .pc.glow { filter: url("#grow-glow"); }
 /* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes (one dash period a loop) */
@@ -107,25 +107,21 @@
 @keyframes grow-flow10 { to { stroke-dashoffset: -20; } }
 @keyframes grow-flow12 { to { stroke-dashoffset: -24; } }
 @keyframes grow-rim { 50% { stroke-opacity: 0.35; } }
-.grow-stage [stroke-dasharray="5 5"] { animation: grow-flow10 0.9s linear infinite; }
-.grow-stage [stroke-dasharray="4 4"] { animation: grow-flow8 0.7s linear infinite; }
-.grow-stage [stroke-dasharray="6 6"] { animation: grow-flow12 3s linear infinite; }
-.grow-stage .dome-rim { animation: grow-rim 2.4s ease-in-out infinite; }
-.grow-stage.is-paused * { animation-play-state: paused !important; }
+.grow-stage [stroke-dasharray="5 5"] { animation: grow-flow10 var(--loop-grow-link) linear infinite; }
+.grow-stage [stroke-dasharray="4 4"] { animation: grow-flow8 var(--loop-grow-cable) linear infinite; }
+.grow-stage [stroke-dasharray="6 6"] { animation: grow-flow12 var(--loop-grow-ring) linear infinite; }
+.grow-stage .dome-rim { animation: grow-rim var(--loop-grow-rim) ease-in-out infinite; }
+.grow-stage.is-paused * { animation-play-state: paused; }   /* as specific as the rules above and after them, so it wins */
 @media (prefers-reduced-motion: reduce) {
   .grow-stage .pc, .grow-tag, .grow-row, .grow-dot i { transition: none; }
   .grow-stage [stroke-dasharray], .grow-stage .dome-rim { animation: none; }
 }
 
-/* phones: the player scrolls with the page and the card sits under it. What sits round the picture scales with the
-   width (sized for a 390-wide phone, smaller below). */
+/* phones: the player scrolls with the page and the card sits under it. Text keeps the site's sizes, so it grows
+   with the visitor's text size (Settings). */
 @media (--phone) {
   .grow { row-gap: var(--sp-3); }
-  .grow-tag, .grow-place, .grow-team { font-size: clamp(0.6rem, 2.75vw, 0.75rem); }
-  .grow-play { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); }
   .grow-card { gap: var(--sp-2); padding-bottom: var(--sp-6); }
-  .grow-card h3 { font-size: clamp(1.2rem, 5.6vw, 1.5rem); }
-  .grow-row p { font-size: clamp(0.875rem, 3.9vw, 1rem); }
 }
 
 /* tablet: the player a little narrower and centred, the card in two columns under it */
@@ -141,5 +137,5 @@
   .grow-cards { grid-row: 2; grid-column: 1; }
   .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
   .grow-player { grid-row: 1 / 3; grid-column: 2; }
-  .grow-stage { width: auto; height: min(calc(var(--fold-inner, 40rem) - var(--tap) - var(--sp-2)), 44rem); }
+  .grow-stage { width: auto; height: min(calc(var(--fold-inner, var(--fold-h)) - var(--tap) - var(--sp-2)), var(--grow-stage-max)); }   /* under 700 tall (no fold): the screen */
 }
