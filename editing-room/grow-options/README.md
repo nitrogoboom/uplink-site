@@ -9,6 +9,7 @@ Chosen so far, round 8: one isometric world that grows in five steps by where pe
 ## Seeing it at real size
 
 - `section.html` (built from `section.template.html`): the round 8 section on its own page at real size, between a stand-in header, the section before and the section after, with the site's fonts, tokens and breakpoints (phone < 700, tablet 700-1099, desktop >= 1100, one screen tall). Resize the window to move between layouts; the mockup controls (bottom right) show the size and switch the camera and the lots.
+- `grow-section.html` (built): the same page as one self-contained file, fonts embedded, nothing to fetch. Published as the working draft: [Grow Section Draft](https://claude.ai/artifact/1TCG1i8DrdXK8987tDZdT7) (private to John's account). Republish the same file to keep the link.
 - `preview.html`: loads `section.html` at an exact size (phone 390 × 844, tablet 820 × 1180 and 1180 × 820, desktop 1440 × 900, or your own), scaled to fit the window.
 - Local server: the `grow-mockups` entry in `.claude/launch.json` (`python -m http.server 8790 --directory editing-room/grow-options`), then http://localhost:8790/preview.html.
 

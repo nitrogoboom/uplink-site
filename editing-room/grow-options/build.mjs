@@ -32,3 +32,15 @@ for (const [from, to] of Object.entries(PAGES)) {
   writeFileSync(new URL(to, here), page);
   console.log(`${to}: ${(page.length / 1024).toFixed(0)} KB`);
 }
+
+// grow-section.html: the same section page as one self-contained file (fonts embedded as data, nothing to fetch),
+// to open on any device or publish. Written without the doctype/html/head/body wrapper, which the publisher adds.
+const fontData = (f) => `data:font/woff2;base64,${readFileSync(new URL(f, fontDir)).toString('base64')}`;
+const fontsInline = read('../../src/styles/fonts.css').replace(/url\('\/assets\/fonts\/([^']+)'\)/g, (_m, f) => `url('${fontData(f)}')`);
+const standalone = read('section.template.html').replace('<!--WORLD-->', () => world).replace('<!--TOKENS-->', () => tokens)
+  .replace('<!--FONTS-->', () => fontsInline)
+  .replace(/^<!doctype html>\s*<html[^>]*>\s*<head>\s*<meta charset="utf-8">\s*<meta name="viewport"[^>]*>\s*/i, '')
+  .replace('<title>Grow section preview</title>', '<title>Grow Section Draft</title>\n<meta name="claude:viewport-fit-sides" content="cover">')
+  .replace(/<\/head>\s*<body>/, '').replace(/<\/body>\s*<\/html>\s*$/, '\n');
+writeFileSync(new URL('grow-section.html', here), standalone);
+console.log(`grow-section.html: ${(standalone.length / 1024).toFixed(0)} KB (self-contained)`);

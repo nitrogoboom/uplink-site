@@ -25,10 +25,12 @@ body { margin: 0; background: var(--c-bg); color: var(--c-text); font: 400 var(-
 h1, h2, h3 { margin: 0; font-family: 'Barlow Condensed', 'Barlow Condensed Fallback', Arial, sans-serif; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
 p { margin: 0; }
 :focus-visible { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }
-.container { max-width: var(--container); margin: 0 auto; padding-inline: var(--gutter); }
+:root { color-scheme: dark; }
+.container { max-width: var(--container); margin: 0 auto; padding-left: max(var(--gutter), env(safe-area-inset-left, 0px)); padding-right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 21; background: var(--c-glass); }
 
 /* stand-ins */
-.hdr { position: sticky; top: 0; z-index: 20; height: var(--header-h); background: var(--c-glass); border-bottom: 1px solid var(--c-line); }
+.hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; height: var(--header-h); background: var(--c-glass); border-bottom: 1px solid var(--c-line); }
 .hdr .container { height: 100%; display: flex; align-items: center; gap: var(--sp-6); }
 .logo { font: 700 italic var(--fs-5)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; display: flex; align-items: center; gap: var(--sp-2); }
 .logo i { width: 1.6rem; height: 1.6rem; border-radius: 0.35rem; background: var(--c-accent); }
