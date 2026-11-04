@@ -141,11 +141,17 @@ def house(s, x0, x1, y0, y1, o, lit=True):
     return dp, (m, ym, h + r)
 
 
+SHIRTS = (SKYBOX, GREEN, HIGH)        # people's shirts, picked by where they stand so a group isn't all one colour
+LEGS = (pal.APP_BAR, pal.SCREEN, pal.PATH)
+
+
 def person(s, x, y, o):
-    """A person: a blue body and a light head, both on the 0.25 grid."""
+    """A person, built so nothing else in the picture shares the shape: dark legs, a coloured shirt, and a small
+    light head centred on top (the head sits on a 0.125 step, a half grid step in from the shoulders)."""
     s.group(o)
-    s.box((x, x + 0.5, y, y + 0.5, 0, 0.875), SKYBOX)
-    s.box((x, x + 0.5, y, y + 0.5, 0.875, 1.375), LIGHT, on_ground=False)
+    s.box((x, x + 0.5, y, y + 0.5, 0, 0.5), LEGS)
+    s.box((x, x + 0.5, y, y + 0.5, 0.5, 1.0), SHIRTS[int(round((x + 2 * y) * 4)) % 3], on_ground=False)
+    s.box((x + 0.125, x + 0.375, y + 0.125, y + 0.375, 1.0, 1.375), LIGHT, on_ground=False)
     s.end()
 
 
@@ -336,11 +342,19 @@ def world():
     st(2); person(s, -4.25, 5.5, 2)
     st(3); cp = car(s, 0.75, 4.5, 1)
     st(3); person(s, 4.25, 4.5, 3)                                      # the salesperson, out of the car
+    # the cloud's cable: straight up from the roof (in front of the roof unit) into the cloud's bottom corner, a dot at
+    # each end. The cloud sits so that corner (x + 1.75, y + 1) is on the cable's line (x - y = 0 on screen); the cable
+    # rises until it meets it on screen: (0.75 + 0.75) / 2 - z = (1.25 + 1.25) / 2 - 6.5, so z = 6.0.
+    CLOUD = (-0.5, 0.25, 6.5)
     st(5); s.group(1)
-    (bx, by), (tx, ty) = w.p(0, 0, top1[2] + 0.5), w.p(0, 0, 6.5)
+    (bx, by), (tx, ty) = w.p(0.75, 0.75, top1[2]), w.p(0.75, 0.75, 6.0)
     s.raw(f'<polyline points="{fmt(bx)},{fmt(by)} {fmt(tx)},{fmt(ty)}" fill="none" stroke="{BLUE}" stroke-width="2" stroke-dasharray="4 4"/>')
     s.end()
-    cl = cloud(s, 0, 0, 6.5, 2)                                         # low enough to sit under the dome
+    cl = cloud(s, *CLOUD, 2)                                            # low enough to sit under the dome
+    st(5); s.group(3)
+    for X, Y in ((bx, by), (tx, ty)):
+        s.raw(f'<circle class="node" cx="{fmt(X)}" cy="{fmt(Y)}" r="3.5" fill="{BLUE}" stroke="{INK}" stroke-width="1.5"/>')
+    s.end()
     st(6); dm = dome(s, RING, 0)
     s.step = None
     s.anchors.update({
