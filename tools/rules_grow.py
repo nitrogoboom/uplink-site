@@ -1,12 +1,13 @@
-"""painter.py rules for the place scenes (gen_places.py): each box's base height, looked up by its left face.
-The scene comes from the file name. usage (one per scene):
-python tools/painter.py editing-room/grow-options/places/office.svg 0 0 20 tools/rules_places.py"""
+"""painter.py rules for the Grow drawings (gen_grow.py): each box's base height, looked up by its left face.
+The drawing comes from the file name (grow-world.svg is the world; the mockups' scenes go by their own names).
+usage: python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py"""
 import pathlib, sys
-import gen_places
+import gen_grow
 from iso import C30
 
-gen_places.build(pathlib.Path(sys.argv[1]).stem)
-w = gen_places.w
+_stem = pathlib.Path(sys.argv[1]).stem
+gen_grow.build('world' if _stem == 'grow-world' else _stem)
+w = gen_grow.w
 
 
 def _left(b):
@@ -15,7 +16,7 @@ def _left(b):
     return [((X - w.ox) / (C30 * w.u), (Y - w.oy) / (w.u / 2)) for X, Y in pts]
 
 
-_known = [(_left(b), b) for b in gen_places.BOXES]
+_known = [(_left(b), b) for b in gen_grow.BOXES]
 
 
 def _find(b):

@@ -1,12 +1,15 @@
-"""Draws the five place scenes for the Home "We grow with you" mockup (round 6): your office, working from home,
-on the road, a second office, and all of it. Mockup only: written to editing-room/grow-options/places/, not the site.
-Edit the numbers below and run again; don't hand-edit the SVGs.
-usage: python tools/gen_places.py editing-room/grow-options/places
+"""Draws the Home "We grow with you" world (src/components/home/grow-world.svg, inlined by Grow.astro): one business
+that grows in six steps by where its people work (the office, a home, the road, a second office, the ring and cloud
+over all of it, then the dome). Every part carries data-s, the step it arrives on, and data-o, its order inside the
+step; src/scripts/grow.js shows a step's parts as it plays. Nothing moves or rebuilds: later steps only add.
+Edit the numbers below and run again; don't hand-edit the SVG.
+usage: python tools/gen_grow.py                       (writes src/components/home/grow-world.svg)
+       python tools/gen_grow.py editing-room/grow-options/places   (also the five separate scenes the mockups used)
 World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch.
-Each scene is square (the mockup's stage), with no words: the page writes its tags over the drawing at the
-anchors (<circle class="tg-a" data-a="...">). Parts that build in come in <g class="pc" data-o="n"> groups,
-n = the order they arrive in.
+No words in the drawing: the page writes its tags over it at the anchors (<circle class="tg-a" data-a="...">).
+Check: python tools/check.py src/components/home/grow-world.svg
+       python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
 """
 import sys, pathlib
 from shapely.geometry import Polygon
@@ -33,7 +36,7 @@ SKYBOX = (pal.SKY, pal.SKY_RIGHT, pal.SKY_TOP)           # car glass, shirts
 ROOF = (pal.STEP_LEFT, pal.STEP_RIGHT, pal.STEP_TOP)     # house roof, a shade lighter than the walls
 LINK = f'fill="none" stroke="{BLUE}" stroke-width="2" stroke-dasharray="5 5" stroke-linecap="round"'
 
-BOXES = []                            # every box drawn in the current scene, in order (rules_places.py reads it)
+BOXES = []                            # every box drawn in the current scene, in order (rules_grow.py reads it)
 
 
 class Scene:
@@ -299,9 +302,9 @@ def dome(s, R, o):
     cx, cy = w.p(0, 0, 0)
     rx, ry = R * w.u * 1.5 ** 0.5, R * w.u / 2 ** 0.5
     top = f'M{fmt(cx - rx)},{fmt(cy)}A{fmt(rx)},{fmt(rx)} 0 0 1 {fmt(cx + rx)},{fmt(cy)}'
-    s.raw(f'<linearGradient id="dome-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{pal.SKY}" stop-opacity="0.3"/>'
+    s.raw(f'<linearGradient id="grow-dome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{pal.SKY}" stop-opacity="0.3"/>'
           f'<stop offset="1" stop-color="{pal.SKY}" stop-opacity="0.05"/></linearGradient>')
-    s.raw(f'<path class="dome" d="{top}A{fmt(rx)},{fmt(ry)} 0 0 1 {fmt(cx - rx)},{fmt(cy)}Z" fill="url(#dome-g)"/>')
+    s.raw(f'<path class="dome" d="{top}A{fmt(rx)},{fmt(ry)} 0 0 1 {fmt(cx - rx)},{fmt(cy)}Z" fill="url(#grow-dome)"/>')
     LAT = (1 / 3, 2 / 3)
     for k in LAT:
         h = R * k
@@ -323,6 +326,9 @@ def world():
     s = Scene('world', 'A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it', (0, 0, 9))
     s.whole_grid = True
     st = lambda n: setattr(s, 'step', n)
+    # the glow a step's new parts wear while they arrive (grow.css .pc.glow)
+    s.raw(f'<defs><filter id="grow-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="4" '
+          f'flood-color="{ORANGE}" flood-opacity="0.95"/></filter></defs>')
     # on the ground, under everything: the ring, then the cables and the road
     st(5); ring(s, RING, 0)
     st(2); link(s, [(-1.5, 0.0), (-4.5, 0.0), (-4.5, 2.75)], 1)
@@ -403,9 +409,15 @@ def build(name):
     return render(SCENES[name]())
 
 
+SITE = pathlib.Path(__file__).resolve().parent.parent / 'src' / 'components' / 'home' / 'grow-world.svg'
+SCENE_NAMES = ['office', 'home', 'road', 'second', 'all']   # the mockups' separate scenes (editing-room/grow-options)
+
 if __name__ == '__main__':
-    out = pathlib.Path(sys.argv[1])
-    out.mkdir(parents=True, exist_ok=True)
-    for name in SCENES:
-        write(out / f'{name}.svg', build(name), card_cut=False)
-        print(f'{name}.svg')
+    write(SITE, build('world'), card_cut=False)
+    print(SITE.name)
+    if len(sys.argv) > 1:
+        out = pathlib.Path(sys.argv[1])
+        out.mkdir(parents=True, exist_ok=True)
+        for name in SCENE_NAMES:
+            write(out / f'{name}.svg', build(name), card_cut=False)
+            print(f'{name}.svg')

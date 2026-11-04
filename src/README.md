@@ -6,7 +6,7 @@ An Astro 7 project. `npm run dev` serves it at http://localhost:4321; `npm run b
 
 | File | Address | Sections (one component each, in `components/<page>/`) |
 |---|---|---|
-| `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ tower drawing) · Work · Proof |
+| `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ world drawing) · Work · Proof |
 | `services.astro` | `/services` | Overview · Faq |
 | `services/[slug].astro` | `/services/<slug>` | one page per service, from `content/services/<slug>.json` |
 | `work.astro` | `/work` | Projects |
@@ -30,7 +30,7 @@ Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700p
 
 Section components live in `components/<page>/`, with their CSS beside them (`hero.css` next to `Hero.astro`) and imported at the top of the component. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full on its own page.
 
-Drawings: `components/home/hero-flows.svg` and `grow-tower.svg` are written by `tools/gen_office.py` and `tools/gen_tower.py` and inlined as components. Don't edit them by hand.
+Drawings: `components/home/hero-flows.svg` and `grow-world.svg` are written by `tools/gen_office.py` and `tools/gen_grow.py` and inlined as components. Don't edit them by hand.
 
 ## Content: `content/` and `data/`
 

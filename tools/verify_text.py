@@ -2,9 +2,9 @@
 # 200% (localStorage uplink.text, as the pop-up saves it), looking for what W3C's failure F69 names: text that is
 # clipped (partly cut by a box that hides its overflow), overlapping (drawn over other text), or out of reach (above
 # or left of the page, where nothing scrolls to it), and sideways scroll. Pages are read as they load, and Home also
-# at seven points down the tower's scroll story (more near its end, where the stage lets go); a label that only slides in on hover (home services' "View service")
+# with its Grow section at each of its six steps (picked with its dots); a label that only slides in on hover (home services' "View service")
 # is not seen in its shown state. Text in drawings (SVG), hidden and screen-reader-only text, and things faded out
-# (the tower's inactive steps) are left out. Text in a bar (the sticky header, the phone tab bar) is checked against
+# (the Grow steps not open) are left out. Text in a bar (the sticky header, the phone tab bar) is checked against
 # its own bar only, not against the page that scrolls under it; a fixed bar's text is also checked against the
 # screen's edges.
 # Exits 1 on any finding.
@@ -94,16 +94,14 @@ async def main():
                 await pg.goto(base + path, wait_until='networkidle')
                 await pg.wait_for_timeout(600)
                 r = await pg.evaluate(PROBE)
-                # the home tower is a scroll story: its tags and steps show only part way down, so read it there too
-                stops = await pg.evaluate(
-                    "(() => { const g = document.querySelector('.grow'); if (!g) return []; const t = g.getBoundingClientRect().top + scrollY; return [0.1, 0.3, 0.5, 0.7, 0.85, 0.92, 0.97].map((f) => t + g.offsetHeight * f - innerHeight * 0.3); })()"
-                )
-                for y in stops:
-                    await pg.evaluate(f'window.scrollTo(0, {y})')
-                    await pg.wait_for_timeout(700)
+                # the home Grow section shows one step's card and tags at a time: open each with its dot and read it
+                dots = await pg.evaluate("document.querySelectorAll('#grow .grow-dot').length")
+                for i in range(dots):
+                    await pg.evaluate(f"(() => {{ const g = document.querySelector('#grow'); g.scrollIntoView(); g.querySelectorAll('.grow-dot')[{i}].click(); }})()")
+                    await pg.wait_for_timeout(3000)
                     s = await pg.evaluate(PROBE)
                     for k in ('clip', 'over'):
-                        r[k] += [f'(scrolled to the tower) {x}' for x in s[k] if x not in r[k]]
+                        r[k] += [f'(Grow step {i + 1}) {x}' for x in s[k] if x not in r[k]]
                 await ctx.close()
                 found = [f'{len(r[k])} {k}' for k in ('clip', 'over', 'away') if r[k]] + (
                     [f'{r["sideways"]}px sideways'] if r['sideways'] > 0 else []

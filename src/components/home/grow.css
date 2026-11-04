@@ -1,158 +1,156 @@
-/*--- HOME · 3. Growing with you. Desktop layout at the end. ---*/
-/* growth scroll story: the world grows as you scroll (home.js scrubs the drawing; see Grow.astro) */
-/* --grow-run: screens of scroll per level while the stage is pinned (home.js reads it; the only place it is set) */
-.grow { --grow-run: 0.5; position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-6); }
-.grow-side { display: contents; }
-.grow-side .section-head { margin-bottom: 0; }
-.grow-art {
+/*--- HOME · 3. We grow with you. The player (picture and controls) and the step cards; grow.js runs it.
+   Phone layout first, then tablet, then desktop at the end. ---*/
+.grow { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: var(--sp-5); }
+.grow-head { margin-bottom: 0; }
+
+/* the player: the picture and its controls, one unit */
+.grow-player { display: grid; gap: var(--sp-2); min-width: 0; }
+.grow-stage {
   position: relative;
-  align-self: start;
-  display: grid;
-  place-items: center;
-  padding: var(--sp-4);
-  background: var(--c-bg-band);
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid var(--c-line);
   border-radius: var(--r-3);
+  background: radial-gradient(60% 55% at 50% 58%, var(--c-glow-sky), transparent 72%), var(--c-bg-band);
 }
-.grow-art svg { width: 100%; max-width: 32.5rem; height: auto; }
-.grow-hud, .grow-tags { display: none; }
-@media (--desktop) {
-  .grow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: var(--sp-7); }
-  .grow-side .section-head { grid-column: 1 / -1; }
-  .grow-art { grid-column: 1; grid-row: 2; position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-4)); }
-  .grow-art svg { max-height: calc(var(--fold-h) - var(--sp-7)); }
-  /* vh, not the space scale: these are scroll distance (how far you scroll per step), not spacing */
-  .grow-steps { grid-column: 2; grid-row: 2; gap: 30vh; padding-block: 8vh 24vh; }
-}
-/* once home.js runs (.is-live; every screen but a short desktop one, and never with reduced motion): the section is one stage, a screen tall, that
-   holds still for 1.5 more screens while the scroll builds each level. No scroll snap: it pulled the page about 200px
-   either way around each level and fought the visitor. On the stage: the level HUD over the picture, and the active
-   step (the steps sit in one grid cell and cross-fade). Without script: the picture, then the steps. */
-.grow.is-live .grow-art { grid-template-rows: auto minmax(0, 1fr); gap: var(--sp-4); place-items: stretch; background: none; border-radius: 0; }
-.grow.is-live .grow-art svg,
-.grow.is-live .grow-tags { grid-area: 2 / 1; width: 100%; height: 100%; max-width: none; max-height: none; min-height: 0; }
-.grow.is-live .grow-hud { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: var(--sp-3) var(--sp-4); }
-.grow.is-live .grow-tags { display: block; position: relative; pointer-events: none; }
-.grow.is-live .grow-step { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-2) var(--ease); }
-.grow.is-live .grow-step[data-active] { opacity: 1; }
-.grow.is-live :is(.tg-tl, .tg-td, .tg-tb, .tg-tt) { display: none; }   /* the HUD and tags replace the drawing's floor labels */
-/* a piece not built yet keeps its looping dashes, ring and float paused (home.js sets .is-off) */
-.tg-live .tg-p.is-off, .tg-live .tg-p.is-off * { animation-play-state: paused; }
-/* phone + tablet: the stage is exactly the screen between the header and the bottom nav (--fold-h, in svh so the
-   address bar can't make it jump). Top to bottom: HUD, picture, step. The step box has a fixed height (home.js sets
-   --grow-cap to the tallest step), so only the picture flexes and nothing moves when the text swaps. The picture
-   and the step are two sticky blocks in the same tall grid cell, pinned one above the other. */
-@media (--below-desktop) {
-  .grow.is-live {
-    --grow-stage: var(--fold-h);
-    --grow-cap: 9rem;
-    --grow-top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
-    /* the picture's height: what the step leaves, but never under 12rem (a landscape phone or large text can
-       make the step nearly a screen tall, and the picture would vanish) */
-    --grow-pic: max(calc(2 * var(--sp-9)), calc(var(--grow-stage) - var(--grow-cap)));
-    grid-template-areas: "head" "stage";
-    grid-template-rows: auto calc(var(--grow-stage) * (1 + 3 * var(--grow-run)));
-    gap: 0;
-  }
-  .grow.is-live .section-head { grid-area: head; padding-bottom: var(--sp-5); }
-  .grow.is-live .grow-art {
-    grid-area: stage;
-    position: sticky;
-    top: var(--grow-top);
-    height: var(--grow-pic);
-    padding: var(--sp-4) 0 0;
-    /* the step box's height, so the picture and the steps let go of the screen together at the end of the stage;
-       otherwise the step box, pinned lower, slides up over the picture (and with bigger text, its HUD) first */
-    margin-bottom: var(--grow-cap);
-  }
-  .grow.is-live .grow-steps {
-    grid-area: stage;
-    position: sticky;
-    top: calc(var(--grow-top) + var(--grow-pic));
-    align-self: start;
-    display: grid;
-    gap: 0;
-    margin-top: var(--grow-pic);
-    padding-block: var(--sp-3) var(--sp-4);
-  }
-  .grow.is-live .grow-card,
-  .grow.is-live .grow-step[data-active] .grow-card { gap: var(--sp-2); padding: 0; background: none; border: 0; box-shadow: none; }
-  /* hidden on screen to keep the stage short, but still read by screen readers (the same clip as .sr-only) */
-  .grow.is-live .grow-card .chip,
-  .grow.is-live .grow-card ul { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-}
-/* phone (and tablets with bigger text, which get the bar too): the bottom nav floats, so the stage stops a step above it */
-@media (--phone) {
-  .grow.is-live { --grow-stage: calc(var(--fold-h) - var(--sp-5)); }
-}
-@media (--tablet) {
-  :root[data-text] .grow.is-live { --grow-stage: calc(var(--fold-h) - var(--sp-5)); }
-}
-.grow-count { justify-self: end; font-size: var(--fs-2); color: var(--c-muted); font-variant-numeric: tabular-nums; }
-.grow-num { font-family: var(--font-display); font-size: var(--fs-6); font-style: italic; font-weight: 800; line-height: var(--lh-tight); color: var(--c-text); }
-.grow-bar { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-1); }
-.grow-bar i { height: var(--bar); overflow: hidden; border-radius: var(--r-pill); background: var(--c-surface-2); }
-.grow-bar i::before { content: ""; display: block; height: 100%; background: var(--c-accent); transform: scaleX(var(--fill, 0)); transform-origin: left; }
+.grow-stage > svg { position: absolute; inset: 2% 2% 3%; display: block; width: 96%; height: 95%; }   /* the drawing only, not the button's icons */
+.grow-place, .grow-team { position: absolute; top: var(--sp-3); z-index: 1; font-family: var(--font-display); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: 1; text-transform: uppercase; }
+.grow-place { left: var(--sp-4); color: var(--c-sky); }
+.grow-team { right: var(--sp-4); color: var(--c-muted); font-variant-numeric: tabular-nums; }
+
+/* tags: a step's risks in red, then its fixes in green, pinned to the drawing's anchors (grow.js places them) */
 .grow-tag {
   position: absolute;
   top: 0;
   left: 0;
-  padding: var(--sp-1) var(--sp-2);
-  border: 1px solid var(--c-accent-text);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-3) var(--sp-1) var(--sp-1);
   border-radius: var(--r-pill);
-  background: var(--c-solid);
-  color: var(--c-accent-text);
+  background: var(--c-alert);
+  color: var(--c-on-accent);
+  font-family: var(--font-display);
   font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: var(--tracking-3);
-  line-height: var(--lh-tight);
+  line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  pointer-events: none;
   opacity: 0;
+  transform: translate(-50%, -100%) scale(0.85);
+  transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
-.grow-tag::after { content: ""; position: absolute; top: 100%; left: 50%; height: var(--sp-3); border-left: 1px solid var(--c-accent-text); }
+.grow-tag-i { display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-family: var(--font-body); font-weight: 700; }
+.grow-tag.is-fixed { background: var(--c-ok); }
+.grow-tag.is-on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+.grow-tag.is-flip { transform: translate(-50%, -100%) scale(1.12); }
 
-.grow-steps { display: flex; flex-direction: column; gap: var(--sp-5); list-style: none; }
-.grow-card { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-5); transition: border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease); }
-.grow-step[data-active] .grow-card { border-color: var(--c-accent-text); background: var(--c-surface-2); }
-.grow-card .chip { margin-bottom: var(--sp-2); transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
-.grow-step[data-active] .chip { background: var(--c-accent); color: var(--c-on-accent); }
-.grow-card ul { display: flex; flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-2); padding-left: var(--sp-5); color: var(--c-muted); }
-
-/* desktop (>= 1100 wide and >= 700 tall): picture pinned on the left, each step is one screen */
-@media (--fold) {
-  .grow-section { padding-block: 0; }
-  .grow { column-gap: var(--sp-8); align-items: start; }
-  .grow-side {
-    position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
-    grid-column: 1;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-5);
-    height: var(--fold-h);
-    padding-block: var(--sp-7);
-  }
-  .grow-side .section-head { grid-column: auto; }
-  .grow-art { position: relative; top: auto; align-self: stretch; flex: 1; min-height: 0; padding: 0; background: none; border-radius: 0; }
-  .grow-art svg { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; }
-  .grow-steps { grid-column: 2; grid-row: 1; gap: 0; padding-block: 0; }
-  .grow-step { min-height: calc(var(--fold-h) * 0.7); display: flex; align-items: center; }
-  .grow-card { width: 100%; max-width: 38rem; }
+/* play / pause, with the story's timer running round its edge */
+.grow-play {
+  position: absolute;
+  right: var(--sp-3);
+  bottom: var(--sp-3);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  padding: 0;
+  border: 1px solid var(--c-edge);
+  border-radius: 50%;
+  background: var(--c-solid);
+  color: var(--c-text);
 }
-/* desktop, live: the stage is the whole section. Left: heading, HUD and picture; right: the active step, centred.
-   Both pin for three levels of --grow-run, the same timing as phone. */
-@media (--fold) {
-  .grow.is-live { grid-template-rows: calc(var(--fold-h) * (1 + 3 * var(--grow-run))); }
-  .grow.is-live .grow-art { display: grid; }
-  .grow.is-live .grow-art svg { position: static; }
-  .grow.is-live .grow-steps {
+.grow-play-i { width: var(--sp-4); height: var(--sp-4); fill: currentColor; }
+.grow-ring { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; transform: rotate(-90deg); pointer-events: none; }
+.grow-ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; vector-effect: non-scaling-stroke; }
+
+/* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
+   the ones already built a dimmer amber, the ones to come grey. Each dot is a 24px-wide button, room to tap. */
+.grow-nav { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); }
+.grow-step-btn:disabled { opacity: 0.4; cursor: default; }
+.grow-step-btn:disabled:hover { background: transparent; color: var(--c-muted); }
+.grow-dots { display: flex; align-items: center; }
+.grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-2); border: 0; border-radius: var(--r-2); background: none; }
+.grow-dot i { display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
+.grow-dot.is-done i { background: var(--c-accent); opacity: 0.45; }
+.grow-dot[aria-pressed="true"] i { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
+@media (hover: hover) { .grow-dot:not([aria-pressed="true"]):hover i { opacity: 1; } }
+
+/* the cards: every step's card in a list without script; with it (.is-live) only the open one */
+.grow-cards { display: grid; gap: var(--sp-5); list-style: none; }
+.grow-card { display: grid; gap: var(--sp-3); }
+.grow-rows { display: grid; gap: var(--sp-3); }
+.grow-row { display: grid; gap: var(--sp-1); transition: opacity var(--dur-2) var(--ease); }
+.grow-lbl { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--font-display); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); text-transform: uppercase; }
+.grow-lbl i { width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-1); background: currentColor; }
+.grow-watch .grow-lbl { color: var(--c-alert); }
+.grow-handle .grow-lbl { color: var(--c-ok); }
+.grow-row p { color: var(--c-muted); }
+.grow-handle p { color: var(--c-text); }
+.grow.is-live .grow-card:not(.is-on) { display: none; }
+.grow-card[data-beat="build"] .grow-row { opacity: 0.35; }
+.grow-card[data-beat="risk"] .grow-handle { opacity: 0.3; }
+.grow-card[data-beat="fix"] .grow-watch { opacity: 0.45; }
+:root:not(.js) :is(.grow-nav, .grow-play, .grow-tag) { display: none; }
+
+/* the drawing's parts: a step's parts drop in and glow; .pre places them at once (first draw, pause) */
+.grow-stage .pc { transition: opacity 0.5s var(--ease), transform 0.7s var(--ease); }
+.grow-stage .pc.hide { opacity: 0; transform: translateY(-16px); }
+.grow-stage .pc.pre { transition: none; }
+.grow-stage .pc.glow { filter: url("#grow-glow"); }
+/* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes (one dash period a loop) */
+@keyframes grow-flow8 { to { stroke-dashoffset: -16; } }
+@keyframes grow-flow10 { to { stroke-dashoffset: -20; } }
+@keyframes grow-flow12 { to { stroke-dashoffset: -24; } }
+@keyframes grow-rim { 50% { stroke-opacity: 0.35; } }
+.grow-stage [stroke-dasharray="5 5"] { animation: grow-flow10 0.9s linear infinite; }
+.grow-stage [stroke-dasharray="4 4"] { animation: grow-flow8 0.7s linear infinite; }
+.grow-stage [stroke-dasharray="6 6"] { animation: grow-flow12 3s linear infinite; }
+.grow-stage .dome-rim { animation: grow-rim 2.4s ease-in-out infinite; }
+.grow-stage.is-paused * { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .grow-stage .pc, .grow-tag, .grow-row, .grow-dot i { transition: none; }
+  .grow-stage [stroke-dasharray], .grow-stage .dome-rim { animation: none; }
+}
+
+/* phones: the player sticks under the header while the words scroll up below it at normal speed, so the picture is
+   on screen above whatever you're reading; past the section it leaves with it (nothing pins the page). What sits
+   round the picture scales with the width (sized for a 390-wide phone, smaller below). */
+@media (--phone) {
+  .grow { row-gap: var(--sp-3); }
+  .grow-player {
     position: sticky;
-    top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
-    align-self: start;
-    display: grid;
-    align-content: center;
-    height: var(--fold-h);
+    top: calc(var(--header-h) + env(safe-area-inset-top, 0px));
+    z-index: 5;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: var(--sp-2) var(--gutter) var(--sp-1);
+    border-bottom: 1px solid var(--c-line);
+    background: var(--c-bg);
   }
-  .grow.is-live .grow-step { min-height: 0; }
+  .grow-stage { aspect-ratio: auto; height: clamp(12rem, 36svh, calc(100vw - 2 * var(--gutter))); }
+  .grow-tag, .grow-place, .grow-team { font-size: clamp(0.6rem, 2.75vw, 0.75rem); }
+  .grow-play { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); }
+  .grow-card { gap: var(--sp-2); padding-bottom: var(--sp-6); }
+  .grow-card h3 { font-size: clamp(1.2rem, 5.6vw, 1.5rem); }
+  .grow-row p { font-size: clamp(0.875rem, 3.9vw, 1rem); }
+}
+
+/* tablet: the player a little narrower and centred, the card in two columns under it */
+@media (--tablet) {
+  .grow-player { justify-self: center; width: min(80%, 36rem); }
+  .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
+}
+
+/* desktop: one screen; heading and card on the left, the player on the right as tall as the screen allows */
+@media (--desktop) {
+  .grow { grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-8); align-items: start; }
+  .grow-head { grid-row: 1; grid-column: 1; }
+  .grow-cards { grid-row: 2; grid-column: 1; }
+  .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
+  .grow-player { grid-row: 1 / 3; grid-column: 2; }
+  .grow-stage { width: auto; height: min(calc(var(--fold-inner, 40rem) - var(--tap) - var(--sp-2)), 44rem); }
 }

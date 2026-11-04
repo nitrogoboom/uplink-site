@@ -1,83 +1,65 @@
 ---
-// HOME · 3. Growing with you. Scroll story: the world grows as you scroll (home.js): floors, then remote staff and a
-// security ring, then a second office and a cloud. Phone and tablet: the picture, a level HUD and the active step hold
-// still for about three screens while the scroll builds each level. Desktop: the
-// picture stays put beside the steps.
-// Drawing: grow-tower.svg, written by tools/gen_tower.py. Don't edit it by hand. Inlined as text (?raw): a plain
-// import would also write a copy to dist/_astro that nothing uses.
-// Tags point at the drawing's anchors (<circle class="tg-a" data-a="…">); data-l is the level they show on.
+// HOME · 3. We grow with you. One business that grows in six steps by where its people work: the office, a home,
+// the road, a second office, the ring and cloud over all of it, then the dome. Each step's new parts drop in and glow
+// while earlier ones stay; its risks show as red tags, then flip to green fixes as the card goes from "Watch for" to
+// "We handle". It plays once when the section comes on screen (src/scripts/grow.js, imported by home.js); the
+// controls step through it by hand.
+// The player (picture and controls) is one unit: on phones it sticks under the header while the words scroll below.
+// Without script the whole world shows, finished, with every step's card in a list. Copy: src/data/grow.json.
+// Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
+// with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
 // Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
-import raw from './grow-tower.svg?raw';
+import raw from './grow-world.svg?raw';
 import { optimize } from 'svgo';
 import { SVGO } from '../../../scripts/svgo-config.mjs';
-import Sep from '../Sep.astro';
+import Icon from '../Icon.astro';
+import steps from '../../data/grow.json';
 import './grow.css';
 
-const tags = [
-  { l: 1, a: 'door', t: 'Help desk' },
-  { l: 1, a: 'mast1', t: 'Backed up' },
-  { l: 2, a: 'ring', t: '24/7 watch' },
-  { l: 2, a: 'home-a', t: 'Remote staff' },
-  { l: 3, a: 'office', t: 'Second office' },
-  { l: 3, a: 'cloud', t: 'Cloud' },
-];
-// Inlined, so scripts/svgo.mjs never sees it: shrunk here with the same settings (about 70 KB -> 50 KB). SVGO writes
-// the quotes in its <style> as &quot;, but the CSP hash (scripts/headers.mjs) must match the text the browser
-// reads, with plain quotes, or the whole block is blocked: put them back.
-const tower = optimize(raw, SVGO).data.replace(/<style>[\s\S]*?<\/style>/g, (css) => css.replaceAll('&quot;', '"'));
+const world = optimize(raw, SVGO).data.replace(/<style>[\s\S]*?<\/style>/g, '').replace(' id="plain"', '');
+const last = steps.length - 1;
 ---
-<section class="section grow-section" id="grow" aria-labelledby="grow-title">
+<section class="section fold grow-section" id="grow" aria-labelledby="grow-title">
   <div class="container">
-    <div class="grow">
-      <div class="grow-side">
-        <div class="section-head">
-          <p class="eyebrow">Built to scale</p>
-          <h2 id="grow-title">We grow with you</h2>
-          <p class="lead">Start with the basics and add more as your team grows. Same people, same help desk, the whole way.</p>
+    <div class="grow" data-steps={steps.length}>
+      <div class="section-head grow-head">
+        <p class="eyebrow">Built to scale</p>
+        <h2 id="grow-title">We grow with you</h2>
+        <p class="lead">As your team spreads out, here's what to watch, and what we take care of.</p>
+      </div>
+      <div class="grow-player">
+        <div class="grow-stage" data-md-skip>
+          <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
+          <span class="grow-team" aria-hidden="true">Team of {steps[last].team}</span>
+          <Fragment set:html={world} />
+          {steps.map((s, i) => s.tags.map((t, k) => (
+            <span class="grow-tag" aria-hidden="true" data-step={i} data-k={k} data-at={t.at} data-risk={t.risk} data-fix={t.fix}><span class="grow-tag-i">!</span><span class="grow-tag-t">{t.risk}</span></span>
+          )))}
+          <button type="button" class="grow-play" aria-label="Pause">
+            <svg class="grow-play-i" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1h3v10H2zM7 1h3v10H7z" /></svg>
+            <svg class="grow-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="100" /></svg>
+          </button>
         </div>
-        <div class="grow-art">
-          <div class="grow-hud" aria-hidden="true" data-md-skip>
-            <span class="chip chip--accent">Level <span class="grow-lvl">1</span></span>
-            <span class="grow-count"><span class="grow-num">1</span> people</span>
-            <span class="grow-bar"><i></i><i></i><i></i></span>
-          </div>
-          <Fragment set:html={tower} />
-          <div class="grow-tags" aria-hidden="true" data-md-skip>
-            {tags.map((g) => <span class="grow-tag" data-l={g.l} data-a={g.a}>{g.t}</span>)}
-          </div>
+        <div class="grow-nav" role="group" aria-label="Where your people work" data-md-skip>
+          <button type="button" class="iconbtn grow-step-btn" data-dir="-1" aria-label="Previous place"><Icon name="chevronL" /></button>
+          <span class="grow-dots">
+            {steps.map((s, i) => (
+              <button type="button" class="grow-dot" data-i={i} aria-label={`${i + 1} of ${steps.length}: ${s.place}`} aria-pressed="false"><i></i></button>
+            ))}
+          </span>
+          <button type="button" class="iconbtn grow-step-btn" data-dir="1" aria-label="Next place"><Icon name="chevronR" /></button>
         </div>
       </div>
-      <ol class="grow-steps">
-        <li class="grow-step" id="grow-l1" data-floors="1"><div class="grow-card panel">
-          <span class="chip"><span>Level 1<Sep />1 to 10 people</span></span>
-          <h3>Get set up right</h3>
-          <p class="muted">A small team needs things to just work. We set up every laptop, phone and account the same way, and you get one number to call.</p>
-          <ul>
-            <li>Help desk for every person</li>
-            <li>Microsoft 365 or Google set up and backed up</li>
-            <li>Devices patched and monitored</li>
-          </ul>
-        </div></li>
-        <li class="grow-step" id="grow-l2" data-floors="2"><div class="grow-card panel">
-          <span class="chip"><span>Level 2<Sep />11 to 50 people</span></span>
-          <h3>Lock it down</h3>
-          <p class="muted">More people means more logins to protect. We add round-the-clock security and train your staff to spot a bad email.</p>
-          <ul>
-            <li>24/7 threat monitoring</li>
-            <li>Email and phishing defence</li>
-            <li>Staff security training</li>
-          </ul>
-        </div></li>
-        <li class="grow-step" id="grow-l3" data-floors="3"><div class="grow-card panel">
-          <span class="chip"><span>Level 3<Sep />51 to 150 people</span></span>
-          <h3>Plan ahead</h3>
-          <p class="muted">Bigger teams need a plan. We map every device and licence, link your offices, and review the budget with you each quarter.</p>
-          <ul>
-            <li>Multi-site networks</li>
-            <li>Quarterly IT reviews</li>
-            <li>Yearly roadmap and budget</li>
-          </ul>
-        </div></li>
+      <ol class="grow-cards">
+        {steps.map((s, i) => (
+          <li class="grow-card" data-i={i} data-place={s.place} data-team={s.team}>
+            <h3>{s.title}</h3>
+            <div class="grow-rows">
+              <div class="grow-row grow-watch"><span class="grow-lbl"><i></i>Watch for</span><p>{s.watch}</p></div>
+              <div class="grow-row grow-handle"><span class="grow-lbl"><i></i>We handle</span><p>{s.handle}</p></div>
+            </div>
+          </li>
+        ))}
       </ol>
     </div>
   </div>

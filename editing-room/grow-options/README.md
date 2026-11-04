@@ -1,10 +1,10 @@
-# Grow section mockups (in progress)
+# Grow section mockups (done: built into the site)
 
-Redesign of the Home "We grow with you" section, worked out in mockups before anything is built. Nothing here is part of the site build. Open items are in `notes.md` (Page structure).
+Redesign of the Home "We grow with you" section, worked out in mockups before it was built. Nothing here is part of the site build. Open items are in `notes.md` (Page structure).
 
-## Where it stands (4 Nov 2026)
+## Where it stands (4 Nov 2026): built into the site
 
-Chosen so far, round 8: one isometric world that grows in five steps by where people work (your office, working from home, on the road, a second office, all of it). New parts drop in and glow; nothing rebuilds. The camera follows growth (close on the office first, pulling back). Dashed lots show what's coming. Pills jump between steps; a card says what to watch for and what we handle. No scroll lock.
+Built into Home on 4 Nov 2026 (`src/components/home/Grow.astro`, `src/scripts/grow.js`, `src/data/grow.json`), from round 8 and the draft that followed it (`section.template.html`): one isometric world that grows in six steps by where people work (your office, working from home, on the road, a second office, all of it, covered by the dome). New parts drop in and glow; nothing rebuilds. The camera follows growth. The picture and its controls (arrows and a dot a step, as the Services carousel's) are one player that sticks under the header on phones while the card scrolls below. No scroll lock.
 
 ## Seeing it at real size
 
@@ -33,9 +33,9 @@ The published links are private to John's account.
 Pages with a template are built (the built `.html` is not committed). From the project root:
 
 ```
-python tools/gen_places.py editing-room/grow-options/places
+python tools/gen_grow.py editing-room/grow-options/places
 node editing-room/grow-options/build.mjs
 ```
 
-- `tools/gen_places.py` draws `places/*.svg`: the five place scenes (round 6) and `world.svg`, the growing world (rounds 7 and 8). Same kit and rules as the other drawings; check each with `tools/check.py` and `tools/painter.py ... 0 0 20 tools/rules_places.py`.
-- `build.mjs` inlines the real tower (rounds 1-2) and the place drawings (rounds 6-8) into the templates.
+- `tools/gen_grow.py` draws the site's world (`src/components/home/grow-world.svg`, which rounds 7, 8 and the draft read) and, given this folder, `places/*.svg`: the five place scenes (round 6). Same kit and rules as the other drawings; check each with `tools/check.py` and `tools/painter.py ... 0 0 20 tools/rules_grow.py`.
+- `build.mjs` inlines the drawings into the templates (rounds 6-8 and the draft). Rounds 1-2 used the old tower, now removed: their templates are a record only.

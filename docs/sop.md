@@ -53,7 +53,7 @@ On every push, the build fails if any of these break:
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page.
 - No sideways scroll on any page at phone size, and on Home at four sizes. The header fits at every width from 320px to 3440px, at normal and 200% text.
-- Hero, tower and footer work; the footer is one screen tall at 1440×900.
+- Hero, Grow section and footer work; the footer is one screen tall at 1440×900.
 - Every link, picture, script and preload on every page answers, and every `#section` link finds its id (`tools/check_links.py`).
 - **axe-core finds nothing serious or critical on Home** (phone and desktop). Other pages get axe only with `--all`, which the release audit runs.
 
@@ -95,7 +95,7 @@ Go easy on W3C: it's a free service that limits requests per address, and a day 
 What a machine can't judge. Where it's built, it's in brackets.
 
 **Real phones** (from the PR preview link)
-- [ ] iPhone, Safari: Home, one service page, Contact. The bottom bar, the notch area, nothing hidden under the address bar, the grow tower scrolls smoothly.
+- [ ] iPhone, Safari: Home, one service page, Contact. The bottom bar, the notch area, nothing hidden under the address bar, the Grow section plays, and its player stays put while the words scroll under it.
 - [ ] Android, Chrome: the same three pages.
 
 **Listen** (NVDA on Windows, free, or VoiceOver on iPhone; 5 minutes)

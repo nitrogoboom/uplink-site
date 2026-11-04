@@ -13,11 +13,9 @@ We run the technology behind a business, so the owner can run the business.
 
 ## How we grow with a business
 
-Same people and the same help desk at every size.
+As a team spreads out, here's what to watch, and what we take care of.
 
-- 1 to 10 people: every laptop, phone and account set up the same way. Help desk for every person, Microsoft 365 or Google set up and backed up, devices patched and monitored.
-- 11 to 50 people: round-the-clock threat monitoring, email and phishing defence, staff security training.
-- 51 to 150 people: multi-site networks, quarterly IT reviews, a yearly roadmap and budget.
+{grow}
 
 ## Contact
 

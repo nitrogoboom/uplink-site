@@ -1,11 +1,11 @@
 // The SVGO settings for every drawing the site ships: scripts/svgo.mjs runs them on dist/assets/img/ after the
-// build, and Grow.astro on the tower it inlines into Home (inlined drawings never reach dist/assets/img/).
+// build, and Grow.astro on the world it inlines into Home (inlined drawings never reach dist/assets/img/).
 // What must survive, so a few SVGO defaults are off:
 //   ids and classes        home.js, the hero CSS and the footer find parts by them (cleanupIds, collapseGroups)
 //   <style> as written     the embedded fonts, and rules for classes the scripts add later, like .is-on
 //                          (minifyStyles would drop those as unused; inlineStyles would write style="" attributes,
 //                          which the CSP blocks)
-//   hidden parts           display="none" paths the hero shows from script, the tower's r="0" anchor circles
+//   hidden parts           display="none" paths the hero shows from script, the Grow world's r="0" anchor circles
 //                          (removeHiddenElems)
 //   role="img"             with the aria-label, so screen readers read a drawing as one picture (removeUnknownsAndDefaults)
 // (SVGO 4 keeps the viewBox on its own.)
