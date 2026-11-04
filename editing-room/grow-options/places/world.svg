@@ -236,7 +236,6 @@
 <path class="dome" d="M-202.1,0.0A202.1,202.1 0 0 1 202.1,0.0A202.1,116.7 0 0 1 -202.1,0.0Z" fill="url(#dome-g)"/>
 <ellipse cx="0.0" cy="-55.0" rx="190.5" ry="110.0" class="dome-lat" fill="none" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.3"/>
 <ellipse cx="0.0" cy="-110.0" rx="150.6" ry="87.0" class="dome-lat" fill="none" stroke="#97C8EA" stroke-width="1" stroke-opacity="0.3"/>
-<g class="dome-spin" data-r="8.25" data-u="20" data-ox="0" data-oy="0" fill="none" stroke="#97C8EA" stroke-linecap="round"></g>
 <path class="dome-rim" d="M-202.1,0.0A202.1,202.1 0 0 1 202.1,0.0" fill="none" stroke="#97C8EA" stroke-width="2" stroke-opacity="0.85"/>
 </g>
 <circle class="tg-a" data-a="s1a" cx="26.0" cy="-15.0" r="0"/>

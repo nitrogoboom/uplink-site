@@ -295,8 +295,6 @@ def dome(s, R, o):
     for k in (1 / 3, 2 / 3):
         h = R * k
         s.raw(ellipse(w, (R * R - h * h) ** 0.5, 0, 0, h, f'class="dome-lat" fill="none" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.3"'))
-    # longitude lines that turn round the dome: drawn and spun by the page (it knows the world-to-screen sums: u, origin)
-    s.raw(f'<g class="dome-spin" data-r="{R}" data-u="{w.u}" data-ox="{w.ox}" data-oy="{w.oy}" fill="none" stroke="{pal.SKY}" stroke-linecap="round"></g>')
     s.raw(f'<path class="dome-rim" d="{top}" fill="none" stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.85"/>')
     s.end()
     s.points.append((cx, cy - rx))
