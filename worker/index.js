@@ -1,5 +1,8 @@
-// The site's one Worker script. Everything else is the built site in dist/, served as static assets: wrangler.jsonc
-// sends only /api/* and /404 here first (run_worker_first).
+// The site's one Worker script. Everything else is the built site in dist/, served as static assets. wrangler.jsonc
+// sends every request here first (run_worker_first: true), so plain http:// can be sent to https:// (workers.dev is
+// Cloudflare's zone, not ours, so its "Always Use HTTPS" setting isn't ours to turn on). Anything that isn't /api/*
+// or /404 goes on to the assets (env.ASSETS), with _headers, _redirects and the 404 page as before.
+// At launch, on our own zone: turn on Always Use HTTPS, and run_worker_first can go back to ["/api/*", "/404"].
 //
 // POST /api/report: problems real visitors' browsers hit, so we hear about them.
 //   CSP blocks       the browser posts these itself (public/_headers: report-to csp, report-uri for older browsers)
@@ -81,11 +84,19 @@ async function notFoundPage(request, env) {
   return new Response(page.body, { status: 404, headers: page.headers });
 }
 
+// http:// to https://, the same address. 308 keeps a POST a POST. Local servers (npm run serve) stay on http.
+const LOCAL = ['localhost', '127.0.0.1', '[::1]'];
+
 export default {
   async fetch(request, env) {
-    const { pathname } = new URL(request.url);
-    if (pathname === '/api/report') return report(request, env);
-    if (pathname === '/404') return notFoundPage(request, env);
-    return new Response('Not found', { status: 404 });
+    const url = new URL(request.url);
+    if (url.protocol === 'http:' && !LOCAL.includes(url.hostname)) {
+      url.protocol = 'https:';
+      return Response.redirect(url.href, 308);
+    }
+    if (url.pathname === '/api/report') return report(request, env);
+    if (url.pathname === '/404') return notFoundPage(request, env);
+    if (url.pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
+    return env.ASSETS.fetch(request);
   },
 };
