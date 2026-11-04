@@ -104,7 +104,17 @@ p { margin: 0; }
   .card .cols { grid-template-columns: 1fr 1fr; }
   .stage { grid-column: 2; grid-row: 1 / 4; width: auto; height: min(calc(var(--fold-h) - 2 * var(--sp-6)), 48rem); }
 }
-@media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } }
+/* always some life in it: data runs along the cables, the lots and the ring creep (one dash period per loop) */
+@keyframes flow8 { to { stroke-dashoffset: -16; } }
+@keyframes flow10 { to { stroke-dashoffset: -20; } }
+@keyframes flow11 { to { stroke-dashoffset: 22; } }
+@keyframes flow12 { to { stroke-dashoffset: -24; } }
+.scene [stroke-dasharray="5 5"] { animation: flow10 0.9s linear infinite; }
+.scene [stroke-dasharray="4 4"] { animation: flow8 0.7s linear infinite; }
+.scene [stroke-dasharray="6 5"] { animation: flow11 2.6s linear infinite; }
+.scene [stroke-dasharray="6 6"] { animation: flow12 3s linear infinite; }
+.stage.paused * { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } .scene [stroke-dasharray] { animation: none; } }
 
 /* mockup controls, not part of the design */
 .mock { position: fixed; right: 12px; bottom: calc(12px + var(--botnav-h)); z-index: 30; background: var(--c-solid); border: 1px solid var(--c-line-2); border-radius: 12px; padding: 8px 12px; font: 400 13px/1.3 'Barlow', sans-serif; color: var(--c-muted); max-width: calc(100vw - 24px); }
@@ -149,7 +159,7 @@ p { margin: 0; }
     { pill: 'Second office', title: 'A second office opens', watch: 'Two networks, two phone systems, files people can\'t find.', handle: 'Both sites linked, one phone system, the same setup in every office.' },
     { pill: 'All of it', title: 'One team, wherever they work', watch: 'Too many apps and accounts, no plan, surprise bills.', handle: 'One map of every device and licence, and a budget review each quarter.' },
   ];
-  const DWELL = 7000, RISK_AT = 1500, FIX_AT = 3600;
+  const DWELL = 4500, RISK_AT = 900, FIX_AT = 2300;   // a step every 4.5 s: built by about 0.9 s, risks in red, fixes in green from 2.3 s
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -313,12 +323,15 @@ p { margin: 0; }
     timer = setTimeout(() => {
       if (cur >= LAST) { stop(); return; }
       go(cur + 1, true); tick();
-    }, cur < 0 ? 500 : DWELL);
+    }, cur < 0 ? 0 : DWELL);
   };
   const play = () => { playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
   screens.forEach((s) => {
     s.pills.forEach((b) => b.addEventListener('click', () => { stop(); go(+b.dataset.i, true); }));
-    s.pause.addEventListener('click', () => { if (playing) { stop(); beats.forEach(clearTimeout); beats = []; screens.forEach((x) => x.show(cur, false, false)); } else play(); });
+    s.pause.addEventListener('click', () => {
+      if (playing) { stop(); beats.forEach(clearTimeout); beats = []; screens.forEach((x) => x.show(cur, false, false)); } else play();
+      screens.forEach((x) => x.host.querySelector('.stage').classList.toggle('paused', !playing));   // pause stops the flowing cables too
+    });
   });
   $$('.mock .ctl button').forEach((b) => b.addEventListener('click', () => {
     const k = b.dataset.k;
@@ -334,7 +347,7 @@ p { margin: 0; }
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
     if (visible && !started && !reduce) { started = true; play(); } else if (visible && playing) tick(); else clearTimeout(timer);
-  }, { threshold: 0.4 }).observe(document.getElementById('grow'));
+  }, { threshold: 0 }).observe(document.getElementById('grow'));   // starts building as the section's first pixel arrives, so it's already moving when you see it
 })();
 
   // the window size in the controls, so a manual resize shows which layout you're on
