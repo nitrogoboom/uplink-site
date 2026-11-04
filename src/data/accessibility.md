@@ -1,10 +1,10 @@
 ## Our commitment
 
-Uplink Technology is committed to meeting the accessibility needs of people with disabilities in a timely manner. We aim to remove barriers and prevent new ones, as Ontario's Accessibility for Ontarians with Disabilities Act (AODA) requires. That covers this website, how we talk with you and how we serve our clients.
+Uplink Technology is committed to meeting the accessibility needs of people with disabilities in a timely manner. We aim to remove barriers and prevent new ones, in the spirit of Ontario's Accessibility for Ontarians with Disabilities Act (AODA). That covers this website, how we talk with you and how we serve our clients.
 
 ## The standard this site meets
 
-This site meets the Web Content Accessibility Guidelines (WCAG) 2.0 at Level AA, the standard Ontario sets for websites. We build to the newer WCAG 2.2 Level AA where we can.
+This site meets the Web Content Accessibility Guidelines (WCAG) 2.0 at Level AA. Ontario requires that standard of organizations with 50 or more staff. We're smaller, so it's our own choice, and we hold ourselves to it. We build to the newer WCAG 2.2 Level AA where we can.
 
 How we check it, every time we release a change to the site:
 
@@ -47,7 +47,7 @@ What happens next:
 2. Within 10 business days, we tell you what we'll do and when. If you raised a barrier, we fix it or give you another way to get what you need.
 3. If you need your answer in a certain format, say so and we'll use it.
 
-You can ask us for a copy of this feedback process, our accessibility policy or our multi-year accessibility plan.
+You can ask us for a copy of this feedback process.
 
 ## Accessible formats and communication supports
 

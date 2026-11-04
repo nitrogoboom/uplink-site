@@ -37,7 +37,7 @@ Two kinds of checking:
 
 | Area | Standard | Why |
 | --- | --- | --- |
-| Accessibility | **WCAG 2.0 Level AA** (the legal floor). We aim for WCAG 2.2 AA where it costs little. A public statement with a feedback route and other formats on request. | Ontario AODA / IASR O. Reg. 191/11, for organisations with 50+ staff in Ontario. `/accessibility` (`src/data/accessibility.md`); `knowledge/Ontario Website Accessibility Rules.md` |
+| Accessibility | **WCAG 2.0 Level AA**, our own standard: Ontario requires it only from 50 staff, and we're under 50 (decided 3 Nov 2026). We aim for WCAG 2.2 AA where it costs little. A public statement with a feedback route and other formats on request. | Ontario AODA / IASR O. Reg. 191/11, for organisations with 50+ staff in Ontario. `/accessibility` (`src/data/accessibility.md`); `knowledge/Ontario Website Accessibility Rules.md` |
 | Privacy | PIPEDA (Canada); CASL for the newsletter. The site's privacy page: what it collects, who handles it and where, how long, your rights | `/privacy` (`src/data/privacy.md`); sources in `docs/privacy-and-accessibility-2026-11-03.md` |
 | Security | HTTPS only, HSTS, strict CSP (no inline script or style) that reports its blocks, Trusted Types, nosniff, Referrer-Policy, Permissions-Policy. A security contact. Secrets listed, never in the repo. | `public/_headers` (the build adds the hashes); `/.well-known/security.txt`, `SECURITY.md`; `docs/secrets.md` |
 | Browsers | Current Chrome, Edge, Firefox, Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras | Support list still to write (`notes.md`) |

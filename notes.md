@@ -20,9 +20,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
 - [ ] Reply times on the accessibility page (2 business days to acknowledge, 10 to answer) are a proposal: keep or change.
 - [ ] "Few people at Uplink can open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
-- [ ] The accessibility page offers the accessibility policy and the multi-year plan. Both must exist, and the plan must be posted on the site (O. Reg. 191/11 s. 3, s. 4). Write them; they're company documents, not site copy.
-- [ ] Quebec (Law 25): does Uplink do business in Quebec? If yes: publish the person in charge, a privacy impact assessment for Cloudflare, a French page.
-- [ ] AODA compliance report every three years for 50+ staff: put it on the calendar (unverified, check the Act).
+- [ ] AODA compliance report: under 50 staff, but organizations with 20 or more staff in Ontario file one every three years (from memory, unverified; the site says 22 technicians). Check whether it applies.
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.

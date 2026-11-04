@@ -2,6 +2,8 @@
 
 3 Nov 2026. Drafts: `src/data/privacy.md` and `src/data/accessibility.md`. Not legal advice; a lawyer should read both before launch.
 
+**Decided 3 Nov 2026, after this was written:** Uplink has fewer than 50 staff and doesn't do business in Quebec. So the 50+ duties (WCAG by law, the written accessibility policy and multi-year plan, s. 3 and s. 4) don't apply, and neither does Law 25. The site keeps WCAG 2.0 AA as its own standard; the accessibility page says so and no longer offers a policy or plan. This settles open questions 6 and 20 below, and the Quebec part of 2. Question 21 (the compliance report) now turns on the 20-staff line, not 50: see `notes.md`.
+
 Sources were read on 3 Nov 2026. Laws were read on the official consolidations: PIPEDA and the CRTC regulations "current to 2026-10-19" (laws-lois), O. Reg. 191/11 "e-Laws currency date October 30, 2026" (ontario.ca), Quebec's P-39.1 on LégisQuébec. **Unverified** marks anything I couldn't confirm from a primary source.
 
 ## Privacy page
