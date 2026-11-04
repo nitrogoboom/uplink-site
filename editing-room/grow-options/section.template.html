@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grow section preview</title>
+<style>
+/* the site's own fonts (copied next to this page by build.mjs) and tokens (src/styles/tokens.css, inlined) */
+<!--FONTS-->
+<!--TOKENS-->
+</style>
+<style>
+/* Grow section at real size, in a stand-in page: header, the section before, the Grow section, the section after,
+   and the phone tab bar. Breakpoints as the site: phone < 700, tablet 700-1099, desktop >= 1100 (src/lib/media.js).
+   The site's custom media queries in tokens.css don't run here (no PostCSS), so their effect is repeated below. */
+@media (max-width: 699px) { :root { --fold-h: calc(100svh - var(--header-h) - var(--botnav-h) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); } }
+@media (min-width: 700px) { :root { --gutter: 1.5rem; } }
+@media (min-width: 1100px) {
+  :root { --gutter: 3rem; --section-y: var(--sp-9); --container: calc(94rem + 2 * var(--gutter)); --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)); }
+  html { font-size: clamp(14px, min(1.1111vw, 1.7778vh), 40px); }
+}
+* { box-sizing: border-box; }
+html { --text: 1; }
+body { margin: 0; background: var(--c-bg); color: var(--c-text); font: 400 var(--fs-3)/1.55 'Barlow', 'Barlow Fallback', Arial, sans-serif; }
+h1, h2, h3 { margin: 0; font-family: 'Barlow Condensed', 'Barlow Condensed Fallback', Arial, sans-serif; text-transform: uppercase; line-height: 1.05; text-wrap: balance; }
+p { margin: 0; }
+:focus-visible { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }
+.container { max-width: var(--container); margin: 0 auto; padding-inline: var(--gutter); }
+
+/* stand-ins */
+.hdr { position: sticky; top: 0; z-index: 20; height: var(--header-h); background: var(--c-glass); border-bottom: 1px solid var(--c-line); }
+.hdr .container { height: 100%; display: flex; align-items: center; gap: var(--sp-6); }
+.logo { font: 700 italic var(--fs-5)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; display: flex; align-items: center; gap: var(--sp-2); }
+.logo i { width: 1.6rem; height: 1.6rem; border-radius: 0.35rem; background: var(--c-accent); }
+.hdr nav { display: none; gap: var(--sp-5); font: 600 var(--fs-2)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-muted); }
+@media (min-width: 700px) { .hdr nav { display: flex; } }
+.stub { padding-block: var(--section-y); border-bottom: 1px solid var(--c-line); }
+.stub.band { background: var(--c-bg-band); }
+.stub p { color: var(--c-muted); }
+.stub .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: var(--sp-4); margin-top: var(--sp-5); }
+.stub .row div { height: 7rem; border-radius: 0.75rem; background: var(--c-surface); border: 1px solid var(--c-line); }
+.botnav { position: fixed; inset: auto 0 0; z-index: 20; height: calc(var(--botnav-h) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); background: var(--c-glass-2); border-top: 1px solid var(--c-line); display: grid; grid-template-columns: repeat(4, 1fr); place-items: center; font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: var(--c-muted); }
+@media (min-width: 700px) { .botnav { display: none; } }
+@media (max-width: 699px) { body { padding-bottom: var(--botnav-h); } }
+
+/* ---- the Grow section ---- */
+.grow { padding-block: var(--section-y); }
+.in { display: grid; gap: var(--sp-5); }
+.m-head { display: grid; gap: var(--sp-2); }
+.m-eyebrow { font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-accent-text); }
+.m-h { font: 700 italic var(--fs-7)/1 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+.m-lead { font-size: var(--fs-4); color: var(--c-muted); max-width: 34rem; }
+.stage { position: relative; aspect-ratio: 1 / 1; width: 100%; border-radius: 1rem; background: radial-gradient(60% 55% at 50% 58%, var(--c-glow-sky), transparent 72%), var(--c-bg-band); border: 1px solid var(--c-line); overflow: hidden; font-size: var(--fs-1); }
+.scene { position: absolute; inset: 0; }
+.scene svg { position: absolute; inset: 4% 4% 6%; width: 92%; height: 90%; display: block; }
+.s-title, .step-n { position: absolute; top: 0.9rem; font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; }
+.s-title { left: 1rem; color: var(--c-sky); }
+.step-n { right: 1rem; color: var(--c-muted); }
+.pause { position: absolute; right: 0.75rem; bottom: 0.75rem; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--c-edge); background: var(--c-solid); color: var(--c-text); display: grid; place-items: center; cursor: pointer; padding: 0; z-index: 2; }
+.pause svg { width: 0.9rem; height: 0.9rem; fill: currentColor; }
+.tag { position: absolute; left: 0; top: 0; transform: translate(-50%, -100%) scale(0.85); display: flex; align-items: center; gap: 0.45em; white-space: nowrap; font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.4em 0.75em 0.4em 0.4em; border-radius: 999px; background: var(--c-alert); color: var(--c-on-accent); opacity: 0; transition: opacity 0.35s ease, transform 0.35s ease, background-color 0.35s ease; pointer-events: none; }
+.tag .ico { width: 1.4em; height: 1.4em; border-radius: 50%; display: grid; place-items: center; background: rgb(14 26 39 / 0.2); font: 700 0.95em/1 'Barlow', sans-serif; }
+.tag.fixed { background: var(--c-ok); }
+.scene .tag.show { opacity: 1; transform: translate(-50%, -100%) scale(1); }
+.tag.flip { transform: translate(-50%, -100%) scale(1.12) !important; }
+.pills { display: flex; gap: var(--sp-2); overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
+.pills::-webkit-scrollbar { display: none; }
+.pill { position: relative; overflow: hidden; flex: none; min-height: 2.75rem; font: 600 var(--fs-2)/1 'Barlow', sans-serif; padding: 0 1.1em; border-radius: 999px; border: 1px solid var(--c-edge); background: var(--c-surface); color: var(--c-muted); cursor: pointer; white-space: nowrap; }
+.pill span { position: relative; }
+.pill .fill { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); background: rgb(255 173 81 / 0.3); }
+.pill[aria-pressed="true"] { border-color: var(--c-accent); color: var(--c-text); }
+.card { display: grid; gap: var(--sp-3); align-content: start; min-height: 11rem; }
+.card h3 { font-size: var(--fs-6); }
+.card .cols { display: grid; gap: var(--sp-3); }
+.card .row { display: grid; gap: var(--sp-1); transition: opacity 0.35s ease; }
+.card .lbl { font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5em; }
+.card .lbl i { width: 0.6em; height: 0.6em; border-radius: 2px; display: inline-block; }
+.card .watch .lbl { color: var(--c-alert); } .card .watch .lbl i { background: var(--c-alert); }
+.card .handle .lbl { color: var(--c-ok); } .card .handle .lbl i { background: var(--c-ok); }
+.card p { font-size: var(--fs-3); color: var(--c-muted); }
+.card .handle p { color: var(--c-text); }
+.card[data-beat="build"] .row { opacity: 0.35; }
+.card[data-beat="risk"] .handle { opacity: 0.3; }
+.card[data-beat="fix"] .watch { opacity: 0.45; }
+.pc { transition: opacity 0.5s ease, transform 0.7s cubic-bezier(.2,.8,.3,1); }
+.pc.hide { opacity: 0; transform: translateY(-16px); }
+.pc.pre { transition: none; }
+.pc.glow { filter: url(#ux-glow); }
+.lot { transition: opacity 0.5s ease; }
+.lot.hide { opacity: 0; }
+/* tablet: the phone order, the square a bit narrower and centred, the card in two columns */
+@media (min-width: 700px) and (max-width: 1099px) {
+  .stage { width: min(80%, 36rem); justify-self: center; }
+  .pills { flex-wrap: wrap; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .card .cols { grid-template-columns: 1fr 1fr; }
+}
+/* desktop: one screen; words, pills and card on the left, the square on the right as tall as the screen allows */
+@media (min-width: 1100px) {
+  .grow { min-height: var(--fold-h); display: grid; align-items: center; padding-block: var(--sp-6); }
+  .in { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: var(--sp-8); row-gap: var(--sp-5); align-items: start; }
+  .m-head { grid-column: 1; grid-row: 1; }
+  .pills { grid-column: 1; grid-row: 2; flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .card { grid-column: 1; grid-row: 3; }
+  .card .cols { grid-template-columns: 1fr 1fr; }
+  .stage { grid-column: 2; grid-row: 1 / 4; width: auto; height: min(calc(var(--fold-h) - 2 * var(--sp-6)), 48rem); }
+}
+@media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } }
+
+/* mockup controls, not part of the design */
+.mock { position: fixed; right: 12px; bottom: calc(12px + var(--botnav-h)); z-index: 30; background: var(--c-solid); border: 1px solid var(--c-line-2); border-radius: 12px; padding: 8px 12px; font: 400 13px/1.3 'Barlow', sans-serif; color: var(--c-muted); max-width: calc(100vw - 24px); }
+@media (min-width: 700px) { .mock { bottom: 12px; } }
+.mock summary { cursor: pointer; font-weight: 600; color: var(--c-text); }
+.mock .ctl { display: grid; gap: 6px; margin-top: 8px; }
+.seg { display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: var(--c-bg); border: 1px solid var(--c-line-2); }
+.seg button { font: 600 12px/1 'Barlow', sans-serif; color: var(--c-muted); background: none; border: 0; border-radius: 999px; padding: 7px 10px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--c-accent); color: var(--c-on-accent); }
+.size { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<!--WORLD-->
+<header class="hdr"><div class="container"><span class="logo"><i></i>Uplink</span><nav><span>Home</span><span>Services</span><span>Our work</span><span>About</span><span>Contact</span></nav></div></header>
+
+<section class="stub band"><div class="container"><h2 class="m-h">Services</h2><p>The section before (stand-in).</p><div class="row"><div></div><div></div><div></div></div></div></section>
+
+<section class="grow" id="grow" aria-labelledby="grow-h"><div class="container"><div class="grow-x"></div></div></section>
+
+<section class="stub"><div class="container"><h2 class="m-h">Our work</h2><p>The section after (stand-in).</p><div class="row"><div></div><div></div><div></div></div></div></section>
+
+<nav class="botnav" aria-label="Tab bar (stand-in)"><span>Home</span><span>Services</span><span>Work</span><span>Contact</span></nav>
+
+<details class="mock">
+  <summary>Mockup controls · <span class="size"></span></summary>
+  <div class="ctl">
+    <span id="cam-l">Camera</span>
+    <div class="seg" role="group" aria-labelledby="cam-l"><button type="button" data-k="camera" data-v="still" aria-pressed="false">Still</button><button type="button" data-k="camera" data-v="follow" aria-pressed="true">Follows growth</button></div>
+    <span id="lot-l">Future lots</span>
+    <div class="seg" role="group" aria-labelledby="lot-l"><button type="button" data-k="lots" data-v="1" aria-pressed="true">Show</button><button type="button" data-k="lots" data-v="0" aria-pressed="false">Hide</button></div>
+  </div>
+</details>
+
+<script>
+
+(() => {
+  const PLACES = [
+    { pill: 'Your office', title: 'Everyone in one place', watch: 'Laptops set up by hand, no backups, no one to call when it breaks.', handle: 'Every device set up the same way, Microsoft 365 backed up, one help desk number.' },
+    { pill: 'Working from home', title: 'Some people work from home', watch: 'Home Wi-Fi, personal devices, logins from anywhere.', handle: 'Two-step sign-in, company laptops we manage, and a 24/7 watch for strange logins.' },
+    { pill: 'On the road', title: 'Sales hit the road', watch: 'A laptop left in a cab, café Wi-Fi, files needed on a phone.', handle: 'Encrypted devices we can wipe from here, and safe access to files from anywhere.' },
+    { pill: 'Second office', title: 'A second office opens', watch: 'Two networks, two phone systems, files people can\'t find.', handle: 'Both sites linked, one phone system, the same setup in every office.' },
+    { pill: 'All of it', title: 'One team, wherever they work', watch: 'Too many apps and accounts, no plan, surprise bills.', handle: 'One map of every device and licence, and a budget review each quarter.' },
+  ];
+  const DWELL = 7000, RISK_AT = 1500, FIX_AT = 3600;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // the world: drawn by tools/gen_places.py (world()), inlined by build.mjs as <template id="world">. Each part is a
+  // <g class="pc" data-s="step">; tags sit on the anchors (<circle class="tg-a" data-a="s1a">).
+  const TAGS = [
+    [{ a: 's1a', r: 'Who do we call?', f: 'One help desk' }, { a: 's1b', r: 'No backups', f: 'Backed up' }],
+    [{ a: 's2a', r: 'Open home Wi-Fi', f: 'Two-step sign-in' }, { a: 's2b', r: 'Personal laptop', f: 'Managed laptop' }],
+    [{ a: 's3a', r: 'Laptop left in the car', f: 'Wiped from here' }, { a: 's3b', r: 'Café Wi-Fi', f: 'Safe access anywhere' }],
+    [{ a: 's4a', r: 'Two networks', f: 'Sites linked' }, { a: 's4b', r: 'Two phone systems', f: 'One phone system' }],
+    [{ a: 's5a', r: 'Too many accounts', f: 'One map of it all' }, { a: 's5b', r: 'Surprise bills', f: 'Budget reviewed quarterly' }],
+  ];
+  const opts = { camera: 'follow', lots: true };
+  const TEAM = [8, 15, 25, 60, 120];   // team size at each step (my guesses)
+  const GLOW = '<defs><filter id="ux-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#FFAD51" flood-opacity="0.95"/></filter></defs>';
+  const WORLD = document.getElementById('world').innerHTML.replace(' id="plain"', '').replace(/(<svg[^>]*>)/, `$1${GLOW}`);
+
+  const PAUSE = 'M2 1h3v10H2zM7 1h3v10H7z', PLAY = 'M2 1l9 5-9 5z', REPLAY = 'M6 1a5 5 0 1 0 5 5h-2a3 3 0 1 1-3-3v2l3-3-3-3z';
+  function Screen(host) {
+    host.innerHTML = `<div class="in">
+      <div class="m-head"><span class="m-eyebrow">Built to scale</span><h2 class="m-h" id="grow-h">We grow with you</h2><span class="m-lead">As your team spreads out, here's what to watch, and what we take care of.</span></div>
+      <div class="pills" role="group" aria-label="Where your people work">${PLACES.map((p, i) => `<button type="button" class="pill" data-i="${i}" aria-pressed="false"><span class="fill"></span><span>${esc(p.pill)}</span></button>`).join('')}</div>
+      <div class="card" aria-live="polite"></div>
+      <div class="stage"><div class="scene on"><span class="s-title"></span><span class="step-n"></span>${WORLD}${TAGS.map((tags, i) => tags.map((t, k) => `<span class="tag" data-step="${i}" data-k="${k}"><span class="ico">!</span><span class="tx">${esc(t.r)}</span></span>`).join('')).join('')}</div>
+        <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg></button></div>
+    </div>`;
+    if (host.dataset.layout !== 'desk') {   // phone and tablet order: heading, picture, pills, card
+      const inn = host.querySelector('.in');
+      inn.insertBefore(host.querySelector('.stage'), host.querySelector('.pills'));
+    }
+    const scene = host.querySelector('.scene'), svg = scene.querySelector('svg');
+    const pcs = $$('.pc', svg).map((g) => ({ g, s: +g.dataset.s - 1, o: +g.dataset.o }));
+    const tags = $$('.tag', scene).map((el) => ({ el, step: +el.dataset.step, k: +el.dataset.k, ...TAGS[+el.dataset.step][+el.dataset.k] }));
+    const pills = $$('.pill', host), card = host.querySelector('.card'), pause = host.querySelector('.pause');
+    const title = scene.querySelector('.s-title'), stepN = scene.querySelector('.step-n');
+    let built = -1, glowT = 0;
+    const lots = $$('.lot', svg).map((g) => ({ g, s: +g.dataset.s - 1 }));
+    const full = svg.getAttribute('viewBox').split(' ').map(Number);
+    let vb = full.slice(), camRaf = 0, teamNow = 0, teamRaf = 0;
+    // the camera: still (the whole world), or close on what's built so far, pulling back as the world grows
+    const target = (i) => {
+      if (opts.camera === 'still' || i < 0) return full;
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      pcs.forEach(({ g, s }) => { if (s > i) return; const b = g.getBBox(); x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height); });
+      const side = Math.min(full[2], Math.max(full[2] * 0.6, (x1 - x0) * 1.45, (y1 - y0) * 1.45));
+      const x = Math.max(full[0], Math.min(full[0] + full[2] - side, (x0 + x1) / 2 - side / 2));
+      const y = Math.max(full[1], Math.min(full[1] + full[3] - side, (y0 + y1) / 2 - side / 2));
+      return [x, y, side, side];
+    };
+    const camTo = (to, animate) => {
+      cancelAnimationFrame(camRaf);
+      const from = vb.slice(), t0 = performance.now(), D = animate && !reduce ? 1400 : 0;
+      const step = (now) => {
+        const k = D ? Math.min(1, (now - t0) / D) : 1, e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+        vb = from.map((v, n) => v + (to[n] - v) * e);
+        svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+        place();
+        if (k < 1) camRaf = requestAnimationFrame(step);
+      };
+      camRaf = requestAnimationFrame(step);
+    };
+    const count = (n, animate) => {   // the team counter climbs to the step's size
+      cancelAnimationFrame(teamRaf);
+      const a = teamNow, t0 = performance.now(), D = animate && !reduce ? 1200 : 0;
+      const f = (now) => {
+        const k = D ? Math.min(1, (now - t0) / D) : 1;
+        teamNow = Math.round(a + (n - a) * k);
+        stepN.textContent = n ? `Team of ${teamNow}` : '';
+        if (k < 1) teamRaf = requestAnimationFrame(f);
+      };
+      teamRaf = requestAnimationFrame(f);
+    };
+    const showLots = () => lots.forEach(({ g, s }) => g.classList.toggle('hide', !opts.lots || s <= built));
+    const place = () => {
+      const m = svg.getScreenCTM(); if (!m) return;
+      const r = scene.getBoundingClientRect();
+      tags.forEach((t) => {   // kept inside the stage: a long tag near an edge slides in
+        const c = svg.querySelector(`.tg-a[data-a="${t.a}"]`); const p = new DOMPoint(+c.getAttribute('cx'), +c.getAttribute('cy')).matrixTransform(m);
+        const half = t.el.offsetWidth / 2, pad = 6;
+        t.el.style.left = Math.min(r.width - half - pad, Math.max(half + pad, p.x - r.left)) + 'px';
+        t.el.style.top = Math.max(t.el.offsetHeight + pad, p.y - r.top - 3) + 'px';
+      });
+    };
+    // beat: 'risk' (red tags, card on Watch for) or 'fix' (green tags, card on We handle), for the newest step only
+    const beat = (b, animate) => {
+      card.dataset.beat = b;
+      tags.forEach((t) => {
+        const on = t.step === built;
+        t.el.classList.toggle('show', on);
+        if (!on) return;
+        const fixed = b === 'fix';
+        t.el.classList.toggle('fixed', fixed);
+        t.el.querySelector('.ico').textContent = fixed ? '✓' : '!';
+        t.el.querySelector('.tx').textContent = fixed ? t.f : t.r;
+        t.el.style.transitionDelay = animate ? `${t.k * 180}ms` : '0ms';
+        if (animate && fixed) { t.el.classList.add('flip'); setTimeout(() => t.el.classList.remove('flip'), 260 + t.k * 180); }
+      });
+      place();
+    };
+    // grow (or shrink) the world to step i (-1 = bare ground). New parts drop in, in step order, and glow a while;
+    // parts already built stay exactly where they are.
+    const show = (i, animate, timed) => {
+      const from = built;
+      built = i;
+      clearTimeout(glowT);
+      pcs.forEach(({ g }) => g.classList.remove('glow'));
+      const fresh = pcs.filter((p) => p.s <= i && (p.s > from || (animate && p.s === i && from === i)));
+      fresh.forEach(({ g }) => { g.classList.add('pre', 'hide'); });
+      void svg.getBoundingClientRect();
+      pcs.forEach(({ g, s, o }) => {
+        g.classList.remove('pre');
+        const isNew = fresh.some((p) => p.g === g);
+        g.style.transitionDelay = animate && isNew ? `${120 + (s - Math.max(from + 1, 0)) * 500 + o * 140}ms` : '0ms';
+        g.classList.toggle('hide', s > i);
+        if (animate && isNew) g.classList.add('glow');
+      });
+      if (animate) glowT = setTimeout(() => pcs.forEach(({ g }) => g.classList.remove('glow')), 3400);
+      tags.forEach((t) => t.el.classList.remove('show', 'fixed', 'flip'));
+      showLots();
+      camTo(target(i), animate);
+      count(i < 0 ? 0 : TEAM[i], animate);
+      if (i < 0) { card.innerHTML = ''; title.textContent = ''; card.dataset.beat = 'build'; }
+      else {
+        const p = PLACES[i];
+        title.textContent = p.pill;
+        card.innerHTML = `<h3>${esc(p.title)}</h3><div class="cols"><div class="row watch"><span class="lbl"><i></i>Watch for</span><p>${esc(p.watch)}</p></div><div class="row handle"><span class="lbl"><i></i>We handle</span><p>${esc(p.handle)}</p></div></div>`;
+        if (animate) card.dataset.beat = 'build'; else { card.dataset.beat = 'both'; beat('fix', false); }
+      }
+      pills.forEach((b, j) => {   // the pills fill as the business grows
+        b.setAttribute('aria-pressed', String(j === i));
+        const f = b.querySelector('.fill');
+        f.style.transition = 'none'; f.style.transform = `scaleX(${j < i || (j === i && !timed) ? 1 : 0})`;
+        if (j === i && timed) requestAnimationFrame(() => requestAnimationFrame(() => { f.style.transition = `transform ${DWELL}ms linear`; f.style.transform = 'scaleX(1)'; }));
+        if (j === i) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      });
+    };
+    const setIcon = (d, label) => { pause.setAttribute('aria-label', label); pause.querySelector('path').setAttribute('d', d); };
+    const refresh = () => { showLots(); camTo(target(built), true); };
+    return { host, pills, pause, show, beat, place, setIcon, refresh };
+  }
+
+  // the frames run together. It plays once, from bare ground to the full world, and stops there.
+  const screens = $$('.grow-x').map(Screen);
+  const LAST = PLACES.length - 1;
+  let cur = -1, playing = false, timer = 0, visible = false, started = false, beats = [];
+  const icon = () => screens.forEach((s) => s.setIcon(playing ? PAUSE : cur >= LAST ? REPLAY : PLAY, playing ? 'Pause' : cur >= LAST ? 'Play again' : 'Play'));
+  const go = (i, animate) => {
+    cur = i;
+    beats.forEach(clearTimeout); beats = [];
+    screens.forEach((s) => s.show(i, animate && !reduce, playing));
+    if (animate && !reduce && i >= 0) {
+      beats.push(setTimeout(() => screens.forEach((s) => s.beat('risk', true)), RISK_AT));
+      beats.push(setTimeout(() => screens.forEach((s) => s.beat('fix', true)), FIX_AT));
+    }
+  };
+  const stop = () => { playing = false; clearTimeout(timer); icon(); };
+  const tick = () => {
+    clearTimeout(timer);
+    if (!playing || !visible) return;
+    timer = setTimeout(() => {
+      if (cur >= LAST) { stop(); return; }
+      go(cur + 1, true); tick();
+    }, cur < 0 ? 500 : DWELL);
+  };
+  const play = () => { playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
+  screens.forEach((s) => {
+    s.pills.forEach((b) => b.addEventListener('click', () => { stop(); go(+b.dataset.i, true); }));
+    s.pause.addEventListener('click', () => { if (playing) { stop(); beats.forEach(clearTimeout); beats = []; screens.forEach((x) => x.show(cur, false, false)); } else play(); });
+  });
+  $$('.mock .ctl button').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.k;
+    opts[k] = k === 'lots' ? b.dataset.v === '1' : b.dataset.v;
+    $$(`.mock .ctl button[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    screens.forEach((s) => s.refresh());
+  }));
+  if (reduce) go(LAST, false); else go(-1, false);
+  icon();
+  requestAnimationFrame(() => screens.forEach((s) => s.place()));
+  if (document.fonts) document.fonts.ready.then(() => screens.forEach((s) => s.place()));
+  addEventListener('resize', () => screens.forEach((s) => s.place()));
+  new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    if (visible && !started && !reduce) { started = true; play(); } else if (visible && playing) tick(); else clearTimeout(timer);
+  }, { threshold: 0.4 }).observe(document.getElementById('grow'));
+})();
+
+  // the window size in the controls, so a manual resize shows which layout you're on
+  const size = document.querySelector('.mock .size');
+  const showSize = () => { const w = innerWidth; size.textContent = `${w} × ${innerHeight} · ${w < 700 ? 'phone' : w < 1100 ? 'tablet' : 'desktop'}`; };
+  showSize(); addEventListener('resize', showSize);
+
+</script>
+</body>
+</html>

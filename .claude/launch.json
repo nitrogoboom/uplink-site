@@ -8,6 +8,12 @@
       "port": 4321
     },
     {
+      "name": "grow-mockups",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8790", "--bind", "127.0.0.1", "--directory", "editing-room/grow-options"],
+      "port": 8790
+    },
+    {
       "name": "built",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["wrangler", "dev", "--port", "8787"],

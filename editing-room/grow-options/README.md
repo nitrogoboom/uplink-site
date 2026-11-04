@@ -6,6 +6,12 @@ Redesign of the Home "We grow with you" section, worked out in mockups before an
 
 Chosen so far, round 8: one isometric world that grows in five steps by where people work (your office, working from home, on the road, a second office, all of it). New parts drop in and glow; nothing rebuilds. The camera follows growth (close on the office first, pulling back). Dashed lots show what's coming. Pills jump between steps; a card says what to watch for and what we handle. No scroll lock.
 
+## Seeing it at real size
+
+- `section.html` (built from `section.template.html`): the round 8 section on its own page at real size, between a stand-in header, the section before and the section after, with the site's fonts, tokens and breakpoints (phone < 700, tablet 700-1099, desktop >= 1100, one screen tall). Resize the window to move between layouts; the mockup controls (bottom right) show the size and switch the camera and the lots.
+- `preview.html`: loads `section.html` at an exact size (phone 390 × 844, tablet 820 × 1180 and 1180 × 820, desktop 1440 × 900, or your own), scaled to fit the window.
+- Local server: the `grow-mockups` entry in `.claude/launch.json` (`python -m http.server 8790 --directory editing-room/grow-options`), then http://localhost:8790/preview.html.
+
 ## The rounds
 
 | Round | Idea | Page | Published |
