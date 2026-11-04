@@ -100,6 +100,26 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   .stage { aspect-ratio: auto; height: clamp(12rem, 36svh, calc(100vw - 2 * var(--gutter))); }
   [data-nav="hud"] .pill { height: 1.75rem; }
   .card { min-height: 0; padding-bottom: var(--sp-6); }
+  /* phones are narrow, so what sits round the picture scales with the width (sized for a 390-wide phone, smaller below),
+     and the town fills more of its box */
+  .scene svg { inset: 2% 2% 3%; width: 96%; height: 95%; }
+  .tag { font-size: clamp(0.6rem, 2.75vw, 0.75rem); }
+  .s-title, .step-n { font-size: clamp(0.6rem, 2.75vw, 0.75rem); top: 0.7rem; }
+  .s-title { left: 0.8rem; } .step-n { right: 0.8rem; }
+  .pause { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); right: 0.6rem; bottom: 0.6rem; }
+  .hud { gap: var(--sp-2); }
+  .hud button { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); }
+  .hud-n { font-size: clamp(1.35rem, 6.4vw, 1.75rem); }
+  .hud-of { font-size: clamp(0.7rem, 3.2vw, 0.875rem); }
+  .hud-name { font-size: clamp(0.85rem, 4.2vw, 1.125rem); }
+  .m-h { font-size: clamp(1.75rem, 8.2vw, 2rem); }
+  .m-lead { font-size: clamp(0.95rem, 4.3vw, 1.125rem); }
+  .card { gap: var(--sp-2); }
+  .in { row-gap: var(--sp-3); }
+  .steps { gap: 0; }
+  .player { padding-bottom: var(--sp-1); }
+  .card h3 { font-size: clamp(1.2rem, 5.6vw, 1.5rem); }
+  .card p { font-size: clamp(0.875rem, 3.9vw, 1rem); line-height: 1.45; }
 }
 /* tablet: the player a bit narrower and centred, the card in two columns under it */
 @media (min-width: 700px) and (max-width: 1099px) {
