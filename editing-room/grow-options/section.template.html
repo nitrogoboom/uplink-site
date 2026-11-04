@@ -157,9 +157,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .hud-n { font: 700 italic var(--fs-6)/1 'Barlow Condensed', sans-serif; color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
 .hud-of { font-weight: 600; font-size: var(--fs-2); color: var(--c-muted); letter-spacing: 0.08em; }
 .hud-name { font-weight: 700; font-size: var(--fs-4); letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.hud button { flex: none; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--c-edge); background: var(--c-surface); color: var(--c-text); display: grid; place-items: center; cursor: pointer; padding: 0; }
-.hud button svg { width: 1.1rem; height: 1.1rem; }
-.hud button:disabled { opacity: 0.35; cursor: default; }
+/* the step arrows match the footer carousel's (.fc-rk in src/styles/footer.css): square key, thin border, 3px base */
+.hud button { flex: none; display: grid; place-items: center; width: var(--tap); height: var(--tap); padding: 0;
+  border: 1px solid var(--c-line-2); border-bottom-width: 3px; border-radius: var(--r-2);
+  background: var(--c-surface); color: var(--c-text); cursor: pointer; transition: background-color var(--dur-2) var(--ease); }
+@media (hover: hover) { .hud button:not(:disabled):hover { background: var(--c-surface-2); } }
+.hud button svg { width: var(--sp-4); height: var(--sp-4); }
+.hud button:disabled { opacity: 0.4; cursor: default; }
 [data-nav="hud"] .pills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; overflow: visible; margin-inline: 0; padding-inline: 0; }
 [data-nav="hud"] .pill { height: 2.75rem; min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; }
 [data-nav="hud"] .pill::before { content: ""; position: absolute; inset: 50% 0 auto; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-surface-2); }
