@@ -41,11 +41,12 @@ if (grow && svg) {
   const placeTags = () => {
     const m = svg.getScreenCTM(); if (!m) return;
     const r = stage.getBoundingClientRect(), pad = 6, gap = 4;
+    const top = Math.max(pad, ...[place, team].map((l) => (l.offsetHeight ? l.offsetTop + l.offsetHeight + gap : 0)));   // below the place and team count
     const spots = tags.map((t) => {
       if (!t.at) return null;
       const p = new DOMPoint(Number(t.at.getAttribute('cx')), Number(t.at.getAttribute('cy'))).matrixTransform(m);
       const w = t.el.offsetWidth, h = t.el.offsetHeight;
-      return { t, w, h, x: Math.min(r.width - w / 2 - pad, Math.max(w / 2 + pad, p.x - r.left)), y: Math.max(h + pad, p.y - r.top - 3) };
+      return { t, w, h, x: Math.min(r.width - w / 2 - pad, Math.max(w / 2 + pad, p.x - r.left)), y: Math.max(h + top, p.y - r.top - 3) };
     });
     for (let s = 0; s < steps.length; s++) {
       const pair = spots.filter((q) => q && q.t.step === s).sort((a, b) => b.y - a.y);   // lower one first
@@ -54,7 +55,7 @@ if (grow && svg) {
         const across = Math.abs(lo.x - hi.x) < (lo.w + hi.w) / 2 + gap, down = lo.y - hi.y < hi.h + gap;
         if (!across || !down) continue;
         const up = lo.y - lo.h - gap;            // the upper tag's bottom edge, just above the lower tag
-        if (up >= hi.h + pad) hi.y = up; else lo.y = hi.y + lo.h + gap;
+        if (up >= hi.h + top) hi.y = up; else lo.y = hi.y + lo.h + gap;
       }
     }
     spots.forEach((q) => { if (q) { q.t.el.style.left = `${q.x}px`; q.t.el.style.top = `${q.y}px`; } });

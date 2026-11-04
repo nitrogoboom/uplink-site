@@ -43,7 +43,7 @@
   transform: translate(-50%, -100%) scale(0.85);
   transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
-.grow-tag-i { display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-family: var(--font-body); font-weight: 700; }
+.grow-tag-i { flex: none; display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-family: var(--font-body); font-weight: 700; }
 .grow-tag.is-fixed { background: var(--c-ok); }
 .grow-tag.is-on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
 .grow-tag.is-flip { transform: translate(-50%, -100%) scale(1.12); }
@@ -122,6 +122,10 @@
 @media (--phone) {
   .grow { row-gap: var(--sp-3); }
   .grow-card { gap: var(--sp-2); padding-bottom: var(--sp-6); }
+  /* bigger text: the team count goes under the place (side by side they meet), and a tag wider than the picture
+     wraps instead of running past its edge (grow.js keeps it inside by its real size) */
+  :root[data-text] .grow-team { top: calc(var(--sp-3) + var(--fs-1) + var(--sp-2)); right: auto; left: var(--sp-4); }
+  :root[data-text] .grow-tag { width: max-content; max-width: calc(100% - var(--sp-3)); white-space: normal; }
 }
 
 /* tablet: the player a little narrower and centred, the card in two columns under it */
