@@ -34,7 +34,7 @@ async def main():
     if not pages:
         pages = site_pages(b)
     diffs = 0
-    gate = asyncio.Semaphore(6)   # pages at a time
+    gate = asyncio.Semaphore(6)  # pages at a time
 
     async def settled(pg, url):
         """the page's styles once two readings half a second apart agree (scripts finish their setup late under load)"""
@@ -57,7 +57,9 @@ async def main():
             ea, eb = await asyncio.gather(settled(pa, a + path), settled(pb, b + path))
             out = []
             if [e[0] for e in ea] != [e[0] for e in eb]:
-                out.append(f'{w}x{h} {path}: the pages differ in markup ({len(ea)} vs {len(eb)} elements); compare the HTML first')
+                out.append(
+                    f'{w}x{h} {path}: the pages differ in markup ({len(ea)} vs {len(eb)} elements); compare the HTML first'
+                )
                 n = 1
             else:
                 bad = [i for i, (x, y) in enumerate(zip(ea, eb)) if x[1:] != y[1:]]
@@ -68,11 +70,18 @@ async def main():
                     for i, x, y in zip(bad, fa, fb):
                         for part, sx, sy in zip(('', '::before', '::after'), x, y):
                             px, py = props(sx), props(sy)
-                            ch = [f'{k}: {px.get(k)} -> {py.get(k)}' for k in sorted(set(px) | set(py)) if px.get(k) != py.get(k)]
+                            ch = [
+                                f'{k}: {px.get(k)} -> {py.get(k)}'
+                                for k in sorted(set(px) | set(py))
+                                if px.get(k) != py.get(k)
+                            ]
                             if ch:
-                                out.append(f'    {ea[i][0]}{part}: ' + '; '.join(ch[:6]) + (' …' if len(ch) > 6 else ''))
+                                out.append(
+                                    f'    {ea[i][0]}{part}: ' + '; '.join(ch[:6]) + (' …' if len(ch) > 6 else '')
+                                )
             await ctx.close()
-            if out: print('\n'.join(out), flush=True)
+            if out:
+                print('\n'.join(out), flush=True)
             return n
 
     async with async_playwright() as p:
@@ -83,5 +92,6 @@ async def main():
         await br.close()
     print(f'{diffs} difference(s)')
     sys.exit(1 if diffs else 0)
+
 
 asyncio.run(main())

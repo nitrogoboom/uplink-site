@@ -7,7 +7,9 @@ import Projects from '../components/work/Projects.astro';
 <Base title={PAGES.work.title} description={PAGES.work.description}
       page="work" path="/work" type="CollectionPage">
   <Projects />
+  <Fragment slot="scripts">
+    <script>
+      import '../scripts/work.js';
+    </script>
+  </Fragment>
 </Base>
-<script>
-  import '../scripts/work.js';
-</script>

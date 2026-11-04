@@ -2,6 +2,7 @@
 // SERVICES · 1. Overview (first screen): what managed IT with Uplink is, then one card per service from the
 // collection, each linking to the service's own page. Styles: overview.css. Desktop layout: at the end of its CSS.
 import './overview.css';
+import Pause from '../Pause.astro';
 import { getServices } from '../../lib/site';
 const services = await getServices();
 ---
@@ -16,8 +17,8 @@ const services = await getServices();
     <ul class="svc-grid" aria-label="Services">
       {services.map(({ id, data: s }) => (
         <li><a class="card" href={`/services/${id}`}>
-          <span class="card-media well"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"><span class="chip">{s.chip}</span></span>
-          <span class="card-body"><span class="card-title">{s.title}</span><span class="muted small">{s.card}</span></span>
+          <span class="card-media well"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"><span class="chip" aria-hidden="true">{s.chip}</span></span>
+          <span class="card-body"><span class="card-title">{s.title}</span><Pause /><span class="muted small">{s.card}</span></span>
         </a></li>
       ))}
     </ul>

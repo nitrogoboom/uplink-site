@@ -1,7 +1,7 @@
 # Off-scale spacing on the built site: every margin, padding and gap that ends up on screen must be a step of the
 # space scale (--sp-1 to --sp-9, read from tokens.css) or 0. Stylelint catches a raw value in our CSS; this catches
 # the rest: browser defaults nobody reset (a <dl>'s 1em margin, a <button>'s 1px padding) and calc() sums that land
-# between steps. Rules: spacing.md. Exits 1 on anything off scale.
+# between steps. Rules: docs/spacing.md. Exits 1 on anything off scale.
 # usage: npm run build && npm run serve   (wrangler dev on 8787)   then   python tools/verify_spacing.py [BASE_URL] [page ...]
 # Pages default to the sitemap plus /soon and a 404; sizes are verify_footer.py's four. Values print as px at a 16px
 # root, so a fixed 1px reads 0.62px on the 3440 screen (25.6px root).
@@ -10,7 +10,8 @@ from playwright.async_api import async_playwright
 from site_pages import SIZES, pages as site_pages
 
 SCALE = [0] + [float(v) * 16 for v in re.findall(r'--sp-\d:\s*([\d.]+)rem', open('src/styles/tokens.css').read())]
-if len(SCALE) < 2: sys.exit('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern')
+if len(SCALE) < 2:
+    sys.exit('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern')
 # selector -> why it may sit off the scale. Keep this short; fix the CSS instead where you can.
 SKIP = {
     '.sr-only': 'the 1px clip',
@@ -19,7 +20,18 @@ SKIP = {
     '.mi-go': 'margin-left: auto pushes the arrow to the end of its row (home/hero.css)',
     '.svc-hint': 'pulled up under the swiping cards by their bottom padding: -(--sp-4 + --sp-8) (home/services.css)',
 }
-PROPS = ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap']
+PROPS = [
+    'marginTop',
+    'marginRight',
+    'marginBottom',
+    'marginLeft',
+    'paddingTop',
+    'paddingRight',
+    'paddingBottom',
+    'paddingLeft',
+    'rowGap',
+    'columnGap',
+]
 # values above the biggest step are layout (auto margins, a scroll track sized in svh), not spacing
 PROBE = """([scale, props, skip]) => {
   const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16, max = Math.max(...scale) * rem, out = [];
@@ -46,7 +58,7 @@ async def main():
     pages = args
     if not pages:
         pages = site_pages(base)
-    found = {}   # element -> {property: values}, and the pages and sizes it shows on
+    found = {}  # element -> {property: values}, and the pages and sizes it shows on
     gate = asyncio.Semaphore(6)
     async with async_playwright() as p:
         br = await p.chromium.launch()
@@ -61,13 +73,21 @@ async def main():
                     f[0].setdefault(prop, set()).add(v)
                     f[1].add(f'{n} {path}')
                 await ctx.close()
+
         await asyncio.gather(*[one(pa, n, w, h) for pa in pages for n, w, h in SIZES])
         await br.close()
     for el in sorted(found):
         props, where = found[el][0], sorted(found[el][1])
-        print(el + ': ' + ', '.join(f'{p} {"/".join(f"{v:g}" for v in sorted(vs))}px' for p, vs in sorted(props.items())))
+        print(
+            el + ': ' + ', '.join(f'{p} {"/".join(f"{v:g}" for v in sorted(vs))}px' for p, vs in sorted(props.items()))
+        )
         print(f'    on {len(where)}: {", ".join(where[:4])}{" ..." if len(where) > 4 else ""}')
-    print(f'{len(found)} element(s) off scale on {len(pages)} pages x {len(SIZES)} sizes' if found else 'spacing: all on scale')
+    print(
+        f'{len(found)} element(s) off scale on {len(pages)} pages x {len(SIZES)} sizes'
+        if found
+        else 'spacing: all on scale'
+    )
     sys.exit(1 if found else 0)
+
 
 asyncio.run(main())

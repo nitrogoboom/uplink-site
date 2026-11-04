@@ -1,0 +1,18 @@
+---
+// One project as a card linking to its case study: Home's "Our work", the Work grid and a service page's
+// "Where we've done this". The link reads "Office move in a weekend. Professional services firm, 40 staff": the
+// tag chip is for the eye only, a pause follows the name, " · " is a short pause (Sep). Styles: .card in
+// src/styles/shared-blocks.css.
+//   project   the collection entry
+//   first     the picture loads eagerly (the first card on screen)
+import type { CollectionEntry } from 'astro:content';
+import Pause from '../Pause.astro';
+import Sep from '../Sep.astro';
+import { cardSize } from '../../lib/site';
+interface Props { project: CollectionEntry<'projects'>; first?: boolean }
+const { project: { id, data: p }, first = false } = Astro.props;
+---
+<a class="card" href={`/work/${id}`}>
+  <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'}><span class="chip" aria-hidden="true">{p.tag}</span></span>
+  <span class="card-body"><span class="card-title">{p.name}</span><Pause /><span class="muted small">{p.clientShort.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span>
+</a>

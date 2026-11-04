@@ -2,6 +2,15 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
+- [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition`, `text-wrap` and Trusted Types fall back cleanly where missing.
+- [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live.
+- [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
+- [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
+- [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
+- [ ] Have `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (it was written from memory).
+- [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
+
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 
@@ -16,14 +25,11 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
-- [ ] Grow world: tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `RUN`, `ZOOM` and the phase points); `RUN` must match the `2.5` in `grow.css` (1 + 3 x RUN; shortened from 3.7 on 2 Nov 2026).
+- [ ] Grow world: tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `ZOOM` and the phase points) and `--grow-run` in `grow.css` (screens of scroll per level, which `home.js` reads).
 - [ ] Grow world on desktop: at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
 
 ## Look and feel
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
-
-## Screen readers (Home done 2 Nov 2026, `screen-reader-home.md`)
-- [ ] Same pass on the other pages: Services, each service page, Work, each case study, About, Contact, soon and 404. Card links: `<Pause />` after the title, category chips `aria-hidden`, a link's name stays its visible text, " · " through `<Sep />`, plain picture descriptions, then read the page out (`aria_snapshot` in Playwright) and write it up like `screen-reader-home.md`.
 
 ## Checks to repeat
 - [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.

@@ -23,14 +23,14 @@ const afterLayout = (fn) => {
 // That gives p, 0 to 3, the drawing's own growth scale: every storey and piece starts at its data-at (written by
 // tools/gen_tower.py) and builds over 0.4 (storeys 0.55). q is eased toward the scroll so a flick can't make the
 // floors jitter. Every screen but a short desktop one: the stage holds still for RUN of a screen per level
-// (grow.css: 1 + 3 x RUN = 2.5). Short desktop screens: q follows the steps down the
+// (--grow-run in grow.css). Short desktop screens: q follows the steps down the
 // right-hand column. Reduced motion: no stage and no scrub; the steps stack and the drawing shows finished. Each level's camera (data-cam1..3) is widened to the picture's shape, and zoomed out to at
 // most ZOOM times the level 3 scale per level, so the pull-back stays gentle and the tower never shrinks much.
 const tower = $('.grow svg.tg');
 const grow = tower && tower.closest('.grow');
 if (grow && 'IntersectionObserver' in window) {
   const LEAD = 0.3;   // level 1 starts building this much of a level before the stage pins
-  const RUN = 0.5;    // screens of scroll per level
+  const RUN = parseFloat(getComputedStyle(grow).getPropertyValue('--grow-run'));   // screens of scroll per level
   const ZOOM = 1.25;  // most a level's camera may zoom in on the next one's
   const liveMode = window.matchMedia(`${MEDIA.belowDesktop}, (min-height: 700px)`);   // all but a short desktop screen
   const wide = window.matchMedia(MEDIA.desktop);

@@ -7,6 +7,7 @@
 //                          which the CSP blocks)
 //   hidden parts           display="none" paths the hero shows from script, the tower's r="0" anchor circles
 //                          (removeHiddenElems)
+//   role="img"             with the aria-label, so screen readers read a drawing as one picture (removeUnknownsAndDefaults)
 // (SVGO 4 keeps the viewBox on its own.)
 /** @type {import('svgo').Config} */
 export const SVGO = {
@@ -22,6 +23,7 @@ export const SVGO = {
           inlineStyles: false,
           removeHiddenElems: false,
           mergeStyles: false,
+          removeUnknownsAndDefaults: { keepRoleAttr: true },
         },
       },
     },

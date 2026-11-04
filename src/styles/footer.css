@@ -81,6 +81,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 /* follow */
 .fc-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: var(--sp-2); list-style: none; }
 .fc-wall-item {
+  position: relative;   /* keeps its screen-reader pause inside (see .fc-tile) */
   display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2);
   border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface);
   color: var(--c-text); text-decoration: none;
@@ -126,7 +127,10 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-dock .container { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); padding-block: var(--sp-4); }
 .fc-roster { display: flex; gap: var(--sp-3); min-width: 0; padding: var(--sp-2) var(--sp-1); overflow-x: auto; scrollbar-width: none; }
 .fc-roster::-webkit-scrollbar { display: none; }
+/* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile; without it the pause hangs
+   off the scrolling roster and widens the whole page on phones */
 .fc-tile {
+  position: relative;
   flex: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
   width: calc(var(--sp-9) + var(--sp-6)); height: calc(var(--sp-9) - var(--sp-1));

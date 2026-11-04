@@ -6,8 +6,9 @@
 import Base from '../../layouts/Base.astro';
 import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
+import ProjectCard from '../../components/work/ProjectCard.astro';
 import '../../components/services/service-page.css';
-import { PAGES, cardSize, getServices, getProjects, breadcrumbs, jsonLd } from '../../lib/site';
+import { PAGES, getServices, getProjects, breadcrumbs, jsonLd } from '../../lib/site';
 
 export async function getStaticPaths() {
   const services = await getServices();
@@ -80,12 +81,7 @@ const ld = {
         <h2 id="projects-title">Where we've done this</h2>
       </div>
       <ul class="card-row">
-        {projects.map(({ id: pid, data: p }) => (
-          <li><a class="card" href={`/work/${pid}`}>
-            <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} loading="lazy"><span class="chip">{p.tag}</span></span>
-            <span class="card-body"><span class="card-title">{p.name}</span><span class="muted small">{p.clientShort}</span></span>
-          </a></li>
-        ))}
+        {projects.map((project) => <li><ProjectCard project={project} /></li>)}
       </ul>
     </div>
   </section>
