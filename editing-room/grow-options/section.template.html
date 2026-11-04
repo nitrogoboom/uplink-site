@@ -157,12 +157,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .hud-n { font: 700 italic var(--fs-6)/1 'Barlow Condensed', sans-serif; color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
 .hud-of { font-weight: 600; font-size: var(--fs-2); color: var(--c-muted); letter-spacing: 0.08em; }
 .hud-name { font-weight: 700; font-size: var(--fs-4); letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-/* the step arrows match the footer carousel's (.fc-rk in src/styles/footer.css): square key, thin border, 3px base */
+/* the step arrows match the Services carousel's (.iconbtn in src/styles/buttons.css, .svc-step in services.css):
+   a bare muted chevron on a 44px square that fills on hover; at the ends it fades */
 .hud button { flex: none; display: grid; place-items: center; width: var(--tap); height: var(--tap); padding: 0;
-  border: 1px solid var(--c-line-2); border-bottom-width: 3px; border-radius: var(--r-2);
-  background: var(--c-surface); color: var(--c-text); cursor: pointer; transition: background-color var(--dur-2) var(--ease); }
-@media (hover: hover) { .hud button:not(:disabled):hover { background: var(--c-surface-2); } }
-.hud button svg { width: var(--sp-4); height: var(--sp-4); }
+  border: 0; border-radius: var(--r-2); background: transparent; color: var(--c-muted); cursor: pointer;
+  transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease); }
+.hud button:not(:disabled):hover { background: var(--c-surface-2); color: var(--c-text); }
+.hud button svg { width: var(--icon); height: var(--icon); }
 .hud button:disabled { opacity: 0.4; cursor: default; }
 [data-nav="hud"] .pills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; overflow: visible; margin-inline: 0; padding-inline: 0; }
 [data-nav="hud"] .pill { height: 2.75rem; min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; }
