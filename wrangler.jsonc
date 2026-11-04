@@ -3,7 +3,8 @@
 //   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787), _headers included
 //   npx wrangler deploy   deploy (CI does this on a push to main; see .github/workflows/site.yml)
 // not_found_handling "404-page": a missing address gets dist/404.html with a 404 status (Pages did this on its own).
-// /404 itself goes through the Worker (ASSETS binding) so it answers 404 too, not 200.
+// run_worker_first true: every request goes through worker/index.js first, which sends http:// to https:// and passes
+// the rest to the assets (ASSETS binding). It also makes /404 itself answer 404, not 200.
 // To put the password lock back, see tools/site-lock/worker.js.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -14,7 +15,7 @@
     "directory": "./dist",
     "not_found_handling": "404-page",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/404"],
+    "run_worker_first": true,
   },
   // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38's FORMS limit is namespace 1001.
   "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],

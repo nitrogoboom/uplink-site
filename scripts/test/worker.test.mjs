@@ -77,3 +77,12 @@ test('past the rate limit: 429, nothing logged', async () => {
   assert.equal(lines.length, 0);
   assert.deepEqual(keys, ['203.0.113.9'], 'counted per visitor address');
 });
+
+test('http:// goes to https://, the same address; local http stays', async () => {
+  const res = await worker.fetch(new Request('http://example.test/services?x=1'), {});
+  assert.equal(res.status, 308);
+  assert.equal(res.headers.get('Location'), 'https://example.test/services?x=1');
+  const assets = { ASSETS: { fetch: async () => new Response('page') } };
+  assert.equal(await (await worker.fetch(new Request('http://localhost:8787/services'), assets)).text(), 'page');
+  assert.equal(await (await worker.fetch(new Request('https://example.test/services'), assets)).text(), 'page', 'pages go to the assets');
+});
