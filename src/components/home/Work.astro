@@ -3,9 +3,8 @@
 // all of them. A placeholder until this spot's real section is decided (notes.md).
 // Styles: shared (.card-row in src/styles/shared-blocks.css).
 import Icon from '../Icon.astro';
-import Pause from '../Pause.astro';
-import Sep from '../Sep.astro';
-import { cardSize, getProjects } from '../../lib/site';
+import ProjectCard from '../work/ProjectCard.astro';
+import { getProjects } from '../../lib/site';
 const projects = (await getProjects()).slice(0, 3);
 ---
 <section class="section section--band fold" id="work" aria-labelledby="work-title">
@@ -18,12 +17,7 @@ const projects = (await getProjects()).slice(0, 3);
       <a class="link-arrow" href="/work">See all work<Icon name="arrow" /></a>
     </div>
     <ul class="card-row">
-      {projects.map(({ id, data: p }) => (
-        <li><a class="card" href={`/work/${id}`}>
-          <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} loading="lazy"><span class="chip" aria-hidden="true">{p.tag}</span></span>
-          <span class="card-body"><span class="card-title">{p.name}</span><Pause /><span class="muted small">{p.clientShort.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span>
-        </a></li>
-      ))}
+      {projects.map((project) => <li><ProjectCard project={project} /></li>)}
     </ul>
   </div>
 </section>

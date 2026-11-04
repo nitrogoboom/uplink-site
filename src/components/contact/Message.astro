@@ -6,6 +6,7 @@
 import './message.css';
 import ServiceOptions from '../ServiceOptions.astro';
 import Icon from '../Icon.astro';
+import Pause from '../Pause.astro';
 import { phone, email } from '../../data/footer.json';
 ---
 <section class="page-intro fold fold-always" id="message" aria-labelledby="contact-title">
@@ -30,7 +31,7 @@ import { phone, email } from '../../data/footer.json';
         </div>
         <a class="chan panel card" href="/contact#message" data-open="book-dialog">
           <span class="icon-tile" aria-hidden="true"><Icon name="calendar" /></span>
-          <span class="chan-text"><span class="chan-title">Book a check-up</span><span class="chan-value">Free, 30 minutes</span></span>
+          <span class="chan-text"><span class="chan-title">Book a check-up</span><Pause /><span class="chan-value">Free, 30 minutes</span></span>
         </a>
       </div>
 
@@ -85,7 +86,7 @@ import { phone, email } from '../../data/footer.json';
         </div>
         <div class="queue-ring" data-md-skip>
           <svg viewBox="0 0 168 168" aria-hidden="true"><circle class="queue-ring-track" cx="84" cy="84" r="70" fill="none" stroke-width="12"/><circle class="queue-ring-arc" data-queue-arc cx="84" cy="84" r="70" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="120 440" transform="rotate(-90 84 84)"/></svg>
-          <div class="queue-ring-label"><span class="stat-val">1 day</span><span class="label">Reply to new messages</span></div>
+          <div class="queue-ring-label"><span class="label">Reply to new messages</span><Pause /><span class="stat-val">1 day</span></div>
         </div>
         <dl class="facts">
           <div><dt>Monday to Friday</dt><dd>7 am to 7 pm ET</dd></div>

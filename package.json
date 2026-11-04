@@ -12,6 +12,7 @@
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "python tools/verify_footer.py out",
     "ci": "node scripts/ci.mjs",
+    "release-audit": "python tools/audit.py",
     "verify:spacing": "python tools/verify_spacing.py",
     "serve": "wrangler dev",
     "deploy": "wrangler deploy"
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@eslint/js": "^10.0.1",
+    "@guidepup/virtual-screen-reader": "^0.33.0",
     "@types/node": "^26.6.5",
     "astro": "^7.4.2",
     "axe-core": "^4.14.0",

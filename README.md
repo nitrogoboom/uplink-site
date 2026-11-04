@@ -19,7 +19,7 @@ Then open http://localhost:4321. Other commands:
 - `npm run ci` – what CI runs, in one go: check, lint, build, then the browser check on the built site (starts `npm run serve` itself if it isn't running; needs the Python tools below)
 - `npm run deploy` – deploy by hand (CI does it on push; see Hosting)
 
-For the drawing and check tools (optional): `pip install -r requirements.txt` and `python -m playwright install chromium`. Python 3.10+ and Node 24 (the version in `.node-version`; CI reads the same file).
+For the drawing and check tools (optional): `pip install -r requirements.txt` and `python -m playwright install chromium firefox webkit` (Firefox and WebKit only for the release audit). Python 3.10+ and Node 24 (the version in `.node-version`; CI reads the same file).
 
 ## What's where
 
@@ -80,6 +80,7 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `painter.py` – finds boxes drawn in the wrong order or poking into each other (exits 1 on any, or when it finds no boxes). Each drawing has a `rules_<name>.py`; its first lines give the exact command
 - `gen_og.py public` – the share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Screenshots of a small page made from the site's tokens, fonts and `office-card.svg`; rerun after changing those.
 - `verify_footer.py out/` – against `npm run serve`: the hero builds, tiles respond to hover, the tower grows on scroll, every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), Home at phone, tablet, 1440×900 and 3440×1440 with no sideways scroll and an axe pass at phone and desktop; every other sitemap page plus soon and the 404 once at phone size (script errors, sideways scroll). Home is the page being worked on (`FOCUS` in the script); `--all` checks every page at every size with axe, as before. It fails on any script error (console error, crash, CSP or Trusted Types block), a hero or tower that doesn't respond, sideways scroll, or a serious axe finding. CI runs it before deploy.
+- `audit.py` (`npm run release-audit`) – the release audit in `docs/sop.md`: every page in Chromium, Firefox, WebKit and emulated phones, a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. A few minutes; run it before a release, not on every build. Report in `out/audit/report.md`.
 - `pagespeed.py <address>` – Google's PageSpeed Insights on the live site's sitemap pages (see Hosting).
 
 ## Hosting (Cloudflare Workers, static assets)

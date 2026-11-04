@@ -9,6 +9,7 @@
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
+import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
 import f from '../data/footer.json';
 import { CAMPUS, getServices } from '../lib/site';
@@ -31,7 +32,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     <button class="fc-rk" type="button" data-fc-step="-1" aria-label="Previous footer section"><Icon name="chevronL" /></button>
     <div class="fc-roster" role="tablist" aria-label="Footer sections">
       {roster.map((t, i) => (
-      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><span class="fc-tile-c">{t.count}</span></button>
+      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><Pause /><span class="fc-tile-c">{t.count}</span></button>
       ))}
     </div>
     <button class="fc-rk" type="button" data-fc-step="1" aria-label="Next footer section"><Icon name="chevronR" /></button>
@@ -61,7 +62,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 <section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}>
 <div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((s) => (
-    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><span><b>{s.name}</b><small>{s.handle}</small></span></a></li>))}</ul>
+    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><span><b>{s.name}</b><Pause /><small>{s.handle}</small></span></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
     <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>

@@ -3,6 +3,7 @@
 import './support.css';
 import { phone } from '../../data/footer.json';
 import Icon from '../Icon.astro';
+import Pause from '../Pause.astro';
 ---
 <section class="section section--band fold fold-always" id="support" aria-labelledby="support-title">
   <div class="container">
@@ -14,17 +15,17 @@ import Icon from '../Icon.astro';
     <ul class="svc-cards help-cards">
       <li><a class="card pad" href={phone.href}>
         <span class="icon-tile" aria-hidden="true"><Icon name="headset" /></span>
-        <span class="card-title">Call the help desk</span>
+        <span class="card-title">Call the help desk</span><Pause />
         <span class="muted">{phone.display}, then press 1. After hours this rings our on-call technician.</span>
       </a></li>
       <li><a class="card pad" href="/soon#client-portal">
         <span class="icon-tile" aria-hidden="true"><Icon name="ticket" /></span>
-        <span class="card-title">Open a ticket</span>
+        <span class="card-title">Open a ticket</span><Pause />
         <span class="muted">Log in to the client portal to open a ticket and follow its progress.</span>
       </a></li>
       <li><a class="card pad" href="/soon#remote-support">
         <span class="icon-tile" aria-hidden="true"><Icon name="screen" /></span>
-        <span class="card-title">Start a remote session</span>
+        <span class="card-title">Start a remote session</span><Pause />
         <span class="muted">A technician will give you a six-digit code to share your screen.</span>
       </a></li>
     </ul>

@@ -3,13 +3,11 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
-- [ ] Browsers: run the CI browser check in Firefox and WebKit too, not just Chromium.
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition`, `text-wrap` and Trusted Types fall back cleanly where missing.
-- [ ] Mobile: one pass on a real iPhone (Safari) and a real Android (Chrome) from a PR preview link.
 - [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
-- [ ] Finish the by-hand parts of the baseline, `docs/releases/2026-11-03.md` (browsers and phones, keyboard, screen reader, contrast, motion, forms, HTML validator). The scripted parts pass.
+- [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks), and rerun `npm run release-audit -- --only html` once W3C stops rate-limiting.
 - [ ] Have `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (it was written from memory).
 - [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 
@@ -32,9 +30,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Look and feel
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
-
-## Screen readers (Home done 2 Nov 2026, `docs/screen-reader-home.md`)
-- [ ] Same pass on the other pages: Services, each service page, Work, each case study, About, Contact, soon and 404. Card links: `<Pause />` after the title, category chips `aria-hidden`, a link's name stays its visible text, " · " through `<Sep />`, plain picture descriptions, then read the page out (`aria_snapshot` in Playwright) and write it up like `docs/screen-reader-home.md`.
 
 ## Checks to repeat
 - [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.

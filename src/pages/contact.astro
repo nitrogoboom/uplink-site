@@ -9,7 +9,9 @@ import Support from '../components/contact/Support.astro';
       page="contact" path="/contact" type="ContactPage">
   <Message />
   <Support />
+  <Fragment slot="scripts">
+    <script>
+      import '../scripts/contact.js';
+    </script>
+  </Fragment>
 </Base>
-<script>
-  import '../scripts/contact.js';
-</script>
