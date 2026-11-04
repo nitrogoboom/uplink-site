@@ -193,11 +193,14 @@ def cloud(s, x, y, z, o):
     return (x, y, z + 1.375)
 
 
-def road(s, x0, x1, y0, y1):
+def road(s, x0, x1, y0, y1, o=0):
+    """A road with lane marks; its own build group, so in the growing world it arrives with its step."""
+    s.group(o)
     s.flat([(x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0)], pal.PATH, f' stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.15"', ground=True)
     m = (y0 + y1) / 2
     for a in range(int(x0) + 1, int(x1) - 1, 2):
         s.raw(f'<polyline points="{w.pts((a, m, 0), (a + 1, m, 0))}" fill="none" stroke="{pal.EDGE}" stroke-width="1.5" stroke-opacity="0.35"/>')
+    s.end()
 
 
 def ring(s, r, o):

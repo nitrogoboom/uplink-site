@@ -4,12 +4,14 @@
 <style>svg:target .lbl{display:none}</style>
 <g font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" stroke-linecap="round" stroke-linejoin="round">
 <path d="M-47.8,-102.4L-116.9,-62.5M-160.2,-37.5L-177.4,-27.6M-6.9,-106.0L-80.1,-63.8M-142.9,-27.5L-183.6,-4.0M26.0,-105.0L-62.8,-53.8M-125.6,-17.5L-181.9,15.0M54.3,-101.3L-45.5,-43.8M-108.3,-7.5L-175.5,31.3M79.2,-95.7L-30.3,-32.5M-90.9,2.5L-165.8,45.7M90.9,-82.5L-30.3,-12.5M-73.6,12.5L-103.9,30.0M-121.2,40.0L-153.3,58.5M90.9,-62.5L-13.0,-2.5M-103.9,50.0L-138.3,69.8M90.9,-42.5L4.3,7.5M-77.9,55.0L-121.0,79.8M90.9,-22.5L21.7,17.5M-77.9,75.0L-101.3,88.5M165.8,-45.7L160.2,-42.5M95.3,-5.0L39.0,27.5M-60.6,85.0L-79.2,95.7M175.5,-31.3L160.2,-22.5M112.6,5.0L56.3,37.5M-43.3,95.0L-54.3,101.3M181.9,-15.0L73.6,47.5M30.3,72.5L13.0,82.5M183.6,4.0L90.9,57.5M47.6,82.5L6.9,106.0M177.4,27.6L108.3,67.5M65.0,92.5L47.8,102.4M47.8,-102.4L90.9,-77.5M160.2,-37.5L177.4,-27.6M6.9,-106.0L90.9,-57.5M160.2,-17.5L183.6,-4.0M-26.0,-105.0L90.9,-37.5M151.6,-2.5L181.9,15.0M-54.3,-101.3L90.9,-17.5M134.2,7.5L175.5,31.3M-79.2,-95.7L165.8,45.7M-101.3,-88.5L153.3,58.5M-121.0,-79.8L-93.1,-63.8M-30.3,-27.5L138.3,69.8M-138.3,-69.8L-121.2,-60.0M103.9,70.0L121.0,79.8M-153.3,-58.5L-138.6,-50.0M86.6,80.0L101.3,88.5M-165.8,-45.7L-155.9,-40.0M69.3,90.0L79.2,95.7M-175.5,-31.3L-69.3,30.0M13.0,77.5L54.3,101.3M-181.9,-15.0L-103.9,30.0M-103.9,30.0L-99.6,32.5M0.0,90.0L26.0,105.0M-183.6,4.0L-121.2,40.0M-115.8,43.1L-77.9,65.0M-17.3,100.0L-6.9,106.0M-177.4,27.6L-47.8,102.4" class="floor" fill="none" stroke="#2B3743" stroke-width="1" stroke-opacity="0.8"/><ellipse cx="0.0" cy="0.0" rx="183.7" ry="106.1" fill="none" stroke="#2B3743" stroke-width="1.2"/>
+<g class="pc" data-o="0">
 <polygon points="-116.9,-62.5 108.3,67.5 65.0,92.5 -160.2,-37.5" fill="#25303C" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.15"/>
 <polyline points="-112.6,-35.0 -95.3,-25.0" fill="none" stroke="#E6ECF2" stroke-width="1.5" stroke-opacity="0.35"/>
 <polyline points="-77.9,-15.0 -60.6,-5.0" fill="none" stroke="#E6ECF2" stroke-width="1.5" stroke-opacity="0.35"/>
 <polyline points="-43.3,5.0 -26.0,15.0" fill="none" stroke="#E6ECF2" stroke-width="1.5" stroke-opacity="0.35"/>
 <polyline points="-8.7,25.0 8.7,35.0" fill="none" stroke="#E6ECF2" stroke-width="1.5" stroke-opacity="0.35"/>
 <polyline points="26.0,45.0 43.3,55.0" fill="none" stroke="#E6ECF2" stroke-width="1.5" stroke-opacity="0.35"/>
+</g>
 <g class="pc" data-o="0">
 <polygon points="90.9,-7.5 125.6,12.5 125.6,-27.5 90.9,-47.5" fill="#37424E" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="160.2,-7.5 125.6,12.5 125.6,-27.5 160.2,-47.5" fill="#222E3A" stroke="#E6ECF2" stroke-width="1" stroke-opacity="0.3"/>

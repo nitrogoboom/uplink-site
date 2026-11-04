@@ -98,7 +98,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   .player { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 5; gap: var(--sp-2);
     margin-inline: calc(-1 * var(--gutter)); padding: var(--sp-2) var(--gutter) var(--sp-3); background: var(--c-bg); border-bottom: 1px solid var(--c-line); }
   .stage { aspect-ratio: auto; height: clamp(12rem, 36svh, calc(100vw - 2 * var(--gutter))); }
-  [data-nav="hud"] .pill { height: 1.75rem; }
   .card { min-height: 0; padding-bottom: var(--sp-6); }
   /* phones are narrow, so what sits round the picture scales with the width (sized for a 390-wide phone, smaller below),
      and the town fills more of its box */
@@ -107,11 +106,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   .s-title, .step-n { font-size: clamp(0.6rem, 2.75vw, 0.75rem); top: 0.7rem; }
   .s-title { left: 0.8rem; } .step-n { right: 0.8rem; }
   .pause { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); right: 0.6rem; bottom: 0.6rem; }
-  .hud { gap: var(--sp-2); }
-  .hud button { width: clamp(2.25rem, 10vw, 2.75rem); height: clamp(2.25rem, 10vw, 2.75rem); }
-  .hud-n { font-size: clamp(1.35rem, 6.4vw, 1.75rem); }
-  .hud-of { font-size: clamp(0.7rem, 3.2vw, 0.875rem); }
-  .hud-name { font-size: clamp(0.85rem, 4.2vw, 1.125rem); }
   .m-h { font-size: clamp(1.75rem, 8.2vw, 2rem); }
   .m-lead { font-size: clamp(0.95rem, 4.3vw, 1.125rem); }
   .card { gap: var(--sp-2); }
@@ -151,8 +145,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 [data-nav]:not([data-nav="pills"]) .pill .fill { display: none; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* A: HUD bar: the place in big type with step arrows, over a slim segmented bar (one segment a step) */
-[data-nav="hud"] .hud { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+/* A: the steps as the Services carousel's controls (src/components/home/services.css, .svc-hint): one row of
+   previous arrow, a dot a step, next arrow. The open step is the long amber dot, the ones already built a dimmer amber,
+   the ones to come grey. No words in the row: the place's name is in the picture's corner and the card's heading. */
+[data-nav="hud"] .steps { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); }
+[data-nav="hud"] .hud { display: contents; }
+[data-nav="hud"] .hud-l { display: none; }
+[data-nav="hud"] .hud-prev { order: 0; } [data-nav="hud"] .pills { order: 1; } [data-nav="hud"] .hud-next { order: 2; }
 .hud-l { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: var(--sp-2); font-family: 'Barlow Condensed', 'Barlow Condensed Fallback', sans-serif; text-transform: uppercase; }
 .hud-n { font: 700 italic var(--fs-6)/1 'Barlow Condensed', sans-serif; color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
 .hud-of { font-weight: 600; font-size: var(--fs-2); color: var(--c-muted); letter-spacing: 0.08em; }
@@ -165,11 +164,14 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .hud button:not(:disabled):hover { background: var(--c-surface-2); color: var(--c-text); }
 .hud button svg { width: var(--icon); height: var(--icon); }
 .hud button:disabled { opacity: 0.4; cursor: default; }
-[data-nav="hud"] .pills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; overflow: visible; margin-inline: 0; padding-inline: 0; }
-[data-nav="hud"] .pill { height: 2.75rem; min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; }
-[data-nav="hud"] .pill::before { content: ""; position: absolute; inset: 50% 0 auto; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-surface-2); }
-[data-nav="hud"] .pill .bar { position: absolute; inset: 50% 0 auto; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-accent); transform-origin: left; transform: scaleX(0); transition: transform 0.6s var(--ease, ease); }
-[data-nav="hud"] .pill.done .bar, [data-nav="hud"] .pill[aria-pressed="true"] .bar { transform: scaleX(1); }
+[data-nav="hud"] .pills { display: flex; align-items: center; gap: 0; overflow: visible; margin-inline: 0; padding-inline: 0; }
+/* each dot is a button with room round it to tap (the dot is the Services carousel's: 8px, the open one 24px long) */
+[data-nav="hud"] .pill { display: grid; place-items: center; height: var(--tap); min-height: 0; padding: 0 0.375rem; border: 0; border-radius: var(--r-2); background: none; overflow: visible; }
+[data-nav="hud"] .pill .bar { position: static; display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2);
+  transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
+[data-nav="hud"] .pill.done .bar { background: var(--c-accent); opacity: 0.45; }
+[data-nav="hud"] .pill[aria-pressed="true"] .bar { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
+@media (hover: hover) { [data-nav="hud"] .pill:not([aria-pressed="true"]):hover .bar { opacity: 1; background: var(--c-line-2); } [data-nav="hud"] .pill.done:hover .bar { background: var(--c-accent); } }
 [data-nav="hud"] .pill .nm { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .pill .bar { display: none; }
 [data-nav="hud"] .pill .bar { display: block; }
@@ -382,12 +384,15 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       fresh.forEach(({ g }) => { g.classList.add('pre', 'hide'); });
       void svg.getBoundingClientRect();
       pcs.forEach(({ g, s, o }) => {
-        g.classList.remove('pre');
         const isNew = fresh.some((p) => p.g === g);
+        // not animating (first draw, pause, reduced motion): parts appear or go at once, so the page never shows the
+        // finished world for a moment before hiding it
+        if (animate) g.classList.remove('pre'); else g.classList.add('pre');
         g.style.transitionDelay = animate && isNew ? `${120 + (s - Math.max(from + 1, 0)) * 500 + o * 140}ms` : '0ms';
         g.classList.toggle('hide', s > i);
         if (animate && isNew) g.classList.add('glow');
       });
+      if (!animate) { void svg.getBoundingClientRect(); pcs.forEach(({ g }) => g.classList.remove('pre')); }
       if (animate) glowT = setTimeout(() => pcs.forEach(({ g }) => g.classList.remove('glow')), 3400);
       tags.forEach((t) => t.el.classList.remove('show', 'fixed', 'flip'));
       showLots();
