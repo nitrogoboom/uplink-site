@@ -15,3 +15,11 @@ updates:
     groups:
       actions:
         patterns: ['*']
+  # requirements.txt: the drawing generators and the browser checks (CI installs Playwright and Pillow from it)
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

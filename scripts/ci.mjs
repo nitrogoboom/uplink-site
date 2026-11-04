@@ -1,6 +1,8 @@
-// What CI runs, on this machine, in one go (npm run ci): types, lint, build, then the built site served the way
-// Cloudflare serves it and checked in a browser (tools/verify_footer.py, screenshots in out/). Stops at the first
-// failure. Uses a server already on :8787 if there is one, else starts `wrangler dev` and stops it after.
+// What CI runs, on this machine, in one go (npm run ci): types, the build scripts' tests, lint, build, then the
+// built site served the way Cloudflare serves it, checked in a browser (tools/verify_footer.py, screenshots in out/)
+// and for broken links (tools/check_links.py). Not the screenshot comparison: CI runs that on pull requests only, and
+// by hand it's python tools/visual_diff.py https://uplink-site.johnoreilly.workers.dev http://localhost:8787. Stops at
+// the first failure. Uses a server already on :8787 if there is one, else starts `wrangler dev` and stops it after.
 // Needs Python with requirements.txt installed; PYTHON picks the interpreter (default `python`).
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -25,6 +27,7 @@ const up = () =>
 let server;
 try {
   await run('npm run check');
+  await run('npm test');
   await run('npm run lint');
   await run('npm run build');
   if (!(await up())) {
@@ -40,6 +43,7 @@ try {
   }
   mkdirSync('out', { recursive: true });
   await run(`${PYTHON} tools/verify_footer.py out/`);
+  await run(`${PYTHON} tools/check_links.py`);
   console.log('\nAll checks passed.');
 } catch (e) {
   console.error(`\n${e.message}`);
