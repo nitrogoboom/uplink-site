@@ -10,7 +10,7 @@ import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import TurndownService from 'turndown';
 
-const DIST = 'dist';
+const DIST = process.env.DIST || 'dist';   // another folder only for the tests (scripts/test/)
 const SKIP = ['index.html', '404.html', 'soon.html'];
 
 const pages = [];
@@ -106,7 +106,7 @@ for (const file of pages) {
   // the page's summary (unless the page already opens with it) and address go right under its title
   const said = description.split(/(?<=\.) /).some((s) => s.length > 40 && body.includes(s));
   const summary = said ? '' : `> ${description}\n\n`;
-  // anything before the title (About's profile card sits first in the HTML) moves under it
+  // anything before the title moves under it (no page has any today; kept so a card placed first can't lead the copy)
   const at = body.search(/^# /m);
   const before = at > 0 ? body.slice(0, at).trim() : '';
   if (before) body = body.slice(at);
