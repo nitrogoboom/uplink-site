@@ -362,6 +362,52 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   const showSize = () => { const w = innerWidth; size.textContent = `${w} × ${innerHeight} · ${w < 700 ? 'phone' : w < 1100 ? 'tablet' : 'desktop'}`; };
   showSize(); addEventListener('resize', showSize);
 
+  // The dome's longitude lines: great half-circles from ground to ground over the top, turning round the dome all the
+  // time (one turn in 14 s), with one brighter line as the coverage sweep. Each line is split into the part on the
+  // dome's near side (brighter) and the far side (faint), so the turn reads in 3D. World to screen as the drawing:
+  // X = ox + (x - y) cos30 u, Y = oy + (x + y) u / 2 - z u. The viewer looks down (1, 1, 1): x + y + z > 0 is near.
+  (() => {
+    const C30 = Math.cos(Math.PI / 6), LINES = 6, TURN = 14000, STEPS = 48;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.dome-spin').forEach((g) => {
+      const R = +g.dataset.r, u = +g.dataset.u, ox = +g.dataset.ox, oy = +g.dataset.oy;
+      const P = (x, y, z) => `${(ox + (x - y) * C30 * u).toFixed(1)},${(oy + (x + y) * u / 2 - z * u).toFixed(1)}`;
+      const NS = 'http://www.w3.org/2000/svg';
+      const mk = (w, o) => { const p = document.createElementNS(NS, 'path'); p.setAttribute('stroke-width', w); p.setAttribute('stroke-opacity', o); g.append(p); return p; };
+      const lines = Array.from({ length: LINES }, () => ({ near: mk(1.2, 0.55), far: mk(1, 0.16) }));
+      const sweep = { near: mk(2.4, 0.95), far: mk(1.6, 0.3) };
+      const arc = (th) => {   // one great half-circle at heading th, as near and far path data
+        let near = '', far = '', side = null;
+        for (let k = 0; k <= STEPS; k++) {
+          const t = Math.PI * k / STEPS, c = Math.cos(t) * R;
+          const x = c * Math.cos(th), y = c * Math.sin(th), z = Math.sin(t) * R;
+          const s = x + y + z >= 0, pt = P(x, y, z);
+          if (s !== side) {   // the line crosses from far to near (or back): start a new piece on that side
+            if (side !== null) { if (s) near += `M${prev}L${pt}`; else far += `M${prev}L${pt}`; }
+            else if (s) near += `M${pt}`; else far += `M${pt}`;
+            side = s;
+          } else if (s) near += `L${pt}`; else far += `L${pt}`;
+          var prev = pt;
+        }
+        return { near, far };
+      };
+      const draw = (a) => {
+        lines.forEach((l, i) => { const d = arc(a + Math.PI * i / LINES); l.near.setAttribute('d', d.near); l.far.setAttribute('d', d.far); });
+        const d = arc(a * 2.2 + 0.4);   // the sweep runs a little faster than the lines
+        sweep.near.setAttribute('d', d.near); sweep.far.setAttribute('d', d.far);
+      };
+      const stage = g.closest('.stage');
+      let a = 0, last = 0;
+      const tick = (now) => {
+        const dt = last ? Math.min(64, now - last) : 0; last = now;
+        if (!stage || !stage.classList.contains('paused')) a = (a + dt / TURN * Math.PI * 2) % (Math.PI * 2);
+        draw(a);
+        requestAnimationFrame(tick);
+      };
+      if (reduce) draw(0.3); else requestAnimationFrame(tick);
+    });
+  })();
+
 </script>
 </body>
 </html>
