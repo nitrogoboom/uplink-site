@@ -88,6 +88,7 @@ jobs:
         with:
           name: dist
           path: dist
+          include-hidden-files: true # dist/.well-known/security.txt: upload-artifact skips dot folders by default
           retention-days: 7
 
   deploy:
