@@ -313,7 +313,7 @@ $$('form[data-validate]').forEach((form) => {
 /* ---------- phone tab bar: out of the way while reading ----------------- */
 // Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
 // It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put: the home Grow player sticks under it on phones. The bar shows on phones, and on tablets with bigger text
+// The header stays put. The bar shows on phones, and on tablets with bigger text
 // (bottom-nav.css); elsewhere it is hidden, so the listener does nothing there.
 const botnav = $('.botnav');
 if (botnav) {
