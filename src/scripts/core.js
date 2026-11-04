@@ -27,6 +27,22 @@ const $ = (sel, ctx = document) => ctx.querySelector(sel);
 const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+/* ---------- error reports ---------------------------------------------- */
+// A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
+// What goes: the page's path, the message, the script's address and line. Never form contents or anything typed.
+// Left out: "Script error." (an outside script's error, which the browser hides) and "ResizeObserver loop" (a
+// browser notice that a resize took two frames, not a fault). Five reports a page at most.
+// CSP blocks are reported by the browser itself (public/_headers).
+let reportsLeft = 5;
+const reportError = (message, source, line, column) => {
+  if (!message || message === 'Script error.' || /ResizeObserver loop/.test(message)) return;
+  if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
+  const body = { kind: 'error', page: location.pathname, message: String(message).slice(0, 300), source, line, column };
+  navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
+};
+window.addEventListener('error', (e) => reportError(e.message, e.filename, e.lineno, e.colno));
+window.addEventListener('unhandledrejection', (e) => reportError(e.reason?.message || String(e.reason), e.reason?.stack?.split('\n')[1]?.trim()));
+
 /* ---------- storage (can be unavailable) ------------------------------ */
 const store = {
   get(key) { try { return window.localStorage.getItem(key); } catch { return null; } },
