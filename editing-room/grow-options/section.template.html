@@ -90,22 +90,33 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .pc.glow { filter: url(#ux-glow); }
 .lot { transition: opacity 0.5s ease; }
 .lot.hide { opacity: 0; }
-/* tablet: the phone order, the square a bit narrower and centred, the card in two columns */
+/* the player: the picture and its controls (HUD) as one unit, everywhere. The words stay outside it. */
+.player { display: grid; gap: var(--sp-3); min-width: 0; }
+/* phone: the player sticks under the header while the words scroll up below it at normal speed, so whatever you're
+   reading, the picture is on screen above it. Nothing pins the page: past the section, the player leaves with it. */
+@media (max-width: 699px) {
+  .player { position: sticky; top: calc(var(--header-h) + env(safe-area-inset-top, 0px)); z-index: 5; gap: var(--sp-2);
+    margin-inline: calc(-1 * var(--gutter)); padding: var(--sp-2) var(--gutter) var(--sp-3); background: var(--c-bg); border-bottom: 1px solid var(--c-line); }
+  .stage { aspect-ratio: auto; height: clamp(12rem, 36svh, calc(100vw - 2 * var(--gutter))); }
+  [data-nav="hud"] .pill { height: 1.75rem; }
+  .card { min-height: 0; padding-bottom: var(--sp-6); }
+}
+/* tablet: the player a bit narrower and centred, the card in two columns under it */
 @media (min-width: 700px) and (max-width: 1099px) {
-  .stage { width: min(80%, 36rem); justify-self: center; }
+  .player { width: min(80%, 36rem); justify-self: center; }
   [data-nav="pills"] .pills { flex-wrap: wrap; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; }
   .card .cols { grid-template-columns: 1fr 1fr; }
 }
-/* desktop: one screen; words, pills and card on the left, the square on the right as tall as the screen allows */
+/* desktop: one screen; heading and words on the left, the player on the right as tall as the screen allows */
 @media (min-width: 1100px) {
   .grow { min-height: var(--fold-h); display: grid; align-items: center; padding-block: var(--sp-6); }
-  .in { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: var(--sp-8); row-gap: var(--sp-5); align-items: start; }
+  .in { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; column-gap: var(--sp-8); row-gap: var(--sp-5); align-items: start; }
   .m-head { grid-column: 1; grid-row: 1; }
-  .steps { grid-column: 1; grid-row: 2; }
   [data-nav="pills"] .pills { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
-  .card { grid-column: 1; grid-row: 3; }
+  .card { grid-column: 1; grid-row: 2; }
   .card .cols { grid-template-columns: 1fr 1fr; }
-  .stage { grid-column: 2; grid-row: 1 / 4; width: auto; height: min(calc(var(--fold-h) - 2 * var(--sp-6)), 48rem); }
+  .player { grid-column: 2; grid-row: 1 / 3; }
+  .stage { height: min(calc(var(--fold-h) - 2 * var(--sp-6) - 7rem), 44rem); width: auto; }
 }
 /* ---- the step controls: four ways to draw the same buttons (data-nav on the section; Mockup controls switch it) ----
    Every button carries its number, icon, name and team size; each design shows the parts it needs. The autoplay
@@ -251,9 +262,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       <div class="stage"><div class="scene on"><span class="s-title"></span><span class="step-n"></span>${WORLD}${TAGS.map((tags, i) => tags.map((t, k) => `<span class="tag" data-step="${i}" data-k="${k}"><span class="ico">!</span><span class="tx">${esc(t.r)}</span></span>`).join('')).join('')}</div>
         <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="100"/></svg></button></div>
     </div>`;
-    if (host.dataset.layout !== 'desk') {   // phone and tablet order: heading, picture, pills, card
-      const inn = host.querySelector('.in');
-      inn.insertBefore(host.querySelector('.stage'), host.querySelector('.steps'));
+    {   // the player: the picture with its controls under it, one unit; order everywhere: heading, player, words
+      const inn = host.querySelector('.in'), player = document.createElement('div');
+      player.className = 'player';
+      player.append(host.querySelector('.stage'), host.querySelector('.steps'));
+      inn.insertBefore(player, host.querySelector('.card'));
     }
     const scene = host.querySelector('.scene'), svg = scene.querySelector('svg');
     const pcs = $$('.pc', svg).map((g) => ({ g, s: +g.dataset.s - 1, o: +g.dataset.o }));
