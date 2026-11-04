@@ -1,9 +1,9 @@
-# Site checks against the built site. Home (the page being worked on, FOCUS) gets everything: hero, tower, footer
+# Site checks against the built site. Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer
 # tabs, sideways scroll at every size, and an axe accessibility pass at phone and desktop (axe-core from node_modules:
 # run npm install first). Every other page (the served sitemap.xml, plus soon and the 404 page) gets a quick look:
 # loaded once at phone size for script errors and sideways scroll. --all gives every page the full treatment.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
-# doesn't answer hover, a tower that doesn't grow, a footer tab at 1440x900 that isn't one screen tall or whose panel
+# doesn't answer hover, a Grow section that doesn't play, a footer tab at 1440x900 that isn't one screen tall or whose panel
 # overflows, sideways scroll, a header whose tabs come within 8px of the logo or buttons (or scroll) at any width
 # from 320 to 1440 in 10px steps and on wider screens, at the default and 200% text, anything serious or critical
 # from axe, or a sitemap with fewer than five pages.
@@ -50,7 +50,7 @@ async def main():
         rep = []
         errs = []
         pg = await b.new_page(viewport={'width': 1440, 'height': 900})
-        watch(pg, 'index 1440 (hero, tower, footer)', errs)
+        watch(pg, 'index 1440 (hero, grow, footer)', errs)
         await pg.goto(base + '/')
         await pg.wait_for_timeout(5500)
         # hover a tile three along from the one showing, so the cloud's own timer can't have got there first
@@ -65,17 +65,22 @@ async def main():
         rep.append(f"hero tile hover ({want}): {before} -> {after}")
         if not lit or after == before:
             fails.append(f'hero: hovering the {want} tile did not show it ({before} -> {after})')
-        steps = await pg.eval_on_selector_all('.grow-step[data-floors]', 's=>s.map(x=>x.dataset.floors)')
-        # the stage pins, so walk down the section a little at a time and note each floor count the tower reaches
-        seen = await pg.evaluate(
-            """async()=>{const g=document.querySelector('.grow'),top=g.getBoundingClientRect().top+scrollY,seen=[];
-          for(let y=top-innerHeight;y<top+g.offsetHeight;y+=60){window.scrollTo({top:y,behavior:'instant'});await new Promise(r=>setTimeout(r,120));
-            const f=document.querySelector('svg.tg').getAttribute('data-floors');if(f&&f!==seen[seen.length-1])seen.push(f)}
-          return seen}"""
-        )
-        rep.append(f"tower floors {','.join(steps)} -> {','.join(seen)}")
-        if not steps or seen != steps:
-            fails.append(f"tower: floors {','.join(seen)}, expected {','.join(steps)}")
+        # the Grow section plays on its own once it's on screen (a step every 4.5 s): a few seconds in, its first steps
+        # are built; then the last dot jumps to the end, where every part shows
+        await pg.eval_on_selector('#grow', 'e=>e.scrollIntoView()')
+        await pg.wait_for_timeout(6000)
+        probe = """()=>{const pcs=[...document.querySelectorAll('#grow .pc')];const on=document.querySelector('#grow .grow-dot[aria-pressed="true"]');
+          return {built:pcs.filter(p=>!p.classList.contains('hide')).length, total:pcs.length, step:on?Number(on.dataset.i):-1}}"""
+        g = await pg.evaluate(probe)
+        rep.append(f"grow playing: step {g['step'] + 1}, {g['built']} of {g['total']} parts built")
+        if g['total'] == 0 or g['built'] == 0 or g['step'] < 1:
+            fails.append(f"grow: didn't play on its own (step {g['step'] + 1}, {g['built']} of {g['total']} parts built)")
+        await pg.click('#grow .grow-dot:last-of-type')
+        await pg.wait_for_timeout(300)
+        g = await pg.evaluate(probe)
+        rep.append(f"grow last dot: step {g['step'] + 1}, {g['built']} of {g['total']} parts")
+        if g['built'] != g['total']:
+            fails.append(f"grow: the last dot left {g['total'] - g['built']} parts unbuilt")
         # footer behaviour on home at 1440
         await pg.eval_on_selector('#footer', 'e=>e.scrollIntoView()')
         await pg.wait_for_timeout(400)

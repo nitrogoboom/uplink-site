@@ -1,0 +1,522 @@
+<title>Grow Section Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&display=swap">
+<style>
+/* Layout: one long page of option cards, each a live mockup on the site's own dark band; a sticky bar switches the picture mode for all of them.
+   Single dark look on purpose: it copies the Uplink site (src/styles/tokens.css). */
+:root {
+  --bg: #0E1A27; --band: #14202D; --solid: #222E3A;
+  --surface: rgb(242 247 252 / 0.05); --surface-2: rgb(242 247 252 / 0.09);
+  --line: rgb(242 247 252 / 0.1); --line-2: rgb(242 247 252 / 0.18); --edge: rgb(242 247 252 / 0.46);
+  --text: #F2F7FC; --muted: #BBC2C9; --accent: #FFAD51; --on-accent: #0E1A27; --sky: #97C8EA; --ok: #A9E9C3;
+  --accent-tint: rgb(255 173 81 / 0.14);
+  --display: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  --body: 'Barlow', Arial, Helvetica, sans-serif;
+  --r: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font: 400 16px/1.55 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--solid); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+h1 { font-style: italic; font-size: clamp(2rem, 5vw, 3.2rem); }
+h2 { font-style: italic; font-size: clamp(1.6rem, 3.6vw, 2.3rem); }
+h3 { font-size: 1.35rem; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.eyebrow { font: 600 0.8rem/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 10px; border-radius: 999px; background: var(--surface-2); color: var(--text); }
+.chip--accent { background: var(--accent); color: var(--on-accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* intro */
+.intro { padding-block: 48px 24px; display: grid; gap: 16px; max-width: 70ch; }
+.intro p { color: var(--muted); }
+.problems { display: grid; gap: 8px; padding: 0; margin: 0; list-style: none; }
+.problems li { display: flex; gap: 10px; color: var(--muted); }
+.problems b { color: var(--text); font-weight: 600; }
+.problems li::before { content: ""; flex: none; width: 6px; height: 6px; margin-top: 10px; border-radius: 50%; background: var(--sky); }
+
+/* sticky picture-mode bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--solid); border-block: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 10px; }
+.bar-label { font: 600 0.85rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line-2); }
+.seg button { font: 600 0.9rem/1 var(--body); color: var(--muted); background: none; border: 0; border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.bar-jump { display: flex; gap: 6px; margin-left: auto; }
+.bar-jump a { font: 700 0.95rem/1 var(--display); color: var(--text); text-decoration: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; background: var(--surface-2); }
+@media (max-width: 640px) { .bar-jump { display: none; } }
+
+/* option frame */
+.opt { padding-block: 56px 8px; display: grid; gap: 20px; scroll-margin-top: 64px; }
+.opt-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; }
+.letter { font: 700 italic 2.6rem/0.9 var(--display); color: var(--accent); }
+.opt-head .lede { margin-top: 8px; color: var(--muted); max-width: 64ch; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin: 0; }
+.facts div { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; min-width: 0; }
+.facts dt { font: 600 0.75rem/1.2 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 4px 0 0; font-size: 0.95rem; }
+.demo { background: var(--band); border: 1px solid var(--line); border-radius: 14px; padding: clamp(16px, 3vw, 32px); min-width: 0; }
+.demo-note { font-size: 0.85rem; color: var(--muted); }
+
+/* tower host */
+.tw { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 100%; border-radius: var(--r); background: radial-gradient(60% 55% at 50% 55%, rgb(151 200 234 / 0.09), transparent 70%); overflow: hidden; }
+.tw svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tw .tg-tl, .tw .tg-td, .tw .tg-tb, .tw .tg-tt { display: none; }
+.tw .tg-p { transition: opacity 0.6s ease; }
+.tw .tg-floor { transition: opacity 0.6s ease, transform 0.6s ease; }
+.tw .is-new { filter: url(#ux-glow); }
+.tw .tags { position: absolute; inset: 0; pointer-events: none; }
+.tw .tag { position: absolute; transform: translate(-50%, calc(-100% - 10px)); white-space: nowrap; font: 600 0.72rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; background: var(--solid); color: var(--text); border: 1px solid var(--line-2); opacity: 0; transition: opacity 0.4s ease; }
+.tw .tag.on { opacity: 1; }
+.tw .tag.new { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.tw .hud { position: absolute; left: 10px; top: 10px; display: flex; gap: 6px; }
+
+/* shared copy block for a level */
+.copy { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.copy ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.copy li { display: flex; gap: 10px; align-items: baseline; }
+.copy li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 2px; background: var(--sky); transform: translateY(-1px); }
+.copy li.add::before { background: var(--accent); }
+.copy li.add span { color: var(--text); }
+.copy li:not(.add) span { color: var(--muted); }
+.copy .key { font-size: 0.8rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.copy .key i { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 6px; }
+
+/* A: tabs */
+.a-grid { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.tab { position: relative; overflow: hidden; display: grid; gap: 4px; text-align: left; padding: 12px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); cursor: pointer; font: inherit; }
+.tab b { font: 700 1.05rem/1 var(--display); text-transform: uppercase; color: var(--text); }
+.tab small { font-size: 0.8rem; }
+.tab[aria-selected="true"] { background: var(--accent-tint); border-color: var(--accent); color: var(--text); }
+.tab .prog { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--accent); }
+.a-side { display: grid; gap: 16px; align-content: start; min-width: 0; }
+@media (min-width: 860px) { .a-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; } }
+
+/* B: slider */
+.b-grid { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+.b-q { display: grid; gap: 12px; }
+.b-q label { font: 700 1.2rem/1.1 var(--display); text-transform: uppercase; }
+.b-num { font: 700 italic 3.4rem/0.9 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.b-num small { font: 600 1rem/1 var(--body); font-style: normal; color: var(--muted); margin-left: 6px; }
+.range { width: 100%; accent-color: var(--accent); height: 32px; cursor: pointer; }
+.ticks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); font: 600 0.75rem/1.2 var(--display); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ticks span { border-left: 1px solid var(--line-2); padding-left: 6px; }
+.ticks span.on { color: var(--accent); border-color: var(--accent); }
+@media (min-width: 860px) { .b-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; } }
+
+/* C: free scroll, sticky picture */
+.c-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.c-art { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 56px); z-index: 1; background: var(--band); padding-bottom: 12px; }
+.c-art .tw { aspect-ratio: auto; height: min(42svh, 360px); }
+.c-steps { display: grid; gap: 28svh; padding-block: 8svh 30svh; margin: 0; list-style: none; padding-left: 0; }
+.c-step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; opacity: 0.45; transition: opacity 0.3s ease, border-color 0.3s ease; }
+.c-step.on { opacity: 1; border-color: var(--line-2); }
+@media (min-width: 860px) {
+  .c-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; }
+  .c-art { align-self: start; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+  .c-art .tw { height: auto; aspect-ratio: 1 / 1; }
+  .c-steps { gap: 40svh; padding-block: 20svh 30svh; }
+}
+
+/* D: three-up */
+.d-row { display: grid; grid-auto-flow: column; grid-auto-columns: 82%; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 8px; }
+.d-card { scroll-snap-align: start; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.d-card .tw { aspect-ratio: 4 / 3; }
+@media (min-width: 860px) { .d-row { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); overflow: visible; } }
+
+/* picture ideas, scorecard, pick */
+.ideas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.idea { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 6px; align-content: start; }
+.idea h3 { font-size: 1.1rem; }
+.idea p { color: var(--muted); font-size: 0.95rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); }
+table { width: 100%; border-collapse: collapse; min-width: 720px; font-size: 0.95rem; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 0.78rem/1.2 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { font-family: var(--display); font-weight: 700; text-transform: uppercase; white-space: nowrap; }
+tr.now td { color: var(--muted); }
+.good { color: var(--ok); }
+.pick { background: var(--accent-tint); border: 1px solid var(--accent); border-radius: 14px; padding: clamp(16px, 3vw, 28px); display: grid; gap: 10px; }
+.pick p { max-width: 70ch; }
+footer { padding-block: 40px 64px; color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .tw .tg-p, .tw .tg-floor, .tw .tag, .c-step { transition: none; } }
+</style>
+
+<template id="tower"><!--TOWER--></template>
+
+<div class="wrap">
+  <header class="intro">
+    <p class="eyebrow">Uplink · Home · "We grow with you"</p>
+    <h1>Grow section: four ways to build it</h1>
+    <p>Every mockup below uses the real tower drawing from <code>gen_tower.py</code>. Try each one, on your phone too, then pick a letter and a picture mode.</p>
+    <ul class="problems">
+      <li><span><b>It holds the page.</b> On phones and tablets the stage pins for three passes. Someone scrolling to the footer has to push through it.</span></li>
+      <li><span><b>The picture undersells the story.</b> Each level adds a storey plus a few small pieces, and the camera pulls back at the same time, so the growth reads as the building getting smaller.</span></li>
+      <li><span><b>The point is easy to miss.</b> The section's job is "whatever your size, we fit, and we add what you need next". Today you have to scroll the whole thing to get that.</span></li>
+    </ul>
+  </header>
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <span class="bar-label" id="mode-label">Picture</span>
+    <div class="seg" role="group" aria-labelledby="mode-label">
+      <button type="button" data-mode="drawn" aria-pressed="false">As drawn today</button>
+      <button type="button" data-mode="new" aria-pressed="true">Highlight what's new</button>
+      <button type="button" data-mode="ghost" aria-pressed="false">Show what's ahead</button>
+    </div>
+    <nav class="bar-jump" aria-label="Jump to option">
+      <a href="#opt-a">A</a><a href="#opt-b">B</a><a href="#opt-c">C</a><a href="#opt-d">D</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- A -->
+  <section class="opt" id="opt-a" aria-labelledby="a-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">A</span>
+      <div>
+        <h2 id="a-title">Pick a level (tabs)</h2>
+        <p class="lede">Three tabs: one per team size. The picture and text swap on click. It can step through on its own while on screen and stops the moment someone taps. The common pattern for feature sections on Stripe, Linear and Vercel.</p>
+      </div>
+    </div>
+    <dl class="facts">
+      <div><dt>Scroll cost</dt><dd class="good">None. One screen tall.</dd></div>
+      <div><dt>Phone</dt><dd>Tabs on top, picture, then text.</dd></div>
+      <div><dt>Build</dt><dd>Small. Reuses the drawing and its cameras.</dd></div>
+    </dl>
+    <div class="demo">
+      <div class="a-grid">
+        <div class="tw" id="a-tw"></div>
+        <div class="a-side">
+          <div class="tabs" role="tablist" aria-label="Team size">
+            <button class="tab" role="tab" id="a-t1" aria-controls="a-panel" aria-selected="true" data-l="1"><b>1–10</b><small>Get set up</small><span class="prog"></span></button>
+            <button class="tab" role="tab" id="a-t2" aria-controls="a-panel" aria-selected="false" tabindex="-1" data-l="2"><b>11–50</b><small>Lock it down</small><span class="prog"></span></button>
+            <button class="tab" role="tab" id="a-t3" aria-controls="a-panel" aria-selected="false" tabindex="-1" data-l="3"><b>51–150</b><small>Plan ahead</small><span class="prog"></span></button>
+          </div>
+          <div class="copy" id="a-panel" role="tabpanel" aria-labelledby="a-t1"></div>
+          <p class="demo-note" id="a-note">Steps through on its own while on screen. Tap a tab to stop it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="opt" id="opt-b" aria-labelledby="b-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">B</span>
+      <div>
+        <h2 id="b-title">How big is your team? (slider)</h2>
+        <p class="lede">The visitor drags to their own team size. The office grows to match and the list shows what they get, with the new items marked. It answers "is this for a company my size?" in one move. The seat slider on SaaS pricing pages works the same way.</p>
+      </div>
+    </div>
+    <dl class="facts">
+      <div><dt>Scroll cost</dt><dd class="good">None. One screen tall.</dd></div>
+      <div><dt>Phone</dt><dd>Big thumb slider; works with arrow keys too.</dd></div>
+      <div><dt>Build</dt><dd>Medium. Same drawing, plus the list logic.</dd></div>
+    </dl>
+    <div class="demo">
+      <div class="b-grid">
+        <div class="tw" id="b-tw"></div>
+        <div class="b-side copy">
+          <div class="b-q">
+            <label for="b-range">How many people on your team?</label>
+            <div class="b-num" aria-hidden="true"><span id="b-n">8</span><small>people</small></div>
+            <input class="range" id="b-range" type="range" min="0" max="100" step="1" value="23" aria-valuetext="8 people">
+            <div class="ticks" aria-hidden="true"><span data-l="1">1–10</span><span data-l="2">11–50</span><span data-l="3">51–150</span></div>
+          </div>
+          <div id="b-copy" class="copy" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="opt" id="opt-c" aria-labelledby="c-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">C</span>
+      <div>
+        <h2 id="c-title">Scroll story, no lock (sticky picture)</h2>
+        <p class="lede">Closest to today. The picture sticks while three cards scroll past at normal speed, and it changes as each card reaches the middle. Nothing holds the page: flick past and it is gone. Apple's product pages use this.</p>
+      </div>
+    </div>
+    <dl class="facts">
+      <div><dt>Scroll cost</dt><dd>The section's own length, about 2–3 screens. No lock.</dd></div>
+      <div><dt>Phone</dt><dd>Picture sticks in the top half; cards slide under it.</dd></div>
+      <div><dt>Build</dt><dd>Small. Close to today's desktop layout.</dd></div>
+    </dl>
+    <div class="demo">
+      <p class="demo-note">Scroll the page normally. Try a fast flick past it.</p>
+      <div class="c-grid">
+        <div class="c-art"><div class="tw" id="c-tw"></div></div>
+        <ol class="c-steps" id="c-steps"></ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- D -->
+  <section class="opt" id="opt-d" aria-labelledby="d-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">D</span>
+      <div>
+        <h2 id="d-title">Three side by side (static)</h2>
+        <p class="lede">All three levels at once, each with its own picture. On phones they become a swipe row. No script needed. The usual pricing-tier layout.</p>
+      </div>
+    </div>
+    <dl class="facts">
+      <div><dt>Scroll cost</dt><dd class="good">None. Short.</dd></div>
+      <div><dt>Phone</dt><dd>Swipe row; one card and a peek of the next.</dd></div>
+      <div><dt>Build</dt><dd>Smallest. Loses the feeling of growth.</dd></div>
+    </dl>
+    <div class="demo">
+      <div class="d-row" id="d-row"></div>
+    </div>
+  </section>
+
+  <!-- picture -->
+  <section class="opt" id="picture" aria-labelledby="p-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">+</span>
+      <div>
+        <h2 id="p-title">Fixing the picture</h2>
+        <p class="lede">Works with any option. The bar at the top tries the first two ideas on every mockup.</p>
+      </div>
+    </div>
+    <div class="ideas">
+      <div class="idea"><h3>Mark what's new</h3><p>Each level's new pieces glow amber and their tags turn amber. The eye goes straight to the change. "Highlight what's new" above.</p></div>
+      <div class="idea"><h3>Keep the camera still</h3><p>Today the camera pulls back as things are added, so the office shrinks while it grows. Fix the framing and show what's coming as faint outlines. "Show what's ahead" above.</p></div>
+      <div class="idea"><h3>One big change per level</h3><p>Level 1 is the office. Level 2 should be one obvious thing: the security dome over everything, with the homes inside it. Level 3: the second office and the cloud, joined by a line. Fewer, bigger pieces.</p></div>
+      <div class="idea"><h3>Show the people</h3><p>The story is about team size, but no people are drawn. Small figures at the desks and in the homes (or a seat count on the building) would make "11–50 people" something you see.</p></div>
+    </div>
+  </section>
+
+  <!-- compare -->
+  <section class="opt" aria-labelledby="t-title">
+    <h2 id="t-title">Side by side</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Option</th><th>Scroll cost</th><th>Phone</th><th>Gets the point across</th><th>Interactive</th><th>Build</th></tr></thead>
+        <tbody>
+          <tr class="now"><td>Today</td><td>3 locked passes</td><td>Pinned stage</td><td>Only if you scroll it all</td><td>Scroll only</td><td>Built</td></tr>
+          <tr><td>A · Tabs</td><td class="good">None</td><td>Good</td><td>Good: three labelled sizes up front</td><td>Tap</td><td>Small</td></tr>
+          <tr><td>B · Slider</td><td class="good">None</td><td>Good</td><td>Best: the visitor finds their own size</td><td>Drag, keys</td><td>Medium</td></tr>
+          <tr><td>C · Sticky</td><td>2–3 screens, no lock</td><td>OK: picture takes the top half</td><td>Good, if they scroll it</td><td>Scroll only</td><td>Small</td></tr>
+          <tr><td>D · Three-up</td><td class="good">None</td><td>Swipe row</td><td>OK: reads as tiers, not growth</td><td>None</td><td>Smallest</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="opt" aria-labelledby="pick-title">
+    <div class="pick">
+      <p class="eyebrow">My pick</p>
+      <h2 id="pick-title">B, with "Highlight what's new"</h2>
+      <p>The slider is the only option where the visitor does something that is about them: they set their own team size and see what they'd get. It costs no scroll, works the same on phone and desktop, and the native slider is accessible as is. Tabs (A) are the safe second choice. If you'd rather keep a scroll story, C keeps today's feel without the lock.</p>
+      <p>Whichever you pick, the picture work comes next: one big, obvious change per level, and people in the drawing.</p>
+    </div>
+  </section>
+
+  <footer>Mockups for a decision, not the final build. Copy is today's copy from <code>Grow.astro</code>.</footer>
+</div>
+
+<script>
+(() => {
+  const LEVELS = [
+    { size: '1 to 10 people', title: 'Get set up right', text: 'A small team needs things to just work. We set up every laptop, phone and account the same way, and you get one number to call.', items: ['Help desk for every person', 'Microsoft 365 or Google set up and backed up', 'Devices patched and monitored'] },
+    { size: '11 to 50 people', title: 'Lock it down', text: 'More people means more logins to protect. We add round-the-clock security and train your staff to spot a bad email.', items: ['24/7 threat monitoring', 'Email and phishing defence', 'Staff security training'] },
+    { size: '51 to 150 people', title: 'Plan ahead', text: 'Bigger teams need a plan. We map every device and licence, link your offices, and review the budget with you each quarter.', items: ['Multi-site networks', 'Quarterly IT reviews', 'Yearly roadmap and budget'] },
+  ];
+  const TAGS = [
+    { l: 1, a: 'door', t: 'Help desk' }, { l: 1, a: 'mast1', t: 'Backed up' },
+    { l: 2, a: 'ring', t: '24/7 watch' }, { l: 2, a: 'home-a', t: 'Remote staff' },
+    { l: 3, a: 'office', t: 'Second office' }, { l: 3, a: 'cloud', t: 'Cloud' },
+  ];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  // one glow filter, shared by every copy of the drawing
+  const tpl = $('#tower');
+  const base = tpl.content.querySelector('svg');
+  base.removeAttribute('width'); base.removeAttribute('height');
+  base.insertAdjacentHTML('afterbegin', '<defs><filter id="ux-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#FFAD51" flood-opacity="0.95"/></filter></defs>');
+
+  let mode = 'new';
+  const towers = [];
+
+  function Tower(host, fixed) {
+    const svg = base.cloneNode(true);
+    host.prepend(svg);
+    const cams = [1, 2, 3].map((i) => svg.dataset['cam' + i].split(' ').map(Number));
+    const floors = [...svg.querySelectorAll('.tg-floor')];
+    const pieces = [...svg.querySelectorAll('.tg-p')];
+    const spots = {};
+    svg.querySelectorAll('.tg-a').forEach((c) => { spots[c.dataset.a] = [+c.getAttribute('cx'), +c.getAttribute('cy')]; });
+    const layer = document.createElement('div');
+    layer.className = 'tags';
+    layer.setAttribute('aria-hidden', 'true');
+    host.append(layer);
+    const tags = TAGS.map((t) => { const el = document.createElement('span'); el.className = 'tag'; el.textContent = t.t; layer.append(el); return { ...t, el }; });
+    let L = fixed || 1, vb = cams[L - 1].slice(), raf = 0;
+
+    const place = () => {
+      const m = svg.getScreenCTM(); if (!m) return;
+      const hr = host.getBoundingClientRect();
+      tags.forEach((t) => {
+        const p = new DOMPoint(spots[t.a][0], spots[t.a][1]).matrixTransform(m);
+        t.el.style.left = (p.x - hr.left) + 'px';
+        t.el.style.top = (p.y - hr.top) + 'px';
+      });
+    };
+    const camTo = (target, instant) => {
+      cancelAnimationFrame(raf);
+      const from = vb.slice(), t0 = performance.now(), D = instant || reduce ? 0 : 700;
+      const step = (now) => {
+        const k = D ? Math.min(1, (now - t0) / D) : 1;
+        const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        vb = from.map((v, i) => v + (target[i] - v) * e);
+        svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+        place();
+        if (k < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    const render = (instant) => {
+      const ghost = mode === 'ghost', hi = mode === 'new';
+      svg.dataset.floors = ghost ? '3' : String(L);
+      floors.forEach((f) => {
+        const n = +f.dataset.f;
+        f.style.opacity = ghost && n > L ? '0.14' : '';
+        f.classList.toggle('is-new', hi && L > 1 && n === L);
+      });
+      pieces.forEach((p) => {
+        const at = +p.dataset.at;
+        p.style.opacity = at < L ? '1' : ghost ? '0.14' : '0';
+        p.classList.toggle('is-new', hi && L > 1 && at >= L - 1 && at < L);
+      });
+      tags.forEach((t) => {
+        t.el.classList.toggle('on', t.l <= L);
+        t.el.classList.toggle('new', hi && t.l === L);
+      });
+      camTo(ghost ? cams[2] : cams[L - 1], instant);
+    };
+    const api = { set(n) { if (n !== L) { L = n; render(); } }, render, place };
+    render(true);
+    towers.push(api);
+    return api;
+  }
+
+  addEventListener('resize', () => towers.forEach((t) => t.place()));
+  document.querySelectorAll('.seg button').forEach((b) => b.addEventListener('click', () => {
+    mode = b.dataset.mode;
+    document.querySelectorAll('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    towers.forEach((t) => t.render());
+  }));
+
+  const copyHTML = (n, opts = {}) => {
+    const lv = LEVELS[n - 1];
+    const list = opts.cumulative
+      ? LEVELS.slice(0, n).flatMap((x, i) => x.items.map((it) => `<li class="${i === n - 1 ? 'add' : ''}"><span>${esc(it)}</span></li>`)).join('')
+      : lv.items.map((it) => `<li class="add"><span>${esc(it)}</span></li>`).join('');
+    const key = opts.cumulative && n > 1 ? '<p class="key"><span><i style="background:#FFAD51"></i>New at this size</span><span><i style="background:#97C8EA"></i>You already had</span></p>' : '';
+    return `<span class="chip">Level ${n} · ${esc(lv.size)}</span><h3>${esc(lv.title)}</h3><p class="muted">${esc(lv.text)}</p><ul>${list}</ul>${key}`;
+  };
+
+  // A: tabs, auto-advancing while on screen until someone taps
+  {
+    const tw = Tower($('#a-tw'));
+    const tabs = [...document.querySelectorAll('#opt-a .tab')];
+    const panel = $('#a-panel');
+    let cur = 1, auto = !reduce, timer = 0, seen = false;
+    const DWELL = 4500;
+    const show = (n) => {
+      cur = n;
+      tabs.forEach((t, i) => { const on = i === n - 1; t.setAttribute('aria-selected', String(on)); t.tabIndex = on ? 0 : -1; const p = t.querySelector('.prog'); p.style.transition = 'none'; p.style.width = '0'; });
+      panel.setAttribute('aria-labelledby', tabs[n - 1].id);
+      panel.innerHTML = copyHTML(n);
+      tw.set(n);
+      if (auto && seen) run();
+    };
+    const run = () => {
+      clearTimeout(timer);
+      const p = tabs[cur - 1].querySelector('.prog');
+      requestAnimationFrame(() => requestAnimationFrame(() => { p.style.transition = `width ${DWELL}ms linear`; p.style.width = '100%'; }));
+      timer = setTimeout(() => show(cur % 3 + 1), DWELL);
+    };
+    const stop = () => { auto = false; clearTimeout(timer); tabs.forEach((t) => { const p = t.querySelector('.prog'); p.style.transition = 'none'; p.style.width = '0'; }); $('#a-note').textContent = 'Stopped. Tap any level.'; };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => { stop(); show(i + 1); });
+      t.addEventListener('keydown', (e) => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault(); stop();
+        const n = (i + d + 3) % 3; show(n + 1); tabs[n].focus();
+      });
+    });
+    if (reduce) $('#a-note').textContent = 'Tap a level.';
+    new IntersectionObserver(([e]) => {
+      seen = e.isIntersecting;
+      if (!auto) return;
+      if (seen) run(); else { clearTimeout(timer); }
+    }, { threshold: 0.5 }).observe($('#opt-a .demo'));
+    show(1);
+  }
+
+  // B: slider. The track is split in thirds so level 1 is as easy to hit as level 3.
+  {
+    const tw = Tower($('#b-tw'));
+    const r = $('#b-range'), out = $('#b-n'), copy = $('#b-copy');
+    const ticks = [...document.querySelectorAll('#opt-b .ticks span')];
+    const people = (v) => v <= 33 ? Math.round(1 + (v / 33) * 9) : v <= 66 ? Math.round(11 + ((v - 34) / 32) * 39) : Math.round(51 + ((v - 67) / 33) * 99);
+    let last = 0;
+    const update = () => {
+      const n = people(+r.value);
+      const L = n <= 10 ? 1 : n <= 50 ? 2 : 3;
+      out.textContent = n;
+      r.setAttribute('aria-valuetext', `${n} people, level ${L}`);
+      ticks.forEach((t) => t.classList.toggle('on', +t.dataset.l === L));
+      if (L !== last) { last = L; copy.innerHTML = copyHTML(L, { cumulative: true }); tw.set(L); }
+    };
+    r.addEventListener('input', update);
+    update();
+  }
+
+  // C: sticky picture, cards scroll at normal speed
+  {
+    const tw = Tower($('#c-tw'));
+    const list = $('#c-steps');
+    list.innerHTML = LEVELS.map((_, i) => `<li class="c-step copy" data-l="${i + 1}">${copyHTML(i + 1)}</li>`).join('');
+    const steps = [...list.children];
+    const io = new IntersectionObserver((es) => {
+      es.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const n = +e.target.dataset.l;
+        steps.forEach((s) => s.classList.toggle('on', s === e.target));
+        tw.set(n);
+      });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    steps.forEach((s) => io.observe(s));
+    steps[0].classList.add('on');
+  }
+
+  // D: three at once
+  {
+    const row = $('#d-row');
+    row.innerHTML = LEVELS.map((_, i) => `<article class="d-card copy"><div class="tw" data-l="${i + 1}"></div>${copyHTML(i + 1)}</article>`).join('');
+    row.querySelectorAll('.tw').forEach((h) => Tower(h, +h.dataset.l));
+  }
+
+  requestAnimationFrame(() => towers.forEach((t) => t.place()));
+  document.fonts && document.fonts.ready.then(() => towers.forEach((t) => t.place()));
+})();
+</script>

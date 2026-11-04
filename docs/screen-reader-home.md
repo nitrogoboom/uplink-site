@@ -48,12 +48,10 @@ How a visitor moves: line by line (arrow keys or swipe), or jumping by landmark,
 *We grow with you*
 19. "Built to scale".
 20. Heading level 2: "We grow with you".
-21. "Start with the basics and add more as your team grows. Same people, same help desk, the whole way."
-22. Image: "Drawing of an office that grows from one floor to three, then adds remote staff, a second office and the cloud".
-23. List of 3 levels, each:
-    - "Level 1, 1 to 10 people", heading level 3 "Get set up right", its paragraph, then a list of 3: "Help desk for every person", "Microsoft 365 or Google set up and backed up", "Devices patched and monitored".
-    - "Level 2, 11 to 50 people", heading level 3 "Lock it down", its paragraph, list: "24/7 threat monitoring", "Email and phishing defence", "Staff security training".
-    - "Level 3, 51 to 150 people", heading level 3 "Plan ahead", its paragraph, list: "Multi-site networks", "Quarterly IT reviews", "Yearly roadmap and budget".
+21. "As your team spreads out, here's what to watch, and what we take care of."
+22. Image: the world drawing ("A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it"), then the "Pause" button (it becomes "Play" and "Play again").
+23. Group "Where your people work": "Previous place", six buttons "1 of 6: Your office" to "6 of 6: Covered" (the open one pressed), "Next place".
+24. The open step's card (a list of one; without script, all six): heading level 3 (for example "Some people work from home"), "Watch for" and its sentence, "We handle" and its sentence. (Written 4 Nov 2026 from the markup, not yet heard in a screen reader.)
 
 *Setups we built and still run*
 24. "Our work".
@@ -88,7 +86,7 @@ How a visitor moves: line by line (arrow keys or swipe), or jumping by landmark,
 - **Header:** the logo link has the same name; the top tabs are gone (the bottom bar takes their place). The two header buttons keep their full names.
 - **Hero:** no "Managed IT, Ontario" line and no "Services" list. The short line is read instead: "We run your IT: help desk, security, cloud, network and phones." The picture is described the same way.
 - **Services and Our work:** the same links, read the same way. The "Swipe" hint and dots are not read.
-- **We grow with you:** the same as desktop. The "Level 1, 1 to 10 people" lines and the checklists are hidden on screen on phones, but screen readers now get them.
+- **We grow with you:** the same as desktop.
 - **Footer:** no "Previous" and "Next footer section" buttons; the tabs still work.
 - **At the very end:** navigation "Main (bottom bar)", 5 links: "Home" (current page), "Services", "Work", "About", "Contact".
 

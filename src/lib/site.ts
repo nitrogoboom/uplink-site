@@ -101,7 +101,7 @@ export const getProjects = async () => (await getCollection('projects')).sort((a
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
-  home: ['src/pages/index.astro', 'src/components/home', 'src/content/services', 'src/content/projects'],
+  home: ['src/pages/index.astro', 'src/components/home', 'src/data/grow.json', 'src/content/services', 'src/content/projects'],
   services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json'],
   work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects'],
   about: ['src/pages/about.astro', 'src/components/about', 'src/data/team.json'],

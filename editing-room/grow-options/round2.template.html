@@ -1,0 +1,541 @@
+<title>Grow Section Round 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Condensed:ital,wght@0,600;0,700;1,700&display=swap">
+<style>
+/* Layout: round 2 of the Grow mockups. Three hybrids, each on the site's dark band; a sticky bar sets the picture mode for all.
+   Single dark look on purpose: it copies the Uplink site (src/styles/tokens.css). */
+:root {
+  --bg: #0E1A27; --band: #14202D; --solid: #222E3A;
+  --surface: rgb(242 247 252 / 0.05); --surface-2: rgb(242 247 252 / 0.09);
+  --line: rgb(242 247 252 / 0.1); --line-2: rgb(242 247 252 / 0.18);
+  --text: #F2F7FC; --muted: #BBC2C9; --accent: #FFAD51; --on-accent: #0E1A27; --sky: #97C8EA; --ok: #A9E9C3;
+  --accent-tint: rgb(255 173 81 / 0.14); --accent-fill: rgb(255 173 81 / 0.22);
+  --display: 'Barlow Condensed', 'Arial Narrow', Arial, sans-serif;
+  --body: 'Barlow', Arial, Helvetica, sans-serif;
+  --r: 10px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--text); font: 400 16px/1.55 var(--body); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--solid); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; text-transform: uppercase; line-height: 1.05; margin: 0; text-wrap: balance; letter-spacing: 0.01em; }
+h1 { font-style: italic; font-size: clamp(2rem, 5vw, 3.2rem); }
+h2 { font-style: italic; font-size: clamp(1.6rem, 3.6vw, 2.3rem); }
+h3 { font-size: 1.35rem; }
+p { margin: 0; }
+a { color: var(--sky); }
+.muted { color: var(--muted); }
+.eyebrow { font: 600 0.8rem/1 var(--display); letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font: 600 0.78rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 10px; border-radius: 999px; background: var(--surface-2); color: var(--text); }
+.chip--accent { background: var(--accent); color: var(--on-accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.intro { padding-block: 48px 24px; display: grid; gap: 16px; max-width: 72ch; }
+.intro p { color: var(--muted); }
+.mix { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.mix li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; display: grid; gap: 2px; }
+.mix b { font: 700 1rem/1.1 var(--display); text-transform: uppercase; }
+.mix span { color: var(--muted); font-size: 0.9rem; }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--solid); border-block: 1px solid var(--line); }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding-block: 10px; }
+.bar-label { font: 600 0.85rem/1 var(--display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line-2); }
+.seg button { font: 600 0.9rem/1 var(--body); color: var(--muted); background: none; border: 0; border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+.bar-jump { display: flex; gap: 6px; margin-left: auto; }
+.bar-jump a { font: 700 0.95rem/1 var(--display); color: var(--text); text-decoration: none; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 6px; background: var(--surface-2); }
+@media (max-width: 640px) { .bar-jump { display: none; } }
+
+.opt { padding-block: 56px 8px; display: grid; gap: 20px; scroll-margin-top: 64px; }
+.opt-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start; }
+.letter { font: 700 italic 2.6rem/0.9 var(--display); color: var(--accent); }
+.opt-head .lede { margin-top: 8px; color: var(--muted); max-width: 66ch; }
+.from { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.demo { background: var(--band); border: 1px solid var(--line); border-radius: 14px; padding: clamp(16px, 3vw, 32px); min-width: 0; }
+.note { font-size: 0.85rem; color: var(--muted); }
+
+/* the drawing */
+.tw { position: relative; width: 100%; aspect-ratio: 1 / 1; max-width: 100%; border-radius: var(--r); background: radial-gradient(60% 55% at 50% 55%, rgb(151 200 234 / 0.09), transparent 70%); overflow: hidden; }
+.tw svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tw .tg-tl, .tw .tg-td, .tw .tg-tb, .tw .tg-tt { display: none; }
+.tw .tg-floor, .tw .tg-roof, .tw .tg-p { transition: none; }
+.tw .tg-p.is-off, .tw .tg-p.is-off * { animation-play-state: paused; }
+.tw .is-new { filter: url(#ux-glow); }
+.tw .tags { position: absolute; inset: 0; pointer-events: none; }
+.tw .tag { position: absolute; left: 0; top: 0; white-space: nowrap; font: 600 0.72rem/1 var(--display); letter-spacing: 0.08em; text-transform: uppercase; padding: 5px 8px; border-radius: 999px; background: var(--solid); color: var(--text); border: 1px solid var(--line-2); opacity: 0; }
+.tw .tag.new { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.hud { position: absolute; left: 10px; right: 10px; top: 10px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; z-index: 1; }
+.count { font: 600 0.85rem/1 var(--body); color: var(--muted); }
+.count b { font: 700 italic 1.6rem/1 var(--display); color: var(--text); margin-right: 4px; font-variant-numeric: tabular-nums; }
+
+/* level copy */
+.copy { display: grid; gap: 10px; align-content: start; min-width: 0; }
+.copy ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.copy li { display: flex; gap: 10px; align-items: baseline; color: var(--muted); }
+.copy li::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 2px; background: var(--sky); transform: translateY(-1px); }
+.copy li.add { color: var(--text); }
+.copy li.add::before { background: var(--accent); }
+.key { font-size: 0.8rem; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; }
+.key i { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 6px; background: var(--sky); }
+.key i.add { background: var(--accent); }
+
+/* the boxes (shared by E, F, G) */
+.boxes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.boxes.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 560px) { .boxes { grid-template-columns: repeat(4, minmax(0, 1fr)); } .boxes.three { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.box { position: relative; overflow: hidden; display: grid; gap: 4px; align-content: start; text-align: left; padding: 12px; min-height: 72px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--surface); color: var(--muted); cursor: pointer; font: inherit; }
+.box > * { position: relative; }
+.box b { font: 700 1.1rem/1 var(--display); text-transform: uppercase; color: var(--text); }
+.box small { font-size: 0.8rem; }
+.box .fill { position: absolute; inset: 0; transform-origin: left; transform: scaleX(0); background: var(--accent-fill); }
+.box[aria-pressed="true"] { border-color: var(--accent); color: var(--text); }
+.box--play { background: var(--solid); border-style: dashed; }
+.box--play b { display: flex; align-items: center; gap: 8px; color: var(--accent); }
+.box--play svg { width: 12px; height: 12px; fill: currentColor; }
+
+/* E */
+.e-grid, .f-grid { display: grid; gap: 24px; grid-template-columns: minmax(0, 1fr); }
+.e-side, .f-side { display: grid; gap: 18px; align-content: start; min-width: 0; }
+.e-art, .f-art { position: relative; }
+@media (min-width: 860px) {
+  .e-grid, .f-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; }
+  .e-side .copy { min-height: 230px; }
+}
+
+/* F */
+.f-q { display: grid; gap: 10px; }
+.f-q label { font: 700 1.2rem/1.1 var(--display); text-transform: uppercase; }
+.f-num { font: 700 italic 3.4rem/0.9 var(--display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.f-num small { font: 600 1rem/1 var(--body); color: var(--muted); margin-left: 6px; }
+.range { width: 100%; accent-color: var(--accent); height: 32px; cursor: pointer; }
+
+/* G */
+.g-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.g-art { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 56px); z-index: 1; background: var(--band); padding-bottom: 12px; display: grid; gap: 10px; }
+.g-art .tw { aspect-ratio: auto; height: min(38svh, 340px); }
+.g-steps { display: grid; gap: 30svh; padding: 6svh 0 30svh; margin: 0; list-style: none; }
+.g-step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; opacity: 0.45; transition: opacity 0.3s ease; }
+.g-step.on { opacity: 1; }
+@media (min-width: 860px) {
+  .g-grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; }
+  .g-art { align-self: start; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+  .g-art .tw { height: auto; aspect-ratio: 1 / 1; }
+  .g-steps { gap: 40svh; padding-block: 25svh 35svh; }
+}
+
+.pick { background: var(--accent-tint); border: 1px solid var(--accent); border-radius: 14px; padding: clamp(16px, 3vw, 28px); display: grid; gap: 10px; }
+.pick p { max-width: 70ch; }
+.qs { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+footer { padding-block: 40px 64px; color: var(--muted); font-size: 0.9rem; }
+@media (prefers-reduced-motion: reduce) { .g-step { transition: none; } }
+</style>
+
+<template id="tower"><!--TOWER--></template>
+
+<div class="wrap">
+  <header class="intro">
+    <p class="eyebrow">Uplink · Home · "We grow with you" · round 2</p>
+    <h1>Mixing the parts you liked</h1>
+    <p>Round 1 had four separate ideas (<a href="https://claude.ai/artifact/GtZ1QNjvAUyUHbHkEubSqk">see round 1</a>). These three mix them. The building now grows the way it does on the site, piece by piece, not in jumps.</p>
+    <ul class="mix">
+      <li><b>Boxes you tap</b><span>From A and D: three sizes you can see and pick.</span></li>
+      <li><b>Growth you watch</b><span>From today: the office builds itself in front of you.</span></li>
+      <li><b>Your own size</b><span>From B: the visitor finds where they fit.</span></li>
+      <li><b>No scroll lock</b><span>From C: flick past and it's gone.</span></li>
+    </ul>
+  </header>
+</div>
+
+<div class="bar">
+  <div class="wrap">
+    <span class="bar-label" id="mode-label">Picture</span>
+    <div class="seg" role="group" aria-labelledby="mode-label">
+      <button type="button" data-mode="drawn" aria-pressed="false">As drawn today</button>
+      <button type="button" data-mode="new" aria-pressed="true">Highlight what's new</button>
+      <button type="button" data-mode="ghost" aria-pressed="false">Show what's ahead</button>
+    </div>
+    <nav class="bar-jump" aria-label="Jump to option">
+      <a href="#opt-e">E</a><a href="#opt-f">F</a><a href="#opt-g">G</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="opt" id="opt-e" aria-labelledby="e-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">E</span>
+      <div>
+        <h2 id="e-title">Watch it grow, then tap around</h2>
+        <p class="lede">When the section comes on screen it plays once by itself: the office builds from the ground up through all three levels in about ten seconds, and each box fills as its level builds. Tap any box to jump there; the building grows or shrinks to match. The fourth box plays it again. It never holds the page.</p>
+        <div class="from"><span class="chip">Boxes you tap</span><span class="chip">Growth you watch</span><span class="chip">No lock</span></div>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="e-grid">
+        <div class="e-art">
+          <div class="tw" id="e-tw"></div>
+          <div class="hud" aria-hidden="true"><span class="chip chip--accent">Level <span id="e-l">1</span></span><span class="count"><b id="e-n">1</b>people</span></div>
+        </div>
+        <div class="e-side">
+          <div class="copy" id="e-copy" aria-live="polite"></div>
+          <div class="boxes" role="group" aria-label="Team size">
+            <button type="button" class="box" data-l="1" aria-pressed="false"><span class="fill"></span><b>1–10</b><small>Get set up</small></button>
+            <button type="button" class="box" data-l="2" aria-pressed="false"><span class="fill"></span><b>11–50</b><small>Lock it down</small></button>
+            <button type="button" class="box" data-l="3" aria-pressed="false"><span class="fill"></span><b>51–150</b><small>Plan ahead</small></button>
+            <button type="button" class="box box--play" id="e-play"><b><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg><span>Watch it grow</span></b><small>From 1 person to 150</small></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt" id="opt-f" aria-labelledby="f-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">F</span>
+      <div>
+        <h2 id="f-title">The slider plays itself</h2>
+        <p class="lede">On screen, the slider glides from 1 person to 150 on its own: the count climbs and the office grows with it. Grab the slider (or tap a box) and it's yours. The list keeps what you already had and marks what's new at your size.</p>
+        <div class="from"><span class="chip">Your own size</span><span class="chip">Growth you watch</span><span class="chip">Boxes you tap</span></div>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="f-grid">
+        <div class="f-art"><div class="tw" id="f-tw"></div></div>
+        <div class="f-side">
+          <div class="f-q">
+            <label for="f-range">How many people on your team?</label>
+            <div class="f-num" aria-hidden="true"><span id="f-n">1</span><small>people</small></div>
+            <input class="range" id="f-range" type="range" min="0" max="1000" step="1" value="0" aria-valuetext="1 person">
+            <div class="boxes three" role="group" aria-label="Jump to a team size">
+              <button type="button" class="box" data-l="1" aria-pressed="false"><span class="fill"></span><b>1–10</b></button>
+              <button type="button" class="box" data-l="2" aria-pressed="false"><span class="fill"></span><b>11–50</b></button>
+              <button type="button" class="box" data-l="3" aria-pressed="false"><span class="fill"></span><b>51–150</b></button>
+            </div>
+          </div>
+          <div class="copy" id="f-copy" aria-live="polite"></div>
+          <p class="note"><button type="button" class="box box--play" id="f-play"><b><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1l9 5-9 5z"/></svg><span>Play it again</span></b></button></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt" id="opt-g" aria-labelledby="g-title">
+    <div class="opt-head">
+      <span class="letter" aria-hidden="true">G</span>
+      <div>
+        <h2 id="g-title">Scroll grows it, nothing locks</h2>
+        <p class="lede">Today's effect without the hold. The office grows smoothly as the cards scroll past at normal speed. The boxes on the picture show where you are, and a tap jumps to that level. A fast flick goes straight past.</p>
+        <div class="from"><span class="chip">Growth you watch</span><span class="chip">No lock</span><span class="chip">Boxes you tap</span></div>
+      </div>
+    </div>
+    <div class="demo">
+      <div class="g-grid">
+        <div class="g-art">
+          <div class="tw" id="g-tw"></div>
+          <div class="boxes three" role="group" aria-label="Jump to a level">
+            <button type="button" class="box" data-l="1" aria-pressed="false"><span class="fill"></span><b>1–10</b></button>
+            <button type="button" class="box" data-l="2" aria-pressed="false"><span class="fill"></span><b>11–50</b></button>
+            <button type="button" class="box" data-l="3" aria-pressed="false"><span class="fill"></span><b>51–150</b></button>
+          </div>
+        </div>
+        <ol class="g-steps" id="g-steps"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt" aria-labelledby="pick-title">
+    <div class="pick">
+      <p class="eyebrow">My pick this round</p>
+      <h2 id="pick-title">E</h2>
+      <p>It has all four things you liked: people see the growth without doing anything, the boxes give them something to tap, and it never holds the page. The fourth box doubles as a replay, so the animation isn't a one-shot.</p>
+      <p>To narrow it down further, tell me:</p>
+      <ol class="qs">
+        <li>Which one did you watch longest?</li>
+        <li>On your phone, did the autoplay in E or F feel too slow, too fast, or right?</li>
+        <li>Which picture mode, now that it grows smoothly?</li>
+      </ol>
+    </div>
+  </section>
+
+  <footer>Mockups for a decision, not the final build. The growth is the site's own code from <code>home.js</code>, driven by time or the slider instead of the scroll.</footer>
+</div>
+
+<script>
+(() => {
+  const LEVELS = [
+    { size: '1 to 10 people', title: 'Get set up right', text: 'A small team needs things to just work. We set up every laptop, phone and account the same way, and you get one number to call.', items: ['Help desk for every person', 'Microsoft 365 or Google set up and backed up', 'Devices patched and monitored'] },
+    { size: '11 to 50 people', title: 'Lock it down', text: 'More people means more logins to protect. We add round-the-clock security and train your staff to spot a bad email.', items: ['24/7 threat monitoring', 'Email and phishing defence', 'Staff security training'] },
+    { size: '51 to 150 people', title: 'Plan ahead', text: 'Bigger teams need a plan. We map every device and licence, link your offices, and review the budget with you each quarter.', items: ['Multi-site networks', 'Quarterly IT reviews', 'Yearly roadmap and budget'] },
+  ];
+  const TAGS = [
+    { l: 1, a: 'door', t: 'Help desk' }, { l: 1, a: 'mast1', t: 'Backed up' },
+    { l: 2, a: 'ring', t: '24/7 watch' }, { l: 2, a: 'home-a', t: 'Remote staff' },
+    { l: 3, a: 'office', t: 'Second office' }, { l: 3, a: 'cloud', t: 'Cloud' },
+  ];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const clamp = (v) => Math.min(1, Math.max(0, v));
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+  const amt = (p, at, d) => ease(clamp((p - at) / d));
+  const people = (p) => Math.round(p <= 1 ? 1 + 9 * p : p <= 2 ? 10 + 40 * (p - 1) : 50 + 100 * (p - 2));
+  const REST = (n) => n - 0.1;   // q where level n is fully built, its tags showing, the next not started
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  const tpl = $('#tower');
+  const base = tpl.content.querySelector('svg');
+  base.removeAttribute('width'); base.removeAttribute('height');
+  base.insertAdjacentHTML('afterbegin', '<defs><filter id="ux-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#FFAD51" flood-opacity="0.95"/></filter></defs>');
+
+  let mode = 'new';
+  const towers = [];
+
+  // The site's growth (home.js draw), driven by q from 0 (bare ground) to 3 (everything built).
+  function Tower(host, onDraw) {
+    const svg = base.cloneNode(true);
+    host.prepend(svg);
+    const storey = +svg.dataset.storey;
+    const cams = [1, 2, 3].map((k) => svg.dataset['cam' + k].split(' ').map(Number));
+    const floors = $$('.tg-floor', svg).map((el) => ({ el, at: +el.dataset.at, n: +el.dataset.f }));
+    const roof = $('.tg-roof', svg);
+    const pieces = $$('.tg-p', svg).map((el) => ({ el, at: +el.dataset.at, line: $('.tg-cable', el), flow: $('.tg-flow', el) }));
+    const spots = {};
+    $$('.tg-a', svg).forEach((c) => { spots[c.dataset.a] = [+c.getAttribute('cx'), +c.getAttribute('cy')]; });
+    const layer = document.createElement('div');
+    layer.className = 'tags'; layer.setAttribute('aria-hidden', 'true');
+    host.append(layer);
+    const tags = TAGS.map((t) => { const el = document.createElement('span'); el.className = 'tag'; el.textContent = t.t; layer.append(el); return { ...t, el, at: spots[t.a], w: 0, h: 0 }; });
+    let views = cams, W = 0, H = 0, q = 0, goal = 0, rate = 0.5, raf = 0, last = 0, done = null;
+
+    const fit = () => {
+      const r = svg.getBoundingClientRect();
+      W = r.width; H = r.height;
+      tags.forEach((t) => { t.w = t.el.offsetWidth; t.h = t.el.offsetHeight; });
+      if (!W || !H) { views = cams; return; }
+      const scale = (c) => Math.min(W / c[2], H / c[3]);
+      const far = scale(cams[2]);
+      views = cams.map((c, i) => {
+        const s = Math.min(scale(c), far * 1.25 ** (2 - i));
+        const w = W / s, h = H / s;
+        return [c[0] + c[2] / 2 - w / 2, c[1] + c[3] / 2 - h / 2, w, h];
+      });
+    };
+
+    const draw = () => {
+      const ghost = mode === 'ghost', hi = mode === 'new';
+      const L = Math.min(3, Math.floor(q) + 1);
+      const u = q >= 3 ? 1 : q - (L - 1);
+      const b0 = L === 1 ? 0.05 : 0.25, b1 = L === 1 ? 0.65 : 0.75;
+      const p = L - 1 + clamp((u - b0) / (b1 - b0));
+      const k = L === 1 ? 0 : reduce ? 1 : ease(clamp((u - 0.08) / 0.17));
+      const vb = ghost ? views[2] : views[Math.max(0, L - 2)].map((v, i) => v + (views[L - 1][i] - v) * k);
+      svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+
+      let built = 0, top = 0;
+      floors.forEach((f, i) => {
+        const a = amt(p, f.at, 0.55);
+        built += a;
+        if (a > 0.85) top = i + 1;
+        f.el.style.opacity = ghost ? Math.max(a, 0.14) : a;
+        f.el.style.transform = ghost ? '' : `translateY(${(-30 * (1 - a)).toFixed(1)}px)`;
+        f.el.classList.toggle('is-new', hi && L > 1 && f.n === L && a > 0);
+      });
+      roof.style.opacity = ghost ? 1 : clamp(amt(p, 0, 0.55) * 2);
+      roof.style.transform = `translateY(${((floors.length - built) * storey).toFixed(1)}px)`;
+      svg.setAttribute('data-floors', String(Math.max(1, top)));
+      pieces.forEach((pc) => {
+        const a = amt(p, pc.at, 0.4);
+        pc.el.classList.toggle('is-off', pc.line ? a <= 0.98 : a === 0);
+        pc.el.classList.toggle('is-new', hi && L > 1 && pc.at >= L - 1 && pc.at < L && a > 0);
+        if (pc.line) {
+          const g = ghost && a === 0;
+          pc.el.style.opacity = a > 0 ? 1 : g ? 0.14 : 0;
+          pc.line.style.strokeDashoffset = g ? '0' : (1 - a).toFixed(3);
+          pc.flow.style.opacity = a > 0.98 ? 1 : 0;
+        } else {
+          pc.el.style.opacity = ghost ? Math.max(a, 0.14) : a;
+          pc.el.style.transform = ghost ? '' : `translateY(${(-24 * (1 - a)).toFixed(1)}px)`;
+        }
+      });
+
+      const s = Math.min(W / vb[2], H / vb[3]);
+      const ox = (W - vb[2] * s) / 2, oy = (H - vb[3] * s) / 2;
+      const fade = clamp((u - 0.72) / 0.1);
+      tags.forEach((t) => {
+        if (t.l !== L || !W) { t.el.style.opacity = 0; return; }
+        const half = t.w / 2;
+        const x = Math.min(W - half - 8, Math.max(half + 8, ox + (t.at[0] - vb[0]) * s));
+        const y = Math.max(t.h + 18, oy + (t.at[1] - vb[1]) * s);
+        t.el.style.transform = `translate(${(x - half).toFixed(1)}px, ${(y - t.h - 10).toFixed(1)}px)`;
+        t.el.style.opacity = fade;
+        t.el.classList.toggle('new', hi);
+      });
+      if (onDraw) onDraw(q, p, L);
+    };
+
+    const tick = (now) => {
+      const dt = last ? Math.min(64, now - last) : 16;
+      last = now;
+      const stepQ = rate * dt / 1000;
+      q = Math.abs(goal - q) <= stepQ ? goal : q + Math.sign(goal - q) * stepQ;
+      draw();
+      if (q !== goal) raf = requestAnimationFrame(tick);
+      else { raf = 0; const d = done; done = null; if (d) d(true); }
+    };
+    const api = {
+      get q() { return q; },
+      // move q to target at r levels a second; resolves true on arrival, false if something else took over
+      go(target, r = 0.5) {
+        if (done) { const d = done; done = null; d(false); }
+        goal = Math.min(3, Math.max(0, target)); rate = r;
+        if (reduce) { q = goal; draw(); return Promise.resolve(true); }
+        return new Promise((res) => { done = res; if (!raf) { last = 0; raf = requestAnimationFrame(tick); } });
+      },
+      set(v) { if (done) { const d = done; done = null; d(false); } cancelAnimationFrame(raf); raf = 0; q = goal = Math.min(3, Math.max(0, v)); draw(); },
+      redraw() { fit(); draw(); },
+    };
+    fit(); draw();
+    towers.push(api);
+    return api;
+  }
+
+  addEventListener('resize', () => towers.forEach((t) => t.redraw()));
+  if (document.fonts) document.fonts.ready.then(() => towers.forEach((t) => t.redraw()));
+  $$('.seg button').forEach((b) => b.addEventListener('click', () => {
+    mode = b.dataset.mode;
+    $$('.seg button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    towers.forEach((t) => t.redraw());
+  }));
+
+  const copyHTML = (n, cumulative) => {
+    const lv = LEVELS[n - 1];
+    const list = cumulative
+      ? LEVELS.slice(0, n).flatMap((x, i) => x.items.map((it) => `<li class="${i === n - 1 ? 'add' : ''}">${esc(it)}</li>`)).join('')
+      : lv.items.map((it) => `<li class="add">${esc(it)}</li>`).join('');
+    const key = cumulative && n > 1 ? '<p class="key"><span><i class="add"></i>New at this size</span><span><i></i>You already had</span></p>' : '';
+    return `<span class="chip">Level ${n} · ${esc(lv.size)}</span><h3>${esc(lv.title)}</h3><p class="muted">${esc(lv.text)}</p><ul>${list}</ul>${key}`;
+  };
+  const boxFill = (boxes, p, L) => boxes.forEach((b) => {
+    const n = +b.dataset.l;
+    b.querySelector('.fill').style.transform = `scaleX(${clamp(p - (n - 1)).toFixed(3)})`;
+    b.setAttribute('aria-pressed', String(n === L));
+  });
+  // plays when most of the picture is on screen; pauses off screen and picks up where it left off
+  const onScreen = (el, cb) => new IntersectionObserver(([e]) => cb(e.intersectionRatio >= 0.6), { threshold: [0, 0.6] }).observe(el);
+
+  // E: plays once on its own, boxes fill as each level builds, tap to take over, fourth box replays
+  {
+    const boxes = $$('#opt-e .box[data-l]');
+    const play = $('#e-play'), playLabel = $('#e-play span');
+    const copy = $('#e-copy'), lvl = $('#e-l'), num = $('#e-n');
+    let shownL = 0, shownN = '';
+    const tw = Tower($('#e-tw'), (q, p, L) => {
+      boxFill(boxes, p, L);
+      if (L !== shownL) { shownL = L; copy.innerHTML = copyHTML(L); lvl.textContent = L; }
+      const n = String(people(p)); if (n !== shownN) { shownN = n; num.textContent = n; }
+    });
+    let run = 0, playing = false, visible = false, started = false;
+    const setPlaying = (on) => { playing = on; playLabel.textContent = on ? 'Pause' : 'Watch it grow'; play.querySelector('path').setAttribute('d', on ? 'M2 1h3v10H2zM7 1h3v10H7z' : 'M2 1l9 5-9 5z'); };
+    const autoplay = async (fromStart) => {
+      const me = ++run;
+      setPlaying(true);
+      if (fromStart) tw.set(0);
+      for (let n = 1; n <= 3; n++) {
+        if (tw.q >= REST(n)) continue;
+        while (!visible && me === run) await wait(200);
+        if (me !== run) return;
+        if (!(await tw.go(REST(n), 0.42)) || me !== run) return;
+        await wait(n < 3 ? 1400 : 0);
+        if (me !== run) return;
+      }
+      setPlaying(false);
+    };
+    const stop = () => { run++; setPlaying(false); };
+    boxes.forEach((b) => b.addEventListener('click', () => { stop(); tw.go(REST(+b.dataset.l), 0.9); }));
+    play.addEventListener('click', () => { if (playing) { stop(); tw.go(tw.q, 1); } else autoplay(tw.q >= REST(3) - 0.01); });
+    onScreen($('#e-tw'), (on) => {
+      visible = on;
+      if (on && !started && !reduce) { started = true; autoplay(true); }
+    });
+    if (reduce) tw.set(REST(1)); else tw.set(0);
+  }
+
+  // F: the slider moves itself on first view; grabbing it or a box hands it over
+  {
+    const r = $('#f-range'), out = $('#f-n'), copy = $('#f-copy');
+    const boxes = $$('#opt-f .box[data-l]');
+    let shownL = 0, fromSlider = false;
+    const tw = Tower($('#f-tw'), (q, p, L) => {
+      boxFill(boxes, p, L);
+      const n = people(p);
+      out.textContent = n;
+      r.setAttribute('aria-valuetext', `${n} ${n === 1 ? 'person' : 'people'}, level ${L}`);
+      if (!fromSlider) r.value = Math.round(q / 3 * 1000);
+      if (L !== shownL) { shownL = L; copy.innerHTML = copyHTML(L, true); }
+    });
+    let run = 0, visible = false, started = false;
+    const take = () => { run++; };
+    r.addEventListener('pointerdown', take);
+    r.addEventListener('keydown', take);
+    r.addEventListener('input', () => { take(); fromSlider = true; tw.set(+r.value / 1000 * 3); fromSlider = false; });
+    boxes.forEach((b) => b.addEventListener('click', () => { take(); tw.go(REST(+b.dataset.l), 0.9); }));
+    const autoplay = async () => {
+      const me = ++run;
+      tw.set(0);
+      for (let n = 1; n <= 3; n++) {
+        while (!visible && me === run) await wait(200);
+        if (me !== run) return;
+        if (!(await tw.go(REST(n), 0.5)) || me !== run) return;
+        await wait(n < 3 ? 1000 : 0);
+      }
+    };
+    $('#f-play').addEventListener('click', autoplay);
+    onScreen($('#f-tw'), (on) => { visible = on; if (on && !started && !reduce) { started = true; autoplay(); } });
+    tw.set(reduce ? REST(1) : 0);
+  }
+
+  // G: scroll position drives q (smoothed, as home.js does), the page never pins
+  {
+    const list = $('#g-steps');
+    list.innerHTML = LEVELS.map((_, i) => `<li class="g-step copy" data-l="${i + 1}">${copyHTML(i + 1)}</li>`).join('');
+    const steps = [...list.children];
+    const boxes = $$('#opt-g .box[data-l]');
+    let shownL = 0;
+    const tw = Tower($('#g-tw'), (q, p, L) => {
+      boxFill(boxes, p, L);
+      if (L !== shownL) { shownL = L; steps.forEach((s) => s.classList.toggle('on', +s.dataset.l === L)); }
+    });
+    // q climbs from 0 as the first card nears the middle of the screen to 3 as the last card passes it
+    const target = () => {
+      const mid = innerHeight * 0.55;
+      const first = steps[0].getBoundingClientRect(), lastR = steps[2].getBoundingClientRect();
+      const start = first.top + first.height * 0.2, end = lastR.top + lastR.height * 0.6;
+      return Math.min(3, Math.max(0, (mid - start + innerHeight * 0.15) / (end - start + innerHeight * 0.15) * 3));
+    };
+    let frame = 0, cur = null, lastT = 0;
+    const tick = (now) => {
+      frame = 0;
+      const t = target();
+      const dt = lastT ? Math.min(64, now - lastT) : 16; lastT = now;
+      cur = cur === null || reduce ? t : cur + (t - cur) * (1 - Math.exp(-dt / 110));
+      if (Math.abs(t - cur) < 0.0005) cur = t;
+      tw.set(cur);
+      if (cur !== t) frame = requestAnimationFrame(tick);
+    };
+    const kick = () => { if (!frame) { lastT = 0; frame = requestAnimationFrame(tick); } };
+    addEventListener('scroll', kick, { passive: true });
+    boxes.forEach((b) => b.addEventListener('click', () => {
+      const s = steps[+b.dataset.l - 1];
+      s.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+    }));
+    kick();
+  }
+})();
+</script>

@@ -135,5 +135,5 @@ One page per pull request, in this order: every page (A1 to A6), Home, Services,
 
 1. Build `main` and the branch; serve them on two ports.
 2. `python tools/verify_styles.py OLD_URL NEW_URL`: the only differences are the ones the PR means to make.
-3. `python tools/verify_footer.py out/`: no sideways scroll, footer one screen tall, hero and tower working, axe clean.
+3. `python tools/verify_footer.py out/`: no sideways scroll, footer one screen tall, hero and Grow section working, axe clean.
 4. `python tools/verify_spacing.py`: no new off-scale values.
