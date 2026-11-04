@@ -321,8 +321,8 @@ def world():
     # lots: faint dashed footprints where the business will grow (the page shows a step's lot until that step is built)
     LOTS = [(2, [(-5.75, -3.25, 2.75, 5.25)]), (3, [(0.0, 5.0, 4.0, 6.25), (3.75, 5.75, 1.5, 3.5)]), (4, [(2.25, 5.25, -5.75, -2.75)])]
     for n, rects in LOTS:
-        polys = ''.join(f'<polygon points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="{pal.SKY}" fill-opacity="0.05" '
-                        f'stroke="{pal.SKY}" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="6 5"/>' for x0, x1, y0, y1 in rects)
+        polys = ''.join(f'<polygon points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="{pal.SKY}" fill-opacity="0.09" '
+                        f'stroke="{pal.SKY}" stroke-width="1.75" stroke-opacity="0.75" stroke-dasharray="6 5"/>' for x0, x1, y0, y1 in rects)
         s.raw(f'<g class="lot" data-s="{n}">{polys}</g>')
     # on the ground, under everything: the ring, then the cables and the road
     st(5); ring(s, RING, 0)

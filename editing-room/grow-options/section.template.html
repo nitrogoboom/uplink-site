@@ -211,8 +211,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   <div class="ctl">
     <span id="cam-l">Camera</span>
     <div class="seg" role="group" aria-labelledby="cam-l"><button type="button" data-k="camera" data-v="still" aria-pressed="false">Still</button><button type="button" data-k="camera" data-v="follow" aria-pressed="true">Follows growth</button></div>
-    <span id="nav-l">Steps</span>
-    <div class="seg" role="group" aria-labelledby="nav-l"><button type="button" data-k="nav" data-v="hud" aria-pressed="true">A · HUD bar</button><button type="button" data-k="nav" data-v="tiles" aria-pressed="false">B · Tiles</button><button type="button" data-k="nav" data-v="chapters" aria-pressed="false">C · Chapters</button><button type="button" data-k="nav" data-v="pills" aria-pressed="false">Pills (old)</button></div>
     <span id="lot-l">Future lots</span>
     <div class="seg" role="group" aria-labelledby="lot-l"><button type="button" data-k="lots" data-v="1" aria-pressed="true">Show</button><button type="button" data-k="lots" data-v="0" aria-pressed="false">Hide</button></div>
   </div>
@@ -435,6 +433,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     opts[k] = k === 'lots' ? b.dataset.v === '1' : b.dataset.v;
     $$(`.mock .ctl button[data-k="${k}"]`).forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     screens.forEach((s) => s.refresh());
+    if (k === 'lots') { stop(); go(-1, false); play(); }   // lots only show on ground not built yet: replay so the difference shows
   }));
   if (reduce) go(LAST, false); else go(-1, false);
   icon();
