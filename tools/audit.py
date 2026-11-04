@@ -34,7 +34,7 @@ fails. Needs: pip install -r requirements.txt; python -m playwright install chro
 import asyncio, json, os, re, subprocess, sys, time, urllib.request
 from pathlib import Path
 from playwright.async_api import async_playwright
-from site_pages import MISSING, pages
+from site_pages import MISSING, UA, pages
 
 ARGS = sys.argv[1:]
 BASE = ARGS[ARGS.index('--base') + 1] if '--base' in ARGS else 'http://localhost:8787'
@@ -477,12 +477,11 @@ def validate(req):
 def html(paths):
     css = set()
     for path in paths if HTML_ALL else ['/']:
-        page = urllib.request.urlopen(urllib.request.Request(BASE + path)).read() if MISSING not in path else None
-        if page is None:  # the 404 answers with an error status; read its body anyway
-            try:
-                urllib.request.urlopen(BASE + path)
-            except urllib.error.HTTPError as e:
-                page = e.read()
+        # the 404 answers with an error status; its body is the page all the same
+        try:
+            page = urllib.request.urlopen(urllib.request.Request(BASE + path, headers=UA)).read()
+        except urllib.error.HTTPError as e:
+            page = e.read()
         req = urllib.request.Request(
             'https://validator.w3.org/nu/?out=json',
             data=page,
