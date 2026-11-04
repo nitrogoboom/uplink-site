@@ -35,6 +35,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Desktop gaps: Home and About done (About 3 Nov 2026: "How we work" is a short band at its own height, Team one screen on desktop and its own height below). Rule agreed 2 Nov 2026: on desktop a section is one screen (`.fold`) when it has enough to fill it, and a short band keeps its own height; below desktop a section takes its own height, except `.fold-always` (the hero and each page's first screen). Next: Contact (Support), Services (Faq) and Work (Projects), which still carry `fold-always` past their first screen. Classes in `src/styles/layout.css`, desktop rules in `fold.css`.
 
 ## Drawings
+- [ ] 404 page: a three-panel heist comic, draft in `editing-room/404-comic/` (branch `404-comic-draft`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 - [ ] Grow world: tune on a real iPhone and Android phone. Timing is in `home.js` (`LEAD`, `ZOOM` and the phase points) and `--grow-run` in `grow.css` (screens of scroll per level, which `home.js` reads).
 - [ ] Grow world on desktop: at level 3 it leaves empty space either side of the left column. Fine for now; a wider level 3 layout would need its own phone cut.
