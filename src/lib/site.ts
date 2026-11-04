@@ -5,7 +5,8 @@
 //   getServices(), getProjects()  the collections in their own order.
 //   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
 //   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
-//   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout).
+//   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout); created(): when first added.
+//   businessNode()  the business in short, for the JSON-LD of every page but Home.
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 //   NAV         the main tabs in order: the header and the phone tab bar read it.
 //   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
@@ -86,6 +87,9 @@ export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 // JSON-LD for a <script type="application/ld+json">: one space per level, and </ escaped so the text can never
 // close the script early.
 export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/<\//g, '<\\/');
+// The business in short, for every page's graph but Home's (whose own block, index.astro, has the rest): a reader
+// of one page alone can still name the provider and publisher the page points at by @id.
+export const businessNode = (site: URL) => ({ '@type': 'ProfessionalService', '@id': `${site.href}#business`, name: 'Uplink Technology', url: site.href });
 // A BreadcrumbList from [name, address] pairs, Home first.
 export const breadcrumbs = (trail: [string, string][]) => ({ '@type': 'BreadcrumbList',
   itemListElement: trail.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })) });
@@ -113,6 +117,16 @@ export function lastmod(paths: string[]): string | undefined {
   try {
     const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...paths], { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
     return out ? out.slice(0, 10) : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** ISO date of the first commit that added any of the paths (the oldest), or undefined outside a git checkout. */
+export function created(paths: string[]): string | undefined {
+  try {
+    const out = execFileSync('git', ['log', '--diff-filter=A', '--format=%cI', '--', ...paths], { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return out ? out.split('\n').pop()!.slice(0, 10) : undefined;
   } catch {
     return undefined;
   }

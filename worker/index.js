@@ -1,5 +1,5 @@
 // The site's one Worker script. Everything else is the built site in dist/, served as static assets: wrangler.jsonc
-// sends only /api/* here first (run_worker_first).
+// sends only /api/* and /404 here first (run_worker_first).
 //
 // POST /api/report: problems real visitors' browsers hit, so we hear about them.
 //   CSP blocks       the browser posts these itself (public/_headers: report-to csp, report-uri for older browsers)
@@ -10,6 +10,10 @@
 // code never logs the IP address or form contents, though Cloudflare's own record of each Worker run carries the
 // request's headers, IP included (kept 3 days on the free plan, 7 on paid). A body over 8 KB, or more than 20
 // reports in one post, is dropped.
+// Only this site's reports count: a post whose Origin header is another site's gets 403, a script error needs our own
+// Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. Each visitor address
+// may post 30 times a minute (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past
+// that, 429. Without the binding (the tests) there is no limit.
 //
 // PR #38 adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
 
@@ -51,21 +55,37 @@ function records(type, body) {
   return [];
 }
 
-async function report(request) {
+async function report(request, env) {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { Allow: 'POST' } });
+  const site = new URL(request.url).origin;
+  const origin = request.headers.get('Origin');
+  if (origin && origin !== site) return new Response(null, { status: 403 });
+  if (env?.REPORTS) {
+    const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
+    if (!success) return new Response(null, { status: 429 });
+  }
   const text = await request.text();
   if (text.length > MAX_BODY) return new Response(null, { status: 413 });
   let body;
   try { body = JSON.parse(text); } catch { return new Response(null, { status: 400 }); }
   const ua = cut(request.headers.get('User-Agent'), 200);
-  for (const r of records(request.headers.get('Content-Type') || '', body)) console.log(JSON.stringify({ report: r, ua }));
+  const ours = (r) => (r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`));
+  for (const r of records(request.headers.get('Content-Type') || '', body).filter(ours)) console.log(JSON.stringify({ report: r, ua }));
   return new Response(null, { status: 204 });
 }
 
+// /404 itself: the not-found page is a built file (dist/404.html), so asked for by name it would come back 200.
+// wrangler.jsonc sends /404 here too; the same page goes back with the status it describes.
+async function notFoundPage(request, env) {
+  const page = await env.ASSETS.fetch(request);
+  return new Response(page.body, { status: 404, headers: page.headers });
+}
+
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const { pathname } = new URL(request.url);
-    if (pathname === '/api/report') return report(request);
+    if (pathname === '/api/report') return report(request, env);
+    if (pathname === '/404') return notFoundPage(request, env);
     return new Response('Not found', { status: 404 });
   },
 };

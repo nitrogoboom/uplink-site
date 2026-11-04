@@ -5,7 +5,7 @@
 import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
-import { PAGES, breadcrumbs, jsonLd } from '../../lib/site';
+import { PAGES, breadcrumbs, businessNode, created, jsonLd, lastmod } from '../../lib/site';
 import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
@@ -17,14 +17,18 @@ const { id, data: p } = project;
 const url = new URL(`/work/${id}`, Astro.site).href;
 const description = `${p.client}. ${p.result}.`;   // as the sitemap list and llms.txt say it (allPages in src/lib/site.ts)
 const services = await getEntries(p.services);
+const business = { '@id': `${Astro.site!.href}#business` };
+const source = `src/content/projects/${id}.json`;   // the case study's dates: when its entry was added and last changed
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
     { '@type': 'Article', '@id': url, url, headline: p.name, description, inLanguage: 'en-CA',
-      publisher: { '@id': `${Astro.site!.href}#business` },
+      author: business, publisher: business, image: new URL('/assets/img/og.png', Astro.site).href,
+      datePublished: created([source]), dateModified: lastmod([source]),
       about: services.map((s) => ({ '@id': new URL(`/services/${s.id}`, Astro.site).href })),
       articleBody: [...p.page.challenge, ...p.page.steps.map((t) => `${t.title}. ${t.detail}`), ...p.page.results].join('\n\n') },
     breadcrumbs([[PAGES.home.name, Astro.site!.href], [PAGES.work.name, new URL(PAGES.work.path, Astro.site).href], [p.name, url]]),
+    businessNode(Astro.site!),
   ],
 };
 ---

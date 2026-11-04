@@ -8,7 +8,7 @@ import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
 import ProjectCard from '../../components/work/ProjectCard.astro';
 import '../../components/services/service-page.css';
-import { PAGES, getServices, getProjects, breadcrumbs, jsonLd } from '../../lib/site';
+import { PAGES, getServices, getProjects, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
 
 export async function getStaticPaths() {
   const services = await getServices();
@@ -28,6 +28,7 @@ const ld = {
     { '@type': 'FAQPage', '@id': `${url}#questions`, url, inLanguage: 'en-CA',
       mainEntity: s.page.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
     breadcrumbs([[PAGES.home.name, Astro.site!.href], [PAGES.services.name, new URL(PAGES.services.path, Astro.site).href], [s.title, url]]),
+    businessNode(Astro.site!),
   ],
 };
 ---

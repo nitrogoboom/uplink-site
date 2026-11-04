@@ -50,7 +50,7 @@ import { phone, email } from '../../data/footer.json';
               </div>
               <div class="field">
                 <label for="c-email">Work email</label>
-                <input class="input" id="c-email" type="email" autocomplete="email" placeholder="you@company.com" required>
+                <input class="input" id="c-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" autocomplete="email" placeholder="you@company.com" required>
                 <span class="field-error" id="c-email-err">Enter an email like name@company.com.</span>
               </div>
               <div class="field">
