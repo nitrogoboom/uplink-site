@@ -19,8 +19,11 @@ What each part does (every page in the sitemap, plus /soon and the 404 page):
              way to stop (WCAG 2.2.2), and nothing may flash more than 3 times a second (2.3.1).
   forms      Submits each form empty, then with a bad email: is each error in words, tied to its field
              (aria-describedby or the field's own message), and does focus go to the first problem?
-  html       Sends each built page's HTML to the W3C Nu validator (validator.w3.org/nu) and lists its errors.
-             The pages are public anyway; nothing else leaves this machine.
+  html       Sends Home's HTML to the W3C Nu validator (validator.w3.org/nu) and lists its errors; --html-all sends
+             every page. The pages are public anyway; nothing else leaves this machine. W3C's free service limits
+             requests per address: on 3 Nov 2026 a day of repeated full runs (20 pages each) got "429 Too Many
+             Requests". So it's Home only by default (one request a run), and while fixing things, skip it:
+             --only browsers,keyboard,reader,motion,forms.
 
 Writes out/audit/report.md (the summary to paste into docs/releases/) and, per page, the reader transcript and the
 keyboard stops in out/audit/reader/ and out/audit/keyboard/, screenshots in out/audit/shots/. Exits 1 if anything
@@ -37,6 +40,7 @@ ARGS = sys.argv[1:]
 BASE = ARGS[ARGS.index('--base') + 1] if '--base' in ARGS else 'http://localhost:8787'
 PARTS = ['browsers', 'keyboard', 'reader', 'motion', 'forms', 'html']
 ONLY = ARGS[ARGS.index('--only') + 1].split(',') if '--only' in ARGS else PARTS
+HTML_ALL = '--html-all' in ARGS  # W3C for every page, not just Home (20 requests to a rate-limited free service)
 OUT = Path('out/audit')
 VSR = Path('out/vsr.js')
 LANES = 4  # pages checked at once
@@ -472,7 +476,7 @@ def validate(req):
 
 def html(paths):
     css = set()
-    for path in paths:
+    for path in paths if HTML_ALL else ['/']:
         page = urllib.request.urlopen(urllib.request.Request(BASE + path)).read() if MISSING not in path else None
         if page is None:  # the 404 answers with an error status; read its body anyway
             try:

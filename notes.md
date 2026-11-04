@@ -7,7 +7,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
-- [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks), and rerun `npm run release-audit -- --only html` once W3C stops rate-limiting.
+- [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks), and the W3C step (a cloud session is running it from another address, 3 Nov 2026; its result lands in the record).
 - [ ] Have `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (it was written from memory).
 - [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 

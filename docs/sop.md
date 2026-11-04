@@ -79,7 +79,9 @@ Do it on the PR preview or the live site. Tick each box, and write a short note 
 - [ ] **200% text (1.4.4):** `verify_text.py`, all clear.
 - [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves; with it off, the pause button stops every loop, and nothing loops faster than 3 times a second.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email: every problem field has its message in words, tied to the field, and focus goes to the first one.
-- [ ] **HTML (4.1.1):** every page through the W3C validator, no HTML errors. (Its CSS checker doesn't know some current CSS yet; the report lists those once and doesn't count them. If W3C answers "too many requests", rerun later with `npm run release-audit -- --only html`.)
+- [ ] **HTML (4.1.1):** Home through the W3C validator, no HTML errors (every page with `-- --html-all`, when a release changes the other pages' markup). Its CSS checker doesn't know some current CSS yet; the report lists those once and doesn't count them.
+
+Go easy on W3C: it's a free service that limits requests per address, and a day of repeated full runs got "429 Too Many Requests" on 3 Nov 2026. While fixing things, rerun only the parts you need, without html: `npm run release-audit -- --only browsers,keyboard,reader,motion,forms`. Run html once, at the end.
 
 ### C. By hand (15 min)
 
