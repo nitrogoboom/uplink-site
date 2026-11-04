@@ -169,6 +169,44 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   [data-nav="chapters"] .pill[aria-pressed="true"] .nm { color: var(--c-text); }
 }
 
+/* ---- phones: keep the picture and the words about it on one screen (three layouts to compare: data-phone) ----
+   The heading scrolls away first; then the HUD, the picture and the words share one screen (--fold-h, the screen
+   under the header and the tab bar). */
+.cap { display: none; }
+.phone-opt { display: none; }
+@media (max-width: 699px) {
+  .phone-opt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: var(--sp-4); font: 600 12px/1 'Barlow', sans-serif; color: var(--c-muted); }
+  .phone-opt button { font: 600 12px/1 'Barlow', sans-serif; color: var(--c-muted); background: var(--c-surface); border: 1px solid var(--c-line-2); border-radius: 999px; padding: 8px 10px; cursor: pointer; }
+  .phone-opt button[aria-pressed="true"] { background: var(--c-accent); border-color: var(--c-accent); color: var(--c-on-accent); }
+  .grow-x[data-phone] .steps { order: 1; }
+  .grow-x[data-phone] .stage { order: 2; }
+  .grow-x[data-phone] .card { order: 3; }
+  .grow-x[data-phone] .in { row-gap: var(--sp-3); }
+  .grow-x[data-phone] .m-head { margin-bottom: var(--sp-3); }
+  /* 1: one screen: HUD, picture, full card; the picture takes what's left */
+  .grow-x[data-phone="screen"] .stage { aspect-ratio: auto; height: clamp(15rem, calc(var(--fold-h) - 22rem), calc(100vw - 2rem)); }
+  /* 2: caption on the picture: a taller picture, the words on it one sentence at a time; the card stays for screen readers */
+  .grow-x[data-phone="caption"] .stage { aspect-ratio: auto; height: clamp(22rem, calc(var(--fold-h) - 7.5rem), 40rem); }
+  .grow-x[data-phone="caption"] .scene svg { inset: 2% 4% 22%; height: 76%; }
+  .grow-x[data-phone="caption"] .card { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); min-height: 0; }
+  .grow-x[data-phone="caption"] .cap { display: grid; gap: var(--sp-1); position: absolute; left: 0.75rem; right: 4.25rem; bottom: 0.75rem; z-index: 1; padding: var(--sp-3) var(--sp-4); border-radius: 0.75rem; background: rgb(14 26 39 / 0.9); border: 1px solid var(--c-line-2); }
+  .cap-l { font: 600 var(--fs-1)/1 'Barlow Condensed', sans-serif; letter-spacing: 0.12em; text-transform: uppercase; display: flex; align-items: center; gap: 0.5em; color: var(--c-sky); }
+  .cap-l i { width: 0.6em; height: 0.6em; border-radius: 2px; background: currentColor; }
+  .cap[data-k="risk"] .cap-l { color: var(--c-alert); }
+  .cap[data-k="fix"] .cap-l { color: var(--c-ok); }
+  .cap-t { font-size: var(--fs-3); line-height: 1.4; color: var(--c-text); }
+  .cap[data-k="title"] .cap-t { font: 700 var(--fs-5)/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+  .cap > * { transition: opacity 0.3s ease; }
+  .cap.swap > * { opacity: 0; }
+  /* 3: one line under: like 1, but the card shows only the sentence for this moment */
+  .grow-x[data-phone="line"] .stage { aspect-ratio: auto; height: clamp(16rem, calc(var(--fold-h) - 17rem), calc(100vw - 2rem)); }
+  .grow-x[data-phone="line"] .card { min-height: 8.5rem; }
+  .grow-x[data-phone="line"] .card .cols { grid-template-columns: 1fr; }
+  .grow-x[data-phone="line"] .card[data-beat="build"] .row, .grow-x[data-phone="line"] .card[data-beat="risk"] .handle,
+  .grow-x[data-phone="line"] .card[data-beat="fix"] .watch, .grow-x[data-phone="line"] .card[data-beat="both"] .watch { display: none; }
+  .grow-x[data-phone="line"] .card .row { opacity: 1; }
+}
+
 /* the dome: its rim breathes once it's up */
 @keyframes rim { 50% { stroke-opacity: 0.35; } }
 .scene .dome-rim { animation: rim 2.4s ease-in-out infinite; }
@@ -191,7 +229,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 <section class="stub band"><div class="container"><h2 class="m-h">Services</h2><p>The section before (stand-in).</p><div class="row"><div></div><div></div><div></div></div></div></section>
 
-<section class="grow" id="grow" aria-labelledby="grow-h"><div class="container"><div class="grow-x"></div></div></section>
+<section class="grow" id="grow" aria-labelledby="grow-h"><div class="container">
+  <div class="phone-opt" role="group" aria-label="Phone layout (mockup only)"><span>Mockup · phone layout:</span><button type="button" data-p="screen" aria-pressed="false">1 · One screen</button><button type="button" data-p="caption" aria-pressed="true">2 · Caption on picture</button><button type="button" data-p="line" aria-pressed="false">3 · One line under</button></div>
+  <div class="grow-x" data-phone="caption"></div>
+</div></section>
 
 <section class="stub"><div class="container"><h2 class="m-h">Our work</h2><p>The section after (stand-in).</p><div class="row"><div></div><div></div><div></div></div></div></section>
 
@@ -249,6 +290,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       </div>
       <div class="card" aria-live="polite"></div>
       <div class="stage"><div class="scene on"><span class="s-title"></span><span class="step-n"></span>${WORLD}${TAGS.map((tags, i) => tags.map((t, k) => `<span class="tag" data-step="${i}" data-k="${k}"><span class="ico">!</span><span class="tx">${esc(t.r)}</span></span>`).join('')).join('')}</div>
+        <div class="cap" aria-hidden="true"><span class="cap-l"></span><p class="cap-t"></p></div>
         <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg><svg class="ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" pathLength="100"/></svg></button></div>
     </div>`;
     if (host.dataset.layout !== 'desk') {   // phone and tablet order: heading, picture, pills, card
@@ -318,8 +360,23 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       });
     };
     // beat: 'risk' (red tags, card on Watch for) or 'fix' (green tags, card on We handle), for the newest step only
+    const cap = host.querySelector('.cap'), capL = host.querySelector('.cap-l'), capT = host.querySelector('.cap-t');
+    // the caption on the picture (phone layout 2): the step's title while it builds, then what to watch for, then what we do
+    const setCap = (k, animate) => {
+      const p = PLACES[Math.max(0, built)];
+      const fill = () => {
+        cap.dataset.k = k;
+        capL.innerHTML = k === 'risk' ? '<i></i>Watch for' : k === 'fix' ? '<i></i>We handle' : `0${built + 1} / 0${PLACES.length}`;
+        capT.textContent = k === 'risk' ? p.watch : k === 'fix' ? p.handle : p.title;
+        cap.classList.remove('swap');
+      };
+      if (!animate) { fill(); return; }
+      cap.classList.add('swap');
+      setTimeout(fill, 250);
+    };
     const beat = (b, animate) => {
       card.dataset.beat = b;
+      setCap(b, animate);
       tags.forEach((t) => {
         const on = t.step === built;
         t.el.classList.toggle('show', on);
@@ -355,12 +412,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       showLots();
       camTo(target(i), animate);
       count(i < 0 ? 0 : TEAM[i], animate);
-      if (i < 0) { card.innerHTML = ''; title.textContent = ''; card.dataset.beat = 'build'; }
+      if (i < 0) { card.innerHTML = ''; title.textContent = ''; card.dataset.beat = 'build'; capL.textContent = ''; capT.textContent = ''; }
       else {
         const p = PLACES[i];
         title.textContent = p.pill;
         card.innerHTML = `<h3>${esc(p.title)}</h3><div class="cols"><div class="row watch"><span class="lbl"><i></i>Watch for</span><p>${esc(p.watch)}</p></div><div class="row handle"><span class="lbl"><i></i>We handle</span><p>${esc(p.handle)}</p></div></div>`;
-        if (animate) card.dataset.beat = 'build'; else { card.dataset.beat = 'both'; beat('fix', false); }
+        if (animate) { card.dataset.beat = 'build'; setCap('title', true); } else { card.dataset.beat = 'both'; beat('fix', false); }
       }
       pills.forEach((b, j) => {   // the pills fill as the business grows
         b.setAttribute('aria-pressed', String(j === i));
@@ -418,6 +475,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       screens.forEach((x) => x.host.querySelector('.stage').classList.toggle('paused', !playing));   // pause stops the flowing cables too
     });
   });
+  document.querySelectorAll('.phone-opt button').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('.grow-x').forEach((g) => { g.dataset.phone = b.dataset.p; });
+    document.querySelectorAll('.phone-opt button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    requestAnimationFrame(() => screens.forEach((s) => s.place()));
+  }));
   if (reduce) go(LAST, false); else go(-1, false);
   icon();
   requestAnimationFrame(() => screens.forEach((s) => s.place()));
