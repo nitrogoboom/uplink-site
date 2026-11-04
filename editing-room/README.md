@@ -1,6 +1,10 @@
 # Editing room
 
-Finished side jobs. Nothing here is part of the site build.
+Side jobs, finished or in progress. Nothing here is part of the site build.
+
+## `404-comic/` (draft, in progress)
+
+A three-panel heist comic for the 404 page. Script, status and next steps in its `README.md`.
 
 ## `palette/` (done, applied 28 Oct 2026)
 
