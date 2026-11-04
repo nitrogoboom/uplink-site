@@ -18,7 +18,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Privacy and accessibility pages (3 Nov 2026; sources and the full list in `docs/privacy-and-accessibility-2026-11-03.md`)
 - [ ] Real inboxes for `privacy@`, `accessibility@` and `security@` (placeholders in `src/data/footer.json`, `inboxes`), and a postal code for the office address.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
-- [ ] Reply times on the accessibility page (2 business days to acknowledge, 10 to answer) are a proposal: keep or change.
+- [ ] Before launch, the accessibility page needs back two short lines Ontario requires (O. Reg. 191/11; cut 3 Nov 2026 as too much for the mockup): what happens after someone sends feedback (s. 80.50(2), e.g. reply times) and that accessible formats are available on request at no cost (s. 12(3)). Sources in `docs/privacy-and-accessibility-2026-11-03.md`.
 - [ ] "Few people at Uplink can open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
 - [ ] AODA compliance report: under 50 staff, but organizations with 20 or more staff in Ontario file one every three years (from memory, unverified; the site says 22 technicians). Check whether it applies.
 

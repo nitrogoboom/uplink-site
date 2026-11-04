@@ -39,20 +39,4 @@ We welcome feedback on how accessible our site and our services are. You can rea
 - Mail: Accessibility, Uplink Technology, {street}, {city}, ON
 - The [contact form](/contact#message), once it sends
 
-Tell us the page and what got in the way, if you can. You don't have to.
-
-What happens next:
-
-1. We reply within 2 business days to say we have it.
-2. Within 10 business days, we tell you what we'll do and when. If you raised a barrier, we fix it or give you another way to get what you need.
-3. If you need your answer in a certain format, say so and we'll use it.
-
-You can ask us for a copy of this feedback process.
-
-## Accessible formats and communication supports
-
-On request, we provide our information in an accessible format, or with communication supports. Examples are large print, an accessible electronic file, plain-language versions, braille, captions or a sign language interpreter. We work with you to find the format that suits you, and we provide it in good time. There's no cost to you.
-
-To ask, email [{accessibility}](mailto:{accessibility}) or call [{phone}](tel:{tel}).
-
 Last updated: 3 November 2026
