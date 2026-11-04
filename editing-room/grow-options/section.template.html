@@ -106,6 +106,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   .card .cols { grid-template-columns: 1fr 1fr; }
   .stage { grid-column: 2; grid-row: 1 / 4; width: auto; height: min(calc(var(--fold-h) - 2 * var(--sp-6)), 48rem); }
 }
+/* the dome: its rim breathes once it's up */
+@keyframes rim { 50% { stroke-opacity: 0.35; } }
+.scene .dome-rim { animation: rim 2.4s ease-in-out infinite; }
 /* always some life in it: data runs along the cables, the lots and the ring creep (one dash period per loop) */
 @keyframes flow8 { to { stroke-dashoffset: -16; } }
 @keyframes flow10 { to { stroke-dashoffset: -20; } }
@@ -116,7 +119,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .scene [stroke-dasharray="6 5"] { animation: flow11 2.6s linear infinite; }
 .scene [stroke-dasharray="6 6"] { animation: flow12 3s linear infinite; }
 .stage.paused * { animation-play-state: paused !important; }
-@media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } .scene [stroke-dasharray] { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .pc, .tag, .lot, .card .row { transition: none; } .scene [stroke-dasharray], .scene .dome-rim { animation: none; } }
 
 /* mockup controls, not part of the design */
 .mock { position: fixed; right: 12px; bottom: calc(12px + var(--botnav-h)); z-index: 30; background: var(--c-solid); border: 1px solid var(--c-line-2); border-radius: 12px; padding: 8px 12px; font: 400 13px/1.3 'Barlow', sans-serif; color: var(--c-muted); max-width: calc(100vw - 24px); }
@@ -160,6 +163,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     { pill: 'On the road', title: 'Sales hit the road', watch: 'A laptop left in a cab, café Wi-Fi, files needed on a phone.', handle: 'Encrypted devices we can wipe from here, and safe access to files from anywhere.' },
     { pill: 'Second office', title: 'A second office opens', watch: 'Two networks, two phone systems, files people can\'t find.', handle: 'Both sites linked, one phone system, the same setup in every office.' },
     { pill: 'All of it', title: 'One team, wherever they work', watch: 'Too many apps and accounts, no plan, surprise bills.', handle: 'One map of every device and licence, and a budget review each quarter.' },
+    { pill: 'Covered', title: 'All of it, covered', watch: 'One gap is all an attacker needs, and the bill lands on you.', handle: 'Every place watched 24/7 under one plan, backed by our cyber warranty.' },
   ];
   const DWELL = 4500, RISK_AT = 900, FIX_AT = 2300;   // a step every 4.5 s: built by about 0.9 s, risks in red, fixes in green from 2.3 s
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -174,9 +178,10 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     [{ a: 's3a', r: 'Laptop left in the car', f: 'Wiped from here' }, { a: 's3b', r: 'Café Wi-Fi', f: 'Safe access anywhere' }],
     [{ a: 's4a', r: 'Two networks', f: 'Sites linked' }, { a: 's4b', r: 'Two phone systems', f: 'One phone system' }],
     [{ a: 's5a', r: 'Too many accounts', f: 'One map of it all' }, { a: 's5b', r: 'Surprise bills', f: 'Budget reviewed quarterly' }],
+    [{ a: 's6a', r: 'Who pays if it goes wrong?', f: 'Cyber warranty' }, { a: 's6b', r: 'Gaps between tools', f: '24/7 watch, one plan' }],
   ];
   const opts = { camera: 'follow', lots: true };
-  const TEAM = [8, 15, 25, 60, 120];   // team size at each step (my guesses)
+  const TEAM = [8, 15, 25, 60, 120, 120];   // team size at each step (my guesses)
   const GLOW = '<defs><filter id="ux-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#FFAD51" flood-opacity="0.95"/></filter></defs>';
   const WORLD = document.getElementById('world').innerHTML.replace(' id="plain"', '').replace(/(<svg[^>]*>)/, `$1${GLOW}`);
 

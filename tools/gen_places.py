@@ -12,7 +12,7 @@ import sys, pathlib
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, ORANGE, BLUE, INK, EDGE, silhouette, floor_grid, disc_arcs, doc, write
+from isogen import FACES, HIGH, ORANGE, BLUE, INK, EDGE, silhouette, floor_grid, disc_arcs, ellipse, doc, write
 from isoprops import tree
 import palette as pal
 
@@ -279,46 +279,73 @@ def everything():
     return s
 
 
+RING = 8.25                           # the security ring round the whole business (world units); the dome sits on it
+
+
+def dome(s, R, o):
+    """The finale: a glass dome over the ring. A hemisphere in true iso: its outline is the top half of a circle as
+    wide as the ring's ellipse, closed by the ring's front half. Two latitude rings, a third and two thirds up."""
+    s.group(o)
+    cx, cy = w.p(0, 0, 0)
+    rx, ry = R * w.u * 1.5 ** 0.5, R * w.u / 2 ** 0.5
+    top = f'M{fmt(cx - rx)},{fmt(cy)}A{fmt(rx)},{fmt(rx)} 0 0 1 {fmt(cx + rx)},{fmt(cy)}'
+    s.raw(f'<linearGradient id="dome-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{pal.SKY}" stop-opacity="0.3"/>'
+          f'<stop offset="1" stop-color="{pal.SKY}" stop-opacity="0.05"/></linearGradient>')
+    s.raw(f'<path class="dome" d="{top}A{fmt(rx)},{fmt(ry)} 0 0 1 {fmt(cx - rx)},{fmt(cy)}Z" fill="url(#dome-g)"/>')
+    for k in (1 / 3, 2 / 3):
+        h = R * k
+        s.raw(ellipse(w, (R * R - h * h) ** 0.5, 0, 0, h, f'class="dome-lat" fill="none" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.3"'))
+    s.raw(f'<path class="dome-rim" d="{top}" fill="none" stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.85"/>')
+    s.end()
+    s.points.append((cx, cy - rx))
+    return (0, 0, R)
+
+
 def world():
-    """One world that grows in five steps (round 7): 1 the office, 2 a home, 3 the road (a car and a café),
-    4 a second office, 5 the ring and the cloud over all of it. Every part carries data-s, the step it arrives on;
-    nothing moves or rebuilds, later steps only add. Drawn back to front whatever the step (painter order)."""
-    s = Scene('world', 'A business that grows: the office, then a home, a car and café, a second office, and the cloud over it all', (0, 0, 8.5))
+    """One world that grows in six steps: 1 the office, 2 a home, 3 the road (a car and a café), 4 a second office,
+    5 the ring and the cloud over all of it, 6 the dome over the ring. Every part carries data-s, the step it arrives
+    on; nothing moves or rebuilds, later steps only add. Drawn back to front whatever the step (painter order).
+    The ring lies on the ground under everything, and everything stands inside it."""
+    s = Scene('world', 'A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it', (0, 0, 9))
     st = lambda n: setattr(s, 'step', n)
     # lots: faint dashed footprints where the business will grow (the page shows a step's lot until that step is built)
-    for n, (x0, x1, y0, y1) in [(2, (-5.75, -3.25, 2.75, 5.25)), (3, (0.25, 6.0, 1.5, 6.5)), (4, (2.75, 5.75, -6.25, -3.25))]:
-        s.raw(f'<g class="lot" data-s="{n}"><polygon points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" '
-              f'fill="{pal.SKY}" fill-opacity="0.05" stroke="{pal.SKY}" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="6 5"/></g>')
-    # cables on the floor, under everything
+    LOTS = [(2, [(-5.75, -3.25, 2.75, 5.25)]), (3, [(0.0, 5.0, 4.0, 6.25), (3.75, 5.75, 1.5, 3.5)]), (4, [(2.25, 5.25, -5.75, -2.75)])]
+    for n, rects in LOTS:
+        polys = ''.join(f'<polygon points="{w.pts((x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0))}" fill="{pal.SKY}" fill-opacity="0.05" '
+                        f'stroke="{pal.SKY}" stroke-width="1.5" stroke-opacity="0.55" stroke-dasharray="6 5"/>' for x0, x1, y0, y1 in rects)
+        s.raw(f'<g class="lot" data-s="{n}">{polys}</g>')
+    # on the ground, under everything: the ring, then the cables and the road
+    st(5); ring(s, RING, 0)
     st(2); link(s, [(-1.5, 0.0), (-4.5, 0.0), (-4.5, 2.75)], 1)
-    st(3); link(s, [(1.0, 2.0), (1.0, 4.5)], 2)
-    st(4); link(s, [(1.75, -0.75), (3.25, -0.75), (3.25, -3.25)], 2)
-    st(3); road(s, 0.5, 5.75, 4.5, 6.25)
+    st(3); link(s, [(1.0, 2.0), (1.0, 4.25)], 2)
+    st(4); link(s, [(1.75, -0.75), (3.0, -0.75), (3.0, -2.75)], 2)
+    st(3); road(s, 0.25, 4.75, 4.25, 6.0)
     # back to front
     st(1); trees(s, [(-1.0, -6.5, 'small'), (-6.0, -2.0, 'big')], 2)
-    st(4); _d4, top4 = building(s, 3.0, 5.5, -6.0, -3.5, 2, 0, lit={0: {('r', 0)}, 1: {('r', 0)}}, roof_unit=False)
+    st(4); _d4, top4 = building(s, 2.5, 5.0, -5.5, -3.0, 2, 0, lit={0: {('r', 0)}, 1: {('r', 0)}}, roof_unit=False)
     st(1); dp1, top1 = building(s, -1.5, 1.5, -1.5, 1.5, 2, 0, lit={0: {('r', 1)}, 1: {('r', 0), ('l', 1)}})
-    st(4); person(s, 4.0, -2.75, 3); person(s, 5.0, -2.5, 4)
+    st(4); person(s, 3.5, -2.25, 3); person(s, 4.5, -2.0, 4)
     st(3); _d3, top3 = building(s, 4.0, 5.5, 1.75, 3.25, 1, 0, lit={0: {('r', 0)}}, door_on=True, roof_unit=False)
     st(1); person(s, -0.5, 2.25, 3); person(s, -1.25, 2.5, 4)
     st(2); person(s, 0.25, 2.75, 3)                                     # the team grows at the office too
     st(2); _d2, ridge = house(s, -5.5, -3.5, 3.0, 5.0, 0, lit=True)
     st(2); person(s, -4.25, 5.5, 2)
-    st(3); cp = car(s, 1.25, 4.75, 1)
-    st(3); person(s, 4.75, 4.75, 3)                                     # the salesperson, out of the car
-    st(5); ring(s, 7.75, 0)
+    st(3); cp = car(s, 0.75, 4.5, 1)
+    st(3); person(s, 4.25, 4.5, 3)                                      # the salesperson, out of the car
     st(5); s.group(1)
-    (bx, by), (tx, ty) = w.p(0, 0, top1[2] + 0.5), w.p(0, 0, 7.75)
+    (bx, by), (tx, ty) = w.p(0, 0, top1[2] + 0.5), w.p(0, 0, 6.5)
     s.raw(f'<polyline points="{fmt(bx)},{fmt(by)} {fmt(tx)},{fmt(ty)}" fill="none" stroke="{BLUE}" stroke-width="2" stroke-dasharray="4 4"/>')
     s.end()
-    cl = cloud(s, 0, 0, 7.75, 2)
+    cl = cloud(s, 0, 0, 6.5, 2)                                         # low enough to sit under the dome
+    st(6); dm = dome(s, RING, 0)
     s.step = None
     s.anchors.update({
         's1a': (1.5, 0.0, 1.5), 's1b': top1,          # s1a on the office's right wall, clear of the people at the door
         's2a': ridge, 's2b': (-3.5, 3.75, 1.0),
         's3a': cp, 's3b': (4.75, 2.5, STOREY),
-        's4a': (3.25, -2.0, 0), 's4b': top4,
-        's5a': (-5.5, 5.5, 0), 's5b': cl,
+        's4a': (3.0, -1.75, 0), 's4b': top4,
+        's5a': (-5.75, 5.75, 0), 's5b': cl,
+        's6a': dm, 's6b': (5.8, -5.8, 0),
     })
     return s
 
