@@ -8,6 +8,7 @@
     "build": "astro build && node scripts/svgo.mjs && node scripts/markdown.mjs && node scripts/headers.mjs",
     "preview": "astro preview",
     "check": "astro check",
+    "test": "node --test \"scripts/test/*.test.mjs\"",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "python tools/verify_footer.py out",

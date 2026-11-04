@@ -4,12 +4,23 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition`, `text-wrap` and Trusted Types fall back cleanly where missing.
-- [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live.
+- [ ] GitHub: protect `main` (PR required, `build` must pass); today every push deploys to live. While there, turn on secret scanning and push protection (Settings > Code security) if the plan offers them.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
+- [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
+- [ ] Watch the reports: after each deploy, look at the Workers logs (Cloudflare > Workers > uplink-site > Logs) for `/api/report` lines: script errors and CSP blocks from real visitors.
 - [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
-- [ ] Have `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (it was written from memory).
+- [ ] Have the WCAG list in `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (written from memory; the rest was checked against O. Reg. 191/11 on 3 Nov 2026).
 - [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
+- [ ] Decide later, on hold: who edits copy. Today it's Claude editing on your behalf about 90% of the time, which suits copy as JSON and Markdown in git (`src/content/`, `src/data/`): every change is reviewed, checked by CI and can be undone. A CMS only earns its place if staff will edit the site themselves.
+- [ ] Decide later, on hold: if the real company has a site today, map its old addresses to the new ones (redirects) before the domain moves.
+
+## Privacy and accessibility pages (3 Nov 2026; sources and the full list in `docs/privacy-and-accessibility-2026-11-03.md`)
+- [ ] Real inboxes for `privacy@`, `accessibility@` and `security@` (placeholders in `src/data/footer.json`, `inboxes`), and a postal code for the office address.
+- [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
+- [ ] Reply times on the accessibility page (2 business days to acknowledge, 10 to answer) are a proposal: keep or change.
+- [ ] "Few people at Uplink can open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
+- [ ] AODA compliance report: under 50 staff, but organizations with 20 or more staff in Ontario file one every three years (from memory, unverified; the site says 22 technicians). Check whether it applies.
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
@@ -33,15 +44,16 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Checks to repeat
 - [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.
-- [ ] W3C HTML checker reports 8 CSS errors per page, all the page-transition rules (`@view-transition` and the rest), which the checker doesn't know yet. Valid CSS; recheck when it catches up.
 
 ## Before going live
 Forms and content:
 - [ ] Forms: PAUSED (2 Nov 2026). [PR #38](https://github.com/nitrogoboom/uplink-site/pull/38) (`claude/sweet-chaum-b12ca0`) has the Worker endpoint, Turnstile, honeypot and rate limit, with email as a stub; leave it open, unmerged. To pick it up: set the Worker secrets `TURNSTILE_SECRET` (Turnstile widget "uplink-site forms") and `FORM_TO`, put a sending domain on Cloudflare, then wire the send step.
+- [ ] Forms PR #38 and `main` now both have `worker/index.js` (`main` has `/api/report`): merge by keeping both routes; `wrangler.jsonc` already has `main` and `run_worker_first`.
+- [ ] When forms send: delete the "send nothing yet" lines and the `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`; link the privacy page beside each Send button; give the newsletter a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."); decide what sends the newsletter (a mailing service is another processor to name) and where consent records are kept; decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).
 - [ ] Forms (decided 2 Nov 2026: build now, email via Cloudflare Email Service): contact, book-a-call and newsletter send nothing yet. Without script, the contact and newsletter forms go to `/soon` and their fields have no `name`; give the fields names back with the endpoint. Plan: a Worker endpoint (same origin, so `form-action 'self'` holds) with Turnstile, a honeypot field and a rate limit. Email Service sends from a domain on a Cloudflare zone, and `workers.dev` is not one, so the sending domain (the real one, or any domain moved to Cloudflare) comes first. CSP then needs `challenges.cloudflare.com` in `script-src` and `frame-src`, and the Trusted Types policy in `core.js` must allow Turnstile's script.
 - [ ] Service and project copy (how it works, questions, case studies) is sample text, and stays sample (decided 2 Nov 2026) until there is a real client. Then rewrite with real details (each entry's `page` field in `src/content/`).
 - [ ] Copy to confirm: VoIP wording ("Phones & Teams calling" section, card and footer); backup drawing subline "a separate, locked site" (`gen_backup.py`); network label VOIP PHONES "calls over your network" (`gen_network.py`); hero phone line `lead-short` in `Hero.astro`; the six grow tags (`tags` in `Grow.astro`); the "Windows 10 support has ended" hero card (slot for the first real article).
-- [ ] About 24 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, privacy, terms, accessibility, five social links). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
+- [ ] About 24 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, terms, five social links; privacy and accessibility have pages since 3 Nov 2026). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
 - [ ] Once there is real content: drawn avatars for the team cards instead of initials; a spot for client quotes on Home or Work.
 - [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. "All systems normal" in the footer (`footer.json` `status`) is hard-coded: link it to a real status page or drop the claim.
 
@@ -49,9 +61,8 @@ Domain and hosting:
 - [ ] Put the real domain's DNS on Cloudflare, add the domain to the Worker, redirect `workers.dev` to it.
 - [ ] Remove `X-Robots-Tag: noindex` from `public/_headers` and set `SITE_URL` to the real domain (environment, or the default in `astro.config.mjs`).
 - [ ] Markdown copies (`/services.md` and the rest): when `noindex` comes off, give each a `Link: <page>; rel="canonical"` header (decided 2 Nov 2026), written per copy by `scripts/headers.mjs`.
-- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode. Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`.
+- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain is HTTPS, then submit to hstspreload.org.
-- [ ] CSP reporting: `Reporting-Endpoints` + `report-to` so blocked scripts on real visitors get seen.
 - [ ] Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host. Add the real domain (and `uplink-site.johnoreilly.workers.dev` until then) to that site in Cloudflare, or make a new site and swap the token.
 - [ ] Search Console: verify the domain, submit the sitemap.
 - [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).

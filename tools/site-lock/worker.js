@@ -1,7 +1,8 @@
 // Password lock for the whole site, as a Worker in front of the static assets. Off by default.
-// To turn it on, add to wrangler.jsonc:
-//   "main": "tools/site-lock/worker.js",
+// The site now has its own Worker (worker/index.js, for /api/*), so this file can't simply become "main". To turn
+// the lock on, call passwordOk() at the top of worker/index.js's fetch for every request, and in wrangler.jsonc set
 //   "assets": { "directory": "./dist", "not_found_handling": "404-page", "binding": "ASSETS", "run_worker_first": true }
+// so every request reaches the Worker, which then serves the files with env.ASSETS.fetch(request).
 // then set the password and deploy:
 //   npx wrangler secret put SITE_PASSWORD
 //   npx wrangler deploy

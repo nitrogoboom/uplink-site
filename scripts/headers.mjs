@@ -14,7 +14,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 
-const DIST = 'dist';
+const DIST = process.env.DIST || 'dist';   // another folder only for the tests (scripts/test/)
 // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
 // into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included), the one
 // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's preloads with

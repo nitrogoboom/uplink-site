@@ -155,6 +155,11 @@
     "href": "tel:+18555550142"
   },
   "email": "hello@uplinkit.ca",
+  "inboxes": {
+    "privacy": "privacy@uplinkit.ca",
+    "accessibility": "accessibility@uplinkit.ca",
+    "security": "security@uplinkit.ca"
+  },
   "office": {
     "city": "Toronto",
     "street": "100 King St W, Suite 4200"
@@ -166,7 +171,7 @@
   "legal": [
     {
       "label": "Privacy",
-      "href": "/soon#privacy"
+      "href": "/privacy"
     },
     {
       "label": "Terms",
@@ -174,7 +179,7 @@
     },
     {
       "label": "Accessibility",
-      "href": "/soon#accessibility"
+      "href": "/accessibility"
     }
   ],
   "copyright": "© 2026 Uplink Technology Inc.",
