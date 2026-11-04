@@ -12,6 +12,13 @@
     .fold { padding-block: var(--sp-5); }
     :root { --fold-inner: calc(var(--fold-h) - 2 * var(--sp-5)); }
   }
+  /* Home's wheel grid (docs/fold-wheel-grid-2026-11-04.md): each fold is --fold-pitch tall, whole wheel steps, so
+     from the top or a menu link every fold edge is a wheel stop. The extra (under one step) is an empty ::after
+     below the content: the content stays centred in the screen's height, and the spacing check never sees it.
+     Proof rounds its own height up to a step (home.js); the footer stays one screen, so the page's end is a stop too. */
+  [data-page="home"] .fold { min-height: var(--fold-pitch); }
+  [data-page="home"] .fold::after { content: ""; flex: none; height: calc(var(--fold-pitch) - var(--fold-h)); }
+  [data-page="home"] #proof { display: flex; flex-direction: column; justify-content: center; }
   /* heading beside its content */
   .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); column-gap: var(--sp-8); align-items: start; }
   .split > .section-head { margin-bottom: 0; }

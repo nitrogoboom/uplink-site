@@ -131,6 +131,8 @@
   --gutter:     1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
   --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
+  --wheel-step: 100px;   /* one mouse-wheel notch in Chrome and Edge on Windows (3 lines, 100% zoom), measured 4 Nov 2026 */
+  --fold-pitch: var(--fold-h);   /* Home desktop: --fold-h rounded up to whole wheel steps (below, fold.css) */
 
   /* ---- depth ----------------------------------------------------------- */
   --shadow-1: 0 12px 32px -12px rgb(0 0 0 / 0.55);
@@ -222,5 +224,10 @@
     --container: calc(94rem + 2 * var(--gutter));  /* one centred block: the full width at 16:9, side margin on wider screens.
                                                        The header, hero and footer stage and base bar run full width. */
     --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
+  }
+  /* the wheel grid: a fold a whole number of notches tall, so the wheel's stops land on fold edges. Bigger text lets
+     sections grow past one screen, so it keeps --fold-h there. Older browsers without round() keep --fold-h too. */
+  @supports (height: round(up, 1px, 1px)) {
+    :root:not([data-text]) { --fold-pitch: round(up, var(--fold-h), var(--wheel-step)); }
   }
 }

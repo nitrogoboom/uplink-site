@@ -35,12 +35,16 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page.
 - [ ] Desktop gaps: Home and About done (About 3 Nov 2026: "How we work" is a short band at its own height, Team one screen on desktop and its own height below). Rule agreed 2 Nov 2026: on desktop a section is one screen (`.fold`) when it has enough to fill it, and a short band keeps its own height; below desktop a section takes its own height, except `.fold-always` (the hero and each page's first screen). Next: Contact (Support), Services (Faq) and Work (Projects), which still carry `fold-always` past their first screen. Classes in `src/styles/layout.css`, desktop rules in `fold.css`.
 
+- [ ] Home wheel grid (4 Nov 2026, `docs/fold-wheel-grid-2026-11-04.md`): folds are whole 100px wheel steps on desktop. Open: Page Down still moves 87.5% of a screen and leaves the grid (a small key handler could step one fold); the other pages' folds could take the same grid once their desktop gaps are done.
+
 ## Drawings
 - [ ] 404 page: a three-panel heist comic, draft in `editing-room/404-comic/` (branch `404-comic-draft`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 
 ## Look and feel
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
+
+- [ ] Settings pop-up: `verify_spacing.py` flags its `fieldset.seg-field` (browser padding 5.6px / 10px) and `legend.label` (2px sides) as off the spacing scale. Reset them in `forms.css`.
 
 ## Checks to repeat
 - [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.
