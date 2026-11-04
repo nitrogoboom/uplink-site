@@ -292,9 +292,13 @@ def dome(s, R, o):
     s.raw(f'<linearGradient id="dome-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{pal.SKY}" stop-opacity="0.3"/>'
           f'<stop offset="1" stop-color="{pal.SKY}" stop-opacity="0.05"/></linearGradient>')
     s.raw(f'<path class="dome" d="{top}A{fmt(rx)},{fmt(ry)} 0 0 1 {fmt(cx - rx)},{fmt(cy)}Z" fill="url(#dome-g)"/>')
-    for k in (1 / 3, 2 / 3):
+    LAT = (1 / 3, 2 / 3)
+    for k in LAT:
         h = R * k
-        s.raw(ellipse(w, (R * R - h * h) ** 0.5, 0, 0, h, f'class="dome-lat" fill="none" stroke="{pal.SKY}" stroke-width="1" stroke-opacity="0.3"'))
+        s.raw(ellipse(w, (R * R - h * h) ** 0.5, 0, 0, h, f'class="dome-lat" fill="none" stroke="{pal.SKY}" stroke-width="1.2" stroke-opacity="0.35"'))
+    # light running round those rings, so they look like they turn: drawn and moved by the page (it knows the sums)
+    s.raw(f'<g class="dome-orbit" data-r="{R}" data-lat="{",".join(f"{k:.4f}" for k in LAT)}" data-u="{w.u}" data-ox="{w.ox}" data-oy="{w.oy}" '
+          f'fill="none" stroke="{pal.SKY}" stroke-linecap="round"></g>')
     s.raw(f'<path class="dome-rim" d="{top}" fill="none" stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.85"/>')
     s.end()
     s.points.append((cx, cy - rx))

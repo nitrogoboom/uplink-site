@@ -362,6 +362,46 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   const showSize = () => { const w = innerWidth; size.textContent = `${w} × ${innerHeight} · ${w < 700 ? 'phone' : w < 1100 ? 'tablet' : 'desktop'}`; };
   showSize(); addEventListener('resize', showSize);
 
+  // The dome's horizontal rings turn: a band of light runs round each one (a bright head, a fading tail), brighter
+  // on the dome's near side than behind it, the two rings at different speeds. World to screen as the drawing:
+  // X = ox + (x - y) cos30 u, Y = oy + (x + y) u / 2 - z u; a point on a ring is on the near side when x + y > 0.
+  (() => {
+    const C30 = Math.cos(Math.PI / 6), TAIL = 1.6, PIECES = 14;   // tail length in radians, cut into pieces that fade
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.dome-orbit').forEach((g) => {
+      const R = +g.dataset.r, u = +g.dataset.u, ox = +g.dataset.ox, oy = +g.dataset.oy;
+      const NS = 'http://www.w3.org/2000/svg';
+      const rings = g.dataset.lat.split(',').map(Number).map((k, n) => {
+        const h = R * k, r = Math.sqrt(R * R - h * h);
+        const pieces = Array.from({ length: PIECES }, () => { const p = document.createElementNS(NS, 'path'); g.append(p); return p; });
+        return { h, r, pieces, period: n ? 11000 : 8000, phase: n * 2.4 };
+      });
+      const P = (x, y, z) => `${(ox + (x - y) * C30 * u).toFixed(1)},${(oy + (x + y) * u / 2 - z * u).toFixed(1)}`;
+      const draw = (now) => rings.forEach((ring) => {
+        const head = ring.phase + (now / ring.period) * Math.PI * 2;
+        ring.pieces.forEach((p, i) => {
+          const a1 = head - (TAIL * i) / PIECES, a0 = a1 - TAIL / PIECES, mid = (a0 + a1) / 2;
+          const near = Math.cos(mid) + Math.sin(mid) > 0;          // x + y > 0 for a point at angle mid
+          const fade = 1 - i / PIECES;
+          let d = '';
+          for (let k = 0; k <= 4; k++) { const a = a0 + (a1 - a0) * k / 4; d += (k ? 'L' : 'M') + P(ring.r * Math.cos(a), ring.r * Math.sin(a), ring.h); }
+          p.setAttribute('d', d);
+          p.setAttribute('stroke-width', ((near ? 2.6 : 1.6) * (0.5 + fade / 2)).toFixed(2));
+          p.setAttribute('stroke-opacity', ((near ? 0.95 : 0.35) * fade).toFixed(2));
+        });
+      });
+      const stage = g.closest('.stage');
+      let t = 0, last = 0;
+      const tick = (now) => {
+        const dt = last ? Math.min(64, now - last) : 0; last = now;
+        if (!stage || !stage.classList.contains('paused')) t += dt;
+        draw(t);
+        requestAnimationFrame(tick);
+      };
+      if (reduce) draw(1500); else requestAnimationFrame(tick);
+    });
+  })();
+
 </script>
 </body>
 </html>
