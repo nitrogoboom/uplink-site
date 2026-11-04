@@ -93,7 +93,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* tablet: the phone order, the square a bit narrower and centred, the card in two columns */
 @media (min-width: 700px) and (max-width: 1099px) {
   .stage { width: min(80%, 36rem); justify-self: center; }
-  .pills { flex-wrap: wrap; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  [data-nav="pills"] .pills { flex-wrap: wrap; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; }
   .card .cols { grid-template-columns: 1fr 1fr; }
 }
 /* desktop: one screen; words, pills and card on the left, the square on the right as tall as the screen allows */
@@ -101,11 +101,73 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   .grow { min-height: var(--fold-h); display: grid; align-items: center; padding-block: var(--sp-6); }
   .in { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; column-gap: var(--sp-8); row-gap: var(--sp-5); align-items: start; }
   .m-head { grid-column: 1; grid-row: 1; }
-  .pills { grid-column: 1; grid-row: 2; flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+  .steps { grid-column: 1; grid-row: 2; }
+  [data-nav="pills"] .pills { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
   .card { grid-column: 1; grid-row: 3; }
   .card .cols { grid-template-columns: 1fr 1fr; }
   .stage { grid-column: 2; grid-row: 1 / 4; width: auto; height: min(calc(var(--fold-h) - 2 * var(--sp-6)), 48rem); }
 }
+/* ---- the step controls: four ways to draw the same buttons (data-nav on the section; Mockup controls switch it) ----
+   Every button carries its number, icon, name and team size; each design shows the parts it needs. The autoplay
+   timer is a thin ring round the play/pause button in every design except "pills" (the original). */
+.steps { display: grid; gap: var(--sp-3); min-width: 0; }
+.pill .num, .pill .ic, .pill .sub { display: none; }
+.hud { display: none; }
+.ring { position: absolute; inset: -4px; width: calc(100% + 8px); height: calc(100% + 8px); transform: rotate(-90deg); pointer-events: none; }
+.ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 138.2; stroke-dashoffset: 138.2; }
+[data-nav="pills"] .ring { display: none; }
+[data-nav]:not([data-nav="pills"]) .pill .fill { display: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* A: HUD bar: the place in big type with step arrows, over a slim segmented bar (one segment a step) */
+[data-nav="hud"] .hud { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; }
+.hud-l { flex: 1; min-width: 0; display: flex; align-items: baseline; gap: var(--sp-2); font-family: 'Barlow Condensed', 'Barlow Condensed Fallback', sans-serif; text-transform: uppercase; }
+.hud-n { font: 700 italic var(--fs-6)/1 'Barlow Condensed', sans-serif; color: var(--c-accent-text); font-variant-numeric: tabular-nums; }
+.hud-of { font-weight: 600; font-size: var(--fs-2); color: var(--c-muted); letter-spacing: 0.08em; }
+.hud-name { font-weight: 700; font-size: var(--fs-4); letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud button { flex: none; width: 2.75rem; height: 2.75rem; border-radius: 50%; border: 1px solid var(--c-edge); background: var(--c-surface); color: var(--c-text); display: grid; place-items: center; cursor: pointer; padding: 0; }
+.hud button svg { width: 1.1rem; height: 1.1rem; }
+.hud button:disabled { opacity: 0.35; cursor: default; }
+[data-nav="hud"] .pills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; overflow: visible; margin-inline: 0; padding-inline: 0; }
+[data-nav="hud"] .pill { height: 2.75rem; min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+[data-nav="hud"] .pill::before { content: ""; position: absolute; inset: 50% 0 auto; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-surface-2); }
+[data-nav="hud"] .pill .bar { position: absolute; inset: 50% 0 auto; height: 4px; margin-top: -2px; border-radius: 2px; background: var(--c-accent); transform-origin: left; transform: scaleX(0); transition: transform 0.6s var(--ease, ease); }
+[data-nav="hud"] .pill.done .bar, [data-nav="hud"] .pill[aria-pressed="true"] .bar { transform: scaleX(1); }
+[data-nav="hud"] .pill .nm { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.pill .bar { display: none; }
+[data-nav="hud"] .pill .bar { display: block; }
+
+/* B: tiles, as the footer's: icon, name, team size; the open one lifts with an amber edge */
+[data-nav="tiles"] .pills { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-2); overflow: visible; margin-inline: 0; padding: var(--sp-1) 0 0; }
+[data-nav="tiles"] .pill { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1); min-height: 5.75rem; padding: var(--sp-2); border: 1px solid var(--c-line); border-radius: 0.75rem; background: var(--c-surface); color: var(--c-text); white-space: normal; text-align: center; transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease; }
+[data-nav="tiles"] .pill .ic { display: block; width: 1.75rem; height: 1.75rem; color: var(--c-muted); }
+[data-nav="tiles"] .pill .nm { font: 700 var(--fs-2)/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+[data-nav="tiles"] .pill .sub { display: block; font-size: var(--fs-1); color: var(--c-muted); }
+[data-nav="tiles"] .pill.done .ic { color: var(--c-sky); }
+[data-nav="tiles"] .pill[aria-pressed="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
+[data-nav="tiles"] .pill[aria-pressed="true"] .ic { color: var(--c-accent-text); }
+@media (hover: hover) { [data-nav="tiles"] .pill:not([aria-pressed="true"]):hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }
+@media (min-width: 700px) and (max-width: 1099px) { [data-nav="tiles"] .pills { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+/* C: chapters: numbered list in the display face on desktop; on phones and tablets the name over a row of numbers */
+[data-nav="chapters"] .hud { display: flex; }
+[data-nav="chapters"] .hud button { display: none; }
+[data-nav="chapters"] .pills { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--sp-1); overflow: visible; margin-inline: 0; padding-inline: 0; }
+[data-nav="chapters"] .pill { height: 2.75rem; min-height: 0; padding: 0; border: 0; border-radius: 0; background: none; color: var(--c-muted); border-bottom: 2px solid var(--c-line-2); }
+[data-nav="chapters"] .pill .num { display: block; font: 700 italic var(--fs-5)/1 'Barlow Condensed', sans-serif; font-variant-numeric: tabular-nums; }
+[data-nav="chapters"] .pill .nm { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[data-nav="chapters"] .pill.done { color: var(--c-text); border-bottom-color: var(--c-sky); }
+[data-nav="chapters"] .pill[aria-pressed="true"] { color: var(--c-accent-text); border-bottom-color: var(--c-accent-text); }
+@media (min-width: 1100px) {
+  [data-nav="chapters"] .hud { display: none; }
+  [data-nav="chapters"] .pills { grid-template-columns: 1fr; gap: 0; }
+  [data-nav="chapters"] .pill { height: auto; display: grid; grid-template-columns: 2.5rem 1fr auto; align-items: baseline; gap: var(--sp-3); padding: var(--sp-2) 0; text-align: left; border-bottom: 1px solid var(--c-line); }
+  [data-nav="chapters"] .pill .nm { position: static; width: auto; height: auto; overflow: visible; clip-path: none; font: 700 var(--fs-4)/1.1 'Barlow Condensed', sans-serif; text-transform: uppercase; letter-spacing: 0.04em; }
+  [data-nav="chapters"] .pill .sub { display: block; font-size: var(--fs-1); color: var(--c-muted); }
+  [data-nav="chapters"] .pill.done, [data-nav="chapters"] .pill[aria-pressed="true"] { border-bottom-color: var(--c-line); }
+  [data-nav="chapters"] .pill[aria-pressed="true"] .nm { color: var(--c-text); }
+}
+
 /* the dome: its rim breathes once it's up */
 @keyframes rim { 50% { stroke-opacity: 0.35; } }
 .scene .dome-rim { animation: rim 2.4s ease-in-out infinite; }
@@ -126,7 +188,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (min-width: 700px) { .mock { bottom: 12px; } }
 .mock summary { cursor: pointer; font-weight: 600; color: var(--c-text); }
 .mock .ctl { display: grid; gap: 6px; margin-top: 8px; }
-.seg { display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: var(--c-bg); border: 1px solid var(--c-line-2); }
+.seg { display: flex; flex-wrap: wrap; gap: 4px; padding: 3px; border-radius: 999px; background: var(--c-bg); border: 1px solid var(--c-line-2); }
 .seg button { font: 600 12px/1 'Barlow', sans-serif; color: var(--c-muted); background: none; border: 0; border-radius: 999px; padding: 7px 10px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--c-accent); color: var(--c-on-accent); }
 .size { font-variant-numeric: tabular-nums; }
@@ -145,10 +207,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <nav class="botnav" aria-label="Tab bar (stand-in)"><span>Home</span><span>Services</span><span>Work</span><span>Contact</span></nav>
 
 <details class="mock">
-  <summary>Mockup controls · <span class="size"></span></summary>
+  <summary>Mockup options · <span class="size"></span></summary>
   <div class="ctl">
     <span id="cam-l">Camera</span>
     <div class="seg" role="group" aria-labelledby="cam-l"><button type="button" data-k="camera" data-v="still" aria-pressed="false">Still</button><button type="button" data-k="camera" data-v="follow" aria-pressed="true">Follows growth</button></div>
+    <span id="nav-l">Steps</span>
+    <div class="seg" role="group" aria-labelledby="nav-l"><button type="button" data-k="nav" data-v="hud" aria-pressed="true">A · HUD bar</button><button type="button" data-k="nav" data-v="tiles" aria-pressed="false">B · Tiles</button><button type="button" data-k="nav" data-v="chapters" aria-pressed="false">C · Chapters</button><button type="button" data-k="nav" data-v="pills" aria-pressed="false">Pills (old)</button></div>
     <span id="lot-l">Future lots</span>
     <div class="seg" role="group" aria-labelledby="lot-l"><button type="button" data-k="lots" data-v="1" aria-pressed="true">Show</button><button type="button" data-k="lots" data-v="0" aria-pressed="false">Hide</button></div>
   </div>
@@ -158,13 +222,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 (() => {
   const PLACES = [
-    { pill: 'Your office', title: 'Everyone in one place', watch: 'Laptops set up by hand, no backups, no one to call when it breaks.', handle: 'Every device set up the same way, Microsoft 365 backed up, one help desk number.' },
-    { pill: 'Working from home', title: 'Some people work from home', watch: 'Home Wi-Fi, personal devices, logins from anywhere.', handle: 'Two-step sign-in, company laptops we manage, and a 24/7 watch for strange logins.' },
-    { pill: 'On the road', title: 'Sales hit the road', watch: 'A laptop left in a cab, café Wi-Fi, files needed on a phone.', handle: 'Encrypted devices we can wipe from here, and safe access to files from anywhere.' },
-    { pill: 'Second office', title: 'A second office opens', watch: 'Two networks, two phone systems, files people can\'t find.', handle: 'Both sites linked, one phone system, the same setup in every office.' },
-    { pill: 'All of it', title: 'One team, wherever they work', watch: 'Too many apps and accounts, no plan, surprise bills.', handle: 'One map of every device and licence, and a budget review each quarter.' },
-    { pill: 'Covered', title: 'All of it, covered', watch: 'One gap is all an attacker needs, and the bill lands on you.', handle: 'Every place watched 24/7 under one plan, backed by our cyber warranty.' },
+    { icon: 'building', pill: 'Your office', title: 'Everyone in one place', watch: 'Laptops set up by hand, no backups, no one to call when it breaks.', handle: 'Every device set up the same way, Microsoft 365 backed up, one help desk number.' },
+    { icon: 'home', pill: 'Working from home', title: 'Some people work from home', watch: 'Home Wi-Fi, personal devices, logins from anywhere.', handle: 'Two-step sign-in, company laptops we manage, and a 24/7 watch for strange logins.' },
+    { icon: 'pin', pill: 'On the road', title: 'Sales hit the road', watch: 'A laptop left in a cab, café Wi-Fi, files needed on a phone.', handle: 'Encrypted devices we can wipe from here, and safe access to files from anywhere.' },
+    { icon: 'sites', pill: 'Second office', title: 'A second office opens', watch: 'Two networks, two phone systems, files people can\'t find.', handle: 'Both sites linked, one phone system, the same setup in every office.' },
+    { icon: 'cloud', pill: 'All of it', title: 'One team, wherever they work', watch: 'Too many apps and accounts, no plan, surprise bills.', handle: 'One map of every device and licence, and a budget review each quarter.' },
+    { icon: 'shield', pill: 'Covered', title: 'All of it, covered', watch: 'One gap is all an attacker needs, and the bill lands on you.', handle: 'Every place watched 24/7 under one plan, backed by our cyber warranty.' },
   ];
+  const svgIcon = (d, sw = 1.8) => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  const ICONS = {
+    building: svgIcon('<path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18M8.5 8h3M8.5 12h3M8.5 16h3"/>'),
+    home: svgIcon('<path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/>'),
+    pin: svgIcon('<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
+    sites: svgIcon('<path d="M3 21V10h6v11M9 21V5h9v16M2 21h20M12 9h3M12 13h3M12 17h3M5.5 14h1.5M5.5 17.5h1.5"/>'),
+    cloud: svgIcon('<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>'),
+    shield: svgIcon('<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>'),
+    left: svgIcon('<path d="M15 6l-6 6 6 6"/>', 2.2).replace('class="ic" ', ''),
+    right: svgIcon('<path d="M9 6l6 6-6 6"/>', 2.2).replace('class="ic" ', ''),
+  };
   const DWELL = 4500, RISK_AT = 900, FIX_AT = 2300;   // a step every 4.5 s: built by about 0.9 s, risks in red, fixes in green from 2.3 s
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -180,7 +255,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     [{ a: 's5a', r: 'Too many accounts', f: 'One map of it all' }, { a: 's5b', r: 'Surprise bills', f: 'Budget reviewed quarterly' }],
     [{ a: 's6a', r: 'Who pays if it goes wrong?', f: 'Cyber warranty' }, { a: 's6b', r: 'Gaps between tools', f: '24/7 watch, one plan' }],
   ];
-  const opts = { camera: 'follow', lots: true };
+  const opts = { camera: 'follow', lots: true, nav: 'hud' };
   const TEAM = [8, 15, 25, 60, 120, 120];   // team size at each step (my guesses)
   const GLOW = '<defs><filter id="ux-glow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#FFAD51" flood-opacity="0.95"/></filter></defs>';
   const WORLD = document.getElementById('world').innerHTML.replace(' id="plain"', '').replace(/(<svg[^>]*>)/, `$1${GLOW}`);
@@ -189,19 +264,25 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   function Screen(host) {
     host.innerHTML = `<div class="in">
       <div class="m-head"><span class="m-eyebrow">Built to scale</span><h2 class="m-h" id="grow-h">We grow with you</h2><span class="m-lead">As your team spreads out, here's what to watch, and what we take care of.</span></div>
-      <div class="pills" role="group" aria-label="Where your people work">${PLACES.map((p, i) => `<button type="button" class="pill" data-i="${i}" aria-pressed="false"><span class="fill"></span><span>${esc(p.pill)}</span></button>`).join('')}</div>
+      <div class="steps">
+        <div class="hud"><button type="button" class="hud-prev" aria-label="Previous place">${ICONS.left}</button><span class="hud-l" aria-hidden="true"><span class="hud-n">01</span><span class="hud-of">/ 0${PLACES.length}</span><span class="hud-name">${esc(PLACES[0].pill)}</span></span><button type="button" class="hud-next" aria-label="Next place">${ICONS.right}</button></div>
+        <div class="pills" role="group" aria-label="Where your people work">${PLACES.map((p, i) => `<button type="button" class="pill" data-i="${i}" aria-pressed="false"><span class="fill"></span><span class="bar"></span><span class="num">0${i + 1}</span>${ICONS[p.icon]}<span class="nm">${esc(p.pill)}</span><span class="sub">Team of ${TEAM[i]}</span></button>`).join('')}</div>
+      </div>
       <div class="card" aria-live="polite"></div>
       <div class="stage"><div class="scene on"><span class="s-title"></span><span class="step-n"></span>${WORLD}${TAGS.map((tags, i) => tags.map((t, k) => `<span class="tag" data-step="${i}" data-k="${k}"><span class="ico">!</span><span class="tx">${esc(t.r)}</span></span>`).join('')).join('')}</div>
-        <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg></button></div>
+        <button type="button" class="pause" aria-label="Pause"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="${PAUSE}"/></svg><svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22"/></svg></button></div>
     </div>`;
     if (host.dataset.layout !== 'desk') {   // phone and tablet order: heading, picture, pills, card
       const inn = host.querySelector('.in');
-      inn.insertBefore(host.querySelector('.stage'), host.querySelector('.pills'));
+      inn.insertBefore(host.querySelector('.stage'), host.querySelector('.steps'));
     }
     const scene = host.querySelector('.scene'), svg = scene.querySelector('svg');
     const pcs = $$('.pc', svg).map((g) => ({ g, s: +g.dataset.s - 1, o: +g.dataset.o }));
     const tags = $$('.tag', scene).map((el) => ({ el, step: +el.dataset.step, k: +el.dataset.k, ...TAGS[+el.dataset.step][+el.dataset.k] }));
     const pills = $$('.pill', host), card = host.querySelector('.card'), pause = host.querySelector('.pause');
+    const ring = host.querySelector('.ring circle'), hudN = host.querySelector('.hud-n'), hudName = host.querySelector('.hud-name');
+    const prev = host.querySelector('.hud-prev'), next = host.querySelector('.hud-next');
+    host.dataset.nav = opts.nav;
     const title = scene.querySelector('.s-title'), stepN = scene.querySelector('.step-n');
     let built = -1, glowT = 0;
     const lots = $$('.lot', svg).map((g) => ({ g, s: +g.dataset.s - 1 }));
@@ -302,11 +383,18 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         f.style.transition = 'none'; f.style.transform = `scaleX(${j < i || (j === i && !timed) ? 1 : 0})`;
         if (j === i && timed) requestAnimationFrame(() => requestAnimationFrame(() => { f.style.transition = `transform ${DWELL}ms linear`; f.style.transform = 'scaleX(1)'; }));
         if (j === i) b.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        b.classList.toggle('done', j < i);
       });
+      hudN.textContent = `0${Math.max(0, i) + 1}`;
+      hudName.textContent = PLACES[Math.max(0, i)].pill;
+      prev.disabled = i <= 0; next.disabled = i >= PLACES.length - 1;
+      // the timer: a ring round play/pause fills over the step while it plays
+      ring.style.transition = 'none'; ring.style.strokeDashoffset = '138.2';
+      if (timed && i >= 0) requestAnimationFrame(() => requestAnimationFrame(() => { ring.style.transition = `stroke-dashoffset ${DWELL}ms linear`; ring.style.strokeDashoffset = '0'; }));
     };
     const setIcon = (d, label) => { pause.setAttribute('aria-label', label); pause.querySelector('path').setAttribute('d', d); };
-    const refresh = () => { showLots(); camTo(target(built), true); };
-    return { host, pills, pause, show, beat, place, setIcon, refresh };
+    const refresh = () => { host.dataset.nav = opts.nav; showLots(); camTo(target(built), true); };
+    return { host, pills, pause, prev, next, show, beat, place, setIcon, refresh };
   }
 
   // the frames run together. It plays once, from bare ground to the full world, and stops there.
@@ -335,6 +423,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   const play = () => { playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
   screens.forEach((s) => {
     s.pills.forEach((b) => b.addEventListener('click', () => { stop(); go(+b.dataset.i, true); }));
+    s.prev.addEventListener('click', () => { stop(); go(Math.max(0, cur - 1), true); });
+    s.next.addEventListener('click', () => { stop(); go(Math.min(LAST, cur + 1), true); });
     s.pause.addEventListener('click', () => {
       if (playing) { stop(); beats.forEach(clearTimeout); beats = []; screens.forEach((x) => x.show(cur, false, false)); } else play();
       screens.forEach((x) => x.host.querySelector('.stage').classList.toggle('paused', !playing));   // pause stops the flowing cables too
@@ -361,6 +451,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   const size = document.querySelector('.mock .size');
   const showSize = () => { const w = innerWidth; size.textContent = `${w} × ${innerHeight} · ${w < 700 ? 'phone' : w < 1100 ? 'tablet' : 'desktop'}`; };
   showSize(); addEventListener('resize', showSize);
+  if (innerWidth >= 700) document.querySelector('.mock').open = true;   // open on bigger screens; on phones it would cover the picture
 
   // The dome's horizontal rings turn: a band of light runs round each one (a bright head, a fading tail), brighter
   // on the dome's near side than behind it, the two rings at different speeds. World to screen as the drawing:
