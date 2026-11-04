@@ -16,6 +16,8 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*", "/404"],
   },
+  // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38's FORMS limit is namespace 1001.
+  "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
   "preview_urls": true,
   "observability": { "enabled": true },
 }

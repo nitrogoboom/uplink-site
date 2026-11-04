@@ -4,15 +4,16 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../../worker/index.js';
 
-const post = (type, body, path = '/api/report') => new Request(`https://example.test${path}`, {
-  method: 'POST', headers: { 'Content-Type': type, 'User-Agent': 'TestBrowser/1' }, body: typeof body === 'string' ? body : JSON.stringify(body),
+const post = (type, body, path = '/api/report', origin = 'https://example.test') => new Request(`https://example.test${path}`, {
+  method: 'POST', headers: { 'Content-Type': type, 'User-Agent': 'TestBrowser/1', ...(origin ? { Origin: origin } : {}) },
+  body: typeof body === 'string' ? body : JSON.stringify(body),
 });
 // runs the Worker and returns [response, logged reports]
-const call = async (req) => {
+const call = async (req, env) => {
   const lines = [];
   const log = console.log;
   console.log = (s) => lines.push(JSON.parse(s));
-  try { return [await worker.fetch(req), lines]; } finally { console.log = log; }
+  try { return [await worker.fetch(req, env), lines]; } finally { console.log = log; }
 };
 
 test('a CSP report (Reporting API) is logged without the query string', async () => {
@@ -54,4 +55,25 @@ test('/404 by name answers 404 with the page', async () => {
   assert.equal(res.status, 404);
   assert.equal(res.headers.get('Content-Type'), 'text/html');
   assert.equal(await res.text(), '<h1>Not found</h1>');
+});
+
+test('only this site counts: another Origin is refused, reports about other sites are dropped', async () => {
+  const csp = { 'csp-report': { 'document-uri': 'https://other.test/', 'blocked-uri': 'inline', 'violated-directive': 'style-src' } };
+  assert.equal((await call(post('application/csp-report', csp, '/api/report', 'https://evil.test')))[0].status, 403);
+  const [res, lines] = await call(post('application/csp-report', csp, '/api/report', null));
+  assert.equal(res.status, 204);
+  assert.equal(lines.length, 0, 'a CSP report about another site is not logged');
+  const error = { kind: 'error', page: '/', message: 'x' };
+  assert.equal((await call(post('application/json', error, '/api/report', null)))[1].length, 0, 'a script error needs our own Origin');
+});
+
+test('past the rate limit: 429, nothing logged', async () => {
+  const keys = [];
+  const env = { REPORTS: { limit: async ({ key }) => { keys.push(key); return { success: false }; } } };
+  const req = post('application/json', { kind: 'error', page: '/', message: 'x' });
+  req.headers.set('CF-Connecting-IP', '203.0.113.9');
+  const [res, lines] = await call(req, env);
+  assert.equal(res.status, 429);
+  assert.equal(lines.length, 0);
+  assert.deepEqual(keys, ['203.0.113.9'], 'counted per visitor address');
 });

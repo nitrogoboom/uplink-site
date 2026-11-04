@@ -35,7 +35,7 @@ After a page has loaded, it runs Cloudflare Web Analytics. It tells us which pag
 
 ### Error reports
 
-If a page hits a script error, or your browser blocks something under our security rules, your browser sends a short report to our own site. It holds the page address, the error or the blocked address, and your browser's user agent. Like any request, it also reaches Cloudflare with your IP address. It holds nothing you typed. We read these reports only to fix bugs.
+If a page hits a script error, or your browser blocks something under our security rules, your browser sends a short report to our own site. It holds the page address, the error or the blocked address, and your browser's user agent. Like any request, it also reaches Cloudflare with your IP address. It holds nothing you typed. Our site counts how many reports come from one IP address in a short time, to stop floods; that count isn't kept. We read these reports only to fix bugs.
 
 ### Settings saved on your device
 
