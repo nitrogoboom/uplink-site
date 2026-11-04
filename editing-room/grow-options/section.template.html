@@ -261,6 +261,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     const pills = $$('.pill', host), card = host.querySelector('.card'), pause = host.querySelector('.pause');
     const ring = host.querySelector('.ring circle'), hudN = host.querySelector('.hud-n'), hudName = host.querySelector('.hud-name');
     const prev = host.querySelector('.hud-prev'), next = host.querySelector('.hud-next');
+    // the story timer on the play/pause outline: k = 0 (nothing) to 1 (all six steps)
+    let ringRun = null, ringAt = 0;
+    const drawRing = (k) => { ring.style.strokeDashoffset = String(100 - 100 * Math.min(1, Math.max(0, k))); };
+    const ringNow = () => ringRun ? ringRun.a + (ringRun.b - ringRun.a) * Math.min(1, (performance.now() - ringRun.t0) / DWELL) : ringAt;
+    const ringTick = () => { if (ringRun) { ringAt = ringNow(); drawRing(ringAt); } requestAnimationFrame(ringTick); };
+    requestAnimationFrame(ringTick);
     host.dataset.nav = opts.nav;
     const title = scene.querySelector('.s-title'), stepN = scene.querySelector('.step-n');
     let built = -1, glowT = 0;
@@ -367,9 +373,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       hudN.textContent = `0${Math.max(0, i) + 1}`;
       hudName.textContent = PLACES[Math.max(0, i)].pill;
       prev.disabled = i <= 0; next.disabled = i >= PLACES.length - 1;
-      // the timer: a ring round play/pause fills over the step while it plays
-      ring.style.transition = 'none'; ring.style.strokeDashoffset = '100';
-      if (timed && i >= 0) requestAnimationFrame(() => requestAnimationFrame(() => { ring.style.transition = `stroke-dashoffset ${DWELL}ms linear`; ring.style.strokeDashoffset = '0'; }));
+      // the timer: the play/pause outline fills once over the whole story (each step adds its sixth, carrying on from
+      // where the last left off). Pause freezes it where it is; jumping to a step shows how far along that step is.
+      // Driven from the clock (ringRun), not a CSS transition, so a slow frame never puts it behind.
+      const N = PLACES.length;
+      if (timed && i >= 0) ringRun = { a: i / N, b: (i + 1) / N, t0: performance.now() };
+      else { const k = !animate && i === from ? ringNow() : i < 0 ? 0 : (i + 1) / N; ringRun = null; ringAt = k; drawRing(k); }
     };
     const setIcon = (d, label) => { pause.setAttribute('aria-label', label); pause.querySelector('path').setAttribute('d', d); };
     const refresh = () => { host.dataset.nav = opts.nav; showLots(); camTo(target(built), true); };
