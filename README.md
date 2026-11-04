@@ -16,6 +16,7 @@ Then open http://localhost:4321. Other commands:
 - `npm run build` – the site into `dist/` (and `dist/_headers`)
 - `npm run serve` – serve `dist/` the way Cloudflare does (http://localhost:8787): headers, the 404 page and the clean-URL redirects apply there, unlike the dev server
 - `npm run check` – types and Astro diagnostics
+- `npm test` – tests for the build's after-steps and the Worker (`scripts/test/`, Node's own test runner)
 - `npm run ci` – what CI runs, in one go: check, lint, build, then the browser check on the built site (starts `npm run serve` itself if it isn't running; needs the Python tools below)
 - `npm run deploy` – deploy by hand (CI does it on push; see Hosting)
 
@@ -26,8 +27,9 @@ For the drawing and check tools (optional): `pip install -r requirements.txt` an
 - `src/` – the site. `src/README.md` maps it: pages, section components, content, styles, scripts.
 - `public/` – files served as they are: `_headers` (the response-header template), fonts, the drawings in `assets/img/`, `og.png`, the favicon.
 - `tools/` – the drawing generators and their checks (Python + Playwright). Run them from the project root.
-- `scripts/` – the build's after-steps: `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), `markdown.mjs` writes each page's Markdown copy, `headers.mjs` finishes `dist/_headers` (script and style hashes, Early Hints).
-- `wrangler.jsonc` – the Cloudflare Worker config. `.github/workflows/site.yml` – CI.
+- `scripts/` – the build's after-steps: `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), `markdown.mjs` writes each page's Markdown copy, `headers.mjs` finishes `dist/_headers` (script and style hashes, Early Hints). Their tests are in `scripts/test/`.
+- `worker/index.js` – the one Worker script, for `/api/*` only: today `/api/report`, where visitors' browsers send script errors and CSP blocks (they land in the Workers logs).
+- `wrangler.jsonc` – the Cloudflare Worker config. `.github/workflows/site.yml` – CI. Every secret and key the site uses, and where it lives: `docs/secrets.md`.
 - `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec; see its README.
 - `docs/layout-reference.md` – layout patterns from Overwatch 2 menus, applied on 28 Oct 2026.
 
@@ -80,6 +82,8 @@ Every drawing was made by a generator with world → screen = `origin + ((x − 
 - `painter.py` – finds boxes drawn in the wrong order or poking into each other (exits 1 on any, or when it finds no boxes). Each drawing has a `rules_<name>.py`; its first lines give the exact command
 - `gen_og.py public` – the share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Screenshots of a small page made from the site's tokens, fonts and `office-card.svg`; rerun after changing those.
 - `verify_footer.py out/` – against `npm run serve`: the hero builds, tiles respond to hover, the tower grows on scroll, every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), Home at phone, tablet, 1440×900 and 3440×1440 with no sideways scroll and an axe pass at phone and desktop; every other sitemap page plus soon and the 404 once at phone size (script errors, sideways scroll). Home is the page being worked on (`FOCUS` in the script); `--all` checks every page at every size with axe, as before. It fails on any script error (console error, crash, CSP or Trusted Types block), a hero or tower that doesn't respond, sideways scroll, or a serious axe finding. CI runs it before deploy.
+- `check_links.py` – against `npm run serve`: every link, picture, script and preload on every page answers, and every `#section` link finds its id. CI runs it.
+- `visual_diff.py OLD NEW` – every page of NEW next to OLD at phone, tablet and desktop, drawings masked; lists what looks different (`out/visual/`). CI runs it on each PR against the live site and puts the list in the run's summary.
 - `audit.py` (`npm run release-audit`) – the release audit in `docs/sop.md`: every page in Chromium, Firefox, WebKit and emulated phones, a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. A few minutes; run it before a release, not on every build. Report in `out/audit/report.md`.
 - `pagespeed.py <address>` – Google's PageSpeed Insights on the live site's sitemap pages (see Hosting).
 

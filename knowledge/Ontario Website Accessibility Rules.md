@@ -4,9 +4,11 @@ Nov 3, 2026 · @John
 
 ## Who it applies to
 
-Ontario's website rule applies if you have 50+ employees in Ontario. You must meet WCAG 2.0 Level AA on public websites and web apps, for content published after Jan 1, 2012.
+Ontario's website rule applies if you have 50+ employees in Ontario. You must meet WCAG 2.0 Level AA on public websites and web apps, for content published after Jan 1, 2012. It can be excused only where meeting it is "not practicable".
 
-With under 50 employees, you have no WCAG duty. It can be excused only where meeting it is "not practicable".
+With under 50 employees, you have no WCAG duty.
+
+The other duties for 50+ employees (accessibility policy, multi-year plan, feedback process, accessible formats on request) are in `docs/privacy-and-accessibility-2026-11-03.md`, with sources (checked against O. Reg. 191/11, 3 Nov 2026).
 
 ## WCAG musts
 
