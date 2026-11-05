@@ -401,7 +401,7 @@ if (stage) {
    A card that takes focus slides to the middle. The snap does the rest.
    ====================================================================== */
 const svcRow = $('.svc-menu');
-const svcDots = $$('.svc-dots i');
+const svcDots = $$('.svc-dots .pip');
 const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const cards = Array.from(svcRow.children);

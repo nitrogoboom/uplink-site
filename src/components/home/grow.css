@@ -76,10 +76,10 @@
 .grow-step-btn:disabled:hover { background: transparent; color: var(--c-muted); }
 .grow-dots { display: flex; align-items: center; }
 .grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-2); border: 0; border-radius: var(--r-2); background: none; }
-.grow-dot i { display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
-.grow-dot.is-done i { background: var(--c-accent); opacity: 0.45; }
-.grow-dot[aria-pressed="true"] i { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
-@media (hover: hover) { .grow-dot:not([aria-pressed="true"]):hover i { opacity: 1; } }
+/* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
+   amber, dimmed */
+.grow-dot.is-done .pip { background: var(--c-accent); opacity: 0.45; }
+@media (hover: hover) { .grow-dot:not([aria-pressed="true"]):hover .pip { opacity: 1; } }
 
 /* the cards: every step's card in a list without script; with it (.is-live) only the open one */
 .grow-cards { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); list-style: none; }
@@ -114,7 +114,7 @@
 .grow-stage .dome-rim { animation: grow-rim var(--loop-grow-rim) ease-in-out infinite; }
 .grow-stage.is-paused * { animation-play-state: paused; }   /* as specific as the rules above and after them, so it wins */
 @media (prefers-reduced-motion: reduce) {
-  .grow-stage .pc, .grow-tag, .grow-row, .grow-dot i { transition: none; }
+  .grow-stage .pc, .grow-tag, .grow-row { transition: none; }
   .grow-stage [stroke-dasharray], .grow-stage .dome-rim { animation: none; }
 }
 
