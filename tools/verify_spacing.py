@@ -19,6 +19,7 @@ SKIP = {
     'select.input': 'room for the arrow: --sp-4 + --icon + --sp-2 (forms.css)',
     '.mi-go': 'margin-left: auto pushes the arrow to the end of its row (home/hero.css)',
     '.svc-hint': 'pulled up under the swiping cards by their bottom padding: -(--sp-4 + --sp-8) (home/services.css)',
+    '.grow-cards': 'desktop: level with the picture\'s bottom, above its controls: --tap + --sp-2 (home/grow.css)',
 }
 PROPS = [
     'marginTop',

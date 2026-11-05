@@ -37,11 +37,11 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 
 ## Fold 3: Grow
 
-- [ ] **G1. Heading to card is 24** (grid `row-gap`, `grow.css:3-4`); should be 32 (X2). Phone: heading to picture 12, picture to card 12.
-- [ ] **G2. Card title to text is 12** on desktop and tablet, 8 on phone (`grow.css:85`, `:124`). R4: 8. Already listed as H2 in `spacing.md`.
-- [ ] **G3. Left column stops halfway.** At 1440×900 the heading and card take the top 290; the picture runs the full height, leaving about 360 empty under the card. Options: centre the left column against the picture, or sit the card at the picture's bottom.
-- [ ] **G4. Labels in the condensed font** and raw `line-height: 1` (X5, X7). `.grow-lbl` has line height 1.6, the other 12px labels 1.
-- [ ] **G5. Phone: card to section end is 96** (card `padding-bottom: --sp-6` + section 64, `grow.css:124`). Other folds end at 64.
+- [x] **G1. Heading to content.** Done: 32 at every size, from the heading's own margin (`.section-head`), as every section. Picture to card is the card's margin: 24 tablet, 12 phone (one unit with the picture).
+- [x] **G2. Card title to text.** Done: 8 at every size (R4).
+- [x] **G3. Left column stops halfway.** Done: the heading is level with the picture's top and the card with its bottom (above the controls). `verify_spacing.py` skips that margin (`--tap + --sp-2`).
+- [x] **G4. Labels in the condensed font.** Done: corner labels and row labels use the label type (body font, 0.12em), tags the chip type (body font, 0.08em); `--lh-tight` instead of 1. Tags are wider; checked all six steps at 375 wide: inside the picture, never overlapping. `.grow-tag-i` stays 1.4em so it grows with the text.
+- [x] **G5. Phone: card to section end.** Done: 64, as every section (the leftover padding from the old sticky player is gone).
 - OK: column gap 64, picture to controls 8.
 
 ## Fold 4: Work

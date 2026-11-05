@@ -1,7 +1,8 @@
 /*--- HOME · 3. We grow with you. The player (picture and controls) and the step cards; grow.js runs it.
    Phone layout first, then tablet, then desktop at the end. ---*/
-.grow { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: var(--sp-5); }
-.grow-head { margin-bottom: 0; }
+/* one source per gap: the heading's own margin (.section-head, --sp-6) sets heading to content, as on every section;
+   the card's margin-top sets picture to card */
+.grow { display: grid; grid-template-columns: minmax(0, 1fr); }
 
 /* the player: the picture and its controls, one unit */
 .grow-player { display: grid; gap: var(--sp-2); min-width: 0; }
@@ -15,7 +16,8 @@
   background: radial-gradient(60% 55% at 50% 58%, var(--c-glow-sky), transparent 72%), var(--c-bg-band);
 }
 .grow-stage > svg { position: absolute; inset: 2% 2% 3%; display: block; width: 96%; height: 95%; }   /* the drawing only, not the button's icons */
-.grow-place, .grow-team { position: absolute; top: var(--sp-3); z-index: 1; font-family: var(--font-display); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: 1; text-transform: uppercase; }
+/* the picture's corner labels, the tags and the card's row labels: the site's label and chip type (.label, .chip) */
+.grow-place, .grow-team { position: absolute; top: var(--sp-3); z-index: 1; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-tight); text-transform: uppercase; }
 .grow-place { left: var(--sp-4); color: var(--c-sky); }
 .grow-team { right: var(--sp-4); color: var(--c-muted); font-variant-numeric: tabular-nums; }
 
@@ -31,11 +33,10 @@
   border-radius: var(--r-pill);
   background: var(--c-alert);
   color: var(--c-on-accent);
-  font-family: var(--font-display);
   font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: var(--tracking-3);
-  line-height: 1;
+  line-height: var(--lh-tight);
   text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
@@ -43,7 +44,7 @@
   transform: translate(-50%, -100%) scale(0.85);
   transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
 }
-.grow-tag-i { flex: none; display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-family: var(--font-body); font-weight: 700; }
+.grow-tag-i { flex: none; display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-weight: 700; }   /* em: grows with the text */
 .grow-tag.is-fixed { background: var(--c-ok); }
 .grow-tag.is-on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
 .grow-tag.is-flip { transform: translate(-50%, -100%) scale(1.12); }
@@ -81,11 +82,11 @@
 @media (hover: hover) { .grow-dot:not([aria-pressed="true"]):hover i { opacity: 1; } }
 
 /* the cards: every step's card in a list without script; with it (.is-live) only the open one */
-.grow-cards { display: grid; gap: var(--sp-5); list-style: none; }
-.grow-card { display: grid; gap: var(--sp-3); }
+.grow-cards { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); list-style: none; }
+.grow-card { display: grid; gap: var(--sp-2); }
 .grow-rows { display: grid; gap: var(--sp-3); }
 .grow-row { display: grid; gap: var(--sp-1); transition: opacity var(--dur-2) var(--ease); }
-.grow-lbl { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--font-display); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); text-transform: uppercase; }
+.grow-lbl { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
 .grow-lbl i { width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-1); background: currentColor; }
 .grow-watch .grow-lbl { color: var(--c-alert); }
 .grow-handle .grow-lbl { color: var(--c-ok); }
@@ -120,8 +121,7 @@
 /* phones: the player scrolls with the page and the card sits under it. Text keeps the site's sizes, so it grows
    with the visitor's text size (Settings). */
 @media (--phone) {
-  .grow { row-gap: var(--sp-3); }
-  .grow-card { gap: var(--sp-2); padding-bottom: var(--sp-6); }
+  .grow-cards { margin-top: var(--sp-3); }
   /* bigger text: the team count goes under the place (side by side they meet), and a tag wider than the picture
      wraps instead of running past its edge (grow.js keeps it inside by its real size) */
   :root[data-text] .grow-team { top: calc(var(--sp-3) + var(--fs-1) + var(--sp-2)); right: auto; left: var(--sp-4); }
@@ -136,9 +136,10 @@
 
 /* desktop: one screen; heading and card on the left, the player on the right as tall as the screen allows */
 @media (--desktop) {
+  /* the heading at the picture's top, the card level with its bottom (above the controls) */
   .grow { grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-8); align-items: start; }
   .grow-head { grid-row: 1; grid-column: 1; }
-  .grow-cards { grid-row: 2; grid-column: 1; }
+  .grow-cards { grid-row: 2; grid-column: 1; align-self: end; margin-block: 0 calc(var(--tap) + var(--sp-2)); }
   .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
   .grow-player { grid-row: 1 / 3; grid-column: 2; }
   .grow-stage { width: auto; height: min(calc(var(--fold-inner, var(--fold-h)) - var(--tap) - var(--sp-2)), var(--grow-stage-max)); }   /* under 700 tall (no fold): the screen */
