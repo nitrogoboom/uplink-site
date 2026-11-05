@@ -15,7 +15,6 @@
   padding: var(--sp-6);
 }
 @media (--desktop) { .cta-band { grid-template-columns: minmax(0, 1fr) auto; padding: var(--sp-7); } }
-.cta-band .row { gap: var(--sp-2); }
 .cta-band .row > .btn { flex: 1 1 12rem; }   /* stacked on phones: same width; side by side: same height, shared evenly */
 @media (--desktop) { .cta-band .row > .btn { flex: 0 0 auto; } }
 
