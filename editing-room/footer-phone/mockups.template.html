@@ -89,7 +89,7 @@ svg { display: block; }
 .notes .eff { padding-top: var(--sp-2); border-top: 1px solid var(--c-line); }
 .notes .eff b { color: var(--c-text); font-weight: 600; }
 
-.after { display: grid; gap: var(--sp-7); }
+.after { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
 .after h2 { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; font-size: var(--fs-7); line-height: var(--lh-display); margin-bottom: var(--sp-4); }
 .tbl { overflow-x: auto; border: 1px solid var(--c-line); border-radius: var(--r-3); }
 table { width: 100%; min-width: 40rem; border-collapse: collapse; font-size: var(--fs-2); font-variant-numeric: tabular-nums; }
@@ -180,6 +180,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
 .fc-nl-row { display: flex; gap: var(--sp-2); }
 .fc-nl-row input { flex: 1; min-width: 0; min-height: 3rem; padding: var(--sp-3) var(--sp-4); background: var(--c-well); border: 1px solid var(--c-edge); border-radius: var(--r-2); }
 .fc-nl-row button { flex: none; min-height: 3rem; padding-inline: var(--sp-4); border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface-2); font-weight: 600; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .small { font-size: var(--fs-2); } .muted { color: var(--c-muted); }
 
 /* map: Now and A keep the site's box (4:3, label at the foot); C a 2:1 strip; B a small window in the heading */
@@ -205,7 +206,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
 .fc-head-row { display: grid; grid-template-columns: minmax(0, 1fr) 9.5rem; align-items: end; gap: var(--sp-3); }
 .mini-slot { min-width: 0; }
 .mini { position: relative; aspect-ratio: 4 / 3; border: 1px solid var(--c-line-2); border-radius: var(--r-3); background: var(--iso-ground); overflow: hidden; }
-.mini-cap { position: absolute; left: var(--sp-1); bottom: var(--sp-1); padding: 2px var(--sp-2); border-radius: var(--r-1); background: var(--c-glass-2); color: var(--c-accent-text); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; line-height: var(--lh-snug); }
+.mini-cap { position: absolute; left: var(--sp-1); top: var(--sp-1); padding: 2px var(--sp-2); border-radius: var(--r-1); background: var(--c-glass-2); color: var(--c-accent-text); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; line-height: var(--lh-snug); }
 .still .fc-w, .still .fc-w * { animation: none !important; }
 
 /* C: rows that open in place */
@@ -326,7 +327,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       <div class="notes">
         <p>Tabs in one sideways row, then the map, then the links.</p>
         <ul>
-          <li class="con">The links land about 540 px under the tap: below the screen on most phones.</li>
+          <li class="con">The links land about 500 px under the tap: at or below the bottom edge.</li>
           <li class="con">Three and a half of six tabs fit. Resources and Follow are off the right edge.</li>
           <li class="con">The map takes about 290 px of a 715 px screen.</li>
         </ul>
@@ -384,7 +385,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       <h2 id="h-sum">Side by side</h2>
       <div class="tbl">
         <table>
-          <thead><tr><th scope="col"><span class="sr-none">Measure</span></th><th scope="col">Now</th><th scope="col">A</th><th scope="col" class="pickcol">B</th><th scope="col">C</th></tr></thead>
+          <thead><tr><th scope="col"><span class="vh">Measure</span></th><th scope="col">Now</th><th scope="col">A</th><th scope="col" class="pickcol">B</th><th scope="col">C</th></tr></thead>
           <tbody>
             <tr><th scope="row">Tap Support: first link lands</th><td data-sum="now:gap">…</td><td data-sum="a:gap">…</td><td class="pickcol" data-sum="b:gap">…</td><td data-sum="c:gap">…</td></tr>
             <tr><th scope="row">Support links on screen after the tap</th><td data-sum="now:seen">…</td><td data-sum="a:seen">…</td><td class="pickcol" data-sum="b:seen">…</td><td data-sum="c:seen">…</td></tr>
@@ -513,7 +514,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
     }
     view(spot) {   // the camera for a spot: the site's own (data-vb), or a closer one for the small window and the strip
       const mk = nums(spot.dataset.mk);
-      if (this.mode === 'mini') { const w = 470, h = w * 0.75; return [mk[0] - w / 2, mk[1] - h * 0.3, w, h]; }
+      if (this.mode === 'mini') { const w = 420, h = w * 0.75; return [mk[0] - w / 2, mk[1] - h * 0.18, w, h]; }
       if (this.mode === 'strip') { const w = 800, h = w / 2; return [mk[0] - w / 2, mk[1] - h * 0.32, w, h]; }
       return nums(spot.dataset.vb);
     }
@@ -601,7 +602,6 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       this.mt = setTimeout(() => this.measure(t, id), instant ? 0 : 420);
     }
     arrive() {   // the screen as you reach the footer: its top just under the header, tab bar showing
-      this.sc.scrollTop = this.fc.offsetTop - this.sc.querySelector('.stub').offsetTop + this.sc.querySelector('.stub').offsetTop - 64;
       this.sc.scrollTop = this.fc.offsetTop - 64;
       this.bn.classList.remove('is-hidden');
     }
@@ -636,9 +636,11 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
   fit();
   const phones = [...document.querySelectorAll('.opt')].map((o) => new Phone(o));
   const start = () => {
-    phones.forEach((p) => { p.select('support', { instant: true }); p.arrive(); });
+    phones.forEach((p) => { p.select('support', { instant: true }); });
+    document.querySelectorAll('.opt').forEach((o) => o.classList.add('is-picked'));   // show all for the measure, then pick one
     requestAnimationFrame(() => {
       phones.forEach((p) => {
+        p.arrive();
         const m = p.measure(p.tabs.find((x) => x.dataset.tab === 'support'), 'support');
         if (!m) return;
         const g = document.querySelector(`[data-sum="${p.v}:gap"]`), s = document.querySelector(`[data-sum="${p.v}:seen"]`);
