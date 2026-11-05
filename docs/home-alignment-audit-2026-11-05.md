@@ -28,11 +28,12 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 
 ## Fold 2: Services
 
-- [ ] **S1. Phone: heading to first card is 48** (`services.css:99-100`: negative margin plus scroller padding, so card shadows aren't clipped). Everywhere else 32. Can drop to 32 if the shadow still fits.
-- [ ] **S2. Big card title** is italic, 28px, line height 1.1; small tile title upright 22px; Work's card titles 22px with no tracking (X6).
-- [ ] **S3. Small tile hides its line with its own clip** (`services.css:62`) instead of `.sr-only`. Same job, second method.
-- [ ] **S4. `.svc-go` label** is its own 12px recipe (X5).
-- OK: heading to cards 32, grid 16/24, the fold fills the screen top to bottom.
+- [x] **S1. Phone: heading to first card is 48.** Done: 32. The row reaches 16px further up into the heading, so the shadow keeps its room; the heading sits above the row so "See all services" keeps its whole tap area.
+- [x] **S2. Big card title italic.** Done: upright, as every title under h1 and h2 (`base.css:51`). Size, tracking and line height unchanged.
+- [x] **S3. Small tile hides its line with its own clip.** Done: the `.sr-only` recipe (without the -1px margin, which the spacing check flags and which isn't needed here).
+- [x] **S4. `.svc-go` label.** Not a problem: it is the label recipe (body font, 0.12em), same as the eyebrow.
+- [x] **S5. Phone card line at line height 1.3** (14px running text; R7 says 1.6). Done: 1.6, as the other cards' lines. Cards grow about 14px.
+- OK: heading to cards 32 at every size, grid 16/24, the fold fills the screen top to bottom.
 
 ## Fold 3: Grow
 

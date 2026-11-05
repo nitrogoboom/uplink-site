@@ -22,7 +22,7 @@
 .svc-icon svg { width: var(--sp-7); height: var(--sp-7); }
 .svc-text { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }
 .svc-text .chip { align-self: center; }
-.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-style: italic; font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
+.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
 .svc-line { max-width: 32ch; color: var(--c-muted); }
 :root[data-text] .svc-title { overflow-wrap: anywhere; hyphens: auto; }   /* bigger text (Settings): a long word breaks rather than being cut */
 /* the bar along the bottom of the card you point at */
@@ -57,9 +57,9 @@
   .svc-small .svc-tile { justify-content: center; padding-top: var(--sp-5); }
   .svc-small .svc-text { padding: var(--sp-3) var(--sp-5) var(--sp-5); }
   .svc-small .svc-text .chip { display: none; }
-  .svc-small .svc-title { font-size: var(--fs-5); font-style: normal; }
-  /* the line stays for screen readers */
-  .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .svc-small .svc-title { font-size: var(--fs-5); }
+  /* the line stays for screen readers: the .sr-only clip (base.css), here only from tablet up */
+  .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* tablets, bigger text (Settings): cards and tiles two to a row, so a name fits its card */
 @media (--tablet) {
@@ -94,9 +94,10 @@
   .svc-menu {
     display: flex;
     gap: var(--sp-3);
-    /* a scroller clips its cards' shadows at its edges, so the row reaches up to the heading (over its margin)
-       and down to the section's edge (under the dots and the section's padding); --shadow-front fades out inside that */
-    margin: calc(-1 * var(--sp-6)) calc(-1 * var(--gutter)) 0;
+    /* a scroller clips its cards' shadows at its edges, so the row reaches up over the heading's margin and a little
+       into the heading (the cards still sit --sp-6 under it, as on every screen) and down to the section's edge
+       (under the dots and the section's padding); --shadow-front fades out inside that */
+    margin: calc(-1 * (var(--sp-4) + var(--sp-6))) calc(-1 * var(--gutter)) 0;
     padding: calc(var(--sp-4) + var(--sp-6)) 0 calc(var(--sp-6) + var(--sp-8));
     overflow-x: auto;
     overscroll-behavior-x: contain;
@@ -104,6 +105,8 @@
     scrollbar-width: none;
   }
   .svc-menu::-webkit-scrollbar { display: none; }
+  /* the heading stays over the row's top edge, so "See all services" keeps its whole tap area */
+  .svc-wrap > .section-head { position: relative; z-index: 3; }
   /* spacers, so the first and last card can sit in the middle */
   .svc-menu::before, .svc-menu::after { content: ""; flex: 0 0 calc(16vw - var(--sp-3)); }
   /* no snap-stop: a hard flick can pass several cards and still lands one in the middle */
@@ -115,7 +118,7 @@
   .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
   .svc-more .svc-text { flex: none; }
   .svc-title { font-size: var(--fs-5); }
-  .svc-line { font-size: var(--fs-2); line-height: var(--lh-snug); }
+  .svc-line { font-size: var(--fs-2); }
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
   .svc-tile { background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band); transition: none; }
   /* the timeline sits in its own rule: the minifier folds a longhand next to `animation` into the shorthand,
