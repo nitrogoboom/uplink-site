@@ -34,7 +34,7 @@
   --tap: 2.75rem; --icon: 1.25rem; --header-h: 4rem; --botnav-h: 4rem;
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1); --dur-1: 150ms; --dur-2: 250ms; --dur-fc-panel: 360ms; --dur-fc-fill: 450ms; --dur-fc-route: 400ms;
   --loop-fc-flow: 1.2s; --loop-fc-blink: 4s; --loop-fc-bob: 3s; --loop-fc-mk-bob: 2.2s; --loop-fc-ring: 2.4s; --loop-fc-sig: 2.8s;
-  --s: 0.8; --cols: 4;
+  --s: 0.8; --cols: 3;
 }
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
@@ -288,7 +288,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
 /* ---------- on a real phone: one option at a time, the frame fills the screen ---------- */
 @media (max-width: 699px) {
   .wrap { padding-block: var(--sp-5) var(--sp-7); }
-  .picker { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-1); margin-top: var(--sp-5); padding-block: var(--sp-2); background: var(--c-bg); }
+  .picker { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-1); margin-top: var(--sp-5); padding-block: var(--sp-2); background: var(--c-bg); }
   .picker button { min-height: var(--tap); border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface); font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); text-transform: uppercase; line-height: 1; }
   .picker button[aria-pressed="true"] { border-color: var(--c-accent-text); background: var(--c-accent-tint); color: var(--c-accent-text); }
   .board { grid-template-columns: minmax(0, 1fr); margin-block: var(--sp-3) var(--sp-7); }
@@ -303,19 +303,18 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
 
 <div class="wrap">
   <header class="intro">
-    <p class="eyebrow">Footer · phones · round 1</p>
-    <h1>Tap here, <em>see it here</em></h1>
-    <p class="lead">On a phone the footer's tabs sit above the map, and the links they open sit below it. Each tap means scrolling down to see what changed and back up to tap again. Three ways to put the result next to the tap, beside the footer as it is now.</p>
+    <p class="eyebrow">Footer · phones · round 2</p>
+    <h1>Rows that open, <em>no map</em></h1>
+    <p class="lead">You picked C, open in place, and asked to drop the map on phones. Here it is beside C with the map and the footer as it is now. Tablet and desktop keep the map and the tabs.</p>
     <ul class="how">
-      <li><b>Tap a section in any phone</b>Each starts on Support, the way your screenshot did.</li>
+      <li><b>Tap a row in any phone</b>Each starts on Support. Tap a row to open it, tap it again to close it.</li>
       <li><b>Scroll inside a phone</b>The tab bar hides as you scroll down and comes back as you scroll up, like the site.</li>
       <li><b>Read the line under it</b>How far the first link lands below your tap, and how many links you can see without scrolling.</li>
     </ul>
     <nav class="picker" aria-label="Pick an option">
       <button type="button" data-pick="now" aria-pressed="false">Now</button>
-      <button type="button" data-pick="a" aria-pressed="false">A</button>
-      <button type="button" data-pick="b" aria-pressed="false">B</button>
       <button type="button" data-pick="c" aria-pressed="false">C</button>
+      <button type="button" data-pick="d" aria-pressed="false">No map</button>
     </nav>
   </header>
 
@@ -334,48 +333,33 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       </div>
     </section>
 
-    <section class="opt" data-opt="a" aria-labelledby="h-a">
-      <div class="opt-h"><span class="opt-k">A</span><h2 class="opt-n" id="h-a">Links first, map last</h2></div>
-      <div class="frame"><div class="bezel"><div class="phone" data-phone></div></div></div>
-      <p class="meter" data-meter aria-live="polite">Measuring…</p>
-      <div class="notes">
-        <p>All six tabs in a 3 × 2 grid. The links sit right under them. The map closes the footer.</p>
-        <ul>
-          <li class="pro">Every tab on screen, and the links show where you tapped.</li>
-          <li class="pro">Smallest change: phone CSS, plus dropping the tile's "4 links" line (the panel already says it).</li>
-          <li class="con">The map flies while it's off screen. You only see where it landed when you scroll down.</li>
-        </ul>
-        <p class="eff"><b>Change:</b> small. footer.css only (phone rules).</p>
-      </div>
-    </section>
-
-    <section class="opt is-pick" data-opt="b" aria-labelledby="h-b">
-      <div class="opt-h"><span class="opt-k">B</span><h2 class="opt-n" id="h-b">Map beside the title</h2><span class="pick-chip">My pick</span></div>
-      <div class="frame"><div class="bezel"><div class="phone" data-phone></div></div></div>
-      <p class="meter" data-meter aria-live="polite">Measuring…</p>
-      <div class="notes">
-        <p>The same grid, and a small map window next to the section title. One look shows the map fly and the links.</p>
-        <ul>
-          <li class="pro">Tap, map and links on one screen. The tap still feels like picking a spot.</li>
-          <li class="pro">The small map holds still between flights. Nothing loops, so no pause button is needed, and it costs the phone less.</li>
-          <li class="con">The window is small: the lit spot reads, the campus less so. At 200% text it moves under the title.</li>
-        </ul>
-        <p class="eff"><b>Change:</b> medium. footer.css, and a few lines in footer.js to move the map into the open panel's heading on phones.</p>
-      </div>
-    </section>
-
     <section class="opt" data-opt="c" aria-labelledby="h-c">
-      <div class="opt-h"><span class="opt-k">C</span><h2 class="opt-n" id="h-c">Open in place</h2></div>
+      <div class="opt-h"><span class="opt-k">C</span><h2 class="opt-n" id="h-c">Open in place, with map</h2></div>
       <div class="frame"><div class="bezel"><div class="phone" data-phone></div></div></div>
       <p class="meter" data-meter aria-live="polite">Measuring…</p>
       <div class="notes">
         <p>Six rows under a short map strip. A tap opens that section's links right under the row.</p>
         <ul>
           <li class="pro">The links open under your finger. Works at any text size, never scrolls sideways.</li>
-          <li class="con">Loses the "pick a hero" feel on phones. The map is above the rows and often off screen when it moves.</li>
-          <li class="con">Lower rows open near the bottom edge, so their links can still fall off screen.</li>
+          <li class="con">The map sits above the rows, often off screen when it moves.</li>
+          <li class="con">Lower rows open near the bottom edge, so their links can fall off screen.</li>
         </ul>
-        <p class="eff"><b>Change:</b> larger. Tabs on tablet and desktop, open-in-place rows on phones: footer.js has to run both.</p>
+      </div>
+    </section>
+    <section class="opt is-pick" data-opt="d" aria-labelledby="h-d">
+      <div class="opt-h"><span class="opt-k">C</span><h2 class="opt-n" id="h-d">Open in place, no map</h2><span class="pick-chip">Your pick</span></div>
+      <div class="frame"><div class="bezel"><div class="phone" data-phone></div></div></div>
+      <p class="meter" data-meter aria-live="polite">Measuring…</p>
+      <div class="notes">
+        <p>Six rows, nothing above them. A tap opens that section's links right under the row.</p>
+        <ul>
+          <li class="pro">With every row closed, the whole footer fits on one screen.</li>
+          <li class="pro">Every row sits higher than in C, with no map strip above them.</li>
+          <li class="pro">One row open at a time. Opening a lower row keeps it where it was under your finger.</li>
+          <li class="pro">Phones skip the map's download (about 30 KB).</li>
+          <li class="con">The campus map is gone on phones. It stays on tablet and desktop.</li>
+        </ul>
+        <p class="eff"><b>Change:</b> medium. footer.css hides the map on phones; footer.js runs tabs on wider screens and rows on phones.</p>
       </div>
     </section>
   </main>
@@ -385,24 +369,25 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       <h2 id="h-sum">Side by side</h2>
       <div class="tbl">
         <table>
-          <thead><tr><th scope="col"><span class="vh">Measure</span></th><th scope="col">Now</th><th scope="col">A</th><th scope="col" class="pickcol">B</th><th scope="col">C</th></tr></thead>
+          <thead><tr><th scope="col"><span class="vh">Measure</span></th><th scope="col">Now</th><th scope="col">C, with map</th><th scope="col" class="pickcol">C, no map</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Tap Support: first link lands</th><td data-sum="now:gap">…</td><td data-sum="a:gap">…</td><td class="pickcol" data-sum="b:gap">…</td><td data-sum="c:gap">…</td></tr>
-            <tr><th scope="row">Support links on screen after the tap</th><td data-sum="now:seen">…</td><td data-sum="a:seen">…</td><td class="pickcol" data-sum="b:seen">…</td><td data-sum="c:seen">…</td></tr>
-            <tr><th scope="row">All six sections without swiping</th><td class="miss">No, 3½ of 6</td><td class="ok">Yes</td><td class="ok pickcol">Yes</td><td class="ok">Yes</td></tr>
-            <tr><th scope="row">Map in view when it moves</th><td class="part">Partly</td><td class="miss">No</td><td class="ok pickcol">Yes</td><td class="part">Top rows only</td></tr>
-            <tr><th scope="row">Tablet and desktop</th><td>As now</td><td>As now</td><td class="pickcol">As now</td><td>As now</td></tr>
-            <tr><th scope="row">Size of the change</th><td>None</td><td>Small</td><td class="pickcol">Medium</td><td>Larger</td></tr>
+            <tr><th scope="row">Tap Support: first link lands</th><td data-sum="now:gap">…</td><td data-sum="c:gap">…</td><td class="pickcol" data-sum="d:gap">…</td></tr>
+            <tr><th scope="row">Support links on screen after the tap</th><td data-sum="now:seen">…</td><td data-sum="c:seen">…</td><td class="pickcol" data-sum="d:seen">…</td></tr>
+            <tr><th scope="row">All six sections without swiping</th><td class="miss">No, 3½ of 6</td><td class="ok">Yes</td><td class="ok pickcol">Yes</td></tr>
+            <tr><th scope="row">Map on phones</th><td>Yes</td><td>Yes, a strip above the rows</td><td class="pickcol">No</td></tr>
+            <tr><th scope="row">Tablet and desktop</th><td>As now</td><td>As now</td><td class="pickcol">As now</td></tr>
+            <tr><th scope="row">Size of the change</th><td>None</td><td>Larger</td><td class="pickcol">Medium</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
     <section class="why" aria-labelledby="h-why">
-      <h2 id="h-why">Why B</h2>
-      <p><b>It fixes the gap and keeps the idea.</b> The footer is a hero select: you pick a section and the camera flies to its spot. B keeps that moment on screen, right beside the result. A fixes the gap too but hides the flight; C fixes it best but turns the footer into a plain list on phones.</p>
-      <p><b>If the small map feels too small on your phone,</b> A is the fallback: same grid, same links, map at the end. Going from B to A later is a CSS change.</p>
-      <p><b>Same in all three:</b> only phones (under 700 px) change. Tablet and desktop keep today's footer. The tabs stay real tabs (arrow keys, screen-reader names) in A and B.</p>
+      <h2 id="h-why">What changes</h2>
+      <p><b>Only phones (under 700 px).</b> Tablet and desktop keep today's tabs and the flying map.</p>
+      <p><b>All rows start closed</b> on the real site, so the footer opens as a short list. Here each phone starts on Support so the numbers compare.</p>
+      <p><b>Screen readers</b> hear each row as a button that says whether it is open. On wider screens they stay real tabs.</p>
+      <p><b>Nothing is live.</b> This page is the mockup. Once you say go, it gets built and you get a preview link first.</p>
     </section>
 
     <section aria-labelledby="h-drop">
@@ -410,7 +395,8 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       <ul class="dropped">
         <li><b>Scroll down for you after a tap</b>Two lines of script, but the page jumps on every tap and the map flight scrolls away before you see it.</li>
         <li><b>Tabs pinned to the bottom of the screen</b>The game look, and in thumb reach. But it fights the site's tab bar for the same edge, and the page jumps as sections change height.</li>
-        <li><b>Drop the map on phones</b>Fixes the gap for free, but the map is the footer's one memorable thing.</li>
+        <li><b>A, links first, map last</b>Fixed the gap, but kept a map you only see after it has moved.</li>
+        <li><b>B, small map beside the title</b>Kept the map in view, but small.</li>
       </ul>
     </section>
   </div>
@@ -523,6 +509,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
     if (v === 'now') return `<footer class="fc">${tilesNow()}<div class="fc-stage">${map()}<div class="fc-panels">${panels}</div></div>${base}</footer>`;
     if (v === 'a') return `<footer class="fc">${tilesGrid()}<div class="fc-stage"><div class="fc-panels">${panels}</div>${map()}</div>${base}</footer>`;
     if (v === 'b') return `<footer class="fc">${tilesGrid()}<div class="fc-stage"><div class="fc-panels">${panels}</div></div>${base}</footer>`;
+    if (v === 'd') return `<footer class="fc"><div class="fc-stage">${rows()}</div>${base}</footer>`;
     return `<footer class="fc"><div class="fc-stage">${map('is-strip')}${rows()}</div>${base}</footer>`;
   };
   const chrome = `<header class="ph-hdr"><span class="ph-brand"><span class="ph-mark">${icon('mark')}</span><span class="ph-name">Uplink</span></span><span class="ph-acts"><span class="ph-btn">${icon('headset')}</span><span class="ph-btn">${icon('person')}</span><span class="ph-btn">${icon('gear')}</span></span></header>
@@ -584,7 +571,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
         this.mini = document.createElement('div'); this.mini.className = 'mini still';
         this.mini.innerHTML = '<span class="mini-cap"></span>';
         this.cam = new Cam(this.mini, 'mini');
-      } else {
+      } else if (this.v !== 'd') {
         const box = phone.querySelector('[data-map]');
         this.cam = new Cam(box, this.v === 'c' ? 'strip' : 'full');
         this.hud = box.querySelector('.fc-hud');
@@ -605,10 +592,14 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
     }
     select(id, { tapped, instant } = {}) {
       const s = SECTIONS.find((x) => x.id === id);
-      if (this.v === 'c') {
+      const rowsMode = this.v === 'c' || this.v === 'd';
+      const y0 = tapped && rowsMode ? tapped.getBoundingClientRect().top : 0;
+      if (rowsMode) {
         const open = !(tapped && tapped.getAttribute('aria-expanded') === 'true');
         this.tabs.forEach((t) => t.setAttribute('aria-expanded', String(open && t.dataset.tab === id)));
         Object.entries(this.panels).forEach(([k, p]) => { p.hidden = !(open && k === id); p.classList.toggle('is-on', open && k === id); });
+        // keep the tapped row where it was: closing a row above it would pull it up the screen
+        if (tapped) { const dy = (tapped.getBoundingClientRect().top - y0) / scale(); if (dy) this.sc.scrollTop += dy; }
         if (!open) { this.meter.textContent = 'Closed. Tap a row to open it.'; this.meter.className = 'meter'; return; }
       } else {
         this.tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
@@ -622,11 +613,11 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
       if (this.v === 'b') {
         this.panels[id].querySelector('.mini-slot').append(this.mini);
         this.mini.querySelector('.mini-cap').textContent = SPOTS[s.map][0];
-      } else {
+      } else if (this.hud) {
         this.hud.querySelector('b').textContent = SPOTS[s.map][0];
         this.hud.querySelector('small').textContent = SPOTS[s.map][1];
       }
-      this.cam.go(s.map, instant);
+      if (this.cam) this.cam.go(s.map, instant);
       const t = tapped || this.tabs.find((x) => x.dataset.tab === id);
       clearTimeout(this.mt);
       this.mt = setTimeout(() => this.measure(t, id), instant ? 0 : 420);
@@ -659,7 +650,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
     document.documentElement.classList.toggle('hand', hand.matches);
     if (hand.matches) { board.style.setProperty('--s', '1'); return; }
     const w = board.clientWidth, gap = 24;
-    const cols = Math.max(1, Math.min(4, Math.floor((w + gap) / (330 + gap))));
+    const cols = Math.max(1, Math.min(3, Math.floor((w + gap) / (330 + gap))));
     board.style.setProperty('--cols', String(cols));
     board.style.setProperty('--s', Math.min(1, (w - gap * (cols - 1)) / cols / 402).toFixed(4));
   };
@@ -682,7 +673,7 @@ th.pickcol, td.pickcol { background: var(--c-accent-faint); }
   };
   // phone view: the picker shows one option; #now, #a, #b, #c link straight to one
   const pick = (v) => {
-    if (!['now', 'a', 'b', 'c'].includes(v)) v = 'b';
+    if (!['now', 'c', 'd'].includes(v)) v = 'd';
     document.querySelectorAll('.opt').forEach((o) => o.classList.toggle('is-picked', o.dataset.opt === v));
     document.querySelectorAll('[data-pick]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.pick === v)));
     if (hand.matches) { const p = phones.find((x) => x.v === v); requestAnimationFrame(() => { p.arrive(); p.measure(p.tabs.find((x) => x.getAttribute('aria-selected') === 'true' || x.getAttribute('aria-expanded') === 'true') || p.tabs[0], SECTIONS.find((s) => p.panels[s.id].classList.contains('is-on'))?.id || 'support'); }); }
