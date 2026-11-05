@@ -28,7 +28,7 @@
 .menu { display: flex; flex-direction: column; gap: var(--sp-1); list-style: none; }
 .mi {
   display: flex; align-items: center; gap: var(--sp-4);
-  padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
+  padding: var(--sp-3);   /* as much as the menu hangs out (desktop, below): icon and arrow line up with the column's edges */
   border-radius: var(--r-3);
   color: var(--c-text);
   text-decoration: none;
@@ -40,21 +40,23 @@
 .mi:hover .icon-tile, .mi:focus-visible .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .mi:focus-visible { background: var(--c-surface-2); }
 .mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
-.mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); line-height: var(--lh-tight); text-transform: uppercase; }
+.mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
 .mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
 .mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
 .mi:hover .mi-go, .mi:focus-visible .mi-go { opacity: 1; }
 
-.hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); min-width: 0; }
+/* the news cards: a card grid, so its gap is every card grid's (docs/spacing.md R6) */
+.hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); min-width: 0; }
 @media (--tablet-up) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* thumb and text start on the same top line, so the two chips stay level
-   when one title wraps further than the other */
-.news { flex-direction: row; align-items: flex-start; gap: var(--sp-4); padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3); }
+@media (--desktop) { .hero-dock { gap: var(--sp-5); } }
+/* a picture card: --sp-3 all round, as .card. Thumb and text start on the same top line, so the two chips stay
+   level when one title wraps further than the other */
+.news { flex-direction: row; align-items: flex-start; gap: var(--sp-4); }
 .news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; overflow: hidden; }
 .news-thumb img { width: 100%; height: 100%; object-fit: contain; }
 .news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
 .news-text .chip { order: -1; align-self: flex-start; }   /* after the title in the markup (read second), on top on screen */
-.news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: var(--lh-title); text-transform: uppercase; }
+.news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
@@ -75,7 +77,7 @@
    the bottom bar). No eyebrow, and the short line. */
 .lead-short { display: none; }
 @media (--phone) {
-  .hero.fold { padding-top: var(--sp-5); }
+  .hero.fold { --hero-pad-top: var(--sp-5); }
   .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
   .hero-top { grid-area: top; gap: var(--sp-3); }
@@ -164,6 +166,7 @@
   /* the office keeps its own shape at the top of its column (stretched to the taller text, it would float far down) */
   :root[data-text] .hero-art .stage { aspect-ratio: 40 / 31; }
   :root[data-text] .hero-dock { align-self: start; }
+  /* the menu is its own group: the column's --sp-6 gap plus this, --sp-8 under the button */
   .hero-menu .hero-services { display: block; margin-top: var(--sp-6); }
   /* icons and text line up with the headline; the highlight hangs outside */
   .hero-menu .menu { margin-inline: calc(-1 * var(--sp-3)); }
