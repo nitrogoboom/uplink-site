@@ -31,8 +31,14 @@ Now: first link about 500 px below the tap, 1 of 4 on screen. A: 195 px, 4 of 4.
 (the row opens near the bottom). Checked in Chromium at 1440 wide and at phone size: no script errors, no sideways
 scroll, B's small map shows the lit building for all six sections.
 
-## Round 2 (mockup)
+## Round 2 (built, waiting for John's go)
 
-John picked C and dropped the map on phones. `mockups.html` now shows Now, C with the map, and C with no map (his
-pick). A build of it was written and checked (commit b27a4f4: verify_footer, verify_text, 200% text all clear), then
-reverted on John's word: mockups only, nothing live. Cherry-pick b27a4f4 when he says go.
+John picked C and dropped the map on phones; `mockups.html` shows it beside C with the map and today's footer.
+Built in `Footer.astro`, `footer.css` and `footer.js`, phones only. Checks: verify_footer, verify_text (200% and
+100%), every row opened at 320 and 390 wide at both text sizes, and verify_styles old vs new: 1280 and 1440 identical;
+3440 reports a margin difference on the Services pages, but the footer sits in the same place in both (a reporting
+quirk in the old build, not a visible change). Phone differs, as intended.
+
+## Next
+
+PR for a preview link. John tries it on his phone. Merge only on his go.
