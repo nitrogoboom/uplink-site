@@ -175,8 +175,6 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-base-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-5); margin-left: auto; }
 .status { display: inline-flex; align-items: center; gap: var(--sp-2); }
 .status::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: var(--c-ok); box-shadow: 0 0 0 var(--sp-1) var(--c-ok-tint); }
-.linkbtn { display: inline-flex; align-items: center; gap: var(--sp-2); min-height: var(--tap); padding: 0; border: 0; background: none; color: var(--c-muted); font-size: var(--fs-2); }
-.linkbtn:hover { color: var(--c-text); }
 
 /* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot) */
 .fc-w polygon { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }

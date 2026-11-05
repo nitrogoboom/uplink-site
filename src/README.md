@@ -24,7 +24,7 @@ Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700p
 
 - `Header.astro`, `BottomNav.astro` – logo, page tabs, the phone tab bar; `current` marks the page's tab
 - `Footer.astro` – hero-select roster and campus map, from `data/footer.json` and the services collection
-- `BookDialog.astro`, `ShortcutsDialog.astro` – the two pop-ups
+- `BookDialog.astro`, `SettingsDialog.astro` – the two pop-ups (Settings: text size and keyboard shortcuts)
 - `ServiceOptions.astro` – the service `<option>`s for the two "What do you need?" lists
 - `Icon.astro` – every inline icon by name; add new ones there
 

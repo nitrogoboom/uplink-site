@@ -13,8 +13,8 @@
      contact.js   Contact      copy buttons, queue card
      soon.js      soon.html    names the missing page
 
-   Keyboard map (single keys, can be switched off in the shortcuts panel):
-     ?          open the shortcuts panel      all pages
+   Keyboard map (single keys, can be switched off in Settings):
+     ?          open Settings (the keys)      all pages
      Esc        close the open pop-up         native <dialog> behaviour
    Single keys never fire while typing in a field, while a pop-up is open,
    or when Ctrl / Cmd / Alt is held.
@@ -261,7 +261,7 @@ document.addEventListener('keydown', (e) => {
   if (isTyping(e.target)) return;
   if (document.querySelector('dialog[open]')) return;
 
-  if (e.key === '?') { e.preventDefault(); openDialog('shortcuts-dialog'); }
+  if (e.key === '?') { e.preventDefault(); openDialog('settings-dialog'); }
 });
 
 /* ======================================================================

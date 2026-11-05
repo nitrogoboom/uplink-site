@@ -80,7 +80,6 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     <span class="fc-brand"><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b><span>{f.copyright}</span></span>
     <nav class="fc-legal" aria-label="Legal">{f.legal.map((l) => <a href={l.href}>{l.label}</a>)}</nav>
     <span class="fc-base-end">
-      <button class="linkbtn kbd-only" type="button" data-open="shortcuts-dialog"><span class="kbd" aria-hidden="true">?</span>Keyboard shortcuts</button>
       <span class="status"><span>{f.status.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span>
     </span>
   </div></div>

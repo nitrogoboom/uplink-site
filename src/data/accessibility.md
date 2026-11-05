@@ -18,7 +18,7 @@ How we check it, every time we release a change to the site:
 - **Text size.** Open Settings (the gear in the header) to make the text up to 200% larger. Only the text grows, so the page stays easy to follow. Your browser's own zoom works too.
 - **Pause animations.** The pause button stops the moving drawings. The site remembers your choice.
 - **Reduce motion.** If your device is set to reduce motion, the site doesn't animate.
-- **Keyboard shortcuts.** Press `?` to see them. You can turn them off in Settings so they don't clash with your own tools.
+- **Keyboard shortcuts.** They are listed in Settings (the gear at the top, or press `?`). You can turn them off there so they don't clash with your own tools.
 - **Skip link.** The first Tab on every page jumps past the menu to the main content.
 - **Works by keyboard.** Every link, button and pop-up works without a mouse, and you can always see where you are.
 
