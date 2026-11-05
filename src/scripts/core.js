@@ -15,7 +15,7 @@
 
    Keyboard map (single keys, can be switched off in Settings):
      ?          open Settings (the keys)      all pages
-     Esc        close the open pop-up         native <dialog> behaviour
+     Esc        close the open pop-up         native <dialog> behaviour; hinted beside each close button
    Single keys never fire while typing in a field, while a pop-up is open,
    or when Ctrl / Cmd / Alt is held.
    ========================================================================== */
