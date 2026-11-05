@@ -146,7 +146,6 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-tile[aria-selected="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .fc-tile-n { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: var(--lh-tight); text-transform: uppercase; }
 .fc-tile-c { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-muted); }
-.fc-tile-chev { display: none; }   /* phones only: the row's open/closed arrow */
 .fc-rk {
   display: grid; place-items: center; flex: none;
   width: var(--tap); height: var(--tap); padding: 0;
@@ -245,36 +244,12 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-rk { display: none; }
   .fc-map { order: -1; }
 }
-/* phones: no map; the roster is six rows and each opens its panel right under it (footer.js, fc-rows-mode) */
 @media (--phone) {
   .fc-rows--two, .fc-facts { grid-template-columns: minmax(0, 1fr); }
-  .fc-map { display: none; }
+  .fc-tile { width: calc(var(--sp-9) + var(--sp-4)); height: calc(var(--sp-8) + var(--sp-5)); }
+  .fc-map { display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 4 / 3; }
+  .fc-hud { position: relative; }
   .fc-base-end { margin-left: 0; }
-  .fc-rows-mode .fc-stage { display: none; }   /* its panels have moved into the rows */
-  .fc-rows-mode .fc-dock { background: none; border-bottom: 0; }
-  .fc-rows-mode .fc-dock .container { padding-block: var(--sp-4) var(--sp-6); }
-  .fc-rows-mode .fc-roster { flex-direction: column; flex: 1; gap: 0; padding-block: 0; overflow: visible; }
-  .fc-rows-mode .fc-tile {
-    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name chev" "icon count chev";
-    align-items: center; column-gap: var(--sp-3); row-gap: var(--sp-1);
-    width: auto; height: auto; min-height: calc(var(--sp-8) - var(--sp-1)); padding: var(--sp-2) 0;
-    border: 0; border-bottom: 1px solid var(--c-line); border-radius: 0; background: none; transform: none; text-align: left;
-  }
-  .fc-rows-mode .fc-tile:hover { transform: none; background: none; }
-  .fc-rows-mode .fc-tile .icon-tile { grid-area: icon; }
-  .fc-rows-mode .fc-tile-n { grid-area: name; align-self: end; font-size: var(--fs-5); }
-  .fc-rows-mode .fc-tile-c { grid-area: count; align-self: start; }
-  .fc-rows-mode .fc-tile-chev { grid-area: chev; display: grid; color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
-  .fc-rows-mode .fc-tile-chev svg { width: var(--sp-4); height: var(--sp-4); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-n { color: var(--c-accent-text); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
-  .fc-rows-mode .fc-panel { padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
-  .fc-rows-mode .fc-head { display: none; }   /* the row above already names it */
-  .fc-rows-mode .fc-lead { margin-top: 0; font-size: var(--fs-3); }
-  .fc-rows-mode .fc-body { margin-top: var(--sp-4); }
-  :root[data-text] .fc-wall { grid-template-columns: minmax(0, 1fr); }   /* bigger text: one card per line */
-  .fc-wall-item > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 }
 
 @media (--fold) {

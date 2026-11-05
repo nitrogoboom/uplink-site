@@ -5,8 +5,6 @@
 // (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near the screen.
 // The lists and the spots' words come from src/data/footer.json; the Services panel's links from the services
 // collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
-// Phones (under 700 px): no map, and the roster turns into six rows that open in place. footer.js moves each panel
-// under its own row and switches the tabs to buttons with aria-expanded; it puts them back when the screen widens.
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
@@ -34,7 +32,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     <button class="fc-rk" type="button" data-fc-step="-1" aria-label="Previous footer section"><Icon name="chevronL" /></button>
     <div class="fc-roster" role="tablist" aria-label="Footer sections">
       {roster.map((t, i) => (
-      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><Pause /><span class="fc-tile-c">{t.count}</span><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span></button>
+      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><Pause /><span class="fc-tile-c">{t.count}</span></button>
       ))}
     </div>
     <button class="fc-rk" type="button" data-fc-step="1" aria-label="Next footer section"><Icon name="chevronR" /></button>
