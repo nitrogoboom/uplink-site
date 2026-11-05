@@ -42,7 +42,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 
 ## Look and feel
-- [ ] Footer on phones (5 Nov 2026): John picked C (rows that open in place) with no map on phones. Built on branch `footer-phone-1erwhy`, preview PR open; merge only on his go. Then a real iPhone and Android.
+- [ ] Footer on phones (live 5 Nov 2026, PR #73): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat
