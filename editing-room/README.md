@@ -6,6 +6,10 @@ Side jobs, finished or in progress. Nothing here is part of the site build.
 
 A three-panel heist comic for the 404 page. Script, status and next steps in its `README.md`.
 
+## `footer-phone/` (mockups, in progress)
+
+The footer on phones: the tabs sit above the map and the links below it, so every tap means scrolling. Round 1 has three fixes beside today's footer, clickable, with a measure under each phone. Where it stands in its `README.md`.
+
 ## `grow-options/` (mockups, in progress)
 
 Redesign of the Home "We grow with you" section, eight rounds of mockups. Where it stands and how to build the pages in its `README.md`.
