@@ -4,6 +4,7 @@
    ========================================================================== */
 
 import { $, $$, html, reduceMotion, replay, toast, whenOnScreen } from './core.js';
+import { MEDIA } from '../lib/media.js';
 
 /* ======================================================================
    Footer: hero-select roster + campus map (every page)
@@ -67,13 +68,17 @@ if (fc) {
   // roster: tabs with arrow keys, plus the two key-cap buttons
   const tabs = $$('.fc-tile', fc);
   const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
+  const roster = $('.fc-roster', fc), home = $('#fc-panels', fc);
   let cur = Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'));
+  const phone = window.matchMedia(MEDIA.phone);
+  let rows = false;   // phones: the tiles are rows that open their panel right under them (no map)
   const select = (i, opts = {}) => {
+    if (rows) return;
     cur = (i + tabs.length) % tabs.length;
     tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === cur)); t.tabIndex = j === cur ? 0 : -1; });
     panels.forEach((p, j) => { p.classList.toggle('is-on', j === cur); if (j !== cur || opts.instant) p.classList.remove('is-in'); });
     if (!opts.instant) replay(panels[cur], 'is-in');   // the new panel slides in (again, if it was already showing)
-    const roster = $('.fc-roster', fc), t = tabs[cur];
+    const t = tabs[cur];
     const centre = () => roster.scrollTo({ left: t.offsetLeft - (roster.clientWidth - t.offsetWidth) / 2, behavior: opts.instant || reduceMotion.matches ? 'auto' : 'smooth' });
     // on page load the first tab is already in view (the roster starts at the left), so nothing to measure;
     // measuring during load would force an extra layout pass
@@ -84,16 +89,54 @@ if (fc) {
   // Tab from the tiles goes on into the chosen panel (the tabs come first in the markup); Enter or Space (a click
   // with detail 0) jumps straight there too
   tabs.forEach((t, i) => t.addEventListener('click', (e) => {
+    if (rows) { toggle(i); return; }
     select(i);
     if (e.detail === 0) panels[i].focus();
   }));
-  $('.fc-roster', fc).addEventListener('keydown', (e) => {
+  roster.addEventListener('keydown', (e) => {
+    if (rows) return;
     const map = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: tabs.length - 1 };
     if (!(e.key in map)) return;
     e.preventDefault();
     select(map[e.key], { focus: true });
   });
   $$('[data-fc-step]', fc).forEach((b) => b.addEventListener('click', () => select(cur + Number(b.dataset.fcStep), { focus: false })));
+
+  // Phones: one row open at a time, or none. Opening a row closes the one above it, which would pull the tapped row
+  // up the screen; the page scrolls by the same amount so the row stays under the finger.
+  const toggle = (i) => {
+    const open = tabs[i].getAttribute('aria-expanded') !== 'true';
+    const y0 = tabs[i].getBoundingClientRect().top;
+    tabs.forEach((t, j) => t.setAttribute('aria-expanded', String(open && j === i)));
+    panels.forEach((p, j) => { p.hidden = !(open && j === i); p.classList.toggle('is-on', open && j === i); p.classList.remove('is-in'); });
+    if (open) { cur = i; replay(panels[i], 'is-in'); }
+    const dy = tabs[i].getBoundingClientRect().top - y0;
+    if (dy) window.scrollBy({ top: dy, behavior: 'instant' });
+  };
+  // Switch between tabs (tablet, desktop) and rows (phones). Rows: each panel moves in under its row, the tablist
+  // roles come off and each row says whether it is open; all start closed. Tabs: the panels go back, cur shows.
+  const layout = (instant) => {
+    rows = phone.matches;
+    fc.classList.toggle('fc-rows-mode', rows);
+    if (rows) {
+      roster.removeAttribute('role');
+      tabs.forEach((t, i) => {
+        t.removeAttribute('role'); t.removeAttribute('aria-selected'); t.tabIndex = 0;
+        t.setAttribute('aria-expanded', 'false');
+        panels[i].setAttribute('role', 'region');
+        panels[i].hidden = true; panels[i].classList.remove('is-on', 'is-in');
+        t.after(panels[i]);
+      });
+    } else {
+      roster.setAttribute('role', 'tablist');
+      tabs.forEach((t, i) => {
+        t.setAttribute('role', 'tab'); t.removeAttribute('aria-expanded');
+        panels[i].setAttribute('role', 'tabpanel'); panels[i].hidden = false;
+        home.append(panels[i]);
+      });
+      select(cur, { instant });
+    }
+  };
 
   // newsletter (prototype: nothing is sent)
   const nl = $('[data-fc-nl]', fc);
@@ -122,9 +165,12 @@ if (fc) {
 
   // the CSS keys on html.js (set in each page's head, before paint); fc-js only says this script ran
   fc.classList.add('fc-js');
-  select(cur, { instant: true });
+  layout(true);
+  phone.addEventListener('change', () => layout(true));
+  // the map is fetched when its box comes within a screen of view; phones hide the box (footer.css), so they never
+  // fetch it, and a phone turned past 700 px fetches it then
   if ('IntersectionObserver' in window) {
     const near = new IntersectionObserver(([en]) => { if (en.isIntersecting) { near.disconnect(); build(); } }, { rootMargin: '100% 0px' });
     near.observe(mapBox);
-  } else build();
+  } else if (!phone.matches) build();
 }
