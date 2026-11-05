@@ -29,8 +29,11 @@
 .toast-ic { display: grid; place-items: center; flex: none; width: var(--sp-6); height: var(--sp-6); border-radius: 50%; background: var(--c-accent); color: var(--c-on-accent); }
 .toast-ic svg { width: var(--sp-4); height: var(--sp-4); }
 .toast--info .toast-ic { background: var(--c-sky); }
-.toast-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); padding-top: var(--sp-1); font-size: var(--fs-2); }
-.toast-text strong { font-size: var(--fs-3); }
+/* Icon, title and close button share one centre line: the title's line is as tall as the icon (--sp-6), and the
+   close button (--tap tall) hangs above and below it by the same amount. A second line of text runs under the title. */
+.toast-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); font-size: var(--fs-2); }
+.toast-text strong { display: flex; align-items: center; min-height: var(--sp-6); font-size: var(--fs-3); line-height: var(--lh-snug); }
+.toast > .iconbtn { flex: none; margin-block: calc((var(--sp-6) - var(--tap)) / 2); }
 @media (--phone) {
   .toasts { left: max(var(--sp-4), env(safe-area-inset-left, 0px)); width: auto; }
 }
