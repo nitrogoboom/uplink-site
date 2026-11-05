@@ -8,7 +8,7 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 
 | # | What | Now | Rule / suggestion |
 |---|---|---|---|
-| X1 | Where a fold's heading sits | Services and Grow start at the top of the fold (48 down). Work is centred, so its heading sits about 130 down. Scrolling fold to fold, the heading jumps. | Pick one. Suggest: every fold pins its head to the top (`--sp-7` padding) and the content fills or centres below it. |
+| X1 | Where a fold's heading sits | Done: Services, Grow and Work all start at the top of the fold (48 down at 1440×900). | Every fold pins its head to the top (`--sp-7` padding) and the content fills below it. |
 | X2 | Heading block to its content | Services 32. Grow 24 (`.grow-head` margin set to 0, grid `row-gap` instead). Work 56 (`.stack-5` gap 24 + `.section-head` margin 32, both at once). Phone: Services 48, Grow 12, Work 56. | R2: 32 at every size. One method: `.section-head`'s margin. Wrappers add no gap of their own. |
 | X3 | Same job, different classes: a heading block | `.section-head`, `.section-head--split > :first-child`, `.hero-top`, Proof's `.stack`. All give 16 between eyebrow, heading and lead. | Result is right. Keep `.section-head` for section heads; the hero and the call-to-action band can keep theirs. |
 | X4 | Card grid gaps | Hero news 12 at every size. Services 16 tablet, 24 desktop. Work 24 from tablet. | R6: 16, 24 from 1100. Work's `.card-row` steps up at 700 instead of 1100 (`shared-blocks.css:37`). Hero news at 12 is the odd one. |
@@ -47,7 +47,7 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 ## Fold 4: Work
 
 - [x] **W1. Heading to cards is 56.** Done: `stack-5` dropped; 32 at every size from the heading's margin.
-- [ ] **W2. Heading sits about 160 down; Services and Grow sit 48 down** (X1). The content is under 500 tall in a 900 fold, centred. Open: a design call (see below).
+- [x] **W2. Heading sits about 160 down; Services and Grow sit 48 down** (X1). Done: on desktop (3:2 and wider, as Services) the heading is at the top and the three cards fill the rest; their pictures take the height left (`work.css`). Top and bottom edges match Services at 1280×720, 1440×900 and 3440×1440. Bigger text: the cards grow and the pictures keep 4:3.
 - [x] **W3. Cards 24 apart on tablet.** Done: `.card-row` is 16, 24 from 1100, as every card grid (also the row on service pages).
 - [x] **W4. `.card-title` has no tracking.** Done: `--tracking-1`, as every display title. Shared, so the cards on Services, Work, Contact and the service pages change too.
 - Note: the section is a placeholder (`notes.md`), so keep fixes here small.
