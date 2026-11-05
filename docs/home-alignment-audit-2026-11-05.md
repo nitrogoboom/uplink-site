@@ -46,10 +46,10 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 
 ## Fold 4: Work
 
-- [ ] **W1. Heading to cards is 56 at every size** (`Work.astro`: `.container.stack-5` + `.section-head` margin). Drop `stack-5` (X2).
-- [ ] **W2. Heading sits about 130 down; Services and Grow sit 48 down** (X1). The content is 500 tall in a 900 fold, centred.
-- [ ] **W3. Cards 24 apart on tablet**, Services 16 (X4; `shared-blocks.css:37`).
-- [ ] **W4. `.card-title` has no tracking** (X6).
+- [x] **W1. Heading to cards is 56.** Done: `stack-5` dropped; 32 at every size from the heading's margin.
+- [ ] **W2. Heading sits about 160 down; Services and Grow sit 48 down** (X1). The content is under 500 tall in a 900 fold, centred. Open: a design call (see below).
+- [x] **W3. Cards 24 apart on tablet.** Done: `.card-row` is 16, 24 from 1100, as every card grid (also the row on service pages).
+- [x] **W4. `.card-title` has no tracking.** Done: `--tracking-1`, as every display title. Shared, so the cards on Services, Work, Contact and the service pages change too.
 - Note: the section is a placeholder (`notes.md`), so keep fixes here small.
 
 ## Fold 5: Proof (call-to-action band)
