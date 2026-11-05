@@ -1,14 +1,15 @@
 ---
 // HOME · 4. Our work: the first three projects from the collection, each linking to its case study, and a link to
 // all of them. A placeholder until this spot's real section is decided (notes.md).
-// Styles: shared (.card-row in src/styles/shared-blocks.css).
+// Styles: shared (.card-row in src/styles/shared-blocks.css); the desktop fold in work.css (imported here).
 import Icon from '../Icon.astro';
+import './work.css';
 import ProjectCard from '../work/ProjectCard.astro';
 import { getProjects } from '../../lib/site';
 const projects = (await getProjects()).slice(0, 3);
 ---
 <section class="section section--band fold" id="work" aria-labelledby="work-title">
-  <div class="container stack-5">
+  <div class="container work-wrap">
     <div class="section-head section-head--split">
       <div>
         <p class="eyebrow">Our work</p>

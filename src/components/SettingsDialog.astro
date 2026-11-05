@@ -1,10 +1,11 @@
 ---
-// SHARED · Settings pop-up (every page), opened by the header's gear. Text size: all the text on every page, up to
-// 200% and back (WCAG 1.4.4, technique G178); the layout keeps its size and the sections grow to fit. More display
-// options go here later (light or dark, English or French). core.js applies a choice at once and remembers it on this
-// device (localStorage uplink.text); Base.astro's head sets it before the page paints, and takes only these SIZES
-// (keep its list in step). Styles: src/styles/dialogs.css
-// and forms.css (.seg).
+// SHARED · Settings pop-up (every page), opened by the header's gear or the ? key.
+// Text size: all the text on every page, up to 200% and back (WCAG 1.4.4, technique G178); the layout keeps its size
+// and the sections grow to fit. Keyboard shortcuts: the single-key switch (off if they clash with a screen reader or
+// voice control) and the keys there are. More display options go here later (light or dark, English or French).
+// core.js applies a choice at once and remembers it on this device (localStorage uplink.text, uplink.shortcuts);
+// Base.astro's head sets the text size before the page paints, and takes only these SIZES (keep its list in step).
+// Styles: src/styles/dialogs.css and forms.css (.seg, .switch).
 import Icon from './Icon.astro';
 const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
 ---
@@ -23,5 +24,16 @@ const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
       </div>
       <p class="small muted" id="st-text-note">Makes the text bigger on every page. Saved on this device.</p>
     </fieldset>
+    <section class="keys-group" aria-labelledby="st-keys">
+      <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
+      <label class="switch" for="sc-toggle">
+        <span class="stack-2"><strong>Single-key shortcuts</strong><span class="small muted">Turn off if they clash with a screen reader or voice control.</span></span>
+        <input id="sc-toggle" type="checkbox" role="switch" checked>
+      </label>
+      <ul class="keys-list">
+        <li><span>Open these settings</span><span class="keys"><span class="kbd">?</span></span></li>
+      </ul>
+      <p class="small muted">Shortcuts pause while you type or while a pop-up is open.</p>
+    </section>
   </div>
 </dialog>

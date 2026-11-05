@@ -1,0 +1,13 @@
+/*--- HOME · 4. Our work. The row of project cards is shared (.card-row, src/styles/shared-blocks.css); this file
+   holds only the desktop fold. ---*/
+/* desktop (>= 1100 wide and >= 700 tall): one screen, as Services. The heading sits at the top of the fold, where the
+   other folds' headings sit, and the three cards fill the rest; their pictures take the height that is left.
+   Only in a window at least 3:2 wide, as Services: a taller one would stretch the cards into poles. */
+@media (min-width: 1100px) and (min-height: 700px) and (min-aspect-ratio: 3 / 2) {
+  .work-wrap { display: flex; flex-direction: column; height: var(--fold-inner); }
+  .work-wrap .card-row { flex: 1; min-height: 0; }
+  .work-wrap .card-media { flex: 1; min-height: 0; aspect-ratio: auto; }
+  /* bigger text (Settings): the cards grow to fit their words; the pictures keep their own shape */
+  :root[data-text] .work-wrap { height: auto; min-height: var(--fold-inner); }
+  :root[data-text] .work-wrap .card-media { flex: none; aspect-ratio: 4 / 3; }
+}
