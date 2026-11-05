@@ -46,7 +46,7 @@ const last = steps.length - 1;
           <button type="button" class="iconbtn grow-step-btn" data-dir="-1" aria-label="Previous place"><Icon name="chevronL" /></button>
           <span class="grow-dots">
             {steps.map((s, i) => (
-              <button type="button" class="grow-dot" data-i={i} aria-label={`${i + 1} of ${steps.length}: ${s.place}`} aria-pressed="false"><i></i></button>
+              <button type="button" class="grow-dot" data-i={i} aria-label={`${i + 1} of ${steps.length}: ${s.place}`} aria-pressed="false"><i class="pip"></i></button>
             ))}
           </span>
           <button type="button" class="iconbtn grow-step-btn" data-dir="1" aria-label="Next place"><Icon name="chevronR" /></button>

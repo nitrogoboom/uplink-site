@@ -1,6 +1,6 @@
 # Home: alignment and style audit (5 Nov 2026)
 
-Home only. Measured on the dev server at 1440×900, 820×1180 and 375×812, then checked against the CSS and the rules in `docs/spacing.md` (R0 to R7). Pixel values are at the 1440×900 reference. Fixed one fold at a time, each its own commit on `home-hero-tidy`. All five folds are done; X8 is the one item left.
+Home only. Measured on the dev server at 1440×900, 820×1180 and 375×812, then checked against the CSS and the rules in `docs/spacing.md` (R0 to R7). Pixel values are at the 1440×900 reference. Fixed one fold at a time, each its own commit on `home-hero-tidy`. All five folds and X8 are done.
 
 Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 
@@ -15,7 +15,7 @@ Fold order: 1 Hero, 2 Services, 3 Grow, 4 Work, 5 Proof.
 | X5 | 12px uppercase labels | Done: two recipes, label (body font, 0.12em) and chip (body font, 0.08em). Grow moved off the condensed font. The hero's phone captions keep 0.06em: they match the drawings' own labels. |
 | X6 | Display titles at the same size, different treatment | Done: every display title has `--tracking-1`; titles that can wrap use `--lh-title`; only h1 and h2 are italic. |
 | X7 | Raw numbers | Done: `--lh-tight` in Grow. `.grow-tag-i` stays 1.4em on purpose (it grows with the text). |
-| X8 | Two dot strips: Services phone dots (`.svc-dots i`) and Grow dots (`.grow-dot i`) | Open: same look, two sets of rules. One shared dots block would do. Low priority. |
+| X8 | Two dot strips: Services phone dots (`.svc-dots i`) and Grow dots (`.grow-dot i`) | Done: one shared block, `.pip` (`shared-blocks.css`; `.dot` was taken by the contact form and the drawings). Grow adds only its dimmed "done" steps and hover. Computed styles match the old ones. |
 
 ## Fold 1: Hero
 

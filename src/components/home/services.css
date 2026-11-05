@@ -155,9 +155,7 @@
   .svc-swipe { display: flex; align-items: center; gap: var(--sp-2); transition: opacity var(--dur-2) var(--ease); }
   .svc-swipe svg { width: var(--sp-4); height: var(--sp-4); }
   .svc-hint.is-swiped .svc-swipe { opacity: 0; }
-  .svc-dots { display: flex; gap: var(--sp-1); margin-right: var(--sp-2); }
-  .svc-dots i { width: var(--sp-2); height: var(--sp-2); background: var(--c-surface-2); border-radius: var(--r-pill); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease); }
-  .svc-dots i.on { width: var(--sp-5); background: var(--c-accent); }
+  .svc-dots { display: flex; gap: var(--sp-1); margin-right: var(--sp-2); }   /* the dots themselves: .pip (shared-blocks.css) */
   .svc-hint .svc-step { display: none; }
 }
 /* phone width with a mouse (a narrow desktop window): no swipe, so arrows either side of the dots step a card,

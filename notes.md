@@ -42,7 +42,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 
 ## Look and feel
-- [ ] Home dots: the Services phone dots (`.svc-dots i`) and the Grow dots (`.grow-dot i`) look the same but are two sets of rules; one shared block would do (`docs/home-alignment-audit-2026-11-05.md`, X8).
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat
