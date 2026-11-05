@@ -31,8 +31,8 @@ Now: first link about 500 px below the tap, 1 of 4 on screen. A: 195 px, 4 of 4.
 (the row opens near the bottom). Checked in Chromium at 1440 wide and at phone size: no script errors, no sideways
 scroll, B's small map shows the lit building for all six sections.
 
-## Next
+## Round 2 (mockup)
 
-Published as an Artifact (https://claude.ai/artifact/Y8WFL9a8jaRuci8XonrE3V) for John to try on his phone. Round 2
-from his pick: build it in `src/styles/footer.css` and `src/scripts/footer.js`, phones only (under 700 px), then
-`verify_footer.py` and `verify_text.py` (with the 200% text case).
+John picked C and dropped the map on phones. `mockups.html` now shows Now, C with the map, and C with no map (his
+pick). A build of it was written and checked (commit b27a4f4: verify_footer, verify_text, 200% text all clear), then
+reverted on John's word: mockups only, nothing live. Cherry-pick b27a4f4 when he says go.
