@@ -116,31 +116,26 @@
     "socials": [
       {
         "name": "LinkedIn",
-        "handle": "/company/uplinkit",
         "href": "/soon#social",
         "icon": "person"
       },
       {
         "name": "YouTube",
-        "handle": "@uplinkit",
         "href": "/soon#social",
         "icon": "play"
       },
       {
         "name": "Facebook",
-        "handle": "/uplinkit",
         "href": "/soon#social",
         "icon": "people"
       },
       {
         "name": "Instagram",
-        "handle": "@uplink.it",
         "href": "/soon#social",
         "icon": "camera"
       },
       {
         "name": "X",
-        "handle": "@uplinkit",
         "href": "/soon#social",
         "icon": "chat"
       }
