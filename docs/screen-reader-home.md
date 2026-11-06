@@ -74,7 +74,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 21. "Built to scale".
 22. Heading level 2: "We grow with you".
 23. "As your team spreads out, here's what to watch, and what we take care of."
-24. List "Where your people work", 6 items: buttons "1 of 6: Your office" to "6 of 6: Covered" (the current one is pressed). On desktop the steps are this list in the left column, in place of the dots under the picture.
+24. List "Where your people work", 6 items: buttons "1 Your office Team of 8" to "6 Covered Team of 120" (the current one is pressed). On desktop the steps are this list in the left column, in place of the dots under the picture.
 25. Image: "A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it".
 26. Button: "Play". While the story plays, it's "Pause"; at the end, "Play again".
 27. The current step's card, a list of 1:

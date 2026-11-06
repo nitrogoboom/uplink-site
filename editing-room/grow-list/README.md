@@ -4,7 +4,7 @@ The problem (John, November 6, 2026): on desktop (1100 px wide and up), the Home
 
 Nothing here is part of the site build.
 
-> **Note:** John approved option C on November 6, 2026, and it's built into the site: `src/components/home/Grow.astro`, `grow.css` and `src/scripts/grow.js`. The real rows are `.grow-item` (the mockup's `.grow-step`, renamed so it isn't confused with the arrows' `.grow-step-btn`), and each has the dots' `aria-label` ("1 of 6: Your office"). "Building it for real" below is the plan it followed.
+> **Note:** John approved option C on November 6, 2026, and it's built into the site: `src/components/home/Grow.astro`, `grow.css` and `src/scripts/grow.js`. The real rows are `.grow-item` (the mockup's `.grow-step`, renamed so it isn't confused with the arrows' `.grow-step-btn`), and each is named by its visible words ("1 Your office Team of 8"), not the dots' `aria-label`: axe flagged that label for leaving out the visible team size (WCAG 2.5.3, label in name). "Building it for real" below is the plan it followed.
 
 ## What the mockup shows
 
