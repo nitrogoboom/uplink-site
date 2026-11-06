@@ -6,9 +6,9 @@ Side jobs, finished or in progress. Nothing here is part of the site build.
 
 A three-panel heist comic for the 404 page. Script, status and next steps in its `README.md`.
 
-## `footer-phone/` (mockups, in progress)
+## `footer-phone/` (done, built into the site November 5, 2026)
 
-The footer on phones: the tabs sit above the map and the links below it, so every tap means scrolling. Round 1 has three fixes beside today's footer, clickable, with a measure under each phone. Where it stands in its `README.md`.
+The footer on phones: the tabs sat above the map and the links below it, so every tap meant scrolling. Option C without the map is on the site: under 700 px, six rows that open in place (PR #73). The rounds and the measures in its `README.md`.
 
 ## `grow-list/` (done, built into the site November 6, 2026)
 
