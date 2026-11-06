@@ -1,13 +1,28 @@
-# Security
+# Report a security problem
 
-Found a security problem with the Uplink Technology site? Email **security@uplinkit.ca** (also in the site's
-[`/.well-known/security.txt`](https://uplink-site.johnoreilly.workers.dev/.well-known/security.txt)). Please don't
-open a public issue for it.
+If you find a security problem with the Uplink Technology website, email **security@uplinkit.ca**. The same address is in the site's [`/.well-known/security.txt`](https://uplink-site.johnoreilly.workers.dev/.well-known/security.txt).
 
-Say which page or address, what you did and what happened. We reply within 2 business days, and tell you when it's fixed.
+Don't open a public issue for a security problem.
 
-In scope: the site's pages, its response headers (CSP, HSTS), and the `/api/*` endpoints in `worker/index.js`.
-Out of scope: Cloudflare's own systems (report those to Cloudflare), and anything that needs a visitor's device to be
-compromised first.
+## What to include
 
-Placeholder: the inbox becomes real with the real domain (`notes.md`, "Before going live").
+- The page or address where you found it.
+- What you did.
+- What happened.
+
+We reply within two business days and tell you when it's fixed.
+
+## Scope
+
+**In scope:**
+
+- The site's pages.
+- Its response headers, such as the CSP and HSTS.
+- The `/api/*` endpoints in `worker/index.js`.
+
+**Out of scope:**
+
+- Cloudflare's own systems. Report those to Cloudflare.
+- Anything that needs a visitor's device to be compromised first.
+
+> **Note:** The inbox is a placeholder until the site moves to its real domain. See "Before going live" in [`notes.md`](notes.md).

@@ -1,99 +1,297 @@
 # Uplink Technology site
 
-Overwatch 2–style website for a made-up IT company, "Uplink Technology". Astro 7, plain CSS and JS, no UI framework, hosted on Cloudflare Workers as static files. The content is data; the drawings are written by scripts.
+*Last updated: November 5, 2026*
 
-`notes.md` holds the open items. `docs/sop.md` is how we work: the stack, the standards (WCAG 2.0 AA and the rest) and the release checklist. `docs/` holds the reference notes (spacing rules, layout reference, screen-reader read-out, ideas); `docs/history/` is the record of finished work (the 28 Oct 2026 review and the plan that followed it), kept for the reasoning, not as instructions.
+This repository holds the website for Uplink Technology, a made-up IT company. The content is placeholder text, and the look is inspired by the Overwatch 2 menus. This page explains how to run the site, how it's organized, and how to use the tools that build and check it.
 
-## Run it on your PC
+The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI framework. Cloudflare Workers serves it as static files. Two ideas shape the code:
 
+- **Content is data.** Every service, project, and list is a typed JSON or Markdown file. Pages, cards, menus, the sitemap, and the structured data all read from those files.
+- **Drawings are code.** Every illustration is written by a Python script. You change the numbers in the script and run it again; you never edit the SVG by hand.
+
+## Related documents
+
+| Document | What it covers |
+| --- | --- |
+| [`notes.md`](notes.md) | Open items: bugs, polish, and decisions still to make. Start here. |
+| [`docs/sop.md`](docs/sop.md) | How a change reaches the live site, the standards the site meets, and the release checklist. |
+| [`src/README.md`](src/README.md) | A map of the source code: pages, components, content, styles, and scripts. |
+| [`docs/spacing.md`](docs/spacing.md) | Spacing and line-height rules. |
+| [`docs/security-and-compliance.md`](docs/security-and-compliance.md) | Security, privacy, and accessibility controls, and how to check each one. |
+| [`docs/secrets.md`](docs/secrets.md) | Every secret and key the site uses, and where it's kept. Names only, never values. |
+| [`docs/go-live-checklist.md`](docs/go-live-checklist.md) and [`docs/launch-runbook.md`](docs/launch-runbook.md) | What's left before the real domain goes live, and the steps for launch day. |
+| [`SECURITY.md`](SECURITY.md) | How to report a security problem. |
+| [`docs/history/`](docs/history/) | Finished work kept for its reasoning. Read it to learn why something is the way it is, not as instructions. |
+
+## Before you begin
+
+You need the following:
+
+- Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
+- For the drawing and check tools only: Python 3.10 or later.
+
+## Run the site locally
+
+1. Install the dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Open http://localhost:4321.
+
+The development server doesn't apply the response headers, the 404 page, or the redirects. To see the site exactly as Cloudflare serves it, build it and serve the result:
+
+```bash
+npm run build
+npm run serve
 ```
-npm install
-npm run dev
+
+Then open http://localhost:8787.
+
+### Install the Python tools
+
+The drawing generators and the browser checks are Python. To install them:
+
+```bash
+pip install -r requirements.txt
+python -m playwright install chromium firefox webkit
 ```
 
-Then open http://localhost:4321. Other commands:
+Firefox and WebKit are needed only for the release audit.
 
-- `npm run build` – the site into `dist/` (and `dist/_headers`)
-- `npm run serve` – serve `dist/` the way Cloudflare does (http://localhost:8787): headers, the 404 page and the clean-URL redirects apply there, unlike the dev server
-- `npm run check` – types and Astro diagnostics
-- `npm test` – tests for the build's after-steps and the Worker (`scripts/test/`, Node's own test runner)
-- `npm run ci` – what CI runs, in one go: check, lint, build, then the browser check on the built site (starts `npm run serve` itself if it isn't running; needs the Python tools below)
-- `npm run deploy` – deploy by hand (CI does it on push; see Hosting)
+## Commands
 
-For the drawing and check tools (optional): `pip install -r requirements.txt` and `python -m playwright install chromium firefox webkit` (Firefox and WebKit only for the release audit). Python 3.10+ and Node 24 (the version in `.node-version`; CI reads the same file).
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Starts the development server at http://localhost:4321. |
+| `npm run build` | Builds the site into `dist/`. After Astro builds, it shrinks the drawings with SVGO, writes a Markdown copy of every page, and writes `dist/_headers` and `dist/_redirects`. |
+| `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787: headers, the 404 page, and redirects included. Runs `wrangler dev`. |
+| `npm run preview` | Astro's own preview server. It doesn't apply the headers or redirects, so use `npm run serve` instead. |
+| `npm run check` | Checks types and runs Astro's diagnostics. |
+| `npm test` | Tests the build's after-steps and the Worker with Node's built-in test runner (`scripts/test/`). |
+| `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks only JSON and YAML; the code is formatted by hand. |
+| `npm run format` | Fixes what the linters can fix on their own. |
+| `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the browser check, and the link check. Starts `npm run serve` if it isn't already running. Needs the Python tools. It doesn't run the screenshot comparison, the preview upload, or the deploy. |
+| `npm run verify` | Runs the browser check: `python tools/verify_footer.py out`. |
+| `npm run verify:spacing` | Runs the spacing check: `python tools/verify_spacing.py`. |
+| `npm run release-audit` | Runs the release audit (`tools/audit.py`). See [`docs/sop.md`](docs/sop.md). |
+| `npm run deploy` | Deploys to the live Worker by hand. It runs `npm run ci` first, which builds the site and runs every check, and deploys only if they pass. |
 
-## What's where
+> **Note:** CI deploys for you when a change is merged to `main`, so you rarely need `npm run deploy`. It deploys whatever branch you have checked out, so run it from `main`.
 
-- `src/` – the site. `src/README.md` maps it: pages, section components, content, styles, scripts.
-- `public/` – files served as they are: `_headers` (the response-header template), fonts, the drawings in `assets/img/`, `og.png`, the favicon.
-- `tools/` – the drawing generators and their checks (Python + Playwright). Run them from the project root.
-- `scripts/` – the build's after-steps: `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), `markdown.mjs` writes each page's Markdown copy, `headers.mjs` finishes `dist/_headers` (script and style hashes, Early Hints). Their tests are in `scripts/test/`.
-- `worker/index.js` – the one Worker script, for `/api/*` only: today `/api/report`, where visitors' browsers send script errors and CSP blocks (they land in the Workers logs).
-- `wrangler.jsonc` – the Cloudflare Worker config. `.github/workflows/site.yml` – CI. Every secret and key the site uses, and where it lives: `docs/secrets.md`.
-- `editing-room/palette/` – the finished colour work. `DESIGN.md` there is the live colour spec; see its README.
-- `docs/layout-reference.md` – layout patterns from Overwatch 2 menus, applied on 28 Oct 2026.
+## How the repository is organized
 
-Links between pages are root-relative and have no `.html` (`/services`, `/contact#message`). Cloudflare serves `services.html` at `/services` and redirects the `.html` form. The site's address is `SITE_URL` in the environment (default in `astro.config.mjs`); it goes into canonicals, Open Graph, the sitemap and JSON-LD. Set the real domain at launch.
+| Path | What it holds |
+| --- | --- |
+| `src/` | The site. [`src/README.md`](src/README.md) maps it. |
+| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon. |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. Tests are in `scripts/test/`. |
+| `tools/` | The drawing generators and every check, in Python. Run them from the project root. See [Tools](#tools). |
+| `worker/index.js` | The Worker script. See [Hosting](#hosting). |
+| `wrangler.jsonc` | The Cloudflare Worker configuration. |
+| `.github/workflows/site.yml` | CI and deploys. |
+| `editing-room/` | Design work that isn't part of the build: mockups, drafts, and the colour work. `editing-room/palette/DESIGN.md` is the live colour spec. See [`editing-room/README.md`](editing-room/README.md). |
+| `knowledge/` | Reference notes on the rules the site follows, such as Ontario's accessibility rules. |
+| `docs/` | Reference pages, records, and dated decisions. |
 
-Content lives in the HTML, not in script: every service and project is on its page in full. Script only shows one at a time; the pages read and work without it.
+### Links and addresses
 
-## Adding a service
+Links between pages are root-relative and have no `.html`, for example `/services` or `/contact#message`. Cloudflare serves `services.html` at `/services`. The build writes `dist/_redirects`, which sends `/services.html`, `/services/`, and `/index.html` to the clean address with a `308` status. Cloudflare's own handling would use `307`, which isn't permanent.
 
-1. `src/content/services/<slug>.json`: copy an existing one (the fields are typed in `src/content.config.ts`). The slug is the page address, `/services/<slug>`.
-2. Drawing: a `tools/gen_NAME.py` writing `public/assets/img/NAME.svg` and `NAME-compact.svg` (copy `gen_voip.py`); `image` in the JSON is NAME.
-3. `npm run build`. The Services page card, the home card, the footer link, the "What do you need?" options, the service's own page, the sitemap, `llms.txt` and the JSON-LD all come from the file.
+The site's public address is `SITE_URL`. Set it in the environment, or change the default in `astro.config.mjs`. It's written into canonical links, Open Graph tags, the sitemap, and the JSON-LD. At launch, set it to the real domain.
 
-A project is the same with `src/content/projects/<slug>.json` (`/work/<slug>`). Its `services` field lists service slugs: the case study links them, and each service page shows the projects that name it. FAQ, team and footer lists are `src/data/*.json`.
+### Content works without script
 
-## Footer (hero select)
+Every service and project is in the page's HTML in full. Script only changes how much shows at once. Every page reads and works with script turned off.
 
-Every page has the same footer. On desktop it is exactly one screen tall.
+## Add a service
 
-- **Stage:** the text for the picked section on the left, a live campus map on the right.
-- **Dock:** a roster of tiles (Contact, Services, Company, Support, Resources, Follow). Arrow keys or the two key-cap buttons switch tiles.
-- **Base bar:** brand, legal links, keyboard shortcuts, status.
+1. Copy an existing file in `src/content/services/` and rename it `SLUG.json`. The slug becomes the page's address, `/services/SLUG`. The fields are typed in `src/content.config.ts`.
+2. Write the drawing's generator. Copy `tools/gen_voip.py` to `tools/gen_NAME.py` and change the scene. It writes `public/assets/img/NAME.svg`, the phone cut `NAME-compact.svg`, and the card cut `NAME-card.svg`. Set `image` in the JSON to `NAME`.
+3. Run the generator and its checks. See [Check a drawing](#check-a-drawing).
+4. Run `npm run build`.
 
-The lists come from `src/data/footer.json` (the Services panel from the services collection); the markup is `src/components/Footer.astro`. Each panel has a `data-map` value that names a spot on the campus map. The map is drawn by `tools/gen_campus.py` (the spots are `SPOTS` there, back-to-front draw order `ORDER`) and fetched by `src/scripts/footer.js` when the footer comes near. Without script, every panel shows in a stack and the roster is hidden.
+Everything else comes from the JSON file: the card on the Services page and Home, the footer link, the options in both "What do you need?" lists, the service's own page, the sitemap, `llms.txt`, and the JSON-LD.
 
-## Drawing rules (measured in the files)
+### Add a project
 
-- True isometric: one axis right-and-down at 30°, one left-and-down at 30°, verticals straight up.
-- Colours come from `tools/palette.py` (read from `src/styles/tokens.css`, roles from DESIGN.md); scripts use names, never hex.
-- Faces: top `pal.TOP` (#4D5863), left `pal.LEFT` (#37424E), right `pal.RIGHT` (#222E3A): top lightest, right darkest, on every box. Edge stroke `pal.EDGE` (#E6ECF2), width 1, opacity 0.3.
-- Highlight faces: `pal.HI_TOP` / `pal.HI_LEFT` / `pal.HI_RIGHT` (#FFCD9B / #FFAD51 / #C37600). Accents: `pal.AMBER` (#FFAD51), `pal.SKY` (#97C8EA) blue.
-- Labels: thin leader line (width 1.2, opacity 0.55), dot r=3 with a `pal.PAGE` (#0E1A27) 1.5 ring, caps title 13px/600, grey subline 11px `pal.GREY` (#BBC2C9).
-- Window outlines on walls: `pal.SKY`, width 0.9, opacity 0.5.
-- Floor discs are true iso circles (height/width = 0.577), with gaps cut around labels.
-- Wi-Fi access points hang at ceiling height; their rings are halos at the AP's height, not on the floor.
+A project works the same way. Its file is `src/content/projects/SLUG.json`, and its page is `/work/SLUG`. The `services` field lists service slugs. The case study links to each one, and each service's page lists the projects that name it.
+
+The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/data/*.json`.
+
+## Footer
+
+Every page has the same footer. On desktop, it's exactly one screen tall. It has three parts:
+
+- **Stage:** the text for the selected section on the left, and a live campus map on the right.
+- **Dock:** a row of tiles: Contact, Services, Company, Support, Resources, and Follow. Use the arrow keys or the two key-cap buttons to switch tiles.
+- **Base bar:** the brand, legal links, and status. Keyboard shortcuts live in the Settings dialog, which the header's gear opens.
+
+Below 700 px wide, the footer is six rows that open in place, with no map.
+
+The lists come from `src/data/footer.json`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`. Each panel has a `data-map` value that names a spot on the map. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` fetches the map when the footer scrolls near. Without script, every panel shows in a stack and the tiles are hidden.
+
+## Drawing rules
+
+Every drawing follows these rules. The values are measured in the files.
+
+- **True isometric.** One axis runs right and down at 30°, one runs left and down at 30°, and verticals go straight up.
+- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. The colour roles come from `editing-room/palette/DESIGN.md`. Scripts use names, never hex values.
+- **Box faces.** Every box has a top of `pal.TOP` (#4D5863), a left side of `pal.LEFT` (#37424E), and a right side of `pal.RIGHT` (#222E3A). The top is lightest and the right is darkest. Edges are `pal.EDGE` (#E6ECF2), width 1, opacity 0.3.
+- **Highlight faces:** `pal.HI_TOP`, `pal.HI_LEFT`, and `pal.HI_RIGHT` (#FFCD9B, #FFAD51, #C37600).
+- **Accents:** `pal.AMBER` (#FFAD51) and `pal.SKY` (#97C8EA).
+- **Labels.** A thin leader line (width 1.2, opacity 0.55) ends in a dot of radius 3 with a 1.5 ring of `pal.PAGE` (#0E1A27). The title is capitals at 13px, weight 600. The subline is 11px in `pal.GREY` (#BBC2C9).
+- **Windows on walls:** outlined in `pal.SKY`, width 0.9, opacity 0.5.
+- **Floor discs** are true isometric circles (height ÷ width = 0.577), with gaps cut around labels.
+- **Wi-Fi access points** hang at ceiling height. Their rings are halos at the access point's height, not on the floor.
 
 ## Tools
 
-Every drawing was made by a generator with world → screen = `origin + ((x − y)·cos30·u, (x + y)·u/2 − z·u)`.
-`tools/iso.py` has `W(ox, oy, u)` for this; each generator sets its own origin and unit near the top.
+Every tool runs from the project root.
 
-- `gen_<name>.py public/assets/img/<name>.svg` – draws `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud` and `voip` from a world-space description. Edit the numbers at the top and rerun; don't hand-edit those SVGs. Running a script with nothing changed gives the same file byte for byte, so a git diff only ever shows what you changed.
-- `gen_office.py public` – the office floor plan: `office.svg`, `office-compact.svg`, `office-card.svg`, an animated reference copy `out/drawings/office-build.svg` (not deployed), the hero `hero-office.svg` and its tablet cut `hero-office-tablet.svg` (same scene, three labels at 1.5×; `home.js` fetches one by screen size, `HERO` in `src/lib/site.ts`), the hero's phone cut animated `office-compact-build.svg` (same scene framed closer, no words: `home.js` writes two captions over it, cloud and office, from its `data-cloud` and `data-items`) with its dashes `office-compact-flows.svg` (fetched on phones) and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the hero's hand-drawn cloud live in `tools/office_parts/`.
-- `gen_grow.py` – the Home "We grow with you" world: the inline `src/components/home/grow-world.svg` (shrunk with SVGO in `Grow.astro` at build). One business in six steps; every part carries the step it arrives on (`data-s`), which `src/scripts/grow.js` plays. `painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py`. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`).
-- `palette.py` – every drawing colour, by name (`pal.AMBER`, `pal.EDGE`, `pal.SCREEN`…). Roles are read from `tokens.css`; shades with no DESIGN.md role are worked out there from the palette. Change a colour in `tokens.css`, then rerun the gen scripts. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`.
-- `isoprops.py` – shared kit: office chair, monitor on a stand (with `screen_glass` / `app_window` for its screen), VoIP desk phone, and `on_front` / `on_side` / `on_top` for drawing flat details exactly on an iso face. Props sit on a grid (x, y in 0.25s, z in 0.125s) so their parts can never nearly-touch; keep the scene around them on the same grid.
-- Compact cuts: every `gen_*.py` (except `gen_grow.py`) also writes `NAME-compact.svg`, the same scene framed closer with fewer, bigger labels (its `COMPACT` settings; `isogen.doc(crop=)`, `label(scale=)`, a newline in a subline wraps it). Pages swap it in with `<picture>` where the drawing shows small (a service's page below 1200px wide, About below 1600px), cards always use `NAME-card.svg` (the compact cut with its labels and their embedded letters taken out, written next to it by `isogen.card()`; about half the bytes), and on phones the home hero plays the hero scene's phone cut (`office-compact-build.svg`), or shows the still `office-compact.svg` (still the older plan) with reduced motion. When you change a drawing's labels or layout, check its compact cut too.
-- `svgfont.py` – an SVG loaded with `<img>` can't see the page's fonts, so each drawing carries just the Barlow letters it uses (fonts in `tools/fonts/`, SIL OFL). The generators do it automatically. Needs `pip install fonttools brotli`.
-- `check.py file.svg` – exits 1 on any finding: edges near (but not on) an iso angle (skipped: leader lines in `.co` groups, `class="mark"` arrowheads, `class="free"` parts tilted on purpose), near-miss vertices, leader dots and what they sit on. Two opt-in exceptions: `<g class="curve">` holds a curved surface cut into flat strips (the hero cloud's side wall), whose strips are not checked against each other; `--step PX` counts, rather than lists, vertex pairs exactly one grid step apart along an iso axis, for drawings whose props sit on a grid finer than 2px on screen (office: `--step 1.758`, 0.0625 × 28.127)
-- `painter.py` – finds boxes drawn in the wrong order or poking into each other (exits 1 on any, or when it finds no boxes). Each drawing has a `rules_<name>.py`; its first lines give the exact command
-- `gen_og.py public` – the share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Screenshots of a small page made from the site's tokens, fonts and `office-card.svg`; rerun after changing those.
-- `verify_footer.py out/` – against `npm run serve`: the hero builds, tiles respond to hover, the Grow section plays on its own, every footer tab at 1440×900 (one screen tall, no panel overflow, map moves), Home at phone, tablet, 1440×900 and 3440×1440 with no sideways scroll and an axe pass at phone and desktop; every other sitemap page plus soon and the 404 once at phone size (script errors, sideways scroll). Home is the page being worked on (`FOCUS` in the script); `--all` checks every page at every size with axe, as before. It fails on any script error (console error, crash, CSP or Trusted Types block), a hero or Grow section that doesn't respond, sideways scroll, or a serious axe finding. CI runs it before deploy.
-- `check_links.py` – against `npm run serve`: every link, picture, script and preload on every page answers, and every `#section` link finds its id. CI runs it.
-- `visual_diff.py OLD NEW` – every page of NEW next to OLD at phone, tablet and desktop, drawings masked; lists what looks different (`out/visual/`). CI runs it on each PR against the live site and puts the list in the run's summary.
-- `audit.py` (`npm run release-audit`) – the release audit in `docs/sop.md`: every page in Chromium, Firefox, WebKit and emulated phones, a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. A few minutes; run it before a release, not on every build. Report in `out/audit/report.md`.
-- `pagespeed.py <address>` – Google's PageSpeed Insights on the live site's sitemap pages (see Hosting).
+### The projection
 
-## Hosting (Cloudflare Workers, static assets)
+Every drawing maps world coordinates to the screen with the same formula:
 
-- Code: private GitHub repo `nitrogoboom/uplink-site`.
-- Site: a Cloudflare Worker named `uplink-site` serving `dist/` as static assets (`wrangler.jsonc`), at https://uplink-site.johnoreilly.workers.dev until it has a domain. (The old Cloudflare Pages project was deleted on 28 Oct 2026.) `SITE_URL` (in the environment, or the default in `astro.config.mjs`) is the address written into canonicals, the sitemap and JSON-LD; set the real domain there at launch.
-- Deploys come from GitHub Actions (`.github/workflows/site.yml`): every push and pull request runs `astro check`, lint, the build, and `tools/verify_footer.py` against the built site (served by `wrangler dev`); a push to `main` runs `wrangler deploy`; a pull request uploads a preview version and posts its address as a comment on the pull request. The address is the branch name (`https://<branch>-uplink-site.johnoreilly.workers.dev`), so it stays the same on every push. The workflow needs two secrets, `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID`, in a GitHub environment called `cloudflare`.
-- Undo a bad deploy: `npx wrangler deployments list` shows the recent ones; `npx wrangler rollback` puts the one before back live (or `npx wrangler rollback <version-id>` for an older one). It takes seconds and needs no build. Then fix `main`, because the next push deploys it again.
-- The site is open to visitors but kept out of search results: `public/_headers` sends `X-Robots-Tag: noindex` on every response (a test build with placeholder content). Delete that line at launch.
-- `public/_headers` sets the security headers on every file (HSTS, nosniff, Referrer-Policy, Permissions-Policy, CSP) and the cache rules. It is a template: `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` in the built pages (the `classList.add('js')` line) and an Early Hints `Link` rule per page. Adding an outside host (fonts, analytics, a form service) means adding it to the CSP. The CSP requires Trusted Types: a script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`, or the browser blocks it. `style-src` has no `'unsafe-inline'`: inline `<style>` blocks (the hero drawings' too) get a hash, and the build refuses any `style=""` attribute.
-- Password lock: off. `tools/site-lock/worker.js` is a Worker that puts the whole site behind a browser password prompt; its header comment says how to wire it into `wrangler.jsonc` and set the `SITE_PASSWORD` secret.
-- PageSpeed is a separate tool, run when you want it: `python tools/pagespeed.py <address>`. Google's PageSpeed Insights tests the live sitemap's pages on phone and desktop on its own servers and reports whether Home scores 100 in all four (`--strict` holds every page to that). It needs the PageSpeed API key in `.dev.vars` as `PSI_API_KEY` (gitignored; Google Cloud project `uplink-site`, key `pagespeed-gate`).
+```
+screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
+```
+
+`tools/iso.py` provides `W(ox, oy, u)` for this. Each generator sets its own origin and unit near the top of the file.
+
+### Generators
+
+| Tool | What it writes |
+| --- | --- |
+| `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
+| `gen_office.py public` | The office floor plan: `office.svg`, `office-compact.svg`, and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
+| `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
+| `gen_campus.py public` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. SVGO leaves this file as written. |
+| `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
+
+A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.
+
+**Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels. Its settings are `COMPACT` in each generator. Pages swap it in with `<picture>` where the drawing shows small: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`, which is the phone cut with its labels and their embedded letters removed (`isogen.card()`), at about half the size. On phones, the Home hero plays `office-compact-build.svg`. With reduced motion, it shows the still `office-compact.svg`, which is still the older plan.
+
+When you change a drawing's labels or layout, check its phone cut too.
+
+### Shared drawing code
+
+| Module | What it provides |
+| --- | --- |
+| `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `DESIGN.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
+| `iso.py` | The projection, `W(ox, oy, u)`. |
+| `isogen.py` | Writing a drawing: the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a subline wraps it), the card cut (`card()`), and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
+| `isoprops.py` | Shared props: office chair, monitor on a stand (with `screen_glass` and `app_window` for its screen), and VoIP desk phone. Also `on_front`, `on_side`, and `on_top`, which draw flat details exactly on a box face. Props sit on a grid (x and y in steps of 0.25, z in steps of 0.125) so their parts can never nearly touch. Keep the scene around them on the same grid. |
+| `hero_cloud.py` | The hero's cloud. |
+| `svgfont.py` | Embeds the Barlow letters a drawing uses. An SVG loaded with `<img>` can't see the page's fonts, so each drawing carries its own subset. The generators do this for you. The fonts are in `tools/fonts/` (SIL Open Font License). Needs `fonttools` and `brotli`. |
+
+### Check a drawing
+
+After you change a drawing, run both checks on it. Each exits with status 1 on any finding.
+
+- **`check.py FILE.svg`** finds edges that are near an isometric angle but not on it (`ANGLE`), vertices of different shapes that nearly meet (`SNAP`), and vertices that nearly touch another shape's edge (`TJOIN`). It also lists where each leader dot sits (`DOT`); those lines are for reading and don't fail the check. For an SVG inline in an HTML file, add the line range: `check.py FILE START_LINE END_LINE`.
+  - It skips leader lines in `.co` groups, `class="mark"` arrowheads, and `class="free"` parts tilted on purpose.
+  - `<g class="curve">` holds a curved surface cut into flat strips, such as the side wall of the hero's cloud. Its strips aren't checked against each other.
+  - `--step PX` counts vertex pairs exactly one grid step apart along an isometric axis, instead of listing them. Use it for drawings whose props sit on a grid finer than 2 px on screen. For the office: `--step 1.758` (0.0625 × 28.127).
+- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`, and its first lines give the exact command. For Grow:
+
+  ```bash
+  python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
+  ```
+
+### Browser checks
+
+These checks open the built site in a real browser. Start `npm run serve` first, unless a tool says it starts the server itself.
+
+| Tool | What it checks |
+| --- | --- |
+| `verify_footer.py out/ [PORT]` | The main browser check, which CI runs before every deploy. It checks: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall, no panel overflow, the map moves). Home at phone, tablet, 1440×900, and 3440×1440 with no sideways scroll, and an axe pass at phone and desktop. The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. Every other sitemap page, plus `/soon` and the 404 page, once at phone size, with an axe pass. It fails on any script error, crash, CSP or Trusted Types block, a hero or Grow section that doesn't respond, sideways scroll, a serious or critical axe finding, or a sitemap with fewer than five pages. Home gets the full check because it's the page being worked on (`FOCUS` in the script). Add `--all` to give every page the full check. |
+| `verify_text.py [PORT] [--text N]` | Every page at four sizes with the text at 200% (or `N`×): no clipped, overlapping, or unreachable text, and no sideways scroll. |
+| `verify_spacing.py [BASE_URL] [PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
+| `verify_styles.py BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
+| `check_links.py [BASE] [--external]` | Every link, picture, script, and preload on every page answers, and every `#section` link finds its id. CI runs it. `--external` also checks links to other sites. |
+| `visual_diff.py OLD_URL NEW_URL [--strict]` | Screenshots every page of both sites at phone, tablet, and desktop, with the drawings masked, and lists what looks different (`out/visual/`). CI runs it on each pull request against the live site and puts the list in the run's summary. It reports and never fails, unless you add `--strict`. |
+| `audit.py` | The release audit (`npm run release-audit`). It runs every page in Chromium, Firefox, WebKit, and emulated phones, plus a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. It takes a few minutes, so run it before a release, not on every build. The report is `out/audit/report.md`. |
+| `site_pages.py` | Not a check. The page list and screen sizes the other checks share (`SIZES`, `MISSING`). |
+
+### Live-site checks
+
+| Tool | What it checks |
+| --- | --- |
+| `smoke.py ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site over plain HTTP: every sitemap page, the security headers, `noindex`, redirects, the 404 status, the report endpoint, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone. `--old` checks that the old address redirects to the new one. |
+| `pagespeed.py ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the live sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
+
+## Hosting
+
+The site runs on Cloudflare Workers with static assets.
+
+- **Code:** the private GitHub repository `nitrogoboom/uplink-site`.
+- **Site:** a Worker named `uplink-site` serves `dist/` as static assets (`wrangler.jsonc`). Until the site has its own domain, it's at https://uplink-site.johnoreilly.workers.dev. The old Cloudflare Pages project was deleted on October 28, 2026.
+
+### The Worker
+
+`worker/index.js` is the site's only server code. Today, `run_worker_first` is `true` in `wrangler.jsonc`, so every request reaches the Worker before the static files. The Worker does three things:
+
+- Redirects `http://` to `https://` with a `308`. `workers.dev` belongs to Cloudflare, so its "Always Use HTTPS" setting isn't ours to turn on.
+- Answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
+- Gives `/404` itself a 404 status.
+
+Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied.
+
+> **Note:** Every request counts against the free plan's 100,000 Worker requests a day. At launch, turn on Always Use HTTPS on the real domain's zone and set `run_worker_first` back to `["/api/*", "/404"]`. The steps are in [`docs/launch-runbook.md`](docs/launch-runbook.md).
+
+### Deploys
+
+GitHub Actions deploys the site (`.github/workflows/site.yml`).
+
+- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, `verify_footer.py`, and `check_links.py` against the built site served by `wrangler dev`.
+- A change that touches only root `*.md` files, `docs/`, or `knowledge/` runs no CI and deploys nothing.
+- A push to `main` that passes deploys to the live Worker.
+- A pull request also runs `visual_diff.py` against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.
+
+### Roll back a bad deploy
+
+1. List the recent deploys:
+
+   ```bash
+   npx wrangler deployments list
+   ```
+
+2. Put the previous version back live:
+
+   ```bash
+   npx wrangler rollback
+   ```
+
+   For an older version, add its ID: `npx wrangler rollback VERSION_ID`. A rollback takes seconds and needs no build.
+
+3. Fix `main`. The next push to `main` deploys it again.
+
+### Response headers
+
+`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP) and the cache rules. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them.
+
+The file is a template. `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also writes an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
+
+Keep these rules in mind:
+
+- **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
+- **Trusted Types.** The CSP requires Trusted Types. A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`, or the browser blocks it.
+- **No `style=""` attributes.** `style-src` has no `'unsafe-inline'`, and the build fails on any `style=""` attribute. Scripts set styles with `el.style.x = …` instead.
+
+### Search engines
+
+The site is open to visitors but kept out of search results. `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
+
+### Password lock
+
+The password lock is off. `tools/site-lock/worker.js` puts the whole site behind a browser password prompt. Its header comment explains how to turn it on and set the `SITE_PASSWORD` secret.

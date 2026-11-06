@@ -1,7 +1,7 @@
 ---
 // The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it.
 //   title, description  the page's own
-//   page                which tab is current (home, services, work, about, contact; notfound and soon have none)
+//   page                which tab is current (home, services, work, about, contact; notfound, soon, privacy and accessibility have none)
 //   path                the page's address ('/', '/services'); gives it a canonical and Open Graph tags.
 //                       Leave it out for pages that should carry neither (soon, 404).
 //   robots              e.g. 'noindex, follow'
@@ -11,7 +11,7 @@
 //   ldPage, ldGraph     more JSON-LD: fields for the page node, and more nodes (the Services page adds its FAQ and
 //                       the Service list from the collections).
 // Anything else a page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
-// The shared CSS (global.css) is imported here, so Astro links it once per page; the page's own CSS is
+// The shared CSS (global.css) is imported here; the build inlines it in a <style> block in every page (astro.config.mjs). The page's own CSS is
 // imported by its section components. Scripts: core.js and footer.js run on every page (ES modules);
 // a page adds its own with a <script> that imports it, inside <Fragment slot="scripts"> so it lands at the end of
 // <body> (a script after </Base> would come after </html>, which isn't valid HTML).

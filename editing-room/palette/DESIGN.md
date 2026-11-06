@@ -293,7 +293,7 @@ Measure contrast with a script (WCAG 2 ratio and APCA Lc), not by eye.
 
 A project lists its own names here so an agent can apply the roles without guessing.
 
-### Uplink / SVS site (`site/assets/css/tokens.css`)
+### Uplink / SVS site (`src/styles/tokens.css`)
 
 | Role | Site token |
 |---|---|

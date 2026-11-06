@@ -11,7 +11,7 @@
 // It also writes dist/_redirects: the other spellings of each page's address (/services/, /services.html,
 // /index.html) to the one address, as 308 (permanent). Cloudflare's own html_handling sends those as 307
 // (temporary), which caches and crawlers don't keep; a _redirects line wins over it.
-// It refuses to finish if a page or the hero drawing has a style="" attribute: no hash covers one, so the CSP
+// It refuses to finish if a page or a drawing a script inserts (hero cuts, campus map) has a style="" attribute: no hash covers one, so the CSP
 // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';

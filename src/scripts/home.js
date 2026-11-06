@@ -1,6 +1,7 @@
 /* ==========================================================================
    Uplink Technology · Home page
-   Hero cloud. The "We grow with you" section runs from grow.js (imported here).
+   The hero (the drawing cut for the screen, the cloud, the phone captions), the Services row on
+   phones, and Proof's wheel-grid height. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
 import { $, $$, held, html, reduceMotion, replay, whenOnScreen } from './core.js';
@@ -156,7 +157,7 @@ const startCloud = (cloud) => {
    Each changes every 4.4s, 2.2s after the other, so one line draws at a
    time. Tapping the drawing moves the office one on. Words and points
    come from the drawing (data-cloud, data-items: tools/gen_office.py);
-   sizes from hero.css (--cap-*), turned into drawing units here.
+   sizes from tokens.css (--cap-*), turned into drawing units here.
    Nothing is measured while the captions run: the drawing's width comes
    from a ResizeObserver, and each caption's text is measured once per
    width, all together in a hidden group, after layout (measure()).

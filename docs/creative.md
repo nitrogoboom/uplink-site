@@ -1,9 +1,11 @@
 # Creative ideas
 
-Ideas for later. Nothing here is planned or built yet.
+This page collects ideas for later. Nothing here is planned or built.
 
-## "Ready when you are" image: the office fire drill
+## The office fire drill
 
-Little people move around the office going about their day. One of them catches on fire and runs around in a panic. The IT guy walks out, sprays him with a fire extinguisher, pats him on the back, and goes back to work, perfectly calm.
+**Where it could go:** a "ready when you are" moment, such as the call to action at the end of Home ("Start with a free check-up"). The spot isn't decided.
 
-The joke: whatever goes wrong, the IT team handles it without breaking a sweat.
+Little people move around the office, going about their day. One of them catches fire and runs around in a panic. The IT person walks over, sprays them with a fire extinguisher, pats them on the back, and goes back to work, perfectly calm.
+
+**The joke:** whatever goes wrong, the IT team handles it without breaking a sweat.

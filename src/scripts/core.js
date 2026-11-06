@@ -2,13 +2,13 @@
    Uplink Technology · core script (every page)
    Plain JS, no libraries. ES modules, bundled by Astro. Every feature is optional: the
    pages read and work without script (links navigate, every service and
-   project is in the HTML, the full building is drawn).
+   project is in the HTML, the drawings show finished).
 
    Files (each page script imports core.js, so core always runs first):
      core.js      every page   helpers, toasts, pop-ups, forms, shortcuts, tab bar;
                                exports the helpers the page scripts import
      footer.js    every page   footer roster + campus map
-     home.js      Home         hero cloud; grow.js (We grow with you)
+     home.js      Home         hero, phone Services row; grow.js (We grow with you)
      work.js      Our work     filters
      contact.js   Contact      copy buttons, queue card
      soon.js      soon.html    names the missing page
@@ -198,7 +198,7 @@ function presetService(name) {
 /* ---------- pause (WCAG 2.2.2) ------------------------------------------ */
 // Every pause button (HoldButton.astro: the hero's on Home, the footer map's on every page) holds every moving part
 // on the page. html.is-held pauses the CSS animations (base.css); page scripts stop their timers on held.ev's
-// 'change' (home.js). One choice for the whole site, kept for next time. Nothing moves with reduced motion, so
+// 'change' (home.js, grow.js). One choice for the whole site, kept for next time. Nothing moves with reduced motion, so
 // the buttons hide then.
 const HOLD_KEY = 'uplink-held';
 const held = { on: false, ev: new EventTarget() };
@@ -349,7 +349,7 @@ const replay = (el, cls) => {
 };
 
 /* ---------- off-screen pause ------------------------------------------ */
-// Marks el with .is-idle while none of it is on screen (site.css pauses
+// Marks el with .is-idle while none of it is on screen (base.css pauses
 // its looping animations) and tells onChange(onScreen) about each change.
 function whenOnScreen(el, onChange) {
   if (!el || !('IntersectionObserver' in window)) return null;

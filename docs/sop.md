@@ -1,142 +1,173 @@
-# SOP: how we build, check and release the site
+# How we build, check, and release the site
 
-The standard way of working on the Uplink site: what it's built with, the standards it meets, and the checklist that proves it before a release. Written 3 Nov 2026. When a tool, rule or standard changes, change this file in the same PR.
+*Last updated: November 5, 2026*
 
-Two kinds of checking:
+This page describes how the Uplink site is built, the standards it meets, and the checks that prove it before a release. It's for anyone who changes the site. When a tool, rule, or standard changes, update this page in the same pull request.
 
-- **Every build (automatic, CI):** fast checks that run on every push. Nobody does anything by hand. See "What CI already proves".
-- **Every release (this checklist):** a longer machine audit (every page, three browsers, keyboard, screen reader, motion, forms, HTML), then the few things only a person can judge. About 25 minutes, recorded. A release is the first production launch and any later change to layout, navigation, forms or a new page. A copy fix or a style tweak doesn't need it; CI is enough. Do it at least every three months anyway.
+The site is checked in two ways:
 
-## 1. Stack
+- **On every pull request and every merge to `main` (automatic).** CI runs fast checks and nobody does anything by hand. See [What CI proves](#what-ci-proves).
+- **On every release (by hand, with this checklist).** A longer machine audit runs, covering every page, three browsers, the keyboard, a screen reader, motion, forms, and the HTML. Then a person checks what only a person can judge. It takes about 25 minutes, and you keep a record.
+
+A *release* is the first production launch, and any later change to layout, navigation, or forms, or a new page. A copy fix or a style tweak isn't a release; CI is enough. Run the release checklist at least every three months anyway.
+
+## Stack
 
 | Part | What we use | Where it's set |
 | --- | --- | --- |
-| Framework | Astro 7, static output. Plain CSS and JS, no UI framework | `astro.config.mjs`, `package.json` |
-| Runtime | Node 24 | `.node-version` (CI reads it) |
-| Content | Typed JSON (services, projects, FAQ, team, footer) | `src/content/`, `src/data/`, `src/content.config.ts` |
-| Styles | One token file; spacing scale enforced by lint | `src/styles/tokens.css`, `docs/spacing.md` |
-| Drawings | Python generators write every SVG | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
-| Hosting | Cloudflare Workers: static assets, plus one small Worker for `/api/*` (error and CSP reports today) | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
-| CI/CD | GitHub Actions: check, tests, lint, build, browser check, link check, deploy; on a PR also a preview and a screenshot comparison. Actions pinned to commits. | `.github/workflows/site.yml` |
-| Tests | Node's test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
-| Dependencies | Dependabot, weekly: npm, pip and GitHub Actions | `.github/dependabot.yml` |
-| Code checks | TypeScript (`astro check`), ESLint, Stylelint, Prettier (JSON/YAML) | `eslint.config.js`, `.stylelintrc.json` |
-| Browser check | Playwright (Python) + axe-core, Chromium | `tools/verify_footer.py` |
-| Release audit | Playwright in Chromium, Firefox and WebKit; Guidepup Virtual Screen Reader; the W3C Nu validator | `tools/audit.py` (`npm run release-audit`) |
+| Framework | Astro 7, static output. Plain CSS and JavaScript, no UI framework. | `astro.config.mjs`, `package.json` |
+| Runtime | Node.js 24 | `.node-version` (CI reads it) |
+| Content | Typed JSON and Markdown: services, projects, FAQ, team, footer, Grow | `src/content/`, `src/data/`, `src/content.config.ts` |
+| Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
+| Drawings | Python generators write every SVG. | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
+| Hosting | Cloudflare Workers: static files, plus one small Worker. Today the Worker sees every request: it redirects `http://` to `https://`, answers `/api/report` (error and CSP reports), and gives `/404` its status. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
+| CI/CD | GitHub Actions: check, tests, lint, build, browser check, link check, deploy. On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
+| Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
+| Dependencies | Dependabot, weekly: npm, pip, and GitHub Actions | `.github/dependabot.yml` |
+| Code checks | TypeScript (`astro check`), ESLint, Stylelint, Prettier (JSON and YAML only) | `eslint.config.js`, `.stylelintrc.json` |
+| Browser check | Playwright (Python) and axe-core, in Chromium | `tools/verify_footer.py` |
+| Release audit | Playwright in Chromium, Firefox, and WebKit; Guidepup Virtual Screen Reader; the W3C Nu HTML Checker | `tools/audit.py` (`npm run release-audit`) |
 
-## 2. How a change gets to live
+## How a change reaches the live site
 
-1. Branch off `main`. One topic per branch.
-2. Work locally: `npm run dev`. Before pushing: `npm run ci` (does everything CI does).
-3. Push and open a PR. CI runs and posts a preview link (`https://<branch>-uplink-site.johnoreilly.workers.dev`). Check it on a phone. Read the run's summary: "Screenshot changes" lists every page that looks different from live. Each change on it should be one you meant (the pictures are in the run's `visual-diff` artifact).
-4. Merge when CI is green. The push to `main` deploys to live.
-5. If live breaks: `npx wrangler rollback` (steps in README, "Hosting"), then fix on a branch.
-6. If the change counts as a release (see the top), run the checklist in section 5 and save the record. Then tag it: `git tag -a vYYYY.MM.DD <merge commit> -m "…"`, `git push origin vYYYY.MM.DD`, and `gh release create vYYYY.MM.DD` with a few lines and a link to the record (as `v2026.11.03` does).
+1. Create a branch from `main`. Keep one topic per branch.
+2. Work locally with `npm run dev`.
+3. Before you push, run `npm run ci`. It runs the same checks as CI, except the screenshot comparison, the preview, and the deploy.
+4. Push the branch and open a pull request. CI runs and posts a preview address, `https://BRANCH-uplink-site.johnoreilly.workers.dev`.
+5. Check the preview on a phone.
+6. Read the run's summary. "Screenshot changes" lists every page that looks different from the live site. Make sure you meant each change. The pictures are in the run's `visual-diff` artifact.
+7. When CI passes, merge. The merge to `main` deploys to the live site.
+8. If the live site breaks, roll back with `npx wrangler rollback`, then fix the problem on a branch. The steps are in the [README](../README.md#roll-back-a-bad-deploy).
+9. If the change is a release, run the [release checklist](#release-checklist) and save the record.
+10. Tag the release, replacing `YYYY.MM.DD` with the date and `COMMIT` with the merge commit:
 
-## 3. Standards we meet
+    ```bash
+    git tag -a vYYYY.MM.DD COMMIT -m "SUMMARY"
+    git push origin vYYYY.MM.DD
+    gh release create vYYYY.MM.DD
+    ```
 
-| Area | Standard | Why |
+    Give the release a few lines and a link to the record, as `v2026.11.03` does.
+
+> **Note:** A change that touches only root `*.md` files, `docs/`, or `knowledge/` runs no CI and deploys nothing. A branch push without a pull request also runs nothing.
+
+## Standards we meet
+
+| Area | Standard | Where it's shown |
 | --- | --- | --- |
-| Accessibility | **WCAG 2.0 Level AA**, our own standard: Ontario requires it only from 50 staff, and we're under 50 (decided 3 Nov 2026). We aim for WCAG 2.2 AA where it costs little. A public statement with a feedback route and other formats on request. | Ontario AODA / IASR O. Reg. 191/11, for organisations with 50+ staff in Ontario. `/accessibility` (`src/data/accessibility.md`); `knowledge/Ontario Website Accessibility Rules.md` |
-| Privacy | PIPEDA (Canada); CASL for the newsletter. The site's privacy page: what it collects, who handles it and where, how long, your rights | `/privacy` (`src/data/privacy.md`); sources in `docs/privacy-and-accessibility-2026-11-03.md` |
-| Security | HTTPS only, HSTS, strict CSP (no inline script or style) that reports its blocks, Trusted Types, nosniff, Referrer-Policy, Permissions-Policy. A security contact. Secrets listed, never in the repo. | `public/_headers` (the build adds the hashes); `/.well-known/security.txt`, `SECURITY.md`; `docs/secrets.md` |
-| Browsers | Current Chrome, Edge, Firefox, Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras | Support list still to write (`notes.md`) |
-| Performance | PageSpeed 100 on Home, phone and desktop | `python tools/pagespeed.py <address>` |
-| Language | English (Canada), `lang="en-CA"`. A French page gets `lang="fr-CA"` | `src/layouts/Base.astro` |
+| Accessibility | **WCAG 2.0 Level AA.** This is our own choice: Ontario requires it only from 50 staff, and we're under 50 (decided November 3, 2026). We aim for WCAG 2.2 AA where it costs little. A public statement gives a feedback route. | Ontario AODA, IASR O. Reg. 191/11. `/accessibility` (`src/data/accessibility.md`); `knowledge/Ontario Website Accessibility Rules.md` |
+| Privacy | PIPEDA (Canada), and CASL for the newsletter. The privacy page says what the site collects, who handles it and where, for how long, and your rights. | `/privacy` (`src/data/privacy.md`); sources in `docs/privacy-and-accessibility-2026-11-03.md` |
+| Security | HTTPS only and HSTS. A strict CSP with no `'unsafe-inline'`: the few inline scripts and styles run only by hash, and the CSP reports what it blocks. Trusted Types, `nosniff`, Referrer-Policy, Permissions-Policy, and the cross-origin policies. A security contact. Secrets are listed and never in the repository. | `public/_headers` (the build adds the hashes); `/.well-known/security.txt`, `SECURITY.md`; `docs/secrets.md` |
+| Browsers | Current Chrome, Edge, Firefox, and Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras. | The support list is still to write (`notes.md`). |
+| Performance | PageSpeed 100 on Home, on phone and desktop. | `python tools/pagespeed.py ADDRESS` |
+| Language | English (Canada), `lang="en-CA"`. A French page gets `lang="fr-CA"`. | `src/layouts/Base.astro` |
 
-## 4. What CI already proves (don't repeat it by hand)
+## What CI proves
 
-On every push, the build fails if any of these break:
+Don't repeat these by hand. CI fails the build if any of them break:
 
-- Types and Astro errors (`astro check`); lint on JS, TS, Astro, CSS and JSON/YAML.
-- The build's after-steps and the Worker pass their tests (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the report endpoint.
+- Types and Astro errors (`astro check`), and lint on JavaScript, TypeScript, Astro, CSS, JSON, and YAML.
+- The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, and the report endpoint.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page.
-- No sideways scroll on any page at phone size, and on Home at four sizes. The header fits at every width from 320px to 3440px, at normal and 200% text.
-- Hero, Grow section and footer work; the footer is one screen tall at 1440×900.
-- Every link, picture, script and preload on every page answers, and every `#section` link finds its id (`tools/check_links.py`).
-- **axe-core finds nothing serious or critical on Home** (phone and desktop). Other pages get axe only with `--all`, which the release audit runs.
+- No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 3440 px, at normal and 200% text.
+- The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
+- Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`tools/check_links.py`).
+- **axe-core finds nothing serious or critical on any page:** Home on phone and desktop, every other page on phone. The release audit adds every size (`--all`).
 
-On a pull request it also compares every page with the live site at three sizes (`tools/visual_diff.py`). That one reports and never fails: a person says whether each change was meant.
+On a pull request, CI also compares every page with the live site at three sizes (`tools/visual_diff.py`). That check reports and never fails: a person decides whether each change was meant.
 
-axe catches only a third to a half of WCAG problems, and only in Chromium. The release audit and the hand checks below cover the rest.
+> **Important:** axe finds only a third to a half of WCAG problems, and CI runs it only in Chromium. The release audit and the checks by hand cover the rest.
 
-## 5. Release checklist
+## Release checklist
 
-Do it on the PR preview or the live site. Tick each box, and write a short note where it asks for proof. Copy this section to `docs/releases/YYYY-MM-DD.md` and fill it in there; that file is the proof. About 25 minutes: 10 for the machine, 15 for you.
+Run it on the pull request's preview or on the live site. Copy this section to `docs/releases/YYYY-MM-DD.md` and fill it in there; that file is the proof. Tick each box, and write a short note where it asks for proof. It takes about 25 minutes: 10 for the machine and 15 for you.
 
 **Release:** date `____` · commit `____` · checked by `____`
 
-### A. Build and hosting (5 min)
+### A. Build and hosting (5 minutes)
 
-- [ ] CI green on the commit that's live. Proof: link to the Actions run.
+- [ ] CI passed on the commit that's live. Proof: a link to the Actions run.
 - [ ] `npx wrangler deployments list` shows that commit's version live.
-- [ ] Response headers present (`curl -sI <address>`: HSTS, CSP, X-Content-Type-Options). Proof: paste the header lines.
-- [ ] `python tools/smoke.py <address>` passes (every page, headers, redirects, the 404 status).
-- [ ] 404 page shows for a made-up address, with a 404 status.
-- [ ] Workers logs since the last release (Cloudflare > Workers > uplink-site > Logs, search `report`): each script error or CSP block from a real visitor is fixed or has a line in `notes.md`.
+- [ ] The response headers are present. Run `curl -sI ADDRESS` and look for HSTS, the CSP, and `X-Content-Type-Options`. Proof: paste the header lines.
+- [ ] `python tools/smoke.py ADDRESS` passes: every page, the headers, the redirects, and the 404 status.
+- [ ] A made-up address shows the 404 page with a 404 status.
+- [ ] Workers logs since the last release (Cloudflare > Workers > uplink-site > Logs, search for `report`): each script error or CSP block from a real visitor is fixed or has a line in `notes.md`.
 
-### B. The release audit (machine, about 10 min)
+### B. Release audit (machine, about 10 minutes)
 
-`npm run build`, `npm run serve`, then in a second window `npm run release-audit` (`tools/audit.py`), `python tools/verify_footer.py out/ --all` and `python tools/verify_text.py`. Paste `out/audit/report.md` and the last line of the other two into the record. Every box here is ticked by a clean run; a failure says the page and what.
+1. Run `npm run build`, then `npm run serve`.
+2. In a second terminal, run `npm run release-audit`, `python tools/verify_footer.py out/ --all`, and `python tools/verify_text.py`.
+3. Paste `out/audit/report.md` and the last line of the other two into the record.
 
-- [ ] **Browsers:** every page in Chromium, Firefox and WebKit (Safari's engine) at 1440, and on an emulated iPhone and Android phone: no script errors, no CSP blocks, no sideways scroll. Screenshots in `out/audit/shots/`.
-- [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page: focus visible on every stop, never off screen, never stuck. Each dialog opens from the keyboard, Esc closes it, focus returns. The stops per page are in `out/audit/keyboard/`.
-- [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. Fails on a link whose parts run together with no pause, or one link name going to two pages. Transcripts in `out/audit/reader/`.
-- [ ] **axe on every page (1.4.3 contrast and the rest):** `verify_footer.py --all`, nothing serious or critical.
-- [ ] **200% text (1.4.4):** `verify_text.py`, all clear.
-- [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves; with it off, the pause button stops every loop, and nothing loops faster than 3 times a second.
-- [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email: every problem field has its message in words, tied to the field, and focus goes to the first one.
-- [ ] **HTML (4.1.1):** Home through the W3C validator, no HTML errors (every page with `-- --html-all`, when a release changes the other pages' markup). Its CSS checker doesn't know some current CSS yet; the report lists those once and doesn't count them.
+A clean run ticks every box here. A failure names the page and the problem.
 
-Go easy on W3C: it's a free service that limits requests per address, and a day of repeated full runs got "429 Too Many Requests" on 3 Nov 2026. While fixing things, rerun only the parts you need, without html: `npm run release-audit -- --only browsers,keyboard,reader,motion,forms`. Run html once, at the end.
+- [ ] **Browsers:** every page in Chromium, Firefox, and WebKit (Safari's engine) at 1440 px, and on an emulated iPhone and Android phone. No script errors, no CSP blocks, no sideways scroll. Screenshots are in `out/audit/shots/`.
+- [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page. Focus is visible on every stop, never off screen, and never stuck. Each dialog opens from the keyboard, Esc closes it, and focus returns. The stops per page are in `out/audit/keyboard/`.
+- [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. It fails on a link whose parts run together with no pause, or one link name that goes to two pages. Transcripts are in `out/audit/reader/`.
+- [ ] **axe on every page at every size (1.4.3 contrast and the rest):** `verify_footer.py --all` finds nothing serious or critical.
+- [ ] **200% text (1.4.4):** `verify_text.py` is all clear.
+- [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves. With it off, the pause button stops every loop, and nothing flashes more than three times a second.
+- [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email address. Every problem field has its message in words, tied to the field, and focus goes to the first one.
+- [ ] **HTML (4.1.1):** Home passes the W3C validator with no HTML errors. When a release changes other pages' markup, check every page with `npm run release-audit -- --html-all`. The validator's CSS checker doesn't know some current CSS yet. The report lists those once and doesn't count them.
 
-### C. By hand (15 min)
+> **Caution:** The W3C validator is a free service that limits requests per address. A day of repeated full runs got "429 Too Many Requests" on November 3, 2026. While you fix things, rerun only the parts you need, without `html`:
+>
+> ```bash
+> npm run release-audit -- --only browsers,keyboard,reader,motion,forms
+> ```
+>
+> Run `html` once, at the end.
 
-What a machine can't judge. Where it's built, it's in brackets.
+### C. By hand (15 minutes)
 
-**Real phones** (from the PR preview link)
-- [ ] iPhone, Safari: Home, one service page, Contact. The bottom bar, the notch area, nothing hidden under the address bar, the Grow section plays, and its card sits under the picture.
+These are what a machine can't judge. Where a check points at code, the place is in brackets.
+
+**Real phones** (open the pull request's preview link)
+
+- [ ] iPhone, Safari: Home, one service page, and Contact. Check the bottom bar and the notch area, that nothing hides under the address bar, that the Grow section plays, and that its card sits under the picture.
 - [ ] Android, Chrome: the same three pages.
 
-**Listen** (NVDA on Windows, free, or VoiceOver on iPhone; 5 minutes)
-- [ ] Read one page you changed top to bottom, then jump by heading (H key in NVDA). It should sound like the transcript in `out/audit/reader/`: no missing pauses, no "dot", nothing read twice.
+**Listen** (NVDA on Windows, which is free, or VoiceOver on iPhone; 5 minutes)
+
+- [ ] Read one page you changed from top to bottom, then jump by heading (the H key in NVDA). It should sound like the transcript in `out/audit/reader/`: no missing pauses, no "dot", and nothing read twice.
 
 **Look and judge**
+
 - [ ] Each link's words, read alone in the transcript, say where it goes (2.4.4).
-- [ ] Headings and labels say what follows (2.4.6); each page's tab title is clear (2.4.2) [`src/lib/site.ts`].
-- [ ] Meaning never by colour alone: errors, the active tab and the selected item also change shape, icon or words (1.4.1).
-- [ ] Any new colour pair: check it with the axe DevTools or WAVE extension (1.4.3) [colours from `tokens.css`].
-- [ ] No words inside pictures that aren't also real text (1.4.5).
+- [ ] Headings and labels say what follows (2.4.6). Each page's tab title is clear (2.4.2) [`src/lib/site.ts`].
+- [ ] Colour is never the only way to show meaning. Errors, the active tab, and the selected item also change shape, icon, or words (1.4.1).
+- [ ] Any new colour pair passes a check with the axe DevTools or WAVE extension (1.4.3) [colours from `tokens.css`].
+- [ ] Pictures contain no words that aren't also real text (1.4.5).
 - [ ] Nothing changes on its own when a field gets focus or a value is picked (3.2.1, 3.2.2).
-- [ ] Header, bottom bar and footer are the same on every page (3.2.3, 3.2.4); the menu and the footer both reach every page (2.4.5).
-- [ ] New video or audio has captions and a text version (1.2.1–1.2.3); text in another language is marked with `lang` (3.1.2); a form that commits money or a contract can be reviewed before it's sent (3.3.4). None of these on the site today.
+- [ ] The header, bottom bar, and footer are the same on every page (3.2.3, 3.2.4). The menu and the footer both reach every page (2.4.5).
+- [ ] New video or audio has captions and a text version (1.2.1–1.2.3). Text in another language is marked with `lang` (3.1.2). A form that commits money or a contract can be reviewed before it's sent (3.3.4). The site has none of these today.
 
-Proof for B and C: one line per failure (page, what, WCAG number). An empty list means it passed.
+Proof for B and C: one line per failure, with the page, the problem, and the WCAG number. An empty list means it passed.
 
-### D. Content and legal (5 min)
+### D. Content and legal (5 minutes)
 
-- [ ] No link goes to `/soon` that shouldn't (before launch, see `notes.md`, "Before going live")
-- [ ] A terms page exists, if the release goes to the real domain or turns forms on
-- [ ] `noindex` is still on until launch, and off after it (`public/_headers`)
-- [ ] Before the first launch on the real domain: `docs/go-live-checklist.md` done, or each open line has a date
-- [ ] Privacy and accessibility pages still true: anything this release changed about what the site collects, who handles it, or its aids and limits is on those pages (`src/data/privacy.md`, `accessibility.md`)
+- [ ] No link goes to `/soon` that shouldn't. Before launch, see "Before going live" in `notes.md`.
+- [ ] A terms page exists, if the release goes to the real domain or turns forms on.
+- [ ] `noindex` is still on until launch, and off after it (`public/_headers`).
+- [ ] Before the first launch on the real domain: `docs/go-live-checklist.md` is done, or each open line has a date.
+- [ ] The privacy and accessibility pages are still true. Anything this release changed about what the site collects, who handles it, or its aids and limits is on those pages (`src/data/privacy.md`, `src/data/accessibility.md`).
 
 ### E. Sign-off
 
-- [ ] Everything above ticked, or each failure has a line in `notes.md` with a date to fix it.
+- [ ] Everything above is ticked, or each failure has a line in `notes.md` with a date to fix it.
 - Result: `pass` / `pass with notes` / `fail` · signed `____`
-- [ ] Tagged and released (section 2, step 6).
+- [ ] Tagged and released (see [How a change reaches the live site](#how-a-change-reaches-the-live-site), step 10).
 
-## 6. Watching the live site
+## Watch the live site
 
-- **Errors and CSP blocks:** real visitors' browsers report them to `/api/report` (`worker/index.js`); they appear in the Workers logs, kept 3 days on the free plan. Look after each deploy and at each release.
-- **Speed and visits:** Cloudflare Web Analytics (no cookies). Its token still points at the old address (`notes.md`).
+- **Errors and CSP blocks:** real visitors' browsers report them to `/api/report` (`worker/index.js`). They appear in the Workers logs, which the free plan keeps for 3 days. Look after each deploy and at each release.
+- **Speed and visits:** Cloudflare Web Analytics, which sets no cookies. Its token still points at the old address (`notes.md`).
 - **Up or down:** an outside uptime check is still to set up (`notes.md`).
-- **Dependencies:** Dependabot's weekly PRs. CI checks each one like any other change; merge when green.
+- **Dependencies:** Dependabot opens pull requests weekly. CI checks each one like any other change. Merge when it passes.
 
-## 7. Keeping this file honest
+## Keep this page accurate
 
-- When CI starts checking something new (for example Firefox and WebKit, see `notes.md`), add it to section 4 and drop it from section 5.
-- If a checklist item fails twice in a row, it's a sign it should be automated. Add a line to `notes.md`.
+- When CI starts checking something new, add it to [What CI proves](#what-ci-proves) and remove it from the release checklist.
+- If a checklist item fails twice in a row, it probably should be automated. Add a line to `notes.md`.
 - The Ontario summary in `knowledge/` was written from memory of the standard, not checked line by line. Have it checked against the W3C text once before the first launch.

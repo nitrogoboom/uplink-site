@@ -1,5 +1,5 @@
 """painter.py rules for voip.svg: each box's base height, looked up from gen_voip.py by its left face.
-usage: python tools/painter.py public/assets/img/voip.svg 288 228 23 tools/rules_voip.py"""
+usage: python tools/painter.py public/assets/img/voip.svg 278 222 23 tools/rules_voip.py"""
 import gen_voip
 from iso import C30, W
 

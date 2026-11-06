@@ -8,6 +8,7 @@
 //   hidden parts           display="none" paths the hero shows from script, the Grow world's r="0" anchor circles
 //                          (removeHiddenElems)
 //   role="img"             with the aria-label, so screen readers read a drawing as one picture (removeUnknownsAndDefaults)
+//   empty groups           ones a script fills, like the Grow dome's <g class="dome-orbit"> (removeEmptyContainers)
 // (SVGO 4 keeps the viewBox on its own.)
 /** @type {import('svgo').Config} */
 export const SVGO = {
@@ -22,6 +23,7 @@ export const SVGO = {
           minifyStyles: false,
           inlineStyles: false,
           removeHiddenElems: false,
+          removeEmptyContainers: false,
           mergeStyles: false,
           removeUnknownsAndDefaults: { keepRoleAttr: true },
         },

@@ -1,6 +1,6 @@
 # Home hero news cards (mockups)
 
-The problem (John, 6 Nov 2026): the two news cards under the hero drawing don't look settled. The picture sits top
+The problem (John, 5 Nov 2026): the two news cards under the hero drawing don't look settled. The picture sits top
 left, the pill pushes the words below the top of the picture, and the two never line up. Mockups first, no site
 changes until one is picked.
 
@@ -33,7 +33,7 @@ equal space above and below the picture and the words in every card.
 - **B, picture panel**: the picture edge to edge on the left, a thin line, then the words. 135 px both.
 - **C, panel with a label**: B with the pill swapped for a dot-and-word label. 122 px both.
 
-**Picked: C** (John, 6 Nov 2026). Built in `hero.css` and `Hero.astro` on branch `news-cards-panel`. Measured on
+**Picked: C** (John, 5 Nov 2026). Built in `hero.css` and `Hero.astro` on branch `news-cards-panel`. Measured on
 the site at 375, 768, 1024, 1440, 1920 and 3440 wide, and at 200% text: the panel is the card's full height and the
 words have the same space above and below in every card. The hero ends where it did before at every size (it is
 one screen tall; the drawing gives up the extra 22 px). verify_footer, verify_text (200% and 100%) and lint pass.

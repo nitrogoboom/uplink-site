@@ -6,7 +6,7 @@ The face is a union of circles on a plane that runs along the room's x axis (u a
 u * (cos30, 0.5) + v * (0, -1). The slab runs back along -y, which on screen is DEPTH * (cos30, -0.5).
 Each outline segment sweeps one strip of the side wall; strips are shaded by their normal and merged when the shade
 repeats, so the wall is one smooth ramp with no seams, and the face carries its own soft gradient.
-The strips sit in <g class="curve">, so check.py doesn't read their 2px outline steps as near-misses.
+The strips sit in <g class="curve">, so check.py doesn't read their outline steps (up to about 5px) as near-misses.
 """
 import math
 from shapely.geometry import Point, Polygon, box
@@ -28,7 +28,7 @@ CIRCLES = [
 ]
 BASE_TOP = 29.4                       # the body under the bumps: flat bottom at v = 0, from the left end to the right end
 FILLET = 3.5                          # rounds the notches where two bumps meet
-SEG = 24                              # segments per quarter circle: 2px or less along the outline, a hair off true at every zoom
+SEG = 24                              # segments per quarter circle: about 2px on the small bumps, under 5px on the big one, a hair off true at every zoom
 
 RIM, RIM_OP, RIM_W = pal.SKY, 0.75, 1.4
 SIDE_DARK, SIDE_LIGHT = (tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in (pal.CLOUD_SIDE_DARK, pal.CLOUD_SIDE_LIGHT))

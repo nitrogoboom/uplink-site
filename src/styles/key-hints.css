@@ -1,4 +1,4 @@
-/*--- Keyboard hints (Esc, arrows, service numbers): desktop with a mouse, when shortcuts are on. ---*/
+/*--- Key caps (.kbd) and the Esc hint beside a pop-up's close button: desktop with a mouse, when shortcuts are on. ---*/
 /* ---------- keyboard hints (desktop + mouse only, and only when on) --- */
 .kbd {
   display: inline-grid;

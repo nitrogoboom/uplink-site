@@ -12,12 +12,12 @@ const services = defineCollection({
     title: z.string(),                 // "Managed help desk"
     chip: z.enum(['Support', 'Protect', 'Build', 'Connect', 'Plan']),
     tag: z.string(),                   // second chip on the drawing ("Starts day one")
-    image: z.string(),                 // drawing name in public/assets/img/ (NAME.svg and NAME-compact.svg)
+    image: z.string(),                 // drawing name in public/assets/img/ (NAME.svg, NAME-compact.svg, NAME-card.svg)
     icon: z.string(),                  // <Icon> name for the short home tile (src/components/Icon.astro)
     featured: z.boolean().optional(),  // one of the three tall cards on the home page; the rest are short tiles
     alt: z.string(),
     lead: z.string(),
-    card: z.string(),                  // one line on the home page card
+    card: z.string(),                  // the short line on every card and menu entry, and in llms.txt
     features: z.array(z.object({ title: z.string(), detail: z.string() })).length(3),
     bestFor: z.string(),
     footerLabel: z.string().optional(),   // when the footer link says it differently

@@ -1,4 +1,4 @@
-"""Draws security.svg (Services page) from a world-space description.
+"""Draws security.svg (Services, Work) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_security.py public/assets/img/security.svg
 World: 1 unit = 58.4/3 px (the floor grid step). Origin = floor centre. x runs right-down, y left-down, z up.

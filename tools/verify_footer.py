@@ -1,7 +1,8 @@
 # Site checks against the built site. Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer
 # tabs, sideways scroll at every size, and an axe accessibility pass at phone and desktop (axe-core from node_modules:
 # run npm install first). Every other page (the served sitemap.xml, plus soon and the 404 page) gets a quick look:
-# loaded once at phone size for script errors and sideways scroll. --all gives every page the full treatment.
+# loaded once at phone size for script errors and sideways scroll, plus an axe pass at phone size. --all gives every
+# page the full treatment.
 # Exits 1 on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that
 # doesn't answer hover, a Grow section that doesn't play, a footer tab at 1440x900 that isn't one screen tall or whose panel
 # overflows, sideways scroll, a header whose tabs come within 8px of the logo or buttons (or scroll) at any width
@@ -185,7 +186,8 @@ async def main():
                 ]
 
         for lines in await asyncio.gather(
-            *(axed(page, *s) for page in PAGES if full(page) for s in [['phone', 390, 844], ['1440', 1440, 900]])
+            *(axed(page, *s) for page in PAGES
+              for s in ([['phone', 390, 844], ['1440', 1440, 900]] if full(page) else [['phone', 390, 844]]))
         ):
             rep.extend(lines)
         await ctx.close()

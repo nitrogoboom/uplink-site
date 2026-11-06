@@ -5,10 +5,12 @@
    when the section comes on screen; the arrows and dots step through it by hand; the play button pauses, plays and
    replays, and its edge times the whole story. The camera starts close on the office and pulls back as the world
    grows. Reduced motion: the finished world, no movement; the controls still step through.
+   The site-wide pause (HoldButton.astro, core.js held) pauses it the same way as its own button, and lets it go on
+   when released; while held it doesn't start on its own. Its own play button still plays it.
    Builds no HTML: everything is in the page (Grow.astro); this only sets classes, attributes and text.
    ========================================================================== */
 
-import { $, $$, reduceMotion, whenOnScreen } from './core.js';
+import { $, $$, held, reduceMotion, whenOnScreen } from './core.js';
 
 const DWELL = 4500;    // ms a step
 const RISK_AT = 900;   // ms into a step: its risks show (the parts have dropped in by then)
@@ -187,9 +189,8 @@ if (grow && svg) {
   dots.forEach((d, i) => d.addEventListener('click', () => jump(i)));
   prev.addEventListener('click', () => jump(cur - 1));
   next.addEventListener('click', () => jump(cur + 1));
-  play.addEventListener('click', () => {
-    if (playing) { stop(); beats.forEach(window.clearTimeout); beats = []; show(cur, false, false); icon(); } else start();
-  });
+  const pause = () => { stop(); beats.forEach(window.clearTimeout); beats = []; show(cur, false, false); icon(); };
+  play.addEventListener('click', () => { if (playing) pause(); else start(); });
 
   grow.classList.add('is-live');
   if (reduceMotion.matches) { started = true; go(LAST, false); } else go(-1, false);
@@ -232,13 +233,21 @@ if (grow && svg) {
       if (!run && raf) { window.cancelAnimationFrame(raf); raf = 0; }
     };
   });
-  const orbitsRun = () => orbits.forEach((o) => o(visible && !stage.classList.contains('is-paused')));
+  const orbitsRun = () => orbits.forEach((o) => o(visible && !stage.classList.contains('is-paused') && !(held.on && !playing)));
   play.addEventListener('click', orbitsRun);
 
   // starts as the section's first pixel arrives, so it's already moving when you see it; off screen it waits
   whenOnScreen(section, (on) => {
     visible = on;
-    if (on && !started && !reduceMotion.matches) start(); else if (on && playing) tick(); else window.clearTimeout(timer);
+    if (on && !started && !reduceMotion.matches && !held.on) start(); else if (on && playing) tick(); else window.clearTimeout(timer);
+    orbitsRun();
+  });
+
+  // the site-wide pause: hold it where it is; on release, go on only if the hold is what stopped it
+  let heldStopped = false;
+  held.ev.addEventListener('change', () => {
+    if (held.on && playing) { heldStopped = true; pause(); }
+    else if (!held.on && (heldStopped || (!started && visible)) && !reduceMotion.matches) { heldStopped = false; start(); }
     orbitsRun();
   });
 }

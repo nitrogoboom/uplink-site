@@ -1,7 +1,7 @@
 # Response headers for every file, read by Cloudflare (Workers static assets and Pages alike). Not served as a page.
 # This is the template: `npm run build` copies it to dist/_headers and scripts/headers.mjs fills in
 #   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (the classList.add('js') line)
-#   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the hero drawing
+#   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
 #   the Early Hints block   one rule per page
 # style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
 # writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
@@ -22,6 +22,8 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin
+  X-Permitted-Cross-Domain-Policies: none
   X-Frame-Options: DENY
   Reporting-Endpoints: csp="/api/report"
   Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
@@ -49,12 +51,15 @@
 # Drawings keep their names when they change (the generators overwrite them), so a day, then revalidate.
 # Opened on their own, the drawings would get the pages' CSP, which blocks their <style> blocks (the embedded
 # letters, the hero's timings). A drawing runs no script, so its own policy allows inline styles and nothing else.
-# (In the page, <img> drawings are not held to the page's CSP, and the hero home.js inserts is hashed above.)
+# (In the page, <img> drawings are not held to the page's CSP, and the drawings home.js and footer.js insert are hashed above.)
 /assets/img/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; font-src data:; img-src data:
-# The share picture is fetched by social sites by its plain name: a day only.
+# The share picture is fetched by social sites by its plain name: a day only. Some apps show it straight from here
+# in their own pages, so it may be loaded cross-origin (every other file is same-origin only).
 /assets/img/og.png
   ! Cache-Control
   Cache-Control: public, max-age=86400
+  ! Cross-Origin-Resource-Policy
+  Cross-Origin-Resource-Policy: cross-origin

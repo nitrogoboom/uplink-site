@@ -37,8 +37,7 @@ const md = (site, page) => {
   const DROP = ['SCRIPT', 'STYLE', 'TEMPLATE', 'SVG', 'PICTURE', 'IMG', 'BUTTON', 'DIALOG', 'NAV'];
   td.addRule('drop', {
     filter: (node) => DROP.includes(node.nodeName.toUpperCase()) || node.getAttribute?.('aria-hidden') === 'true'
-      || node.hasAttribute?.('data-md-skip') || node.hasAttribute?.('hidden') || cls(node, 'tags', 'kbd', 'roster-wrap')
-      || (cls(node, 'eyebrow') && !/^H[1-6]$/.test(node.nodeName))   // Services' h1 is styled as an eyebrow
+      || node.hasAttribute?.('data-md-skip') || node.hasAttribute?.('hidden') || cls(node, 'tags', 'kbd', 'roster-wrap', 'eyebrow')
       || (cls(node, 'chip') && node.parentNode?.nodeName !== 'LI')
       // a <Pause /> after a label: the label rule's ": " already separates ("Office move: Law office", not ": .")
       || (cls(node, 'sr-only') && !!node.previousElementSibling && cls(node.previousElementSibling, 'label', 'chan-title', 'card-title')),
@@ -65,7 +64,7 @@ const md = (site, page) => {
   td.addRule('table', {
     filter: 'table',
     replacement: (_, node) => {
-      const cell = (c) => {   // "Business<small>Most teams pick this</small>" → "Business (Most teams pick this)"
+      const cell = (c) => {   // a cell's <small> note goes in brackets after its text (none today)
         const sub = text(all(c, 'small')[0]);
         return (sub ? `${text(c).replace(sub, '').trim()} (${sub})` : text(c)).replace(/\|/g, '\\|');
       };
@@ -80,10 +79,6 @@ const md = (site, page) => {
     replacement: (content, node) => {
       const href = node.getAttribute('href');
       const full = href.startsWith('/') ? site + href : href;
-      if (cls(node, 'next-link')) {   // the "Next service" panel: one plain line
-        const title = all(node, 'span').find((s) => cls(s, 'next-title'));
-        return `\n\nNext: [${text(title)}](${full})\n\n`;
-      }
       const label = content.replace(/\s+/g, ' ').trim();
       return label ? `[${label}](${full})` : '';
     },

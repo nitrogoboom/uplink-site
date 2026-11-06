@@ -9,7 +9,7 @@
 //   script errors    core.js posts uncaught errors and rejected promises (navigator.sendBeacon)
 // Each report becomes one line in the Workers logs (Cloudflare dashboard > Workers > uplink-site > Logs; observability
 // is on in wrangler.jsonc). Nothing else is kept. What a line holds, and what it never holds, is in the privacy page
-// (src/data/privacy.md): the page and script addresses without their ?query, the message, the browser's name. This
+// (src/data/privacy.md): the page and script addresses without their ?query, the message, the user agent (cut to 200 characters). This
 // code never logs the IP address or form contents, though Cloudflare's own record of each Worker run carries the
 // request's headers, IP included (kept 3 days on the free plan, 7 on paid). A body over 8 KB, or more than 20
 // reports in one post, is dropped.
@@ -18,7 +18,7 @@
 // may post 30 times a minute (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past
 // that, 429. Without the binding (the tests) there is no limit.
 //
-// PR #38 adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
+// PR #38 (open, paused until a sending domain exists) adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
 
 const MAX_BODY = 8 * 1024;
 const MAX_REPORTS = 20;

@@ -6,7 +6,8 @@ Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_grow.py                       (writes src/components/home/grow-world.svg)
        python tools/gen_grow.py editing-room/grow-options/places   (also the five separate scenes the mockups used)
 World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
-Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch.
+Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch
+(except each person's head, a half step in: see person()).
 No words in the drawing: the page writes its tags over it at the anchors (<circle class="tg-a" data-a="...">).
 Check: python tools/check.py src/components/home/grow-world.svg
        python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
@@ -77,7 +78,7 @@ def windows(s, x0, x1, y0, y1, z, lit=(), skip=()):
     """Windows on the two walls the viewer sees: right (x = x1) then left (y = y1), back to front."""
     lo, hi = z + WIN_Z[0], z + WIN_Z[1]
     for wall, a0, a1 in (('r', y0, y1), ('l', x0, x1)):
-        n = int((a1 - a0 - 0.5) // 1.75)                    # 1 wide, at least 0.75 apart and from the corners
+        n = int((a1 - a0 - 0.5) // 1.75)                    # 1 wide, about 0.75 apart and from the corners (0.5 at worst)
         gap = (a1 - a0 - n * WIN_W) / (n + 1)
         for k in range(n):
             a = a0 + gap * (k + 1) + WIN_W * k
@@ -168,7 +169,7 @@ def trees(s, spots, o):
 
 
 def link(s, pts, o):
-    """A cable on the floor: an L along the iso axes, dashed blue."""
+    """A cable on the floor: a cable along the iso axes, dashed blue."""
     s.group(o)
     s.raw(f'<polyline points="{w.pts(*[(x, y, 0) for x, y in pts])}" {LINK}/>')
     s.end()

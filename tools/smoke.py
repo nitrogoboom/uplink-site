@@ -24,7 +24,8 @@ import urllib.request
 
 UA = {'User-Agent': 'uplink-smoke-test'}
 HEADERS = ['strict-transport-security', 'content-security-policy', 'x-content-type-options', 'referrer-policy',
-           'x-frame-options', 'permissions-policy']
+           'x-frame-options', 'permissions-policy', 'cross-origin-opener-policy', 'cross-origin-resource-policy',
+           'x-permitted-cross-domain-policies']
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):

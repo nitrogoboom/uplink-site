@@ -21,7 +21,7 @@ RACK = (0, 60, 0, 60, 0, 140)         # x0, x1, y0, y1, z0, z1 (about 2.7 desks 
 FIREWALL = (-5, 65, -5, 65, 140, 150) # sits on the rack, 5 wider each side
 PORT_X = (5, 55)                      # patch rows on the rack's left wall (y = 60)
 PORT_STEP, PORTS = 12.5, 10           # rows at z = 12.5, 25 ... 125
-LED_X = 50                            # status lights, between the rows
+LED_X = 50                            # status lights, on the patch rows near their right end
 LEDS = [BLUE, pal.WHITE, pal.WHITE] * 4   # repeats bottom to top
 
 # two workstations in front of the rack, facing +x (towards the viewer's right), with open floor between them
@@ -80,7 +80,7 @@ def workstation(y0):
 
 
 def solids():
-    """Every box, in draw order."""
+    """Every box."""
     out = [RACK, FIREWALL]
     for y0 in DESK_Y:
         parts, _s, _t, seat = workstation(y0)

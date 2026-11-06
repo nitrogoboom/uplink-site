@@ -1,7 +1,8 @@
 """Painter-order + overlap check for box triples in an iso SVG.
 usage: python painter.py file ox oy u rules.py   (rules.py defines z0(box)->float|None to skip, label(box))
 Prints pairs whose screen silhouettes overlap but whose DOM order contradicts 3D depth,
-and pairs whose 3D volumes intersect (poke-through). Exits 1 on any, or when it finds no boxes."""
+and pairs whose 3D volumes intersect (poke-through). Exits 1 on any, when it finds no boxes, or when the rules
+resolve none of them (z0 gives None for every box: usually a wrong ox, oy or u), so a check can't pass by checking nothing."""
 import sys, math, importlib.util
 from iso import load, W, C30
 from shapely.geometry import Polygon
@@ -63,7 +64,11 @@ def main():
             if front == 'a':   # a should be drawn after b, but a comes first in DOM
                 print(f'ORDER  L{a["line"]} {R.label(a)} is in front of L{b["line"]} {R.label(b)} but drawn before it (overlap {ov:.0f}px²)')
                 found += 1
-    print(f'-- {len(bs)} boxes, {found} findings', file=sys.stderr)
+    checked = sum(b['box'] is not None for b in bs)
+    print(f'-- {len(bs)} boxes, {checked} checked, {found} findings', file=sys.stderr)
+    if not checked:
+        print(f'the rules resolved none of the {len(bs)} boxes: check ox, oy and u against the drawing', file=sys.stderr)
+        return 1
     return 1 if found else 0
 
 def fmt(B): return f'x{B[0]:.2f}-{B[1]:.2f} y{B[2]:.2f}-{B[3]:.2f} z{B[4]:.2f}-{B[5]:.2f}'

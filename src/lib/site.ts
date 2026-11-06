@@ -1,10 +1,10 @@
 // The site's page table and the helpers the generated files share (sitemap.xml, robots.txt, llms.txt,
-// index.md, agents.md, and the Early Hints block in _headers).
+// index.md, agents.md).
 //   PAGES       the static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The .astro pages read their
 //               title and description from here, so the sitemap and llms.txt say the same thing.
 //   getServices(), getProjects()  the collections in their own order.
 //   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
-//   allPages()  every indexable page: those five plus one per service and project, with a lastmod.
+//   allPages()  every indexable page: the seven in PAGES plus one per service and project, with a lastmod.
 //   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout); created(): when first added.
 //   businessNode()  the business in short, for the JSON-LD of every page but Home.
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
@@ -56,7 +56,7 @@ export const PAGES = {
   privacy: { path: '/privacy', name: 'Privacy', title: 'Privacy · Uplink Technology',
     description: 'What this website collects, why, who handles it and where, how long it is kept, and your rights under Canadian law.' },
   accessibility: { path: '/accessibility', name: 'Accessibility', title: 'Accessibility · Uplink Technology',
-    description: 'How this website meets WCAG 2.0 AA under Ontario law, its built-in aids, known limits, and how to ask for another format.' },
+    description: 'How this website meets WCAG 2.0 AA under Ontario law, its built-in aids, known limits, and how to give feedback.' },
 } as const;
 
 // Name and address come from PAGES. short: the phone tab bar's word, where it differs.

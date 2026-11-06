@@ -10,7 +10,7 @@ from playwright.async_api import async_playwright
 from site_pages import pages as site_pages
 
 SIZES = [(390, 844), (1280, 720), (1440, 900), (3440, 1440)]
-# html, body and every element in the body except script/style/link (the head's links change when CSS moves), in
+# html, body and every element in the body except script/style/link/template (the head's links change when CSS moves), in
 # document order: a hash of its computed style, its ::before and its ::after
 # (computed url() values are absolute, so the origin is cut out: the two copies run on different ports; and custom
 # properties list in no fixed order, so the properties are sorted by name)

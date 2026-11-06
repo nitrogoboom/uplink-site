@@ -1,7 +1,7 @@
 """The pages and screen sizes the verify_*.py checks share.
 pages(base): every address in the served sitemap.xml ('/' for home), then /soon and an address that gets the 404 page.
-Stops with an error if the sitemap lists fewer than the five static pages, so a broken sitemap can't pass a check
-by leaving pages out. SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (verify_footer.py, verify_spacing.py)."""
+Stops with an error if the sitemap lists fewer than five pages, so a broken sitemap can't pass a check
+by leaving pages out. SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (verify_footer.py, verify_spacing.py, verify_text.py)."""
 import re, sys, urllib.request
 
 MISSING = 'no-such-page'   # any missing address gets the 404 page

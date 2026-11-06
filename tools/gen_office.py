@@ -1,5 +1,6 @@
-"""Draws the office floor plan from one world-space description, in three versions that share every shape:
-  public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
+"""Draws the office floor plan from one world-space description, in these cuts, which share every shape:
+  public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero (carries its Barlow letters)
+  public/assets/img/office-card.svg   card cut: office-compact.svg without its labels or their letters (isogen.card)
   out/drawings/office-build.svg       animated reference copy of the hero (not deployed; carries its Barlow letters)
   public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
   public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
@@ -63,7 +64,7 @@ TABLE_CHAIRS = [(2.25, 11.5, '+y'), (4.0, 11.5, '+y'), (2.25, 14.0, '-y'), (4.0,
 
 # ---- server room --------------------------------------------------------------
 GLASS = (17, 4.5, 4)                   # partition: along x = 17 from the back wall to y = 4.5, then along y = 4.5 to the right edge; height
-RACKS = [(18.5, 2300), (20.1, 2400)]   # x0 and LED pattern id; racks are 1.1 x 1.3 x 3.6 at y 1..2.3
+RACKS = [18.5, 20.1]                   # x0 of each rack (LEDS and LED_ANIM are keyed by it); racks are 1.1 x 1.3 x 3.6 at y 1..2.3
 RACK = (1.1, 1.0, 2.3, 3.6)            # w, y0, y1, h
 RACK_SLOTS = 10                        # vent lines between slots; one LED per slot
 VENT = (0.1, 1.0)                      # vent line runs from x0 + 0.1 to x0 + 1.0
@@ -114,7 +115,7 @@ COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
     (LABELS[2][0], (640.3, 682.1), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
 # ---- hero layout (the hero's three cuts only for now; office, build and compact keep the plan above) ------------
-# Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 2-wide aisle, set right so the meeting
+# Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 1.75-wide aisle, set right so the meeting
 # room's glass doesn't hide them; a utility wall on the left (filing cabinet, printer, coffee counter); a small
 # network closet (4 x 3) round the rack and UPS in the back-right corner.
 # Front half, left to right: the meeting room (7.25 x 7.5, glass on its two inner sides with a door, 7 seats facing
@@ -128,7 +129,7 @@ PRINTER = [(0.375, 1.375, 4.25, 5.25, 0, 0.875), (0.5, 1.25, 4.375, 5.125, 0.875
 PAPER = (0.625, 1.125, 4.5, 5.0)                # a sheet on the printer lid (x0 x1 y0 y1)
 COFFEE = [(0.25, 1.25, 5.5, 7.25, 0, 1.25), (0.375, 0.875, 5.75, 6.375, 1.25, 1.875), (0.5, 0.75, 6.75, 7.0, 1.25, 1.5)]   # counter on the left wall, machine, mug
 MUG = (pal.MUG_LEFT, pal.MUG_RIGHT, pal.MUG_TOP)
-HERO_APS = [(15.25, 7.875), (RACKS[0][0] + RACK[0] / 2, 8.5), (6.5, 13.875)]
+HERO_APS = [(15.25, 7.875), (RACKS[0] + RACK[0] / 2, 8.5), (6.5, 13.875)]
 # The desks' and meeting room's points: on screen a ceiling AP shows 4.5 back-left of where it hangs, so these read
 # as over the desks (10.75, 3.375) and the middle of the meeting room's box (centred left to right on screen).
 # The guest point hangs at the true ceiling centre above the sofa and table, in line with the rack, so its blue
@@ -281,7 +282,7 @@ def solids():
     out.append((x0, x1, y0, y1, 0, h))
     for x, y, f in TABLE_CHAIRS:
         out += [b for _n, b in chair(x, y, f, s=PROP_S)]
-    out += [(x, x + RACK[0], RACK[1], RACK[2], 0, RACK[3]) for x, _ in RACKS]
+    out += [(x, x + RACK[0], RACK[1], RACK[2], 0, RACK[3]) for x in RACKS]
     s, t, z = AP
     out += [(x - s / 2, x + s / 2, y - s / 2, y + s / 2, z, z + t) for x, y in APS]   # hung high, but they hide the floor behind them
     return out
@@ -407,7 +408,7 @@ def rack(x0, v, h=RACK[3], slots=RACK_SLOTS):
 
 
 def rack_top(i=0, h=RACK[3]):
-    x0 = RACKS[i][0]
+    x0 = RACKS[i]
     return (x0 + RACK[0] / 2, (RACK[1] + RACK[2]) / 2, h)
 
 
@@ -656,7 +657,7 @@ def hero_groups(v):
     for (cx, cy), d in HERO_DESKS.items():
         G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
     G += [('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_back(HERO_GLASS)),
-          ('class="ob-i ob-grow" style="--d:1500ms;animation-duration:520ms"', rack(RACKS[0][0], v, *HERO_RACK)),
+          ('class="ob-i ob-grow" style="--d:1500ms;animation-duration:520ms"', rack(RACKS[0], v, *HERO_RACK)),
           ('class="ob-i" style="--d:1580ms"', ups())]
     for (cx, cy), d in HERO_DESKS_B.items():
         G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
@@ -703,7 +704,7 @@ def groups(v):
         elif item == 'front': G.append(('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_front()))
         elif item in ('rack0', 'rack1'):
             i = int(item[-1])
-            G.append((f'class="ob-i ob-grow" style="--d:{1500 + 80 * i}ms;animation-duration:520ms"', rack(RACKS[i][0], v)))
+            G.append((f'class="ob-i ob-grow" style="--d:{1500 + 80 * i}ms;animation-duration:520ms"', rack(RACKS[i], v)))
         else:
             (cx, cy), d = item
             G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
@@ -819,6 +820,10 @@ def render(v):
     body, css = hoist_styles(body)
     if css:
         style += f'\n<style>{css}</style>'
+    if v in HERO_CUTS:
+        # home.js inlines these in the page, so the drawing's parts would join the accessibility tree and its labels
+        # be read after the image's name. Hide them: the <svg>'s role="img" and aria-label are what a screen reader gets.
+        body = f'<g aria-hidden="true">\n{body}\n</g>'
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 

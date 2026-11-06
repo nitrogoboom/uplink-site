@@ -89,7 +89,7 @@ Every issue says who sent it, gives our contact details and has a working unsubs
 
 ## Who handles the data, and where
 
-Cloudflare, Inc. hosts this site, runs the analytics and the bot check, and will send our form emails. It acts for us, under its own privacy and security terms. Cloudflare is a US company. Its network spans many countries, so a request may be handled outside Canada, and Cloudflare stores data mainly in the United States and the European Union.
+Cloudflare, Inc. hosts this site and runs the analytics. Once the forms send, it will also run the bot check and send our form emails. It acts for us, under its own privacy and security terms. Cloudflare is a US company. Its network spans many countries, so a request may be handled outside Canada, and Cloudflare stores data mainly in the United States and the European Union.
 
 While your data is outside Canada, the laws of that country apply, and its courts, police or security agencies may be able to get it. We stay responsible for your personal information when Cloudflare handles it for us.
 
@@ -108,7 +108,7 @@ We don't share personal information with anyone else, unless the law requires it
 
 ## How we protect it
 
-The site is served only over an encrypted connection (HTTPS). It runs no code from other sites except Cloudflare's analytics and bot check. Few people at Uplink can open the inbox where form messages arrive.
+The site is served only over an encrypted connection (HTTPS). It runs no code from other sites except Cloudflare's analytics (and, once the forms send, its bot check). Few people at Uplink can open the inbox where form messages arrive.
 
 ## Your choices and rights
 

@@ -90,7 +90,7 @@ def chair(x, y, facing='-y', s=1.0, z=0):
 def monitor(x, y, top, facing='+y', s=1.0, width=4.0, height=2.625):
     """Monitor centred on x (or y) with its screen face at y (or x), standing on a desk whose top is z = top.
     Facing '+y' puts the screen on the panel's y1 face, '+x' on its x1 face (the faces the viewer sees).
-    Returns (parts back to front, screen) where screen = (transform, width, height) for drawing on the glass."""
+    Returns (parts back to front, screen) where screen = (facing, (x, y, z) top-left of the glass, width, height) for screen_glass()."""
     hw = width / 2
     local = [  # local facing -y: the screen is on the -y side at y = 0
         ('foot', (-1.0, 1.0, -0.25, 0.5, 0, 0.125)),
@@ -149,7 +149,7 @@ CRADLE = [  # cradle=True: two hooks on the body's left strip, the handset lying
 
 def desk_phone(x, y, top, facing='-y', s=1.0, cradle=False):
     """VoIP desk phone centred on (x, y) on a desk at z = top. Returns (parts back to front, top_face) where
-    top_face = (x0, y0, z, width_x, depth_y) of the body's top for phone_face().
+    top_face = (x0, y0, z, width_x, depth_y, facing, s) of the body's top for phone_face().
     cradle=True raises the handset on two hooks (for a drawing where the phone shows big)."""
     if cradle:
         parts = dict(place(PHONE[:1] + CRADLE, x, y, top, facing, s))

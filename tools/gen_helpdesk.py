@@ -1,4 +1,4 @@
-"""Draws helpdesk.svg (Services, Work) from a world-space description.
+"""Draws helpdesk.svg (Services, and the Home services card) from a world-space description.
 Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_helpdesk.py public/assets/img/helpdesk.svg
 World: 1 unit = 23px. x runs right-down, y left-down, z up. Desk's back-left corner is the origin.

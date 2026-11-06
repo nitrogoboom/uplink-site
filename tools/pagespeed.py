@@ -12,7 +12,7 @@ It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or 
 The key lives in Google Cloud, project uplink-site, APIs & Services > Credentials > pagespeed-gate
 (limited to the PageSpeed Insights API).
 
-Pages come from the live site's sitemap.xml (18 now). Home (GATED) must reach the bar on both; the other pages are drafts for
+Pages come from the live site's sitemap.xml. Home (GATED) must reach the bar on both; the other pages are drafts for
 now, so they are shown but don't fail the check unless --strict.
 A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here
 leaves out the "Page is blocked from indexing" audit (is-crawlable). Everything else counts.
@@ -52,7 +52,7 @@ def api_key():
 
 
 def pages(base):
-    """The paths in the live site's sitemap (18 pages now: five static, one per service and project)."""
+    """The paths in the live site's sitemap (the static pages, plus one per service and project)."""
     # a named User-Agent: Cloudflare answers Python's default one with 403
     req = urllib.request.Request(f'{base}/sitemap.xml', headers={'User-Agent': 'lighthouse-gate warm-up'})
     xml = urllib.request.urlopen(req, timeout=30).read().decode('utf-8')
@@ -114,7 +114,7 @@ def main():
     base = args[0].rstrip('/')
     bar = int(args[args.index('--min') + 1]) if '--min' in args else 100
     paths = pages(base)
-    if '--sample' in args:   # Home plus the first service and the first project: 6 tests, not 36
+    if '--sample' in args:   # Home plus the first service and the first project: 6 tests, not 40
         paths = ['/'] + [next(p for p in paths if p.startswith(d)) for d in ('/services/', '/work/')]
     gated = paths if '--strict' in args else GATED
     key = api_key()

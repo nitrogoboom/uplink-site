@@ -70,7 +70,7 @@
 .grow-ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; vector-effect: non-scaling-stroke; }
 
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
-   the ones already built a dimmer amber, the ones to come grey. Each dot is a 24px-wide button, room to tap. */
+   the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */
 .grow-nav { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); }
 .grow-step-btn:disabled { opacity: 0.4; cursor: default; }
 .grow-step-btn:disabled:hover { background: transparent; color: var(--c-muted); }

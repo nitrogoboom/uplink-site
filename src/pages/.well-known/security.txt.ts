@@ -10,7 +10,7 @@ export const GET: APIRoute = ({ site }) => {
   const body = [
     `Contact: mailto:${inboxes.security}`,
     `Expires: ${expires}`,
-    'Preferred-Languages: en, fr',
+    'Preferred-Languages: en',
     `Canonical: ${new URL('/.well-known/security.txt', site).href}`,
     '',
   ].join('\n');

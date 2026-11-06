@@ -1,22 +1,32 @@
 # Go-live checklist
 
-What a professional team runs a site through before the real domain goes live, on top of what CI and the release audit already prove (`docs/sop.md`, sections 4 and 5). Started 5 Nov 2026. Tick a line when it's done, with the date and the proof. Work that's still open on `notes.md` is pointed to, not copied.
+*Started November 5, 2026. Last updated: November 5, 2026.*
 
-Key: [x] done · [ ] open · **(you)** needs a person or an account · **(domain)** waits for the real domain · **(content)** waits for real copy
+This checklist covers what to check before the site moves to its real domain, beyond what CI and the release audit already prove. For those, see [What CI proves](sop.md#what-ci-proves) and the [release checklist](sop.md#release-checklist). For the launch-day steps, see [`launch-runbook.md`](launch-runbook.md).
 
-Not in this list on purpose: wording and keyword SEO. The copy is placeholder until there's a real client (`notes.md`, "Before going live").
+When you finish a line, tick it and add the date and the proof. Work that's still open in `notes.md` is linked from here, not copied.
+
+| Mark | Meaning |
+| --- | --- |
+| [x] | Done |
+| [ ] | Open |
+| **(you)** | Needs a person or an account sign-in |
+| **(domain)** | Waits for the real domain |
+| **(content)** | Waits for real copy |
+
+Wording and keyword SEO aren't in this list on purpose. The copy is placeholder until there's a real client (see "Before going live" in `notes.md`).
 
 ## 1. Security
 
-- [x] **Worker code review** (5 Nov 2026, `worker/index.js`). Sound overall: the origin check, query stripping, rate limit and JSON-only logging are all right. Two fixes made:
+- [x] **Worker code review** (November 5, 2026, `worker/index.js`). Sound overall: the origin check, query stripping, rate limit and JSON-only logging are all right. Two fixes made:
   - `/api/report` now stops reading a body at 8 KB, even with no `Content-Length`. Before, it read the whole post into memory, then checked the size.
   - `line` and `column` are logged only when they're whole numbers. Before, they were logged as sent.
-  - Two tests added (`scripts/test/worker.test.mjs`); 15/15 pass.
+  - Two tests added to `scripts/test/worker.test.mjs`, which now has 10. The whole suite, 15 tests, passes.
 - [ ] Review PR #38's form routes (`/api/contact`, `/api/book`, `/api/newsletter`) the same way before it merges. Look at the Turnstile check, the honeypot, the rate limit, what gets into the email, and header injection in the subject and reply-to.
-- [x] **Response headers, outside scan** (5 Nov 2026). Mozilla Observatory on the live `workers.dev` address: **A+, 130, 12/12 tests passed**. Rerun on the real domain.
+- [x] **Response headers, outside scan** (November 5, 2026). Mozilla Observatory on the live `workers.dev` address: **A+, 130, 12/12 tests passed**. Rerun on the real domain.
 - [ ] **(domain)** SSL Labs (ssllabs.com/ssltest) on the real domain: aim for A or A+. Also run securityheaders.com once.
-- [x] **Dependencies** (5 Nov 2026). `npm audit --omit=dev`: 0 vulnerabilities in anything the site ships. The full tree shows 11 moderate, all one advisory in `minimatch` under ESLint (dev only, never deployed). Dependabot will bring the fix; nothing to do by hand.
-- [x] GitHub code scanning (CodeQL): skipped on purpose (5 Nov 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public.
+- [x] **Dependencies** (November 5, 2026). `npm audit --omit=dev`: 0 vulnerabilities in anything the site ships. The full tree shows 11 moderate, all one advisory in `minimatch` under ESLint (dev only, never deployed). Dependabot will bring the fix; nothing to do by hand.
+- [x] GitHub code scanning (CodeQL): skipped on purpose (November 5, 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public.
 - [ ] **(you)** Protect `main`, 2FA on Cloudflare, a scoped API token, secret owners and rotation dates (`notes.md`, "Production readiness").
 - [ ] **(domain)** Domain hardening at the registrar and in DNS:
   - registrar lock, auto-renew, 2FA on the registrar account
@@ -26,9 +36,9 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 
 ## 2. Licences and legal
 
-- [x] **Fonts** (5 Nov 2026). Barlow and Barlow Condensed, SIL OFL 1.1, © The Barlow Project Authors, with no Reserved Font Name. That means subsetting them into the drawings (`tools/svgfont.py`) is allowed. The licence is shipped as `public/assets/fonts/OFL.txt` and kept in `tools/fonts/`.
-- [x] **Icons and drawings** (5 Nov 2026). Every icon is a few hand-written paths (`src/components/Icon.astro`), and every drawing is generated by `tools/gen_*.py`. Nothing is borrowed.
-- [x] **No brand marks** (5 Nov 2026). The social links use generic icons (person, play, people, camera, chat), not the LinkedIn/YouTube/Facebook/Instagram/X logos. No Overwatch or Blizzard name, font or asset is anywhere in the code.
+- [x] **Fonts** (November 5, 2026). Barlow and Barlow Condensed, SIL OFL 1.1, © The Barlow Project Authors, with no Reserved Font Name. That means subsetting them into the drawings (`tools/svgfont.py`) is allowed. The licence is shipped as `public/assets/fonts/OFL.txt` and kept in `tools/fonts/`.
+- [x] **Icons and drawings** (November 5, 2026). Every icon is a few hand-written paths (`src/components/Icon.astro`), and every drawing is generated by `tools/gen_*.py`. Nothing is borrowed.
+- [x] **No brand marks** (November 5, 2026). The social links use generic icons (person, play, people, camera, chat), not the LinkedIn/YouTube/Facebook/Instagram/X logos. No Overwatch or Blizzard name, font or asset is anywhere in the code.
 - [ ] **(you)** Look-and-feel check: someone other than us looks at the site beside Overwatch 2's menus and says it reads as "inspired by", not a copy (trade dress). The font is already different (Barlow, not Blizzard's).
 - [ ] **(content)** Social handles (`footer.json`: `@uplinkit`, `/company/uplinkit` …) are made up and may belong to someone. Confirm the real ones before launch, or drop them.
 - [ ] **(you)** A lawyer reads `/privacy` and the terms page (to write: `notes.md`, "Before going live").
@@ -36,7 +46,7 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 
 ## 3. Page structure (headings, landmarks, ARIA, head tags)
 
-- [x] **Structure audit, all 22 pages** (5 Nov 2026; static HTML plus the live page at 1440 and 375). Passes:
+- [x] **Structure audit, all 22 pages** (November 5, 2026; static HTML plus the live page at 1440 and 375). Passes:
   - one h1 per page, no skipped heading levels
   - one main, banner and footer each; skip link works
   - distinct nav names, no duplicate ids
@@ -48,7 +58,7 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
   - both dialogs named and modal
 - [x] Fixed: `/privacy` and `/accessibility` had two regions both named "Privacy" (or "Accessibility"). The body section no longer repeats the h1's name (`src/components/TextPage.astro`).
 - [x] Fixed: the Settings shortcut switch read its hint as part of its name. Now the name is "Single-key shortcuts" and the hint is its description (`src/components/SettingsDialog.astro`).
-- [ ] Known, waits on forms: the contact and newsletter fields have no `name`, so a real submit would send nothing (`notes.md`, "Forms").
+- [ ] Known, waits on forms: the contact and newsletter fields have no `name`, so a real submit would send nothing ("Before going live" in `notes.md`).
 - [ ] Optional, a design call:
   - On service pages "What's included" and "Best for" are h2s beside the real sections. They could be h3s, or "Best for" a plain label (`src/components/services/ServiceCard.astro`; its comment says h2 is on purpose).
   - Card titles on `/work` and `/services` are not headings, so the h1 is the only heading on `/work`. Each card is one well-named link, so it passes; headings would let screen-reader users jump card to card.
@@ -56,28 +66,28 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 
 ## 4. Display modes
 
-- [x] **Lighthouse, all 20 sitemap pages, phone and desktop** (5 Nov 2026, local build).
+- [x] **Lighthouse, all 20 sitemap pages, phone and desktop** (November 5, 2026, local build).
   - Accessibility 100, Best practices 100 everywhere.
   - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`).
   - SEO 66–69 only because of the intended `noindex`.
 - [x] **Reflow at 320 px wide (WCAG 1.4.10, the same as 400% zoom)**: no sideways scroll on any page at 320×800 or 320×256.
 - [x] Checked: at 320×256 (a phone on its side with big zoom) the header and bottom bar take half the screen until you scroll. The bottom bar already slides away on scroll down (`core.js`, `.botnav.is-hidden`), so the reading space comes back. Left as is.
-- [x] **Forced colours (Windows contrast themes)**. Text, borders, focus rings and form controls all held. Fixed (5 Nov 2026):
+- [x] **Forced colours (Windows contrast themes)**. Text, borders, focus rings and form controls all held. Fixed (November 5, 2026):
   - In a light contrast theme, the drawings' pale labels vanished on the white page. Each drawing now keeps a dark plate behind it (`src/styles/surfaces.css`).
   - The current-page bar under the header tabs now shows, in the theme's highlight colour (`src/styles/header.css`).
 - [x] Fixed: dots before chip words ("Open now" on Contact) now show in contrast themes (`src/styles/buttons.css`).
-- [x] **Print** (5 Nov 2026). There was no print style, so pages printed as a blank first page, pale headings, a "Skip to content" on every page and cards split across pages. Now (`src/styles/print.css`, ink colours in `src/styles/tokens.css`):
+- [x] **Print** (November 5, 2026). There was no print style, so pages printed as a blank first page, pale headings, a "Skip to content" on every page and cards split across pages. Now (`src/styles/print.css`, ink colours in `src/styles/tokens.css`):
   - dark ink on white
   - the header shows without its buttons, and the footer, bottom bar, skip link and dialogs drop out
   - the two animated drawings (hero, Grow) drop out, since they print half built
   - cards and headings don't split across pages
 - [x] **No JavaScript**: every page shows its content, links and footer.
 - [x] Fixed: without script, Home's "Previous / Next service" arrows and the dots under the phone service row are hidden, since they can't do anything; the row still swipes (`src/components/home/services.css`).
-- [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed 5 Nov 2026; every other page already passed.
+- [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed November 5, 2026; every other page already passed.
   - The hero's height is now a floor, not a cap, and its text centres only while it fits (`safe center`). With the WCAG spacing, the h1 stays below the header at 1280, 1440 and 3440.
   - The desktop service tiles' rows grow when their words do, so no icon is cut off (`src/components/home/hero.css`, `src/components/home/services.css`).
   - `tools/verify_styles.py`: nothing else on any page moved, at all four sizes.
-- [x] **Cache headers** (5 Nov 2026, local and live match). HTML revalidates, and `/_astro/*` is immutable for a year.
+- [x] **Cache headers** (November 5, 2026, local and live match). HTML revalidates, and `/_astro/*` is immutable for a year.
 - [ ] Risk: the fonts in `/assets/fonts/` have no hash in their names but are cached immutable for a year (`public/_headers`). If a font file ever changes, give it a new name.
 
 ## 5. Performance
@@ -85,7 +95,7 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 - [ ] **(you)** PageSpeed on every page, phone and desktop: `python tools/pagespeed.py https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
 - [ ] One WebPageTest run from Toronto on a slow phone profile, Home and Contact (webpagetest.org, free).
 - [ ] Decide: a performance budget in CI (Lighthouse CI) so a slow change fails the build instead of being found later.
-- [ ] **(domain)** Traffic against the free plan: until Always Use HTTPS is on, every request runs the Worker (100,000 a day free; `notes.md`, "HTTPS").
+- [ ] **(domain)** Traffic against the free plan: while `run_worker_first` is `true`, every request runs the Worker (100,000 a day free). It can be narrowed once Always Use HTTPS is on, unless the old address is redirected by the Worker (option B in `launch-runbook.md`).
 
 ## 6. SEO and sharing (structure only, not wording)
 
@@ -96,14 +106,14 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 
 ## 7. Launch day
 
-- [x] Cutover runbook written (5 Nov 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
+- [x] Cutover runbook written (November 5, 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
 - [ ] **(you)** Practise one rollback on a quiet day (steps at the end of the runbook). It briefly puts the previous version live.
-- [x] Smoke test written (5 Nov 2026): `python tools/smoke.py <address> [--launch] [--old <old address>]`. It checks:
+- [x] Smoke test written (November 5, 2026): `python tools/smoke.py <address> [--launch] [--old <old address>]`. It checks:
   - every sitemap page: 200, html, security headers
   - noindex present today, gone with `--launch`
   - `http://` and the old address redirect
   - made-up addresses and `/404` give 404
-  - the report endpoint, `robots.txt`, `llms.txt` and the `.md` copies answer
+  - the report endpoint, `robots.txt`, `llms.txt` and one `.md` copy (`/services.md`) answer
   - the sitemap names this host
   - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since Python can't see it.
 - [ ] **(you)** Alerts, not just logs. Workers logs keep 3 days and ping nobody. Add a notification for errors (Cloudflare Notifications, or a small daily summary of `/api/report` lines to email), plus the outside uptime check (`notes.md`).

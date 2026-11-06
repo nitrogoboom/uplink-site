@@ -1,73 +1,102 @@
 # Layout reference: Overwatch 2 menus
 
-What to take from the screenshots in `RAW Screenshots/` (git ignores that folder; the files stay on this PC only). Taken at 3440×1440. Numbers in brackets are the file order, oldest first (1 = `000610`, 16 = `001133`).
+*Measured October 28, 2026. Last updated: November 5, 2026.*
 
-What we want is the **layout**: how the boxes sit, their corners, the spacing, the sizes, and how one design fills a 21:9 screen and a 1080p screen without breaking. We're **not** taking their colours or backgrounds. We **are** taking how they place one strong image. We're **not** taking the slanted tabs or skewed boxes (see "Skip").
+This page records what the site takes from the Overwatch 2 menus, and what it leaves out. Read it before you change how boxes sit, their corners, their spacing, or how a page fills a wide screen.
 
-**Applied site-wide on 28 Oct 2026:** small corners (`--r-2` 0.25rem, `--r-3` 0.5rem), straight header tab, centred 94rem block on desktop (`--container` in `tokens.css`), edge-to-edge pictures on service cards, bigger stat numbers, steps with the number beside the title. The "Ours now" column and the "Ours:" notes below are what the site looked like **before** that pass; they are kept to show what changed and why.
+The measurements come from screenshots in `RAW Screenshots/`, taken at 3440×1440. Git ignores that folder, so the files stay on one computer only. Numbers in square brackets, such as [4], point at a screenshot by file order, oldest first: 1 is `000610` and 16 is `001133`.
 
-## How it fits every screen
+## What we take and what we skip
 
-The menus never reflow. Everything is sized from **screen height**, so a 1440-tall screen is a 1080p screen scaled up by 1.33. Extra width never stretches the content. It goes to the art and to empty space at the sides.
+| Take | Don't take |
+| --- | --- |
+| The layout: how boxes sit, their corners, spacing, and sizes. | Their colours and backgrounds. |
+| How one design fills a 21:9 screen and a 1080p screen without breaking. | The slanted nav tabs and skewed boxes. See [Skip](#skip). |
+| How they place one strong image. | |
+
+### Applied on October 28, 2026
+
+These changes were made site-wide:
+
+- Small corners: `--r-2` is 0.25rem and `--r-3` is 0.5rem.
+- A straight header tab.
+- A centred block of about 94rem on large desktops (`--container` in `tokens.css`).
+- Edge-to-edge pictures on service cards.
+- Bigger stat numbers.
+- Steps with the number beside the title.
+
+> **Note:** The "Ours before" column and the "Before" notes on this page describe the site before that pass. They're kept to show what changed and why.
+
+## How the menus fit every screen
+
+The menus never reflow. Everything is sized from the **screen height**, so a 1440-tall screen is a 1080p screen scaled up by 1.33. Extra width never stretches the content. It goes to the art and to empty space at the sides.
 
 Each item has one of two jobs:
 
-- **Pinned to an edge or corner.** The top bar, the hero copy (top-left), the key hints (bottom corners) and the side panels (right edge) hold a fixed distance from their edge. On a wider screen they just sit further apart.
-- **The centred block.** Cards, profile pages and lists sit in one centred block about 94rem wide (in our units; see below). At 3440 that block covers 70% of the width. At 1920×1080 the same block covers about 94%, leaving roughly 58px each side. Same design, no breakpoint.
+- **Pinned to an edge or corner.** The top bar, the hero copy (top left), the key hints (bottom corners), and the side panels (right edge) hold a fixed distance from their edge. On a wider screen, they sit further apart.
+- **In the centred block.** Cards, profile pages, and lists sit in one centred block about 94rem wide, in our units. At 3440 px, that block covers 70% of the width. At 1920×1080, it covers about 94%, leaving roughly 58 px on each side. It's the same design, with no breakpoint.
 
-The image fills the whole screen behind both. The subject sits in the middle or the right, in the space the copy leaves free. [2, 4, 14, 16]
+The image fills the whole screen behind both. The subject sits in the middle or on the right, in the space the copy leaves free. [2, 4, 14, 16]
 
-**Our site already scales by height:** `tokens.css` sets the root font to `min(1.1111vw, 1.7778vh)` from 1100px wide, which gives 25.6px at 3440×1440 and 19.2px at 1920×1080. Before 28 Oct, desktop set `--container: none`, so content stretched across all 3440px. Now `--container` is the 94rem block plus gutters, for card grids and lists, with heroes and the header kept full width.
+### How the site does it
+
+On a `fold` screen, at least 1100 px wide and 700 px tall, `tokens.css` sets the root font size to `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`. That gives 25.6 px at 3440×1440 and 19.2 px at 1920×1080, so the whole layout scales with the smaller of the screen's width and height.
+
+On the same screens, `--container` is `94rem` plus two gutters: one centred block for card grids and lists. The header, the hero, and the footer's stage and base bar run full width. Smaller screens, and desktops shorter than 700 px, keep `--container` at 80rem.
+
+Before October 28, desktop set `--container: none`, so content stretched across all 3,440 px.
 
 ## Measurements
 
-Measured at 3440×1440, converted to rem at our 25.6px root there.
+Measured at 3440×1440 and converted to rem at the 25.6 px root used there.
 
-| Thing | OW at 1440 tall | In rem | Ours now |
-|---|---|---|---|
-| Top bar height | 94px | 3.7rem | `--header-h` 4rem (close) |
-| Button height | 71–80px | 2.8–3.1rem | `--control-h` 3rem (match); `--control-lg` 4rem (bigger than OW) |
-| Gap between buttons | 13px | 0.5rem | `--sp-2` |
-| Square icon button | 80×80, same height as the buttons beside it | 3.1rem | — |
-| Copy inset from the left edge | 133px | 5.2rem | `--gutter` 3rem (we're tighter) |
-| Hero copy column | ~665px | ~26rem | `--measure-lead` 56ch (wider) |
-| Mode card | 493×693, about 5:7 | 19×27rem | — |
-| Gap between cards | 42px | 1.6rem | `--sp-5` 1.5rem |
-| Profile banner height | 160px | 6.25rem | — |
-| Centred block | 2412px | 94rem | `--container: none` on desktop |
-| Key hints | ~60px up from the bottom | 2.3rem | — |
+| Item | Overwatch 2 at 1440 tall | In rem | Ours before October 28 |
+| --- | --- | --- | --- |
+| Top bar height | 94 px | 3.7rem | `--header-h` 4rem (close) |
+| Button height | 71–80 px | 2.8–3.1rem | `--control-h` 3rem (a match); `--control-lg` 4rem (bigger) |
+| Gap between buttons | 13 px | 0.5rem | `--sp-2` |
+| Square icon button | 80×80 px, the same height as the buttons beside it | 3.1rem | — |
+| Copy inset from the left edge | 133 px | 5.2rem | `--gutter` 3rem (tighter) |
+| Hero copy column | about 665 px | about 26rem | `--measure-lead` 56ch (wider) |
+| Mode card | 493×693 px, about 5:7 | 19×27rem | — |
+| Gap between cards | 42 px | 1.6rem | `--sp-5` 1.5rem |
+| Profile banner height | 160 px | 6.25rem | — |
+| Centred block | 2,412 px | 94rem | `--container: none` on desktop |
+| Key hints | about 60 px up from the bottom | 2.3rem | — |
 
 ## Corners
 
-The main difference from our site. OW keeps corners **small**:
+This was the main difference from our site. The menus keep corners **small**:
 
-- Buttons, dropdowns, tabs: square or about 2px. [4, 8, 10]
-- Cards and panels: about 8–10px (0.35–0.4rem). Shop art cards about 12px. [1, 5, 6]
-- Only status things are round: price pills, check pills, avatars in circles. [4, 5, 9]
+- Buttons, drop-down menus, and tabs: square, or about 2 px. [4, 8, 10]
+- Cards and panels: about 8–10 px (0.35–0.4rem). Shop art cards: about 12 px. [1, 5, 6]
+- Only status items are round: price pills, check pills, and avatars in circles. [4, 5, 9]
 
-Ours before 28 Oct: `--r-2` was 0.75rem (19px at 3440) on buttons, and `--r-3` 1.25rem (32px) on cards, two to three times rounder. Now 0.25rem and 0.5rem. `--r-pill` is unchanged.
+**Before:** `--r-2` was 0.75rem (19 px at 3440) on buttons, and `--r-3` was 1.25rem (32 px) on cards, two to three times rounder. They're now 0.25rem and 0.5rem. `--r-pill` didn't change.
 
 ## Boxes
 
-- **Card = picture + caption.** Title and one short line go at the bottom, over a dark fade on the image. A tiny caps eyebrow goes above the title, and price or status goes in a pill under it. [5, 6]
-- **Tall card + short tiles.** Three tall 5:7 cards, then a column of three short tiles whose total height matches one tall card. Main choices large, side choices small, same row. [1]
-- **Stat tile.** Outlined box: icon on top, a huge number in the middle, a caps label at the bottom. Laid out 3×2, beside a table. [13]
-- **Row lists.** Full-width rows with thin gaps (about 4px) instead of lines between them. A small square picture on the left, the text, then a number on the right. A coloured bar can fill behind the row to show its value. [9, 12]
-- **Category list + content.** A narrow list on the left (active row filled, count on the right), and a two-column card list on the right. [11]
-- **Button row.** One main button, one other button, and an optional square icon button. All the same height, about 13px apart. [4, 16]
-- **Banner across the page.** A full-width band over a dimmed page: copy on the left, picture on the right, and one button centred under it. [3]
-- **Menu screen.** Split by one thin vertical line: logo on the left, a stack of full-width buttons on the right, with a gap before the last one. [8]
-- **Side drawer.** Full height on the right edge, rows that open and close, a short centred line when empty. [7]
+- **Card: picture and caption.** The title and one short line sit at the bottom, over a dark fade on the image. A tiny capitals eyebrow sits above the title, and a price or status goes in a pill under it. [5, 6]
+- **Tall cards and short tiles.** Three tall 5:7 cards, then a column of three short tiles whose total height matches one tall card. Main choices are large and side choices small, in the same row. [1]
+- **Stat tile.** An outlined box with an icon on top, a huge number in the middle, and a capitals label at the bottom. Laid out 3×2, beside a table. [13]
+- **Row lists.** Full-width rows with thin gaps, about 4 px, instead of lines between them. A small square picture on the left, then the text, then a number on the right. A coloured bar can fill behind the row to show its value. [9, 12]
+- **Category list and content.** A narrow list on the left, with the active row filled and a count on the right, and a two-column card list on the right. [11]
+- **Button row.** One main button, one other button, and an optional square icon button. All the same height, about 13 px apart. [4, 16]
+- **Banner across the page.** A full-width band over a dimmed page: copy on the left, a picture on the right, and one button centred under it. [3]
+- **Menu screen.** Split by one thin vertical line: the logo on the left, and a stack of full-width buttons on the right, with a gap before the last one. [8]
+- **Side drawer.** Full height on the right edge, with rows that open and close, and a short centred line when it's empty. [7]
 
-## Type sizes (relative)
+## Type sizes
 
-- Page title: about 2× the size of section titles. Big, condensed and italic, top-left, with a smaller subline tucked under it. [1, 7, 12, 16]
-- Labels, tabs and buttons: small bold caps, the same size everywhere.
-- Body: sentence case, short lines (the hero column caps it at about 26rem).
+These sizes are relative to each other.
+
+- **Page title:** about twice the size of section titles. Big, condensed, and italic, in the top left, with a smaller subline tucked under it. [1, 7, 12, 16]
+- **Labels, tabs, and buttons:** small, bold capitals, the same size everywhere.
+- **Body:** sentence case, in short lines. The hero column caps it at about 26rem.
 
 ## Skip
 
-- **Slanted nav tabs** (the parallelogram behind the active link) and **skewed thumbnail cards** along the bottom of the home screen. [1, 2, 5, 14]
-- **The blue edge on the left of the active mode tab.** It breaks our no-left-accent rule. [1]
+- **Slanted nav tabs** (the parallelogram behind the active link) and the **skewed thumbnail cards** along the bottom of the home screen. [1, 2, 5, 14]
+- **The blue edge on the left of the active mode tab.** It breaks the site's rule against left-side accents. [1]
 
-Replacement for the slanted tab: a **straight full-height block**. The active link fills the bar's full height edge to edge, with square corners, a lighter fill and a short accent line along the bottom edge of the bar. It's the same look OW uses on its own right-hand icons. [7, 16] That is what `src/styles/header.css` does now; before 28 Oct it was a rounded chip floating in the bar.
+**What replaces the slanted tab:** a straight, full-height block. The active link fills the bar's full height, edge to edge, with square corners, a lighter fill, and a short accent line along the bottom edge of the bar. The menus use the same look on their own right-hand icons. [7, 16] That's what `src/styles/header.css` does now. Before October 28, the active tab was a rounded chip floating in the bar.

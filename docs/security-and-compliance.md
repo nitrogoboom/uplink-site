@@ -8,15 +8,15 @@ This page explains how the Uplink Technology website protects its visitors and w
 - how you can check it yourself with public tools
 - how to apply the same idea to your own site
 
-The site is a static site: pages are built ahead of time and served from Cloudflare's network. One small server function handles error reports from browsers. Because there are no accounts, no database, and no third-party scripts beyond privacy-friendly analytics, there is very little that an attacker can reach. The sections below build on that small footprint.
+The site is a static site: pages are built ahead of time and served from Cloudflare's network. One small server function sees each request first: it redirects plain `http://` to `https://` and handles error reports from browsers. Because there are no accounts, no database, and no third-party scripts beyond privacy-friendly analytics, there is very little that an attacker can reach. The sections below build on that small footprint.
 
 ## Standards this site meets
 
 | Area | Standard | What the site does |
 | --- | --- | --- |
-| Accessibility | [WCAG 2.0](https://www.w3.org/TR/WCAG20/) Level AA, the level set by Ontario's [Integrated Accessibility Standards](https://www.ontario.ca/laws/regulation/110191) | Conforms to Level AA. Also meets the WCAG 2.1 and 2.2 criteria listed in [Accessibility](#accessibility). |
+| Accessibility | [WCAG 2.0](https://www.w3.org/TR/WCAG20/) Level AA, the level set by Ontario's [Integrated Accessibility Standards](https://www.ontario.ca/laws/regulation/110191) | Built to Level AA and checked by machine on every page. The review by hand is still open. Also built to the WCAG 2.1 and 2.2 criteria listed in [Accessibility](#accessibility). |
 | Privacy | [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/) | Publishes what it collects, who processes it, where, and for how long. Sets no cookies. |
-| Response headers | [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/) | Sends every recommended header. Scores A+ on [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). |
+| Response headers | [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/) | Sends the headers listed in [Set protective response headers](#set-protective-response-headers). Scores A+ on [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). |
 | Vulnerability disclosure | [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) | Publishes a `security.txt` file with a contact address. |
 
 ## Security
@@ -27,7 +27,7 @@ HTTPS encrypts the connection between the visitor and the site. Without it, anyo
 
 **How the site does it**
 - Every request made with `http://` is redirected to the same address with `https://`. The redirect uses status `308`, which keeps the request method unchanged.
-- Every response includes HTTP Strict Transport Security (HSTS), which tells the browser to use HTTPS for this site for the next year, even if someone types `http://`:
+- Every page and file includes HTTP Strict Transport Security (HSTS), which tells the browser to use HTTPS for this site for the next year, even if someone types `http://`:
 
   ```http
   Strict-Transport-Security: max-age=31536000
@@ -109,7 +109,7 @@ Some XSS happens entirely in the browser: a script takes text from somewhere and
 **How the site does it**
 - The CSP includes `require-trusted-types-for 'script'` and `trusted-types uplink`. Only one policy, named `uplink`, may exist.
 - The site's shared script creates that policy. Every script that writes HTML calls one helper that goes through it.
-- The policy builds HTML only from the site's own text, never from a URL or a form.
+- The policy doesn't clean or change the HTML it's given. Its job is to make sure HTML is written in one place only. Callers pass it only the site's own text and the site's own drawings, never anything from a URL or a form.
 - The policy may load exactly one outside script, the analytics script, and throws an error for any other.
 
 **Verify it**
@@ -133,7 +133,7 @@ To learn more, see [Prevent DOM-based XSS with Trusted Types](https://web.dev/ar
 
 ### Set protective response headers
 
-Besides HSTS and the CSP, every response carries these headers:
+Besides HSTS and the CSP, every page and file carries these headers. Short responses the server function writes itself, such as the `http://` redirect and the report endpoint's replies, don't carry them.
 
 ```http
 X-Content-Type-Options: nosniff
@@ -141,6 +141,8 @@ X-Frame-Options: DENY
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+X-Permitted-Cross-Domain-Policies: none
 ```
 
 `X-Content-Type-Options`
@@ -157,6 +159,14 @@ Cross-Origin-Opener-Policy: same-origin
 
 `Cross-Origin-Opener-Policy`
 : Keeps other sites' windows from holding a reference to this one. That blocks a group of cross-window attacks.
+
+`Cross-Origin-Resource-Policy`
+: Stops other sites from loading the site's files into their own pages, which closes off some side-channel attacks. The share picture, `og.png`, is the one exception (`cross-origin`), because some apps show it directly.
+
+`X-Permitted-Cross-Domain-Policies`
+: Tells Adobe products such as Acrobat that the site allows no cross-domain access.
+
+The site doesn't send `Cross-Origin-Embedder-Policy`. It's needed only for features the site doesn't use, and it could block the analytics script, which comes from another domain.
 
 **Verify it**
 
@@ -187,7 +197,7 @@ The report endpoint is the only part of the site that accepts input. It's built 
 - It removes the query string from every web address before saving it, because a query string can hold personal data.
 - It records numbers, such as line numbers, only if they're whole numbers.
 
-Automated tests cover these rules, and they run before any change goes live.
+Automated tests cover these rules, and CI runs them before it deploys a change.
 
 **Apply it to your site**
 
@@ -215,7 +225,7 @@ For any endpoint that accepts input:
 
 ### Publish a security contact
 
-If you find a security problem on this site, report it to the address in [`/.well-known/security.txt`](/.well-known/security.txt). The file follows RFC 9116. It's generated each time the site is built, so its expiry date is always about a year ahead.
+If you find a security problem on this site, report it to the address in [`/.well-known/security.txt`](/.well-known/security.txt). The file follows RFC 9116. It's generated each time the site is built, with an expiry date a year after the build. The site must be rebuilt at least once a year to keep it valid.
 
 ## Privacy
 
@@ -241,7 +251,9 @@ An error report from the browser contains:
 - the page address, without its query string
 - the error message
 - the script address and line number
-- the browser's name
+- the browser's user-agent string, cut to 200 characters
+
+A report of a blocked resource also contains the blocked address, without its query string, and the rule that blocked it.
 
 It never includes anything a visitor typed. Cloudflare keeps its own record of each request, including the IP address, for up to three days. The privacy page says so.
 
@@ -251,7 +263,7 @@ The site has a working rule: any change that starts collecting new information, 
 
 ## Accessibility
 
-The site conforms to WCAG 2.0 Level AA. It also meets these later success criteria:
+The site is built to WCAG 2.0 Level AA and checked by machine on every page. A review by hand, on real phones and with a screen reader, is still to be done. The site is also built to these later success criteria:
 - from WCAG 2.1: 1.3.5, 1.4.10, 1.4.11, 1.4.12, 2.1.4, 2.5.3 and 4.1.3
 - from WCAG 2.2: 2.5.8
 
@@ -277,7 +289,7 @@ The [accessibility statement](/accessibility) describes the site's support and h
 | Motion | If your system asks for reduced motion, nothing animates. Otherwise, every looping animation has a pause button, and nothing flashes more than three times a second. | 2.2.2, 2.3.1 |
 | Forms | Every field has a visible label. Optional fields say so. Common fields support autofill. Errors are written out, tied to their field, and focus moves to the first one. | 1.3.5, 3.3.1, 3.3.2 |
 | Status messages | Updates such as the number of projects shown after you filter are announced by screen readers without moving focus | 4.1.3 |
-| Valid code | The HTML passes the W3C validator | 4.1.1 |
+| Valid code | The home page passes the W3C validator at each release. Every page is checked when a release changes their markup. | 4.1.1 |
 
 ### Works the way you browse
 
@@ -290,7 +302,7 @@ The [accessibility statement](/accessibility) describes the site's support and h
 You can check most of these yourself:
 1. **Keyboard:** put your mouse aside and press Tab through a page. Every stop shows a visible outline, and you can reach and use everything.
 2. **Screen reader:** turn on [NVDA](https://www.nvaccess.org/) on Windows or VoiceOver on Mac and iPhone. Read a page from the top, then jump between headings.
-3. **Automated scan:** run [axe DevTools](https://www.deque.com/axe/devtools/), [WAVE](https://wave.webaim.org/), or Lighthouse's **Accessibility** audit. On November 5, 2026, Lighthouse scored every page 100 on phone and desktop.
+3. **Automated scan:** run [axe DevTools](https://www.deque.com/axe/devtools/), [WAVE](https://wave.webaim.org/), or Lighthouse's **Accessibility** audit. On November 5, 2026, Lighthouse scored 100 for accessibility on every sitemap page on phone and desktop, after one fix to the home page.
 4. **Text size:** zoom the browser to 200%, or use the site's own text setting. Nothing is cut off or overlaps.
 5. **Narrow screens:** in DevTools, open the device toolbar and set the width to 320 pixels. Nothing scrolls sideways.
 6. **Reduced motion:** turn on your system's reduced-motion setting and reload. Nothing moves.
@@ -314,7 +326,7 @@ Every change goes through the same path before visitors see it:
    - a headless browser over every page, which fails on any script error, blocked resource, sideways scroll, or serious accessibility problem
    - a check that every link and file answers
 2. **Preview.** Each proposed change gets its own preview address, plus a screenshot comparison against the live site.
-3. **Release.** Only changes that pass every check are deployed.
+3. **Release.** CI deploys only changes that pass every check.
 4. **Smoke test.** After a release, a smoke test requests every page and checks its status code, its security headers, and the redirects.
 5. **Rollback.** If something goes wrong, the previous version can be restored in seconds.
 

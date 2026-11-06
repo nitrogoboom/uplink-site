@@ -1,5 +1,5 @@
-// Cloudflare Workers, static assets: the built site in dist/ is served as is. The one script, worker/index.js, answers
-// /api/* only (run_worker_first): today the error and CSP reports from visitors' browsers (/api/report).
+// Cloudflare Workers, static assets: the built site in dist/ is served as is. The one script, worker/index.js, sees
+// every request first (run_worker_first, below): it answers /api/report, the error and CSP reports from visitors' browsers.
 //   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787), _headers included
 //   npx wrangler deploy   deploy (CI does this on a push to main; see .github/workflows/site.yml)
 // not_found_handling "404-page": a missing address gets dist/404.html with a 404 status (Pages did this on its own).
@@ -17,7 +17,7 @@
     "binding": "ASSETS",
     "run_worker_first": true,
   },
-  // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38's FORMS limit is namespace 1001.
+  // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38 (open, paused) adds a FORMS limit, namespace 1001.
   "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
   "preview_urls": true,
   "observability": { "enabled": true },

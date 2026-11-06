@@ -1,4 +1,4 @@
-/*--- Toasts (small messages, bottom of the screen). ---*/
+/*--- Toasts (small messages, top right under the header; full width on phones). ---*/
 /* ---------- toasts --------------------------------------------------- */
 .toasts {
   position: fixed;

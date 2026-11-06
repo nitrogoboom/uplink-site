@@ -1,4 +1,4 @@
-/*--- Footer (src/components/Footer.html). ---*/
+/*--- Footer (src/components/Footer.astro). ---*/
 /* ---------- footer (hero select) -----------------------------------
    One full screen on desktop: the stage (section text left, campus map
    right), the roster dock and the base bar. Each roster tile shows one
@@ -37,7 +37,7 @@
 .fc-lead { max-width: 46ch; margin-top: var(--sp-4); font-size: var(--fs-4); color: var(--c-muted); }
 .fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-6); }
 
-/* link rows: hairline rows, two columns when there are more than three */
+/* link rows: hairline rows, two columns (one on phones) */
 .fc-rows { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--sp-6); list-style: none; }
 .fc-rows--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .fc-link {

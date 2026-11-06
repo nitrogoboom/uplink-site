@@ -36,7 +36,6 @@ BUDGET_ELBOW = (140.0, -66.0)         # IT BUDGET leader: elbow (screen), a shor
 # so the four still fit side by side at the bigger size.
 COMPACT = dict(crop=(88, 50, 473, 354.75), scale=1.55, budget_sub='planned,\nnot surprised',
                budget_elbow=(132.0, -72.0))    # IT BUDGET a little left of the full one, clear of the frame
-GREY = pal.GREY
 
 WHITE = pal.WHITE
 TITLE = 'Rising budget bars and a quarterly IT roadmap path'
@@ -69,10 +68,6 @@ def hidden(compact=False):
     rects = compact_rects() if compact else [text_rect(*m) for m in MILESTONES]
     sil = [silhouette(w, *b) for b, _c in bar_boxes()]
     return unary_union(rects + sil)
-
-
-
-
 
 
 def roadmap():

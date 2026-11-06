@@ -1,50 +1,129 @@
-# src/ – the site
+# Source code map
 
-An Astro 7 project. `npm run dev` serves it at http://localhost:4321; `npm run build` writes `dist/`.
+*Last updated: November 5, 2026*
 
-## Pages: `pages/`
+This page maps the `src/` folder: where each page, component, content file, stylesheet, and script lives, and how they fit together. For how to run and build the site, see the [project README](../README.md).
 
-| File | Address | Sections (one component each, in `components/<page>/`) |
-|---|---|---|
-| `index.astro` | `/` | home: Hero (+ office drawing) · Services · Grow (+ world drawing) · Work · Proof |
-| `services.astro` | `/services` | Overview · Faq |
-| `services/[slug].astro` | `/services/<slug>` | one page per service, from `content/services/<slug>.json` |
+`src/` is an Astro 7 project. `npm run dev` serves it at http://localhost:4321, and `npm run build` writes the site to `dist/`.
+
+## Pages
+
+Each file in `pages/` is one address. Most pages are a stack of sections, with one component per section in `components/PAGE/`.
+
+| File | Address | Sections |
+| --- | --- | --- |
+| `index.astro` | `/` | Hero (with the office drawing), Services, Grow (with the world drawing), Work, and Proof |
+| `services.astro` | `/services` | Overview and Faq |
+| `services/[slug].astro` | `/services/SLUG` | One page per service, from `content/services/SLUG.json` |
 | `work.astro` | `/work` | Projects |
-| `work/[slug].astro` | `/work/<slug>` | one page per project, from `content/projects/<slug>.json` |
-| `about.astro` | `/about` | Profile · Process · Team |
-| `contact.astro` | `/contact` | Message · Support |
-| `soon.astro`, `404.astro` | `/soon`, any missing address | one section each, inline |
-| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts` | those files | built from the data (`lib/site.ts`, the collections, `data/*.md`) |
+| `work/[slug].astro` | `/work/SLUG` | One page per project, from `content/projects/SLUG.json` |
+| `about.astro` | `/about` | Profile, Process, and Team |
+| `contact.astro` | `/contact` | Message and Support |
+| `privacy.astro`, `accessibility.astro` | `/privacy`, `/accessibility` | The Markdown in `data/privacy.md` or `data/accessibility.md`, rendered by `components/TextPage.astro` |
+| `soon.astro`, `404.astro` | `/soon`, and any missing address | One section each, written inline |
+| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts`, `.well-known/security.txt.ts` | Those files | Built from the data: `lib/site.ts`, the content collections, and `data/*.md` |
 
-A page is `<Base …>` with its sections inside. `layouts/Base.astro` is the shared `<head>`, header, footer, bottom bar, pop-ups and toast region; its props are the page's title, description, which tab is current (`page`), its address (`path`, for the canonical and Open Graph), `robots`, its schema.org `type`, and JSON-LD extras: `ldPage` (merged into the page's own node) and `ldGraph` (more nodes). The five static pages take title and description from `lib/site.ts` (`PAGES`).
+### The shared layout
 
-Each section's desktop layout (`@media (min-width: 1100px) and (min-height: 700px)`) sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules. There is no last-import rule any more.
+Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds the shared `<head>`, the header, the footer, the phone tab bar, the pop-ups, and the toast region. It takes these props:
 
-## Shared parts: `components/`
+| Prop | What it sets |
+| --- | --- |
+| `title`, `description` | The page's `<title>` and meta description. |
+| `page` | Which header tab is marked current. `soon`, `notfound`, `privacy`, and `accessibility` have no tab. |
+| `path` | The page's address, for the canonical link and Open Graph. |
+| `robots` | The robots meta tag. |
+| `ogType` | `website` (the default) or `article`, which project pages use. |
+| `type` | The page's schema.org type, such as `FAQPage` or `AboutPage`. |
+| `ldPage` | More fields merged into the page's own JSON-LD node. |
+| `ldGraph` | More nodes added to the page's JSON-LD graph. |
 
-- `Header.astro`, `BottomNav.astro` – logo, page tabs, the phone tab bar; `current` marks the page's tab
-- `Footer.astro` – hero-select roster and campus map, from `data/footer.json` and the services collection
-- `BookDialog.astro`, `SettingsDialog.astro` – the two pop-ups (Settings: text size and keyboard shortcuts)
-- `ServiceOptions.astro` – the service `<option>`s for the two "What do you need?" lists
-- `Icon.astro` – every inline icon by name; add new ones there
+The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list.
 
-Section components live in `components/<page>/`, with their CSS beside them (`hero.css` next to `Hero.astro`) and imported at the top of the component. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full on its own page.
+A page adds its own script inside `<Base>`, like this:
 
-Drawings: `components/home/hero-flows.svg` and `grow-world.svg` are written by `tools/gen_office.py` and `tools/gen_grow.py` and inlined as components. Don't edit them by hand.
+```astro
+<Fragment slot="scripts"><script>import '../scripts/home.js'</script></Fragment>
+```
 
-## Content: `content/` and `data/`
+The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`, it would come after `</html>`.
 
-Typed in `content.config.ts`.
+## Components
 
-- `content/services/<slug>.json` – one per service. The slug is its address. Fields: order, title, chip, tag, icon, image (drawing name in `public/assets/img/`), alt, lead, card, features (3), bestFor, page (the longer copy only its own page shows: how it works, questions), and optional featured / footerLabel / optionLabel.
-- `content/projects/<slug>.json` – one per project: order, name, tag, client, clientShort, services (service slugs), result, image, alt, story, and page (the case study).
-- `data/faq.json`, `team.json`, `footer.json` – the smaller lists. Lists keep file order through `byOrder`.
-- `data/index.md`, `data/agents.md` – hand-written Markdown for AI agents; `{site}` and `{services}` are filled in by their endpoints.
+### Shared components
 
-## Styles: `styles/`
+| Component | What it is |
+| --- | --- |
+| `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
+| `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` and the services collection. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the text size and the keyboard-shortcuts switch. |
+| `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
+| `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
+| `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
+| `Pause.astro` | A pause for screen readers between two parts of one link, so the title doesn't run into the next words. Nothing shows on screen. |
+| `Sep.astro` | The " · " between two short phrases. Screen readers hear a comma instead of "dot". |
+| `Icon.astro` | Every inline icon, by name. Add new icons here. |
 
-`global.css` lists the shared files in cascade order (tokens, fonts, base, layout, type, header, …), ending with the blocks more than one page uses (`hero.css`, `facts.css`, `detail-pages.css`), then `page-transitions.css` and `motion.css`. `fold.css` is the desktop one-section-per-screen rules every page shares. Colours, sizes and timings stay in `tokens.css`. `tools/verify_styles.py` compares every element's computed style between two builds: run it after moving CSS.
+### Section components
 
-## Scripts: `scripts/`
+Section components live in `components/PAGE/`. Each section's CSS sits beside it and is imported at the top of the component, for example `hero.css` next to `Hero.astro`. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full on its own page.
 
-ES modules, bundled by Astro. `core.js` (helpers, toasts, pop-ups, forms, shortcuts, Trusted Types) and `footer.js` run on every page from `Base.astro`; `home.js`, `work.js`, `contact.js`, `soon.js` are imported by their page. Every page script imports `core.js`, so it always runs first. The keyboard map is at the top of `core.js`.
+`components/home/hero-flows.svg` and `components/home/grow-world.svg` are drawings, inlined as components. `tools/gen_office.py` and `tools/gen_grow.py` write them. Don't edit them by hand.
+
+## Content
+
+The content types are defined in `content.config.ts`.
+
+| File | What it holds |
+| --- | --- |
+| `content/services/SLUG.json` | One service. The slug is its address. Fields: `order`, `title`, `chip`, `tag`, `icon`, `image` (the drawing's name in `public/assets/img/`), `alt`, `lead`, `card`, `features` (three), `bestFor`, and `page`, which is the longer copy only the service's own page shows. Optional: `featured`, `footerLabel`, and `optionLabel`. |
+| `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
+| `data/faq.json`, `data/team.json`, `data/footer.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
+| `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json`. Don't type an email address or phone number into them. |
+| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}` and `{services}`. |
+
+Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
+
+## Styles
+
+`styles/global.css` imports the shared stylesheets in cascade order. Order matters: when two rules tie, the later file wins. The order is:
+
+1. Foundations: `tokens.css`, `fonts.css`, `base.css`, `layout.css`, and `type.css`.
+2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
+3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares), `fold-foot.css`, and `compact-cuts.css`.
+4. Blocks more than one page uses: `hero.css`, `facts.css`, and `detail-pages.css`.
+5. Last: `page-transitions.css`, `motion.css`, and `print.css`.
+
+Each section's desktop layout sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules.
+
+All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
+
+### Breakpoints
+
+The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
+
+| Name | Query |
+| --- | --- |
+| `smallPhone` | Below 600 px. The drawings switch to their phone cut. |
+| `phone` | Below 700 px. |
+| `tablet` | 700 px to 1099 px. |
+| `desktop` | 1100 px and up. |
+| `fold` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
+
+After you move CSS, prove nothing changed with `tools/verify_styles.py`. It compares every element's computed style between two builds.
+
+## Scripts
+
+Scripts in `scripts/` are ES modules, bundled by Astro.
+
+| Script | Where it runs | What it does |
+| --- | --- | --- |
+| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, and the Trusted Types policy (`html()`). The keyboard map is at the top. |
+| `footer.js` | Every page, from `Base.astro` | The footer's tiles and panels, and the campus map, which it fetches when the footer scrolls near. |
+| `home.js` | Home | The hero: it fetches the drawing cut for the screen, runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
+| `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. |
+| `work.js` | Our work | The project filters. |
+| `contact.js` | Contact | The copy buttons and the queue card. |
+| `soon.js` | Coming soon | Names the page that isn't built yet. |
+
+Every page script imports `core.js`, so `core.js` always runs first.

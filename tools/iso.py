@@ -3,7 +3,6 @@ import re, math
 from lxml import etree
 
 C30 = math.cos(math.radians(30)); S30 = 0.5
-T30 = math.tan(math.radians(30))
 
 def matmul(a, b):
     # a,b = (a,b,c,d,e,f) svg matrices; returns a*b
@@ -134,19 +133,8 @@ def classify(p, q):
     for k, a in ISO_DIRS.items():
         d = abs((ang - a + 90) % 180 - 90)
         if d < bd: bd, best = d, k
-    hd = min(ang, 180-ang)
     off = ln * math.sin(math.radians(bd))
     return best, bd, off, ln
-
-def to_iso(p, o=(0, 0)):
-    """screen point -> (r, l) coords on a horizontal plane through origin o.
-    screen = o + r*(C30, .5) + l*(-C30, .5)"""
-    x, y = p[0]-o[0], p[1]-o[1]
-    a = x / C30; b = 2*y
-    return ((a + b)/2, (b - a)/2)
-
-def from_iso(r, l, z=0, o=(0, 0)):
-    return (o[0] + (r - l)*C30, o[1] + (r + l)*0.5 - z)
 
 class W:
     """World->screen for a generator-style iso drawing: screen = o + ((x-y)*C30*u, (x+y)*u/2 - z*u)."""
@@ -159,21 +147,6 @@ class W:
         return f'{fmt(X)},{fmt(Y)}'
     def pts(self, *P):
         return ' '.join(self.s(*q) for q in P)
-    def inv(self, X, Y, z=0):
-        """screen -> world (x,y) on plane z."""
-        a = (X - self.ox) / (C30*self.u)          # x - y
-        b = (Y - self.oy + z*self.u) / (self.u/2)  # x + y
-        return ((a + b)/2, (b - a)/2)
-    def inv_x(self, X, Y, x):
-        """screen -> (y,z) on plane x=const"""
-        y = x - (X - self.ox)/(C30*self.u)
-        z = ((x + y)*self.u/2 - (Y - self.oy))/self.u
-        return (y, z)
-    def inv_y(self, X, Y, y):
-        """screen -> (x,z) on plane y=const"""
-        x = y + (X - self.ox)/(C30*self.u)
-        z = ((x + y)*self.u/2 - (Y - self.oy))/self.u
-        return (x, z)
     def box(self, x0, x1, y0, y1, z0, z1):
         """(left, right, top) point strings in the generator's vertex order."""
         L = self.pts((x0,y1,z0),(x1,y1,z0),(x1,y1,z1),(x0,y1,z1))
@@ -185,15 +158,3 @@ def fmt(v):
     v = round(v + 0.0, 1)
     if v == 0: v = 0.0
     return f'{v:.1f}'
-
-def boxes_from_svg(shapes, w, z0_guess=None):
-    """Group consecutive (left,right,top) polygon triples and report world box extents.
-    Uses the right face's bottom-front vertical edge; needs z of the base (z0_guess) to resolve depth."""
-    out = []
-    polys = [s for s in shapes if s.tag == 'polygon']
-    for i in range(len(polys) - 2):
-        a, b, c = polys[i:i+3]
-        A, B, Cc = a.subs[0], b.subs[0], c.subs[0]
-        if len(A) == 4 and len(B) == 4 and len(Cc) == 4 and math.isclose(A[1][0], B[1][0], abs_tol=0.11) and math.isclose(A[1][1], B[1][1], abs_tol=0.11):
-            out.append((a.line, A, B, Cc))
-    return out
