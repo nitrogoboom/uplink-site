@@ -1,331 +1,358 @@
-# Security and compliance: what we built, how to review it, how to reproduce it
+# Security, privacy, and accessibility on the Uplink site
 
-This is how the Uplink site handles security, privacy, accessibility and operations. Each control says what it is, the rule it answers to, how we built it, how to check it, and how to do the same on another site.
+*Last updated: November 5, 2026*
 
-It leaves out the look and the code style; those are in README, `docs/spacing.md` and `CLAUDE.md`.
+This page explains how the Uplink Technology website protects its visitors and who it's built to serve. For each protection, you'll find:
+- what it guards against
+- how the site puts it in place
+- how you can check it yourself with public tools
+- how to apply the same idea to your own site
 
-This is reference, not a to-do list. The release checklist is `docs/sop.md`; open items are `notes.md` and `docs/go-live-checklist.md`. When a control changes, change its entry here in the same PR. Written 5 Nov 2026.
+The site is a static site: pages are built ahead of time and served from Cloudflare's network. One small server function handles error reports from browsers. Because there are no accounts, no database, and no third-party scripts beyond privacy-friendly analytics, there is very little that an attacker can reach. The sections below build on that small footprint.
 
-## How to review the site
+## Standards this site meets
 
-About 30 minutes for a full review. To review one change, do only the steps its area touches.
-
-1. **Run the machine checks** against a local build:
-
-   ```
-   npm run build
-   npm run serve
-   ```
-
-   Then in a second window:
-
-   ```
-   npm run ci
-   python tools/verify_footer.py out/ --all
-   python tools/verify_text.py
-   ```
-
-   Each must end clean. Together they cover types, lint, the build steps, the Worker's tests, script errors and CSP blocks, sideways scroll, axe on every page, broken links, and text at 200%.
-2. **Check the live site from outside:**
-
-   ```
-   python tools/smoke.py <address>
-   ```
-
-   Then run Mozilla Observatory on the address (developer.mozilla.org/en-US/observatory). It should be A+, 12 of 12.
-3. **For a release, run the release audit:** `npm run release-audit`. It covers three browser engines, keyboard, screen-reader transcripts, motion, forms and the W3C HTML check. Then do the hand checks in `docs/sop.md`, section 5C.
-4. **Walk the controls below.** For each, run its "Check it" line, and confirm "How we built it" still holds.
-5. **Write down each finding:** the control, the page or file, what's wrong, and the rule number.
-
-## Standards we answer to
-
-| Area | Standard | Our level |
+| Area | Standard | What the site does |
 | --- | --- | --- |
-| Accessibility | WCAG 2.0 AA (AODA, O. Reg. 191/11) | Required of us only from 50 staff; we hold it anyway. 2.1 and 2.2 AA rules met where cheap (marked below). Public statement at `/accessibility`. |
-| Privacy | PIPEDA; CASL for email marketing | `/privacy` says what's collected, by whom, where, how long, and your rights. No cookies. |
-| Security | OWASP secure headers; Mozilla Observatory | A+, 130/130 (5 Nov 2026). Strict CSP with Trusted Types. |
-| Disclosure | RFC 9116 (security.txt) | `/.well-known/security.txt`, `SECURITY.md` |
-
----
+| Accessibility | [WCAG 2.0](https://www.w3.org/TR/WCAG20/) Level AA, the level set by Ontario's [Integrated Accessibility Standards](https://www.ontario.ca/laws/regulation/110191) | Conforms to Level AA. Also meets the WCAG 2.1 and 2.2 criteria listed in [Accessibility](#accessibility). |
+| Privacy | [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/) | Publishes what it collects, who processes it, where, and for how long. Sets no cookies. |
+| Response headers | [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/) | Sends every recommended header. Scores A+ on [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). |
+| Vulnerability disclosure | [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) | Publishes a `security.txt` file with a contact address. |
 
 ## Security
 
-### HTTPS everywhere, with HSTS
+### Serve every page over HTTPS
 
-- **What:** every request is HTTPS. Browsers are told never to use plain HTTP for a year.
-- **Why:** it stops anyone on the network reading or changing pages.
-- **How we built it:**
-  - `worker/index.js` sends any `http://` request to the same `https://` address with a 308. `run_worker_first: true` in `wrangler.jsonc` makes every request pass through it, because a `workers.dev` zone has no "Always Use HTTPS" switch.
-  - `public/_headers` sends `Strict-Transport-Security: max-age=31536000`.
-- **Check it:** `curl -sI http://<host>/services` gives a 308 to `https://`. `curl -sI https://<host>/` shows the HSTS line. `smoke.py` checks both.
-- **To reproduce:**
-  1. On your own domain, turn on Always Use HTTPS at the CDN, plus TLS 1.2 minimum.
-  2. Send HSTS for a year.
-  3. Add `includeSubDomains; preload` only once every subdomain is HTTPS for good, then submit at hstspreload.org.
-  4. For us, steps 1 and 3 come at launch (`docs/launch-runbook.md`).
+HTTPS encrypts the connection between the visitor and the site. Without it, anyone on the same network, such as a café's Wi-Fi, can read the page or change it on the way.
 
-### Content Security Policy, strict
+**How the site does it**
+- Every request made with `http://` is redirected to the same address with `https://`. The redirect uses status `308`, which keeps the request method unchanged.
+- Every response includes HTTP Strict Transport Security (HSTS), which tells the browser to use HTTPS for this site for the next year, even if someone types `http://`:
 
-- **What:** the browser runs only the scripts and styles we named. No inline script or style runs unless its exact hash is listed.
-- **Why:** it's the main defence against cross-site scripting. Even if an attacker got markup into a page, their script wouldn't run.
-- **How we built it:**
-  - `public/_headers` holds the policy as a template:
-    - `default-src 'self'`
-    - scripts from our own site, plus Cloudflare's analytics beacon
-    - styles from our own site
-    - `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`
-  - At build, `scripts/headers.mjs` finds every inline `<script>` and `<style>` in the built pages and drawings and writes their SHA-256 hashes into the policy. Nobody pastes a hash by hand.
-  - There is no `'unsafe-inline'` for styles. The build refuses any `style=""` attribute; scripts set styles through `el.style`; generated drawings put timings in classes.
-- **Check it:**
-  - `curl -sI https://<host>/ | grep -i content-security`
-  - `verify_footer.py` fails on any CSP block in any page
-  - `npm test` covers the hashing and the `style=""` refusal (`scripts/test/build-scripts.test.mjs`)
-- **To reproduce:**
-  1. Start from `default-src 'self'` and add only what breaks, one host at a time.
-  2. Hash inline scripts at build time, not by hand.
-  3. Ban `style=""` attributes so `style-src` needs no `'unsafe-inline'`.
-  4. Run a headless browser over every page in CI and fail on any CSP console error.
+  ```http
+  Strict-Transport-Security: max-age=31536000
+  ```
 
-### Trusted Types
+**Verify it**
 
-- **What:** script can write HTML into the page only through one named policy, and load scripts only from one allowed address.
-- **Why:** it closes the DOM-based XSS that a CSP alone can't see, such as `innerHTML` with data from somewhere unexpected.
-- **How we built it:**
-  - The CSP adds `require-trusted-types-for 'script'; trusted-types uplink`.
-  - `src/scripts/core.js` creates the `uplink` policy and exports `html()`. Every `innerHTML` in our scripts goes through it.
-  - Its `createScriptURL` allows only the analytics beacon and throws on anything else.
-- **Check it:** grep `src/scripts/` for `innerHTML`, `insertAdjacentHTML` and `outerHTML`. Each must take `html(...)`. A miss shows up as a console error that `verify_footer.py` catches.
-- **To reproduce:** add the two CSP directives, create one policy in your first script, export one helper, and route all HTML writes through it. Browsers without Trusted Types simply skip it.
+Run these commands, replacing `example.com` with the site's address:
 
-### Other response headers
+```sh
+curl -sI http://example.com/services
+curl -sI https://example.com/ | grep -i strict-transport
+```
 
-- **What we send** (`public/_headers`, every file):
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`, plus `frame-ancestors 'none'` in the CSP
-  - `Referrer-Policy: strict-origin-when-cross-origin`
-  - `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`
-  - `Cross-Origin-Opener-Policy: same-origin`
-- **Why:** they stop MIME sniffing, clickjacking, leaking full addresses to other sites, other pages grabbing device features, and cross-window attacks.
-- **Check it:** `smoke.py` fails if any of the security headers is missing on any page. Observatory grades them all.
-- **To reproduce:** copy the block. Add a feature to `Permissions-Policy` only when the site truly needs it.
+The first response shows `308 Permanent Redirect` with a `Location` that starts with `https://`. The second shows the HSTS header.
 
-### Reporting what the browser blocks
+**Apply it to your site**
+1. Turn on your host's "always use HTTPS" setting, and set the minimum TLS version to 1.2.
+2. Add the HSTS header with `max-age=31536000`.
+3. Once every subdomain also serves HTTPS, add `includeSubDomains; preload` and submit your domain to [hstspreload.org](https://hstspreload.org/).
 
-- **What:** visitors' browsers tell us when the CSP blocks something or a script throws an error. We find out about problems without anyone reporting them.
-- **How we built it:**
-  - Headers: `Reporting-Endpoints: csp="/api/report"`, plus `report-to csp` and `report-uri /api/report` in the CSP (the second for older browsers).
-  - `core.js` posts uncaught errors and rejected promises with `navigator.sendBeacon`. At most 5 a page; "Script error." and ResizeObserver notices are skipped.
-  - `worker/index.js` `/api/report` turns each report into one JSON line in the Workers logs (Cloudflare > Workers > uplink-site > Logs; kept 3 days on the free plan).
-- **Check it:** `npm test` (`scripts/test/worker.test.mjs`). After a deploy, look at the logs for `report` lines.
-- **To reproduce:** one small endpoint on your own origin, so no new CSP host is needed. Log a flat, trimmed record. Wire both `report-to` and `report-uri`.
+> **Caution:** Preloading is hard to reverse. Don't add `preload` until you're sure every subdomain will stay on HTTPS.
 
-### The one server endpoint, hardened
+### Restrict what can run with a Content Security Policy
 
-The Worker answers `/api/*` only. Everything else is static files. Its report endpoint:
-- accepts POST only (405 otherwise)
-- refuses another site's Origin (403)
-- drops reports about pages on other sites
-- rate-limits each visitor address to 30 posts a minute (a Cloudflare rate-limit binding, `REPORTS` in `wrangler.jsonc`; 429 past it)
-- stops reading a body past 8 KB, even without a `Content-Length` (413)
-- refuses bodies that aren't JSON (400)
-- caps each text field at 300 characters
-- strips the query and fragment from every address
-- logs line and column only as whole numbers
-- never logs form contents or the IP address (Cloudflare's own run log has the IP; the privacy page says so)
+Cross-site scripting (XSS) is when an attacker gets their own script to run on your page. A Content Security Policy (CSP) is a response header that tells the browser exactly which scripts, styles, and other resources the page may use. Anything not on the list is blocked, so injected code doesn't run.
 
-- **Check it:** `npm test`; each rule has a test.
-- **To reproduce:** for any endpoint that takes input:
-  1. Allow only the method you need.
-  2. Check the Origin header.
-  3. Rate-limit per address.
-  4. Cap the body while reading it, not after.
-  5. Parse strictly, trim every field, and log only what you need.
+**How the site does it**
 
-### Secrets and the supply chain
+The site uses a *strict* policy. It doesn't trust whole domains. Inline code runs only if its exact SHA-256 hash is listed, and the site allows no `'unsafe-inline'` for scripts or styles. This is the shape of the policy, with the hashes shortened:
 
-- **What:** secrets stay out of the repo, the tools that build the site are pinned, and updates arrive on a schedule.
-- **How we built it:**
-  - Secrets live in a GitHub environment (`cloudflare`) and Cloudflare. `docs/secrets.md` lists every one by name and place, never its value. `.dev.vars` is gitignored.
-  - GitHub Actions are pinned to commit hashes, not tags. Dependabot runs weekly for npm, pip and Actions (`.github/dependabot.yml`).
-  - The page loads no third-party code except Cloudflare's analytics beacon. Fonts are self-hosted.
-- **Check it:**
-  - `npm audit --omit=dev` shows 0 in what the site ships. Today the dev-only tooling has 11 moderate, all one ESLint dependency.
-  - `git grep -iE "api[_-]?key|token|secret" -- ':!docs'` finds names only, never values.
-- **To reproduce:**
-  1. One page listing every secret's name, place, owner and how to rotate it.
-  2. Pin Actions to commits.
-  3. Run Dependabot.
-  4. Self-host fonts.
-  5. Treat every outside script as a CSP and privacy change.
-- **Still open:** branch protection, secret scanning, 2FA on a company account, rotation dates (`notes.md`, "Production readiness").
+```http
+Content-Security-Policy:
+  default-src 'self';
+  script-src 'self' https://static.cloudflareinsights.com 'sha256-…';
+  style-src 'self' 'sha256-…' 'sha256-…';
+  font-src 'self' data:;
+  img-src 'self' data:;
+  connect-src 'self' https://cloudflareinsights.com;
+  form-action 'self';
+  frame-ancestors 'none';
+  base-uri 'self';
+  object-src 'none';
+  require-trusted-types-for 'script';
+  trusted-types uplink;
+  report-uri /api/report;
+  report-to csp
+```
 
-### Security contact
+What the directives do:
+- `default-src 'self'`: anything not named elsewhere may come only from the site itself.
+- `script-src`: scripts come from the site, plus Cloudflare's analytics script. The one inline script, which marks the page as script-enabled, is allowed by its hash.
+- `style-src`: styles come from the site. Each inline `<style>` block is allowed by its hash.
+- `object-src 'none'`, `base-uri 'self'`, and `form-action 'self'` close three common ways around a CSP: plugins, a rewritten base URL, and forms that post somewhere else.
+- `frame-ancestors 'none'`: no other site can show these pages in a frame. This prevents clickjacking.
 
-- **What:** a published way to report a security problem.
-- **How we built it:**
-  - `/.well-known/security.txt` is generated at build (`src/pages/.well-known/security.txt.ts`). Its `Contact` comes from `footer.json`, and `Expires` is a year from each build, so it renews itself on every deploy.
-  - `SECURITY.md` in the repo.
-  - The inbox is still a placeholder (`notes.md`).
-- **Check it:** `curl https://<host>/.well-known/security.txt`. The `Expires` date must be in the future, and the `Contact` inbox must be one someone reads.
-- **To reproduce:** follow RFC 9116, generate the file at build so it never expires, and point it at a watched inbox.
+The hashes are calculated when the site is built, so a policy can't fall out of date with the pages it protects. No HTML element carries a `style` attribute, because the policy would block it. Scripts set styles through the DOM instead, which the policy allows.
 
----
+> **Note:** A CSP adds a layer of defence on top of good coding. It doesn't replace it. The site still never inserts untrusted text into a page.
+
+**Verify it**
+1. In Chrome, open the site, then open **DevTools** > **Network**. Select the page request and look for `content-security-policy` under **Response Headers**.
+2. Open the **Console** tab and browse a few pages. A blocked resource appears as an error that names the directive. A clean site shows none.
+3. Paste the policy into Google's [CSP Evaluator](https://csp-evaluator.withgoogle.com/) to check it for weaknesses.
+
+**Apply it to your site**
+1. Start with `default-src 'self'` and send it as `Content-Security-Policy-Report-Only`, so nothing breaks while you test.
+2. Read the reports. Add each source you need by name, and give inline scripts hashes or nonces.
+3. Remove `style` attributes from your HTML so `style-src` doesn't need `'unsafe-inline'`.
+4. Generate the hashes in your build, not by hand.
+5. Switch the header to `Content-Security-Policy` to start enforcing.
+
+For a full walkthrough, see [Mitigate cross-site scripting with a strict CSP](https://web.dev/articles/strict-csp) on web.dev.
+
+### Control HTML writes with Trusted Types
+
+Some XSS happens entirely in the browser: a script takes text from somewhere and writes it into the page with `innerHTML`. A CSP can't see this. Trusted Types makes the browser refuse those writes unless they go through a policy you define.
+
+**How the site does it**
+- The CSP includes `require-trusted-types-for 'script'` and `trusted-types uplink`. Only one policy, named `uplink`, may exist.
+- The site's shared script creates that policy. Every script that writes HTML calls one helper that goes through it.
+- The policy builds HTML only from the site's own text, never from a URL or a form.
+- The policy may load exactly one outside script, the analytics script, and throws an error for any other.
+
+**Verify it**
+
+In the DevTools **Console**, run:
+
+```js
+document.body.innerHTML = '<b>test</b>';
+```
+
+The browser blocks the assignment and reports a Trusted Types violation. A page without Trusted Types would accept it.
+
+**Apply it to your site**
+1. Find every `innerHTML`, `outerHTML`, `insertAdjacentHTML`, and `document.write` in your code.
+2. Create one policy in your first script, and route those writes through it.
+3. Add the two CSP directives, in report-only mode first.
+
+Browsers that don't support Trusted Types ignore the directives, so the site keeps working there.
+
+To learn more, see [Prevent DOM-based XSS with Trusted Types](https://web.dev/articles/trusted-types).
+
+### Set protective response headers
+
+Besides HSTS and the CSP, every response carries these headers:
+
+```http
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+Cross-Origin-Opener-Policy: same-origin
+```
+
+`X-Content-Type-Options`
+: Stops the browser from guessing a file's type. A file is only ever treated as what the server says it is.
+
+`X-Frame-Options`
+: Blocks framing in older browsers that don't read `frame-ancestors`.
+
+`Referrer-Policy`
+: When a visitor follows a link to another site, that site learns only which domain they came from, not the full address of the page.
+
+`Permissions-Policy`
+: Turns off the camera, microphone, location, payment, and USB features. No script on the page, including any that got in by mistake, can ask for them.
+
+`Cross-Origin-Opener-Policy`
+: Keeps other sites' windows from holding a reference to this one. That blocks a group of cross-window attacks.
+
+**Verify it**
+
+Scan the site with [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). On November 5, 2026, the site scored A+ (130 points) and passed all 12 tests.
+
+### Find out when the browser blocks something
+
+A policy is only useful if you know when it fires. The site asks visitors' browsers to report problems, so issues are found without anyone having to report them.
+
+**How the site does it**
+- The CSP names a report endpoint on the site itself, `/api/report`, using both `report-to` (the current standard) and `report-uri` (for older browsers). The same endpoint is declared in this header:
+
+  ```http
+  Reporting-Endpoints: csp="/api/report"
+  ```
+
+- The site's script also sends uncaught JavaScript errors to the same endpoint, at most five per page view.
+- Because the endpoint is on the site's own domain, the CSP doesn't need to trust another host.
+
+### Harden the one server endpoint
+
+The report endpoint is the only part of the site that accepts input. It's built to accept only what it expects:
+- It accepts only `POST` requests.
+- It rejects requests whose `Origin` header names another site, and it drops reports about other sites' pages.
+- It limits how many reports each visitor can send per minute.
+- It stops reading a request body after 8 KB.
+- It accepts only valid JSON, keeps a short list of known fields, and cuts each to a fixed length.
+- It removes the query string from every web address before saving it, because a query string can hold personal data.
+- It records numbers, such as line numbers, only if they're whole numbers.
+
+Automated tests cover these rules, and they run before any change goes live.
+
+**Apply it to your site**
+
+For any endpoint that accepts input:
+1. Allow only the HTTP methods you need.
+2. Check the `Origin` header.
+3. Rate-limit by visitor.
+4. Cap the size while you read the body, not after.
+5. Parse strictly, and keep only the fields you need.
+
+### Keep secrets and dependencies under control
+
+**How the site does it**
+- Passwords, API keys, and tokens are never stored in the code. They live in the hosting and build services' secret stores. A private list records each secret's name, purpose, and location, without its value.
+- Every build step from GitHub Actions is pinned to an exact commit, so a changed release can't slip into the build.
+- Automated update requests arrive weekly for every dependency, and each is tested like any other change.
+- The pages load no third-party code except the analytics script. Fonts are hosted on the site itself.
+- `npm audit` reports no known vulnerabilities in anything the site ships to visitors.
+
+**Apply it to your site**
+1. Keep secrets in your platform's secret store, and keep a list of names and owners.
+2. Pin third-party CI actions to a commit hash.
+3. Turn on automated dependency updates.
+4. Treat every new third-party script as a security and privacy decision.
+
+### Publish a security contact
+
+If you find a security problem on this site, report it to the address in [`/.well-known/security.txt`](/.well-known/security.txt). The file follows RFC 9116. It's generated each time the site is built, so its expiry date is always about a year ahead.
 
 ## Privacy
 
+The site follows Canada's Personal Information Protection and Electronic Documents Act (PIPEDA). The [privacy page](/privacy) explains, in plain language:
+- what the site collects and why
+- who processes it and in which country
+- how long it's kept
+- how to ask for a copy of your information, or to have it removed
+
 ### No cookies, no tracking
 
-- **What:** the site sets no cookies and uses no ad or tracking scripts.
-- **How we built it:** analytics is Cloudflare Web Analytics, which uses no cookies. `core.js` loads it after the page has loaded, with its host named in the CSP.
-- **Check it:** load any page in a fresh profile; the browser's cookies list for the site is empty.
-- **To reproduce:** pick cookieless analytics, and you need no consent banner. If a CDN setting adds a cookie (Bot Fight Mode's `__cf_bm`), the privacy page changes first.
+The site sets no cookies. Visit counts come from Cloudflare Web Analytics, which doesn't use cookies or follow visitors across sites. Its script loads after the page has finished loading, so it never slows the page down. Because there's nothing to consent to, the site shows no cookie banner.
 
-### A privacy page that stays true
+If you change a display setting, such as text size, the site remembers it in your browser's own storage. That setting never leaves your device, and you can clear it by clearing the site's data in your browser.
 
-- **Why:** PIPEDA requires saying what you collect, why, who processes it and where, how long you keep it, and how to ask about it.
-- **How we built it:**
-  - `/privacy` is Markdown (`src/data/privacy.md`). The reasoning and the law behind each claim are in `docs/privacy-and-accessibility-2026-11-03.md`.
-  - Contact details are placeholders filled from `src/data/footer.json`, so they're never typed twice.
-  - The rule: anything that starts collecting data, or changes a processor, changes the privacy page in the same PR.
-- **Check it:** for each claim on the page, find the code that makes it true. The error-report fields are in `worker/index.js`, and the analytics in `core.js`.
-- **To reproduce:** write each claim with its source beside it in a reasoning doc, and review the page in every PR that touches data.
-- **Still open:** a lawyer's read, a named Privacy Officer, real inboxes (`notes.md`).
+**Verify it**
 
-### Data minimisation in reports
+Open the site in a private window. In Chrome, open **DevTools** > **Application** > **Cookies**. The list for the site is empty.
 
-- Error reports carry the page path without its query, the message, the script address without its query, line and column, and the browser name. They never carry form contents or anything typed.
-- The privacy page says what the report holds, and that Cloudflare keeps its own record with the IP for 3 days.
+### Collect as little as possible
 
----
+An error report from the browser contains:
+- the page address, without its query string
+- the error message
+- the script address and line number
+- the browser's name
+
+It never includes anything a visitor typed. Cloudflare keeps its own record of each request, including the IP address, for up to three days. The privacy page says so.
+
+### Keep the privacy page accurate
+
+The site has a working rule: any change that starts collecting new information, or adds a new service that handles visitor data, updates the privacy page in the same change. The page is reviewed together with the code that it describes.
 
 ## Accessibility
 
-Target: WCAG 2.0 AA. The public statement is at `/accessibility` (`src/data/accessibility.md`), with a feedback route.
+The site conforms to WCAG 2.0 Level AA. It also meets these later success criteria:
+- from WCAG 2.1: 1.3.5, 1.4.10, 1.4.11, 1.4.12, 2.1.4, 2.5.3 and 4.1.3
+- from WCAG 2.2: 2.5.8
 
-### What we built
+The [accessibility statement](/accessibility) describes the site's support and how to send feedback or ask for another format.
 
-| Area | How | WCAG |
+### What the site does
+
+| What | How | WCAG |
 | --- | --- | --- |
-| Page structure | One h1, no skipped heading levels, one `main`, header and footer, each `nav` named, no duplicate region names | 1.3.1, 2.4.6 |
-| Skip link | First Tab stop, lands in `main` | 2.4.1 |
-| Titles and language | Unique `<title>` per page (`src/lib/site.ts`); `lang="en-CA"` | 2.4.2, 3.1.1 |
-| Link and button names | From visible words; `<Pause />` between the parts of a two-part link; one name never goes to two places | 2.4.4, 2.5.3 (2.1) |
-| Images | Decorative SVG hidden; card images `alt=""`; drawing labels repeated in the page text | 1.1.1, 1.4.5 |
-| Keyboard | Everything reachable, nothing trapped; native `<dialog>` with Esc and focus return; amber focus ring on every stop | 2.1.1, 2.1.2, 2.4.3, 2.4.7 |
-| Shortcuts | Single keys can be turned off in Settings; never fire while typing or in a pop-up | 2.1.4 (2.1) |
-| Contrast | 4.5:1 for text, 3:1 for control edges; all colours from `tokens.css` | 1.4.3, 1.4.11 (2.1) |
-| Colour alone | Errors have words and an icon; the current tab changes shape as well as colour | 1.4.1 |
-| Text size | Settings scales text to 200% (only text grows); browser zoom to 200% works | 1.4.4 |
-| Text spacing | WCAG's spacing applied: nothing clips; screen-tall boxes are floors, centred with `safe center` | 1.4.12 (2.1) |
-| Reflow | Every page at 320px wide, no sideways scroll | 1.4.10 (2.1) |
-| Targets | 44px minimum (`--tap`); nothing under 24px | 2.5.8 (2.2) |
-| Motion | Reduced motion stops everything; each loop has a pause button; nothing flashes more than 3 times a second; loops stop off screen | 2.2.2, 2.3.1 |
-| Forms | Visible labels, "(optional)" marked, `autocomplete`, errors in words tied to the field, focus to the first error | 1.3.5 (2.1), 3.3.1, 3.3.2 |
-| Status messages | Toasts and filter counts in a polite live region | 4.1.3 (2.1) |
-| Valid HTML | W3C validator, no errors | 4.1.1 |
+| Page structure | One main heading per page, headings in order, and labelled landmarks (header, navigation, main, footer) | 1.3.1, 2.4.6 |
+| Skip link | The first Tab stop jumps straight to the main content | 2.4.1 |
+| Page titles and language | A unique title on every page; the language set to Canadian English | 2.4.2, 3.1.1 |
+| Link and button names | Every name matches its visible words, so voice control can find it. One name never leads to two places. | 2.4.4, 2.5.3 |
+| Images | Decorative images are hidden from screen readers. Words in drawings are repeated in the page text. | 1.1.1, 1.4.5 |
+| Keyboard | Everything works from the keyboard, nothing traps focus, and focus is always visible. Pop-ups close with Esc and return focus to where it was. | 2.1.1, 2.1.2, 2.4.3, 2.4.7 |
+| Keyboard shortcuts | Single-key shortcuts can be turned off. They never fire while you type or while a pop-up is open. | 2.1.4 |
+| Contrast | Text has at least 4.5:1 contrast, and the edges of controls have at least 3:1 | 1.4.3, 1.4.11 |
+| Colour | Colour is never the only signal. Errors also have words and an icon. | 1.4.1 |
+| Text size | A built-in setting enlarges text to 200% without breaking the layout, and browser zoom to 200% works too | 1.4.4 |
+| Text spacing | The page holds up when you increase line, letter, word, and paragraph spacing | 1.4.12 |
+| Reflow | Every page works at 320 pixels wide without scrolling sideways | 1.4.10 |
+| Target size | Touch targets are at least 44 pixels, and never smaller than 24 | 2.5.8 |
+| Motion | If your system asks for reduced motion, nothing animates. Otherwise, every looping animation has a pause button, and nothing flashes more than three times a second. | 2.2.2, 2.3.1 |
+| Forms | Every field has a visible label. Optional fields say so. Common fields support autofill. Errors are written out, tied to their field, and focus moves to the first one. | 1.3.5, 3.3.1, 3.3.2 |
+| Status messages | Updates such as the number of projects shown after you filter are announced by screen readers without moving focus | 4.1.3 |
+| Valid code | The HTML passes the W3C validator | 4.1.1 |
 
-### Display modes
+### Works the way you browse
 
-- **No script:** every page reads in full, and controls that need script are hidden rather than dead (the `js` class on `<html>`).
-- **Windows contrast themes:**
-  - text, borders and focus follow the system colours
-  - drawings keep a dark plate so their labels stay readable
-  - anything drawn with a background only has a `forced-colors` rule
-- **Print:** dark ink on white; navigation, footer and the self-building drawings stay off; cards don't split (`src/styles/print.css`).
+- **Without JavaScript:** every page shows all of its content. Controls that need script are hidden instead of left broken.
+- **In Windows contrast themes:** text, borders, and focus outlines take your theme's colours. Drawings keep a dark background, so their labels stay readable.
+- **When printed:** pages print dark text on white paper, without menus or animations, and cards don't split across pages.
 
-### Check it
+### Verify it
 
-- **Every push (CI):**
-  - axe on Home at phone and desktop, nothing serious or critical
-  - no sideways scroll; text at 200% on every page
-- **Every release (`npm run release-audit`):**
-  - axe on every page, Tab-through stops recorded (`out/audit/keyboard/`), screen-reader transcripts (`out/audit/reader/`)
-  - motion, form errors, W3C
-- **By hand, each release:**
-  - 5 minutes with NVDA or VoiceOver
-  - a real iPhone and Android phone
-  - the judgement checks in `docs/sop.md` 5C
-- **For display modes and text spacing,** the Playwright checks from the go-live review:
-  - `emulate_media(forced_colors='active')`
-  - `emulate_media(media='print')`
-  - `java_script_enabled=False`
-  - injected WCAG spacing CSS
+You can check most of these yourself:
+1. **Keyboard:** put your mouse aside and press Tab through a page. Every stop shows a visible outline, and you can reach and use everything.
+2. **Screen reader:** turn on [NVDA](https://www.nvaccess.org/) on Windows or VoiceOver on Mac and iPhone. Read a page from the top, then jump between headings.
+3. **Automated scan:** run [axe DevTools](https://www.deque.com/axe/devtools/), [WAVE](https://wave.webaim.org/), or Lighthouse's **Accessibility** audit. On November 5, 2026, Lighthouse scored every page 100 on phone and desktop.
+4. **Text size:** zoom the browser to 200%, or use the site's own text setting. Nothing is cut off or overlaps.
+5. **Narrow screens:** in DevTools, open the device toolbar and set the width to 320 pixels. Nothing scrolls sideways.
+6. **Reduced motion:** turn on your system's reduced-motion setting and reload. Nothing moves.
+7. **Contrast themes:** in DevTools, open **Rendering** and emulate `forced-colors: active`.
 
-### To reproduce
+> **Note:** Automated tools find roughly a third to a half of accessibility problems. Testing with a keyboard and a screen reader catches much of the rest.
 
-1. Write down the level you hold (2.0 AA, 2.1 AA) and why. Publish a statement with a feedback route.
-2. Put axe and a no-sideways-scroll check in CI on every page. They catch about a third of problems.
-3. Before each release, run three engines, a keyboard Tab-through and a screen-reader transcript, and listen with a real screen reader for 5 minutes.
-4. Test the four modes a person can bring:
-   - no script
-   - reduced motion
-   - contrast themes
-   - big text with spacing
-5. Keep a one-page record per release (`docs/releases/`).
+### Apply it to your site
+1. Pick the WCAG level you'll meet, and publish an accessibility statement with a way to contact you.
+2. Run an automated checker on every page, every time you change the site.
+3. Before each release, test with a keyboard, a screen reader, and in more than one browser engine.
+4. Test the settings people bring with them: no JavaScript, reduced motion, contrast themes, and large text with extra spacing.
+5. Keep a dated record of each test.
 
----
+## How changes reach the live site
 
-## Search engines and AI agents
+Every change goes through the same path before visitors see it:
+1. **Automated checks.** Each change runs:
+   - type checks and code linting
+   - tests for the build and the server endpoint
+   - a headless browser over every page, which fails on any script error, blocked resource, sideways scroll, or serious accessibility problem
+   - a check that every link and file answers
+2. **Preview.** Each proposed change gets its own preview address, plus a screenshot comparison against the live site.
+3. **Release.** Only changes that pass every check are deployed.
+4. **Smoke test.** After a release, a smoke test requests every page and checks its status code, its security headers, and the redirects.
+5. **Rollback.** If something goes wrong, the previous version can be restored in seconds.
 
-- **Test builds stay out of search:**
-  - `X-Robots-Tag: noindex` on every response
-  - `robots.txt` allows crawling, so the noindex can be read, and names no sitemap
-  - Both flip at launch (`docs/launch-runbook.md`).
-  - `smoke.py` checks noindex is on now; with `--launch`, that it's gone.
-- **Clean signals:**
-  - canonical on every page, absolute and pointing at itself
-  - unique title and description
-  - Open Graph tags
-  - JSON-LD built from the content files
-  - a sitemap with real `lastmod` dates
-- **For AI agents:** every page has a Markdown copy at its address plus `.md`, and `llms.txt` and `agents.md` give the map. Each `.md` copy will carry a canonical `Link` header back to its page at launch.
+Larger releases also get a full audit:
+- three browser engines and emulated phones
+- a keyboard walkthrough of every page
+- a screen-reader transcript of every page
+- motion and form checks
+- HTML validation
+- a hands-on pass with real phones and a screen reader
 
----
+## Review checklist
 
-## Operations
+Use this list to review the site, or a site you build the same way.
 
-### Deploy, preview, undo
-
-- **Deploy:** every push runs CI (check, tests, lint, build, browser check, link check). Only a green push to `main` deploys.
-- **Preview:** a PR gets a preview address and a screenshot comparison against live.
-- **Undo:** `npx wrangler rollback`, which takes seconds. Practise it once before launch (steps in `docs/launch-runbook.md`).
-- **After every deploy:** `python tools/smoke.py <address>` checks:
-  - every page answers 200 with its headers
-  - `http://` redirects
-  - made-up addresses give 404
-  - the report endpoint refuses GET
-  - noindex is in the right state
-  - the sitemap names this host
-
-### Watching the live site
-
-- **Script errors and CSP blocks** from real visitors: Workers logs, `/api/report` lines.
-- **Visits and speed:** Cloudflare Web Analytics (no cookies).
-- **Still open:** an outside uptime check, and alerts rather than logs alone (`docs/go-live-checklist.md`, section 7).
-
-### Launch
-
-`docs/launch-runbook.md` has the steps in order, who does each, and a back-out table. It covers:
-- DNS TTL, then the zone
-- TLS and HTTPS settings
-- DNSSEC, CAA records, and SPF, DMARC and null MX for a domain that doesn't send mail yet
-- noindex off
-- the smoke test with `--launch`
-- SSL Labs and Observatory on the real domain
-
----
-
-## Results on record
-
-| Date | Check | Result |
+| Check | How | Pass |
 | --- | --- | --- |
-| 3 Nov 2026 | Release audit (machine part), W3C on Home | Pass (`docs/releases/2026-11-03.md`) |
-| 5 Nov 2026 | Mozilla Observatory, live `workers.dev` | A+, 130, 12/12 |
-| 5 Nov 2026 | `npm audit --omit=dev` | 0 vulnerabilities |
-| 5 Nov 2026 | Lighthouse, 20 pages × phone and desktop | Accessibility 100, Best practices 100 |
-| 5 Nov 2026 | Structure audit, 22 pages | Pass after two fixes |
-| 5 Nov 2026 | Contrast themes, print, no script, 320px reflow, text spacing | Pass after fixes |
-| 5 Nov 2026 | `verify_footer.py --all`, `verify_text.py` (200% and 100%) | All clear |
-| 5 Nov 2026 | `smoke.py`, live | 20 pages, pass |
+| HTTPS and HSTS | `curl -sI http://…` and `curl -sI https://…` | `308` to `https://`; HSTS header present |
+| Security headers | [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory) | A+ |
+| CSP strength | [CSP Evaluator](https://csp-evaluator.withgoogle.com/) | No high-severity findings |
+| CSP in use | DevTools **Console** on several pages | No violations |
+| Trusted Types | `document.body.innerHTML = 'x'` in the **Console** | Blocked |
+| TLS | [SSL Labs Server Test](https://www.ssllabs.com/ssltest/) | A or higher |
+| Cookies | DevTools **Application** > **Cookies** | None |
+| Security contact | Open `/.well-known/security.txt` | Present, with an expiry date in the future |
+| Accessibility scan | Lighthouse, axe, or WAVE on each page | No errors |
+| Keyboard | Tab through each page | Focus always visible; nothing trapped |
+| Screen reader | NVDA or VoiceOver, top to bottom | Every part is announced clearly and in order |
+| Zoom and reflow | 200% zoom; 320 px wide | Nothing lost; no sideways scroll |
+| Reduced motion | System setting on | Nothing animates |
+| Privacy page | Compare it with what the site collects | Every claim matches |
 
-Add a row each time a check runs for a release.
+## Further reading
+
+- [Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) on MDN
+- [Mitigate cross-site scripting with a strict CSP](https://web.dev/articles/strict-csp) on web.dev
+- [Prevent DOM-based XSS with Trusted Types](https://web.dev/articles/trusted-types) on web.dev
+- [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/)
+- [Web Content Accessibility Guidelines 2.0](https://www.w3.org/TR/WCAG20/) and the [WCAG 2.2 quick reference](https://www.w3.org/WAI/WCAG22/quickref/)
+- [PIPEDA in brief](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/pipeda_brief/) from the Office of the Privacy Commissioner of Canada
+- [RFC 9116: security.txt](https://www.rfc-editor.org/rfc/rfc9116)
