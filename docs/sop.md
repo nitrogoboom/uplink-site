@@ -1,6 +1,6 @@
 # How we build, check, and release the site
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This page describes how the Uplink site is built, the standards it meets, and the checks that prove it before a release. It's for anyone who changes the site. When a tool, rule, or standard changes, update this page in the same pull request.
 
@@ -82,10 +82,10 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, and the report endpoint.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page.
-- No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 3440 px, at normal and 200% text.
+- No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px, at normal and 200% text.
 - The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
 - Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`npm run verify:links`).
-- **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop, every other page on phone. The release audit adds every size (`--all`).
+- **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop (1440×900), every other page on phone. At release, `npm run verify -- --all` adds desktop for every page.
 
 On a pull request, CI also compares every page with the live site at three sizes (`npm run visual-diff`). That check reports and never fails: a person decides whether each change was meant.
 
@@ -117,7 +117,7 @@ A clean run ticks every box here. A failure names the page and the problem.
 - [ ] **Browsers:** every page in Chromium, Firefox, and WebKit (Safari's engine) at 1440 px, and on an emulated iPhone and Android phone. No script errors, no CSP blocks, no sideways scroll. Screenshots are in `out/audit/shots/`.
 - [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page. Focus is visible on every stop, never off screen, and never stuck. Each dialog opens from the keyboard, Esc closes it, and focus returns. The stops per page are in `out/audit/keyboard/`.
 - [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. It fails on a link whose parts run together with no pause, or one link name that goes to two pages. Transcripts are in `out/audit/reader/`.
-- [ ] **axe on every page at every size (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical.
+- [ ] **axe on every page, on phone and desktop (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical.
 - [ ] **200% text (1.4.4):** `npm run verify:text` passes.
 - [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves. With it off, the pause button stops every loop, and nothing flashes more than three times a second.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email address. Every problem field has its message in words, tied to the field, and focus goes to the first one.
@@ -188,7 +188,7 @@ Free tools for checking one page by hand. Scanners find only about a third to ha
 | [VoiceOver](https://www.apple.com/accessibility/vision/) | Screen reader built into Mac and iPhone. |
 | Narrator | Screen reader built into Windows. |
 
-The site doesn't need a paid whole-site scanner: the release audit runs axe on every page at every size.
+The site doesn't need a paid whole-site scanner: CI runs axe on every page, and `npm run verify -- --all` at release runs it on every page on phone and desktop.
 
 ## Watch the live site
 

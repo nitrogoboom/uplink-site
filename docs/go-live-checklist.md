@@ -1,6 +1,6 @@
 # Go-live checklist
 
-*Started November 5, 2026. Last updated: November 5, 2026.*
+*Started November 5, 2026. Last updated: November 6, 2026.*
 
 This checklist covers what to check before the site moves to its real domain, beyond what CI and the release audit already prove. For those, see [What CI proves](sop.md#what-ci-proves) and the [release checklist](sop.md#release-checklist). For the launch-day steps, see [`launch-runbook.md`](launch-runbook.md).
 
@@ -68,7 +68,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 - [x] **Lighthouse, all 20 sitemap pages, phone and desktop** (November 5, 2026, local build).
   - Accessibility 100, Best practices 100 everywhere.
-  - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`).
+  - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`). Since November 6, 2026, desktop shows the steps as a list in the left column instead of the dots; phones and tablets keep the dots.
   - SEO 66–69 only because of the intended `noindex`.
 - [x] **Reflow at 320 px wide (WCAG 1.4.10, the same as 400% zoom)**: no sideways scroll on any page at 320×800 or 320×256.
 - [x] Checked: at 320×256 (a phone on its side with big zoom) the header and bottom bar take half the screen until you scroll. The bottom bar already slides away on scroll down (`core.js`, `.botnav.is-hidden`), so the reading space comes back. Left as is.
@@ -86,7 +86,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed November 5, 2026; every other page already passed.
   - The hero's height is now a floor, not a cap, and its text centres only while it fits (`safe center`). With the WCAG spacing, the h1 stays below the header at 1280, 1440 and 3440.
   - The desktop service tiles' rows grow when their words do, so no icon is cut off (`src/components/home/hero.css`, `src/components/home/services.css`).
-  - `tools/verify_styles.py`: nothing else on any page moved, at all four sizes.
+  - The styles check (then `tools/verify_styles.py`, now `npm run verify:styles`): nothing else on any page moved, at all four sizes.
 - [x] **Cache headers** (November 5, 2026, local and live match). HTML revalidates, and `/_astro/*` is immutable for a year.
 - [ ] Risk: the fonts in `/assets/fonts/` have no hash in their names but are cached immutable for a year (`public/_headers`). If a font file ever changes, give it a new name.
 

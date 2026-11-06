@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This repository holds the website for Uplink Technology, a made-up IT company. The content is placeholder text, and the look is inspired by the Overwatch 2 menus. This page explains how to run the site, how it's organized, and how to use the tools that build and check it.
 
@@ -234,7 +234,7 @@ Each check fails, and exits with status 1, on any finding. Every check reads its
 
 | Command | What it checks |
 | --- | --- |
-| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). It checks: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall, no panel overflow, the map moves). Home at phone, tablet, 1440×900, and 3440×1440 with no sideways scroll, and an axe pass at phone and desktop. The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. Every other page once at phone size, with an axe pass. It fails on any script error, crash, CSP or Trusted Types block, a hero or Grow section that doesn't respond, sideways scroll, or a serious or critical axe finding. Home gets the full check because it's the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. Screenshots go to `out/`. |
+| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). It checks: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall below the header, no panel overflow). Home at phone, tablet, 1440×900, and 3440×1440 with no sideways scroll, and an axe pass at phone and desktop. The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. Every other page once at phone size, with an axe pass. It fails on any script error, crash, CSP or Trusted Types block, a hero or Grow section that doesn't respond, sideways scroll, or a serious or critical axe finding. Home gets the full check because it's the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. Screenshots go to `out/`. |
 | `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, and every `#section` link finds its id. CI runs it. `--external` also checks links to other sites. |
 | `npm run verify:text [-- --text N]` | Every page at four sizes with the text at 200% (or `N`×): no clipped, overlapping, or unreachable text, and no sideways scroll. `--text 1` runs it at the default size, where it should come back clear too. |
 | `npm run verify:spacing [-- PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
