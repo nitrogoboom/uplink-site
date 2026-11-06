@@ -23,6 +23,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
+- [ ] W3C validator: Home has an HTML error, `pathLength` on the `<circle>` in the Grow play button's ring (`Grow.astro`, `.grow-ring`). Both the Python and Node audits flag it (5 Nov 2026). Drop the attribute and size the ring's dash in CSS or script, or set it some other valid way.
+- [ ] Open PR #76 (clean up old pull request previews on Cloudflare every 3 days): its build passed; it waits for the owner's merge, then a one-preview delete test.
 - [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
 - [ ] Spacing check fails on `main` since #74 (cbf673c): on phones `.fc-base` has `padding-bottom: calc(var(--botnav-h) + var(--sp-5) + …)` (`bottom-nav.css`), 88px, off the scale. Put it on a step, or add it to `SKIP` in `checks/spacing.spec.mjs` with its reason (November 6, 2026).
