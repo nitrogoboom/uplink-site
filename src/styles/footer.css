@@ -28,6 +28,7 @@
 .js .fc-panels { gap: 0; }
 .js .fc-panel:not(.is-on) { display: none; }
 .fc-panel { display: flex; flex-direction: column; min-width: 0; }
+.fc-panel-in { display: contents; }   /* no box of its own here; on phones it is what grows open under a row (below) */
 .js .fc-panel.is-in { animation: fc-in var(--dur-fc-panel) var(--ease); }
 @keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
 .fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
@@ -268,10 +269,28 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-rows-mode .fc-tile[aria-expanded="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
   .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-n { color: var(--c-accent-text); }
   .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
-  .fc-rows-mode .fc-panel { padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
-  /* lines only between rows: none along the footer's top, none under the last row (or under its panel when open) */
-  .fc-rows-mode { border-top: 0; }
-  .fc-rows-mode .fc-tile:nth-last-child(2):not([aria-expanded="true"]), .fc-rows-mode .fc-panel:last-child { border-bottom: 0; }
+  .fc-rows-mode .fc-panel { border-bottom: 1px solid var(--c-line); }
+  /* a row's links grow open: the panel's one grid row goes from nothing to the height of what is in it (minmax(0, 1fr),
+     so bigger text never clips) as the links fade and settle in; shutting runs it back, a little quicker, and footer.js
+     hides the panel once it has shrunk. Only the height is clipped, so a link's hover box still reaches past its text.
+     With reduced motion a row opens and shuts at once */
+  .fc-rows-mode .fc-panel:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 0fr); overflow-y: clip; }
+  .fc-rows-mode .fc-panel.is-on { grid-template-rows: minmax(0, 1fr); }
+  .fc-rows-mode .fc-panel-in { display: flex; flex-direction: column; padding-block: var(--sp-3) var(--sp-6); opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); }
+  .fc-rows-mode .fc-panel.is-on .fc-panel-in { opacity: 1; transform: none; }
+  /* none at all with reduced motion, not motion.css's near-zero one, which still shows the shut row for a frame */
+  .fc-rows-mode .fc-panel, .fc-rows-mode .fc-panel-in { transition: none; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fc-rows-mode .fc-panel { transition: grid-template-rows var(--dur-fc-row-shut) var(--ease-soft); }
+    .fc-rows-mode .fc-panel-in { transition: opacity var(--dur-fc-row-shut) var(--ease-soft), transform var(--dur-fc-row-shut) var(--ease-soft); }
+    .fc-rows-mode .fc-panel.is-on, .fc-rows-mode .fc-panel.is-on .fc-panel-in { transition-duration: var(--dur-fc-row-open); }
+  }
+  /* lines only between rows: none along the footer's top, none under the last row (or under its panel when open);
+     the last row keeps its line until its panel has shrunk shut. No scroll anchoring: footer.js keeps a tapped row
+     still while the row above it shrinks shut, and the browser's own would move the page a second time */
+  .fc-rows-mode { border-top: 0; overflow-anchor: none; }
+  .fc-rows-mode .fc-panel:last-child { border-bottom: 0; }
+  .fc-rows-mode .fc-tile:nth-last-child(2):has(+ .fc-panel[hidden]) { border-bottom: 0; }
   /* base bar: the logo sat 8px under its line, against about 21px between the bar's other lines; one step more */
   .fc-base .container { padding-top: var(--sp-4); }
   .fc-rows-mode .fc-head { display: none; }   /* the row above already names it */

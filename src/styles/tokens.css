@@ -156,13 +156,17 @@
 
   /* ---- motion ---------------------------------------------------------- */
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);   /* starts slowly and settles: a box growing open, which --ease would pop */
   --dur-1: 150ms;
   --dur-2: 250ms;
   --dur-3: 600ms;
   --dur-pulse: 1.8s;   /* a dot's ring, looping */
-  /* footer (footer.css): a panel sliding in, the map's colour and route fades, and the map's loops (each loop's
-     steps() count is its frames, so change the two together) */
+  /* footer (footer.css): a panel sliding in, a phone row's links growing open and shut (shutting a little quicker),
+     the map's colour and route fades, and the map's loops (each loop's steps() count is its frames, so change the
+     two together) */
   --dur-fc-panel: 360ms;
+  --dur-fc-row-open: 320ms;
+  --dur-fc-row-shut: 240ms;
   --dur-fc-fill: 450ms;
   --dur-fc-route: 400ms;
   --loop-fc-flow: 1.2s;
