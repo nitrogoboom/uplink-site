@@ -75,7 +75,7 @@
 .grow-step-btn:disabled { opacity: 0.4; cursor: default; }
 .grow-step-btn:disabled:hover { background: transparent; color: var(--c-muted); }
 .grow-dots { display: flex; align-items: center; }
-.grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-2); border: 0; border-radius: var(--r-2); background: none; }
+.grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-3); border: 0; border-radius: var(--r-2); background: none; }
 /* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
    amber, dimmed */
 .grow-dot.is-done .pip { background: var(--c-accent); opacity: 0.45; }

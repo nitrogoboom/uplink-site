@@ -56,6 +56,7 @@
   height: var(--sp-1);
   background: var(--c-accent);
 }
+@media (forced-colors: active) { .tab[aria-current]::after { forced-color-adjust: none; background: Highlight; } }
 
 .hdr-actions { flex: none; display: flex; align-items: center; gap: var(--sp-2); }
 

@@ -222,6 +222,20 @@
   :root { --gutter: 3rem; --section-y: var(--sp-9); }
 }
 
+/* Print: dark ink on white paper (print.css does the layout) */
+@media print {
+  :root {
+    color-scheme: light;
+    --c-bg: #FFF; --c-bg-band: #FFF; --c-solid: #FFF; --c-glass: #FFF; --c-glass-2: #FFF;
+    --c-surface: transparent; --c-surface-2: transparent; --c-well: transparent;
+    --c-cool-surface: transparent; --c-cool-surface-2: transparent;
+    --c-glow-accent: transparent; --c-glow-sky: transparent; --c-glow-sky-2: transparent;
+    --c-line: rgb(14 26 39 / 0.2); --c-line-2: rgb(14 26 39 / 0.3); --c-edge: rgb(14 26 39 / 0.5);
+    --c-text: #0E1A27; --c-muted: #3D4955; --c-cool-muted: #3D4955;
+    --c-accent-text: #8A4B00; --c-sky: #1F4E73; --c-ok: #1D6B3C; --c-alert: #A32B20;
+  }
+}
+
 /* Desktop screens: the whole layout scales with the screen.
    Reference screen is 1440 x 900 at a 16px root. A bigger screen scales
    everything up by whichever is smaller, width or height, so a section

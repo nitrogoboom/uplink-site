@@ -27,8 +27,8 @@ const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
     <section class="keys-group" aria-labelledby="st-keys">
       <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
       <label class="switch" for="sc-toggle">
-        <span class="stack-2"><strong>Single-key shortcuts</strong><span class="small muted">Turn off if they clash with a screen reader or voice control.</span></span>
-        <input id="sc-toggle" type="checkbox" role="switch" checked>
+        <span class="stack-2"><strong id="sc-name">Single-key shortcuts</strong><span class="small muted" id="sc-hint">Turn off if they clash with a screen reader or voice control.</span></span>
+        <input id="sc-toggle" type="checkbox" role="switch" aria-labelledby="sc-name" aria-describedby="sc-hint" checked>
       </label>
       <ul class="keys-list">
         <li><span>Open these settings</span><span class="keys"><span class="kbd">?</span></span></li>

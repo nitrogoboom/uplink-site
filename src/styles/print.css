@@ -1,0 +1,16 @@
+/* ---------------------------------------------------------------------------
+   Print: the page's words on paper. Colours come from tokens.css (@media print). Screen-only parts go,
+   screen-tall boxes take their own height, and cards don't split across pages. The hero and Grow drawings build
+   themselves in with script, so on paper they'd be half drawn: they stay off.
+   --------------------------------------------------------------------------- */
+@media print {
+  .skip-link, .site-header .hdr-actions, .botnav, dialog, .toasts, .site-footer, .svc-step, .grow-dots,
+  .hero-art .stage, .grow-stage,
+  [data-md-skip] { display: none !important; }
+  .site-header { position: static; }
+  .fold, .fold-always, .hero, .hero-grid { min-height: 0 !important; height: auto !important; }
+  h1, h2, h3 { break-after: avoid; }
+  article, figure, li, .card, .grow-card { break-inside: avoid; }
+  img, svg { max-height: 60vh; }
+  .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+}

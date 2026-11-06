@@ -37,3 +37,8 @@
 }
 .icon-tile svg { width: var(--icon); height: var(--icon); }
 
+/* Forced colours (Windows contrast themes): the drawings keep their own colours, which are made for the dark page. In a
+   light theme the page turns white and their pale labels vanish, so each drawing keeps a dark plate behind it. */
+@media (forced-colors: active) {
+  .hero-art .stage, .picker-art, .case-img, .grow-stage { forced-color-adjust: none; background: var(--c-bg); }
+}

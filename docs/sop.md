@@ -118,6 +118,7 @@ Proof for B and C: one line per failure (page, what, WCAG number). An empty list
 - [ ] No link goes to `/soon` that shouldn't (before launch, see `notes.md`, "Before going live")
 - [ ] A terms page exists, if the release goes to the real domain or turns forms on
 - [ ] `noindex` is still on until launch, and off after it (`public/_headers`)
+- [ ] Before the first launch on the real domain: `docs/go-live-checklist.md` done, or each open line has a date
 - [ ] Privacy and accessibility pages still true: anything this release changed about what the site collects, who handles it, or its aids and limits is on those pages (`src/data/privacy.md`, `accessibility.md`)
 
 ### E. Sign-off
