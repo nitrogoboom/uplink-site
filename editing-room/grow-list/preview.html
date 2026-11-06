@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grow option C · sizes</title>
+<style>
+/* Loads section.html (option C) at a real screen size (phone, tablet, desktop 1440 and 1920, or your own), scaled down to fit this window
+   if it's bigger. The page inside lays itself out at that size, so what you see is that layout. */
+:root { --bg: #0A131D; --bar: #222E3A; --line: rgb(242 247 252 / 0.18); --text: #F2F7FC; --muted: #BBC2C9; --accent: #FFAD51; --ink: #0E1A27; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 400 14px/1.3 system-ui, sans-serif; }
+body { display: grid; grid-template-rows: auto 1fr; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; background: var(--bar); border-bottom: 1px solid var(--line); }
+.bar b { font-weight: 600; margin-right: 6px; }
+.bar button { font: 600 13px/1 system-ui, sans-serif; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 12px; cursor: pointer; }
+.bar button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+.bar label { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.bar input { width: 5.5em; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 6px; }
+.bar .info { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar a { color: var(--accent); }
+.view { position: relative; overflow: hidden; display: grid; place-items: start center; padding: 16px; }
+.dev { transform-origin: top center; border: 8px solid #000; border-radius: 18px; overflow: hidden; background: #000; box-shadow: 0 0 0 1px var(--line); }
+iframe { display: block; border: 0; background: #0E1A27; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <b>Grow option C</b>
+  <button type="button" data-w="390" data-h="844">Phone 390 × 844</button>
+  <button type="button" data-w="820" data-h="1180">Tablet 820 × 1180</button>
+  <button type="button" data-w="1440" data-h="900">Desktop 1440 × 900</button>
+  <button type="button" data-w="1920" data-h="1080">Desktop 1920 × 1080</button>
+  <label>W <input id="w" type="number" min="320" max="3840" step="10"></label>
+  <label>H <input id="h" type="number" min="480" max="2160" step="10"></label>
+  <span class="info"></span>
+  <a href="section.html" target="_blank" rel="noopener">Open full page</a>
+</div>
+<div class="view"><div class="dev"><iframe src="section.html" title="Grow section at the chosen size"></iframe></div></div>
+<script>
+(() => {
+  const view = document.querySelector('.view'), dev = document.querySelector('.dev'), frame = document.querySelector('iframe');
+  const wIn = document.getElementById('w'), hIn = document.getElementById('h'), info = document.querySelector('.info');
+  const btns = [...document.querySelectorAll('.bar button')];
+  let W = 1440, H = 900;
+  const fit = () => {
+    frame.style.width = W + 'px'; frame.style.height = H + 'px';
+    const room = view.getBoundingClientRect();
+    const k = Math.min(1, (room.width - 48) / (W + 16), (room.height - 48) / (H + 16));
+    dev.style.transform = `scale(${k})`;
+    const layout = W < 700 ? 'phone' : W < 1100 ? 'tablet' : 'desktop';
+    info.textContent = `${W} × ${H} · ${layout} layout · shown at ${Math.round(k * 100)}%`;
+    wIn.value = W; hIn.value = H;
+    btns.forEach((b) => b.setAttribute('aria-pressed', String(+b.dataset.w === W && +b.dataset.h === H)));
+    try { localStorage.setItem('grow-list-size', `${W}x${H}`); } catch (e) { /* storage off: fine */ }
+  };
+  btns.forEach((b) => b.addEventListener('click', () => { W = +b.dataset.w; H = +b.dataset.h; fit(); }));
+  [wIn, hIn].forEach((el) => el.addEventListener('change', () => { W = Math.max(320, +wIn.value || W); H = Math.max(480, +hIn.value || H); fit(); }));
+  try { const s = localStorage.getItem('grow-list-size'); if (s) [W, H] = s.split('x').map(Number); } catch (e) { /* none saved */ }
+  addEventListener('resize', fit);
+  fit();
+})();
+</script>
+</body>
+</html>

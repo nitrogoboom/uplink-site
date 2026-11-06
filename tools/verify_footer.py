@@ -76,7 +76,7 @@ async def main():
         rep.append(f"grow playing: step {g['step'] + 1}, {g['built']} of {g['total']} parts built")
         if g['total'] == 0 or g['built'] == 0 or g['step'] < 1:
             fails.append(f"grow: didn't play on its own (step {g['step'] + 1}, {g['built']} of {g['total']} parts built)")
-        await pg.click('#grow .grow-dot:last-of-type')
+        await pg.locator('#grow :is(.grow-dot, .grow-item):visible').last.click()   # the last step: the list on desktop, the dots below
         await pg.wait_for_timeout(300)
         g = await pg.evaluate(probe)
         rep.append(f"grow last dot: step {g['step'] + 1}, {g['built']} of {g['total']} parts")
