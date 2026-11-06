@@ -106,7 +106,8 @@ if (grow && svg) {
 
   // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), run from the clock ----
   let ringRun = null, ringAt = 0, ringRaf = 0;
-  const drawRing = (k) => { ring.style.strokeDashoffset = String(100 - 100 * Math.min(1, Math.max(0, k))); };
+  const RING = 311.02;   // the play ring's length in its own units (2π × 49.5, as its stroke-dasharray in grow.css)
+  const drawRing = (k) => { ring.style.strokeDashoffset = String(RING * (1 - Math.min(1, Math.max(0, k)))); };
   const ringNow = () => (ringRun ? ringRun.a + (ringRun.b - ringRun.a) * Math.min(1, (performance.now() - ringRun.t0) / DWELL) : ringAt);
   const ringTick = () => { ringRaf = 0; if (!ringRun) return; ringAt = ringNow(); drawRing(ringAt); ringRaf = window.requestAnimationFrame(ringTick); };   // runs only while a step plays
   const ringGo = () => { if (!ringRaf) ringRaf = window.requestAnimationFrame(ringTick); };
