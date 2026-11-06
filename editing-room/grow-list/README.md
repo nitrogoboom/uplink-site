@@ -2,7 +2,9 @@
 
 The problem (John, November 6, 2026): on desktop (1100 px wide and up), the Home "We grow with you" section's left column has the heading at the top and the card at the bottom, with about 450 px of empty space between them. John picked option C from a sketch: fill the middle with the six steps as a list you can click. The idea comes from a game's play screen, where the modes are listed on the left and the big picture reacts to the one you pick.
 
-Nothing here is part of the site build, and the site is unchanged.
+Nothing here is part of the site build.
+
+> **Note:** John approved option C on November 6, 2026, and it's built into the site: `src/components/home/Grow.astro`, `grow.css` and `src/scripts/grow.js`. The real rows are `.grow-item` (the mockup's `.grow-step`, renamed so it isn't confused with the arrows' `.grow-step-btn`), and each has the dots' `aria-label` ("1 of 6: Your office"). "Building it for real" below is the plan it followed.
 
 ## What the mockup shows
 
