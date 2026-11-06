@@ -28,7 +28,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 You need the following:
 
 - Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
-- For the drawing and check tools only: Python 3.10 or later.
+- For the drawing and check tools only: Python 3.12, the version CI uses.
 
 ## Run the site locally
 
@@ -172,7 +172,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
 | `gen_office.py public` | The office floor plan: `office.svg`, `office-compact.svg`, and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
-| `gen_campus.py public` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. SVGO leaves this file as written. |
+| `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. SVGO leaves this file as written. |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
 A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.

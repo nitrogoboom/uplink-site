@@ -8,13 +8,15 @@ We build and test this site to the Web Content Accessibility Guidelines (WCAG) 2
 
 ### How we check it
 
-Every time we release a change to the site, automated tests:
+Every change to the site is checked automatically before it goes live. Each page is opened in a browser, scanned for accessibility problems, and checked on a phone-sized screen for anything cut off. Every link is tested too.
+
+Before each bigger release, we run a fuller set of automated checks. They:
 
 1. Open every page in the three browser engines behind Chrome, Firefox, and Safari, on desktop and phone screens.
 2. Read every page from top to bottom the way a screen reader would.
 3. Move through every page using only the keyboard.
 
-A person then checks what a machine can't judge: the site on real phones, how a page sounds in a real screen reader, colour contrast, motion, and whether the words make sense.
+A person also checks what a machine can't judge: the site on real phones, how a page sounds in a real screen reader, colour contrast, motion, and whether the words make sense. The first of these checks by a person is still to come (see Known limits).
 
 ## Built-in aids
 

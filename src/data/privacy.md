@@ -97,9 +97,9 @@ Please only fill in what the form asks for. Don't send passwords, health details
 
 ## Newsletter
 
-Our newsletter is one email a month about IT threats and how to fix them. We only send it if you ask for it, and we keep a record of when you signed up, so we can show you agreed.
+Our newsletter hasn't started yet, and the sign-up form doesn't send anything. Once it starts, it will be one email a month about IT threats and how to fix them. We'll only send it if you ask for it, and we'll keep a record of when you signed up, so we can show you agreed.
 
-Every issue says who it's from, includes our contact details, and has an unsubscribe link that works. We stop sending within 10 business days of your request, and usually much sooner. You can also unsubscribe by writing to [{privacy}](mailto:{privacy}).
+Every issue will say who it's from, include our contact details, and have an unsubscribe link that works. We'll stop sending within 10 business days of your request, and usually much sooner. You'll also be able to unsubscribe by writing to [{privacy}](mailto:{privacy}).
 
 ## Who handles your data, and where
 
@@ -117,7 +117,7 @@ We don't share personal information with anyone else, unless the law requires it
 | Visits and page speed | Cloudflare Web Analytics | Full detail for 7 days, then only as totals |
 | Error reports and our site's logs | Cloudflare, for us | Up to 7 days |
 | Form messages, once forms send | Our email | Until we no longer need them to help you |
-| Newsletter address and sign-up record | Us | Until you unsubscribe, plus the record that you agreed |
+| Newsletter address and sign-up record, once it starts | Us | Until you unsubscribe, plus the record that you agreed |
 | Settings on your device | Your browser | Until you clear them |
 
 ## How we protect it
