@@ -17,9 +17,11 @@
 // Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. WebKit (Safari)
 // posts its CSP reports with "Origin: null", so null is let through: a report about another page is still dropped,
 // and a script error still needs our own Origin. Reports about a browser extension's own scripts (Chrome strips their
-// address to "chrome-extension") are dropped too: they aren't the site's, and they'd bury the ones that are. Each visitor address
-// may post 30 times a minute (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past
-// that, 429. Without the binding (the tests) there is no limit.
+// address to "chrome-extension") are dropped too: they aren't the site's, and they'd bury the ones that are. So is
+// WebKit's refusal of its own style for each <select> (style-src-attr, "inline", no script named: it does it on a bare
+// page with nothing of ours, checked November 6, 2026), two on every page. Each visitor address may have 30 posts a
+// minute logged (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past that, 429. A post
+// with nothing to log isn't counted. Without the binding (the tests) there is no limit.
 //
 // PR #38 (open, paused until a sending domain exists) adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
 
@@ -93,20 +95,21 @@ async function report(request, env) {
   const site = new URL(request.url).origin;
   const origin = request.headers.get('Origin');
   if (origin && origin !== 'null' && origin !== site) return new Response(null, { status: 403 });   // null: WebKit's CSP reports (above)
-  if (env?.REPORTS) {
-    const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
-    if (!success) return new Response(null, { status: 429 });
-  }
   const text = await capped(request);
   if (text == null) return new Response(null, { status: 413 });
   let body;
   try { body = JSON.parse(text); } catch { return new Response(null, { status: 400 }); }
-  const ua = cut(request.headers.get('User-Agent'), 200);
   const ours = (r) => (r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`));
   const extension = (r) => EXTENSION.test(r.source || '') || EXTENSION.test(r.blocked || '');
-  for (const r of records(request.headers.get('Content-Type') || '', body)) {
-    if (ours(r) && !extension(r)) console.log(JSON.stringify({ report: r, ua }));
+  const webkitSelect = (r) => r.directive === 'style-src-attr' && r.blocked === 'inline' && !r.source && r.line === undefined;
+  const keep = records(request.headers.get('Content-Type') || '', body).filter((r) => ours(r) && !extension(r) && !webkitSelect(r));
+  if (!keep.length) return new Response(null, { status: 204 });
+  if (env?.REPORTS) {
+    const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
+    if (!success) return new Response(null, { status: 429 });
   }
+  const ua = cut(request.headers.get('User-Agent'), 200);
+  for (const r of keep) console.log(JSON.stringify({ report: r, ua }));
   return new Response(null, { status: 204 });
 }
 
