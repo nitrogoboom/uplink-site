@@ -42,7 +42,7 @@
   .botnav { display: block; }
   /* room for the bar under the page: kept in the footer's base bar (the last thing on every page), so its band colour
      runs down behind the bar instead of a strip of page background */
-  .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }   /* 96px: on the scale (docs/spacing.md R0) */
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
@@ -53,7 +53,7 @@
   :root[data-text] .tabs { display: none; }
   :root[data-text] .site-header .container { justify-content: space-between; }
   :root[data-text] .botnav { display: block; }
-  :root[data-text] .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  :root[data-text] .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   :root[data-text] { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
 }
 
