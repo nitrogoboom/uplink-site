@@ -2,9 +2,10 @@
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
 // Drawing: one of three cuts (HERO, in src/lib/site.ts), fetched by home.js for the screen it's on: hero-office.svg, or its tablet
 // cut hero-office-tablet.svg, both under the moving dashes' own layer in hero-flows.svg, inlined here; phones get the animated
-// phone cut office-compact-build.svg with its own dashes. All written by tools/gen_office.py; don't edit by hand.
+// phone cut office-compact-build.svg with its own dashes (with reduced motion too: it stands still then). All written by
+// tools/gen_office.py; don't edit by hand.
 // The dashes come in as text (?raw): a plain import would also write a copy to dist/_astro that nothing uses.
-// Without script, office.svg shows (office-compact.svg on phones). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
+// Without script, office.svg shows (on phones hero-office-phone.svg, the phone cut as a still). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero.css.
 import flows from './hero-flows.svg?raw';
 import './hero.css';
 import Icon from '../Icon.astro';
@@ -58,12 +59,8 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
 
     <div class="hero-art">
       <div class="stage" data-hero={HERO.full} data-hero-tablet={HERO.tablet} data-hero-phone={HERO.phone} data-hero-phone-flows={HERO.phoneFlows} data-tablet={HERO.media.tablet}>
-        <noscript><picture><source media={HERO.media.phone} srcset="/assets/img/office-compact.svg"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></noscript>
+        <noscript><picture><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></noscript>
         <Fragment set:html={flows} />
-        <!-- phones with reduced motion only (compact-cuts.css): other screens get a 1px blank instead, so they don't
-             download the still (phones with motion get the animated cut from home.js). Where it shows it is the largest
-             paint, so index.astro preloads it there and it is asked for first. -->
-        <picture><source media="(min-width: 600px)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><source media="(prefers-reduced-motion: no-preference)" srcset="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="><img class="hero-still" fetchpriority="high" src="/assets/img/office-compact.svg" alt={still} width="1200" height="900"></picture>
         <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
         <HoldButton class="hero-pause" />
       </div>

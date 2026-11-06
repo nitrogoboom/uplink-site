@@ -71,8 +71,8 @@
   .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
 }
 
-/* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP); with reduced
-   motion the 4:3 still sits in it with thin bands above and below */
+/* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP), which its still
+   for no script (hero-office-phone.svg) shares */
 @media (--small-phone) {
   .hero-art .stage { aspect-ratio: 962 / 900; }
   .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }

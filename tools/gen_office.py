@@ -1,18 +1,21 @@
 """Draws the office floor plan from one world-space description, in these cuts, which share every shape:
-  public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero (carries its Barlow letters)
-  public/assets/img/office-card.svg   card cut: office-compact.svg without its labels or their letters (isogen.card)
+  public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
+  public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
+                                      badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
   out/drawings/office-build.svg       animated reference copy of the hero (not deployed; carries its Barlow letters)
   public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
   public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
   src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
-  public/assets/img/office-compact.svg  phone cut: static, cropped 4:3 closer on the room, two big labels, no card or badges
   public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, no words;
-                                         home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply)
+                                         home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply).
+                                         Its build starts PHONE_AHEAD in, on the furnished room. With reduced motion
+                                         it stands still (hero.css) and the captions come at once.
   public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
+  public/assets/img/hero-office-phone.svg  the phone cut as a still, dashes in, nothing moving: Home's no-script hero on phones
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of them.
 The hero and its tablet and phone cuts have their own floor layout for now ('hero layout' below: desk rows, lounge,
-guest Wi-Fi, reception, entrance); office, build and compact (the phone still) still draw the plan above. To move them over, send them through hero_groups() too.
+guest Wi-Fi, reception, entrance); office, build and compact (the card) still draw the plan above. To move them over, send them through hero_groups() too.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
 Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
 to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
@@ -196,6 +199,12 @@ TABLET_CLOUD = (842.7, -82.0)          # the cloud label's text scales about thi
 PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab, room for a caption in each free corner
 PHONE_CLOUD_DOT = (950.1, -36.0)       # the cloud label's dot in office_parts/hero_cloud.svg
 PHONE_ITEMS = [HERO_LABELS[i] for i in (1, 2, 3, 4, 0)]   # Wi-Fi, workstations, Teams room, guest Wi-Fi, firewall rack
+# The phone cut starts its build this far in (ms), so it opens on the furnished room (the last of it, the lounge,
+# lands at 1750 + 450) and only the network and the cloud build in, over about 1.3 s. Started at 0, it opened on a
+# bare floor slab for a second or more. The captions come as the cloud settles (3300 on the build's own clock); the
+# <svg> carries that time as data-words for home.js.
+PHONE_AHEAD = 2200
+PHONE_WORDS = 3300 - PHONE_AHEAD
 HERO_CUTS = ('hero', 'tablet', 'phone')   # the animated hero layout's three cuts
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
@@ -751,6 +760,13 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None, scale=1.0):
 
 HERO_FLOWS = []                          # the hero's flow layer, filled by render('hero'); written to hero-flows.svg
 PHONE_FLOWS = []                         # the animated phone cut's, filled by render('phone'); office-compact-flows.svg
+PHONE_STILL = []                         # the phone cut's drawing and dashes as render('phone') draws them; phone_still()
+
+
+def ahead(text, ms):
+    """Every build delay (--d) moved ms earlier: a part whose delay goes negative starts part way through its
+    animation, or already finished."""
+    return re.sub(r'--d:(\d+)ms', lambda m: f'--d:{int(m.group(1)) - ms}ms', text)
 
 
 def split_flows(body):
@@ -790,7 +806,7 @@ def render(v):
     elif v == 'phone':                      # inlined in the page like the hero: page fonts, hero.css for the motion and the tiles
         cloud_at, items = phone_data()
         head = (f'<svg xmlns="http://www.w3.org/2000/svg" class="ob ob-phone" viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" '
-                f'role="img" aria-label="{title}" data-cloud="{cloud_at}" data-items="{items}">')
+                f'role="img" aria-label="{title}" data-cloud="{cloud_at}" data-items="{items}" data-words="{PHONE_WORDS}">')
         style = '<style>' + part('hero.css') + '</style>'
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
@@ -806,6 +822,9 @@ def render(v):
     flows = []
     if v in HERO_CUTS + ('phone',):
         body, over = split_flows(body)
+        if v == 'phone':
+            body, over = ahead(body, PHONE_AHEAD), ahead(over, PHONE_AHEAD)
+            PHONE_STILL[:] = [body, over]
         over, over_css = hoist_styles(over)
         size = f'viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}"' if v == 'phone' else 'viewBox="0 -130 1200 930" width="1200" height="930"'
         cls = 'ob-over ob-phone' if v == 'phone' else 'ob-over'   # ob-phone: compact-cuts.css shows these on phones only
@@ -827,17 +846,29 @@ def render(v):
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
+def phone_still():
+    """The phone cut as a still (render('phone') first): the same scene and framing with its dashes, the build
+    finished and nothing moving. Phones without script show it in an <img>, so it needs none of home.js's hooks or
+    the animation CSS: its style="" attributes held timings only. No words, like the phone cut."""
+    body, over = PHONE_STILL
+    body = re.sub(r' style="[^"]*"', '', body + '\n' + over)
+    head = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{" ".join(f"{c:g}" for c in PHONE_CROP)}" '
+            f'width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" role="img" aria-label="{TITLES["office"]}">')
+    return '\n'.join([head, f'<title>{TITLES["office"]}</title>', '<style>.ob-flow{stroke-dasharray:2 7}</style>', body, '</svg>'])
+
+
 if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
-    for v, name in (('office', 'office.svg'), ('compact', 'office-compact.svg')):
-        (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
+    (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
     ref = pathlib.Path(__file__).resolve().parent.parent / 'out/drawings'   # not deployed or tracked: nothing links it
     ref.mkdir(parents=True, exist_ok=True)
     (ref / 'office-build.svg').write_text(render('build') + '\n', encoding='utf-8', newline='\n')
-    # the card cut: the compact one without its labels or their letters (isogen.card)
+    # the card cut: the compact one without its labels or their letters (isogen.card). The compact cut itself is
+    # no longer a file: the phone hero's still is hero-office-phone.svg, below.
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
     root = pathlib.Path(__file__).resolve().parent.parent
     for v, name in (('hero', 'hero-office.svg'), ('tablet', 'hero-office-tablet.svg'), ('phone', 'office-compact-build.svg')):
         (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
     (root / 'src/components/home/hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
     (site / 'assets/img/office-compact-flows.svg').write_text('\n'.join(PHONE_FLOWS) + '\n', encoding='utf-8', newline='\n')
+    (site / 'assets/img/hero-office-phone.svg').write_text(phone_still() + '\n', encoding='utf-8', newline='\n')
