@@ -65,6 +65,8 @@ test('index 1440: hero, Grow, footer tabs', async ({ browser }) => {
   // footer behaviour on home at 1440
   await pg.$eval('#footer', (e) => e.scrollIntoView());
   await pg.waitForTimeout(400);
+  // the map is fetched as the footer comes near (footer.js): wait for it, as a slow CI machine can take over a second
+  await pg.waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 }).catch(() => fails.push('footer: the campus map never loaded'));
   const tabs = await pg.$$eval('.fc-tile', (t) => t.map((x) => x.id));
   if (!tabs.length) fails.push('footer: no tabs (.fc-tile) found');
   for (const [i, t] of tabs.entries()) {
