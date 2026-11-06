@@ -2,13 +2,12 @@
    SIL Open Font License, copy in public/assets/fonts/OFL.txt. The four faces every first screen uses are
    preloaded in each page's <head> (and sent as Early Hints); the nav tabs' face only from 700px wide.
    Condensed 700 italic is for page and section titles and big numbers; 700 upright for buttons, card titles and
-   sub-headings; 600 upright for tabs, links and small labels. 600 italic is kept but nothing uses it now. The "Fallback" faces are Arial resized to Barlow's width and line
+   sub-headings; 600 upright for tabs, links and small labels. The "Fallback" faces are Arial resized to Barlow's width and line
    height, so text set in the fallback takes the same room and nothing moves when Barlow arrives. ---*/
 @font-face { font-family: 'Barlow'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/fonts/barlow-400.woff2') format('woff2'); }
 @font-face { font-family: 'Barlow'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/fonts/barlow-600.woff2') format('woff2'); }
 @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/fonts/barlow-condensed-600.woff2') format('woff2'); }
 @font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 700; font-display: swap; src: url('/assets/fonts/barlow-condensed-700.woff2') format('woff2'); }
-@font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 600; font-display: swap; src: url('/assets/fonts/barlow-condensed-600-italic.woff2') format('woff2'); }
 @font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 700; font-display: swap; src: url('/assets/fonts/barlow-condensed-700-italic.woff2') format('woff2'); }
 
 /* sizes measured with fontTools on a line of the site's own copy (Arial regular and bold, Windows) */
