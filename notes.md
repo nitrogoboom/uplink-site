@@ -5,7 +5,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
 
 Get main green first:
-- [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Owner's call: Pro, or leave it. Until then CI is the gate: `deploy` runs only after `build` passes.
+- [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Left for now (owner, November 6, 2026): CI is the gate, as `deploy` runs only after `build` passes. Revisit with GitHub Pro.
 
 Quick, visible:
 - [ ] Phone hero opens on a near-empty grey slab for 1 to 2 seconds before the drawing builds. Fix: paint a finished still first (the `render('phone')` still, already a "Drawings" item), then start the animation over it, or start the build further along.
