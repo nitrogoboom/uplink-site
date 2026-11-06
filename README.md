@@ -69,6 +69,8 @@ The release audit also needs Firefox and WebKit:
 npx playwright install firefox webkit
 ```
 
+Claude Code's sandbox on Windows can't start Firefox from Playwright's usual folder (`%LOCALAPPDATA%\ms-playwright`: Windows refuses to load its `mozglue` library there). So Claude's sessions keep their browsers in `%USERPROFILE%\.cache\ms-playwright` instead, set by `PLAYWRIGHT_BROWSERS_PATH` in `.claude/settings.local.json` (on this machine only, not in git). The install commands above, run from a Claude session, put the browsers there; your own terminal keeps the usual folder.
+
 ### Install the Python drawing tools
 
 The drawing generators are Python. You need them only to change a drawing. To install them:
