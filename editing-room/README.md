@@ -14,6 +14,10 @@ The footer on phones: the tabs sit above the map and the links below it, so ever
 
 Redesign of the Home "We grow with you" section, eight rounds of mockups. Where it stands and how to build the pages in its `README.md`.
 
+## `news-cards/` (done, picked C, 6 Nov 2026)
+
+The home hero's two news cards: today's layout and three others (pill above the picture, pill on the picture, pill and title on top), at desktop and phone size. Where it stands in its `README.md`.
+
 ## `palette/` (done, applied 28 Oct 2026)
 
 The Navy & Amber colour work.

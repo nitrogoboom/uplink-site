@@ -49,13 +49,20 @@
 .hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); min-width: 0; }
 @media (--tablet-up) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (--desktop) { .hero-dock { gap: var(--sp-5); } }
-/* a picture card: --sp-3 all round, as .card. Thumb and text start on the same top line, so the two chips stay
-   level when one title wraps further than the other */
-.news { flex-direction: row; align-items: flex-start; gap: var(--sp-4); }
-.news-thumb { flex: none; display: grid; place-items: center; width: var(--sp-9); aspect-ratio: 4 / 3; overflow: hidden; }
-.news-thumb img { width: 100%; height: 100%; object-fit: contain; }
-.news-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; text-wrap: pretty; }
-.news-text .chip { order: -1; align-self: flex-start; }   /* after the title in the markup (read second), on top on screen */
+/* a picture card with the picture as a panel: edge to edge on the left, a line, then the words with --sp-4 all
+   round (R5, small card). The panel is as tall as the card and the words sit centred beside it as one block, so
+   nothing leaves a gap under it; the two cards in a row stretch to one height (the dock is a grid). Picked from
+   editing-room/news-cards/ (round 2, C). */
+.news { flex-direction: row; align-items: stretch; gap: var(--sp-4); padding: 0; overflow: hidden; }
+.news-thumb { flex: none; display: grid; place-items: center; width: calc(var(--sp-9) + var(--sp-5)); padding: var(--sp-3); border-radius: 0; border-right: 1px solid var(--c-line); }
+.news-thumb img { width: 100%; height: auto; max-height: 100%; }
+.news-text { display: flex; flex-direction: column; justify-content: center; gap: var(--sp-1); min-width: 0; padding: var(--sp-4) var(--sp-4) var(--sp-4) 0; text-wrap: pretty; }
+/* the tag: a dot and a word in the card's colour, as the eyebrows. After the title in the markup (read second),
+   on top on screen */
+.news-tag { order: -1; display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; }
+.news-tag::before { content: ""; flex: none; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: currentColor; }
+.news-tag--accent { color: var(--c-accent-text); }
+.news-tag--sky { color: var(--c-sky); }
 .news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the

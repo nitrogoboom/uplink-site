@@ -13,11 +13,11 @@ import { HERO, PAGES, getServices } from '../../lib/site';
 import type { IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
-// the two news cards under the drawing. The chip comes after the title in the markup, so a screen reader says
-// "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
+// the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
+// reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
-  { href: '/contact#message', book: true, img: 'security', chip: 'Free', tone: 'accent', title: 'IT and security check-up', line: '30 minutes. We look first, then quote.' },
-  { href: '/soon#windows-10-guide', book: false, img: 'cloud', chip: 'Guide', tone: 'sky', title: 'Windows 10 support has ended', line: 'Your upgrade plan, step by step' },
+  { href: '/contact#message', book: true, img: 'security', tag: 'Free', tone: 'accent', title: 'IT and security check-up', line: '30 minutes. We look first, then quote.' },
+  { href: '/soon#windows-10-guide', book: false, img: 'cloud', tag: 'Guide', tone: 'sky', title: 'Windows 10 support has ended', line: 'Your upgrade plan, step by step' },
 ];
 // the menu under the button: the featured services (each its own page), then all of them. A list, not a <nav>:
 // the header holds the one main menu.
@@ -71,7 +71,7 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
         {news.map((n) => (
           <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
             <span class="news-thumb well"><img src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" fetchpriority="low"></span>
-            <span class="news-text"><span class="news-title">{n.title}</span><Pause /><span class={`chip chip--${n.tone}`}>{n.chip}</span><Pause /><span class="small muted">{n.line}</span></span>
+            <span class="news-text"><span class="news-title">{n.title}</span><Pause /><span class={`news-tag news-tag--${n.tone}`}>{n.tag}</span><Pause /><span class="small muted">{n.line}</span></span>
           </a>
         ))}
       </div>
