@@ -92,6 +92,13 @@ async function browsers(paths) {
       // clientWidth, not innerWidth: a phone widens its viewport to fit a page that's too wide, hiding it
       const side = await pg.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       if (side > 0) fail('browsers', `${label} ${path}: ${side}px sideways scroll`);
+      // WebKit (27.2) refuses a style of its own for every <select> on the page: one each, even on a bare page with
+      // nothing of ours, under any style-src without 'unsafe-inline' (checked November 6, 2026; Chromium doesn't). That
+      // many "Refused to apply a stylesheet" lines are expected; one more is a real refusal and fails.
+      if (engine === 'webkit') {
+        let known = await pg.evaluate(() => document.querySelectorAll('select').length);
+        for (let i = mine.length - 1; i >= 0 && known > 0; i--) if (mine[i].includes('Refused to apply a stylesheet')) { mine.splice(i, 1); known--; }
+      }
       // WebKit's screenshot injects a <style> of its own, which the CSP blocks: keep only the errors from before it.
       // caret: 'initial', as hiding the caret injects a <style> too (a false error in WebKit)
       errs.push(...mine);
