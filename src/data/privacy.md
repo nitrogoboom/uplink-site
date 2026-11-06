@@ -122,7 +122,7 @@ We don't share personal information with anyone else, unless the law requires it
 
 ## How we protect it
 
-The site only works over a secure, encrypted connection (HTTPS). The only code it runs from another company is Cloudflare's analytics, plus its bot check once the forms work. Only a few people at Uplink can open the inbox where form messages arrive.
+The site only works over a secure, encrypted connection (HTTPS). The only code it runs from another company is Cloudflare's analytics, plus its bot check once the forms work. Once the forms send, only a few people at Uplink will be able to open the inbox where form messages arrive.
 
 ## Your choices and rights
 
