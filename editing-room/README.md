@@ -16,7 +16,7 @@ Redesign of the Home "We grow with you" section, eight rounds of mockups. Where 
 
 ## `news-cards/` (done, picked C, 6 Nov 2026)
 
-The home hero's two news cards: today's layout and three others (pill above the picture, pill on the picture, pill and title on top), at desktop and phone size. Where it stands in its `README.md`.
+The home hero's two news cards, two rounds of mockups at desktop and phone size. Round 2's C (picture as a full-height panel, a dot-and-word tag) is on the site. The rounds and the measures in its `README.md`.
 
 ## `palette/` (done, applied 28 Oct 2026)
 
