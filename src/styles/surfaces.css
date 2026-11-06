@@ -28,6 +28,29 @@
 .card.pad { padding: var(--sp-5); }
 @media (--tablet-up) { .card.pad { padding: var(--sp-6); } }
 
+/* project card (ProjectCard.astro): picture, tag chip, words. The chip comes after the picture in the markup; from
+   700px it sits over the picture's corner, where .card-media .chip puts other cards' chips (one card padding plus one
+   inset in from the card's edge). */
+.card--project { position: relative; }
+.card--project > .chip { position: absolute; top: calc(var(--sp-3) * 2); left: calc(var(--sp-3) * 2); }
+.card-meta .keep { white-space: nowrap; }   /* "40 staff" on one line: the client line breaks at its dot */
+/* phones: a row, so more projects fit on a screen. The drawing on the left at a fixed width, as tall as the row; the
+   chip, name and client beside it as one block, centred on the drawing (the empty rows above and below share what
+   is left). Chip, name and client share one left edge; the client sits close under the name (docs/spacing.md R4). */
+@media (--phone) {
+  .card--project { display: grid; grid-template: "media ." 1fr "media chip" auto "media body" auto "media ." 1fr / var(--card-thumb) minmax(0, 1fr); gap: 0 var(--sp-4); }
+  .card--project > .card-media { grid-area: media; aspect-ratio: auto; min-height: calc(var(--card-thumb) * 3 / 4); }
+  .card--project > .card-media img { padding: var(--sp-2); }
+  .card--project > .chip { position: static; grid-area: chip; justify-self: start; margin-bottom: var(--sp-2); }
+  .card--project > .card-body { grid-area: body; gap: var(--sp-1); padding: 0; overflow-wrap: break-word; }
+  .card--project .card-title { font-size: var(--fs-4); text-wrap: balance; }   /* "Office move / in a weekend", not "…in a / weekend" */
+  .card--project .card-meta { line-height: var(--lh-snug); }
+  /* bigger text (Settings) from 150%: the words would squeeze beside the drawing, so the card stacks again, with a
+     shorter picture than the wider screens' and the chip under it */
+  :root[data-text]:not([data-text="1.25"]) .card--project { grid-template: "media" auto "chip" auto "body" auto / minmax(0, 1fr); }
+  :root[data-text]:not([data-text="1.25"]) .card--project > .card-media { aspect-ratio: 2 / 1; min-height: 0; margin-bottom: var(--sp-3); }
+}
+
 .icon-tile {
   display: grid; place-items: center; flex: none;
   width: var(--tap); height: var(--tap);

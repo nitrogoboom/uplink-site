@@ -66,6 +66,7 @@ Rule from now on:
 
 ## Look and feel
 - [ ] Footer on phones (live 5 Nov 2026, PR #73): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android.
+- [ ] Project cards on phones (6 Nov 2026): rows, option A from `editing-room/work-phone/` (`.card--project` in `surfaces.css`, `ProjectCard.astro`). Home's "Setups we built and still run" now fits one screen; five of the Work page's six per screen. Open: a look on a real iPhone and Android.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat

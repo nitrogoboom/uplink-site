@@ -26,6 +26,9 @@
 .work-side .filters { margin-top: var(--sp-2); }
 .work-main { min-width: 0; }
 .work-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+/* phones: the project cards are rows (surfaces.css); each as tall as the tallest, as on Home (.card-row) */
+@media (--phone) { .work-grid { grid-auto-rows: 1fr; } }
+@media (--phone) { :root[data-text]:not([data-text="1.25"]) .work-grid { grid-auto-rows: auto; } }
 @media (--tablet-up) { .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (--desktop) { .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
 .work-grid > li { display: flex; }

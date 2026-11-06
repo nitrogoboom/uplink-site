@@ -34,6 +34,10 @@
 .card-row > li { display: flex; }
 .card-row .card { flex: 1; width: 100%; }
 @media (--tablet-up) { .card-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* phones: the project cards are rows (surfaces.css); each as tall as the tallest, so the drawings and words sit at
+   the same place in every card. Not once the text is big enough to stack them. */
+@media (--phone) { .card-row { grid-auto-rows: 1fr; } }
+@media (--phone) { :root[data-text]:not([data-text="1.25"]) .card-row { grid-auto-rows: auto; } }
 @media (--desktop) { .card-row { gap: var(--sp-5); } }   /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the

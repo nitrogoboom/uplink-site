@@ -30,3 +30,7 @@ The Navy & Amber colour work.
 - `palette/final/` is the measured result (`build.py` checks the twelve contrast and harmony criteria and writes `tokens.css`, `notes.md`, `preview.html` beside it). Rerun it if a colour changes.
 - `palette/inputs/` holds the logo colour sheet (`logo-palette.html`).
 - `BRIEF.md`, `proposal-a/`, `proposal-b/`, `proposal-c/` and `review/` are the record of how the palette was chosen. The rules in `BRIEF.md` ("work only in this folder", "don't commit") applied to that job and are over. Don't take design direction from the proposals; proposal C plus the review is what `final/` and `DESIGN.md` carry.
+
+## `work-phone/` (done, picked A, built November 6, 2026)
+
+"Setups we built and still run" on phones: one tall project card per screen. Round 1 turned the cards into rows (A, and B with each project's result) beside today's, on Home and the Work page, with a measure under each phone. A was picked and built; what changed from the mockup is in its `README.md`.
