@@ -23,6 +23,8 @@
 const MAX_BODY = 8 * 1024;
 const MAX_REPORTS = 20;
 const cut = (v, n = 300) => (v == null ? undefined : String(v).slice(0, n));
+// a line or column number, or nothing (a report is the sender's word: never log what it sends as is)
+const num = (v) => (Number.isInteger(v) && v >= 0 ? v : undefined);
 // an address without its ?query or #fragment (a query can carry personal data; the path is what we need)
 const bare = (u) => {
   if (!u) return undefined;
@@ -43,19 +45,39 @@ function records(type, body) {
       blocked: bare(r.body?.blockedURL),
       directive: cut(r.body?.effectiveDirective, 60),
       source: bare(r.body?.sourceFile),
-      line: r.body?.lineNumber,
+      line: num(r.body?.lineNumber),
     }));
   }
   if (type.includes('application/csp-report')) {     // report-uri: { "csp-report": { … } }
     const r = body?.['csp-report'] || {};
     return [{ kind: 'csp-violation', page: bare(r['document-uri']), blocked: bare(r['blocked-uri']),
-      directive: cut(r['effective-directive'] || r['violated-directive'], 60), source: bare(r['source-file']), line: r['line-number'] }];
+      directive: cut(r['effective-directive'] || r['violated-directive'], 60), source: bare(r['source-file']), line: num(r['line-number']) }];
   }
   if (body?.kind === 'error') {                       // core.js
     return [{ kind: 'script-error', page: bare(body.page), message: cut(body.message), source: bare(body.source),
-      line: body.line, column: body.column }];
+      line: num(body.line), column: num(body.column) }];
   }
   return [];
+}
+
+// the body as text, or null past MAX_BODY: stops reading there, so a huge post costs no more than a small one
+async function capped(request) {
+  if (Number(request.headers.get('Content-Length')) > MAX_BODY) return null;
+  if (!request.body) return '';
+  const reader = request.body.getReader();
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > MAX_BODY) { await reader.cancel(); return null; }
+    chunks.push(value);
+  }
+  const all = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) { all.set(c, at); at += c.byteLength; }
+  return new TextDecoder().decode(all);
 }
 
 async function report(request, env) {
@@ -67,8 +89,8 @@ async function report(request, env) {
     const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
     if (!success) return new Response(null, { status: 429 });
   }
-  const text = await request.text();
-  if (text.length > MAX_BODY) return new Response(null, { status: 413 });
+  const text = await capped(request);
+  if (text == null) return new Response(null, { status: 413 });
   let body;
   try { body = JSON.parse(text); } catch { return new Response(null, { status: 400 }); }
   const ua = cut(request.headers.get('User-Agent'), 200);

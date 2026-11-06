@@ -86,3 +86,16 @@ test('http:// goes to https://, the same address; local http stays', async () =>
   assert.equal(await (await worker.fetch(new Request('http://localhost:8787/services'), assets)).text(), 'page');
   assert.equal(await (await worker.fetch(new Request('https://example.test/services'), assets)).text(), 'page', 'pages go to the assets');
 });
+
+test('line and column are logged only as whole numbers', async () => {
+  const [, lines] = await call(post('application/json', { kind: 'error', page: '/', message: 'm', line: 'x'.repeat(500), column: { a: 1 } }));
+  assert.equal(lines[0].report.line, undefined);
+  assert.equal(lines[0].report.column, undefined);
+});
+
+test('a body over the cap is refused even without a Content-Length', async () => {
+  const big = new ReadableStream({ start(c) { for (let i = 0; i < 10; i++) c.enqueue(new TextEncoder().encode('x'.repeat(1000))); c.close(); } });
+  const req = new Request('https://example.test/api/report', { method: 'POST', body: big, duplex: 'half',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://example.test' } });
+  assert.equal((await worker.fetch(req)).status, 413);
+});
