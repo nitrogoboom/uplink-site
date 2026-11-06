@@ -8,7 +8,8 @@ Get main green first:
 - [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Left for now (owner, November 6, 2026): CI is the gate, as `deploy` runs only after `build` passes. Revisit with GitHub Pro.
 
 Quick, visible:
-- [ ] Phone hero opens on a near-empty grey slab for 1 to 2 seconds before the drawing builds. Fix: paint a finished still first (the `render('phone')` still, already a "Drawings" item), then start the animation over it, or start the build further along.
+- [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
+- [ ] Hero with pause already on from an earlier page: the build freezes on its first frame (on phones the furnished room with no network or cloud, and the caption lines don't draw; desktop too). Fix: when the drawing goes in while paused, finish its build animations.
 
 Design, nice to have:
 - [ ] Desktop: the small secondary text under hero items and footer lines is low-contrast (it passes AA). Raise its size a step or its colour toward `--c-text`.
@@ -55,7 +56,6 @@ Rule from now on:
 
 ## Drawings
 - [ ] 404 page: a three-panel heist comic, draft in `editing-room/404-comic/` (branch `404-comic-draft`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
-- [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 
 ## Look and feel
 - [ ] Footer on phones (live 5 Nov 2026, PR #73): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android.
@@ -63,7 +63,7 @@ Rule from now on:
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `npm run pagespeed`. Phones with reduced motion still paint the picture as LCP.
+- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `npm run pagespeed`. Reduced-motion phones now show the same scene, and the hero text stays the LCP there too (6 Nov 2026).
 
 ## Before going live
 Forms and content:
