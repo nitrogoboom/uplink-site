@@ -149,7 +149,7 @@ for (const page of PAGES) {
       const errs = [];
       const q = await browser.newPage({ viewport: { width: w, height: h } });
       watch(q, `${page} ${n}`, errs);
-      // Home: long enough for the hero's first two captions (about 3.3s and 4.4s in), whose script errors would
+      // Home: long enough for the hero's first two captions (about 1.1s and 2.2s in), whose script errors would
       // otherwise come after the check had moved on
       await q.goto(url(page));
       await q.waitForTimeout(page === 'index' ? 5000 : 700);

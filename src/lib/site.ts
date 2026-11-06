@@ -26,12 +26,14 @@ const fresh = (path: string) => `${path}?v=${createHash('sha1').update(readFileS
 
 // written by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
 // 440-680px wide there). phone: the hero scene framed closer for phones, no words (home.js writes its captions),
-// with its dashes in their own file; with reduced motion phones keep the still (office-compact.svg).
+// with its dashes in their own file; with reduced motion it stands still. still: the phone cut as a picture, for
+// phones without script (an <img>, so no ?v=).
 export const HERO = {
   full: fresh('/assets/img/hero-office.svg'),
   tablet: fresh('/assets/img/hero-office-tablet.svg'),
   phone: fresh('/assets/img/office-compact-build.svg'),
   phoneFlows: fresh('/assets/img/office-compact-flows.svg'),
+  still: '/assets/img/hero-office-phone.svg',
   media: {
     phone: MEDIA.smallPhone,
     tablet: '(min-width: 600px) and (max-width: 1299px) and (max-height: 1099px)',
