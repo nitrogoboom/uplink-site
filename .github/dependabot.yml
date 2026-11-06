@@ -15,7 +15,7 @@ updates:
     groups:
       actions:
         patterns: ['*']
-  # requirements.txt: the drawing generators and the browser checks (CI installs Playwright and Pillow from it)
+  # requirements.txt: the drawing tools (CI installs none of it; the checks run on Node)
   - package-ecosystem: pip
     directory: /
     schedule:

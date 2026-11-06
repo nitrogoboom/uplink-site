@@ -110,7 +110,7 @@ The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as 
 | `desktop` | 1100 px and up. |
 | `fold` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
 
-After you move CSS, prove nothing changed with `tools/verify_styles.py`. It compares every element's computed style between two builds.
+After you move CSS, prove nothing changed with `npm run verify:styles -- OLD_URL NEW_URL`. It compares every element's computed style between two builds.
 
 ## Scripts
 

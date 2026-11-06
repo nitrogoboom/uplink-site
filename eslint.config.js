@@ -15,6 +15,8 @@ export default defineConfig(
   ...astro.configs.recommended,
   { files: ['src/scripts/**/*.js', 'tools/**/*.js'], languageOptions: { globals: globals.browser } },
   { files: ['scripts/**/*.mjs', '*.{js,mjs}', 'src/**/*.ts'], languageOptions: { globals: globals.node } },
+  // the site checks run in Node and hand functions to the page, so both sets of globals apply
+  { files: ['checks/**/*.mjs'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   // the Worker runs on Cloudflare: the web platform's globals (fetch, Request, Response, URL), no DOM
   { files: ['worker/**/*.js'], languageOptions: { globals: globals.serviceworker } },
 );

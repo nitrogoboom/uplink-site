@@ -15,7 +15,7 @@
 .svc-page .picker-art { aspect-ratio: 4 / 3; flex: none; }
 /* the drawing in flow, not absolute (service-card.css): same box, since the art is overflow: hidden and sized by its aspect
    ratio. Absolute, its late load made Chrome re-lay out the page grid by a shortcut that leaves getComputedStyle
-   reporting the grid's auto side margins as 0 (the box itself never moved), so verify_styles saw 0 or 440px. */
+   reporting the grid's auto side margins as 0 (the box itself never moved), so the styles check saw 0 or 440px. */
 .svc-page .picker-prev img { position: static; display: block; }
 .svc-page .picker-detail { gap: var(--sp-5); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
 .svc-page .feat-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
