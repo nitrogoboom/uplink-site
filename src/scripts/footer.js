@@ -102,16 +102,44 @@ if (fc) {
   });
   $$('[data-fc-step]', fc).forEach((b) => b.addEventListener('click', () => select(cur + Number(b.dataset.fcStep), { focus: false })));
 
-  // Phones: one row open at a time, or none. Opening a row closes the one above it, which would pull the tapped row
-  // up the screen; the page scrolls by the same amount so the row stays under the finger.
+  // Phones: one row open at a time, or none. A row's links grow open and shrink shut (is-on, footer.css; at once with
+  // reduced motion). A shutting panel is out of reach from the start (inert) and hidden once it has shrunk; tapped
+  // again on the way, it turns round from where it is. Opening a row shuts the one above it, which pulls the tapped
+  // row up the screen as it shrinks; the page scrolls with it, frame by frame, so the row stays under the finger. Only
+  // the panels' own change is made up for, so a visitor scrolling meanwhile isn't held back.
+  let hold = 0;
+  const shut = (p) => {
+    p.inert = true;
+    const done = () => { if (rows && !p.classList.contains('is-on')) { p.hidden = true; p.inert = false; } };
+    const moving = p.getAnimations();
+    if (moving.length) Promise.all(moving.map((a) => a.finished)).then(done, done); else done();
+  };
   const toggle = (i) => {
     const open = tabs[i].getAttribute('aria-expanded') !== 'true';
-    const y0 = tabs[i].getBoundingClientRect().top;
     tabs.forEach((t, j) => t.setAttribute('aria-expanded', String(open && j === i)));
-    panels.forEach((p, j) => { p.hidden = !(open && j === i); p.classList.toggle('is-on', open && j === i); p.classList.remove('is-in'); });
-    if (open) { cur = i; replay(panels[i], 'is-in'); }
-    const dy = tabs[i].getBoundingClientRect().top - y0;
-    if (dy) window.scrollBy({ top: dy, behavior: 'instant' });
+    if (open) { cur = i; panels[i].hidden = false; panels[i].inert = false; }
+    // where the row is on the page; reading it lays out the panel just shown while still shut, so it grows from there
+    let y = tabs[i].getBoundingClientRect().top + window.scrollY;
+    panels.forEach((p, j) => {
+      const on = open && j === i;
+      if (on === p.classList.contains('is-on')) return;
+      p.classList.toggle('is-on', on);
+      if (!on) shut(p);
+    });
+    const busy = () => rows && panels.some((p) => !p.hidden && (!p.classList.contains('is-on') || p.getAnimations().length));
+    let owed = 0;   // the page scrolls in whole pixels: what a frame fell short by goes into the next one
+    const keep = () => {
+      const now = tabs[i].getBoundingClientRect().top + window.scrollY, dy = now - y + owed;
+      y = now;
+      if (dy) {
+        const was = window.scrollY;
+        window.scrollBy({ top: dy, behavior: 'instant' });
+        owed = Math.max(-1, Math.min(1, dy - (window.scrollY - was)));
+      }
+      hold = busy() ? window.requestAnimationFrame(keep) : 0;
+    };
+    window.cancelAnimationFrame(hold);
+    keep();
   };
   // Switch between tabs (tablet, desktop) and rows (phones). Rows: each panel moves in under its row, the tablist
   // roles come off and each row says whether it is open; all start closed. Tabs: the panels go back, cur shows.
@@ -131,7 +159,7 @@ if (fc) {
       roster.setAttribute('role', 'tablist');
       tabs.forEach((t, i) => {
         t.setAttribute('role', 'tab'); t.removeAttribute('aria-expanded');
-        panels[i].setAttribute('role', 'tabpanel'); panels[i].hidden = false;
+        panels[i].setAttribute('role', 'tabpanel'); panels[i].hidden = false; panels[i].inert = false;
         home.append(panels[i]);
       });
       select(cur, { instant });
