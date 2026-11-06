@@ -55,4 +55,4 @@ node editing-room/grow-list/build.mjs
 
 **Checks after building**
 
-`npm run ci`, then `python tools/verify_footer.py out/` and `python tools/verify_text.py` (at 200% and `--text 1`). Check at 1440 × 900, 1920 × 1080 and a short laptop screen (1280 × 720), where `--fold-inner` is smallest and the left column is tightest.
+`npm run ci`, then `npm run verify` and `npm run verify:text` (at 200%, and with `-- --text 1`). Check at 1440 × 900, 1920 × 1080 and a short laptop screen (1280 × 720), where `--fold-inner` is smallest and the left column is tightest.

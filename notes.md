@@ -25,6 +25,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
 - [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
+- [ ] Spacing check fails on `main` since #74 (cbf673c): on phones `.fc-base` has `padding-bottom: calc(var(--botnav-h) + var(--sp-5) + …)` (`bottom-nav.css`), 88px, off the scale. Put it on a step, or add it to `SKIP` in `checks/spacing.spec.mjs` with its reason (November 6, 2026).
+- [ ] Release audit, WebKit: Playwright 1.64's WebKit (27.2) logs "Refused to apply a stylesheet … style-src" twice on every page, and the Worker answers its CSP report with 403. The older WebKit (Playwright 1.58) logged neither, and the page's one `<style>` matches its hash. Find what WebKit refuses (an SVG's own `<style>`, reached through `<use>`?), check it in real Safari, and see why `/api/report` refuses WebKit's report (November 6, 2026).
 
 ## Page structure
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
