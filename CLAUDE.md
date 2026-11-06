@@ -5,7 +5,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Where things are written down
 
 - `notes.md`: open items. Start here. Add new items there; remove a line when it's done.
-- `README.md`: every command, tool and flag, the repo layout, drawing rules, hosting. Look a command up there (or in `package.json`) rather than guessing.
+- `README.md`: every command, tool and flag, the repo layout, drawing rules, hosting. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
 - `src/README.md`: the source map: pages, `Base.astro` props, components, content fields, CSS order, breakpoints, scripts.
 - `docs/sop.md`: how a change ships, the standards (WCAG 2.0 AA, security, browsers), the release checklist.
 - `docs/spacing.md`: which `--sp-*` step goes where. Read it before touching any margin, padding, gap or line height.
@@ -37,7 +37,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 
 - Values come from tokens in `src/styles/tokens.css`: colours, sizes, timings. Lint refuses raw spacing.
 - Order matters: a later file wins a tie. `src/styles/global.css` is the cascade order. A section's CSS sits beside its component, with its desktop layout at the end of that file; a block more than one page uses lives in `src/styles/`.
-- After moving CSS, prove nothing changed: build old and new, then `python tools/verify_styles.py OLD_URL NEW_URL`.
+- After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
 - Text size (WCAG 1.4.4): Settings scales the `--fs-*` tokens by `--text` (`html[data-text]`). A box that pins a height to the screen gets a `:root[data-text]` rule in its own CSS so it grows (with `safe center`). A font size capped by the screen multiplies its cap by `var(--text)`. New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings
@@ -49,9 +49,9 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Checking a change
 
 - Local first: `npm run dev`, then `npm run ci` (what CI runs).
-- After layout changes: `npm run build && npm run serve`, then `python tools/verify_footer.py out/` and `python tools/verify_text.py` (`--text 1` should come back clear too). Add `--all` to `verify_footer.py` for the full check on every page.
+- After layout changes: `npm run build && npm run serve`, then `npm run verify` and `npm run verify:text` (`npm run verify:text -- --text 1` should come back clear too). `npm run verify -- --all` gives every page the full check.
 - Before a release: `npm run release-audit` and the checklist in `docs/sop.md`.
-- After a deploy: `python tools/smoke.py ADDRESS`.
+- After a deploy: `npm run smoke -- ADDRESS`.
 
 ## Branches, pushes, previews
 

@@ -9,7 +9,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
 - [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
 - [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
-- [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 - [ ] Decide later, on hold: who edits copy. Today it's Claude editing on your behalf about 90% of the time, which suits copy as JSON and Markdown in git (`src/content/`, `src/data/`): every change is reviewed, checked by CI and can be undone. A CMS only earns its place if staff will edit the site themselves.
 - [ ] Decide later, on hold: if the real company has a site today, map its old addresses to the new ones (redirects) before the domain moves.
 
@@ -25,6 +24,9 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
 - [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
+- [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
+- [ ] Spacing check fails on `main` since #74 (cbf673c): on phones `.fc-base` has `padding-bottom: calc(var(--botnav-h) + var(--sp-5) + …)` (`bottom-nav.css`), 88px, off the scale. Put it on a step, or add it to `SKIP` in `checks/spacing.spec.mjs` with its reason (November 6, 2026).
+- [ ] Release audit, WebKit: Playwright 1.64's WebKit (27.2) logs "Refused to apply a stylesheet … style-src" twice on every page, and the Worker answers its CSP report with 403. The older WebKit (Playwright 1.58) logged neither, and the page's one `<style>` matches its hash. Find what WebKit refuses (an SVG's own `<style>`, reached through `<use>`?), check it in real Safari, and see why `/api/report` refuses WebKit's report (November 6, 2026).
 
 ## Page structure
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
@@ -44,7 +46,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.
+- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `npm run pagespeed`. Phones with reduced motion still paint the picture as LCP.
 
 ## Before going live
 Forms and content:
@@ -62,7 +64,7 @@ Domain and hosting:
 - [ ] Put the real domain's DNS on Cloudflare and add the domain to the Worker. Then redirect or switch off `workers.dev` (both ways are in `docs/launch-runbook.md`).
 - [ ] Remove `X-Robots-Tag: noindex` from `public/_headers`, put the `Sitemap:` line back in `robots.txt` (`src/pages/robots.txt.ts` says how; left out while every page is noindex), and set `SITE_URL` to the real domain (environment, or the default in `astro.config.mjs`).
 - [ ] Markdown copies (`/services.md` and the rest): when `noindex` comes off, give each a `Link: <page>; rel="canonical"` header (decided 2 Nov 2026), written per copy by `scripts/headers.mjs`.
-- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`. Check the Browser Integrity Check doesn't block agents reading `llms.txt` and the `.md` copies (on `workers.dev` it 403s Python's urllib).
+- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`. Check the Browser Integrity Check doesn't block agents reading `llms.txt` and the `.md` copies (on `workers.dev` it 403s a client with no user agent of its own).
 - [ ] HTTPS: turn on Always Use HTTPS on the real domain's zone (SSL/TLS > Edge Certificates). Then, unless the Worker redirects `workers.dev` (option B in the runbook), set `run_worker_first` back to `["/api/*", "/404"]` in `wrangler.jsonc` and drop the http-to-https lines in `worker/index.js`. Today every request runs the Worker so it can send `http://` to `https://` (`workers.dev` has no such setting), and each one counts against the free plan's 100,000 Worker requests a day. Then check plain `http://` still redirects.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain is HTTPS, then submit to hstspreload.org.
 - [ ] Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host. Add the real domain (and `uplink-site.johnoreilly.workers.dev` until then) to that site in Cloudflare, or make a new site and swap the token.

@@ -49,14 +49,14 @@ The launch takes about an hour.
    - SSL/TLS: **Full (strict)**, and **Always Use HTTPS** on.
    - Minimum TLS version 1.2, with HTTP/3 and Early Hints on.
    - Auto Minify and Rocket Loader off. They would break the CSP hashes.
-   - Browser Integrity Check: make sure it doesn't block agents that read `llms.txt` and the `.md` copies. On `workers.dev`, it returns 403 to Python's `urllib`.
+   - Browser Integrity Check: make sure it doesn't block agents that read `llms.txt` and the `.md` copies. On `workers.dev`, it returns 403 to a client that sends no user agent of its own.
    - DNSSEC on. Then add the DS record at the registrar.
 3. **Claude:** merge the `launch` pull request. CI deploys it, and the Worker answers on `DOMAIN`.
 4. **Owner:** in Workers > uplink-site > Settings, check that the custom domain shows Active, with a certificate.
 5. **Claude:** run the smoke test. Every line must pass.
 
    ```bash
-   python tools/smoke.py https://DOMAIN --launch
+   npm run smoke -- https://DOMAIN --launch
    ```
 
 6. **Owner and Claude:** retire the old address.
@@ -64,7 +64,7 @@ The launch takes about an hour.
    - **Option B:** check the redirect with the smoke test:
 
      ```bash
-     python tools/smoke.py https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev
+     npm run smoke -- https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev
      ```
 
 7. **Owner:** add the DNS records the domain needs, even before it sends mail. They stop anyone from faking mail from it:
@@ -75,7 +75,7 @@ The launch takes about an hour.
 
    When Cloudflare Email Service starts sending mail, replace these with its records.
 8. **Owner:** in Web Analytics, add `DOMAIN` to the site. Or make a new site and give Claude the token for `core.js`.
-9. **Claude:** check the real domain in a browser. `tools/verify_footer.py` only checks a local server, so open Home, one service page, and Contact in a real browser, and watch the console for CSP blocks.
+9. **Claude:** check the real domain in a browser. The site check (`npm run verify`) checks only a local server, so open Home, one service page, and Contact in a real browser, and watch the console for CSP blocks.
 
 ## Straight after launch
 
@@ -116,14 +116,14 @@ Do this once before launch, on a quiet day with nothing else deploying. It brief
 
    ```bash
    npx wrangler rollback
-   python tools/smoke.py https://uplink-site.johnoreilly.workers.dev
+   npm run smoke -- https://uplink-site.johnoreilly.workers.dev
    ```
 
 3. Go back to the current version, replacing `VERSION_ID` with the ID from step 1, and run the smoke test again:
 
    ```bash
    npx wrangler rollback VERSION_ID
-   python tools/smoke.py https://uplink-site.johnoreilly.workers.dev
+   npm run smoke -- https://uplink-site.johnoreilly.workers.dev
    ```
 
 4. Write the date, and how long it took, in `docs/go-live-checklist.md`.

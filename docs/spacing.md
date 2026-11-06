@@ -96,22 +96,22 @@ Keep the 4 px scale. Don't move to a Fibonacci scale (8, 13, 21, 34, 55, 89). Th
 - **Fibonacci drops the steps the site uses most.** `--sp-4` (16) and `--sp-5` (24) are the two most used tokens, with about 106 and 98 uses. Neither is a Fibonacci number, and neither are 4 and 12, which carry chip and icon spacing.
 - **13 and 21 are off the 4 px grid.** The controls are 44 px (`--tap`), 48 px (`--control-h`), and 64 px (`--header-h`, `--control-lg`). Body lines are 25.6 px. Fibonacci gaps would never line up with any of them, and they turn into fractions on scaled desktops.
 - **The top of the scale already grows like Fibonacci.** 16, 24, 32, 48, 64, and 96 step up by ×1.33 to ×1.5. Fibonacci steps by ×1.6. Big gaps already feel proportional, and the small ones need the even grid.
-- **Moving would change every value on the site:** about 530 token uses. `verify_styles.py` would show every page changed.
+- **Moving would change every value on the site:** about 530 token uses. The styles check (`npm run verify:styles`) would show every page changed.
 
 The one gap in the scale was line height (R7). Two tokens closed it on October 28, 2026: `--lh-tight` (1) and `--lh-title` (1.1).
 
 ## How the rules are checked
 
 - **`npm run lint`:** Stylelint refuses a raw length, negative ones included, in `margin*`, `padding*`, `gap`, `row-gap`, `column-gap`, `scroll-margin*`, and `scroll-padding*` (`.stylelintrc.json`).
-- **`python tools/verify_spacing.py`**, against `npm run serve`: every margin, padding, and gap the browser computes, on every page at four sizes, must be a step of the scale. It catches what lint can't: browser defaults, and `calc()` sums that land between steps. It reads the scale from `tokens.css`. Allowed exceptions are in its `SKIP` list, each with a reason.
+- **`npm run verify:spacing`**, against `npm run serve`: every margin, padding, and gap the browser computes, on every page at four sizes, must be a step of the scale. It catches what lint can't: browser defaults, and `calc()` sums that land between steps. It reads the scale from `tokens.css`. Allowed exceptions are in its `SKIP` list, each with a reason.
 
 ## Change spacing safely
 
 Change spacing on one page per pull request. Each pull request proves itself:
 
 1. Build `main` and your branch, and serve them on two ports.
-2. Run `python tools/verify_styles.py OLD_URL NEW_URL`. The only differences should be the ones you meant to make.
-3. Run `python tools/verify_footer.py out/`: no sideways scroll, the footer one screen tall, the hero and Grow section working, and axe clean.
-4. Run `python tools/verify_spacing.py`: no new values off the scale.
+2. Run `npm run verify:styles -- OLD_URL NEW_URL`. The only differences should be the ones you meant to make.
+3. Run `npm run verify`: no sideways scroll, the footer one screen tall, the hero and Grow section working, and axe clean.
+4. Run `npm run verify:spacing`: no new values off the scale.
 
 > **Note:** The audit of spacing problems measured on October 28, 2026 (items A1 to D3) was removed from this page on November 5, 2026, because every item was fixed. It's in the git history of this file.

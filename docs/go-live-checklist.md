@@ -92,7 +92,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 ## 5. Performance
 
-- [ ] **(you)** PageSpeed on every page, phone and desktop: `python tools/pagespeed.py https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
+- [ ] **(you)** PageSpeed on every page, phone and desktop: `npm run pagespeed -- https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
 - [ ] One WebPageTest run from Toronto on a slow phone profile, Home and Contact (webpagetest.org, free).
 - [ ] Decide: a performance budget in CI (Lighthouse CI) so a slow change fails the build instead of being found later.
 - [ ] **(domain)** Traffic against the free plan: while `run_worker_first` is `true`, every request runs the Worker (100,000 a day free). It can be narrowed once Always Use HTTPS is on, unless the old address is redirected by the Worker (option B in `launch-runbook.md`).
@@ -108,14 +108,14 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 - [x] Cutover runbook written (November 5, 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
 - [ ] **(you)** Practise one rollback on a quiet day (steps at the end of the runbook). It briefly puts the previous version live.
-- [x] Smoke test written (November 5, 2026): `python tools/smoke.py <address> [--launch] [--old <old address>]`. It checks:
+- [x] Smoke test written (November 5, 2026), moved to Node on November 6, 2026: `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]`. It checks:
   - every sitemap page: 200, html, security headers
   - noindex present today, gone with `--launch`
   - `http://` and the old address redirect
   - made-up addresses and `/404` give 404
   - the report endpoint, `robots.txt`, `llms.txt` and one `.md` copy (`/services.md`) answer
   - the sitemap names this host
-  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since Python can't see it.
+  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since the smoke test can't see it.
 - [ ] **(you)** Alerts, not just logs. Workers logs keep 3 days and ping nobody. Add a notification for errors (Cloudflare Notifications, or a small daily summary of `/api/report` lines to email), plus the outside uptime check (`notes.md`).
 
 ## 8. People

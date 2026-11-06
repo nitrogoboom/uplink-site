@@ -64,7 +64,7 @@
 }
 /* Tablet header, measured (16px root): logo 99px, five tabs 419px at 12px padding, three icon buttons 154px (318px
    with their words), gutters and gaps 48px. The room each side of the tabs is (width - 720) / 2 with icon buttons and
-   (width - 884) / 2 with words. verify_footer.py checks it at every 10px; it fails under 8px.
+   (width - 884) / 2 with words. The site check (checks/site.spec.mjs) checks it at every 10px; it fails under 8px.
    Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
    padding would overlap). */
 @media (min-width: 700px) and (max-width: 779px) {

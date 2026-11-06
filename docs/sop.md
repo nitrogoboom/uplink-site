@@ -19,14 +19,14 @@ A *release* is the first production launch, and any later change to layout, navi
 | Runtime | Node.js 24 | `.node-version` (CI reads it) |
 | Content | Typed JSON and Markdown: services, projects, FAQ, team, footer, Grow | `src/content/`, `src/data/`, `src/content.config.ts` |
 | Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
-| Drawings | Python generators write every SVG. | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
+| Drawings | Python generators write every SVG. Builds and checks never run them. | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
 | Hosting | Cloudflare Workers: static files, plus one small Worker. Today the Worker sees every request: it redirects `http://` to `https://`, answers `/api/report` (error and CSP reports), and gives `/404` its status. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
-| CI/CD | GitHub Actions: check, tests, lint, build, browser check, link check, deploy. On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
+| CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. On a pull request, also a preview and a screenshot comparison. Node only, no Python. Actions are pinned to commits. | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
-| Dependencies | Dependabot, weekly: npm, pip, and GitHub Actions | `.github/dependabot.yml` |
+| Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
 | Code checks | TypeScript (`astro check`), ESLint, Stylelint, Prettier (JSON and YAML only) | `eslint.config.js`, `.stylelintrc.json` |
-| Browser check | Playwright (Python) and axe-core, in Chromium | `tools/verify_footer.py` |
-| Release audit | Playwright in Chromium, Firefox, and WebKit; Guidepup Virtual Screen Reader; the W3C Nu HTML Checker | `tools/audit.py` (`npm run release-audit`) |
+| Site checks | Playwright Test and axe-core (`@axe-core/playwright`), in Chromium | `checks/*.spec.mjs` (`npm run verify`, `npm run verify:links`, and the rest in the README) |
+| Release audit | Playwright Test in Chromium, Firefox, and WebKit; Guidepup Virtual Screen Reader; the W3C Nu HTML Checker | `checks/audit.spec.mjs` (`npm run release-audit`) |
 
 ## How a change reaches the live site
 
@@ -59,7 +59,7 @@ A *release* is the first production launch, and any later change to layout, navi
 | Privacy | PIPEDA (Canada), and CASL for the newsletter. The privacy page says what the site collects, who handles it and where, for how long, and your rights. | `/privacy` (`src/data/privacy.md`); sources in `docs/privacy-and-accessibility-2026-11-03.md` |
 | Security | HTTPS only and HSTS. A strict CSP with no `'unsafe-inline'`: the few inline scripts and styles run only by hash, and the CSP reports what it blocks. Trusted Types, `nosniff`, Referrer-Policy, Permissions-Policy, and the cross-origin policies. A security contact. Secrets are listed and never in the repository. | `public/_headers` (the build adds the hashes); `/.well-known/security.txt`, `SECURITY.md`; `docs/secrets.md` |
 | Browsers | Current Chrome, Edge, Firefox, and Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras. | The support list is still to write (`notes.md`). |
-| Performance | PageSpeed 100 on Home, on phone and desktop. | `python tools/pagespeed.py ADDRESS` |
+| Performance | PageSpeed 100 on Home, on phone and desktop. | `npm run pagespeed -- ADDRESS` |
 | Language | English (Canada), `lang="en-CA"`. A French page gets `lang="fr-CA"`. | `src/layouts/Base.astro` |
 
 ### Ontario's website rule
@@ -84,10 +84,10 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - No script errors and no CSP blocks on any page.
 - No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 3440 px, at normal and 200% text.
 - The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
-- Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`tools/check_links.py`).
+- Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`npm run verify:links`).
 - **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop, every other page on phone. The release audit adds every size (`--all`).
 
-On a pull request, CI also compares every page with the live site at three sizes (`tools/visual_diff.py`). That check reports and never fails: a person decides whether each change was meant.
+On a pull request, CI also compares every page with the live site at three sizes (`npm run visual-diff`). That check reports and never fails: a person decides whether each change was meant.
 
 > **Important:** axe finds only a third to a half of WCAG problems, and CI runs it only in Chromium. The release audit and the checks by hand cover the rest.
 
@@ -102,23 +102,23 @@ Run it on the pull request's preview or on the live site. Copy this section to `
 - [ ] CI passed on the commit that's live. Proof: a link to the Actions run.
 - [ ] `npx wrangler deployments list` shows that commit's version live.
 - [ ] The response headers are present. Run `curl -sI ADDRESS` and look for HSTS, the CSP, and `X-Content-Type-Options`. Proof: paste the header lines.
-- [ ] `python tools/smoke.py ADDRESS` passes: every page, the headers, the redirects, and the 404 status.
+- [ ] `npm run smoke -- ADDRESS` passes: every page, the headers, the redirects, and the 404 status.
 - [ ] A made-up address shows the 404 page with a 404 status.
 - [ ] Workers logs since the last release (Cloudflare > Workers > uplink-site > Logs, search for `report`): each script error or CSP block from a real visitor is fixed or has a line in `notes.md`.
 
 ### B. Release audit (machine, about 10 minutes)
 
 1. Run `npm run build`, then `npm run serve`.
-2. In a second terminal, run `npm run release-audit`, `python tools/verify_footer.py out/ --all`, and `python tools/verify_text.py`.
-3. Paste `out/audit/report.md` and the last line of the other two into the record.
+2. In a second terminal, run `npm run release-audit`, `npm run verify -- --all`, and `npm run verify:text`.
+3. Paste `out/audit/report.md` and the last line of the other two (the count of passed tests) into the record.
 
 A clean run ticks every box here. A failure names the page and the problem.
 
 - [ ] **Browsers:** every page in Chromium, Firefox, and WebKit (Safari's engine) at 1440 px, and on an emulated iPhone and Android phone. No script errors, no CSP blocks, no sideways scroll. Screenshots are in `out/audit/shots/`.
 - [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page. Focus is visible on every stop, never off screen, and never stuck. Each dialog opens from the keyboard, Esc closes it, and focus returns. The stops per page are in `out/audit/keyboard/`.
 - [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. It fails on a link whose parts run together with no pause, or one link name that goes to two pages. Transcripts are in `out/audit/reader/`.
-- [ ] **axe on every page at every size (1.4.3 contrast and the rest):** `verify_footer.py --all` finds nothing serious or critical.
-- [ ] **200% text (1.4.4):** `verify_text.py` is all clear.
+- [ ] **axe on every page at every size (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical.
+- [ ] **200% text (1.4.4):** `npm run verify:text` passes.
 - [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves. With it off, the pause button stops every loop, and nothing flashes more than three times a second.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email address. Every problem field has its message in words, tied to the field, and focus goes to the first one.
 - [ ] **HTML (4.1.1):** Home passes the W3C validator with no HTML errors. When a release changes other pages' markup, check every page with `npm run release-audit -- --html-all`. The validator's CSS checker doesn't know some current CSS yet. The report lists those once and doesn't count them.
