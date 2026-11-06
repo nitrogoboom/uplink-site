@@ -72,6 +72,7 @@ Do it on the PR preview or the live site. Tick each box, and write a short note 
 - [ ] CI green on the commit that's live. Proof: link to the Actions run.
 - [ ] `npx wrangler deployments list` shows that commit's version live.
 - [ ] Response headers present (`curl -sI <address>`: HSTS, CSP, X-Content-Type-Options). Proof: paste the header lines.
+- [ ] `python tools/smoke.py <address>` passes (every page, headers, redirects, the 404 status).
 - [ ] 404 page shows for a made-up address, with a 404 status.
 - [ ] Workers logs since the last release (Cloudflare > Workers > uplink-site > Logs, search `report`): each script error or CSP block from a real visitor is fixed or has a line in `notes.md`.
 

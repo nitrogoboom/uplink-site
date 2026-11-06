@@ -5,6 +5,7 @@
 //   path                the page's address ('/', '/services'); gives it a canonical and Open Graph tags.
 //                       Leave it out for pages that should carry neither (soon, 404).
 //   robots              e.g. 'noindex, follow'
+//   ogType              Open Graph type: 'website' (the default) or 'article' (a case study)
 //   type                the page's schema.org type (FAQPage, CollectionPage, AboutPage, ContactPage): writes JSON-LD
 //                       for the page and its breadcrumb, pointing at Home's business block by @id.
 //   ldPage, ldGraph     more JSON-LD: fields for the page node, and more nodes (the Services page adds its FAQ and
@@ -30,11 +31,12 @@ interface Props {
   page: Page;
   path?: string;
   robots?: string;
+  ogType?: 'website' | 'article';
   type?: 'FAQPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
   ldPage?: Record<string, unknown>;   // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
   ldGraph?: object[];                 // more nodes for the page's JSON-LD graph (e.g. the Services listed)
 }
-const { title, description, page, path, robots, type, ldPage = {}, ldGraph = [] } = Astro.props;
+const { title, description, page, path, robots, ogType = 'website', type, ldPage = {}, ldGraph = [] } = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
 // the page's Markdown copy, for AI agents (scripts/markdown.mjs writes it; Home's is src/data/index.md)
 const markdown = path === undefined ? null : new URL(path === '/' ? '/index.md' : `${path}.md`, Astro.site).href;
@@ -69,7 +71,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 {canonical && (
   <Fragment>
-    <meta property="og:type" content="website">
+    <meta property="og:type" content={ogType}>
     <meta property="og:site_name" content="Uplink Technology">
     <meta property="og:title" content={title}>
     <meta property="og:description" content={description}>

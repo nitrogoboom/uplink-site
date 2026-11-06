@@ -16,7 +16,7 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 - [x] **Response headers, outside scan** (5 Nov 2026). Mozilla Observatory on the live `workers.dev` address: **A+, 130, 12/12 tests passed**. Rerun on the real domain.
 - [ ] **(domain)** SSL Labs (ssllabs.com/ssltest) on the real domain: aim for A or A+. Also run securityheaders.com once.
 - [x] **Dependencies** (5 Nov 2026). `npm audit --omit=dev`: 0 vulnerabilities in anything the site ships. The full tree shows 11 moderate, all one advisory in `minimatch` under ESLint (dev only, never deployed). Dependabot will bring the fix; nothing to do by hand.
-- [ ] **(you)** GitHub code scanning (CodeQL, free on public repos) next to the secret scanning in `notes.md`.
+- [x] GitHub code scanning (CodeQL): skipped on purpose (5 Nov 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public.
 - [ ] **(you)** Protect `main`, 2FA on Cloudflare, a scoped API token, secret owners and rotation dates (`notes.md`, "Production readiness").
 - [ ] **(domain)** Domain hardening at the registrar and in DNS:
   - registrar lock, auto-renew, 2FA on the registrar account
@@ -52,7 +52,7 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 - [ ] Optional, a design call:
   - On service pages "What's included" and "Best for" are h2s beside the real sections. They could be h3s, or "Best for" a plain label (`src/components/services/ServiceCard.astro`; its comment says h2 is on purpose).
   - Card titles on `/work` and `/services` are not headings, so the h1 is the only heading on `/work`. Each card is one well-named link, so it passes; headings would let screen-reader users jump card to card.
-- [ ] Small: project pages say `og:type` "website"; "article" fits their `Article` JSON-LD. `/privacy` and `/accessibility` have no JSON-LD (they don't need any).
+- [x] Fixed: project pages now say `og:type` "article", to match their `Article` JSON-LD (the new `ogType` prop on `Base.astro`). `/privacy` and `/accessibility` have no JSON-LD and don't need any.
 
 ## 4. Display modes
 
@@ -61,22 +61,22 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
   - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`).
   - SEO 66–69 only because of the intended `noindex`.
 - [x] **Reflow at 320 px wide (WCAG 1.4.10, the same as 400% zoom)**: no sideways scroll on any page at 320×800 or 320×256.
-- [ ] Advisory: at 320×256 (a phone on its side with big zoom) the header and bottom bar take half the screen. One `max-height` rule that unpins the bottom bar would help (`src/styles/bottom-nav.css`).
+- [x] Checked: at 320×256 (a phone on its side with big zoom) the header and bottom bar take half the screen until you scroll. The bottom bar already slides away on scroll down (`core.js`, `.botnav.is-hidden`), so the reading space comes back. Left as is.
 - [x] **Forced colours (Windows contrast themes)**. Text, borders, focus rings and form controls all held. Fixed (5 Nov 2026):
   - In a light contrast theme, the drawings' pale labels vanished on the white page. Each drawing now keeps a dark plate behind it (`src/styles/surfaces.css`).
   - The current-page bar under the header tabs now shows, in the theme's highlight colour (`src/styles/header.css`).
-- [ ] Small: the "Open now" dot on Contact disappears in forced colours. The words still say it, so this is fine to leave.
+- [x] Fixed: dots before chip words ("Open now" on Contact) now show in contrast themes (`src/styles/buttons.css`).
 - [x] **Print** (5 Nov 2026). There was no print style, so pages printed as a blank first page, pale headings, a "Skip to content" on every page and cards split across pages. Now (`src/styles/print.css`, ink colours in `src/styles/tokens.css`):
   - dark ink on white
   - the header shows without its buttons, and the footer, bottom bar, skip link and dialogs drop out
   - the two animated drawings (hero, Grow) drop out, since they print half built
   - cards and headings don't split across pages
 - [x] **No JavaScript**: every page shows its content, links and footer.
-- [ ] Small: without script, Home's "Previous / Next service" buttons on phones show but do nothing (`.svc-step`, `src/components/home/services.css`). Hide them until script runs.
-- [ ] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. With the WCAG spacing applied, Home at 1440 fails in two places:
-  - the hero's text box overflows its screen-tall box, and the top of the h1 slides under the header (needs `safe center` and a min-height; `src/components/home/hero.css`)
-  - the small service tiles clip their icon (`src/components/home/services.css`)
-  - Every other page passes.
+- [x] Fixed: without script, Home's "Previous / Next service" arrows and the dots under the phone service row are hidden, since they can't do anything; the row still swipes (`src/components/home/services.css`).
+- [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed 5 Nov 2026; every other page already passed.
+  - The hero's height is now a floor, not a cap, and its text centres only while it fits (`safe center`). With the WCAG spacing, the h1 stays below the header at 1280, 1440 and 3440.
+  - The desktop service tiles' rows grow when their words do, so no icon is cut off (`src/components/home/hero.css`, `src/components/home/services.css`).
+  - `tools/verify_styles.py`: nothing else on any page moved, at all four sizes.
 - [x] **Cache headers** (5 Nov 2026, local and live match). HTML revalidates, and `/_astro/*` is immutable for a year.
 - [ ] Risk: the fonts in `/assets/fonts/` have no hash in their names but are cached immutable for a year (`public/_headers`). If a font file ever changes, give it a new name.
 
@@ -96,14 +96,16 @@ Not in this list on purpose: wording and keyword SEO. The copy is placeholder un
 
 ## 7. Launch day
 
-- [ ] Write the cutover runbook: lower the DNS TTL to 5 minutes a day ahead; the order of steps (`notes.md`, "Domain and hosting"); who does each; how to back out.
-- [ ] Practise one rollback on a quiet day: `npx wrangler rollback` (README, "Hosting"), then roll forward again.
-- [ ] Smoke test straight after the switch:
-  - every sitemap page answers 200 on https
-  - `http://` and `workers.dev` both 301/308 to the real domain
-  - a made-up address gives 404
-  - the headers are there; `robots.txt` and `sitemap.xml` name the real domain
-  - the Early Hints 103 arrives (`curl -I --http2`)
+- [x] Cutover runbook written (5 Nov 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
+- [ ] **(you)** Practise one rollback on a quiet day (steps at the end of the runbook). It briefly puts the previous version live.
+- [x] Smoke test written (5 Nov 2026): `python tools/smoke.py <address> [--launch] [--old <old address>]`. It checks:
+  - every sitemap page: 200, html, security headers
+  - noindex present today, gone with `--launch`
+  - `http://` and the old address redirect
+  - made-up addresses and `/404` give 404
+  - the report endpoint, `robots.txt`, `llms.txt` and the `.md` copies answer
+  - the sitemap names this host
+  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since Python can't see it.
 - [ ] **(you)** Alerts, not just logs. Workers logs keep 3 days and ping nobody. Add a notification for errors (Cloudflare Notifications, or a small daily summary of `/api/report` lines to email), plus the outside uptime check (`notes.md`).
 
 ## 8. People

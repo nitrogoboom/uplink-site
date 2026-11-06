@@ -157,8 +157,7 @@
   .hero-grid {
     /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
-    height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem);
-    min-height: 0;
+    min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem);
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "menu stage" "menu dock";
@@ -166,7 +165,10 @@
     /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
     row-gap: var(--sp-6);
   }
-  .hero-menu { min-height: 0; }
+  /* wider letter and line spacing (WCAG 1.4.12, a reader's own style sheet): the text can outgrow one screen. The
+     hero's height is a floor, not a cap, so it grows, and the menu centres only while it fits (safe), so its top
+     never slides up under the header */
+  .hero-menu { min-height: 0; justify-content: safe center; }
   /* bigger text (Settings): the hero grows past one screen instead of cutting its headline off at the top */
   :root[data-text] .hero-grid { height: auto; min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); grid-template-rows: auto 1fr; }
   :root[data-text] .hero-menu { justify-content: safe center; }
@@ -191,7 +193,8 @@
       column-gap: var(--sp-6);
       justify-content: center;
     }
-    .hero-art .stage { aspect-ratio: 40 / 31; height: 100%; }
+    /* the hero's own height, written out: the grid's height is only a floor, so 100% of it wouldn't resolve */
+    .hero-art .stage { aspect-ratio: 40 / 31; height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); }
     /* bigger text: the hero has no set height then, so the office takes the height the hero would have had (its
        width comes from its height, and 100% of a growing box would feed back into itself) */
     :root[data-text] .hero-grid { justify-content: safe center; grid-template-rows: auto; }

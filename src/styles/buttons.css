@@ -62,6 +62,7 @@
 .chip--sky { background: var(--c-sky-tint); color: var(--c-sky); }
 .chip--ok { background: var(--c-ok-tint); color: var(--c-ok); }
 .chip--dot::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: currentColor; }
+@media (forced-colors: active) { .chip--dot::before { forced-color-adjust: none; background: CanvasText; } }   /* contrast themes paint backgrounds over */
 
 .link-arrow {
   display: inline-flex;

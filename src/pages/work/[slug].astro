@@ -32,7 +32,7 @@ const ld = {
   ],
 };
 ---
-<Base title={`${p.name} · Uplink Technology`} description={description} page="work" path={`/work/${id}`}>
+<Base title={`${p.name} · Uplink Technology`} description={description} page="work" path={`/work/${id}`} ogType="article">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={jsonLd(ld)} />
   </Fragment>
