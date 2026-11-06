@@ -270,6 +270,9 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-n { color: var(--c-accent-text); }
   .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
   .fc-rows-mode .fc-panel { padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
+  /* lines only between rows: none along the footer's top, none under the last row (or under its panel when open) */
+  .fc-rows-mode { border-top: 0; }
+  .fc-rows-mode .fc-tile:nth-last-child(2):not([aria-expanded="true"]), .fc-rows-mode .fc-panel:last-child { border-bottom: 0; }
   .fc-rows-mode .fc-head { display: none; }   /* the row above already names it */
   .fc-rows-mode .fc-lead { margin-top: 0; font-size: var(--fs-3); }
   .fc-rows-mode .fc-body { margin-top: var(--sp-4); }
