@@ -20,9 +20,6 @@ Design, nice to have:
 Rule from now on:
 - [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
 
-## Cloudflare logs (6 Nov 2026, the last 7 days of Worker logs and analytics)
-- [ ] Log access: reading Worker logs through the API (`POST …/workers/observability/telemetry/query`) needs "Workers Observability Write" (the API accepts no Read scope for queries; checked November 6, 2026). Wrangler's login can't ask for it (not in `wrangler login --scopes-list`). The Cloudflare connector can: the owner reconnects it (`/mcp` > cloudflare, or Settings > Connectors) and ticks Workers Observability Write. Until then, read them in the dashboard (Workers > uplink-site > Observability).
-
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
 - [ ] GitHub: protect `main` (PR required, `build` must pass). Today a push straight to `main` deploys as soon as CI passes, with no review. While there, turn on secret scanning and push protection (Settings > Code security) if the plan offers them.
