@@ -10,9 +10,12 @@
 //                       for the page and its breadcrumb, pointing at Home's business block by @id.
 //   ldPage, ldGraph     more JSON-LD: fields for the page node, and more nodes (the Services page adds its FAQ and
 //                       the Service list from the collections).
+//   footer              false leaves the footer out (the 404: one screen, nothing under it). <body> gets .no-footer,
+//                       so <main> keeps the room under the page for the phone tab bar (bottom-nav.css). Default true.
 // Anything else a page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
 // The shared CSS (global.css) is imported here; the build inlines it in a <style> block in every page (astro.config.mjs). The page's own CSS is
-// imported by its section components. Scripts: core.js and footer.js run on every page (ES modules);
+// imported by its section components. Scripts: core.js and footer.js run on every page (ES modules; footer.js does
+// nothing on a page without the footer);
 // a page adds its own with a <script> that imports it, inside <Fragment slot="scripts"> so it lands at the end of
 // <body> (a script after </Base> would come after </html>, which isn't valid HTML).
 import '../styles/global.css';
@@ -35,8 +38,9 @@ interface Props {
   type?: 'FAQPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
   ldPage?: Record<string, unknown>;   // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
   ldGraph?: object[];                 // more nodes for the page's JSON-LD graph (e.g. the Services listed)
+  footer?: boolean;                   // false: no footer (the 404)
 }
-const { title, description, page, path, robots, ogType = 'website', type, ldPage = {}, ldGraph = [] } = Astro.props;
+const { title, description, page, path, robots, ogType = 'website', type, ldPage = {}, ldGraph = [], footer = true } = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
 // the page's Markdown copy, for AI agents (scripts/markdown.mjs writes it; Home's is src/data/index.md)
 const markdown = path === undefined ? null : new URL(path === '/' ? '/index.md' : `${path}.md`, Astro.site).href;
@@ -91,14 +95,14 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
 <slot name="head" />
 {jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
 </head>
-<body data-page={page}>
+<body data-page={page} class={footer ? undefined : 'no-footer'}>
 <a class="skip-link" href="#main">Skip to content</a>
 <Header current={page} />
 
 <main id="main">
 <slot />
 </main>
-<Footer />
+{footer && <Footer />}
 
 <BottomNav current={page} />
 

@@ -2,7 +2,8 @@
 // Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer tabs, sideways scroll at every size, and
 // an axe accessibility pass at phone and desktop. Every other page (the served sitemap.xml, plus soon and the 404
 // page) gets a quick look: loaded once at phone size for script errors and sideways scroll, plus an axe pass at phone
-// size. --all gives every page the full treatment.
+// size. --all gives every page the full treatment. Each page is scrolled to its footer; the 404 page has none (one
+// screen, nothing under it: Base.astro footer={false}), so it is scrolled to its end and expects no footer.
 // Fails on any script error (console error, uncaught error, a CSP or Trusted Types block), a hero tile that doesn't
 // answer hover, a Grow section that doesn't play, a footer tab at 1440x900 that isn't one screen tall or whose panel
 // overflows, sideways scroll, a header whose tabs come within 8px of the logo or buttons (or scroll) at any width from
@@ -14,7 +15,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { BASE, ROOT, SIZES, flag, option, pad, pages, verdict, watch } from './lib.mjs';
+import { BASE, MISSING, ROOT, SIZES, flag, option, pad, pages, verdict, watch } from './lib.mjs';
 
 const ALL = flag('--all');
 const OUT = join(ROOT, option('--out', 'out'));
@@ -152,17 +153,24 @@ for (const page of PAGES) {
       // otherwise come after the check had moved on
       await q.goto(url(page));
       await q.waitForTimeout(page === 'index' ? 5000 : 700);
-      await q.$eval('#footer', (e) => e.scrollIntoView());
+      const footer = page !== MISSING; // the 404 has no footer
+      if (footer) await q.$eval('#footer', (e) => e.scrollIntoView());
+      else await q.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
       await q.waitForTimeout(500);
       const r = await q.evaluate(() => {
         const f = document.getElementById('footer');
         const s = document.querySelector('.fc-panels');
+        if (!f) return [document.documentElement.scrollWidth - innerWidth, 'none', '-', '-'];
         return [document.documentElement.scrollWidth - innerWidth, f.offsetHeight, s.scrollHeight - s.clientHeight, f.classList.contains('fc-js')];
       });
       if (page === 'soon' || page === 'index') await q.screenshot({ path: join(OUT, `f-${page}-${n}.png`) });
       await q.close();
       console.log(`${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} js ${r[3]}`);
-      verdict([...(r[0] > 0 ? [`${page} ${n}: ${r[0]}px sideways scroll`] : []), ...errs]);
+      verdict([
+        ...(r[0] > 0 ? [`${page} ${n}: ${r[0]}px sideways scroll`] : []),
+        ...(!footer && r[1] !== 'none' ? [`${page} ${n}: has a footer (the 404 has none)`] : []),
+        ...errs,
+      ]);
     });
   }
 }

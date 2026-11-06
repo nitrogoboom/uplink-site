@@ -145,7 +145,7 @@ The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/d
 
 ## Footer
 
-Every page has the same footer. On desktop, it's exactly one screen tall. It has three parts:
+Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). On desktop, the footer is exactly one screen tall. It has three parts:
 
 - **Stage:** the text for the selected section on the left, and a live campus map on the right.
 - **Dock:** a row of tiles: Contact, Services, Company, Support, Resources, and Follow. Use the arrow keys or the two key-cap buttons to switch tiles.
