@@ -273,6 +273,8 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   /* lines only between rows: none along the footer's top, none under the last row (or under its panel when open) */
   .fc-rows-mode { border-top: 0; }
   .fc-rows-mode .fc-tile:nth-last-child(2):not([aria-expanded="true"]), .fc-rows-mode .fc-panel:last-child { border-bottom: 0; }
+  /* base bar: the logo sat 8px under its line, against about 21px between the bar's other lines; one step more */
+  .fc-base .container { padding-top: var(--sp-4); }
   .fc-rows-mode .fc-head { display: none; }   /* the row above already names it */
   .fc-rows-mode .fc-lead { margin-top: 0; font-size: var(--fs-3); }
   .fc-rows-mode .fc-body { margin-top: var(--sp-4); }
