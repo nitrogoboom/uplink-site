@@ -97,6 +97,7 @@ Firefox and WebKit are needed only for the release audit.
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
+| `.github/workflows/clean-previews.yml` | Deletes old pull request previews from Cloudflare every 3 days (`scripts/clean-previews.mjs`). |
 | `editing-room/` | Design work that isn't part of the build: mockups, drafts, and the colour work. `editing-room/palette/DESIGN.md` is the live colour spec. See [`editing-room/README.md`](editing-room/README.md). |
 | `docs/` | Reference pages, records, and dated decisions. |
 
@@ -256,6 +257,27 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - A push to `main` that passes deploys to the live Worker.
 - A pull request also runs `visual_diff.py` against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.
+- Cloudflare keeps every preview, each with its own address, until it's deleted. Every 3 days, `.github/workflows/clean-previews.yml` deletes previews older than 3 days. It keeps every deployed version, so rollback still works, and the newest preview of each open pull request. It deletes nothing in git.
+
+### Clean up previews by hand
+
+1. See what would be deleted, without deleting anything:
+
+   ```
+   gh workflow run clean-previews.yml
+   ```
+
+2. Delete them:
+
+   ```
+   gh workflow run clean-previews.yml -f dry_run=false
+   ```
+
+3. To delete one branch's previews only, add `-f only_alias=ALIAS`, where `ALIAS` is the branch as it appears in its preview address.
+
+The run's summary in the Actions tab lists each preview and what happened to it.
+
+> **Note:** The delete needs the API token in the `cloudflare` environment. Cloudflare refuses it with a `wrangler login` (error 10405), so `scripts/clean-previews.mjs` can only list from your computer.
 
 ### Roll back a bad deploy
 
