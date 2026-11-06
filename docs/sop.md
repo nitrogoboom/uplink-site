@@ -153,7 +153,7 @@ These are what a machine can't judge. Where a check points at code, the place is
 - [ ] Pictures contain no words that aren't also real text (1.4.5).
 - [ ] The page still reads in a sensible order with its styles turned off, and no instruction relies only on shape, size, or position, such as "the button on the right" (1.3.2, 1.3.3).
 - [ ] Nothing changes on its own when a field gets focus or a value is picked (3.2.1, 3.2.2).
-- [ ] The header, bottom bar, and footer are the same on every page (3.2.3, 3.2.4). The menu and the footer both reach every page (2.4.5).
+- [ ] The header, bottom bar, and footer are the same on every page (3.2.3, 3.2.4). The menu and the footer both reach every page (2.4.5). The 404 page has no footer, on purpose: it is one screen, and the header and bottom bar still reach every page.
 - [ ] New video or audio has captions and a text version (1.2.1–1.2.3). Text in another language is marked with `lang` (3.1.2). A form that commits money or a contract can be reviewed before it's sent (3.3.4). Audio that plays on its own can be stopped (1.4.2), and a time limit can be turned off or extended (2.2.1). The site has none of these today.
 
 Proof for B and C: one line per failure, with the page, the problem, and the WCAG number. An empty list means it passed.
