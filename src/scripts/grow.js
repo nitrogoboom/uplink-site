@@ -18,6 +18,7 @@ const DWELL = 4500;    // ms a step
 const RISK_AT = 900;   // ms into a step: its risks show (the parts have dropped in by then)
 const FIX_AT = 2300;   // ms into a step: the risks flip to fixes
 const GLOW = 3400;     // ms the new parts glow
+const COUNT = 300;     // ms the team counter takes to climb to a new step's size (short: the desktop list shows it at once)
 const PAUSE = 'M2 1h3v10H2zM7 1h3v10H7z', PLAY = 'M2 1l9 5-9 5z', REPLAY = 'M6 1a5 5 0 1 0 5 5h-2a3 3 0 1 1-3-3v2l3-3-3-3z';
 const C30 = Math.cos(Math.PI / 6);
 
@@ -90,15 +91,21 @@ if (grow && svg) {
     camRaf = window.requestAnimationFrame(step);
   };
 
-  // ---- the team counter climbs to the step's size ----
-  let teamNow = 0, teamRaf = 0;
-  const count = (n, animate) => {
+  // ---- the team counter: the step's size. The desktop list shows every step's size all along, so the counter
+  // mustn't stay on another number: it climbs, briefly, only when the story reaches a step for the first time since
+  // bare ground, from the number it shows; going back, to a step already reached, paused, or with reduced motion, it
+  // changes at once, with the list. ----
+  let teamNow = 0, teamRaf = 0, reached = -1;
+  const setTeam = (v) => { teamNow = v; team.textContent = v ? `Team of ${v}` : ''; };
+  const count = (i, animate) => {
     window.cancelAnimationFrame(teamRaf);
-    const a = teamNow, t0 = performance.now(), dur = animate && !reduceMotion.matches ? 1200 : 0;
+    const n = i < 0 ? 0 : teams[i], a = teamNow, climb = animate && i > reached && n > a && !reduceMotion.matches;
+    reached = i < 0 ? -1 : Math.max(reached, i);
+    if (!climb) { setTeam(n); return; }
+    const t0 = performance.now();
     const f = (now) => {
-      const k = dur ? Math.min(1, (now - t0) / dur) : 1;
-      teamNow = Math.round(a + (n - a) * k);
-      team.textContent = n ? `Team of ${teamNow}` : '';
+      const k = Math.min(1, Math.max(0, (now - t0) / COUNT));
+      setTeam(Math.round(a + (n - a) * k));
       if (k < 1) teamRaf = window.requestAnimationFrame(f);
     };
     teamRaf = window.requestAnimationFrame(f);
@@ -149,7 +156,7 @@ if (grow && svg) {
     if (!animate) { void svg.getBoundingClientRect(); pcs.forEach(({ g }) => g.classList.remove('pre')); }
     if (animate) glowT = window.setTimeout(() => pcs.forEach(({ g }) => g.classList.remove('glow')), GLOW);
     camTo(target(i), animate);
-    count(i < 0 ? 0 : teams[i], animate);
+    count(i, animate);
     tags.forEach((t) => t.el.classList.remove('is-on', 'is-fixed', 'is-flip'));
     steps.forEach((c, k) => { c.classList.toggle('is-on', k === Math.max(0, i)); c.removeAttribute('data-beat'); });
     place.textContent = i < 0 ? '' : places[i];
