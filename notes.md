@@ -2,6 +2,27 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Outside review (6 Nov 2026, independent session, 7.5/10)
+
+Get main green first:
+- [ ] Spacing check fails since #74: on phones `.fc-base` gets 88px bottom padding (`--botnav-h` + `--sp-5` + safe area, `bottom-nav.css`). Fix: make the sum land on the scale (for example `--botnav-h` + `--sp-6`, if `--botnav-h` is a step), or add a reasoned `SKIP` entry in the spacing check if the tab bar's height has to stay off the scale. Rerun `npm run verify:spacing`.
+- [ ] W3C error on Home: `pathLength` on the Grow play ring's `<circle>` (`Grow.astro`, `.grow-ring`). Fix: drop the attribute; set the circle's real circumference as `stroke-dasharray` in `grow.css`, and have `drawRing()` in `grow.js` use that length instead of 100.
+- [ ] Release audit, WebKit: "Refused to apply a stylesheet" on every page, and `/api/report` answers its CSP report with 403. Fix: find which stylesheet it means (the report body names the blocked URL); likely a hash WebKit computes differently, or the Origin check rejecting WebKit's report. Fix the cause, not the check.
+- [ ] Then protect `main`: PR required, `build` must pass (already in "Production readiness").
+
+Quick, visible:
+- [ ] Phone hero opens on a near-empty grey slab for 1 to 2 seconds before the drawing builds. Fix: paint a finished still first (the `render('phone')` still, already a "Drawings" item), then start the animation over it, or start the build further along.
+- [ ] Grow "Team of" counter climbs 0 to the step's size over 1.2 s, while the desktop step list shows the final number at once, so for a moment they disagree (a reviewer saw "Team of 2" next to the list). Fix: shorten the climb, or count only when moving to a step that wasn't shown yet; check the list and counter always end on the same number.
+- [ ] 404 page runs straight into the full-screen "Reach us" footer, so it reads as two pages stacked. Fix: give the 404 section its own full screen (`fold-always`), or a short footer on that page only.
+
+Design, nice to have:
+- [ ] Desktop: the small secondary text under hero items and footer lines is low-contrast (it passes AA). Raise its size a step or its colour toward `--c-text`.
+- [ ] Home services row mixes three tall cards with four short tiles; the tall ones are mostly empty. Even out the row, or give the tall cards their drawing.
+- [ ] Trusted Types policy passes every string (`createHTML: (s) => s` in `core.js`). Fix: only accept the site's own drawings (for example, a string that starts with `<svg` from a same-origin `/assets/img/` fetch), and say so in the docs.
+
+Rule from now on:
+- [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
+
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
 - [ ] GitHub: protect `main` (PR required, `build` must pass). Today a push straight to `main` deploys as soon as CI passes, with no review. While there, turn on secret scanning and push protection (Settings > Code security) if the plan offers them.
