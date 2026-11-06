@@ -14,7 +14,10 @@
 // request's headers, IP included (kept 3 days on the free plan, 7 on paid). A body over 8 KB, or more than 20
 // reports in one post, is dropped.
 // Only this site's reports count: a post whose Origin header is another site's gets 403, a script error needs our own
-// Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. Each visitor address
+// Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. WebKit (Safari)
+// posts its CSP reports with "Origin: null", so null is let through: a report about another page is still dropped,
+// and a script error still needs our own Origin. Reports about a browser extension's own scripts (Chrome strips their
+// address to "chrome-extension") are dropped too: they aren't the site's, and they'd bury the ones that are. Each visitor address
 // may post 30 times a minute (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past
 // that, 429. Without the binding (the tests) there is no limit.
 //
@@ -22,6 +25,7 @@
 
 const MAX_BODY = 8 * 1024;
 const MAX_REPORTS = 20;
+const EXTENSION = /^(chrome|moz|safari-web)-extension$/;   // an extension's address, as bare() leaves it
 const cut = (v, n = 300) => (v == null ? undefined : String(v).slice(0, n));
 // a line or column number, or nothing (a report is the sender's word: never log what it sends as is)
 const num = (v) => (Number.isInteger(v) && v >= 0 ? v : undefined);
@@ -30,25 +34,29 @@ const bare = (u) => {
   if (!u) return undefined;
   try {
     const url = new URL(u);
+    if (url.origin === 'null') return cut(url.protocol.slice(0, -1));   // data:, an extension's own address: the scheme only
     return cut(url.origin + url.pathname);
   } catch {
     return cut(String(u).split(/[?#]/)[0]);   // 'inline', 'eval' and the like
   }
 };
 
-// the three shapes a report arrives in, as one flat record
+// one Reporting API report, { type, url, body }, as a record
+const fromReport = (r) => ({
+  kind: cut(r.type, 40),
+  page: bare(r.url || r.body?.documentURL),
+  blocked: bare(r.body?.blockedURL),
+  directive: cut(r.body?.effectiveDirective, 60),
+  source: bare(r.body?.sourceFile),
+  line: num(r.body?.lineNumber),
+});
+// the shapes a report arrives in, as one flat record
 function records(type, body) {
   if (type.includes('application/reports+json')) {   // Reporting API: an array of { type, url, body }
-    return (Array.isArray(body) ? body : []).slice(0, MAX_REPORTS).map((r) => ({
-      kind: cut(r.type, 40),
-      page: bare(r.url || r.body?.documentURL),
-      blocked: bare(r.body?.blockedURL),
-      directive: cut(r.body?.effectiveDirective, 60),
-      source: bare(r.body?.sourceFile),
-      line: num(r.body?.lineNumber),
-    }));
+    return (Array.isArray(body) ? body : []).slice(0, MAX_REPORTS).map(fromReport);
   }
   if (type.includes('application/csp-report')) {     // report-uri: { "csp-report": { … } }
+    if (!body?.['csp-report'] && body?.body) return [fromReport(body)];   // WebKit: one Reporting API report under this type
     const r = body?.['csp-report'] || {};
     return [{ kind: 'csp-violation', page: bare(r['document-uri']), blocked: bare(r['blocked-uri']),
       directive: cut(r['effective-directive'] || r['violated-directive'], 60), source: bare(r['source-file']), line: num(r['line-number']) }];
@@ -84,7 +92,7 @@ async function report(request, env) {
   if (request.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: { Allow: 'POST' } });
   const site = new URL(request.url).origin;
   const origin = request.headers.get('Origin');
-  if (origin && origin !== site) return new Response(null, { status: 403 });
+  if (origin && origin !== 'null' && origin !== site) return new Response(null, { status: 403 });   // null: WebKit's CSP reports (above)
   if (env?.REPORTS) {
     const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
     if (!success) return new Response(null, { status: 429 });
@@ -95,7 +103,10 @@ async function report(request, env) {
   try { body = JSON.parse(text); } catch { return new Response(null, { status: 400 }); }
   const ua = cut(request.headers.get('User-Agent'), 200);
   const ours = (r) => (r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`));
-  for (const r of records(request.headers.get('Content-Type') || '', body).filter(ours)) console.log(JSON.stringify({ report: r, ua }));
+  const extension = (r) => EXTENSION.test(r.source || '') || EXTENSION.test(r.blocked || '');
+  for (const r of records(request.headers.get('Content-Type') || '', body)) {
+    if (ours(r) && !extension(r)) console.log(JSON.stringify({ report: r, ua }));
+  }
   return new Response(null, { status: 204 });
 }
 

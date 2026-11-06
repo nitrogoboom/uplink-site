@@ -67,6 +67,27 @@ test('only this site counts: another Origin is refused, reports about other site
   assert.equal((await call(post('application/json', error, '/api/report', null)))[1].length, 0, 'a script error needs our own Origin');
 });
 
+test('WebKit: a CSP report with Origin null, in the Reporting API shape under application/csp-report, is logged', async () => {
+  const webkit = { type: 'csp-violation', url: 'https://example.test/about',
+    body: { documentURL: 'https://example.test/about', disposition: 'enforce', effectiveDirective: 'style-src-attr', blockedURL: 'inline', statusCode: 200, sample: '' } };
+  const [res, lines] = await call(post('application/csp-report', webkit, '/api/report', 'null'));
+  assert.equal(res.status, 204);
+  assert.deepEqual(lines.map((l) => l.report), [{ kind: 'csp-violation', page: 'https://example.test/about', blocked: 'inline', directive: 'style-src-attr' }]);
+  const other = { ...webkit, url: 'https://other.test/', body: { ...webkit.body, documentURL: 'https://other.test/' } };
+  assert.equal((await call(post('application/csp-report', other, '/api/report', 'null')))[1].length, 0, 'still only about our own pages');
+  const error = { kind: 'error', page: '/', message: 'x' };
+  assert.equal((await call(post('application/json', error, '/api/report', 'null')))[1].length, 0, 'a script error still needs our own Origin');
+});
+
+test("reports about a browser extension's own scripts are dropped", async () => {
+  const ext = (sourceFile, blockedURL = 'trusted-types-policy') => ({ type: 'trusted-types-policy', url: 'https://example.test/',
+    body: { documentURL: 'https://example.test/', effectiveDirective: 'trusted-types', blockedURL, sourceFile, lineNumber: 1 } });
+  const [res, lines] = await call(post('application/reports+json', [ext('chrome-extension'), ext('moz-extension://abc-123/content.js'),
+    ext('https://example.test/_astro/core.js', 'safari-web-extension://abc/x.css'), ext('https://example.test/_astro/core.js')]));
+  assert.equal(res.status, 204);
+  assert.deepEqual(lines.map((l) => l.report.source), ['https://example.test/_astro/core.js'], "only the site's own report is left");
+});
+
 test('past the rate limit: 429, nothing logged', async () => {
   const keys = [];
   const env = { REPORTS: { limit: async ({ key }) => { keys.push(key); return { success: false }; } } };
