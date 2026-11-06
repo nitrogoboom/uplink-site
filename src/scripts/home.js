@@ -307,7 +307,10 @@ const startCaptions = (svg) => {
         probes.forEach(([key, el]) => lengths.set(key, el.getComputedTextLength()));
         cloudFill = window.getComputedStyle(probes[0][1]).fill;
         width = w;
-        if (begun) { write.cloud(); write.office(); }
+        // only the captions already shown: the office's comes 1.1 s after the cloud's (CAP_SECOND), and before that
+        // at.office is -1, with no item to write (a width change in that gap threw and left this box behind)
+        if (at.cloud >= 0) write.cloud();
+        if (at.office >= 0) write.office();
       }
       box.remove();
     });
