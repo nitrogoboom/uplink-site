@@ -9,8 +9,6 @@ Get main green first:
 
 Quick, visible:
 - [ ] Phone hero opens on a near-empty grey slab for 1 to 2 seconds before the drawing builds. Fix: paint a finished still first (the `render('phone')` still, already a "Drawings" item), then start the animation over it, or start the build further along.
-- [ ] Grow "Team of" counter climbs 0 to the step's size over 1.2 s, while the desktop step list shows the final number at once, so for a moment they disagree (a reviewer saw "Team of 2" next to the list). Fix: shorten the climb, or count only when moving to a step that wasn't shown yet; check the list and counter always end on the same number.
-- [ ] 404 page runs straight into the full-screen "Reach us" footer, so it reads as two pages stacked. Fix: give the 404 section its own full screen (`fold-always`), or a short footer on that page only.
 
 Design, nice to have:
 - [ ] Desktop: the small secondary text under hero items and footer lines is low-contrast (it passes AA). Raise its size a step or its colour toward `--c-text`.
