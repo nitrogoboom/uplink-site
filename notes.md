@@ -5,9 +5,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
 
 Get main green first:
-- [ ] Spacing check fails since #74: on phones `.fc-base` gets 88px bottom padding (`--botnav-h` + `--sp-5` + safe area, `bottom-nav.css`). Fix: make the sum land on the scale (for example `--botnav-h` + `--sp-6`, if `--botnav-h` is a step), or add a reasoned `SKIP` entry in the spacing check if the tab bar's height has to stay off the scale. Rerun `npm run verify:spacing`.
-- [ ] W3C error on Home: `pathLength` on the Grow play ring's `<circle>` (`Grow.astro`, `.grow-ring`). Fix: drop the attribute; set the circle's real circumference as `stroke-dasharray` in `grow.css`, and have `drawRing()` in `grow.js` use that length instead of 100.
-- [ ] Then protect `main`: PR required, `build` must pass (already in "Production readiness").
+- [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Owner's call: Pro, or leave it. Until then CI is the gate: `deploy` runs only after `build` passes.
 
 Quick, visible:
 - [ ] Phone hero opens on a near-empty grey slab for 1 to 2 seconds before the drawing builds. Fix: paint a finished still first (the `render('phone')` still, already a "Drawings" item), then start the animation over it, or start the build further along.
@@ -23,7 +21,7 @@ Rule from now on:
 - [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
 
 ## Cloudflare logs (6 Nov 2026, the last 7 days of Worker logs and analytics)
-- [ ] Log access: the Cloudflare connector and the Wrangler login can't read Worker logs (no "Workers Observability Read"), so today they're read in the dashboard (Workers > uplink-site > Observability). Add that permission when the company account's token is made ("Production readiness").
+- [ ] Log access: reading Worker logs through the API (`POST …/workers/observability/telemetry/query`) needs "Workers Observability Write" (the API accepts no Read scope for queries; checked November 6, 2026). Wrangler's login can't ask for it (not in `wrangler login --scopes-list`). The Cloudflare connector can: the owner reconnects it (`/mcp` > cloudflare, or Settings > Connectors) and ticks Workers Observability Write. Until then, read them in the dashboard (Workers > uplink-site > Observability).
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
@@ -50,8 +48,8 @@ Rule from now on:
 - [ ] Open PR #76 (clean up old pull request previews on Cloudflare every 3 days): its build passed; it waits for the owner's merge, then a one-preview delete test.
 - [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
-- [ ] Spacing check fails on `main` since #74 (cbf673c): on phones `.fc-base` has `padding-bottom: calc(var(--botnav-h) + var(--sp-5) + …)` (`bottom-nav.css`), 88px, off the scale. Put it on a step, or add it to `SKIP` in `checks/spacing.spec.mjs` with its reason (November 6, 2026).
 - [ ] Real Safari: Playwright's WebKit (27.2) refuses a style of its own for every `<select>` under our CSP (one each, even on a bare page with nothing of ours; Chromium doesn't), so twice a page from the booking dialog's dropdowns. The release audit expects that many and the Worker drops that report (November 6, 2026). Open: look at Safari's console on a Mac (Develop menu) for "Refused to apply a stylesheet"; if it's there too, report it to WebKit (bugs.webkit.org).
+- [ ] Firefox in Claude's sandbox: Playwright's Firefox won't start from `%LOCALAPPDATA%\ms-playwright` (Windows: "side-by-side configuration is incorrect", mozglue). A copy elsewhere starts. For a session that needs it: copy `firefox-1555` into the session's scratchpad, junction the other browser folders beside it, and run with `PLAYWRIGHT_BROWSERS_PATH` set to that folder (the full release audit passed that way, November 6, 2026).
 
 ## Page structure
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
