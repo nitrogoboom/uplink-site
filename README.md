@@ -106,7 +106,7 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | Path | What it holds |
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
-| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon. |
+| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
 | `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
