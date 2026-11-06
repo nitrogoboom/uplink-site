@@ -399,7 +399,10 @@ if (stage) {
    A tap on any card opens it. "Swipe" fades once they have left the first card.
    No swipe with a mouse: the arrows step one card, a click on the dots
    jumps to the nearest dot's card, and Left / Right move focus card to card.
-   A card that takes focus slides to the middle. The snap does the rest.
+   A card that takes keyboard focus slides to the middle. The snap does the rest.
+   Not on a mouse press: that focuses the link too, and the slide would carry
+   the card out from under the pointer before the button comes up, so the click
+   would never land. A click on a side card opens it, as a tap does.
    ====================================================================== */
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots .pip');
@@ -437,7 +440,9 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
     const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
     go(near.indexOf(Math.min(...near)));
   });
-  svcRow.addEventListener('focusin', (e) => { if (row.matches) go(cards.indexOf(e.target.closest('li'))); });
+  // keyboard focus only (above); a browser without :focus-visible slides on any focus, as before
+  const byKeyboard = (el) => { try { return el.matches(':focus-visible'); } catch { return true; } };
+  svcRow.addEventListener('focusin', (e) => { if (row.matches && byKeyboard(e.target)) go(cards.indexOf(e.target.closest('li'))); });
   svcRow.addEventListener('keydown', (e) => {
     if (!row.matches || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey) return;
     const next = cards[cards.indexOf(e.target.closest('li')) + (e.key === 'ArrowLeft' ? -1 : 1)];
