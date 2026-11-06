@@ -9,7 +9,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
 - [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
 - [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
-- [ ] Have the WCAG list in `knowledge/Ontario Website Accessibility Rules.md` checked against the W3C WCAG 2.0 text (written from memory; the rest was checked against O. Reg. 191/11 on 3 Nov 2026).
 - [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 - [ ] Decide later, on hold: who edits copy. Today it's Claude editing on your behalf about 90% of the time, which suits copy as JSON and Markdown in git (`src/content/`, `src/data/`): every change is reviewed, checked by CI and can be undone. A CMS only earns its place if staff will edit the site themselves.
 - [ ] Decide later, on hold: if the real company has a site today, map its old addresses to the new ones (redirects) before the domain moves.
@@ -18,7 +17,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Real inboxes for `privacy@`, `accessibility@` and `security@` (placeholders in `src/data/footer.json`, `inboxes`), and a postal code for the office address.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
 - [ ] Before launch, the accessibility page needs back two short lines Ontario requires (O. Reg. 191/11; cut 3 Nov 2026 as too much for the mockup): what happens after someone sends feedback (s. 80.50(2), e.g. reply times) and that accessible formats are available on request at no cost (s. 12(3)). Sources in `docs/privacy-and-accessibility-2026-11-03.md`.
-- [ ] "Few people at Uplink can open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
+- [ ] "Only a few people at Uplink can open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
 - [ ] AODA compliance report: businesses with 20 to 49 employees in Ontario file one every three years; **the next deadline is 31 Dec 2026** (checked on ontario.ca, 5 Nov 2026: "Accessibility rules for businesses and non-profits"). The site says 22 technicians, so it applies to the real company if that's true. Filed through the Accessibility Compliance Reporting Portal.
 
 ## Home fixes (review 2 Nov 2026, GPT review checked against the code)

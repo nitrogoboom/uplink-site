@@ -72,7 +72,7 @@ The built-in aids and the checks come from the code and `docs/sop.md`: Settings 
 
 Known limits come from `notes.md` and `docs/releases/2026-11-03.md`: forms send nothing, about 24 links per page go to `/soon`, and the person-run screen-reader listen (NVDA) is still open; `docs/screen-reader-home.md` is a read-out of the accessibility tree, not a listen.
 
-On `knowledge/Ontario Website Accessibility Rules.md`: what I relied on checks out against the regulation (50+ employees, WCAG 2.0 AA, content after 1 Jan 2012, the 1.2.4 and 1.2.5 exemptions, "not practicable"). One wording is off: "It can be excused only where meeting it is 'not practicable'" sits under the under-50 sentence, but it is the 50+ exception. I didn't check its WCAG list.
+On `knowledge/Ontario Website Accessibility Rules.md` (removed 5 Nov 2026; its rules are now in `docs/sop.md`, "Ontario's website rule"): what I relied on checks out against the regulation (50+ employees, WCAG 2.0 AA, content after 1 Jan 2012, the 1.2.4 and 1.2.5 exemptions, "not practicable"). One wording is off: "It can be excused only where meeting it is 'not practicable'" sits under the under-50 sentence, but it is the 50+ exception. I didn't check its WCAG list.
 
 ## Open questions for the owner
 

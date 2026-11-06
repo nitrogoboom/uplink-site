@@ -80,7 +80,7 @@ The content types are defined in `content.config.ts`.
 | `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
 | `data/faq.json`, `data/team.json`, `data/footer.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
 | `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json`. Don't type an email address or phone number into them. |
-| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}` and `{services}`. |
+| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, and on Home also `{services}` and `{grow}`. |
 
 Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
 

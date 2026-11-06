@@ -49,18 +49,30 @@ A *release* is the first production launch, and any later change to layout, navi
 
     Give the release a few lines and a link to the record, as `v2026.11.03` does.
 
-> **Note:** A change that touches only root `*.md` files, `docs/`, or `knowledge/` runs no CI and deploys nothing. A branch push without a pull request also runs nothing.
+> **Note:** A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing. A branch push without a pull request also runs nothing.
 
 ## Standards we meet
 
 | Area | Standard | Where it's shown |
 | --- | --- | --- |
-| Accessibility | **WCAG 2.0 Level AA.** This is our own choice: Ontario requires it only from 50 staff, and we're under 50 (decided November 3, 2026). We aim for WCAG 2.2 AA where it costs little. A public statement gives a feedback route. | Ontario AODA, IASR O. Reg. 191/11. `/accessibility` (`src/data/accessibility.md`); `knowledge/Ontario Website Accessibility Rules.md` |
+| Accessibility | **WCAG 2.0 Level AA.** This is our own choice: Ontario requires it only from 50 staff, and we're under 50 (decided November 3, 2026). We aim for WCAG 2.2 AA where it costs little. A public statement gives a feedback route. | [Ontario's website rule](#ontarios-website-rule). `/accessibility` (`src/data/accessibility.md`) |
 | Privacy | PIPEDA (Canada), and CASL for the newsletter. The privacy page says what the site collects, who handles it and where, for how long, and your rights. | `/privacy` (`src/data/privacy.md`); sources in `docs/privacy-and-accessibility-2026-11-03.md` |
 | Security | HTTPS only and HSTS. A strict CSP with no `'unsafe-inline'`: the few inline scripts and styles run only by hash, and the CSP reports what it blocks. Trusted Types, `nosniff`, Referrer-Policy, Permissions-Policy, and the cross-origin policies. A security contact. Secrets are listed and never in the repository. | `public/_headers` (the build adds the hashes); `/.well-known/security.txt`, `SECURITY.md`; `docs/secrets.md` |
 | Browsers | Current Chrome, Edge, Firefox, and Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras. | The support list is still to write (`notes.md`). |
 | Performance | PageSpeed 100 on Home, on phone and desktop. | `python tools/pagespeed.py ADDRESS` |
 | Language | English (Canada), `lang="en-CA"`. A French page gets `lang="fr-CA"`. | `src/layouts/Base.astro` |
+
+### Ontario's website rule
+
+Ontario's Integrated Accessibility Standards ([O. Reg. 191/11](https://www.ontario.ca/laws/regulation/110191), section 14) set the rule for websites:
+
+- **Who:** organizations with 50 or more employees in Ontario. Below 50, there's no WCAG duty. We meet it anyway, by choice.
+- **What:** WCAG 2.0 Level AA on public websites and web content published after January 1, 2012. An organization is excused only where meeting it isn't practicable.
+- **Two exemptions:** live captions (1.2.4) and pre-recorded audio description (1.2.5). That leaves 36 of WCAG 2.0's 38 Level A and AA criteria. Each one is checked by number in [What CI proves](#what-ci-proves) or the [release checklist](#release-checklist).
+- **Other duties at 50 or more staff:** an accessibility policy, a multi-year plan, a feedback process, and accessible formats on request. They're listed, with sources, in `docs/privacy-and-accessibility-2026-11-03.md`.
+- **The compliance report** is a separate duty from 20 employees. See `notes.md`.
+
+Ontario's own guide: [How to make websites accessible](https://www.ontario.ca/page/how-make-websites-accessible).
 
 ## What CI proves
 
@@ -73,7 +85,7 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 3440 px, at normal and 200% text.
 - The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
 - Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`tools/check_links.py`).
-- **axe-core finds nothing serious or critical on any page:** Home on phone and desktop, every other page on phone. The release audit adds every size (`--all`).
+- **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop, every other page on phone. The release audit adds every size (`--all`).
 
 On a pull request, CI also compares every page with the live site at three sizes (`tools/visual_diff.py`). That check reports and never fails: a person decides whether each change was meant.
 
@@ -130,7 +142,7 @@ These are what a machine can't judge. Where a check points at code, the place is
 
 **Listen** (NVDA on Windows, which is free, or VoiceOver on iPhone; 5 minutes)
 
-- [ ] Read one page you changed from top to bottom, then jump by heading (the H key in NVDA). It should sound like the transcript in `out/audit/reader/`: no missing pauses, no "dot", and nothing read twice.
+- [ ] Read one page you changed from top to bottom, then jump by heading (the H key in NVDA). Narrator, built into Windows, works too. It should sound like the transcript in `out/audit/reader/`: no missing pauses, no "dot", and nothing read twice.
 
 **Look and judge**
 
@@ -139,9 +151,10 @@ These are what a machine can't judge. Where a check points at code, the place is
 - [ ] Colour is never the only way to show meaning. Errors, the active tab, and the selected item also change shape, icon, or words (1.4.1).
 - [ ] Any new colour pair passes a check with the axe DevTools or WAVE extension (1.4.3) [colours from `tokens.css`].
 - [ ] Pictures contain no words that aren't also real text (1.4.5).
+- [ ] The page still reads in a sensible order with its styles turned off, and no instruction relies only on shape, size, or position, such as "the button on the right" (1.3.2, 1.3.3).
 - [ ] Nothing changes on its own when a field gets focus or a value is picked (3.2.1, 3.2.2).
 - [ ] The header, bottom bar, and footer are the same on every page (3.2.3, 3.2.4). The menu and the footer both reach every page (2.4.5).
-- [ ] New video or audio has captions and a text version (1.2.1–1.2.3). Text in another language is marked with `lang` (3.1.2). A form that commits money or a contract can be reviewed before it's sent (3.3.4). The site has none of these today.
+- [ ] New video or audio has captions and a text version (1.2.1–1.2.3). Text in another language is marked with `lang` (3.1.2). A form that commits money or a contract can be reviewed before it's sent (3.3.4). Audio that plays on its own can be stopped (1.4.2), and a time limit can be turned off or extended (2.2.1). The site has none of these today.
 
 Proof for B and C: one line per failure, with the page, the problem, and the WCAG number. An empty list means it passed.
 
@@ -159,6 +172,24 @@ Proof for B and C: one line per failure, with the page, the problem, and the WCA
 - Result: `pass` / `pass with notes` / `fail` · signed `____`
 - [ ] Tagged and released (see [How a change reaches the live site](#how-a-change-reaches-the-live-site), step 10).
 
+## Accessibility tools
+
+Free tools for checking one page by hand. Scanners find only about a third to half of WCAG problems, so use them alongside the checks above, not instead of them.
+
+| Tool | What it is |
+| --- | --- |
+| [WAVE](https://wave.webaim.org/extension/) | Browser extension. Marks problems on the page. |
+| [axe DevTools](https://www.deque.com/axe/devtools/) | Browser extension. The same rules CI runs. |
+| [Accessibility Insights](https://accessibilityinsights.io/) | Browser extension, with a guided manual check. |
+| [ARC Toolkit](https://vispero.com/lp/arc-toolkit/) | Browser extension. |
+| [IBM Equal Access](https://www.ibm.com/able/toolkit/tools/) | Browser extension. |
+| [Lighthouse](https://developer.chrome.com/docs/lighthouse/accessibility/scoring) | Built into Chrome's DevTools. |
+| [NVDA](https://www.nvaccess.org/about-nvda/) | Free screen reader for Windows, the most used on desktop. |
+| [VoiceOver](https://www.apple.com/accessibility/vision/) | Screen reader built into Mac and iPhone. |
+| Narrator | Screen reader built into Windows. |
+
+The site doesn't need a paid whole-site scanner: the release audit runs axe on every page at every size.
+
 ## Watch the live site
 
 - **Errors and CSP blocks:** real visitors' browsers report them to `/api/report` (`worker/index.js`). They appear in the Workers logs, which the free plan keeps for 3 days. Look after each deploy and at each release.
@@ -170,4 +201,3 @@ Proof for B and C: one line per failure, with the page, the problem, and the WCA
 
 - When CI starts checking something new, add it to [What CI proves](#what-ci-proves) and remove it from the release checklist.
 - If a checklist item fails twice in a row, it probably should be automated. Add a line to `notes.md`.
-- The Ontario summary in `knowledge/` was written from memory of the standard, not checked line by line. Have it checked against the W3C text once before the first launch.

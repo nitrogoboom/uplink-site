@@ -8,14 +8,14 @@
 # skipped (the run stays green and says "skipped"); the build still tells you if the site is sound.
 name: site
 
-# the notes (root Markdown, docs/, knowledge/) aren't part of the site, so a change to only those
+# the notes (root Markdown, docs/) aren't part of the site, so a change to only those
 # runs nothing and deploys nothing (src/data/*.md are part of the site and still count)
 on:
   push:
     branches: [main]
-    paths-ignore: ['*.md', 'docs/**', 'knowledge/**']
+    paths-ignore: ['*.md', 'docs/**']
   pull_request:
-    paths-ignore: ['*.md', 'docs/**', 'knowledge/**']
+    paths-ignore: ['*.md', 'docs/**']
   workflow_dispatch: # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
 
 permissions:

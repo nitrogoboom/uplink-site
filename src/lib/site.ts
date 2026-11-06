@@ -56,7 +56,7 @@ export const PAGES = {
   privacy: { path: '/privacy', name: 'Privacy', title: 'Privacy · Uplink Technology',
     description: 'What this website collects, why, who handles it and where, how long it is kept, and your rights under Canadian law.' },
   accessibility: { path: '/accessibility', name: 'Accessibility', title: 'Accessibility · Uplink Technology',
-    description: 'How this website meets WCAG 2.0 AA under Ontario law, its built-in aids, known limits, and how to give feedback.' },
+    description: 'How we build this website to WCAG 2.0 AA, the aids built into it, its known limits, and how to give feedback.' },
 } as const;
 
 // Name and address come from PAGES. short: the phone tab bar's word, where it differs.

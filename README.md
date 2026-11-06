@@ -98,7 +98,6 @@ Firefox and WebKit are needed only for the release audit.
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
 | `editing-room/` | Design work that isn't part of the build: mockups, drafts, and the colour work. `editing-room/palette/DESIGN.md` is the live colour spec. See [`editing-room/README.md`](editing-room/README.md). |
-| `knowledge/` | Reference notes on the rules the site follows, such as Ontario's accessibility rules. |
 | `docs/` | Reference pages, records, and dated decisions. |
 
 ### Links and addresses
@@ -253,7 +252,7 @@ Everything else goes on to the static files, with `_headers`, `_redirects`, and 
 GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
 - CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, `verify_footer.py`, and `check_links.py` against the built site served by `wrangler dev`.
-- A change that touches only root `*.md` files, `docs/`, or `knowledge/` runs no CI and deploys nothing.
+- A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
 - A push to `main` that passes deploys to the live Worker.
 - A pull request also runs `visual_diff.py` against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.

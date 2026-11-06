@@ -1,42 +1,45 @@
 ## Our commitment
 
-Uplink Technology is committed to meeting the accessibility needs of people with disabilities in a timely manner. We aim to remove barriers and prevent new ones, in the spirit of Ontario's Accessibility for Ontarians with Disabilities Act (AODA). That covers this website, how we talk with you and how we serve our clients.
+Uplink Technology wants everyone to be able to use our website and our services, including people with disabilities. We work to remove barriers and to avoid creating new ones, in the spirit of Ontario's Accessibility for Ontarians with Disabilities Act (AODA). That covers this website, how we talk with you, and how we serve our clients.
 
-## The standard this site meets
+## The standard we build to
 
-This site meets the Web Content Accessibility Guidelines (WCAG) 2.0 at Level AA. Ontario requires that standard of organizations with 50 or more staff. We're smaller, so it's our own choice, and we hold ourselves to it. We build to the newer WCAG 2.2 Level AA where we can.
+We build and test this site to the Web Content Accessibility Guidelines (WCAG) 2.0, Level AA. Ontario requires that standard from organizations with 50 or more staff. We're smaller, so it's our own choice, and we hold ourselves to it. Where we can, we also follow the newer WCAG 2.2, Level AA.
 
-How we check it, every time we release a change to the site:
+### How we check it
 
-1. Automated tests on every page in three browser engines (the ones behind Chrome, Firefox and Safari), on desktop and phone screens.
-2. A screen-reader read-through of every page by script, and a person listening to the pages that changed.
-3. A full pass with only the keyboard.
-4. A review by a person on real phones: contrast, motion, and whether the words make sense.
+Every time we release a change to the site, automated tests:
+
+1. Open every page in the three browser engines behind Chrome, Firefox, and Safari, on desktop and phone screens.
+2. Read every page from top to bottom the way a screen reader would.
+3. Move through every page using only the keyboard.
+
+A person then checks what a machine can't judge: the site on real phones, how a page sounds in a real screen reader, colour contrast, motion, and whether the words make sense.
 
 ## Built-in aids
 
-- **Text size.** Open Settings (the gear in the header) to make the text up to 200% larger. Only the text grows, so the page stays easy to follow. Your browser's own zoom works too.
-- **Pause animations.** The pause button stops the moving drawings. The site remembers your choice.
-- **Reduce motion.** If your device is set to reduce motion, the site doesn't animate.
-- **Keyboard shortcuts.** They are listed in Settings (the gear at the top, or press `?`). You can turn them off there so they don't clash with your own tools.
-- **Skip link.** The first Tab on every page jumps past the menu to the main content.
-- **Works by keyboard.** Every link, button and pop-up works without a mouse, and you can always see where you are.
+- **Bigger text.** Open Settings (the gear at the top of the page) to make the text up to twice its size. Only the text grows, so the page stays easy to follow. Your browser's own zoom works too.
+- **Pause animations.** The pause button stops the moving drawings, and the site remembers your choice next time.
+- **Less motion.** If your device is set to reduce motion, the site doesn't animate at all.
+- **Keyboard shortcuts.** You'll find them in Settings (the gear, or press the question mark key). You can turn them off there if they get in the way of your own tools.
+- **Skip to content.** The first press of the Tab key on any page lets you jump past the menu, straight to the main content.
+- **Works without a mouse.** Every link, button, and pop-up works from the keyboard, and you can always see where you are on the page.
 
 ## Known limits
 
-- **Forms don't send yet.** The contact form, "Book a check-up" and the newsletter sign-up are being finished. Until they work, please email or call us (below).
-- **Some links lead to a "coming soon" page.** These include the client portal, the blog and our social media pages.
-- **Screen-reader review.** Every page passes our automated screen-reader read-through. A person has not yet listened to every page with a real screen reader, such as NVDA or VoiceOver. That's next.
+- **Forms don't send yet.** We're still finishing the contact form, "Book a check-up", and the newsletter sign-up. Until they work, please email or call us (details below).
+- **Some links go to a "coming soon" page.** These include the client portal, the blog, and our social media pages.
+- **The checks by a person aren't finished.** Every page passes our automated tests, including the screen-reader read-through. A person hasn't yet tried every page on real phones or listened to it with a real screen reader, such as NVDA or VoiceOver. That's next.
 
 If something on the site doesn't work for you, please tell us. We'll fix it, or get you the same information another way.
 
 ## Tell us what you think
 
-We welcome feedback on how accessible our site and our services are. You can reach us by:
+We'd like to hear how accessible you find our site and our services. You can reach us by:
 
 - Email: [{accessibility}](mailto:{accessibility})
 - Phone: [{phone}](tel:{tel}), {hours}
 - Mail: Accessibility, Uplink Technology, {street}, {city}, ON
-- The [contact form](/contact#message), once it sends
+- The [contact form](/contact#message), once it works
 
-Last updated: 3 November 2026
+Last updated: 5 November 2026
