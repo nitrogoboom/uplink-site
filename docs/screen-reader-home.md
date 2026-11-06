@@ -74,9 +74,9 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 21. "Built to scale".
 22. Heading level 2: "We grow with you".
 23. "As your team spreads out, here's what to watch, and what we take care of."
-24. Image: "A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it".
-25. Button: "Play". While the story plays, it's "Pause"; at the end, "Play again".
-26. Group "Where your people work": button "Previous place" (dimmed on the first step), six buttons "1 of 6: Your office" to "6 of 6: Covered" (the current one is pressed), and button "Next place".
+24. List "Where your people work", 6 items: buttons "1 Your office Team of 8" to "6 Covered Team of 120" (the current one is pressed). On desktop the steps are this list in the left column, in place of the dots under the picture.
+25. Image: "A business that grows: the office, a home, a car and café, a second office, the cloud over it all, and a dome that protects it".
+26. Button: "Play". While the story plays, it's "Pause"; at the end, "Play again".
 27. The current step's card, a list of 1:
     - Heading level 3: "Everyone in one place".
     - "Watch for". "Laptops set up by hand, no backups, no one to call when it breaks."
@@ -124,6 +124,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 On a phone, the order is the same, with these differences:
 
 - **Header:** no "Main" navigation. The page tabs move to the bottom bar, read last.
+- **We grow with you:** no step list after the lead. The steps come after the "Play" button instead, as group "Where your people work": button "Previous place" (dimmed on the first step), six buttons "1 of 6: Your office" to "6 of 6: Covered" (the current one is pressed), and button "Next place". Tablets read the same as phones here.
 - **Hero:** no "Managed IT, Ontario" line and no four-link services list. The lead is shorter: "We run your IT: help desk, security, cloud, network and phones."
 - **Footer:** no tabs, no map, and no map pause button. The footer is six buttons that open in place: "Contact. Start here", "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", and "Follow. 5 channels". Each button says whether it's open or closed (`aria-expanded`), and an open one reads its links next.
 - **Bottom bar:** after the footer, navigation "Main (bottom bar)", a list of 5 links: "Home" (current page), "Services", "Work", "About", "Contact".

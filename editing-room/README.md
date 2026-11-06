@@ -10,6 +10,10 @@ A three-panel heist comic for the 404 page. Script, status and next steps in its
 
 The footer on phones: the tabs sit above the map and the links below it, so every tap means scrolling. Round 1 has three fixes beside today's footer, clickable, with a measure under each phone. Where it stands in its `README.md`.
 
+## `grow-list/` (done, built into the site November 6, 2026)
+
+Home "We grow with you" on desktop, option C: the six steps as a clickable list in the left column's empty middle, in place of the dots under the picture. Phones and tablets keep the dots. The mockup and how it was built, in its `README.md`.
+
 ## `grow-options/` (done, built into the site 4 Nov 2026)
 
 Redesign of the Home "We grow with you" section, eight rounds of mockups. The record, and how to build the pages, in its `README.md`.

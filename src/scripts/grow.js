@@ -5,6 +5,8 @@
    when the section comes on screen; the arrows and dots step through it by hand; the play button pauses, plays and
    replays, and its edge times the whole story. The camera starts close on the office and pulls back as the world
    grows. Reduced motion: the finished world, no movement; the controls still step through.
+   Two sets of step buttons do the same job: the dots under the picture (phones, tablets) and the list in the left
+   column (desktop, .grow-item); CSS shows one. While the story plays, the open row's foot fills over the step's time.
    The site-wide pause (HoldButton.astro, core.js held) pauses it the same way as its own button, and lets it go on
    when released; while held it doesn't start on its own. Its own play button still plays it.
    Builds no HTML: everything is in the page (Grow.astro); this only sets classes, attributes and text.
@@ -28,7 +30,7 @@ if (grow && svg) {
   const N = steps.length, LAST = N - 1;
   const pcs = $$('.pc', svg).map((g) => ({ g, s: Number(g.dataset.s) - 1, o: Number(g.dataset.o) }));
   const tags = $$('.grow-tag', grow).map((el) => ({ el, step: Number(el.dataset.step), k: Number(el.dataset.k), at: $(`.tg-a[data-a="${el.dataset.at}"]`, svg), icon: $('.grow-tag-i', el), text: $('.grow-tag-t', el) }));
-  const dots = $$('.grow-dot', grow);
+  const dots = $$('.grow-dot', grow), items = $$('.grow-item', grow);
   const [prev, next] = $$('.grow-step-btn', grow);
   const play = $('.grow-play', grow), playIcon = $('.grow-play-i path', grow), ring = $('.grow-ring circle', grow);
   const place = $('.grow-place', grow), team = $('.grow-team', grow);
@@ -151,7 +153,9 @@ if (grow && svg) {
     steps.forEach((c, k) => { c.classList.toggle('is-on', k === Math.max(0, i)); c.removeAttribute('data-beat'); });
     place.textContent = i < 0 ? '' : places[i];
     if (i >= 0) { if (animate) steps[i].dataset.beat = 'build'; else beat('fix', false); }
-    dots.forEach((d, j) => { d.setAttribute('aria-pressed', String(j === i)); d.classList.toggle('is-done', j < i); });
+    [dots, items].forEach((set) => set.forEach((d, j) => { d.setAttribute('aria-pressed', String(j === i)); d.classList.toggle('is-done', j < i); }));
+    items.forEach((d) => d.classList.remove('is-timing'));
+    if (timed && i >= 0 && items[i]) { void items[i].offsetWidth; items[i].classList.add('is-timing'); }   // the bar starts over
     prev.disabled = i <= 0; next.disabled = i >= LAST;
     if (timed && i >= 0) { ringRun = { a: i / N, b: (i + 1) / N, t0: performance.now() }; ringGo(); }
     else { const k = !animate && i === from ? ringNow() : i < 0 ? 0 : (i + 1) / N; ringRun = null; ringAt = k; drawRing(k); }
@@ -186,12 +190,13 @@ if (grow && svg) {
   const start = () => { started = true; playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
   const jump = (i) => { stop(); started = true; go(Math.max(0, Math.min(LAST, i)), true); icon(); };
 
-  dots.forEach((d, i) => d.addEventListener('click', () => jump(i)));
+  [dots, items].forEach((set) => set.forEach((d, i) => d.addEventListener('click', () => jump(i))));
   prev.addEventListener('click', () => jump(cur - 1));
   next.addEventListener('click', () => jump(cur + 1));
   const pause = () => { stop(); beats.forEach(window.clearTimeout); beats = []; show(cur, false, false); icon(); };
   play.addEventListener('click', () => { if (playing) pause(); else start(); });
 
+  grow.style.setProperty('--grow-dwell', `${DWELL}ms`);   // the list row's timing bar runs one step
   grow.classList.add('is-live');
   if (reduceMotion.matches) { started = true; go(LAST, false); } else go(-1, false);
   icon();

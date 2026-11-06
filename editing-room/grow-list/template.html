@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-CA" class="js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grow option C</title>
+<style>
+/* the site's own CSS (build.mjs): tokens, fonts, base, layout, type, buttons, shared blocks, fold, grow.css */
+/*CSS*/
+/* the list stays hidden unless option C's sheet shows it (so "Today" is today's section) */
+.grow-list { display: none; }
+</style>
+<style id="option-c">
+/* option C (grow-list.css): the steps as a list in the left column on desktop. The header's switch turns this off. */
+/*OPTION-C*/
+</style>
+<style>
+/* the stand-in page round the section: a header the site's height, and a band after it. Mockup only. */
+.mock-head { position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: var(--sp-4); height: var(--header-h); padding-inline: var(--gutter); background: var(--c-bg); border-bottom: 1px solid var(--c-line); }
+.mock-logo { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); letter-spacing: var(--tracking-1); text-transform: uppercase; }
+.mock-tag { color: var(--c-muted); font-size: var(--fs-2); }
+.mock-switch { display: flex; gap: var(--sp-1); margin-left: auto; padding: var(--sp-1); border: 1px solid var(--c-line); border-radius: var(--r-pill); }
+.mock-switch button { padding: var(--sp-1) var(--sp-3); border: 0; border-radius: var(--r-pill); background: none; color: var(--c-muted); font-size: var(--fs-2); font-weight: 600; }
+.mock-switch button[aria-pressed="true"] { background: var(--c-accent); color: var(--c-on-accent); }
+.mock-next { padding-block: var(--sp-8); color: var(--c-muted); text-align: center; }
+@media (max-width: 699px) { .mock-tag { display: none; } }
+</style>
+</head>
+<body>
+<header class="mock-head">
+  <span class="mock-logo">Uplink</span>
+  <span class="mock-tag">Mockup · Home "We grow with you" · option C</span>
+  <div class="mock-switch" role="group" aria-label="Layout">
+    <button type="button" data-v="c" aria-pressed="true">Option C</button>
+    <button type="button" data-v="now" aria-pressed="false">Today</button>
+  </div>
+</header>
+<main>
+<!--SECTION-->
+<section class="section section--band mock-next"><div class="container">The next section (Our work) starts here.</div></section>
+</main>
+<script type="module">
+/*SCRIPT*/
+</script>
+<script>
+// the header switch: option C's CSS on or off, to compare with today's section
+(() => {
+  const sheet = document.getElementById('option-c');
+  const btns = [...document.querySelectorAll('.mock-switch button')];
+  const set = (v) => {
+    sheet.disabled = v !== 'c';
+    btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+    window.dispatchEvent(new Event('resize'));   // grow.js re-pins the tags to the drawing
+  };
+  btns.forEach((b) => b.addEventListener('click', () => set(b.dataset.v)));
+  const v = new URLSearchParams(location.search).get('v');
+  if (v === 'now') set('now');
+})();
+</script>
+</body>
+</html>

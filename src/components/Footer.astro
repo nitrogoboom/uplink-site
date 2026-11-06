@@ -64,7 +64,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 <section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}>
 <div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((s) => (
-    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><span><b>{s.name}</b><Pause /><small>{s.handle}</small></span></a></li>))}</ul>
+    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><b>{s.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
     <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>

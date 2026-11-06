@@ -91,7 +91,6 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-wall-item:hover .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
 .fc-wall-item .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
 .fc-wall-item b { display: block; font-weight: 600; line-height: var(--lh-snug); }
-.fc-wall-item small { display: block; font-size: var(--fs-1); line-height: var(--lh-snug); color: var(--c-muted); }
 .fc-nl { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 30rem; }
 .fc-nl-row { display: flex; gap: var(--sp-2); }
 .fc-nl-row .input { flex: 1; min-width: 0; }
@@ -279,7 +278,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .fc-rows-mode .fc-lead { margin-top: 0; font-size: var(--fs-3); }
   .fc-rows-mode .fc-body { margin-top: var(--sp-4); }
   :root[data-text] .fc-wall { grid-template-columns: minmax(0, 1fr); }   /* bigger text: one card per line */
-  .fc-wall-item > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+  .fc-wall-item b { min-width: 0; overflow-wrap: anywhere; }
 }
 
 @media (--fold) {

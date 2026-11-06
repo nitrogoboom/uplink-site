@@ -96,7 +96,9 @@
 .grow-card[data-beat="build"] .grow-row { opacity: 0.35; }
 .grow-card[data-beat="risk"] .grow-handle { opacity: 0.3; }
 .grow-card[data-beat="fix"] .grow-watch { opacity: 0.45; }
-:root:not(.js) :is(.grow-nav, .grow-play, .grow-tag) { display: none; }
+/* the step list: desktop only, in place of the dots (its look is in the desktop block at the end) */
+.grow-list { display: none; }
+:root:not(.js) :is(.grow-nav, .grow-play, .grow-tag, .grow-list) { display: none; }
 
 /* the drawing's parts: a step's parts drop in and glow; .pre places them at once (first draw, pause) */
 .grow-stage .pc { transition: opacity var(--dur-grow-fade) var(--ease), transform var(--dur-grow-drop) var(--ease); }
@@ -134,13 +136,71 @@
   .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
 }
 
-/* desktop: one screen; heading and card on the left, the player on the right as tall as the screen allows */
+/* desktop: one screen; on the left the heading, the step list and the card, on the right the picture as tall as the
+   screen allows. The list does the dots' job here (as a game's play screen lists its modes beside the big picture),
+   so the dots and arrows go and the picture takes their row. */
 @media (--desktop) {
-  /* the heading at the picture's top, the card level with its bottom (above the controls) */
-  .grow { grid-template-rows: auto 1fr; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-8); align-items: start; }
+  /* the heading at the picture's top, the list in the middle, the card level with the picture's bottom */
+  .grow { grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-8); align-items: start; }
   .grow-head { grid-row: 1; grid-column: 1; }
-  .grow-cards { grid-row: 2; grid-column: 1; align-self: end; margin-block: 0 calc(var(--tap) + var(--sp-2)); }
+  .grow-list { grid-row: 2; grid-column: 1; align-self: center; display: grid; gap: var(--sp-1); margin-bottom: var(--sp-6); list-style: none; }
+  .grow-cards { grid-row: 3; grid-column: 1; align-self: end; margin-block: 0; }
   .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
-  .grow-player { grid-row: 1 / 3; grid-column: 2; }
-  .grow-stage { width: auto; height: min(calc(var(--fold-inner, var(--fold-h)) - var(--tap) - var(--sp-2)), var(--grow-stage-max)); }   /* under 700 tall (no fold): the screen */
+  .grow-player { grid-row: 1 / 4; grid-column: 2; }
+  .grow-nav { display: none; }
+  .grow-stage { width: auto; height: min(var(--fold-inner, var(--fold-h)), var(--grow-stage-max)); }   /* under 700 tall (no fold): the screen */
+
+  /* a row: the step's number in a tile, the place, the team size; a button at least --tap tall. The same three
+     states as the dots: the open step lit, the ones already built a dimmer amber, the ones to come grey. */
+  .grow-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--sp-4);
+    width: 100%;
+    min-height: var(--tap);
+    padding: var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-1);   /* the tile sits close to the edge, as a tag's icon */
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: var(--r-2);
+    background: none;
+    color: var(--c-muted);
+    text-align: left;
+    transition: background-color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+  }
+  .grow-item-n {
+    display: grid;
+    place-items: center;
+    width: calc(var(--tap) - var(--sp-2));
+    aspect-ratio: 1;
+    border-radius: var(--r-1);
+    background: var(--c-surface-2);
+    font-family: var(--font-display);
+    font-size: var(--fs-4);
+    font-style: italic;
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+  }
+  .grow-item-t { font-family: var(--font-display); font-size: var(--fs-5); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
+  .grow-item-m { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-tight); text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  /* built already: dimmed amber. 0.7, not lower: the small team text keeps 4.5:1 */
+  .grow-item.is-done { color: var(--c-accent-text); }
+  .grow-item.is-done .grow-item-n { background: var(--c-accent-tint); }
+  .grow-item.is-done :is(.grow-item-t, .grow-item-m) { opacity: 0.7; }
+  /* the open step: an even amber border and a filled tile */
+  .grow-item[aria-pressed="true"] { border-color: var(--c-accent); background: var(--c-accent-faint); color: var(--c-text); }
+  .grow-item[aria-pressed="true"] .grow-item-n { background: var(--c-accent); color: var(--c-on-accent); }
+  .grow-item[aria-pressed="true"] .grow-item-m { color: var(--c-accent-text); }
+  @media (hover: hover) { .grow-item:not([aria-pressed="true"]):hover { background: var(--c-surface); color: var(--c-text); } }
+  /* while the story plays, the open row's foot fills over the step's time (grow.js sets --grow-dwell and .is-timing) */
+  .grow-item::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--c-accent); transform: scaleX(0); transform-origin: left; }
+  .grow-item.is-timing::after { animation: grow-item-fill var(--grow-dwell) linear forwards; }
+  .is-idle .grow-item.is-timing::after { animation-play-state: paused; }   /* off screen, as the story's timer waits */
+  @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
+    .grow-item, .grow-item-n { transition: none; }
+    .grow-item.is-timing::after { animation: none; }
+  }
 }
+@keyframes grow-item-fill { to { transform: scaleX(1); } }

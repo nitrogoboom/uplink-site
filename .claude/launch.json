@@ -20,6 +20,12 @@
       "port": 8791
     },
     {
+      "name": "grow-list",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8792", "--bind", "127.0.0.1", "--directory", "editing-room/grow-list"],
+      "port": 8792
+    },
+    {
       "name": "built",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["wrangler", "dev", "--port", "8787"],
