@@ -1,7 +1,7 @@
 // Link check against the built site: every link, picture, script, stylesheet and preload on every page must answer,
 // and a link to a #section must find that id on the page it points to. CI runs it after the site check.
 // usage: npm run verify:links [-- --base URL] [--external]   (--external also asks each outside address; slower, not in CI)
-// Pages: the served sitemap.xml plus /soon and the 404 page (lib.mjs). Fragments on /soon are not checked: that page
+// Pages: every built page (dist/), the 404 page's links included, after checking the served sitemap.xml lists them (lib.mjs). Fragments on /soon are not checked: that page
 // reads the #address itself (soon.js) to say which page isn't built yet. Fails on any broken address.
 // The HTML is parsed by the browser's own parser (DOMParser), so no page script runs and nothing is loaded.
 import { test } from '@playwright/test';
@@ -30,11 +30,11 @@ const PARSE = (html) => {
   return { refs, ids };
 };
 
-// [status, body or null]. The 404 page's own address answers 404 on purpose; its body still counts.
-async function fetchPage(url) {
+// [status, body or null]. The 404 page's own address answers 404 on purpose (missing: true); its body still counts.
+async function fetchPage(url, missing = false) {
   try {
     const r = await get(url);
-    if (!r.ok) return [r.status, null];
+    if (!r.ok && !(missing && r.status === 404)) return [r.status, null];
     return [r.status, (r.headers.get('content-type') || '').includes('html') ? await r.text() : null];
   } catch (e) {
     return [String(e.cause?.message || e.message).slice(0, 80), null]; // DNS, refused, timeout
@@ -51,9 +51,9 @@ test('links answer', async ({ page }) => {
   const ids = new Map(); // page path -> its ids
   const fails = [];
   for (const path of await pages(BASE)) {
-    const [status, body] = await fetchPage(BASE + path);
+    const [status, body] = await fetchPage(BASE + path, path.endsWith(MISSING));
     if (body === null) {
-      if (!path.endsWith(MISSING)) fails.push(`${path}: the page itself answered ${status}`);
+      fails.push(`${path}: the page itself answered ${status}${path.endsWith(MISSING) ? ' (the 404 page should answer 404, as HTML)' : ''}`);
       continue;
     }
     const p = await page.evaluate(PARSE, body);
@@ -62,8 +62,10 @@ test('links answer', async ({ page }) => {
       if (/^(mailto|tel|data|javascript):/.test(ref)) continue;
       const full = new URL(ref, BASE + path);
       const url = strip(full);
-      if (!found.has(url)) found.set(url, new Set());
-      found.get(url).add(path);
+      // the 404 page's own address (its skip link's #main): fetched above, and answering 404 is its job
+      const self = path.endsWith(MISSING) && url === strip(BASE + path);
+      if (!self && !found.has(url)) found.set(url, new Set());
+      if (!self) found.get(url).add(path);
       const frag = full.hash.slice(1);
       if (frag && full.host === host) {
         const k = url + '#' + frag;
