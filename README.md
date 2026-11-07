@@ -28,7 +28,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 You need the following:
 
 - Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
-- For the drawing tools only: Python 3.12. The site's checks, and CI, need only Node.
+- For the drawing tools only: Python 3.12 or later. The site's checks need only Node.
 
 ## Run the site locally
 
@@ -81,6 +81,12 @@ python -m playwright install chromium
 ```
 
 Python's Chromium is used only by `gen_og.py`, which screenshots the share picture.
+
+`requirements.txt` is locked: every package, the ones they need included, at one version with its hashes, so `pip` installs exactly what CI installs. You change `requirements.in` and then lock it again:
+
+```bash
+uv pip compile requirements.in --universal --python-version 3.12 --generate-hashes -o requirements.txt
+```
 
 ## Commands
 
@@ -188,12 +194,20 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | Tool | What it writes |
 | --- | --- |
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
-| `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
+| `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
 | `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
-A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.
+A generator that runs with nothing changed writes the same file, byte for byte, on any machine. A `git diff` shows only what you changed.
+
+To run every generator at once (all but `gen_og.py`, whose screenshots depend on the machine):
+
+```bash
+python tools/regen.py
+```
+
+CI's `drawings` job does the same on every pull request and push, and fails when `git diff` then shows any drawing: a hand edit, or a script changed without its output committed.
 
 **Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels. Its settings are `COMPACT` in each generator. Pages swap it in with `<picture>` where the drawing shows small: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`, which is the phone cut with its labels and their embedded letters removed (`isogen.card()`), at about half the size. On phones, the Home hero plays `office-compact-build.svg`. Its build starts part way, on the furnished room (`PHONE_AHEAD` in `gen_office.py`). With reduced motion, it stands still. Without script, phones show the same scene as a picture, `hero-office-phone.svg`.
 
@@ -205,7 +219,7 @@ When you change a drawing's labels or layout, check its phone cut too.
 | --- | --- |
 | `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `DESIGN.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
 | `iso.py` | The projection, `W(ox, oy, u)`. |
-| `isogen.py` | Writing a drawing: the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a subline wraps it), the card cut (`card()`), and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
+| `isogen.py` | Writing a drawing: boxes (`box()`, the one box writer, which can log each box to the generator's `BOXES`), the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a title or subline wraps it) and the floor gaps round their words (`label_text_gaps()`), the card cut (`card()`), `esc()` for any words written into a drawing, and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
 | `isoprops.py` | Shared props: office chair, monitor on a stand (with `screen_glass` and `app_window` for its screen), and VoIP desk phone. Also `on_front`, `on_side`, and `on_top`, which draw flat details exactly on a box face. Props sit on a grid (x and y in steps of 0.25, z in steps of 0.125) so their parts can never nearly touch. Keep the scene around them on the same grid. |
 | `hero_cloud.py` | The hero's cloud. |
 | `svgfont.py` | Embeds the Barlow letters a drawing uses. An SVG loaded with `<img>` can't see the page's fonts, so each drawing carries its own subset. The generators do this for you. The fonts are in `tools/fonts/` (SIL Open Font License). Needs `fonttools` and `brotli`. |
@@ -226,6 +240,9 @@ After you change a drawing, run both checks on it. Each exits with status 1 on a
   python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
   python tools/check.py src/components/home/grow-world.svg
   ```
+
+- **Every check at once:** `python tools/regen.py --check` regenerates the drawings, then runs every command the rules files list. `--checks-only` skips the generators.
+- **The tools' own tests:** `python -m pytest tools/tests`. They cover the projection, the palette, `isogen`, `check.py` on small hand-made drawings, and depth order straight from each generator's `BOXES` (the check `painter.py` does on the SVG).
 
 ### Site checks
 
@@ -286,11 +303,12 @@ The Workers logs keep the Worker's own lines, one per report, for 3 days on the 
 
 GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
-- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), the link check (`npm run verify:links`), and the smoke check (`npm run smoke`) against the built site served by `wrangler dev`. It needs no Python. Playwright's Chromium is cached between runs, keyed on the `@playwright/test` version in `package-lock.json`.
+- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), the link check (`npm run verify:links`), and the smoke check (`npm run smoke`) against the built site served by `wrangler dev`. Playwright's Chromium is cached between runs, keyed on the `@playwright/test` version in `package-lock.json`.
+- Beside it, the `drawings` job installs the locked `requirements.txt` on Python 3.12, regenerates every drawing (`python tools/regen.py`) and fails if `git diff` then shows any, then runs the tools' tests and every drawing check (`python tools/regen.py --checks-only`). It runs alongside the build job, which takes longer, so it adds no time to a run. A failure there stops the deploy.
 - Every run also lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. Each pull request also gets a dependency review (`actions/dependency-review-action`), which fails on a new high-severity vulnerability. It runs only while the repository is public (it went public on November 7, 2026); on a private repository it needs GitHub Advanced Security.
 - Every step runs in `bash` with `pipefail`, and every job has a time limit (`timeout-minutes`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
-- A push to `main` that passes the build job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
+- A push to `main` that passes the build job, the drawings job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
 
