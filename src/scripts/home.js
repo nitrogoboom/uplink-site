@@ -368,14 +368,14 @@ if (stage) {
     added.forEach((n) => n.remove());
     added = [];
   };
-  // a drawing that can't load (offline, blocked): the still office the page shows without script (its <noscript>
-  // picture) stands in, and the dashes' layer and the pause button go, so no beams hang over an empty stage. The
-  // next change of cut tries again.
-  const still = $('noscript', stage);
+  // a drawing that can't load (offline, blocked): the still office the page shows without script (the same picture
+  // as its <noscript>, cloned from a <template>, so no text is turned into HTML) stands in, and the dashes' layer and
+  // the pause button go, so no beams hang over an empty stage. The next change of cut tries again.
+  const still = $('template.hero-still', stage);
   const failed = (on) => {
     $$('svg.ob-over', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
     $$('.hero-pause', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
-    if (on && still) { stage.insertAdjacentHTML('afterbegin', html(still.textContent)); added = [stage.firstElementChild]; }
+    if (on && still) { const pic = still.content.firstElementChild.cloneNode(true); stage.prepend(pic); added = [pic]; }
   };
   const load = () => {
     const cut = phone.matches ? 'phone' : (tablet.matches ? 'tablet' : 'full');
