@@ -26,7 +26,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [x] **Response headers, outside scan** (November 5, 2026). Mozilla Observatory on the live `workers.dev` address: **A+, 130, 12/12 tests passed**. Rerun on the real domain.
 - [ ] **(domain)** SSL Labs (ssllabs.com/ssltest) on the real domain: aim for A or A+. Also run securityheaders.com once.
 - [x] **Dependencies** (November 5, 2026). `npm audit --omit=dev`: 0 vulnerabilities in anything the site ships. The full tree shows 11 moderate, all one advisory in `minimatch` under ESLint (dev only, never deployed). Dependabot will bring the fix; nothing to do by hand.
-- [x] GitHub code scanning (CodeQL): skipped on purpose (November 5, 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public.
+- [x] GitHub code scanning (CodeQL): skipped on purpose (November 5, 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public. **It went public on November 7, 2026: CodeQL is now free; see `notes.md`.**
 - [ ] **(you)** Protect `main`, 2FA on Cloudflare, a scoped API token, secret owners and rotation dates (`notes.md`, "Production readiness").
 - [ ] **(domain)** Domain hardening at the registrar and in DNS:
   - registrar lock, auto-renew, 2FA on the registrar account

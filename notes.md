@@ -8,7 +8,8 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
 
 Get main green first:
-- [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Left for now (owner, November 6, 2026): CI is the gate, as `deploy` runs only after `build` passes. Revisit with GitHub Pro.
+- [ ] Protect `main`: now possible. The repository went public on November 7, 2026, and GitHub offers rulesets and environment branch limits free on public repositories. Owner steps: Settings > Rules > Rulesets: require a pull request and the `build` check on `main`; block force pushes. Then the H5 environment split (`docs/review-2026-11-07.md`).
+- [ ] Public repository (November 7, 2026): turn on secret scanning, push protection and private vulnerability reporting (Settings > Code security), and consider CodeQL (free on public repositories). Private vulnerability reporting gives `SECURITY.md` a working contact until the real inbox exists.
 
 Quick, visible:
 - [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
