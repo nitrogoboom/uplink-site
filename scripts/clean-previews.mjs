@@ -5,8 +5,7 @@
 //   - any version that is or was deployed (the live site and every rollback target), and
 //   - the newest preview of a branch with an open pull request (its preview address keeps working).
 // Run by .github/workflows/clean-previews.yml (every 3 days, and by hand). Dry run unless DRY_RUN=false.
-// Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID (an API token: Cloudflare refuses the delete with a wrangler
-// login), OPEN_BRANCHES (file: one open pull request branch a line), KEEP_DAYS (3), ONLY_ALIAS (one alias only),
+// Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, OPEN_BRANCHES (file: one open pull request branch a line), KEEP_DAYS (3), ONLY_ALIAS (one alias only),
 // DRY_RUN ('false' to delete), GITHUB_STEP_SUMMARY (optional: the list goes there too).
 import { appendFileSync, readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -45,8 +44,9 @@ async function main() {
     console.log('No Cloudflare secrets: nothing to clean (skipped).');
     return;
   }
-  const api = async (method, path) => {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/scripts/${WORKER}${path}`, {
+  // the delete lives only under the newer /workers/workers/ path: the /workers/scripts/ one answers 405 (error 10405)
+  const api = async (method, path, base = 'scripts') => {
+    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/${base}/${WORKER}${path}`, {
       method,
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -77,7 +77,7 @@ async function main() {
   for (const g of gone) {
     let result = 'would delete';
     if (!dry) {
-      const { status, body } = await api('DELETE', `/versions/${g.id}`);
+      const { status, body } = await api('DELETE', `/versions/${g.id}`, 'workers');
       result = status === 200 ? 'deleted' : `failed: ${status} ${JSON.stringify(body.errors)}`;
       if (status !== 200) failed++;
     }

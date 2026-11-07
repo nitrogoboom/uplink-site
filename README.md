@@ -336,7 +336,7 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
 The run's summary in the Actions tab lists each preview and what happened to it.
 
-> **Note:** The delete needs the API token in the `cloudflare` environment. Cloudflare refuses it with a `wrangler login` (error 10405), so `scripts/clean-previews.mjs` can only list from your computer.
+> **Note:** The script deletes through Cloudflare's `/workers/workers/WORKER/versions/VERSION_ID` path. The older `/workers/scripts/` path lists versions but refuses a delete (error 10405).
 
 ### Repository rules
 
