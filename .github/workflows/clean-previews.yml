@@ -25,7 +25,7 @@ on:
         type: number
         default: 3
   pull_request:
-    paths: ['.github/workflows/clean-previews.yml', 'scripts/clean-previews.mjs']
+    paths: ['.github/workflows/clean-previews.yml', 'scripts/clean-previews.mjs', 'scripts/preview-alias.mjs']
 
 permissions:
   contents: read

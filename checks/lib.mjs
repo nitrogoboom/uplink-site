@@ -1,15 +1,19 @@
 // What the checks share: their command-line arguments, the pages and screen sizes, a fetch that names itself, and a
 // watcher for script errors.
-// pages(base): every address in the served sitemap.xml ('/' for home), then /soon and an address that gets the 404
-// page. Throws if the sitemap lists fewer than five pages, so a broken sitemap can't pass a check by leaving pages out.
+// pages(base): every page the build wrote (dist/**/*.html, or --dist DIR), as addresses ('/' for home, /soon, and an
+// address that gets the 404 page in place of /404). It also reads the served sitemap.xml and throws unless it lists
+// exactly the built pages other than /soon and the 404, so a page can't drop out of the sitemap, or out of the checks,
+// unnoticed.
 // SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (site, spacing and text checks).
+import { existsSync, readdirSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
 // scripts/check.mjs passes its arguments here, as JSON: `npm run verify:text -- --text 1` gives ['--text', '1']
 export const ARGS = JSON.parse(process.env.CHECK_ARGS || '[]');
-const VALUED = new Set(['--base', '--out', '--text', '--only', '--min', '--old']); // options that take a value
+const VALUED = new Set(['--base', '--out', '--text', '--only', '--min', '--old', '--dist']); // options that take a value
 export const flag = (name) => ARGS.includes(name);
 export const option = (name, fallback) => (ARGS.includes(name) ? ARGS[ARGS.indexOf(name) + 1] : fallback);
 export const positional = ARGS.filter((a, i) => !a.startsWith('--') && !VALUED.has(ARGS[i - 1]));
@@ -28,11 +32,33 @@ export const SIZES = [
 export const get = (url, init = {}) =>
   fetch(url, { ...init, headers: { ...UA, ...init.headers }, signal: AbortSignal.timeout(30_000) });
 
+export const DIST = join(ROOT, option('--dist', 'dist'));
+const NOT_IN_SITEMAP = ['/soon', '/404']; // soon is noindex; the 404 page is served at any missing address
+
+// the built pages' addresses: dist/index.html -> '/', dist/services/backup.html -> '/services/backup'
+export function builtPages(dir = DIST) {
+  if (!existsSync(join(dir, 'index.html'))) throw new Error(`no built site in ${dir}: run npm run build first (or pass --dist DIR)`);
+  const out = [];
+  const walk = (d) => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      if (e.isDirectory()) walk(join(d, e.name));
+      else if (e.name.endsWith('.html')) out.push('/' + relative(dir, join(d, e.name)).split(sep).join('/').replace(/(^|\/)index\.html$/, '').replace(/\.html$/, ''));
+    }
+  };
+  walk(dir);
+  return out.sort();
+}
+
 export async function pages(base) {
+  const built = builtPages();
   const sitemap = await (await get(base + '/sitemap.xml')).text();
-  const found = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(/^https?:\/\/[^/]+/, '') || '/');
-  if (found.length < 5) throw new Error(`sitemap.xml lists ${found.length} page(s): expected at least the five static pages`);
-  return [...found, '/soon', '/' + MISSING];
+  const listed = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].replace(/^https?:\/\/[^/]+/, '') || '/');
+  const want = built.filter((p) => !NOT_IN_SITEMAP.includes(p));
+  const missing = want.filter((p) => !listed.includes(p));
+  const extra = listed.filter((p) => !want.includes(p));
+  if (missing.length || extra.length)
+    throw new Error(`sitemap.xml at ${base} doesn't match the build (${DIST}): ${[...missing.map((p) => `${p} not listed`), ...extra.map((p) => `${p} listed but not built`)].join(', ')}`);
+  return [...listed, ...NOT_IN_SITEMAP.filter((p) => built.includes(p)).map((p) => (p === '/404' ? '/' + MISSING : p))];
 }
 
 // Chromium reports a CSP or Trusted Types block as a console error, and a script crash as a page error

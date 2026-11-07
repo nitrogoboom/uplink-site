@@ -3,6 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { aliasOf, pick } from '../clean-previews.mjs';
+import { previewAlias } from '../preview-alias.mjs';
 
 const DAY = 86400000;
 const now = Date.parse('2026-11-10T00:00:00Z');
@@ -24,7 +25,8 @@ const versions = [
 test('aliasOf matches the alias site.yml gives a branch', () => {
   assert.equal(aliasOf('claude/wizardly-curran-beef14'), 'claude-wizardly-curran-beef14');
   assert.equal(aliasOf('Feature/__Big  Change__'), 'feature-big-change');
-  assert.equal(aliasOf('claude/a-very-long-branch-name-that-goes-on'), 'claude-a-very-long-branch-name');
+  assert.equal(aliasOf('claude/a-very-long-branch-name-that-goes-on'), previewAlias('claude/a-very-long-branch-name-that-goes-on'));
+  assert.ok(aliasOf('claude/a-very-long-branch-name-that-goes-on').length <= 30);
 });
 
 test('old previews go; deployed, recent, unaliased and open newest stay', () => {

@@ -13,15 +13,9 @@ import { pathToFileURL } from 'node:url';
 
 const WORKER = 'uplink-site';
 
-// the alias site.yml gives a branch: lowercased, other characters to '-', repeats and end dashes dropped, 30 long
-export const aliasOf = (branch) =>
-  branch
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 30)
-    .replace(/-$/, '');
+// the same alias site.yml's preview job gives a branch
+import { previewAlias as aliasOf } from './preview-alias.mjs';
+export { aliasOf };
 
 // what to delete, from the versions (newest first, as Cloudflare lists them), the deployed version ids, the aliases
 // of open pull requests and the cut-off time (ms). Pure, so the test can run it.
