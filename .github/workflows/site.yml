@@ -122,7 +122,7 @@ jobs:
           exit 1
 
   deploy:
-    needs: build
+    needs: [build, workflows] # a high zizmor finding on main stops the deploy too
     if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -138,8 +138,9 @@ jobs:
         with:
           node-version-file: .node-version
           cache: npm
-      # wrangler and everything under it exactly as package-lock.json has them (install scripts only those allowed
-      # in package.json); the token is handed to the wrangler step alone
+      # wrangler and everything under it exactly as package-lock.json has them; the token is handed to the wrangler
+      # step alone. Install scripts: npm 11 (Node 24) runs them all and warns about any not in package.json's
+      # allowScripts; npm 12 runs only those
       - run: npm ci
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
@@ -213,9 +214,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }} # its online audits (known-vulnerable actions, moved tags) read public repositories
 
-  # a pull request's new or changed dependencies: known vulnerabilities (high and above) fail it. GitHub offers this on
-  # public repositories only (a private one needs GitHub Advanced Security, which a personal account can't have), so it
-  # is skipped while this one is private and starts on its own if it goes public
+  # a pull request's new or changed dependencies: known vulnerabilities (high and above) fail it. The repository is
+  # public (since November 7, 2026), where GitHub offers this; a private one needs GitHub Advanced Security, so the job
+  # skips itself if the repository goes private again
   dependency-review:
     if: github.event_name == 'pull_request' && !github.event.repository.private
     runs-on: ubuntu-latest
