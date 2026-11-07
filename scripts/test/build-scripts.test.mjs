@@ -249,3 +249,15 @@ test('svgo.mjs: shrinks every drawing, the campus map too, and stops the build o
   try { assert.match(fails('svgo.mjs', bad), /assets\/img\/hero\.svg: its <style> styles <polygon>/); }
   finally { rmSync(bad, { recursive: true }); }
 });
+
+// footer.css gives every polygon of the campus map its edge by class (the tag is gone once SVGO has run): a polygon
+// whose class isn't in that rule's list would lose its edge, as the map's marker did once
+test("footer.css: the campus map's edge rule names a class of every polygon the map draws", () => {
+  const css = readFileSync('src/styles/footer.css', 'utf-8');
+  const listed = css.match(/\.fc-w :where\(([^)]*)\) \{ stroke:/)[1].split(',').map((c) => c.trim().slice(1));
+  const svg = readFileSync('public/assets/img/campus.svg', 'utf-8');
+  const polygons = [...svg.matchAll(/<polygon\b[^>]*>/g)].map((m) => m[0].match(/class="([^"]*)"/)?.[1] ?? '');
+  assert.ok(polygons.length > 100, 'the map has its polygons');
+  const missed = [...new Set(polygons.filter((c) => !c.split(' ').some((k) => listed.includes(k))))];
+  assert.deepEqual(missed, [], `polygon classes with no edge rule (listed: ${listed.join(', ')})`);
+});
