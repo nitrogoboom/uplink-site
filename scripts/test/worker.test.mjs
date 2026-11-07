@@ -181,16 +181,32 @@ test('[null], [1] and ["x"] as a Reporting API post: nothing to log, no crash', 
   }
 });
 
-test('any other error inside the Worker falls back to the static assets', async () => {
-  const env = {
-    REPORTS: { limit: async () => { throw new Error('rate limit binding down'); } },
-    ASSETS: { fetch: async () => new Response('from the assets', { status: 404 }) },
+// like workerd's: a request whose body has been read can't be passed on ("Cannot reconstruct a Request with a used body")
+const assets = (first = null) => {
+  let calls = 0;
+  return {
+    fetch: async (req) => {
+      if (req.bodyUsed) throw new TypeError('Cannot reconstruct a Request with a used body');
+      if (calls++ === 0 && first) throw first;
+      return new Response('from the assets', { status: 200 });
+    },
   };
+};
+const quiet = async (fn) => {
   const err = console.error;
   console.error = () => {};
-  try {
-    const [res] = await call(post('application/json', { kind: 'error', page: '/', message: 'x' }), env);
-    assert.equal(res.status, 404);
-    assert.equal(await res.text(), 'from the assets');
-  } finally { console.error = err; }
+  try { return await fn(); } finally { console.error = err; }
+};
+
+test('an error after a report was read answers 503, not stored, instead of passing a used body on', async () => {
+  const env = { REPORTS: { limit: async () => { throw new Error('rate limit binding down'); } }, ASSETS: assets() };
+  const [res] = await quiet(() => call(post('application/json', { kind: 'error', page: '/', message: 'x' }), env));
+  assert.equal(res.status, 503);
+  assert.equal(res.headers.get('Cache-Control'), 'no-store');
+});
+
+test('any other error inside the Worker falls back to the static assets', async () => {
+  const res = await quiet(() => worker.fetch(new Request('https://example.test/404'), { ASSETS: assets(new Error('first try fails')) }));
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), 'from the assets');
 });

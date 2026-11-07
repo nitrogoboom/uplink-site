@@ -143,13 +143,17 @@ async function route(request, env) {
 }
 
 // The Worker sees every request, so a throw anywhere would be Cloudflare's error page instead of the site: anything
-// unexpected is logged and the request goes on to the static assets as if the Worker weren't there.
+// unexpected is logged and the request goes on to the static assets as if the Worker weren't there. Not an /api/
+// request, nor one whose body has been read: the assets have nothing for it, and a used body can't be passed on
+// (workerd throws "Cannot reconstruct a Request with a used body"), so that gets a plain 503.
 export default {
   async fetch(request, env) {
     try {
       return await route(request, env);
     } catch (e) {
-      console.error(JSON.stringify({ worker_error: cut(e?.message) ?? 'unknown', path: cut(new URL(request.url).pathname) }));
+      const path = new URL(request.url).pathname;
+      console.error(JSON.stringify({ worker_error: cut(e?.message) ?? 'unknown', path: cut(path) }));
+      if (path.startsWith('/api/') || request.bodyUsed) return new Response(null, { status: 503, headers: { 'Cache-Control': 'no-store' } });
       return env.ASSETS.fetch(request);
     }
   },

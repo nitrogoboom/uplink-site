@@ -268,7 +268,7 @@ The site runs on Cloudflare Workers with static assets.
 - Answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
 - Gives `/404` itself a 404 status.
 
-Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied. A report it can't read gets a `400`, and anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
+Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied. A report it can't read gets a `400`, and anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead (`Cache-Control: no-store`), as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
 
 > **Note:** Every request counts against the free plan's 100,000 Worker requests a day. At launch, turn on Always Use HTTPS on the real domain's zone and set `run_worker_first` back to `["/api/*", "/404"]`. The steps are in [`docs/launch-runbook.md`](docs/launch-runbook.md).
 
