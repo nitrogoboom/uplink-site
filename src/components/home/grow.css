@@ -76,14 +76,14 @@
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
    the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */
 .grow-nav { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); }
-.grow-step-btn:disabled { opacity: 0.4; cursor: default; }
-.grow-step-btn:disabled:hover { background: transparent; color: var(--c-muted); }
+.grow-step-btn[aria-disabled="true"] { opacity: 0.4; cursor: default; }   /* at an end; not disabled, so focus stays on it */
+.grow-step-btn[aria-disabled="true"]:hover { background: transparent; color: var(--c-muted); }
 .grow-dots { display: flex; align-items: center; }
 .grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-3); border: 0; border-radius: var(--r-2); background: none; }
 /* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
    amber, dimmed */
 .grow-dot.is-done .pip { background: var(--c-accent); opacity: 0.45; }
-@media (hover: hover) { .grow-dot:not([aria-pressed="true"]):hover .pip { opacity: 1; } }
+@media (hover: hover) { .grow-dot:not([aria-current="step"]):hover .pip { opacity: 1; } }
 
 /* the cards: every step's card in a list without script; with it (.is-live) only the open one */
 .grow-cards { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); list-style: none; }
@@ -194,14 +194,14 @@
   .grow-item.is-done .grow-item-n { background: var(--c-accent-tint); }
   .grow-item.is-done :is(.grow-item-t, .grow-item-m) { opacity: 0.7; }
   /* the open step: an even amber border and a filled tile */
-  .grow-item[aria-pressed="true"] { border-color: var(--c-accent); background: var(--c-accent-faint); color: var(--c-text); }
-  .grow-item[aria-pressed="true"] .grow-item-n { background: var(--c-accent); color: var(--c-on-accent); }
-  .grow-item[aria-pressed="true"] .grow-item-m { color: var(--c-accent-text); }
-  @media (hover: hover) { .grow-item:not([aria-pressed="true"]):hover { background: var(--c-surface); color: var(--c-text); } }
+  .grow-item[aria-current="step"] { border-color: var(--c-accent); background: var(--c-accent-faint); color: var(--c-text); }
+  .grow-item[aria-current="step"] .grow-item-n { background: var(--c-accent); color: var(--c-on-accent); }
+  .grow-item[aria-current="step"] .grow-item-m { color: var(--c-accent-text); }
+  @media (hover: hover) { .grow-item:not([aria-current="step"]):hover { background: var(--c-surface); color: var(--c-text); } }
   /* while the story plays, the open row's foot fills over the step's time (grow.js sets --grow-dwell and .is-timing) */
   .grow-item::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--c-accent); transform: scaleX(0); transform-origin: left; }
-  .grow-item.is-timing::after { animation: grow-item-fill var(--grow-dwell) linear forwards; }
-  .is-idle .grow-item.is-timing::after { animation-play-state: paused; }   /* off screen, as the story's timer waits */
+  .grow-item.is-timing::after { animation: grow-item-fill var(--grow-dwell) linear var(--grow-at, 0ms) forwards; }   /* --grow-at: the time the step has played */
+  .is-idle .grow-item.is-timing::after, .grow-item.is-timing.is-waiting::after { animation-play-state: paused; }   /* off screen or paused, as the step's clock holds */
   @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
     .grow-item, .grow-item-n { transition: none; }
     .grow-item.is-timing::after { animation: none; }

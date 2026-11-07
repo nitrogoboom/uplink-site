@@ -19,6 +19,9 @@
 // anything serious or critical from axe, or a sitemap that doesn't list exactly the built pages.
 // Known failures are marked test.fail with the review item that fixes them (KNOWN, below): such a test fails the run
 // once the bug is fixed, as a reminder to drop the mark.
+// At the end, one test for each bug the November 7, 2026 review found and batch 2b fixed, named by its item (B2 …), so
+// it can't come back unseen: Grow's timing and frames, pop-ups and focus, forms, drawings that fail to load, the font
+// swap, print, and the drawings' ?v= addresses.
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): the footer tabs at 1440, and Home and /soon at each size.
 import { mkdirSync } from 'node:fs';
@@ -60,7 +63,7 @@ test('index 1440: hero, Grow, footer tabs', async ({ browser }) => {
   await pg.waitForTimeout(6000);
   const probe = () => {
     const pcs = [...document.querySelectorAll('#grow .pc')];
-    const on = document.querySelector('#grow .grow-dot[aria-pressed="true"]');
+    const on = document.querySelector('#grow .grow-dot[aria-current="step"]');
     return { built: pcs.filter((p) => !p.classList.contains('hide')).length, total: pcs.length, step: on ? Number(on.dataset.i) : -1 };
   };
   let g = await pg.evaluate(probe);
@@ -399,3 +402,180 @@ for (const page of PAGES) {
     });
   }
 }
+
+// Behaviour the review's quick bugs (batch 2b, docs/review-2026-11-07.md) broke, one test each, on Home unless named.
+// Each test counts the frames the page's scripts ask for (requestAnimationFrame, wrapped before the page loads),
+// reads Grow's open step from its card (.grow-card.is-on) and its timer from the play ring.
+const frames = () => {
+  window.__frames = 0;
+  const raf = window.requestAnimationFrame.bind(window);
+  window.requestAnimationFrame = (cb) => {
+    window.__frames++;
+    return raf(cb);
+  };
+};
+const framesIn = (q, ms = 1000) =>
+  q.evaluate(async (ms) => {
+    const a = window.__frames;
+    await new Promise((r) => setTimeout(r, ms));
+    return window.__frames - a;
+  }, ms);
+const growStep = (q) => q.evaluate(() => [...document.querySelectorAll('#grow .grow-card')].findIndex((c) => c.classList.contains('is-on')));
+const growLabel = (q) => q.$eval('#grow .grow-play', (b) => b.getAttribute('aria-label'));
+const ringAt = (q) => q.$eval('#grow .grow-ring circle', (c) => getComputedStyle(c).strokeDashoffset);
+const loopsIn = (q, sel) =>
+  q.evaluate(
+    (sel) =>
+      document
+        .getAnimations()
+        .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.(sel))
+        .map((a) => a.animationName || 'animation'),
+    sel,
+  );
+// waits for Grow to open step `i` and says how long that took (ms), or Infinity
+const until = async (q, i, timeout = 9000) => {
+  const t0 = Date.now();
+  const ok = await q.waitForFunction((i) => document.querySelectorAll('#grow .grow-card')[i]?.classList.contains('is-on'), i, { timeout, polling: 50 }).then(() => true, () => false);
+  return ok ? Date.now() - t0 : Infinity;
+};
+const home = async (browser, { w = 1440, h = 900, held = false, init } = {}) => {
+  const ctx = await browser.newContext({ viewport: { width: w, height: h } });
+  await ctx.addInitScript((on) => {
+    try {
+      localStorage.setItem('uplink-held', on ? '1' : '0');
+    } catch {
+      /* no storage: not paused, the default */
+    }
+  }, held);
+  await ctx.addInitScript(frames);
+  if (init) await init(ctx);
+  const q = await ctx.newPage();
+  const errs = [];
+  watch(q, `index ${w} (2b)`, errs);
+  await q.goto(BASE + '/');
+  await q.waitForLoadState('networkidle');
+  return { ctx, q, errs };
+};
+const toGrow = (q) => q.$eval('#grow', (e) => e.scrollIntoView({ block: 'start', behavior: 'instant' }));
+
+// B2, B21: once the story ends it stands still. Its timer ring used to ask for a frame forever (B2: 60 a second, the
+// whole of Home's idle CPU) and its CSS loops and the dome's orbits ran on (B21). Off screen nothing runs either.
+test('Grow: no frames and no loops once the story ends, or off screen (B2, B21)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  await toGrow(q);
+  await until(q, 0);
+  await q.waitForTimeout(1500);
+  await q.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  await q.waitForTimeout(400);
+  const off = await framesIn(q);
+  if (off > 0) fails.push(`Grow off screen (the hero showing): ${off} frames asked for in 1 s`);
+  await toGrow(q);
+  await q.locator('#grow .grow-item').nth(4).click();
+  await q.locator('#grow .grow-play').click();
+  const ended = await q.waitForFunction(() => document.querySelector('#grow .grow-play').getAttribute('aria-label') === 'Play again', null, { timeout: 15000 }).then(() => true, () => false);
+  if (!ended) fails.push(`Grow didn't reach the end of its story (button: ${await growLabel(q)})`);
+  await q.waitForTimeout(500);
+  const end = await framesIn(q);
+  if (end > 0) fails.push(`Grow ended, on screen: ${end} frames asked for in 1 s`);
+  const loops = await loopsIn(q, '#grow');
+  if (loops.length) fails.push(`Grow ended: ${loops.length} loop(s) still running: ${[...new Set(loops)].join(', ')}`);
+  console.log(`grow idle: off screen ${off} frames/s, ended ${end} frames/s, ${loops.length} loops`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// B17: a step paused (the site's pause) or scrolled off screen goes on for what's left of it, not a whole new 4.5 s,
+// and its ring goes on at once; the site's pause, released, leaves Grow paused if you paused it yourself since.
+test('Grow: a held or hidden step resumes where it was; your own pause wins (B17)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  const DWELL = 4500;
+  await toGrow(q);
+  await until(q, 0);
+  // held for 2 s at 1.5 s into step 1
+  await q.waitForTimeout(1500);
+  await q.evaluate(() => document.querySelector('[data-hold]').click());
+  await q.waitForTimeout(2000);
+  const r1 = await ringAt(q);
+  await q.evaluate(() => document.querySelector('[data-hold]').click());
+  await q.waitForTimeout(400);
+  const r2 = await ringAt(q);
+  if (r1 === r2) fails.push(`held and released: the ring stood still (${r1}) after the release`);
+  const rest = 400 + (await until(q, 1));
+  if (rest > DWELL - 800) fails.push(`held at 1.5 s into a step, released: the step ran ${rest} ms more (about ${DWELL - 1500} left)`);
+  // your own pause, under the site's: releasing the site's pause doesn't play it
+  await q.evaluate(() => document.querySelector('[data-hold]').click());
+  await q.locator('#grow .grow-play').click(); // play
+  await q.locator('#grow .grow-play').click(); // pause
+  await q.evaluate(() => document.querySelector('[data-hold]').click());
+  await q.waitForTimeout(600);
+  const label = await growLabel(q);
+  if (label !== 'Play') fails.push(`paused by hand under the site's pause, then the site's pause released: Grow plays (button "${label}")`);
+  // off screen for 2.5 s at 1.5 s into step 3
+  await q.locator('#grow .grow-play').click();
+  const at = await growStep(q);
+  await until(q, at + 1);
+  const t0 = Date.now();
+  await q.waitForTimeout(1500);
+  await q.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+  const shown = Date.now() - t0;
+  await q.waitForTimeout(2500);
+  await toGrow(q);
+  const more = await until(q, at + 2);
+  if (more > DWELL - 700 || shown + more < DWELL - 800) fails.push(`a step scrolled off screen ${shown} ms in, and back: it ran ${more} ms more (${DWELL} ms a step)`);
+  console.log(`grow resume: ${rest} ms after release (ring ${r1} -> ${r2}); own pause kept: ${label}; on screen ${shown}+${more} ms`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// B15: reduced motion switched on mid-visit pauses Grow: no more steps, no frames
+test('Grow: reduced motion switched on mid-visit pauses it (B15)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  await toGrow(q);
+  await until(q, 0);
+  await q.waitForTimeout(1000);
+  await q.emulateMedia({ reducedMotion: 'reduce' });
+  const at = await growStep(q);
+  await q.waitForTimeout(5500);
+  const now = await growStep(q);
+  if (now !== at) fails.push(`reduced motion on at step ${at + 1}: Grow went on to step ${now + 1}`);
+  const n = await framesIn(q);
+  if (n > 0) fails.push(`reduced motion on: ${n} frames asked for in 1 s`);
+  console.log(`grow reduced motion: step ${at + 1} -> ${now + 1}, ${n} frames/s, button "${await growLabel(q)}"`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// B14, M11: at the ends the arrows are aria-disabled, so a keyboard user's focus stays on them (disabled dropped it to
+// <body>); the open step is aria-current="step", not aria-pressed (one of a set, not a toggle)
+test('Grow phone: Next keeps focus at the last step; steps are aria-current (B14, M11)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser, { w: 390, h: 844 });
+  await toGrow(q);
+  await q.waitForTimeout(500);
+  await q.locator('#grow .grow-step-btn').last().focus();
+  for (let i = 0; i < 7; i++) {
+    await q.keyboard.press('Enter');
+    await q.waitForTimeout(150);
+  }
+  const s = await q.evaluate(() => {
+    const a = document.activeElement;
+    return {
+      focus: a === document.body ? 'body' : `${a.tagName.toLowerCase()}.${a.className}`,
+      onNext: a === [...document.querySelectorAll('#grow .grow-step-btn')].pop(),
+      off: a.getAttribute('aria-disabled'),
+      pressed: document.querySelectorAll('#grow [aria-pressed]').length,
+      current: [...document.querySelectorAll('#grow .grow-dot')].map((d) => d.getAttribute('aria-current')),
+    };
+  });
+  if (!s.onNext) fails.push(`Next pressed past the last step: focus went to ${s.focus}`);
+  else if (s.off !== 'true') fails.push(`Next at the last step isn't aria-disabled (${s.off})`);
+  if (s.pressed) fails.push(`${s.pressed} Grow step button(s) use aria-pressed`);
+  if (s.current.filter((c) => c === 'step').length !== 1 || s.current.at(-1) !== 'step')
+    fails.push(`the open step isn't the only aria-current="step" dot: ${JSON.stringify(s.current)}`);
+  console.log(`grow keys: ${JSON.stringify(s)}`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});

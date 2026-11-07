@@ -41,9 +41,9 @@
 @media (--desktop) { .card-row { gap: var(--sp-5); } }   /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the
-   current one is a wide amber pill: .on (set by script), or the dot inside a pressed button. */
+   current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current). */
 .pip { display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
-.pip.on, [aria-pressed="true"] > .pip { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
+.pip.on, [aria-current="step"] > .pip { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .pip { transition: none; } }
 
 /* stat tiles */
