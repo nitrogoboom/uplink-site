@@ -4,6 +4,7 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Review of November 7, 2026
 - [ ] Work through `docs/review-2026-11-07.md` (about 90 verified items, in batches; status lives in that file).
+- [ ] Resume the paused review work (November 7, 2026, evening): three batches wait on `wip/js`, `wip/hosting` and `wip/phase4`. Where each stands and what's next: "Paused" in `docs/review-2026-11-07.md`. Delete each `wip/` branch once its PR merges.
 - [ ] Real Android phone: check the "Fallback Roboto" faces in `src/styles/fonts.css` (review B5, November 7, 2026). Their sizes were measured from Google Fonts' Roboto and checked in Chromium on Linux, which has no Roboto installed, so whether Android's Chrome finds `local('Roboto')` and `local('Roboto Bold')` (its Roboto may be one variable font) is unproven. Load the 404 page on a slow connection and watch for text jumping when Barlow arrives.
 
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
