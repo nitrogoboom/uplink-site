@@ -229,7 +229,8 @@ document.addEventListener('click', (e) => {
   const closer = target.closest('[data-close]');
   if (closer) {
     const dlg = closer.closest('dialog');
-    if (dlg) dlg.close();
+    // closed here, so the button's own command="close" is cancelled (it would find the pop-up shut, and say so)
+    if (dlg) { dlg.close(); e.preventDefault(); }
   }
 });
 

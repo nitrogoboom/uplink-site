@@ -891,6 +891,32 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
   verdict([...fails, ...errs]);
 });
 
+// J8 follow-up: with script, a pop-up's close button (Settings' is also command="close") shuts it once. core.js closes
+// it and cancels the command; the command running after it made Chromium warn "A command attempted to close an
+// already closed Dialog" on every click. No console warning or error from opening and closing either pop-up.
+test('pop-ups: a close button closes once, with nothing in the console (J8)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  const said = [];
+  q.on('console', (m) => { if (m.type() === 'warning' || m.type() === 'error') said.push(`${m.type()}: ${m.text()}`); });
+  for (const [opener, close] of [
+    ['.hbtn-settings', '#settings-dialog .dlg-head .hbtn'],
+    ['.hero [data-open="book-dialog"]', '#book-dialog .dlg-head .hbtn'],
+    ['.hero [data-open="book-dialog"]', '#book-dialog .dlg-actions [data-close]'],
+  ]) {
+    await q.locator(opener).first().click();
+    await q.waitForTimeout(500);
+    await q.locator(close).click();
+    await q.waitForTimeout(300);
+    const open = await q.evaluate(() => [...document.querySelectorAll('dialog')].filter((d) => d.open).map((d) => d.id));
+    if (open.length) fails.push(`${close} left ${open.join(', ')} open`);
+  }
+  for (const s of said) fails.push(`console ${s}`);
+  console.log(`close buttons (J8): ${said.length} console message(s)`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
 // J9: a form error adds its id to the field's aria-describedby and takes only that id away again, so a field's own
 // hint stays linked. No validated field has a hint today, so the check gives Book's email one.
 test('form errors keep a field\'s own hint in aria-describedby (J9)', async ({ browser }) => {
