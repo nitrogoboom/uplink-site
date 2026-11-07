@@ -342,16 +342,17 @@ for (const page of PAGES) {
           rep.push(`services row after a swipe: ${JSON.stringify(c)}`);
           if (c.i < 1 || c.scale < 0.98 || c.art < 0.95) fails.push(`${name}: the services row didn't follow the swipe (the middle card: ${JSON.stringify(c)})`);
         }
-        // with the pause on, nothing loops: Grow and the footer map scrolled in, then every endless animation paused
+        // with the pause on, nothing loops: the hero, Grow and the footer map each counted while on screen (off screen
+        // they idle anyway, so counting only at the end would miss a broken pause)
         if (held && page === 'index') {
-          for (const sel of ['#grow', '#footer']) {
+          for (const sel of ['#top', '#grow', '#footer']) {
             await q.$eval(sel, (e) => e.scrollIntoView());
             await q.waitForTimeout(800);
+            const running = await q.evaluate(() =>
+              document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).map((a) => a.animationName || 'animation'),
+            );
+            if (running.length) fails.push(`${name}: ${running.length} loop(s) still running with the pause on at ${sel}: ${[...new Set(running)].join(', ')}`);
           }
-          const running = await q.evaluate(() =>
-            document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).map((a) => a.animationName || 'animation'),
-          );
-          if (running.length) fails.push(`${name}: ${running.length} loop(s) still running with the pause on: ${[...new Set(running)].join(', ')}`);
         }
         // desktop footer tabs: the panel a tab opens shows (the 404 page has no footer)
         if (w >= 700 && page !== MISSING) {
