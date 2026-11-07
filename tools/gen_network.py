@@ -6,10 +6,9 @@ Grid: everything sits on x, y = multiples of 5 and z = multiples of 2.5 (the iso
 either meet exactly or sit clearly apart.
 """
 import sys
-from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import HIGH, ORANGE, BLUE, faces, ellipse, clip_out, label, doc, write, silhouette, floor_grid, disc_arcs, label_text_gaps
+from isogen import HIGH, ORANGE, BLUE, faces, ellipse, clip_out, label, doc, write, silhouette, floor_grid, disc_arcs, label_text_gaps, ROOMY_PAD
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, app_window
 import palette as pal
 
@@ -88,17 +87,10 @@ def solids():
     return out + [AP, ROD, PLATE]
 
 
-def label_gaps(L):
-    ex, ey = L['elbow']; x = L['x']; ty, sy = ey + 4.5, ey + 19.5
-    if L['anchor'] == 'end':
-        return [box_shape(x - L['tw'] - 5, ty - 18, ex + 4, ty - 1), box_shape(x - L['sw'] - 5, sy - 16, x + 5, sy + 8)]
-    return [box_shape(ex - 4, ty - 18, x + L['tw'] + 5, ty - 1), box_shape(x - 5, sy - 16, x + L['sw'] + 5, sy + 8)]
-
-
 def text_gaps(compact=False):
     if compact:
         return [g for L in COMPACT['labels'] for g in label_text_gaps(L, COMPACT['scale'])]
-    return [g for L in LABELS for g in label_gaps(L)]
+    return [g for L in LABELS for g in label_text_gaps(L, pad=ROOMY_PAD)]   # the full cut keeps more room round its words
 
 
 def floor_mask(compact=False):

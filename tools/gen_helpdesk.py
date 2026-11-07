@@ -6,11 +6,10 @@ Flat details (the chat window, the ticket cards' contents) are drawn in 2D on th
 with an SVG matrix, so they sit exactly in the iso plane.
 """
 import sys
-from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, on_top, rect
-from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs, label_text_gaps
+from isogen import ORANGE, BLUE, INK, faces, label, doc, write, silhouette, floor_grid, disc_arcs, label_text_gaps, ROOMY_PAD
 import palette as pal
 
 w = W(0, 0, 23)                       # inside the group's translate(265.7,200.9)
@@ -70,9 +69,8 @@ def objects():
 
 
 def label_gaps(L):
-    """Floor lines stop around each label's title, subline and level tail (end-anchored text)."""
-    ex, ey = L['elbow']; x = L['x']; ty, sy = ey + 4.5, ey + 19.5
-    return [box_shape(x - L['tw'] - 5, ty - 18, ex + 4, ty - 1), box_shape(x - L['sw'] - 5, sy - 16, x + 5, sy + 8)]
+    """Floor lines stop around each label's title, subline and level tail (end-anchored text), with room to spare."""
+    return label_text_gaps(dict(L, anchor='end'), pad=ROOMY_PAD)
 
 
 def hidden(compact=False):

@@ -14,10 +14,26 @@ ORANGE, BLUE, GREY, INK = pal.AMBER, pal.SKY, pal.GREY, pal.PAGE
 FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 
 
+def box(w, b, cols=FACES, edge=EDGE, classes=('', '', ''), tail='', log=None):
+    """A box as its (left, right, top) face triple, the order painter.py expects. b = (x0, x1, y0, y1, z0, z1).
+    classes: a class per face ('' for none); tail: attributes after the edge's; log: a list b is appended to (a
+    generator's BOXES, which its rules_NAME.py and tools/tests read). Every generator draws its boxes through this,
+    except gen_campus.py, whose faces carry classes only (footer.css colours them)."""
+    if log is not None:
+        log.append(b)
+    return [f'<polygon {f"class={chr(34)}{c}{chr(34)} " if c else ""}points="{pts}" fill="{col}" {edge}{tail}/>'
+            for pts, col, c in zip(w.box(*b), cols, classes)]
+
+
 def faces(w, x0, x1, y0, y1, z0, z1, cols=FACES, extra=''):
-    """A box as its (left, right, top) face triple, the order painter.py expects."""
-    return [f'<polygon points="{pts}" fill="{c}" {EDGE}{extra}/>'
-            for pts, c in zip(w.box(x0, x1, y0, y1, z0, z1), cols)]
+    """box() with the standard edge and extra attributes, for generators that don't keep a BOXES list."""
+    return box(w, (x0, x1, y0, y1, z0, z1), cols, EDGE, tail=extra)
+
+
+def esc(text):
+    """Words for an SVG text node or a double-quoted attribute: &, <, > and " escaped, so a label like 'R&D' can't
+    break the file (an apostrophe is left as it is)."""
+    return html.escape(text, quote=False).replace('"', '&quot;')
 
 
 def iso_ellipse(w, r, x=0, y=0, z=0):
@@ -128,7 +144,7 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
     k = scale
     tail = text_x - 7 * k if anchor == 'start' else text_x + 7 * k
     ty = ey + 4.5 * k if title_y is None else title_y
-    titles = title.split('\n')
+    titles = [esc(t) for t in title.split('\n')]
     sy = ty + 15 * k * len(titles) if sub_y is None else sub_y
     out = [key_group(title, sub) + f'<g class="co lt"><polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tail)},{fmt(ey)}" '
            f'fill="none" stroke="{colour}" stroke-width="{1.2 * k:.3g}" stroke-opacity="0.55"/>'
@@ -136,20 +152,28 @@ def label(dot, elbow, text_x, title, sub, colour=ORANGE, anchor='start', title_y
            *(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(ty + n * 15 * k)}" font-size="{13 * k:.3g}" font-weight="600" letter-spacing="{0.78 * k:.3g}" fill="{colour}" text-anchor="{anchor}">{line}</text>'
              for n, line in enumerate(titles))]
     for n, line in enumerate((sub or '').split('\n') if sub else []):   # a '\n' in sub wraps it (compact cuts)
-        out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{line}</text>')
+        out.append(f'<text class="lt" x="{fmt(text_x)}" y="{fmt(sy + n * 13 * k)}" font-size="{11 * k:.3g}" font-weight="400" fill="{GREY}" text-anchor="{anchor}">{esc(line)}</text>')
     out.append('</g>')
     return out
 
 
-def label_text_gaps(L, k=1.0):
-    """Where floor lines stop around one label drawn by label(): its title, its (maybe wrapped) subline and its
-    level tail. L is a label dict (elbow, x, anchor, sub, and the measured widths tw and sw); k is its scale."""
-    ex, ey = L['elbow']; x = L['x']; ty = ey + 4.5 * k; sy = ty + 15 * k
+TEXT_PAD = ((15, 3), (12, 5))   # label_text_gaps: px kept clear above and below the title, then the subline (above scales)
+ROOMY_PAD = ((18, -1), (16, 8))  # the same for the full cuts of helpdesk and network, which keep more room round their words
+
+
+def label_text_gaps(L, k=1.0, pad=TEXT_PAD):
+    """Where floor lines stop around one label drawn by label(): its (maybe wrapped) title, its (maybe wrapped)
+    subline and its level tail. L is a label dict (elbow, x, anchor, sub, the measured widths tw and sw, and title if
+    it wraps); k is its scale; pad is ((above, below) the title, (above, below) the subline) in px."""
+    ex, ey = L['elbow']; x = L['x']
+    titles = L.get('title', '').count('\n') + 1
+    ty = ey + 4.5 * k; sy = ty + 15 * k * titles          # where label() puts them
     lines = L['sub'].count('\n') + 1
     t0, t1 = (x - L['tw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['tw'] * k + 5)
     s0, s1 = (x - L['sw'] * k - 5, x + 5) if L['anchor'] == 'end' else (x - 5, x + L['sw'] * k + 5)
-    return [box_shape(min(t0, ex - 4), ty - 15 * k, max(t1, ex + 4), ty + 3),
-            box_shape(s0, sy - 12 * k, s1, sy + (lines - 1) * 13 * k + 5)]
+    (ta, tb), (sa, sb) = pad
+    return [box_shape(min(t0, ex - 4), ty - ta * k, max(t1, ex + 4), ty + (titles - 1) * 15 * k + tb),
+            box_shape(s0, sy - sa * k, s1, sy + (lines - 1) * 13 * k + sb)]
 
 
 def doc(title, body, translate=None, view=(640, 480), crop=None):
@@ -158,10 +182,10 @@ def doc(title, body, translate=None, view=(640, 480), crop=None):
     vw, vh = view
     g = f' transform="translate({translate[0]},{translate[1]})"' if translate else ''
     body = '\n'.join(body)
-    box, css = (' '.join(f'{v:g}' for v in crop) if crop else f'0 0 {vw} {vh}'), PLAIN_CSS
+    view_box, css = (' '.join(f'{v:g}' for v in crop) if crop else f'0 0 {vw} {vh}'), PLAIN_CSS
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{box}" width="{vw}" height="{vh}" role="img" aria-label="{title}">',
-        f'<title>{title}</title>',
+        f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{view_box}" width="{vw}" height="{vh}" role="img" aria-label="{esc(title)}">',
+        f'<title>{esc(title)}</title>',
         font_style(body),     # <img> SVGs can't see the page's fonts, so carry the letters they use
         css,
         f'<g{g} font-family="{FONT}" stroke-linecap="round" stroke-linejoin="round">',
@@ -181,6 +205,8 @@ def card(svg):
             if depth == 0:
                 pos = start + t.end()
                 break
+        else:                                  # no closing </g>: stop, rather than find this label again forever
+            raise ValueError(f'card(): the label group at character {start} has no closing </g>')
     svg = ''.join(parts) + svg[pos:]
     svg = svg.replace(PLAIN_CSS + '\n', '').replace(PLAIN_CSS, '')
     return re.sub(r'<style>@font-face.*?</style>', lambda _m: font_style(svg), svg, count=1, flags=re.S)

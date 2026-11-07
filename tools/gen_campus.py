@@ -15,7 +15,7 @@ blink, led, w2, dot, mast, beacon, sig, bob, tk-n, mk-*) and the group order: ba
 """
 import math, pathlib
 from decimal import Decimal, ROUND_HALF_UP
-from isogen import hoist_styles
+from isogen import hoist_styles, esc
 
 C30, U = math.cos(math.pi / 6), 38
 VB0 = (-600, -120, 1200, 860)       # the whole map; each spot's camera zooms into it
@@ -210,7 +210,7 @@ def build():
              '<polygon class="mk-d" points="0,-15 11,0 0,15 -11,0"/><polygon class="mk-i" points="0,-6 4.5,0 0,6 -4.5,0"/></g></g>')
     body, css = hoist_styles('\n'.join(s))
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" class="fc-w" viewBox="{" ".join(map(str, VB0))}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="{TITLE}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" class="fc-w" viewBox="{" ".join(map(str, VB0))}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="{esc(TITLE)}">',
         f'<style>{css}</style>', body, '</svg>', ''])
 
 
