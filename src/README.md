@@ -56,7 +56,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | Component | What it is |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
-| `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` (through `lib/footer.ts`) and the services collection. |
+| `Footer.astro` | The footer: one `<nav aria-label="Footer">` of six `<details name="footer">` sections (the summary is the tile, the rest its panel), the campus map, and the base bar, from `data/footer.json` (through `lib/footer.ts`) and the services collection. CSS lays it out (`styles/footer.css`). |
 | `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
@@ -100,6 +100,8 @@ Each section's desktop layout sits at the end of its own CSS file, so it always 
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
 
+Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`, where `cqi` is 1% of the nearest container's width. A heading whose longest word has 10 letters or more ("Cybersecurity", "Everything") carries the class `fit`, which components add at build time with `fit(text)` from `lib/fit.js` (`TextPage.astro` adds it to the Markdown's `h2`s): its `--fit` is `--fit-long` (14cqi), so a 13-letter word fits on one line. Every other heading gets `--fit-short` (21cqi), which keeps its size step except with big text in a narrow column; `fit(text)` gives a heading whose words all have 6 letters or fewer the class `fit-loose` (30cqi). `h3` follows the same rule. A heading's container must be its own column: the project page's title has a box of its own (`.case-title`), and Contact's form heading measures `.form-head`. A process step puts its title under the number when the step is narrower than 12rem. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing.
+
 ### Breakpoints
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
@@ -123,7 +125,7 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | Script | Where it runs | What it does |
 | --- | --- | --- |
 | `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
-| `footer.js` | Every page, from `Base.astro` | The footer's tiles and panels, and the campus map, which it fetches when the footer scrolls near. Does nothing on a page without the footer (the 404). |
+| `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `work.js` | Our work | The project filters. |

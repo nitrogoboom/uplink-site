@@ -1,42 +1,96 @@
 /*--- Footer (src/components/Footer.astro). ---*/
 /* ---------- footer (hero select) -----------------------------------
-   One full screen on desktop: the stage (section text left, campus map
-   right), the roster dock and the base bar. Each roster tile shows one
-   panel. Without script every panel is shown in a stack. */
+   Six <details name="footer"> (.fc-sec) in one nav: the summary is the
+   tile (.fc-tile), the rest its panel (.fc-panel). The browser opens one
+   at a time; nothing here needs script.
+   - Rows (the base rules): each section a row that opens in place. Phones,
+     and every screen in a browser that can't place a details' panel
+     (no ::details-content: Firefox before 143, Safari before 18.4).
+   - Tiles (tablet and up, with ::details-content, at the end): the
+     details have no box of their own (display: contents), so their
+     summaries and panels sit straight in the .fc-deck grid. The summaries
+     are the tile
+     row; the open panel fills the stage beside the campus map (desktop)
+     or under it (tablet). With nothing open, Contact shows. One full
+     screen on desktop: the stage, the tile row and the base bar. */
 .fc {
   position: relative;
   isolation: isolate;
   display: flex;
   flex-direction: column;
-  border-top: 1px solid var(--c-line);
   background: var(--c-bg);
 }
+.fc-nav { display: flex; flex: 1; flex-direction: column; }
 .fc::before {
   content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  overflow-anchor: none;   /* never the scroll anchor: it doesn't move, so a row anchored to it wouldn't hold (below) */
   background:
     radial-gradient(48% 58% at 70% 46%, var(--c-glow-sky-2), transparent 70%),
     radial-gradient(30% 40% at 4% 18%, var(--c-accent-faint), transparent 70%);
 }
 
-/* stage */
-.fc-stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-5); padding-block: var(--sp-6) var(--sp-5); }
-.fc-panels { display: flex; flex-direction: column; gap: var(--sp-8); min-width: 0; }
-.js .fc-panels { gap: 0; }
-.js .fc-panel:not(.is-on) { display: none; }
-.fc-panel { display: flex; flex-direction: column; min-width: 0; }
-.fc-panel-in { display: contents; }   /* no box of its own here; on phones it is what grows open under a row (below) */
-.js .fc-panel.is-in { animation: fc-in var(--dur-fc-panel) var(--ease); }
-@keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
-.fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
+/* sections as rows: a summary row, and under it the panel when open. Lines only between rows: none along the footer's
+   top, none under the last row (or under its panel when open). The browser's own scroll anchoring keeps a tapped row
+   in place while the one above it shuts. For that its anchor must be a row, the first on screen: the panels and the
+   footer's glow (.fc::before) are never the anchor (overflow-anchor: none), and the details have no box of their own
+   (display: contents), since a details running off the top of the screen would be picked whole. Anchored to any of
+   those, it would hold nothing still, and the tapped row would jump up by the shut panel's height, off the top of the
+   screen if that panel was tall. */
+.fc-deck { flex: 1; padding-block: var(--sp-4) var(--sp-6); }
+/* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile, so it never widens the page */
+.fc-tile {
+  position: relative;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name chev" "icon count chev";
+  align-items: center; column-gap: var(--sp-3); row-gap: var(--sp-1);
+  min-height: calc(var(--sp-8) - var(--sp-1)); padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--c-line);
+  list-style: none; color: var(--c-text); text-align: left; cursor: pointer;
+}
+.fc-tile::-webkit-details-marker { display: none; }   /* Safari's own triangle */
+.fc-tile .icon-tile { grid-area: icon; width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
+.fc-tile-n { grid-area: name; align-self: end; font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); line-height: var(--lh-tight); text-transform: uppercase; }
+.fc-tile-c { grid-area: count; align-self: start; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-muted); }
+.fc-tile-chev { grid-area: chev; display: grid; color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
+.fc-tile-chev svg { width: var(--sp-4); height: var(--sp-4); }
+/* the open row. Forced colours (B4, phase 9) keep only the chevron's turn: the icon's and name's colours go */
+.fc-sec[open] > .fc-tile .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
+.fc-sec[open] > .fc-tile .fc-tile-n { color: var(--c-accent-text); }
+.fc-sec[open] > .fc-tile .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
+/* :where(): as weak as .fc-tile, so the tiles' own border (below) wins */
+:where(.fc-sec:last-of-type:not([open])) > .fc-tile, .fc-sec:last-of-type .fc-panel { border-bottom: 0; }
+.fc-panel { display: flex; flex-direction: column; min-width: 0; padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
+.fc-head { display: none; flex-direction: column; gap: var(--sp-3); }   /* rows: the row above already names it */
 /* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
-.fc-head h3 { font-size: var(--fs-8); font-style: italic; line-height: var(--lh-display); }
+.fc-head h3 { font-size: min(var(--fs-8), var(--fit)); font-style: italic; line-height: var(--lh-display); }
 .fc-head h3 em { color: var(--c-accent-text); }
-.fc-lead { max-width: 46ch; margin-top: var(--sp-4); font-size: var(--fs-4); color: var(--c-muted); }
-.fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-6); }
+.fc-lead { max-width: 46ch; font-size: var(--fs-3); color: var(--c-muted); }
+.fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-4); }
+@supports selector(::details-content) {
+  .fc-sec { display: contents; }
+  .fc-sec::details-content { overflow-anchor: none; }
+}
+/* a row's panel grows open and shrinks shut: the details' content box animates its height to and from auto
+   (interpolate-size: Chrome; elsewhere it opens at once), as the links fade and settle in; shutting is a little
+   quicker. Only the height is clipped, so a link's hover box still reaches past its text. With reduced motion a row
+   opens and shuts at once (no transition at all, not motion.css's near-zero one). Phones only: tiles (below) place
+   the same box in the stage. */
+@media (--phone) and (prefers-reduced-motion: no-preference) {
+  @supports selector(::details-content) {
+    .fc { interpolate-size: allow-keywords; }
+    .fc-sec::details-content {
+      height: 0; overflow-y: clip;
+      transition: height var(--dur-fc-row-shut) var(--ease-soft), content-visibility var(--dur-fc-row-shut) allow-discrete;
+    }
+    .fc-sec[open]::details-content { height: auto; transition-duration: var(--dur-fc-row-open); }
+    .fc-panel { opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); transition: opacity var(--dur-fc-row-shut) var(--ease-soft), transform var(--dur-fc-row-shut) var(--ease-soft); }
+    .fc-sec[open] .fc-panel { opacity: 1; transform: none; transition-duration: var(--dur-fc-row-open); }
+    @starting-style { .fc-sec[open] .fc-panel { opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); } }
+  }
+}
 
 /* link rows: hairline rows, two columns (one on phones) */
 .fc-rows { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--sp-6); list-style: none; }
@@ -97,8 +151,8 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-nl-row .input { flex: 1; min-width: 0; }
 .fc-nl-row .btn { flex: none; }
 
-/* map */
-.fc-map { position: relative; min-height: 18rem; aspect-ratio: 16 / 11; max-width: 100%; }
+/* map: tiles only (below); rows have none, and a box that never shows never fetches it (footer.js) */
+.fc-map { position: relative; display: none; min-height: 18rem; aspect-ratio: 16 / 11; max-width: 100%; }
 .fc-map > svg {
   position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
@@ -118,42 +172,18 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-hud svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-accent-text); }
 .fc-hud b { display: block; font-size: var(--fs-2); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; color: var(--c-accent-text); }
 .fc-hud small { display: block; font-size: var(--fs-2); line-height: var(--lh-snug); color: var(--c-muted); }
+/* the label names the shown section's spot: all six are in the markup, in section order, and one shows */
+.fc-hud-l { display: none; }
+.fc-deck:not(:has(> .fc-sec[open])) .fc-hud-l:nth-of-type(1),
+.fc-deck:has(> .fc-sec:nth-of-type(1)[open]) .fc-hud-l:nth-of-type(1),
+.fc-deck:has(> .fc-sec:nth-of-type(2)[open]) .fc-hud-l:nth-of-type(2),
+.fc-deck:has(> .fc-sec:nth-of-type(3)[open]) .fc-hud-l:nth-of-type(3),
+.fc-deck:has(> .fc-sec:nth-of-type(4)[open]) .fc-hud-l:nth-of-type(4),
+.fc-deck:has(> .fc-sec:nth-of-type(5)[open]) .fc-hud-l:nth-of-type(5),
+.fc-deck:has(> .fc-sec:nth-of-type(6)[open]) .fc-hud-l:nth-of-type(6) { display: block; }
 /* pause button (HoldButton.astro, look in buttons.css), top right, clear of the label; only once the map is in */
 .fc-hold { position: absolute; top: 0; right: 0; }
 .fc-map:not(:has(> svg.fc-w)) .fc-hold { display: none; }
-
-/* dock: the roster */
-.fc-dock { background: var(--c-bg-band); border-top: 1px solid var(--c-line); }
-.fc-dock .container { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); padding-block: var(--sp-4); }
-.fc-roster { display: flex; gap: var(--sp-3); min-width: 0; padding: var(--sp-2) var(--sp-1); overflow-x: auto; scrollbar-width: none; }
-.fc-roster::-webkit-scrollbar { display: none; }
-/* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile; without it the pause hangs
-   off the scrolling roster and widens the whole page on phones */
-.fc-tile {
-  position: relative;
-  flex: none;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
-  min-width: calc(var(--sp-9) + var(--sp-6)); min-height: calc(var(--sp-9) - var(--sp-1));   /* the least it takes: it grows to fit its name and count */
-  padding: var(--sp-2);
-  border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); color: var(--c-text);
-  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
-}
-@media (hover: hover) { .fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }   /* real pointers only: on touch a tap leaves :hover stuck */
-.fc-tile[aria-selected="true"] { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
-.fc-tile .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
-.fc-tile[aria-selected="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-.fc-tile-n { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); line-height: var(--lh-tight); text-transform: uppercase; }
-.fc-tile-c { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-muted); }
-.fc-tile-chev { display: none; }   /* phones only: the row's open/closed arrow */
-.fc-rk {
-  display: grid; place-items: center; flex: none;
-  width: var(--tap); height: var(--tap); padding: 0;
-  border: 1px solid var(--c-line-2); border-bottom-width: 3px; border-radius: var(--r-2);
-  background: var(--c-surface); color: var(--c-text);
-}
-.fc-rk:hover { background: var(--c-surface-2); }
-.fc-rk svg { width: var(--sp-4); height: var(--sp-4); }
-:root:not(.js) .fc-dock { display: none; }
 
 /* base bar */
 .fc-base { background: var(--c-bg-band); }
@@ -168,7 +198,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-mark { display: grid; place-items: center; flex: none; width: var(--sp-6); height: var(--sp-6); border-radius: var(--r-1); background: var(--c-accent); color: var(--c-on-accent); }
 .fc-mark svg { width: var(--sp-4); height: var(--sp-4); }
 .fc-brand b { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-text); }
-.fc-legal { display: flex; flex-wrap: wrap; gap: 0 var(--sp-5); }
+.fc-legal { display: flex; flex-wrap: wrap; gap: 0 var(--sp-5); list-style: none; }
 .fc-legal a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--c-muted); text-decoration: none; }
 .fc-legal a:hover { color: var(--c-text); }
 .fc-base-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-5); margin-left: auto; }
@@ -230,85 +260,107 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 @keyframes fc-ring { from { transform: scale(0.75); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
 @keyframes fc-ping { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.5); opacity: 0; } }
 
-/* desktop: stage beside the map, the footer one screen tall (a floor: see the fold rule at the end) */
-@media (--desktop) {
-  .fc-dock { order: 1; }   /* first in the markup (Footer.astro), under the panels on screen */
-  .fc-base { order: 2; }
-  .fc-stage { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); column-gap: var(--sp-8); align-items: stretch; }
-  .fc-map { aspect-ratio: auto; min-height: 26rem; }
-  .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
-}
-/* tablet + phone: roster on top, then the map, then the text */
-@media (--below-desktop) {
-  .fc-dock { border-top: 0; border-bottom: 1px solid var(--c-line); }
-  .fc-dock .container { justify-content: flex-start; padding-inline: 0; }
-  .fc-roster { padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); }
-  .fc-rk { display: none; }
-  .fc-map { order: -1; }
-}
-/* phones: no map; the roster is six rows and each opens its panel right under it (footer.js, fc-rows-mode) */
+/* phones: one column of links and facts */
 @media (--phone) {
   .fc-rows--two, .fc-facts { grid-template-columns: minmax(0, 1fr); }
-  .fc-map { display: none; }
   .fc-base-end { margin-left: 0; }
-  .fc-rows-mode .fc-stage { display: none; }   /* its panels have moved into the rows */
-  .fc-rows-mode .fc-dock { background: none; border-bottom: 0; }
-  .fc-rows-mode .fc-dock .container { padding-block: var(--sp-4) var(--sp-6); }
-  .fc-rows-mode .fc-roster { flex-direction: column; flex: 1; gap: 0; padding-block: 0; overflow: visible; }
-  .fc-rows-mode .fc-tile {
-    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name chev" "icon count chev";
-    align-items: center; column-gap: var(--sp-3); row-gap: var(--sp-1);
-    width: auto; height: auto; min-height: calc(var(--sp-8) - var(--sp-1)); padding: var(--sp-2) 0;
-    border: 0; border-bottom: 1px solid var(--c-line); border-radius: 0; background: none; transform: none; text-align: left;
-  }
-  .fc-rows-mode .fc-tile:hover { transform: none; background: none; }
-  .fc-rows-mode .fc-tile .icon-tile { grid-area: icon; }
-  .fc-rows-mode .fc-tile-n { grid-area: name; align-self: end; font-size: var(--fs-5); }
-  .fc-rows-mode .fc-tile-c { grid-area: count; align-self: start; }
-  .fc-rows-mode .fc-tile-chev { grid-area: chev; display: grid; color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
-  .fc-rows-mode .fc-tile-chev svg { width: var(--sp-4); height: var(--sp-4); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-n { color: var(--c-accent-text); }
-  .fc-rows-mode .fc-tile[aria-expanded="true"] .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
-  .fc-rows-mode .fc-panel { border-bottom: 1px solid var(--c-line); }
-  /* a row's links grow open: the panel's one grid row goes from nothing to the height of what is in it (minmax(0, 1fr),
-     so bigger text never clips) as the links fade and settle in; shutting runs it back, a little quicker, and footer.js
-     hides the panel once it has shrunk. Only the height is clipped, so a link's hover box still reaches past its text.
-     With reduced motion a row opens and shuts at once */
-  .fc-rows-mode .fc-panel:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 0fr); overflow-y: clip; }
-  .fc-rows-mode .fc-panel.is-on { grid-template-rows: minmax(0, 1fr); }
-  .fc-rows-mode .fc-panel-in { display: flex; flex-direction: column; padding-block: var(--sp-3) var(--sp-6); opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); }
-  .fc-rows-mode .fc-panel.is-on .fc-panel-in { opacity: 1; transform: none; }
-  /* none at all with reduced motion, not motion.css's near-zero one, which still shows the shut row for a frame */
-  .fc-rows-mode .fc-panel, .fc-rows-mode .fc-panel-in { transition: none; }
-  @media (prefers-reduced-motion: no-preference) {
-    .fc-rows-mode .fc-panel { transition: grid-template-rows var(--dur-fc-row-shut) var(--ease-soft); }
-    .fc-rows-mode .fc-panel-in { transition: opacity var(--dur-fc-row-shut) var(--ease-soft), transform var(--dur-fc-row-shut) var(--ease-soft); }
-    .fc-rows-mode .fc-panel.is-on, .fc-rows-mode .fc-panel.is-on .fc-panel-in { transition-duration: var(--dur-fc-row-open); }
-  }
-  /* lines only between rows: none along the footer's top, none under the last row (or under its panel when open);
-     the last row keeps its line until its panel has shrunk shut. No scroll anchoring: footer.js keeps a tapped row
-     still while the row above it shrinks shut, and the browser's own would move the page a second time */
-  .fc-rows-mode { border-top: 0; overflow-anchor: none; }
-  .fc-rows-mode .fc-panel:last-child { border-bottom: 0; }
-  .fc-rows-mode .fc-tile:nth-last-child(2):has(+ .fc-panel[hidden]) { border-bottom: 0; }
   /* base bar: the logo sat 8px under its line, against about 21px between the bar's other lines; one step more */
   .fc-base .container { padding-top: var(--sp-4); }
-  .fc-rows-mode .fc-head { display: none; }   /* the row above already names it */
-  .fc-rows-mode .fc-lead { margin-top: 0; font-size: var(--fs-3); }
-  .fc-rows-mode .fc-body { margin-top: var(--sp-4); }
   .fc-wall-item b { min-width: 0; overflow-wrap: anywhere; }
 }
 
+/* ---------- tiles: tablet and desktop, where the browser can place a details' panel ----------
+   Each details has no box of its own (display: contents, above), so its summary and its content box
+   (::details-content) are items of the .fc-deck grid. The summaries go in the tile row, each in its own column (t1 … t6, in section order:
+   a seventh section needs a column here and a label rule above). The open section's content box goes in the stage;
+   the closed ones' have no box at all. With nothing open, Contact's shows and its tile looks picked. The tile row's
+   band (::before) and its line (::after, a 1px row of its own) run the full width of the screen (their margins;
+   .fc clips the scrollbar's width they add). */
+@media (--tablet-up) {
+  @supports selector(::details-content) {
+    .fc { overflow-x: clip; border-top: 1px solid var(--c-line); }
+    .fc-deck { display: grid; column-gap: var(--sp-3); padding-block: 0; }
+    .fc-deck::before, .fc-deck::after { content: ""; grid-column: 1 / -1; margin-inline: calc(50% - 50vw); }
+    .fc-deck::before { grid-row: dock; background: var(--c-bg-band); }
+    .fc-deck::after { grid-row: line; height: 1px; background: var(--c-line); }
+    .fc-sec:nth-of-type(1) > .fc-tile { grid-column: t1; }
+    .fc-sec:nth-of-type(2) > .fc-tile { grid-column: t2; }
+    .fc-sec:nth-of-type(3) > .fc-tile { grid-column: t3; }
+    .fc-sec:nth-of-type(4) > .fc-tile { grid-column: t4; }
+    .fc-sec:nth-of-type(5) > .fc-tile { grid-column: t5; }
+    .fc-sec:nth-of-type(6) > .fc-tile { grid-column: t6; }
+    .fc-sec::details-content { grid-column: 1 / -1; min-width: 0; }
+    .fc-sec:not([open])::details-content { display: none; }
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type::details-content { display: block; content-visibility: visible; }
+    .fc-tile {
+      grid-row: dock;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+      min-width: calc(var(--sp-9) + var(--sp-6)); min-height: calc(var(--sp-9) - var(--sp-1));   /* the least it takes: it grows to fit its name and count */
+      margin-block: var(--sp-5); padding: var(--sp-2);
+      border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); text-align: center;
+      transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+    }
+    .fc-tile-n { font-size: var(--fs-4); }
+    .fc-tile-n, .fc-tile-c { align-self: auto; }
+    .fc-tile-chev { display: none; }
+    /* the picked tile. Forced colours (B4, phase 9) lose its border colour and fills: it needs a cue of its own */
+    .fc-sec[open] > .fc-tile,
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
+    .fc-sec[open] > .fc-tile .fc-tile-n { color: inherit; }
+    /* real pointers only: on touch a tap leaves :hover stuck */
+    @media (hover: hover) { .fc-sec:not([open]) > .fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }
+    .fc-panel { padding-block: 0; border-bottom: 0; }
+    .fc-sec[open] .fc-panel { animation: fc-in var(--dur-fc-panel) var(--ease); }   /* the picked panel slides in */
+    .fc-head { display: flex; }
+    .fc-lead { margin-top: var(--sp-4); font-size: var(--fs-4); }
+    .fc-body { margin-top: var(--sp-6); }
+    .fc-map { display: block; grid-column: 1 / -1; }
+  }
+}
+@keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
+
+/* tablet: the tile row on top (six even columns, no sideways scroll), then the map, then the panel */
+@media (--tablet) {
+  @supports selector(::details-content) {
+    .fc-deck {
+      grid-template-columns: [t1] minmax(0, 1fr) [t2] minmax(0, 1fr) [t3] minmax(0, 1fr) [t4] minmax(0, 1fr) [t5] minmax(0, 1fr) [t6] minmax(0, 1fr);
+      grid-template-rows: [dock] auto [line] auto [map] auto [panel] auto;
+      padding-bottom: var(--sp-5);
+    }
+    .fc-tile { min-width: 0; }
+    .fc-map { grid-row: map; margin-top: var(--sp-6); }
+    .fc-sec::details-content { grid-row: panel; margin-top: var(--sp-5); }
+  }
+}
+
+/* desktop: the stage (panel left, map right), then the tile row, centred, then the base bar */
+@media (--desktop) {
+  @supports selector(::details-content) {
+    .fc-deck {
+      grid-template-columns: minmax(0, 1fr) [t1] auto [t2] auto [t3] auto [t4] auto [t5] auto [t6] auto minmax(0, 1fr);
+      grid-template-rows: [stage] 1fr [line] auto [dock] auto;
+      padding-top: var(--sp-6);
+    }
+    /* the stage's two columns, 5 : 7 with --sp-8 between, in the one grid cell they share */
+    .fc-sec::details-content { grid-row: stage; justify-self: start; width: calc((100% - var(--sp-8)) * 5 / 12); margin-bottom: var(--sp-5); }
+    .fc-map { grid-row: stage; justify-self: end; width: calc((100% - var(--sp-8)) * 7 / 12); aspect-ratio: auto; min-height: 26rem; margin-bottom: var(--sp-5); }
+    .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
+  }
+}
+
+/* one screen as a floor: a panel whose words need more grows it */
 @media (--fold) {
-  .js .fc { min-height: max(var(--fold-h), 40rem); }   /* one screen as a floor: a panel whose words need more grows it */
-  .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
-  .js .fc-panels { padding-top: var(--sp-2); }
-  .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
-  .js .fc-map { min-height: 16rem; height: 100%; }
-  @media (height <= 51.25em) {
-    .js .fc-stage { padding-top: var(--sp-6); }
-    .fc-body { margin-top: var(--sp-5); }
+  @supports selector(::details-content) {
+    .fc { min-height: max(var(--fold-h), 40rem); }
+    .fc-deck { padding-top: var(--sp-7); }
+    .fc-sec::details-content { padding-top: var(--sp-2); }
+    .fc-head h3 { font-size: min(var(--fs-8), 8.2svh, var(--fit)); }
+    .fc-map { min-height: 16rem; }
+    @media (height <= 51.25em) {
+      .fc-deck { padding-top: var(--sp-6); }
+      .fc-body { margin-top: var(--sp-5); }
+    }
   }
 }
 

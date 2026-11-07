@@ -9,7 +9,7 @@
 }
 .proj-page .case-src, .proj-page .case { display: contents; }
 .proj-page .crumbs { grid-area: crumbs; }
-.proj-page .case-src > h1 { grid-area: title; }
+.proj-page .case-title { grid-area: title; }   /* a box of its own: the title sizes to its column (layout.css) */
 .proj-page .case-fig { grid-area: fig; }
 .proj-page .case .stack { grid-area: body; gap: var(--sp-5); }
 .proj-page .case .stack > .chip { align-self: flex-start; }
@@ -22,7 +22,7 @@
     grid-template-areas: "crumbs fig" "title fig" "body fig";
     column-gap: var(--sp-7);
   }
-  .proj-page .case-src > h1 { align-self: end; }
+  .proj-page .case-title { align-self: end; }
 }
 
 /* desktop (>= 1100 wide and >= 700 tall): the drawing never taller than most of the screen */

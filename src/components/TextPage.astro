@@ -15,6 +15,7 @@
 import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
 import { PLACEHOLDER } from '../lib/placeholders.mjs';
+import { fit } from '../lib/fit';
 import './text-page.css';
 interface Props { page: 'privacy' | 'accessibility'; md: { compiledContent: () => string | Promise<string> }; eyebrow: string; lead: string }
 const { page, md, eyebrow, lead } = Astro.props;
@@ -22,18 +23,20 @@ const meta = PAGES[page];
 const body = await md.compiledContent();
 const unfilled = body.match(new RegExp(PLACEHOLDER.source, 'i'));
 if (unfilled) throw new Error(`${meta.path}: the placeholder ${unfilled[0]} was not filled (TextPage.astro)`);
+// a Markdown heading with a long word shrinks to fit its column, as the components' headings do (lib/fit.js)
+const html = body.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/g, (all, attrs = '', text) => (fit(text) ? `<h2 class="fit"${attrs}>${text}</h2>` : all));
 ---
 <Base title={meta.title} description={meta.description} page={page} path={meta.path}>
   <section class="page-intro" aria-labelledby={`${page}-title`}>
     <div class="container">
       <p class="eyebrow">{eyebrow}</p>
-      <h1 id={`${page}-title`}>{meta.name}</h1>
+      <h1 id={`${page}-title`} class={fit(meta.name)}>{meta.name}</h1>
       <p class="lead">{lead}</p>
     </div>
   </section>
   <section class="section text-page">
     <div class="container">
-      <div class="prose" set:html={body} />
+      <div class="prose" set:html={html} />
     </div>
   </section>
 </Base>

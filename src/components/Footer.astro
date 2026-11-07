@@ -1,13 +1,16 @@
 ---
-// SHARED · Footer (every page). Hero-select roster and campus map: one panel per section, one roster tile per
-// panel; each panel's data-map names a spot on the campus map (hq, services, company, support, resources, follow),
-// and data-map-name / data-map-sub the words the map's label shows for it. The map is drawn by tools/gen_campus.py
-// (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near the screen.
-// The lists and the spots' words come from src/data/footer.json (through src/lib/footer.ts, its schema); the Services panel's links from the services
-// collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
-// Phones (under 700 px): no map, and the roster turns into six rows that open in place. footer.js moves each panel
-// under its own row and switches the tabs to buttons with aria-expanded; it puts them back when the screen widens.
-// Each panel's .fc-panel-in is what grows open under its row on phones; on wider screens it has no box of its own.
+// SHARED · Footer (every page). One <nav aria-label="Footer"> holding six <details name="footer">, in reading order
+// on every screen: the <summary> is the section's tile, the rest is its panel. The browser opens one at a time
+// (name="footer") and gives each summary its open or closed state; no script moves or relabels anything.
+// Tablet and desktop: the summaries form the tile row and the open panel fills the stage beside (desktop) or under
+// (tablet) the campus map; with nothing open, Contact shows (footer.css, :has()). Phones (under 700 px): no map, and
+// the sections are six rows that open in place.
+// Each section's data-map names its spot on the campus map (hq, services, company, support, resources, follow). The
+// map's label holds all six spots' words, and footer.css shows the open section's. The map is drawn by
+// tools/gen_campus.py (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near
+// the screen and flies its camera to the open section's spot. Without script there is no map; the sections work.
+// The lists and the spots' words come from src/data/footer.json (through src/lib/footer.ts, its schema); the Services
+// panel's links from the services collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js.
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
@@ -16,33 +19,29 @@ import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
 import { footer as f } from '../lib/footer';
 import { CAMPUS, getServices } from '../lib/site';
+import { fit } from '../lib/fit';
 const services = await getServices();
-const spot = (k: keyof typeof f.spots) => f.spots[k];
+type Spot = keyof typeof f.spots;
+const spot = (k: Spot) => f.spots[k];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
 const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : p.links ?? [] }));
-const roster: { id: string; icon: IconName; name: string; count: string }[] = [
-  { id: 'contact', icon: 'bubble', name: 'Contact', count: 'Start here' },
-  ...panels.map((p) => ({ id: p.id, icon: p.icon, name: p.tile, count: `${p.links.length} links` })),
-  { id: 'follow', icon: f.follow.icon, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
+// the six sections in reading order: Contact, the link panels, Follow. footer.css places the tiles by this order.
+const sections: { id: string; map: Spot; icon: IconName; name: string; count: string; panel?: (typeof panels)[number] }[] = [
+  { id: 'contact', map: 'hq', icon: 'bubble', name: 'Contact', count: 'Start here' },
+  ...panels.map((p) => ({ id: p.id, map: p.map, icon: p.icon, name: p.tile, count: `${p.links.length} links`, panel: p })),
+  { id: 'follow', map: 'follow', icon: f.follow.icon, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
 ];
 ---
 <footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
   <h2 class="sr-only" id="fc-title">Site footer</h2>
-  <!-- the tabs come first, so the keyboard reaches them before the panel they open; desktop shows them under the
-       panels (footer.css order) -->
-  <div class="fc-dock"><div class="container">
-    <button class="fc-rk" type="button" data-fc-step="-1" aria-label="Previous footer section"><Icon name="chevronL" /></button>
-    <div class="fc-roster" role="tablist" aria-label="Footer sections">
-      {roster.map((t, i) => (
-      <button class="fc-tile" type="button" role="tab" id={`fc-t-${t.id}`} aria-controls={`fc-p-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}><span class="icon-tile"><Icon name={t.icon} /></span><span class="fc-tile-n">{t.name}</span><Pause /><span class="fc-tile-c">{t.count}</span><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span></button>
-      ))}
-    </div>
-    <button class="fc-rk" type="button" data-fc-step="1" aria-label="Next footer section"><Icon name="chevronR" /></button>
-  </div></div>
-  <div class="container fc-stage">
-    <div class="fc-panels" id="fc-panels">
-<section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq" data-map-name={spot('hq').name} data-map-sub={spot('hq').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3>{f.contact.title} <em>{f.contact.accent}</em></h3></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
+  <nav class="fc-nav" aria-label="Footer">
+  <div class="container fc-deck">
+{sections.map((s) => (
+<details class="fc-sec" name="footer" id={`fc-${s.id}`} data-map={s.map}>
+  <summary class="fc-tile"><span class="icon-tile"><Icon name={s.icon} /></span><span class="fc-tile-n">{s.name}</span><Pause /><span class="fc-tile-c">{s.count}</span><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span></summary>
+  <div class="fc-panel">
+  {s.id === 'contact' && (<Fragment>
+<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 class={fit(`${f.contact.title} ${f.contact.accent}`)}>{f.contact.title} <em>{f.contact.accent}</em></h3></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
   <div class="fc-facts">
     <div><p class="label">Call or email</p>
       <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
@@ -51,38 +50,39 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
       <p class="fc-cl fc-cl--two"><Icon name="pin" /><span>{f.office.city}<small>{f.office.street}</small></span></p>
       <p class="fc-cl fc-cl--two"><Icon name="clock" /><span>{f.hours.line}<small>{f.hours.days}</small></span></p></div>
   </div>
-  <div class="fc-follow"><span class="label">Follow</span><ul class="fc-socials">{f.follow.socials.map((s) => (
-    <li><a class="fc-soc" href={s.href} aria-label={s.name} title={s.name}><Icon name={s.icon} /></a></li>))}</ul></div>
+  <div class="fc-follow"><span class="label">Follow</span><ul class="fc-socials">{f.follow.socials.map((x) => (
+    <li><a class="fc-soc" href={x.href} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a></li>))}</ul></div>
 </div>
-</div></section>
-{panels.map((p) => (
-<section class="fc-panel" id={`fc-p-${p.id}`} role="tabpanel" aria-labelledby={`fc-t-${p.id}`} tabindex="-1" data-map={p.map} data-map-name={spot(p.map).name} data-map-sub={spot(p.map).sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{p.links.length} links</p><h3>{p.title}</h3></div><p class="fc-lead">{p.lead}</p><nav class="fc-body" aria-label={p.title}><ul class="fc-rows fc-rows--two">{p.links.map((l) => (
-  <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={p.more.href}>{p.more.label}<Icon name="arrow" /></a></nav>
-</div></section>
-))}
-<section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3>{f.follow.title} <em>{f.follow.accent}</em></h3></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
-  <ul class="fc-wall">{f.follow.socials.map((s) => (
-    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon} /></span><b>{s.name}</b></a></li>))}</ul>
+  </Fragment>)}
+  {s.panel && (<Fragment>
+<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(s.panel.title)}>{s.panel.title}</h3></div><p class="fc-lead">{s.panel.lead}</p><div class="fc-body"><ul class="fc-rows fc-rows--two">{s.panel.links.map((l) => (
+  <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a></div>
+  </Fragment>)}
+  {s.id === 'follow' && (<Fragment>
+<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(`${f.follow.title} ${f.follow.accent}`)}>{f.follow.title} <em>{f.follow.accent}</em></h3></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
+  <ul class="fc-wall">{f.follow.socials.map((x) => (
+    <li><a class="fc-wall-item" href={x.href}><span class="icon-tile"><Icon name={x.icon} /></span><b>{x.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
     <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="An email address like name@company.com" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
     <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
   </form>
 </div>
-</div></section>
-    </div>
+  </Fragment>)}
+  </div>
+</details>
+))}
     <div class="fc-map" data-fc-map={CAMPUS}>
-      <div class="fc-hud" aria-hidden="true"><Icon name="spot" /><span><b>{spot('hq').name}</b><small>{spot('hq').sub}</small></span></div>
+      <div class="fc-hud" aria-hidden="true"><Icon name="spot" />{sections.map((s) => <span class="fc-hud-l"><b>{spot(s.map).name}</b><small>{spot(s.map).sub}</small></span>)}</div>
       <HoldButton class="fc-hold" />
     </div>
   </div>
   <div class="fc-base"><div class="container">
     <span class="fc-brand"><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b><span>{f.copyright}</span></span>
-    <nav class="fc-legal" aria-label="Legal">{f.legal.map((l) => <a href={l.href}>{l.label}</a>)}</nav>
+    <ul class="fc-legal" aria-label="Legal">{f.legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
     <span class="fc-base-end">
       <span class="status"><span>{f.status.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span>
     </span>
   </div></div>
+  </nav>
 </footer>

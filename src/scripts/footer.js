@@ -1,30 +1,36 @@
 /* ==========================================================================
    Uplink Technology · footer (every page)
-   Hero-select roster and campus map.
+   The campus map, and the newsletter mockup. The sections themselves are
+   <details name="footer"> (Footer.astro): the browser opens and shuts them,
+   and footer.css lays them out. Nothing here moves them; on tablet and up
+   it only keeps one open (Contact when none is picked).
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, replay, toast, whenOnScreen } from './core.js';
+import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 
 /* ======================================================================
-   Footer: hero-select roster + campus map (every page)
-   Each roster tile shows one panel. The panel's data-map names a spot on
-   the map (hq, services, company, support, resources, follow) and
-   data-map-name / data-map-sub the words of the map's label; the camera
-   flies there and lights it up. The map is drawn by tools/gen_campus.py:
-   each spot's group carries its camera (data-vb, a viewBox) and the
-   marker's point (data-mk), and the spot's group, route and ring share
-   its data-k.
+   Campus map (tablet and desktop; phones hide it). Decoration only.
+   Each section's data-map names a spot on the map (hq, services, company,
+   support, resources, follow); the map's label is in the markup and CSS
+   shows the open section's words. Here the camera flies to the spot and
+   lights it up whenever a section opens or shuts (the toggle event). With
+   nothing open, Contact shows (footer.css, and Contact is opened for real
+   on tablet and up, below), so its spot does too. The map
+   is drawn by tools/gen_campus.py: each spot's group carries its camera
+   (data-vb, a viewBox) and the marker's point (data-mk), and the spot's
+   group, route and ring share its data-k.
    ====================================================================== */
-const MAP_MOVE = 700;   // ms the map's camera takes to fly to a tab's spot
+const MAP_MOVE = 700;   // ms the map's camera takes to fly to a section's spot
 const fc = $('.fc');
 if (fc) {
   const mapBox = $('[data-fc-map]', fc);
-  const hud = $('.fc-hud', fc);
+  const sections = $$('.fc-sec', fc);
+  const shown = () => sections.find((d) => d.open) || sections[0];
   const nums = (s) => s.split(' ').map(Number);
   // The map (about 30 KB of SVG, 290-odd shapes) is fetched when the footer comes within a screen or so of view,
   // not at load: most visits never reach the footer. Its box keeps its size in CSS, so nothing moves when it lands.
-  let svg = null, marker = null, shown = null;
+  let svg = null, marker = null;
   let vb = [], mk = [0, 0], raf = 0;
   const build = () => window.fetch(mapBox.dataset.fcMap)
     .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
@@ -32,23 +38,21 @@ if (fc) {
       mapBox.insertAdjacentHTML('afterbegin', html(text));
       svg = $('svg.fc-w', mapBox); marker = $('.mk', svg);
       vb = nums(svg.getAttribute('viewBox'));
-      focusMap(shown, true);
+      focusMap(true);
       // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
       whenOnScreen(svg, (on) => { if (on) svg.classList.add('is-seen'); });
     })
-    .catch(() => { /* no map: the panels and the label still work */ });
+    .catch(() => { /* no map: the sections and the label still work */ });
 
   const paint = () => {
     svg.setAttribute('viewBox', vb.map((n) => n.toFixed(1)).join(' '));
     marker.setAttribute('transform', `translate(${mk[0].toFixed(1)} ${mk[1].toFixed(1)})`);
   };
-  // the label names the panel's spot at once; once the map is in, the spot lights up and the camera flies there
-  const focusMap = (panel, instant) => {
-    shown = panel;
-    $('b', hud).textContent = panel.dataset.mapName;
-    $('small', hud).textContent = panel.dataset.mapSub;
-    if (!svg) return;   // not in yet: build() shows this spot when it is
-    const spot = $(`.dist[data-k="${panel.dataset.map}"]`, svg) || $('.dist[data-k="hq"]', svg);
+  // the shown section's spot lights up and the camera flies there
+  const focusMap = (instant) => {
+    if (!svg) return;   // not in yet: build() shows the spot when it is
+    const k = shown().dataset.map;
+    const spot = $(`.dist[data-k="${k}"]`, svg) || $('.dist[data-k="hq"]', svg);
     $$('[data-k]', svg).forEach((el) => el.classList.toggle('on', el.dataset.k === spot.dataset.k));
     const to = nums(spot.dataset.vb), toMk = nums(spot.dataset.mk);
     window.cancelAnimationFrame(raf);
@@ -64,107 +68,21 @@ if (fc) {
     };
     raf = window.requestAnimationFrame(step);
   };
-
-  // roster: tabs with arrow keys, plus the two key-cap buttons
-  const tabs = $$('.fc-tile', fc);
-  const panels = tabs.map((t) => document.getElementById(t.getAttribute('aria-controls')));
-  const roster = $('.fc-roster', fc), home = $('#fc-panels', fc);
-  let cur = Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'));
-  const phone = window.matchMedia(MEDIA.phone);
-  let rows = false;   // phones: the tiles are rows that open their panel right under them (no map)
-  const select = (i, opts = {}) => {
-    if (rows) return;
-    cur = (i + tabs.length) % tabs.length;
-    tabs.forEach((t, j) => { t.setAttribute('aria-selected', String(j === cur)); t.tabIndex = j === cur ? 0 : -1; });
-    panels.forEach((p, j) => { p.classList.toggle('is-on', j === cur); if (j !== cur || opts.instant) p.classList.remove('is-in'); });
-    if (!opts.instant) replay(panels[cur], 'is-in');   // the new panel slides in (again, if it was already showing)
-    const t = tabs[cur];
-    const centre = () => roster.scrollTo({ left: t.offsetLeft - (roster.clientWidth - t.offsetWidth) / 2, behavior: opts.instant || reduceMotion.matches ? 'auto' : 'smooth' });
-    // on page load the first tab is already in view (the roster starts at the left), so nothing to measure;
-    // measuring during load would force an extra layout pass
-    if (!opts.instant) centre(); else if (cur > 0) window.requestAnimationFrame(() => window.setTimeout(centre));
-    if (opts.focus) t.focus({ preventScroll: true });
-    focusMap(panels[cur], opts.instant);
-  };
-  // Tab from the tiles goes on into the chosen panel (the tabs come first in the markup); Enter or Space (a click
-  // with detail 0) jumps straight there too
-  tabs.forEach((t, i) => t.addEventListener('click', (e) => {
-    if (rows) { toggle(i); return; }
-    select(i);
-    if (e.detail === 0) panels[i].focus();
-  }));
-  roster.addEventListener('keydown', (e) => {
-    if (rows) return;
-    const map = { ArrowRight: cur + 1, ArrowLeft: cur - 1, Home: 0, End: tabs.length - 1 };
-    if (!(e.key in map)) return;
-    e.preventDefault();
-    select(map[e.key], { focus: true });
-  });
-  $$('[data-fc-step]', fc).forEach((b) => b.addEventListener('click', () => select(cur + Number(b.dataset.fcStep), { focus: false })));
-
-  // Phones: one row open at a time, or none. A row's links grow open and shrink shut (is-on, footer.css; at once with
-  // reduced motion). A shutting panel is out of reach from the start (inert) and hidden once it has shrunk; tapped
-  // again on the way, it turns round from where it is. Opening a row shuts the one above it, which pulls the tapped
-  // row up the screen as it shrinks; the page scrolls with it, frame by frame, so the row stays under the finger. Only
-  // the panels' own change is made up for, so a visitor scrolling meanwhile isn't held back.
-  let hold = 0;
-  const shut = (p) => {
-    p.inert = true;
-    const done = () => { if (rows && !p.classList.contains('is-on')) { p.hidden = true; p.inert = false; } };
-    const moving = p.getAnimations();
-    if (moving.length) Promise.all(moving.map((a) => a.finished)).then(done, done); else done();
-  };
-  const toggle = (i) => {
-    const open = tabs[i].getAttribute('aria-expanded') !== 'true';
-    tabs.forEach((t, j) => t.setAttribute('aria-expanded', String(open && j === i)));
-    if (open) { cur = i; panels[i].hidden = false; panels[i].inert = false; }
-    // where the row is on the page; reading it lays out the panel just shown while still shut, so it grows from there
-    let y = tabs[i].getBoundingClientRect().top + window.scrollY;
-    panels.forEach((p, j) => {
-      const on = open && j === i;
-      if (on === p.classList.contains('is-on')) return;
-      p.classList.toggle('is-on', on);
-      if (!on) shut(p);
-    });
-    const busy = () => rows && panels.some((p) => !p.hidden && (!p.classList.contains('is-on') || p.getAnimations().length));
-    let owed = 0;   // the page scrolls in whole pixels: what a frame fell short by goes into the next one
-    const keep = () => {
-      const now = tabs[i].getBoundingClientRect().top + window.scrollY, dy = now - y + owed;
-      y = now;
-      if (dy) {
-        const was = window.scrollY;
-        window.scrollBy({ top: dy, behavior: 'instant' });
-        owed = Math.max(-1, Math.min(1, dy - (window.scrollY - was)));
-      }
-      hold = busy() ? window.requestAnimationFrame(keep) : 0;
-    };
-    window.cancelAnimationFrame(hold);
-    keep();
-  };
-  // Switch between tabs (tablet, desktop) and rows (phones). Rows: each panel moves in under its row, the tablist
-  // roles come off and each row says whether it is open; all start closed. Tabs: the panels go back, cur shows.
-  const layout = (instant) => {
-    rows = phone.matches;
-    fc.classList.toggle('fc-rows-mode', rows);
-    if (rows) {
-      roster.removeAttribute('role');
-      tabs.forEach((t, i) => {
-        t.removeAttribute('role'); t.removeAttribute('aria-selected'); t.tabIndex = 0;
-        t.setAttribute('aria-expanded', 'false');
-        panels[i].setAttribute('role', 'region');
-        panels[i].hidden = true; panels[i].classList.remove('is-on', 'is-in');
-        t.after(panels[i]);
-      });
-    } else {
-      roster.setAttribute('role', 'tablist');
-      tabs.forEach((t, i) => {
-        t.setAttribute('role', 'tab'); t.removeAttribute('aria-expanded');
-        panels[i].setAttribute('role', 'tabpanel'); panels[i].hidden = false; panels[i].inert = false;
-        home.append(panels[i]);
-      });
-      select(cur, { instant });
-    }
-  };
+  // Tiles (tablet and up, where footer.css can place a panel): one section is always open, Contact unless another is
+  // picked, so the panel on screen is always the one whose summary says it's open. Without script CSS shows Contact
+  // anyway (its summary then says closed). Phones and the fallback rows start with every row shut.
+  const tiles = window.matchMedia(MEDIA.tabletUp);
+  const placed = window.CSS?.supports?.('selector(::details-content)');
+  const keepOne = () => { if (placed && tiles.matches && !sections.some((d) => d.open)) sections[0].open = true; };
+  keepOne();
+  tiles.addEventListener('change', keepOne);
+  // toggle doesn't bubble: listen on the way down. Opening one section shuts the open one, so two events can come
+  // in a row; both see the new one open. Shutting the open one leaves none: Contact opens again.
+  fc.addEventListener('toggle', (e) => {
+    if (!e.target.matches('.fc-sec')) return;
+    keepOne();
+    focusMap(false);
+  }, true);
 
   // newsletter (prototype: nothing is sent)
   const nl = $('[data-fc-nl]', fc);
@@ -191,14 +109,10 @@ if (fc) {
     toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
   });
 
-  // the CSS keys on html.js (set in each page's head, before paint); fc-js only says this script ran
-  fc.classList.add('fc-js');
-  layout(true);
-  phone.addEventListener('change', () => layout(true));
   // the map is fetched when its box comes within a screen of view; phones hide the box (footer.css), so they never
   // fetch it, and a phone turned past 700 px fetches it then
   if ('IntersectionObserver' in window) {
     const near = new IntersectionObserver(([en]) => { if (en.isIntersecting) { near.disconnect(); build(); } }, { rootMargin: '100% 0px' });
     near.observe(mapBox);
-  } else if (!phone.matches) build();
+  } else if (!window.matchMedia(MEDIA.phone).matches) build();
 }

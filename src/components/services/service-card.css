@@ -14,6 +14,7 @@ html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
 .feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
 .feat { display: flex; align-items: center; gap: var(--sp-4); }
 .feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent-text); }
+.feat > :last-child { min-width: 0; }   /* the words beside the number tile wrap inside the card (B20) */
 .feat-t { display: block; font-weight: 600; }
 .feat-d { display: block; font-size: var(--fs-2); color: var(--c-muted); }
 
