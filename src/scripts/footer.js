@@ -2,7 +2,8 @@
    Uplink Technology · footer (every page)
    The campus map, and the newsletter mockup. The sections themselves are
    <details name="footer"> (Footer.astro): the browser opens and shuts them,
-   and footer.css lays them out. Nothing here moves or relabels them.
+   and footer.css lays them out. Nothing here moves them; on tablet and up
+   it only keeps one open (Contact when none is picked).
    ========================================================================== */
 
 import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
@@ -14,7 +15,8 @@ import { MEDIA } from '../lib/media.js';
    support, resources, follow); the map's label is in the markup and CSS
    shows the open section's words. Here the camera flies to the spot and
    lights it up whenever a section opens or shuts (the toggle event). With
-   nothing open, Contact shows (footer.css), so its spot does too. The map
+   nothing open, Contact shows (footer.css, and Contact is opened for real
+   on tablet and up, below), so its spot does too. The map
    is drawn by tools/gen_campus.py: each spot's group carries its camera
    (data-vb, a viewBox) and the marker's point (data-mk), and the spot's
    group, route and ring share its data-k.
@@ -66,9 +68,21 @@ if (fc) {
     };
     raf = window.requestAnimationFrame(step);
   };
+  // Tiles (tablet and up, where footer.css can place a panel): one section is always open, Contact unless another is
+  // picked, so the panel on screen is always the one whose summary says it's open. Without script CSS shows Contact
+  // anyway (its summary then says closed). Phones and the fallback rows start with every row shut.
+  const tiles = window.matchMedia(MEDIA.tabletUp);
+  const placed = window.CSS?.supports?.('selector(::details-content)');
+  const keepOne = () => { if (placed && tiles.matches && !sections.some((d) => d.open)) sections[0].open = true; };
+  keepOne();
+  tiles.addEventListener('change', keepOne);
   // toggle doesn't bubble: listen on the way down. Opening one section shuts the open one, so two events can come
-  // in a row; both read the same open section.
-  fc.addEventListener('toggle', (e) => { if (e.target.matches('.fc-sec')) focusMap(false); }, true);
+  // in a row; both see the new one open. Shutting the open one leaves none: Contact opens again.
+  fc.addEventListener('toggle', (e) => {
+    if (!e.target.matches('.fc-sec')) return;
+    keepOne();
+    focusMap(false);
+  }, true);
 
   // newsletter (prototype: nothing is sent)
   const nl = $('[data-fc-nl]', fc);

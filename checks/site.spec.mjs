@@ -120,15 +120,15 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   }
   if (seen.hud.size !== n || [...seen.hud].some((h) => !h || h.includes('|'))) fails.push(`footer: the map's label didn't name one spot per section: ${[...seen.hud].join(' / ')}`);
   if (seen.vb.size !== n) fails.push(`footer: the map's camera didn't move to each section's spot (${seen.vb.size} views for ${n} sections)`);
-  // shut the open one: nothing open shows Contact, and its tile looks picked
+  // shut the open one: Contact opens again (footer.js), shows, and its tile looks picked
   await fcTiles.nth(n - 1).click();
   await pg.waitForTimeout(500);
   const none = await pg.evaluate(() => {
     const p = document.querySelector('.fc-sec:first-of-type .fc-panel');
-    return { open: document.querySelectorAll('.fc-sec[open]').length, contact: p.getBoundingClientRect().height, tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth };
+    return { open: [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id), contact: p.getBoundingClientRect().height, tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth };
   });
-  rep.push(`nothing open: ${JSON.stringify(none)}`);
-  if (none.open || none.contact < 50 || none.tile !== '2px') fails.push(`footer with nothing open doesn't show Contact as picked: ${JSON.stringify(none)}`);
+  rep.push(`after shutting the open section: ${JSON.stringify(none)}`);
+  if (none.open.join() !== 'fc-contact' || none.contact < 50 || none.tile !== '2px') fails.push(`footer after shutting the open section doesn't show Contact, open and picked: ${JSON.stringify(none)}`);
   await pg.close();
   console.log(rep.join('\n'));
   verdict([...fails, ...errs]);
@@ -656,7 +656,9 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
 // without script, one section open at a time; Tab reaches each summary and Enter or Space opens it, then Tab goes on
 // into its links; focus inside it stays put through a resize from desktop to phone and a turn (it used to drop to
 // <body> as script moved the panels between tabs and rows); it holds the footer's only navigation landmark (it had
-// five); and a screen reader hears each summary as open or closed.
+// five); and a screen reader hears each summary as open or closed. On tablet and up the panel on screen is always the
+// open section's (Contact when none is picked), so no summary says "collapsed" over a panel that shows; phones start
+// with every row shut.
 test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, L7, M11)', async ({ browser }) => {
   const fails = [];
   const rep = [];
@@ -682,6 +684,16 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
     await ctx.close();
   }
 
+  // with script, on a phone every row starts shut
+  const ph = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pq = await ph.newPage();
+  await pq.goto(url('about'));
+  await pq.waitForLoadState('networkidle');
+  const phoneOpen = await openIds(pq);
+  rep.push(`390 at load, open: ${JSON.stringify(phoneOpen)}`);
+  if (phoneOpen.length) fails.push(`390 at load: ${JSON.stringify(phoneOpen)} open, every row should start shut`);
+  await ph.close();
+
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const q = await ctx.newPage();
   const errs = [];
@@ -689,6 +701,21 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
   await q.goto(url('about'));
   await q.waitForLoadState('networkidle');
   await q.$eval('#footer', (e) => e.scrollIntoView());
+  // tablet and up: the panel on screen is always the open one, so its summary never says "collapsed" while it shows:
+  // at load (nothing picked), and after a visitor shuts the section they opened
+  const shownState = async (when) => {
+    const s = await q.evaluate(() =>
+      [...document.querySelectorAll('.fc-sec')].filter((d) => d.querySelector('.fc-panel').getClientRects().length).map((d) => ({ id: d.id, open: d.open })),
+    );
+    rep.push(`1440 ${when}, panel shown: ${JSON.stringify(s)}`);
+    if (s.length !== 1 || !s[0].open) fails.push(`1440 ${when}: the panel on screen isn't its open section's: ${JSON.stringify(s)}`);
+  };
+  await shownState('at load');
+  await q.locator('.fc-tile').nth(1).click();
+  await q.waitForTimeout(400);
+  await q.locator('.fc-tile').nth(1).click();
+  await q.waitForTimeout(400);
+  await shownState('after shutting Services');
   // Tab from the first summary to the end of the footer's nav reaches all six
   await q.locator('.fc-tile').first().focus();
   const reached = [];

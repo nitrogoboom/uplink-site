@@ -104,7 +104,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 ### Footer
 
 36. Heading level 2: "Site footer".
-37. Navigation "Footer". Six groups, each with a button that says whether it's open or closed (a `<details>` summary), in this order: "Contact. Start here", "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", "Follow. 5 channels". One opens at a time. An open one reads its panel right after its button. With none open, the Contact panel shows on screen and is read after its button, which still says closed:
+37. Navigation "Footer". Six groups, each with a button that says whether it's open or closed (a `<details>` summary), in this order: "Contact. Start here", "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", "Follow. 5 channels". One opens at a time, and one is always open: "Contact. Start here" (open) until another is picked. An open one reads its panel right after its button:
     - "Contact". Heading level 3: "Reach us".
     - "Call, email or drop by. The help desk is open 7 am to 7 pm ET, Monday to Friday."
     - "Call or email". Links: "1-855-555-0142", "hello@uplinkit.ca".
