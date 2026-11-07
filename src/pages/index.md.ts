@@ -15,6 +15,11 @@ export const GET: APIRoute = async ({ site }) => {
   const grow = await getGrow();
   const list = services.map(({ id, data: s }) => `- [${s.title}](${base}/services/${id}): ${s.card}`).join('\n');
   const steps = grow.map((s) => `- ${s.place}: ${s.title}. Watch for: ${s.watch} We handle: ${s.handle}`).join('\n');
-  const text = fill(source.replace(/<!--.*?-->\n/s, ''), { ...PLACEHOLDERS, site: base, services: list, grow: steps }, 'src/data/index.md');
+  // the file carries one editors' note in <!-- … --> (under its title): cut it out by position, with the newline after
+  // it, rather than by pattern matching over the text
+  const start = source.indexOf('<!--');
+  const end = start < 0 ? -1 : source.indexOf('-->', start);
+  const body = end < 0 ? source : source.slice(0, start) + source.slice(end + 3).replace(/^\n/, '');
+  const text = fill(body, { ...PLACEHOLDERS, site: base, services: list, grow: steps }, 'src/data/index.md');
   return new Response(text, { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
 };
