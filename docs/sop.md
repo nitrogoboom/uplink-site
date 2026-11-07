@@ -19,9 +19,9 @@ A *release* is the first production launch, and any later change to layout, navi
 | Runtime | Node.js 24 | `.node-version` (CI reads it) |
 | Content | Typed JSON and Markdown: services, projects, FAQ, team, footer, Grow | `src/content/`, `src/data/`, `src/content.config.ts` |
 | Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
-| Drawings | Python generators write every SVG. Builds and checks never run them. | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
+| Drawings | Python generators write every SVG. The build never runs them; CI's drawings job regenerates them, fails on any difference, and checks them. | `tools/gen_*.py`, `tools/regen.py`, Python 3.12, `requirements.txt` (locked from `requirements.in`) |
 | Hosting | Cloudflare Workers: static files, plus one small Worker. The Worker runs only for `/api/*`, `/404` and addresses with no file: it answers `/api/report` (error and CSP reports) and sends the 404 page with a 404 status and the pages' headers. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
-| CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. On a pull request, also a preview and a screenshot comparison. Node only, no Python. Actions are pinned to commits. | `.github/workflows/site.yml` |
+| CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. Beside them, the drawings job (Python). On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
 | Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
 | Code checks | TypeScript (`astro check`), ESLint, Stylelint, Prettier (JSON and YAML only) | `eslint.config.js`, `.stylelintrc.json` |

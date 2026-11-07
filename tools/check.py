@@ -1,12 +1,18 @@
 """Generic geometry checks.
 usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
 Reports:
-  (exits 1 on any finding; DOT lines only list where each leader dot sits; the floor grid, class="floor", is skipped:
-   it is clipped round the objects, so its ends sit a hair from their edges by design)
+  (exits 1 on any finding; DOT lines only list where each leader dot sits; the floor grid, class="floor" on a shape or
+   its group, is skipped: it is clipped round the objects, so its ends sit a hair from their edges by design)
   ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
-  SNAP   vertices of different shapes that almost (not exactly) coincide
+  SNAP   vertices of different shapes that almost (not exactly) coincide (two shapes on one source line count too)
   TJOIN  vertices that almost (not exactly) touch another shape's edge
+  A vertex (or the part of an edge) that sits inside an opaque filled face drawn later can't be seen, so a near-miss
+  there is not reported (SNAP or TJOIN). Opaque means filled, with no opacity or fill-opacity under 1 in its
+  attributes. A stylesheet's opacity isn't seen, so a near-miss covered only by a part made see-through in CSS
+  (the campus windows) would be missed; today none is.
   DOT    leader dots (.co circles) and what filled faces they sit on
+Leader lines (in a .co group) and class="mark" (arrowheads, routes, 2D markers) cross the drawing on purpose, so
+none of ANGLE, SNAP or TJOIN reads them; class="free" (parts tilted on purpose) skips ANGLE only.
 Two narrow exceptions, both opt-in by the drawing:
   <g class="curve">  a curved surface cut into flat strips (the hero cloud's side wall). Its strips are not iso
                      edges (no ANGLE) and their outline points sit a couple of px apart by design, so SNAP and TJOIN
@@ -35,13 +41,18 @@ def is_ui(sh):
     if abs(sh.m[1]) > 1e-6 or abs(sh.m[2]) > 1e-6: return True   # icon mapped with matrix
     return False
 
-def is_leader(sh):
+def group_classes(sh):
     p = sh.el.getparent()
-    return p is not None and 'co' in (p.get('class') or '').split()
+    return set((p.get('class') or '').split()) if p is not None else set()
+
+def own_classes(sh):
+    return set((sh.a.get('class') or '').split())
+
+def is_leader(sh):
+    return 'co' in group_classes(sh)
 
 def is_curve(sh):
-    p = sh.el.getparent()
-    return p is not None and 'curve' in (p.get('class') or '').split()
+    return 'curve' in group_classes(sh)
 
 def one_step(p, q, step):
     # q - p is one grid step along an iso axis: vertical, or 30 deg either side of horizontal
@@ -53,12 +64,35 @@ def one_step(p, q, step):
     return False
 
 def is_floor(sh):
-    # class="floor": the floor grid, clipped where objects stand, so its ends stop a hair from their edges on purpose
-    return 'floor' in (sh.a.get('class') or '').split()
+    # class="floor" on the shape or its group: the floor grid, clipped where objects stand, so its ends stop a hair
+    # from their edges on purpose
+    return 'floor' in own_classes(sh) | group_classes(sh)
+
+def is_mark(sh):
+    # class="mark": arrowheads, routes and other 2D markers drawn over the scene
+    return 'mark' in own_classes(sh)
 
 def is_free(sh):
-    # class="mark" (arrowheads, 2D markers) or class="free" (parts tilted on purpose, like a laptop lid)
-    return bool({'mark', 'free'} & set((sh.a.get('class') or '').split()))
+    # class="free": parts tilted on purpose, like a laptop lid
+    return 'free' in own_classes(sh)
+
+def occluders(shapes):
+    """Opaque filled faces in drawing order: (order, shape, polygon)."""
+    out = []
+    for k, s in enumerate(shapes):
+        a = s.a
+        if not (s.closed and s.subs and len(s.subs[0]) >= 3) or a.get('fill') == 'none' or is_leader(s) or is_mark(s):
+            continue
+        if min(float(a.get('fill-opacity', 1)), float(a.get('opacity', 1))) < 1:
+            continue
+        out.append((k, s, Polygon(s.subs[0]).buffer(0)))
+    return out
+
+def hidden(p, s, faces, order):
+    """p is covered by an opaque face drawn after shape s (other than s), at least 0.15px inside it."""
+    P = Point(p)
+    return any(k > order[id(s)] and f is not s and poly.contains(P) and poly.exterior.distance(P) >= 0.15
+               for k, f, poly in faces)
 
 def main():
     argv, step = list(sys.argv), None
@@ -68,19 +102,22 @@ def main():
     off = int(argv[2]) - 1 if len(argv) > 3 else 0
     _, shapes = load(text)
     geo = [s for s in shapes if s.subs and not is_ui(s) and not is_floor(s)]
+    faces, order = occluders(shapes), {id(s): k for k, s in enumerate(shapes)}
     out = []
     # ANGLE
     for s in geo:
-        if is_leader(s) or is_free(s) or is_curve(s): continue   # leaders, markers, tilted parts and curves are off-axis by design
+        if is_leader(s) or is_mark(s) or is_free(s) or is_curve(s): continue   # leaders, markers, tilted parts and curves are off-axis by design
         for p, q in s.edges():
             k, d, o, ln = classify(p, q)
             if k is None or ln < 3: continue
             hor = min(abs(math.degrees(math.atan2(q[1]-p[1], q[0]-p[0])) % 180), 180 - abs(math.degrees(math.atan2(q[1]-p[1], q[0]-p[0])) % 180))
             if 0.12 < o and d < 10 and ln > 3:
                 out.append(f'ANGLE L{s.line+off} {s.tag} {k} off={o:.2f}px ang_err={d:.2f} len={ln:.1f} {p[0]:.1f},{p[1]:.1f}->{q[0]:.1f},{q[1]:.1f}')
-    # SNAP
+    # SNAP and TJOIN: leaders and marks cross the drawing by design
+    solid = [not (is_leader(s) or is_mark(s)) for s in geo]
     verts = []
     for i, s in enumerate(geo):
+        if not solid[i]: continue
         for sub in s.subs:
             for p in sub: verts.append((p, i))
     grid = {}
@@ -93,7 +130,7 @@ def main():
             for dy in (-1, 0, 1): cand += grid.get((gx+dx, gy+dy), [])
         for a in vs:
             for b in cand:
-                if a[1] == b[1] or geo[a[1]].line == geo[b[1]].line: continue
+                if a[1] == b[1]: continue   # by shape, not source line: one line often holds a whole box
                 if is_curve(geo[a[1]]) and is_curve(geo[b[1]]): continue
                 d = math.dist(a[0], b[0])
                 if 0.15 < d < 2.0:
@@ -102,13 +139,16 @@ def main():
                     seen.add(key)
                     if step and one_step(a[0], b[0], step):
                         stepped += 1; continue
+                    if hidden(a[0], geo[a[1]], faces, order) or hidden(b[0], geo[b[1]], faces, order): continue
                     out.append(f'SNAP  L{geo[a[1]].line+off}/L{geo[b[1]].line+off} d={d:.2f} {a[0][0]:.1f},{a[0][1]:.1f} vs {b[0][0]:.1f},{b[0][1]:.1f}')
-    # TJOIN (vertex near other shape's edge)
+    # TJOIN (vertex near other shape's edge); faces that share the vertex and edge would list it twice
+    tjoins = set()
     for i, s in enumerate(geo):
+        if not solid[i]: continue
         for sub in s.subs:
             for p in sub:
                 for j, t in enumerate(geo):
-                    if j == i or (is_curve(s) and is_curve(t)): continue
+                    if j == i or not solid[j] or (is_curve(s) and is_curve(t)): continue
                     for a, b in t.edges():
                         ln = math.dist(a, b)
                         if ln < 4: continue
@@ -117,7 +157,10 @@ def main():
                         if tpar < 1 or tpar > ln-1: continue
                         dperp = abs((p[0]-a[0])*uy - (p[1]-a[1])*ux)
                         if 0.15 < dperp < 1.2:
-                            out.append(f'TJOIN L{s.line+off}->L{t.line+off} d={dperp:.2f} pt {p[0]:.1f},{p[1]:.1f}')
+                            foot = (a[0] + ux * tpar, a[1] + uy * tpar)
+                            if hidden(p, s, faces, order) or hidden(foot, t, faces, order): continue
+                            line = f'TJOIN L{s.line+off}->L{t.line+off} d={dperp:.2f} pt {p[0]:.1f},{p[1]:.1f}'
+                            if line not in tjoins: tjoins.add(line); out.append(line)
     # DOTS
     faces = [s for s in geo if s.closed and s.fill not in ('none', '') and len(s.subs[0]) >= 3]
     for s in shapes:

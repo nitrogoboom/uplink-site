@@ -7,7 +7,7 @@ Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edg
 import sys
 from shapely.geometry import box as box_shape, Polygon
 from iso import W, fmt
-from isogen import FACES, HIGH, ORANGE, INK, EDGE, silhouette, floor_grid, disc_arcs, label, doc, write
+from isogen import FACES, HIGH, ORANGE, INK, EDGE, silhouette, floor_grid, disc_arcs, label, doc, write, box as draw_box
 from isoprops import tree
 import palette as pal
 
@@ -52,8 +52,7 @@ BOXES = []                            # every box drawn, in order (rules_hq.py r
 
 
 def box(x0, x1, y0, y1, z0, z1, cols=FACES, edge=EDGE):
-    BOXES.append((x0, x1, y0, y1, z0, z1))
-    return [f'<polygon points="{pts}" fill="{c}" {edge}/>' for pts, c in zip(w.box(x0, x1, y0, y1, z0, z1), cols)]
+    return draw_box(w, (x0, x1, y0, y1, z0, z1), cols, edge, log=BOXES)
 
 
 def flat(pts, fill, extra=''):

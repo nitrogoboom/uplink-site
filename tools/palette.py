@@ -13,14 +13,54 @@ import pathlib
 import re
 
 TOKENS = pathlib.Path(__file__).resolve().parent.parent / 'src' / 'styles' / 'tokens.css'
-_root = TOKENS.read_text(encoding='utf-8').split(':root {', 1)[1].split('}', 1)[0]
-_tok = {k: v.upper() for k, v in re.findall(r'--([a-z0-9-]+):\s*(#[0-9A-Fa-f]{3,6})\b', _root)}
+
+
+class PaletteError(ValueError):
+    """tokens.css doesn't give a drawing colour in a form the drawings can use."""
+
+
+def root_block(css):
+    """The body of the top-level :root { } rule (not one inside @media or another block). Comments are skipped."""
+    css = re.sub(r'/\*.*?\*/', '', css, flags=re.S)
+    depth, i = 0, 0
+    for m in re.finditer(r'[{}]', css):
+        if m.group() == '}':
+            depth -= 1
+            continue
+        if depth == 0 and re.fullmatch(r'\s*:root\s*', css[i:m.start()].rsplit(';', 1)[-1].rsplit('}', 1)[-1]):
+            end, d = m.end(), 1
+            for n in re.finditer(r'[{}]', css[end:]):
+                d += 1 if n.group() == '{' else -1
+                if d == 0:
+                    return css[end:end + n.start()]
+            raise PaletteError(':root { in tokens.css is never closed')
+        depth += 1
+        i = m.end()
+    raise PaletteError('tokens.css has no top-level :root { } block')
+
+
+def read_tokens(css):
+    """{name: value} for every custom property in the top-level :root block (values as written, trimmed)."""
+    return {k: v.strip() for k, v in re.findall(r'--([A-Za-z0-9-]+)\s*:\s*([^;]*)', root_block(css))}
+
+
+def solid(name, value):
+    """#RRGGBB (upper case) from a #RGB or #RRGGBB token value; anything else is a PaletteError naming the token."""
+    if not re.fullmatch(r'#(?:[0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})', value):
+        raise PaletteError(f'--{name} in tokens.css is "{value}": the drawings take a solid colour written as #RGB or '
+                           f'#RRGGBB (not oklch(), var(), an alpha channel or another form)')
+    v = value.upper()
+    return '#' + ''.join(c * 2 for c in v[1:]) if len(v) == 4 else v
+
+
+_tok = read_tokens(TOKENS.read_text(encoding='utf-8'))
 
 
 def tok(name):
     """A solid colour from tokens.css, e.g. tok('iso-top')."""
-    v = _tok[name]
-    return '#' + ''.join(c * 2 for c in v[1:]) if len(v) == 4 else v
+    if name not in _tok:
+        raise PaletteError(f'--{name} is not in the top-level :root block of tokens.css')
+    return solid(name, _tok[name])
 
 
 # ---- OKLCH, for the shades without a role -------------------------------------------------------

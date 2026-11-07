@@ -2,7 +2,6 @@
   public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
   public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
                                       badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
-  out/drawings/office-build.svg       animated reference copy of the hero (not deployed; carries its Barlow letters)
   public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
   public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
   src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
@@ -15,19 +14,19 @@
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of them.
 The hero and its tablet and phone cuts have their own floor layout for now ('hero layout' below: desk rows, lounge,
-guest Wi-Fi, reception, entrance); office, build and compact (the card) still draw the plan above. To move them over, send them through hero_groups() too.
+guest Wi-Fi, reception, entrance); office and compact (the card) still draw the plan above. To move them over, send them through hero_groups() too.
 World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
 Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
 to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
 The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept as the page's JS and CSS expect:
-  tools/office_parts/build.css, hero.css   the animation CSS inside the two animated versions
+  tools/office_parts/hero.css              the animation CSS inside the animated cuts
   tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
   tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
 """
 import html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, card as card_cut
+from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, card as card_cut, box as draw_box
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -217,8 +216,7 @@ TRAY_EDGE = f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.75"'
 ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
 # what screen readers say for the drawing: plain words, as a person would describe it
 TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace',
-          'build': 'Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
-TITLES['hero'] = TITLES['build']
+          'hero': 'Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
 
 
 # ---- small builders -------------------------------------------------------------
@@ -237,10 +235,7 @@ BOXES = []                             # every box drawn, in order (rules_office
 
 
 def box(b, cols=FACES, edge=EDGE, classes=('', '', '')):
-    BOXES.append(b)
-    x0, x1, y0, y1, z0, z1 = b
-    return [f'<polygon {f"class={chr(34)}{c}{chr(34)} " if c else ""}points="{pts}" fill="{col}" {edge} stroke-linejoin="round"/>'
-            for pts, col, c in zip(w.box(x0, x1, y0, y1, z0, z1), cols, classes)]
+    return draw_box(w, b, cols, edge, classes, ' stroke-linejoin="round"', log=BOXES)
 
 
 def wall_x(x, y0, y1, z0, z1):        # rectangle on the plane x = const, back to front
@@ -608,7 +603,7 @@ def card(v):
     for i, (name, cy, ty) in enumerate(rows):
         g = f'<g class="lt ob-swap ob-swap-{i}">' if v != 'office' else '<g class="lt">'
         out.append(f'{g}<circle cx="532.2" cy="{cy}" r="6.2" fill="{pal.GREEN}"/><text x="545.9" y="{ty}" font-family="{FONT}" font-size="24" '
-                   f'font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{name}</text></g>')
+                   f'font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{esc(name)}</text></g>')
     out.append('</g>')
     return out
 
@@ -646,12 +641,12 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
         x, ty, sy, anchor = label_text(elbow, side, k)
         return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>',
                 f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="8" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3.5"/>',
-                f'<text class="lt" x="{fmt(x)}" y="{fmt(ty)}" font-family="{FONT}" font-size="{24 * k:.3g}" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}" {HALO}>{title}</text>',
-                f'<text class="lt" x="{fmt(x)}" y="{fmt(sy)}" font-family="{FONT}" font-size="{19 * k:.3g}" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}" {HALO}>{sub}</text>']
+                f'<text class="lt" x="{fmt(x)}" y="{fmt(ty)}" font-family="{FONT}" font-size="{24 * k:.3g}" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}" {HALO}>{esc(title)}</text>',
+                f'<text class="lt" x="{fmt(x)}" y="{fmt(sy)}" font-family="{FONT}" font-size="{19 * k:.3g}" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}" {HALO}>{esc(sub)}</text>']
     return [f'<polyline class="lt" points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
             f'<circle class="lt" cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3"/>',
-            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{title}</text>',
-            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}">{sub}</text>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 8)}" font-family="{FONT}" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{colour}" text-anchor="{anchor}">{esc(title)}</text>',
+            f'<text class="lt" x="{fmt(tx + sign * 12)}" y="{fmt(ey + 36)}" font-family="{FONT}" font-size="21" font-weight="400" letter-spacing="0" fill="{pal.GREY}" text-anchor="{anchor}">{esc(sub)}</text>',
             '']   # the blank line the retired badge left, so the drawing stays byte for byte the same
 
 
@@ -749,12 +744,12 @@ def air(v, G, aps, labels, rack_h=RACK[3], guest=None, scale=1.0):
         G.append((None, [hero_cloud]))
     elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
         for (dot, elbow, colour, title, sub, side), d in zip(COMPACT_LABELS, (2800, 2960)):
-            G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
+            G.append((f'class="ob-i ob-lab co lbl" data-t="{esc(title)}" data-s="{esc(sub)}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
         return G
     else:
         G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
     for dot, elbow, colour, title, sub, d, *side in labels:
-        G.append((f'class="ob-i ob-lab co lbl" data-t="{title}" data-s="{sub}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side, k=scale)))
+        G.append((f'class="ob-i ob-lab co lbl" data-t="{esc(title)}" data-s="{esc(sub)}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side, k=scale)))
     return G
 
 
@@ -797,7 +792,7 @@ def render(v):
             open_, close = f'<g {attrs}>', '</g>'
         out += [open_, *shapes, close]
     body = number_badges('\n'.join(out))
-    title = TITLES['office' if v == 'compact' else 'build' if v in ('phone', 'tablet') else v]
+    title = esc(TITLES['office' if v == 'compact' else 'hero' if v in ('phone', 'tablet') else v])
     crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
     phone_crop = ' '.join(f'{c:g}' for c in PHONE_CROP)
     if v == 'compact':
@@ -811,9 +806,6 @@ def render(v):
     elif v == 'office':
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
         style = font_style(body) + '\n' + key_css()
-    elif v == 'build':
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" class="ob" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
-        style = font_style(body) + '\n' + key_css() + '\n<style>' + part('build.css') + '</style>'
     else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
         style = '<style>' + part('hero.css') + '</style>'
@@ -853,16 +845,13 @@ def phone_still():
     body, over = PHONE_STILL
     body = re.sub(r' style="[^"]*"', '', body + '\n' + over)
     head = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{" ".join(f"{c:g}" for c in PHONE_CROP)}" '
-            f'width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" role="img" aria-label="{TITLES["office"]}">')
-    return '\n'.join([head, f'<title>{TITLES["office"]}</title>', '<style>.ob-flow{stroke-dasharray:2 7}</style>', body, '</svg>'])
+            f'width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" role="img" aria-label="{esc(TITLES["office"])}">')
+    return '\n'.join([head, f'<title>{esc(TITLES["office"])}</title>', '<style>.ob-flow{stroke-dasharray:2 7}</style>', body, '</svg>'])
 
 
 if __name__ == '__main__':
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
-    ref = pathlib.Path(__file__).resolve().parent.parent / 'out/drawings'   # not deployed or tracked: nothing links it
-    ref.mkdir(parents=True, exist_ok=True)
-    (ref / 'office-build.svg').write_text(render('build') + '\n', encoding='utf-8', newline='\n')
     # the card cut: the compact one without its labels or their letters (isogen.card). The compact cut itself is
     # no longer a file: the phone hero's still is hero-office-phone.svg, below.
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')

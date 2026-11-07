@@ -23,7 +23,7 @@ updates:
     groups:
       actions:
         patterns: ['*']
-  # requirements.txt: the drawing tools (CI installs none of it; the checks run on Node)
+  # requirements.in, locked into requirements.txt with hashes (uv pip compile): the drawing tools, which CI's drawings job installs
   - package-ecosystem: pip
     directory: /
     schedule:

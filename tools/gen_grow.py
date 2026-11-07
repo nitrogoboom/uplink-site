@@ -16,7 +16,7 @@ import sys, pathlib
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, ORANGE, BLUE, INK, EDGE, silhouette, floor_grid, disc_arcs, ellipse, doc, write
+from isogen import FACES, HIGH, ORANGE, BLUE, INK, EDGE, silhouette, floor_grid, disc_arcs, ellipse, doc, write, box as draw_box
 from isoprops import tree
 import palette as pal
 
@@ -390,8 +390,7 @@ def render(s):
             body.append(op[1])
         else:
             _k, b, cols, edge = op
-            BOXES.append(b)
-            body += [f'<polygon points="{pts}" fill="{c}" {edge}/>' for pts, c in zip(w.box(*b), cols)]
+            body += draw_box(w, b, cols, edge, log=BOXES)
     for k, p in s.anchors.items():
         X, Y = w.p(*p)
         body.append(f'<circle class="tg-a" data-a="{k}" cx="{fmt(X)}" cy="{fmt(Y)}" r="0"/>')

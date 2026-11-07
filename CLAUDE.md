@@ -51,6 +51,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Every illustration is written by `tools/gen_*.py`. Change the numbers in the script and rerun it; the SVGs are outputs. That includes the hero (`gen_office.py`), Grow (`gen_grow.py`) and the footer map (`gen_campus.py`).
 - True isometric, per "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it (each `rules_NAME.py` gives the exact command), and look at its `NAME-compact.svg` phone cut.
 - Timings in a drawing become classes in a `<style>` block (`hoist_styles` in `tools/isogen.py`).
+- `python tools/regen.py --check` reruns every generator and every check; CI's `drawings` job fails if a committed SVG differs from its script's output. Commit the regenerated SVGs with the script change. Tool tests: `python -m pytest tools/tests`.
 
 ## Checking a change
 
