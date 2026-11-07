@@ -740,8 +740,9 @@ for (const [page, w, h] of [['index', 1440, 900], [MISSING, 390, 844]]) {
 }
 
 // B22, M7: on paper every Grow step shows, sections take their content's height whatever the screen (a page printed
-// scaled down is laid out at a desktop width, where sections are a screen tall), forms, copy buttons and pop-up
-// openers go, and a contact line stands in for the footer
+// scaled down is laid out at a desktop width, where sections are a screen tall), forms, copy buttons and the buttons
+// that open a pop-up go, while a card that opens one (Home's check-up card, Contact's "Book a check-up") prints its
+// words, and a contact line stands in for the footer
 for (const page of ['index', 'contact']) {
   test(`print ${page} (B22, M7)`, async ({ browser }) => {
     const fails = [];
@@ -767,12 +768,14 @@ for (const page of ['index', 'contact']) {
       return {
         cards: [...document.querySelectorAll('.grow-card')].filter(shown).length,
         of: document.querySelectorAll('.grow-card').length,
-        gone: [...document.querySelectorAll('form, .copy-btn, [data-open]')].filter(shown).map((e) => e.className || e.tagName),
+        gone: [...document.querySelectorAll('form, .copy-btn, .btn[data-open], button[data-open]')].filter(shown).map((e) => e.className || e.tagName),
+        cardsOpen: [...document.querySelectorAll('main .card[data-open]')].map((e) => (shown(e) ? '' : e.textContent.trim())).filter(Boolean),
         contact: [...document.querySelectorAll('.print-contact')].filter(shown).map((e) => e.textContent).join(),
       };
     });
     if (s.cards !== s.of) fails.push(`${page} on paper: ${s.cards} of ${s.of} Grow steps`);
     if (s.gone.length) fails.push(`${page} on paper still shows: ${s.gone.join(', ')}`);
+    if (s.cardsOpen.length) fails.push(`${page} on paper drops a card's words: ${s.cardsOpen.join(' | ')}`);
     if (!/\d.*@/.test(s.contact)) fails.push(`${page} on paper: no contact line (phone, email) in place of the footer: "${s.contact}"`);
     console.log(`print ${page}: ${a}px / ${b}px, ${JSON.stringify(s)}`);
     await ctx.close();
