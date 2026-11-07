@@ -1081,8 +1081,7 @@ for (const page of ['index', 'contact']) {
     await q.waitForLoadState('networkidle');
     await q.emulateMedia({ media: 'print' });
     // the page's content laid out on two screen heights that meet the same media queries (desktop, landscape, wider
-    // than 3:2) and give the same root font size (tokens.css: the smaller of 1.11vw and 1.78vh, so both at least
-    // 1000 tall at 1600 wide): it must be the same length. Pictures are capped at 60vh on paper (a share of the page), so they're
+    // than 3:2, and the same --fold-pad step in tokens.css: both under 1080 tall): it must be the same length. Pictures are capped at 60vh on paper (a share of the page), so they're
     // held to one size for this comparison.
     await q.addStyleTag({ content: 'img, svg { max-height: 300px !important; }' });
     const tall = async (hh) => {

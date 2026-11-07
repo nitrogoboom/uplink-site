@@ -100,6 +100,8 @@ Each section's desktop layout sits at the end of its own CSS file, so it always 
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
 
+Text sizes are in `rem`, and `html` has no font size of its own, so 1rem is the visitor's own font size (16 px unless they changed it) on every screen. Browser zoom and the browser's font setting then grow every text, and the zoom check (`checks/zoom.spec.mjs`) holds it. Only pictures, gaps, and page width may follow the screen (`vw`, `svh`).
+
 Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`, where `cqi` is 1% of the nearest container's width. A heading whose longest word has 10 letters or more ("Cybersecurity", "Everything") carries the class `fit`, which components add at build time with `fit(text)` from `lib/fit.js` (`TextPage.astro` adds it to the Markdown's `h2`s): its `--fit` is `--fit-long` (14cqi), so a 13-letter word fits on one line. Every other heading gets `--fit-short` (21cqi), which keeps its size step except with big text in a narrow column; `fit(text)` gives a heading whose words all have 6 letters or fewer the class `fit-loose` (30cqi). `h3` follows the same rule. A heading's container must be its own column: the project page's title has a box of its own (`.case-title`), and Contact's form heading measures `.form-head`. A process step puts its title under the number when the step is narrower than 12rem. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing.
 
 ### Breakpoints
@@ -114,7 +116,7 @@ Every breakpoint is in `em`, in range syntax: `(width < 43.75em)`. In a media qu
 | `phone` | `width < 43.75em` | Below 700 px. |
 | `tablet` | `43.75em <= width < 68.75em` | 700 px to 1099 px. |
 | `desktop` | `width >= 68.75em` | 1100 px and up. |
-| `fold` | `width >= 68.75em` and `height >= 43.75em` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
+| `fold` | `width >= 68.75em` and `height >= 43.75em` | 1100 px and up, and at least 700 px tall. One section per screen. Text keeps the visitor's size; the centred block (`--container`, 85% of a screen wider than 1,600 px), the section padding (`--fold-pad`) and the pictures (`--hero-max`, `--grow-stage-max`) follow the screen. |
 
 After you move CSS, prove nothing changed with `npm run verify:styles -- OLD_URL NEW_URL`. It compares every element's computed style between two builds.
 

@@ -40,9 +40,9 @@ The image fills the whole screen behind both. The subject sits in the middle or 
 
 ### How the site does it
 
-On a `fold` screen, at least 1100 px wide and 700 px tall, `tokens.css` sets the root font size to `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`. That gives 25.6 px at 3440×1440 and 19.2 px at 1920×1080, so the whole layout scales with the smaller of the screen's width and height.
+Text doesn't scale with the screen: 1rem is the visitor's own font size on every screen, so browser zoom and the browser's font setting work (review C1; until November 7, 2026, a `fold` screen set the root to `clamp(14px, min(1.1111vw, 1.7778vh), 40px)`, which zoom barely moved). What follows the screen is the room round the text, so each section still fills one screen.
 
-On the same screens, `--container` is `94rem` plus two gutters: one centred block for card grids and lists. The header, the hero, and the footer's stage and base bar run full width. Smaller screens, and desktops shorter than 700 px, keep `--container` at 80rem.
+On a `fold` screen, at least 1100 px wide and 700 px tall, `--container` is `max(94rem + 2 * var(--gutter), 85vw)`: one centred block for card grids and lists, the full width up to 1,600 px and 85% of a wider screen. `--fold-pad`, the padding of a one-screen section, steps up with the screen's height, and the hero and Grow pictures are capped by shares of the screen (`--hero-max`, `--grow-stage-max`). The header, the hero, and the footer's stage and base bar run full width. Smaller screens, and desktops shorter than 700 px, keep `--container` at 80rem.
 
 Before October 28, desktop set `--container: none`, so content stretched across all 3,440 px.
 

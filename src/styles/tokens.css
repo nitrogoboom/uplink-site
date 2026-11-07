@@ -3,7 +3,7 @@
    Every size, colour and timing on the site comes from this file.
    Layout concept: game-client chrome (sticky top bar) around calm scrolling
    sections. Heroes and the header run full width; cards and lists sit in one
-   centred block (--container, 94rem on desktop; docs/layout-reference.md).
+   centred block (--container: 1600px, or 85% of a wider desktop screen; docs/layout-reference.md).
    ========================================================================== */
 
 :root {
@@ -131,7 +131,7 @@
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
   --chevron-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
   --container:  80rem;
-  --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on desktop (grow.css) */
+  --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on a desktop under 700px tall (grow.css); taller: below */
   --gutter:    1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
   --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
@@ -234,17 +234,25 @@
   }
 }
 
-/* Desktop screens: the whole layout scales with the screen.
-   Reference screen is 1440 x 900 at a 16px root. A bigger screen scales
-   everything up by whichever is smaller, width or height, so a section
-   always fits one screen. 3440 x 1440 ends up at about 25.6px. */
+/* Desktop screens tall enough for one section per screen. Text never follows the screen: 1rem is the visitor's own
+   font size (16px unless they changed it), so zoom and their font setting work on every screen (review C1). What
+   follows the screen is the room round the text: the centred block's width (here), the space round a one-screen
+   section (--fold-pad, below) and the pictures, which take what the text leaves (fold.css). */
 @media (--fold) {
-  html { font-size: clamp(14px, min(1.1111vw, 1.7778vh), 40px); }
   :root {
-    --container: calc(94rem + 2 * var(--gutter));  /* one centred block: the full width at 16:9, side margin on wider screens.
-                                                       The header, hero and footer stage and base bar run full width. */
+    --container: max(94rem + 2 * var(--gutter), 85vw);  /* one centred block: the full width up to 1600px, then 85% of the
+                                                          screen. The header, hero and footer stage and base bar run full width. */
     --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
+    /* the tallest the Home hero (home/hero.css) and the Grow picture (home/grow.css) get: shares of the screen, not
+       rem, so the pictures fill big screens whatever the text size. 62vw: the hero stops growing taller only on a
+       near-square window */
+    --hero-max: 62vw;
+    --grow-stage-max: min(49vw, 78svh);
+    --fold-pad: var(--sp-7);   /* top and bottom of a one-screen section (fold.css): a step of the scale that grows
+                                  with the screen's height, so big screens keep their air */
   }
+  @media (height <= 47.5em) { :root { --fold-pad: var(--sp-5); } }  /* short laptops: 1280 x 720 */
+  @media (height >= 67.5em) { :root { --fold-pad: var(--sp-8); } }  /* 1080 tall and up */
   /* the wheel grid: a fold a whole number of notches tall, so the wheel's stops land on fold edges. Older browsers
      without round() keep --fold-h. */
   @supports (height: round(up, 1px, 1px)) {

@@ -8,7 +8,8 @@
 // page's root font size, so a visitor's bigger default font, and zoom, count as a narrower screen. Range syntax:
 // (width < 43.75em) is everything below 700px, fractions included.
 //   phone < 700px (43.75em), tablet 700-1099px, desktop >= 1100px (68.75em).
-//   fold         a desktop screen tall enough for one section per screen (fold.css; the root font scales, tokens.css).
+//   fold         a desktop screen tall enough for one section per screen (fold.css). Text keeps the visitor's size there
+//                too; the page width, section padding and pictures follow the screen (tokens.css).
 //   smallPhone   < 600px (37.5em): where the drawings switch to their phone cut (compact-cuts.css, the home hero's).
 export const MEDIA = {
   smallPhone: '(width < 37.5em)',

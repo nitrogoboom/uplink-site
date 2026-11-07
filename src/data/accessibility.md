@@ -20,7 +20,7 @@ A person also checks what a machine can't judge: the site on real phones, how a 
 
 ## Built-in aids
 
-- **Bigger text.** Use your browser's zoom (Ctrl and +, or Cmd and + on a Mac) to make the page bigger. On large screens, see Known limits.
+- **Bigger text.** Use your browser's zoom (Ctrl and +, or Cmd and + on a Mac) to make the page bigger, or set a bigger font size in your browser's settings. The site follows both on every screen, up to 400% zoom.
 - **Pause animations.** The pause button stops the moving drawings, and the site remembers your choice next time.
 - **Less motion.** If your device is set to reduce motion, the site doesn't animate at all.
 - **Keyboard shortcuts.** You'll find them in Settings (the gear, or press the question mark key). You can turn them off there if they get in the way of your own tools.
@@ -30,7 +30,6 @@ A person also checks what a machine can't judge: the site on real phones, how a 
 ## Known limits
 
 - **Forms don't send yet.** We're still finishing the contact form, "Book a check-up", and the newsletter sign-up. Until they work, please email or call us (details below).
-- **Zoom on large screens.** On a large desktop screen, your browser's zoom and its own text size setting barely change the size of the text yet. We're fixing this.
 - **Some links go to a "coming soon" page.** These include the client portal, the blog, and our social media pages.
 - **The checks by a person aren't finished.** Every page passes our automated accessibility checks, including the screen-reader read-through. The code check still finds one small error on the home page, which we're fixing. A person hasn't yet tried every page on real phones or listened to it with a real screen reader, such as NVDA or VoiceOver. That's next.
 

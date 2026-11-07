@@ -151,13 +151,13 @@
 
 /* ---- desktop, tall enough for the menu ----------------------------------
    The whole hero is one screen: headline, button and menu centred on the
-   left, the office over the news cards on the right. The root font scales
-   with the screen (tokens.css), so this keeps its shape from 1440 x 900 up. */
+   left, the office over the news cards on the right. Text keeps the visitor's
+   size; the office takes the height and width left, so it fills big screens. */
 @media (width >= 68.75em) and (height >= 50em) and (orientation: landscape) {
   .hero-grid {
-    /* on a tall, near-square window the hero stops at 56rem and centres in the screen, so the
+    /* on a tall, near-square window the hero stops at --hero-max and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
-    min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem);
+    min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: "menu stage" "menu dock";
@@ -188,7 +188,7 @@
       justify-content: center;
     }
     /* the hero's own height, written out: the grid's height is only a floor, so 100% of it wouldn't resolve */
-    .hero-art .stage { aspect-ratio: 40 / 31; height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); }
+    .hero-art .stage { aspect-ratio: 40 / 31; height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max)); }
     .hero-menu { margin-right: var(--sp-6); }   /* menu to office: sp-6 + sp-6, as wide as the sp-8 gap above */
     .hero-dock { grid-template-columns: minmax(0, 1fr); align-content: end; }
   }
