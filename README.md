@@ -215,14 +215,16 @@ When you change a drawing's labels or layout, check its phone cut too.
 After you change a drawing, run both checks on it. Each exits with status 1 on any finding.
 
 - **`check.py FILE.svg`** finds edges that are near an isometric angle but not on it (`ANGLE`), vertices of different shapes that nearly meet (`SNAP`), and vertices that nearly touch another shape's edge (`TJOIN`). It also lists where each leader dot sits (`DOT`); those lines are for reading and don't fail the check. For an SVG inline in an HTML file, add the line range: `check.py FILE START_LINE END_LINE`.
-  - It skips leader lines in `.co` groups, `class="mark"` arrowheads, and `class="free"` parts tilted on purpose.
+  - It skips leader lines in `.co` groups and `class="mark"` parts (arrowheads, the map's routes), which cross the drawing on purpose, and the floor grid (`class="floor"` on a line or its group). `class="free"` parts, tilted on purpose, skip only `ANGLE`.
+  - A near-miss that a later opaque face covers can't be seen, so it isn't reported.
   - `<g class="curve">` holds a curved surface cut into flat strips, such as the side wall of the hero's cloud. Its strips aren't checked against each other.
   - `--step PX` counts vertex pairs exactly one grid step apart along an isometric axis, instead of listing them. Use it for drawings whose props sit on a grid finer than 2 px on screen. For the office: `--step 1.758` (0.0625 × 28.127).
 - A drawing's CSS, its own `<style>` or the site's, styles parts by class, never by tag: SVGO writes `<polygon>`, `<line>` and `<rect>` as `<path>` in the shipped file. `npm run build` stops on a drawing whose `<style>` breaks this rule.
-- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`, and its first lines give the exact command. For Grow:
+- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`. Its first lines give the exact commands for both checks, on every cut. For Grow:
 
   ```bash
   python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
+  python tools/check.py src/components/home/grow-world.svg
   ```
 
 ### Site checks

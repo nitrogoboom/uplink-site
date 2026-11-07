@@ -129,7 +129,7 @@ def services():
 
 
 def resources():
-    s = box(4.9, 1.6, 0, 0.8, 0.8, 0.5)
+    s = box(4.9, 1.6, 0, 0.8, 0.8, 0.4)   # 0.4 tall: at 0.5 its top corner ran 1px from the stack's first box (check.py)
     for z in (0, 0.58, 1.16):
         s += box(6.1, 1.1, z, 1.8, 1.8, 0.45)
         for k in range(3):
@@ -159,7 +159,7 @@ def support():
 def industries():
     return (box(8.2, 12.6, 0, 1.2, 1.2, 1.8) + wins_y(8.2, 9.4, 13.8, 0.2, 1.7, 2, 3) +
             box(9.8, 12.4, 0, 1.3, 1.0, 2.6) + wins_x(11.1, 12.4, 13.4, 0.2, 2.5, 2, 4) +
-            box(8.6, 14.1, 0, 1.6, 1.0, 1.1) + wins_y(8.6, 10.2, 15.1, 0.15, 1.0, 3, 2) +
+            box(8.5, 14.1, 0, 1.6, 1.0, 1.2) + wins_y(8.5, 10.1, 15.1, 0.15, 1.0, 3, 2) +   # 1.2 tall, from x 8.5: clear of the windows behind (check.py)
             box(10.3, 13.7, 0, 1.0, 1.0, 1.4) + wins_x(11.3, 13.7, 14.7, 0.15, 1.3, 2, 2))
 
 
@@ -192,14 +192,14 @@ def build():
     BOXES.clear()
     s = ['<defs><radialGradient id="fc-shade"><stop offset="0.45" class="shade"/><stop offset="1" class="shade" stop-opacity="0"/></radialGradient></defs>',
          f'<ellipse class="shadow" cx="0" cy="{fmt(pr(16, 16)[1] + 34)}" rx="466" ry="74"/>',   # the platform's soft shadow
-         box(0, 0, -0.7, 16, 16, 0.7, 'plat') + '<g class="grid">' +
+         box(0, 0, -0.7, 16, 16, 0.7, 'plat') + '<g class="grid floor">' +   # floor: check.py skips the grid
          ''.join(line('', (k, 0), (k, 16)) + line('', (0, k), (16, k)) for k in range(1, 16)) + '</g>',
          f'<polyline class="edge" points="{pts([[0, 16, 0], [16, 16, 0], [16, 0, 0]])}"/>',
          f'<polyline class="ring2" points="{circ(8, 8, 0, 3.6)}"/>']
     for k in ORDER:
         if 'route' in SPOTS[k]:
             p = pts([[x, y, 0] for x, y in SPOTS[k]['route']])
-            s.append(f'<polyline class="route" data-k="{k}" points="{p}"/><polyline class="flow" data-k="{k}" points="{p}"/>')
+            s.append(f'<polyline class="route mark" data-k="{k}" points="{p}"/><polyline class="flow mark" data-k="{k}" points="{p}"/>')   # mark: drawn over the ground, not part of it (check.py)
     s += [f'<polyline class="ring" data-k="{k}" points="{circ(*SPOTS[k]["at"], 0.02, SPOTS[k]["r"])}"/>' for k in ORDER]
     s.append(tree(1.4, 1.6) + tree(2.4, 1.2, 0.4) + tree(1.2, 2.8, 0.45) + tree(14.6, 14.4) + tree(13.6, 14.9, 0.4) +
              tree(6.2, 15, 0.45) + tree(14.8, 1.4, 0.45))
