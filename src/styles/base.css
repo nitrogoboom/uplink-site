@@ -64,12 +64,14 @@ a:hover { text-decoration-color: currentColor; }
   border-radius: var(--r-1);
 }
 
-/* set by script on the hero and footer drawings while they are off screen, and on <html> by the pause
-   buttons (.is-held, core.js). !important because the inline drawings' own <style> comes later.
-   The pause holds the drawings and decorative loops, never a pop-up's own entrance or exit: a dialog, a toast or a
-   footer panel paused on its first frame would stay invisible (opacity 0), and a toast would never leave, as it
-   waits for its exit animation to end (review B1; the site check opens each with the pause on). */
-.is-idle, .is-idle *, .is-held, .is-held *:not(.dialog, .toast, .fc-panel) { animation-play-state: paused !important; }
+/* .is-idle: set by script on the hero and footer drawings (and Grow) while they are off screen.
+   .is-held: set on <html> by the pause buttons (core.js). It holds the drawings only: every looping or building
+   animation on the site is part of an inline SVG (hero, hero captions, Grow, the footer map). Anything else that
+   animates is the page answering the visitor (a dialog, a toast or a footer panel coming in, the phone services row
+   following a swipe) and keeps running: held on its first frame, a pop-up would stay invisible and a toast would never
+   leave (review B1). A new decorative loop outside an SVG must be added here.
+   !important because the inline drawings' own <style> comes later. */
+.is-idle, .is-idle *, .is-held svg, .is-held svg * { animation-play-state: paused !important; }
 
 .sr-only {
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the standard 1px clip, not spacing */

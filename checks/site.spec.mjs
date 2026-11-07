@@ -242,6 +242,14 @@ for (const page of PAGES) {
         await q.waitForTimeout(250);
         worst = Math.max(worst, await q.evaluate(() => document.documentElement.scrollWidth - innerWidth));
       }
+      // Grow: don't leave it to its own timer (a slow machine may not have stepped yet). Pick each step by hand, the
+      // list on desktop or the dots below, and measure with each one active
+      const steps = q.locator('#grow :is(.grow-dot, .grow-item):visible');
+      for (let i = 0, n = await steps.count(); i < n; i++) {
+        await steps.nth(i).click();
+        await q.waitForTimeout(300);
+        worst = Math.max(worst, await q.evaluate(() => document.documentElement.scrollWidth - innerWidth));
+      }
       await q.close();
       if (worst > 0 || known) console.log(`sideways ${page} ${width}: ${worst}px${known ? ` (known: ${known})` : ''}`);
       verdict(worst > 0 ? [`${page} at ${width}px: ${worst}px sideways scroll`] : []);
@@ -250,8 +258,9 @@ for (const page of PAGES) {
 }
 
 // pop-ups: each dialog the page can open, with the site's pause off and on (review B1: with it on, the dialogs,
-// toasts and footer panels stayed at their first, invisible animation frame). axe gets the open dialog, which a pass
-// over the page at load can't see (a closed <dialog> isn't rendered).
+// toasts and footer panels stayed at their first, invisible animation frame, and the phone services row stopped
+// following a swipe). axe gets the open dialog, which a pass over the page at load can't see (a closed <dialog> isn't
+// rendered). With the pause on, every looping animation must be paused once the drawings have loaded.
 const shownStyle = (sel) => {
   const e = document.querySelector(sel);
   if (!e) return null;
@@ -312,6 +321,37 @@ for (const page of PAGES) {
           const after = await q.evaluate((d) => ({ open: document.getElementById(d).open, back: document.activeElement?.dataset?.open === d }), id);
           if (after.open) fails.push(`${name}: Esc didn't close #${id}`);
           else if (!after.back) fails.push(`${name}: focus didn't go back to what opened #${id}`);
+        }
+        // the phone services row (Home): swiped two cards along, the card now in the middle is the big, bright one
+        // (scroll-driven animations; review B1 follow-up: the pause held them, so the old card stayed big)
+        const row = q.locator('.svc-menu');
+        if ((await row.count()) && (await row.evaluate((e) => e.scrollWidth > e.clientWidth + 10))) {
+          await row.scrollIntoViewIfNeeded();
+          await row.evaluate((e) => e.scrollBy({ left: e.querySelector('li').offsetWidth * 2, behavior: 'instant' }));
+          await q.waitForTimeout(800);
+          const c = await row.evaluate((e) => {
+            const mid = e.getBoundingClientRect().left + e.clientWidth / 2;
+            const li = [...e.children].reduce((a, b) => {
+              const d = (x) => Math.abs(x.getBoundingClientRect().left + x.getBoundingClientRect().width / 2 - mid);
+              return d(b) < d(a) ? b : a;
+            });
+            const scale = new DOMMatrix(getComputedStyle(li.querySelector('.svc-tile')).transform).a;
+            const art = li.querySelector('.svc-art, .svc-icon');
+            return { i: [...e.children].indexOf(li), scale: Math.round(scale * 100) / 100, art: art ? Number(getComputedStyle(art).opacity) : 1 };
+          });
+          rep.push(`services row after a swipe: ${JSON.stringify(c)}`);
+          if (c.i < 1 || c.scale < 0.98 || c.art < 0.95) fails.push(`${name}: the services row didn't follow the swipe (the middle card: ${JSON.stringify(c)})`);
+        }
+        // with the pause on, nothing loops: Grow and the footer map scrolled in, then every endless animation paused
+        if (held && page === 'index') {
+          for (const sel of ['#grow', '#footer']) {
+            await q.$eval(sel, (e) => e.scrollIntoView());
+            await q.waitForTimeout(800);
+          }
+          const running = await q.evaluate(() =>
+            document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).map((a) => a.animationName || 'animation'),
+          );
+          if (running.length) fails.push(`${name}: ${running.length} loop(s) still running with the pause on: ${[...new Set(running)].join(', ')}`);
         }
         // desktop footer tabs: the panel a tab opens shows (the 404 page has no footer)
         if (w >= 700 && page !== MISSING) {

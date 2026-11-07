@@ -84,7 +84,7 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - No script errors and no CSP blocks on any page: watched until the network is idle and a few seconds after, while the screen turns, and while each of the page's own buttons is pressed.
 - No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px, at normal and 200% text.
 - Exactly one `h1` on every page, and every JSON-LD block parses.
-- Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own. All of it with the site's pause on too.
+- Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own; the phone services row follows a swipe. All of it with the site's pause on too, when nothing on Home may loop.
 - The sitemap lists exactly the pages the build wrote, and every check covers all of them.
 - The security headers and `noindex` on every page, the 404 status, and the report endpoint (`npm run smoke` against the local build).
 - The workflows pass zizmor's high-severity audits.
