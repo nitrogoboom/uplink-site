@@ -1,15 +1,13 @@
 ---
-// OUR WORK. Sections in page order; each is one component in src/components/work/.
+// OUR WORK. Sections in page order; each is one component in src/components/work/. No page script: the filters are
+// radios, and the CSS that hides the other cards (workFilterCss() in lib/site.ts) goes in the <head>.
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
+import { PAGES, workFilterCss } from '../lib/site';
 import Projects from '../components/work/Projects.astro';
+const filterCss = await workFilterCss();
 ---
 <Base title={PAGES.work.title} description={PAGES.work.description}
       page="work" path="/work" type="CollectionPage">
+  <Fragment slot="head"><style is:inline set:html={filterCss}></style></Fragment>
   <Projects />
-  <Fragment slot="scripts">
-    <script>
-      import '../scripts/work.js';
-    </script>
-  </Fragment>
 </Base>

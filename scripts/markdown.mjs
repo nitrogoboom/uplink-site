@@ -98,7 +98,6 @@ for (const file of pages) {
   const site = new URL(canonical).origin;
   let body = md(site, canonical).turndown(main)
     .replace(/^[ \t\xa0]+$/gm, '')            // lines left holding only a space (or a no-break space)
-    .replace(/^\s*(-|\d+\.)\s*$/gm, '')        // list items left empty (the Work filter buttons)
     .replace(/^(\s*)(-|\d+\.) +/gm, '$1$2 ')   // "-   item" → "- item"
     .replace(/\n{3,}/g, '\n\n').trim();
   // the page's summary (unless the page already opens with it) and address go right under its title

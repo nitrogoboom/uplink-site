@@ -1,12 +1,14 @@
 ---
-// WORK · 1. Projects (first screen): intro, filter buttons (work.js) and one card per project from the
-// collection, each linking to the project's own page. Styles: projects.css. Desktop layout: at the end of its CSS.
+// WORK · 1. Projects (first screen): intro, the filters and one card per project from the collection, each linking to
+// the project's own page. The filters are a radio group (workFilters() in lib/site.ts), "All" checked: each label
+// holds its count, so a screen reader hears "Build, 2". Choosing one hides the other cards with CSS alone (the
+// :has() rules work.astro puts in the <head>), so they work without script. Styles: projects.css. Desktop layout: at
+// the end of its CSS.
 import './projects.css';
 import ProjectCard from './ProjectCard.astro';
-import { getProjects } from '../../lib/site';
+import { WORK_FILTER, getProjects, workFilters } from '../../lib/site';
 const projects = await getProjects();
-const tags = ['Build', 'Protect', 'Plan'] as const;
-const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
+const filters = await workFilters();
 ---
 <section class="page-intro fold fold-always" id="projects" aria-labelledby="work-title">
   <div class="container work-layout">
@@ -14,17 +16,15 @@ const count = (t: string) => projects.filter((p) => p.data.tag === t).length;
       <p class="eyebrow">Our work</p>
       <h1 id="work-title">Setups we built and still run</h1>
       <p class="lead">Every project here is a client we still look after today. Open one to see what we found, what we did and how it turned out.</p>
-      <ul class="filters" aria-label="Filter projects">
-        <li><button class="filter" type="button" data-filter="all" aria-pressed="true">All<span class="count">{projects.length}</span></button></li>
-        {tags.map((t) => <li><button class="filter" type="button" data-filter={t.toLowerCase()} aria-pressed="false">{t}<span class="count">{count(t)}</span></button></li>)}
-      </ul>
-      <p class="sr-only" aria-live="polite" data-work-live></p>
+      <fieldset class="filters" data-md-skip>
+        <legend class="sr-only">Filter projects</legend>
+        {filters.map((f) => <label class="filter"><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'}>{f.label}<span class="sr-only">, </span><span class="count">{f.count}</span></label>)}
+      </fieldset>
     </div>
     <div class="work-main">
-    <ul class="work-grid" data-work-grid>
+    <ul class="work-grid">
       {projects.map((project, i) => <li data-tags={project.data.tag.toLowerCase()}><ProjectCard project={project} first={i === 0} /></li>)}
     </ul>
-    <p class="muted empty-note" data-work-empty hidden>No projects match this filter yet.</p>
     </div>
   </div>
 </section>

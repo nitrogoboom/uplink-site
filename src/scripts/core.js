@@ -9,7 +9,6 @@
                                exports the helpers the page scripts import
      footer.js    every page   footer campus map (the sections are <details>)
      home.js      Home         hero, phone Services row; grow.js (We grow with you)
-     work.js      Our work     filters
      contact.js   Contact      copy buttons, queue card
      soon.js      soon.html    names the missing page
 

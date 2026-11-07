@@ -5,7 +5,7 @@
 // every size it runs at:
 //   script errors   watched until the network is idle and a few seconds after (3 s; Home 5 s, for the hero's
 //                   captions), then while the screen turns (portrait to landscape and back) and while each of the
-//                   page's own buttons is pressed (pause, Grow, filters, copy buttons)
+//                   page's own buttons is pressed (pause, Grow, copy buttons)
 //   markup          exactly one <h1>; every JSON-LD block parses
 //   sideways scroll scrolled to its footer (the 404 page has none: Base.astro footer={false}, so to its end); and
 //                   separately at 320, 390, 600, 768, 1024 and 1280 wide, walked down a screen at a time
@@ -23,7 +23,8 @@
 // At the end, one test for each bug the November 7, 2026 review found and batch 2b fixed, named by its item (B2 …), so
 // it can't come back unseen: Grow's timing and frames, pop-ups and focus, forms, drawings that fail to load, the font
 // swap, print, and the drawings' ?v= addresses. And one for the footer on <details> (J7, B14, L7, M11): without
-// script, from the keyboard, through a resize and a turn, its landmarks and what a screen reader is told.
+// script, from the keyboard, through a resize and a turn, its landmarks and what a screen reader is told. And one for
+// the /work filters as a radio group (M11, B4): without script, from the keyboard, in forced colours, and axe.
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): the footer tiles at 1440, and Home and /soon at each size.
 import { createHash } from 'node:crypto';
@@ -31,6 +32,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { PNG } from 'pngjs';
 import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
 import { LONG, longest } from '../src/lib/fit.js';
 
@@ -946,6 +948,195 @@ test('forms: copy buttons without script, pattern titles, blank required choices
   if (!s.note) fails.push('the Book pop-up doesn\'t say fields are required unless marked optional');
   console.log(`forms: ${JSON.stringify(s)}`);
   await ctx.close();
+  verdict(fails);
+});
+
+// M11, B4 (layout plan D5): the /work filters are one radio group (a fieldset named by its legend), "All" checked,
+// each option named with its count ("Build, 3"). Without script, choosing one hides the other cards (CSS :has()) and
+// "All" brings them back; the arrow keys move the choice, and Tab leaves the group in one step. In forced colours the
+// checked chip still looks different from the rest (a colour change that isn't only transparency). axe passes with
+// a filter chosen. They used to be aria-pressed buttons that needed work.js and were hidden without it.
+test('work filters: a radio group that works without script, keys, forced colours, axe (M11, B4)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const shown = (q) => q.$$eval('.work-grid > li', (ls) => ls.filter((l) => l.getClientRects().length).map((l) => l.dataset.tags));
+  for (const [w, h] of [[390, 844], [1440, 900]]) {
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h } });
+    const q = await ctx.newPage();
+    await q.goto(url('work'));
+    const all = await q.$$eval('.work-grid > li', (ls) => ls.map((l) => l.dataset.tags));
+    const s = await q.evaluate(() => {
+      const radios = [...document.querySelectorAll('.filters input[type="radio"]')];
+      const set = radios[0]?.closest('fieldset');
+      return {
+        n: radios.length,
+        names: [...new Set(radios.map((r) => r.name))],
+        grouped: !!set && radios.every((r) => r.closest('fieldset') === set),
+        legend: set?.querySelector(':scope > legend')?.textContent.trim() || '',
+        checked: radios.filter((r) => r.checked).map((r) => r.value),
+        values: radios.map((r) => r.value),
+        onScreen: radios.length > 0 && radios[0].closest('label').getClientRects().length > 0,
+      };
+    });
+    // forced colours: the chip chosen at load ("All") against another, with alpha set aside (the theme keeps it, so a
+    // white chip at 70% on a white page looks the same as one at 5%)
+    await q.emulateMedia({ forcedColors: 'active' });
+    await q.waitForTimeout(400); // a colour transition, if any
+    const fc = await q.evaluate(() => {
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).join(',');
+      const look = (e) => {
+        const c = getComputedStyle(e);
+        return { color: rgb(c.color), bg: rgb(c.backgroundColor), border: c.borderTopWidth, outline: c.outlineStyle };
+      };
+      const chips = [...document.querySelectorAll('.filters .filter')];
+      const on = chips.find((c) => c.matches(':has(:checked), [aria-pressed="true"]'));
+      const off = chips.find((c) => c !== on);
+      return { on: on && look(on), off: off && look(off) };
+    });
+    if (!fc.on || JSON.stringify(fc.on) === JSON.stringify(fc.off)) fails.push(`forced colours, ${w}: the checked filter looks like the others: ${JSON.stringify(fc)}`);
+    else if (fc.on.color === fc.on.bg) fails.push(`forced colours, ${w}: the checked filter's words are the colour of its background: ${JSON.stringify(fc.on)}`);
+    rep.push(`forced colours ${w}: ${JSON.stringify(fc)}`);
+    await q.emulateMedia({ forcedColors: 'none' });
+    if (s.n < 2) {
+      fails.push(`no script, ${w}: ${s.n} filter radio(s) in .filters`);
+      await ctx.close();
+      continue;
+    }
+    if (s.names.length !== 1 || !s.names[0]) fails.push(`no script, ${w}: the radios aren't one named group: names ${JSON.stringify(s.names)}`);
+    if (!s.grouped || !s.legend) fails.push(`no script, ${w}: the radios aren't in one fieldset with a legend (${JSON.stringify(s.legend)})`);
+    if (!s.onScreen) fails.push(`no script, ${w}: the filters don't show`);
+    if (JSON.stringify(s.checked) !== '["all"]') fails.push(`no script, ${w}: checked at load ${JSON.stringify(s.checked)}, not "all"`);
+    // each radio's accessible name ends in its count, and the count is the cards it shows
+    const tree = await q.getByRole('group', { name: s.legend }).ariaSnapshot();
+    const named = [...tree.matchAll(/- radio "([^"]+)"/g)].map((m) => m[1]);
+    if (named.length !== s.n) fails.push(`no script, ${w}: ${named.length} radio(s) in the group "${s.legend}", not ${s.n}`);
+    const labels = q.locator('.filters label');
+    for (let i = 0; i < s.n; i++) {
+      await labels.nth(i).click();
+      const on = await shown(q);
+      const key = s.values[i];
+      const want = all.filter((t) => key === 'all' || t.split(' ').includes(key));
+      if (JSON.stringify(on) !== JSON.stringify(want)) fails.push(`no script, ${w}: "${key}" chosen shows ${JSON.stringify(on)}, not ${JSON.stringify(want)}`);
+      const count = Number((named[i] || '').match(/,\s*(\d+)$/)?.[1]);
+      if (count !== want.length) fails.push(`no script, ${w}: radio "${named[i]}" doesn't end in its count, ${want.length}`);
+    }
+    await labels.first().click();
+    if ((await shown(q)).length !== all.length) fails.push(`no script, ${w}: "All" chosen again doesn't show every project`);
+    // keys: the arrow moves the choice (and the cards follow); the chip shows the focus ring; Tab leaves the group
+    await q.locator('.filters input:checked').focus();
+    await q.keyboard.press('ArrowRight');
+    const k = await q.evaluate(() => {
+      const a = document.activeElement;
+      return { value: a.value, checked: a.checked, ring: getComputedStyle(a.closest('label')).outlineStyle };
+    });
+    const afterKey = await shown(q);
+    if (k.value !== s.values[1] || !k.checked) fails.push(`no script, ${w}: ArrowRight from "All" left ${JSON.stringify(k)} focused, not "${s.values[1]}" checked`);
+    if (afterKey.length === all.length) fails.push(`no script, ${w}: ArrowRight to "${s.values[1]}" didn't filter the cards`);
+    if (k.ring === 'none') fails.push(`no script, ${w}: the focused chip shows no focus ring`);
+    await q.keyboard.press('Tab');
+    const out = await q.evaluate(() => !document.activeElement.closest('.filters'));
+    if (!out) fails.push(`no script, ${w}: Tab from the checked radio stayed in the group`);
+    rep.push(`no script ${w}: ${s.n} radios "${s.names[0]}" in "${s.legend}", names ${JSON.stringify(named)}, ArrowRight -> ${k.value} (${afterKey.length} shown)`);
+    await ctx.close();
+  }
+  // axe, with a filter chosen (axe needs script)
+  const ctx = await browser.newContext({ bypassCSP: true, viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('work'));
+  await q.locator('.filters .filter').nth(1).click();
+  await q.waitForTimeout(300);
+  const v = (await new AxeBuilder({ page: q }).analyze()).violations;
+  for (const x of v.filter((x) => x.impact === 'serious' || x.impact === 'critical')) fails.push(`axe, a filter chosen: [${x.impact}] ${x.id}`);
+  rep.push(`axe with a filter chosen: ${v.length} violation(s)`);
+  await ctx.close();
+  console.log(`work filters:\n  ${rep.join('\n  ')}`);
+  verdict(fails);
+});
+
+// B4, WCAG 2.4.7: in forced colours, dark and light, without script, as pixels (the theme's readability backplate
+// sits behind the words in Canvas, which computed styles don't show): the checked chip's word is legible (its box
+// holds two clearly different colours, not one solid block), and the focus ring round the focused chip (with radios,
+// always the checked one) isn't the page's Canvas colour. On paper a chosen filter doesn't filter: the filters don't
+// print, so every project does.
+test('work filters: forced colours legible as pixels, focus ring, print shows every project (B4)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const far = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2])) > 96;
+  const pixels = (buf) => {
+    const png = PNG.sync.read(buf);
+    const out = [];
+    for (let i = 0; i < png.data.length; i += 4) out.push([png.data[i], png.data[i + 1], png.data[i + 2]]);
+    return { w: png.width, h: png.height, px: out };
+  };
+  for (const scheme of ['dark', 'light']) {
+    for (const [w, h] of [[390, 844], [1440, 900]]) {
+      const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h }, deviceScaleFactor: 2 });
+      const q = await ctx.newPage();
+      await q.emulateMedia({ forcedColors: 'active', colorScheme: scheme });
+      await q.goto(url('work'));
+      await q.evaluate(() => document.fonts.ready);
+      const chip = q.locator('.filters .filter:has(:checked), .filters .filter[aria-pressed="true"]').first();
+      if (!(await chip.count()) || !(await chip.isVisible())) {
+        fails.push(`forced colours ${scheme} ${w}: no checked filter on screen`);
+        await ctx.close();
+        continue;
+      }
+      await chip.scrollIntoViewIfNeeded();
+      // the word's own box (its text node), shot as pixels: the commonest colour, and the share far from it
+      const word = await chip.evaluate((c) => {
+        const t = [...c.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim());
+        const r = document.createRange();
+        r.selectNodeContents(t);
+        const b = r.getBoundingClientRect();
+        return { text: t.textContent.trim(), x: b.x, y: b.y, width: b.width, height: b.height };
+      });
+      const shot = pixels(await q.screenshot({ clip: { x: word.x, y: word.y, width: word.width, height: word.height } }));
+      const tally = new Map();
+      for (const p of shot.px) tally.set(p.join(), (tally.get(p.join()) || 0) + 1);
+      const main = [...tally].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+      const ink = shot.px.filter((p) => far(p, main)).length / shot.px.length;
+      if (ink < 0.08) fails.push(`forced colours ${scheme} ${w}: the checked chip's "${word.text}" is one block of rgb(${main}) (${(ink * 100).toFixed(1)}% of it another colour)`);
+      // the focus ring: Tab into the group from just before it lands on the checked radio
+      await chip.locator('input').focus();
+      await q.keyboard.press('Shift+Tab');
+      await q.keyboard.press('Tab');
+      const ring = await chip.evaluate((c) => {
+        const probe = document.createElement('div');
+        probe.style.backgroundColor = 'Canvas';
+        probe.style.forcedColorAdjust = 'none';
+        document.body.append(probe);
+        const canvas = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        const s = getComputedStyle(c);
+        const b = c.getBoundingClientRect();
+        return { focused: c.contains(document.activeElement), style: s.outlineStyle, color: s.outlineColor, width: parseFloat(s.outlineWidth), offset: parseFloat(s.outlineOffset), canvas, x: b.x, y: b.y, w: b.width, h: b.height };
+      });
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      if (!ring.focused) fails.push(`forced colours ${scheme} ${w}: Tab into the filters didn't focus the checked one`);
+      else if (ring.style === 'none' || !far(rgb(ring.color), rgb(ring.canvas))) fails.push(`forced colours ${scheme} ${w}: the focus ring is ${ring.style} ${ring.color}, on a Canvas of ${ring.canvas}`);
+      else {
+        // and as pixels: a line across the chip's middle, just outside its left edge, in the ring's band
+        const at = ring.x - ring.offset - ring.width / 2;
+        const band = pixels(await q.screenshot({ clip: { x: at - 0.5, y: ring.y + ring.h / 2 - 2, width: 1, height: 4 } }));
+        const seen = band.px.filter((p) => far(p, rgb(ring.canvas))).length / band.px.length;
+        if (seen < 0.5) fails.push(`forced colours ${scheme} ${w}: no focus ring to be seen beside the chip (${(seen * 100).toFixed(0)}% off Canvas ${ring.canvas})`);
+      }
+      rep.push(`forced colours ${scheme} ${w}: "${word.text}" ${(ink * 100).toFixed(1)}% ink on rgb(${main}); ring ${ring.style} ${ring.color} on ${ring.canvas}`);
+      await ctx.close();
+    }
+  }
+  // print, with a filter chosen
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('work'));
+  const labels = q.locator('.filters label');
+  if (await labels.count()) await labels.nth(1).click();
+  await q.emulateMedia({ media: 'print' });
+  const p = await q.$$eval('.work-grid > li', (ls) => ({ all: ls.length, shown: ls.filter((l) => l.getClientRects().length).length }));
+  if (p.shown !== p.all) fails.push(`print with a filter chosen: ${p.shown} of ${p.all} projects print`);
+  rep.push(`print with a filter chosen: ${p.shown} of ${p.all} projects`);
+  await ctx.close();
+  console.log(`work filters, forced colours and print:\n  ${rep.join('\n  ')}`);
   verdict(fails);
 });
 

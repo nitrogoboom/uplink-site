@@ -15,7 +15,7 @@ Each file in `pages/` is one address. Most pages are a stack of sections, with o
 | `index.astro` | `/` | Hero (with the office drawing), Services, Grow (with the world drawing), Work, and Proof |
 | `services.astro` | `/services` | Overview and Faq |
 | `services/[slug].astro` | `/services/SLUG` | One page per service, from `content/services/SLUG.json` |
-| `work.astro` | `/work` | Projects |
+| `work.astro` | `/work` | Projects. No page script: the filters are radios, and the CSS that hides the other cards (`workFilterCss()` in `lib/site.ts`) goes in its `<head>` |
 | `work/[slug].astro` | `/work/SLUG` | One page per project, from `content/projects/SLUG.json` |
 | `about.astro` | `/about` | Profile, Process, and Team |
 | `contact.astro` | `/contact` | Message and Support |
@@ -128,7 +128,6 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
-| `work.js` | Our work | The project filters. |
 | `contact.js` | Contact | The copy buttons and the queue card. |
 | `soon.js` | Coming soon | Names the page that isn't built yet. |
 
