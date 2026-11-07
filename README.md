@@ -337,6 +337,10 @@ Keep these rules in mind:
 
 The site is open to visitors but kept out of search results. `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
 
+The sitemap's `<lastmod>` dates and a case study's `datePublished` and `dateModified` come from git history (`src/lib/git-dates.mjs`). A static page dates from the files listed in `SOURCES` in `src/lib/site.ts`. A service or project page dates from its own JSON file only, so editing one project changes one page's date.
+
+> **Note:** A shallow clone (`git clone --depth N`) would give every page the cut-off commit's date. With `CI` set, the build stops on one. Elsewhere it warns once and leaves the dates out. Run `git fetch --unshallow` to put them back. CI checks out with `fetch-depth: 0`.
+
 ### Password lock
 
 The password lock is off. `tools/site-lock/worker.js` puts the whole site behind a browser password prompt. Its header comment explains how to turn it on and set the `SITE_PASSWORD` secret.

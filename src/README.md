@@ -39,7 +39,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
-The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list.
+The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
 
 A page adds its own script inside `<Base>`, like this:
 

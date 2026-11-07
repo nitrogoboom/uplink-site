@@ -5,20 +5,21 @@
 //   getServices(), getProjects()  the collections in their own order.
 //   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
 //   allPages()  every indexable page: the seven in PAGES plus one per service and project, with a lastmod.
-//   lastmod()   when the files behind a page last changed, from git (the build runs in a checkout); created(): when first added.
+//               A static page dates from its SOURCES below; a service or project from its own entry file
+//               (lastmod() and entryFile() in git-dates.mjs, which also refuses a shallow clone in CI).
 //   businessNode()  the business in short, for the JSON-LD of every page but Home.
 //   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
 //   NAV         the main tabs in order: the header and the phone tab bar read it.
 //   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
 //   svgSize()   a drawing's own width and height, read from the file, for the <img> that shows it (cardSize(): its card cut).
 import type { IconName } from '../components/Icon.astro';
-import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { shipped } from '../../scripts/svgo-config.mjs';
 import { getCollection } from 'astro:content';
 import { MEDIA } from './media.js';
 import { byOrder } from '../content.config';
+import { entryFile, lastmod } from './git-dates.mjs';
 
 // Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
 // page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file as the
@@ -105,7 +106,8 @@ export const getProjects = async () => (await getCollection('projects')).sort((a
 export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data);   // in file order
 
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
-// on purpose: a footer tweak is not a reason for a crawler to refetch every page.
+// on purpose: a footer tweak is not a reason for a crawler to refetch every page. A service or project page dates
+// from its own entry file alone (entryFile()), the date its JSON-LD carries too: editing one changes one URL.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
   home: ['src/pages/index.astro', 'src/components/home', 'src/data/grow.json', 'src/content/services', 'src/content/projects'],
   services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json'],
@@ -118,34 +120,14 @@ const SOURCES: Record<keyof typeof PAGES, string[]> = {
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };
 
-/** ISO date of the last commit that touched any of the paths, or undefined outside a git checkout. */
-export function lastmod(paths: string[]): string | undefined {
-  try {
-    const out = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...paths], { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    return out ? out.slice(0, 10) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-/** ISO date of the first commit that added any of the paths (the oldest), or undefined outside a git checkout. */
-export function created(paths: string[]): string | undefined {
-  try {
-    const out = execFileSync('git', ['log', '--diff-filter=A', '--format=%cI', '--', ...paths], { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    return out ? out.split('\n').pop()!.slice(0, 10) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
 export async function allPages(): Promise<SitePage[]> {
   const services = await getServices();
   const projects = await getProjects();
   return [
     ...(Object.keys(PAGES) as (keyof typeof PAGES)[]).map((k) => ({ ...PAGES[k], lastmod: lastmod(SOURCES[k]) })),
     ...services.map(({ id, data: s }) => ({ path: `/services/${id}`, name: s.title, description: s.card,
-      lastmod: lastmod([`src/content/services/${id}.json`, 'src/components/services/ServiceCard.astro', 'src/pages/services/[slug].astro', 'src/content/projects']) })),
+      lastmod: lastmod([entryFile('services', id)]) })),
     ...projects.map(({ id, data: p }) => ({ path: `/work/${id}`, name: p.name, description: `${p.client}. ${p.result}.`,
-      lastmod: lastmod([`src/content/projects/${id}.json`, 'src/components/work/ProjectCase.astro', 'src/pages/work/[slug].astro', 'src/content/services']) })),
+      lastmod: lastmod([entryFile('projects', id)]) })),
   ];
 }
