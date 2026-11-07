@@ -36,7 +36,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 3. Navigation "Main", a list of 5 links: "Home" (current page), "Services", "Our work", "About", "Contact".
 4. Link: "Get support, for existing clients".
 5. Link: "Client portal, sign in".
-6. Button: "Accessibility settings", has pop-up dialog. It opens Settings: text size and keyboard shortcuts.
+6. Button: "Accessibility settings", has pop-up dialog. It opens Settings: keyboard shortcuts.
 
 ### Your IT team, always online
 
