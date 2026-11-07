@@ -59,7 +59,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` (through `lib/footer.ts`) and the services collection. |
 | `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
-| `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
+| `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
 | `Pause.astro` | A pause for screen readers between two parts of one link, so the title doesn't run into the next words. Nothing shows on screen. |
 | `Sep.astro` | The " · " between two short phrases. Screen readers hear a comma instead of "dot". |
@@ -81,7 +81,7 @@ The content types are defined in `content.config.ts`, and `footer.json`'s in `li
 | `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
 | `data/faq.json`, `data/team.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
 | `data/footer.json` | The footer's lists, the contact details, and the map's spots. `lib/footer.ts` checks it against its schema and exports it typed. A heading with an emphasized word is `title` plus `accent` ("Reach" + "us"); the JSON holds no HTML. |
-| `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json`. Don't type an email address or phone number into them. |
+| `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json` (`PLACEHOLDERS` in `lib/footer.ts`) by a Markdown plugin (`lib/placeholders.mjs`), so each value is escaped as text. A name with no value stops the build. Don't type an email address or phone number into them. |
 | `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, and on Home also `{services}` and `{grow}`. |
 
 Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
