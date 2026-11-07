@@ -72,6 +72,23 @@ test('headers.mjs: hashes every inline script and style, skips JSON-LD, writes E
   } finally { rmSync(dir, { recursive: true }); }
 });
 
+// a dist/ the way a plain `astro build` leaves it (the template copied as is), then finished by headers.mjs
+test('check-dist.mjs (wrangler build.command): refuses an unfinished dist/, passes a finished one (review H11)', async () => {
+  const dir = base();
+  try {
+    assert.match(fails('check-dist.mjs', dir), /still has \{script-hashes\} and \{style-hashes\} in it.*npm run build/s);
+    run('headers.mjs', dir);
+    run('check-dist.mjs', dir);
+    rmSync(join(dir, '_redirects'));
+    assert.match(fails('check-dist.mjs', dir), /_redirects is missing/);
+  } finally { rmSync(dir, { recursive: true }); }
+  const empty = site({});
+  try { assert.match(fails('check-dist.mjs', empty), /_headers is missing/); }
+  finally { rmSync(empty, { recursive: true }); }
+  const { unstable_readConfig } = await import('wrangler');
+  assert.equal(unstable_readConfig({ config: 'wrangler.jsonc' }).build.command, 'node scripts/check-dist.mjs', 'wrangler runs it before dev, deploy and versions upload');
+});
+
 test('headers.mjs: refuses a style="" attribute (no hash covers one)', () => {
   const dir = base({ 'about.html': '<!doctype html><html><body><p style="color:red">x</p></body></html>' });
   try { assert.match(fails('headers.mjs', dir), /style="" attributes the CSP would block: about\.html/); }

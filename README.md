@@ -109,7 +109,7 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
-| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `check-dist.mjs` is wrangler's build step (`build.command`): it refuses a `dist/` that `headers.mjs` didn't finish. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
@@ -271,6 +271,8 @@ The site runs on Cloudflare Workers with static assets.
 Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied. A report it can't read gets a `400`, and anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead (`Cache-Control: no-store`), as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
 
 > **Note:** Every request counts against the free plan's 100,000 Worker requests a day. At launch, turn on Always Use HTTPS on the real domain's zone and set `run_worker_first` back to `["/api/*", "/404"]`. The steps are in [`docs/launch-runbook.md`](docs/launch-runbook.md).
+
+> **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
 
 ### Deploys
 
