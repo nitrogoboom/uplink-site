@@ -2,7 +2,8 @@
 // page address: src/content/services/help-desk.json → /services/help-desk). Smaller lists are one file each
 // in src/data/. Every page, card, footer link and JSON-LD block reads from here, so a service or project is
 // added in one place.
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
+import { z } from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 
 const services = defineCollection({

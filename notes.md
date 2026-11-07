@@ -20,7 +20,7 @@ Design, nice to have:
 Rule from now on:
 - [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
 
-## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
+## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
 - [ ] GitHub environments (made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`.
 - [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
