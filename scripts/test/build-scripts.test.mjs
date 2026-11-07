@@ -5,11 +5,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { optimize } from 'svgo';
-import { SVGO } from '../svgo-config.mjs';
+import { SVGO, shrink, styledTags } from '../svgo-config.mjs';
 
 const sha = (text) => "'sha256-" + createHash('sha256').update(text).digest('base64') + "'";
 
@@ -216,4 +216,48 @@ test('markdown.mjs: refuses a page with no <main> or no canonical', () => {
   const dir = site({ 'about.html': '<!doctype html><html><body><main><h1>About</h1></main></body></html>' });
   try { assert.match(fails('markdown.mjs', dir), /markdown: about\.html has no <main> or no canonical/); }
   finally { rmSync(dir, { recursive: true }); }
+});
+
+// review B9: SVGO writes <polygon> and <line> as <path>, so a drawing whose <style> styles them by tag loses that
+// styling on the live site, silently
+const TILE = (css) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><style>${css}</style>`
+  + '<g class="ob-tile"><polygon class="f-t" points="0,0 5,0 5,5"/><line x1="0" y1="0" x2="5" y2="5"/></g></svg>';
+
+test('svgo-config.mjs: shrink() refuses a drawing whose <style> styles a tag SVGO writes as something else', () => {
+  assert.deepEqual(styledTags(TILE('.ob-tile polygon{stroke:red}@keyframes a{from{opacity:0}to{opacity:1}}.x line,.y{fill:none}')).sort(), ['line', 'polygon']);
+  assert.deepEqual(styledTags(TILE('.ob-tile .f-t{stroke:red}/* polygon { */')), [], 'classes, a comment and a declaration name no tag');
+  assert.throws(() => shrink(TILE('.ob-tile polygon{stroke:red}'), 'tile.svg'), /tile\.svg: its <style> styles <polygon>/);
+  assert.ok(shrink(TILE('.ob-tile .f-t{stroke:red}')).includes('class="f-t"'), 'a class rule still finds its part');
+});
+
+test('svgo-config.mjs: every drawing in public/assets/img/ keeps what its own <style> styles', () => {
+  const dir = 'public/assets/img';
+  const bad = [];
+  for (const name of readdirSync(dir).filter((f) => f.endsWith('.svg'))) {
+    try { shrink(readFileSync(join(dir, name), 'utf-8'), name); } catch (e) { bad.push(e.message); }
+  }
+  assert.deepEqual(bad, []);
+});
+
+test('svgo.mjs: shrinks every drawing, the campus map too, and stops the build on a styled tag it would lose', () => {
+  const dir = site({ 'assets/img/campus.svg': TILE('.ob-tile .f-t{stroke:red}'), 'assets/img/hero.svg': TILE('.f-t{fill:red}') });
+  try {
+    run('svgo.mjs', dir);
+    for (const name of ['campus.svg', 'hero.svg']) assert.ok(!readFileSync(join(dir, 'assets/img', name), 'utf-8').includes('<polygon'), `${name} shrunk`);
+  } finally { rmSync(dir, { recursive: true }); }
+  const bad = site({ 'assets/img/hero.svg': TILE('.ob-tile polygon{stroke:red}') });
+  try { assert.match(fails('svgo.mjs', bad), /assets\/img\/hero\.svg: its <style> styles <polygon>/); }
+  finally { rmSync(bad, { recursive: true }); }
+});
+
+// footer.css gives every polygon of the campus map its edge by class (the tag is gone once SVGO has run): a polygon
+// whose class isn't in that rule's list would lose its edge, as the map's marker did once
+test("footer.css: the campus map's edge rule names a class of every polygon the map draws", () => {
+  const css = readFileSync('src/styles/footer.css', 'utf-8');
+  const listed = css.match(/\.fc-w :where\(([^)]*)\) \{ stroke:/)[1].split(',').map((c) => c.trim().slice(1));
+  const svg = readFileSync('public/assets/img/campus.svg', 'utf-8');
+  const polygons = [...svg.matchAll(/<polygon\b[^>]*>/g)].map((m) => m[0].match(/class="([^"]*)"/)?.[1] ?? '');
+  assert.ok(polygons.length > 100, 'the map has its polygons');
+  const missed = [...new Set(polygons.filter((c) => !c.split(' ').some((k) => listed.includes(k))))];
+  assert.deepEqual(missed, [], `polygon classes with no edge rule (listed: ${listed.join(', ')})`);
 });

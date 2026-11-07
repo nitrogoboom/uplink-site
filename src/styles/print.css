@@ -2,15 +2,32 @@
    Print: the page's words on paper. Colours come from tokens.css (@media print). Screen-only parts go,
    screen-tall boxes take their own height, and cards don't split across pages. The hero and Grow drawings build
    themselves in with script, so on paper they'd be half drawn: they stay off.
+   On paper:
+     heights   nothing is a screen tall. A page printed scaled down is laid out wide enough for the desktop rules,
+               where sections are --fold-h (a screen) tall; here the fold sizes are cleared (initial: every
+               height and min-height that reads them falls back to its own default), so each box takes its content.
+     Grow      every step's card, each row at full strength (on screen only the open step's card shows)
+     gone      what can't be used on paper: forms, copy buttons, the buttons that open a pop-up ("Get started",
+               "Book a check-up"), the footer. A card that opens one (the hero's check-up card, Contact's "Book a
+               check-up") is content: its words print.
+     contact   the footer goes, so a one-line contact block (.print-contact, Base.astro) takes its place
    --------------------------------------------------------------------------- */
+@media not print {
+  .print-contact { display: none; }
+}
 @media print {
   .skip-link, .site-header .hdr-actions, .botnav, dialog, .toasts, .site-footer, .svc-step, .grow-dots,
-  .hero-art .stage, .grow-stage,
+  .hero-art .stage, .grow-stage, form, .copy-btn, .btn[data-open], button[data-open],
   [data-md-skip] { display: none !important; }
+  :root { --fold-h: initial !important; --fold-inner: initial !important; --fold-pitch: initial !important; }
   .site-header { position: static; }
   .fold, .fold-always, .hero, .hero-grid { min-height: 0 !important; height: auto !important; }
+  .fold::after { content: none !important; }
+  .grow.is-live .grow-card { display: grid !important; }
+  .grow-row { opacity: 1 !important; }
   h1, h2, h3 { break-after: avoid; }
   article, figure, li, .card, .grow-card { break-inside: avoid; }
   img, svg { max-height: 60vh; }
   .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
+  .print-contact { margin-top: var(--sp-6); padding-top: var(--sp-3); border-top: 1px solid var(--c-line-2); font-size: var(--fs-2); }
 }

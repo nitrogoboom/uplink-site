@@ -12,7 +12,7 @@ const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
 <dialog class="dialog" id="settings-dialog" aria-labelledby="st-title">
   <div class="dlg-head">
     <h2 id="st-title">Settings</h2>
-    <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close</span></button>
+    <button class="hbtn" type="button" data-close aria-keyshortcuts="Escape"><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close (Esc)</span></button>
   </div>
   <div class="dlg-body">
     <fieldset class="seg-field" aria-describedby="st-text-note">
@@ -36,4 +36,5 @@ const SIZES = ['1', '1.25', '1.5', '1.75', '2'];
       <p class="small muted">Shortcuts pause while you type or while a pop-up is open.</p>
     </section>
   </div>
+  <div class="toasts" aria-live="polite"></div>
 </dialog>

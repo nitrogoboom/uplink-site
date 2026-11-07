@@ -177,14 +177,17 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .status { display: inline-flex; align-items: center; gap: var(--sp-2); }
 .status::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: var(--c-ok); box-shadow: 0 0 0 var(--sp-1) var(--c-ok-tint); }
 
-/* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot) */
-.fc-w polygon { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }
+/* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot). Its parts
+   are styled by class, never by tag: SVGO (scripts/svgo-config.mjs) writes its polygons and lines as paths. The
+   faces are .f-t, .f-l, .f-r, the windows .win, the marker .mk-d, .mk-i (every polygon gen_campus.py draws: a test in
+   scripts/test/ holds the list to the drawing); :where() keeps this base rule as weak as the tag rule it replaces. */
+.fc-w :where(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }
 .fc-w .f-t { fill: var(--iso-top); } .fc-w .f-l { fill: var(--iso-left); } .fc-w .f-r { fill: var(--iso-right); }
 .fc-w .on .b .f-t { fill: var(--iso-hi-top); } .fc-w .on .b .f-l { fill: var(--iso-hi-left); } .fc-w .on .b .f-r { fill: var(--iso-hi-right); }
-.fc-w .on .b polygon { stroke: var(--iso-hi-edge); stroke-opacity: 0.55; }
-.fc-w .tree polygon { stroke-opacity: 0.22; } .fc-w .tree .f-t { fill: var(--iso-green-top); } .fc-w .tree .f-l { fill: var(--iso-green-mid); } .fc-w .tree .f-r { fill: var(--iso-green-dark); }
+.fc-w .on .b :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke: var(--iso-hi-edge); stroke-opacity: 0.55; }
+.fc-w .tree :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke-opacity: 0.22; } .fc-w .tree .f-t { fill: var(--iso-green-top); } .fc-w .tree .f-l { fill: var(--iso-green-mid); } .fc-w .tree .f-r { fill: var(--iso-green-dark); }
 .fc-w .plat .f-t { fill: var(--iso-ground); }
-.fc-w .grid line { stroke: var(--iso-grid); stroke-width: 0.8; stroke-opacity: 0.6; }
+.fc-w .grid > * { stroke: var(--iso-grid); stroke-width: 0.8; stroke-opacity: 0.6; }
 .fc-w .edge { fill: none; stroke: var(--c-sky); stroke-width: 1.4; stroke-opacity: 0.6; }
 .fc-w .win { fill: var(--iso-window); fill-opacity: 0.6; stroke: var(--c-sky); stroke-width: 0.9; stroke-opacity: 0.5; }
 .fc-w .win.lit { fill: var(--iso-sky-left); fill-opacity: 0.38; }   /* cool lit window (DESIGN.md 5.4) */

@@ -70,8 +70,8 @@
   --iso-shadow:     #000;     /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
-  --font-display: 'Barlow Condensed', 'Barlow Condensed Fallback', 'Roboto Condensed', 'Arial Narrow', sans-serif;
-  --font-body:    'Barlow', 'Barlow Fallback', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-display: 'Barlow Condensed', 'Barlow Condensed Fallback', 'Barlow Condensed Fallback Roboto', 'Roboto Condensed', 'Arial Narrow', sans-serif;
+  --font-body:    'Barlow', 'Barlow Fallback', 'Barlow Fallback Roboto', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* 8-step scale, times the visitor's text size (--text: 1 to 2, the Settings pop-up; set before paint in
      Base.astro's head). Only the text grows: spacing and layout keep the screen's scale (WCAG 1.4.4, technique G178) */

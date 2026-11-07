@@ -72,21 +72,15 @@ const ICON = {
 /* ======================================================================
    Toasts
    ====================================================================== */
-const pageToasts = $('.toasts');
+// the page's own region is the one straight under <body> (each dialog holds one too, and they come first)
+const pageToasts = $(':scope > .toasts', document.body);
 
-// A modal pop-up makes the rest of the page inert, so while one is open
-// the toast is placed inside it to stay visible and announced.
+// A modal pop-up makes the rest of the page inert, so while one is open the toast is placed inside it to stay
+// visible and announced. Each pop-up has its own empty live region in its markup (Base.astro's .toasts for the page,
+// the dialogs' own): a region made in the same moment as its first message isn't announced.
 function toastRegion() {
   const dlg = document.querySelector('dialog[open]');
-  if (!dlg) return pageToasts;
-  let region = $(':scope > .toasts', dlg);
-  if (!region) {
-    region = document.createElement('div');
-    region.className = 'toasts';
-    region.setAttribute('aria-live', 'polite');
-    dlg.append(region);
-  }
-  return region;
+  return dlg ? $(':scope > .toasts', dlg) || pageToasts : pageToasts;
 }
 
 function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
@@ -120,11 +114,18 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
   el.append(ic, body, btn);
   region.append(el);
 
-  let timer = null;
+  // focus that came into the toast (Tab to its button) goes back where it came from when the toast leaves, or to
+  // the pop-up's close button or the page's main content, never to the page's <body>
+  let timer = null, from = null;
   const leave = () => {
     clearTimeout(timer);
     if (el.dataset.leaving !== undefined) return;
     el.dataset.leaving = '';
+    if (el.contains(document.activeElement)) {
+      const dlg = region.closest('dialog');
+      const to = [from, dlg && $('[data-close]', dlg), $('#main')].find((x) => x && document.contains(x) && !el.contains(x) && typeof x.focus === 'function');
+      if (to) to.focus({ preventScroll: true });
+    }
     const done = () => el.remove();
     if (reduceMotion.matches) done(); else el.addEventListener('animationend', done, { once: true });
   };
@@ -132,7 +133,7 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
   btn.addEventListener('click', leave);
   el.addEventListener('mouseenter', () => clearTimeout(timer));
   el.addEventListener('mouseleave', arm);
-  el.addEventListener('focusin', () => clearTimeout(timer));
+  el.addEventListener('focusin', (e) => { clearTimeout(timer); if (e.relatedTarget && !el.contains(e.relatedTarget)) from = e.relatedTarget; });
   el.addEventListener('focusout', arm);
   arm();
 }
@@ -143,11 +144,13 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 // On touch screens the first field would bring the keyboard up over the sheet before it is read, so there focus
 // starts on the close button (a screen reader still reads the dialog's title) and a tap on a field brings the keyboard.
 const coarse = window.matchMedia('(pointer: coarse)');
+const openedAt = new WeakMap();   // dialog -> when it opened
 function openDialog(id, opener) {
   const dlg = document.getElementById(id);
   if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
   dlg._opener = opener || document.activeElement;
   dlg.showModal();
+  openedAt.set(dlg, performance.now());
   // a group of options (radios) is entered at its chosen one, as Tab does
   const first = (coarse.matches ? null : $('[autofocus]', dlg) || $('input:not([type="radio"]), input[type="radio"]:checked, select, textarea', dlg)) || $('[data-close]', dlg);
   if (first) first.focus({ preventScroll: true });
@@ -156,10 +159,15 @@ function openDialog(id, opener) {
 }
 
 $$('dialog').forEach((dlg) => {
-  // click on the dimmed backdrop closes
+  // click on the dimmed backdrop closes; not the second click of a double-click (or a quick second tap) on what
+  // opened it, which lands on the backdrop of the pop-up the first click opened
   let downOnBackdrop = false;
   dlg.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === dlg; });
-  dlg.addEventListener('click', (e) => { if (e.target === dlg && downOnBackdrop) dlg.close(); downOnBackdrop = false; });
+  dlg.addEventListener('click', (e) => {
+    const settled = e.detail < 2 && performance.now() - (openedAt.get(dlg) || 0) > 400;
+    if (e.target === dlg && downOnBackdrop && settled) dlg.close();
+    downOnBackdrop = false;
+  });
   // return focus to whatever opened it; a toast still in it goes too (a closed pop-up never plays the toast's
   // fade-out, so the toast would wait there and flash up the next time the pop-up opens)
   dlg.addEventListener('close', () => {
@@ -362,6 +370,14 @@ function whenOnScreen(el, onChange) {
   io.observe(el);
   return io;
 }
+
+/* ---------- pictures that can't load ------------------------------------ */
+// A picture that fails (offline, blocked) gets .is-broken (base.css: see-through, so no broken-image box; its alt
+// text still reaches screen readers). An error doesn't bubble, so it's caught on the way down; one that came before
+// this script ran is found by decode(), which fails only for a picture that can't be shown.
+const broken = (img) => img.classList.add('is-broken');
+document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) broken(e.target); }, true);
+$$('img').forEach((img) => { if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img)); });
 
 /* ---------- Cloudflare Web Analytics ----------------------------------- */
 // Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and

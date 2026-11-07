@@ -37,7 +37,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `type` | The page's schema.org type, such as `FAQPage` or `AboutPage`. |
 | `ldPage` | More fields merged into the page's own JSON-LD node. |
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
-| `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. |
+| `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
 The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list.
 
@@ -119,9 +119,9 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 
 | Script | Where it runs | What it does |
 | --- | --- | --- |
-| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, and the Trusted Types policy (`html()`). The keyboard map is at the top. |
+| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
 | `footer.js` | Every page, from `Base.astro` | The footer's tiles and panels, and the campus map, which it fetches when the footer scrolls near. Does nothing on a page without the footer (the 404). |
-| `home.js` | Home | The hero: it fetches the drawing cut for the screen, runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
+| `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `work.js` | Our work | The project filters. |
 | `contact.js` | Contact | The copy buttons and the queue card. |

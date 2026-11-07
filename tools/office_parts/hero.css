@@ -17,9 +17,9 @@
 @keyframes ob-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
 @keyframes ob-led{0%,62%{opacity:1}68%,80%{opacity:.25}86%,100%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.ob-i,.ob-i *{animation:none!important}}
-.ob-tile polygon,.ob-tile .f-ic{transition:fill .35s ease,stroke .35s ease}
-.ob-tile .f-l{fill:{{pal:LEFT}}}.ob-tile .f-r{fill:{{pal:RIGHT}}}.ob-tile .f-t{fill:{{pal:TOP}}}.ob-tile polygon{stroke:{{pal:EDGE}};stroke-opacity:.3}.ob-tile .f-ic{stroke:{{pal:WHITE}}}
-.ob-tile.is-on .f-l{fill:{{pal:HI_LEFT}}}.ob-tile.is-on .f-r{fill:{{pal:HI_RIGHT}}}.ob-tile.is-on .f-t{fill:{{pal:HI_TOP}}}.ob-tile.is-on polygon{stroke:{{pal:HI_EDGE}};stroke-opacity:.55}.ob-tile.is-on .f-ic{stroke:{{pal:ON_AMBER}}}
+.ob-tile .f-l,.ob-tile .f-r,.ob-tile .f-t,.ob-tile .f-ic{transition:fill .35s ease,stroke .35s ease}
+.ob-tile .f-l{fill:{{pal:LEFT}}}.ob-tile .f-r{fill:{{pal:RIGHT}}}.ob-tile .f-t{fill:{{pal:TOP}}}.ob-tile .f-l,.ob-tile .f-r,.ob-tile .f-t{stroke:{{pal:EDGE}};stroke-opacity:.3}.ob-tile .f-ic{stroke:{{pal:WHITE}}}
+.ob-tile.is-on .f-l{fill:{{pal:HI_LEFT}}}.ob-tile.is-on .f-r{fill:{{pal:HI_RIGHT}}}.ob-tile.is-on .f-t{fill:{{pal:HI_TOP}}}.ob-tile.is-on .f-l,.ob-tile.is-on .f-r,.ob-tile.is-on .f-t{stroke:{{pal:HI_EDGE}};stroke-opacity:.55}.ob-tile.is-on .f-ic{stroke:{{pal:ON_AMBER}}}
 .ob-seg{fill:{{pal:GREEN}};fill-opacity:.4;transition:fill .3s ease,fill-opacity .3s ease}.ob-seg.is-on{fill:{{pal:AMBER}};fill-opacity:1}
 .ob-seg-hit,.ob-tile{cursor:pointer}
 .ob-focus{transition:opacity .18s ease}.ob-focus.is-out{opacity:0}

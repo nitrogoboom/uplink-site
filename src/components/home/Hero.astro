@@ -60,6 +60,8 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
     <div class="hero-art">
       <div class="stage" data-hero={HERO.full} data-hero-tablet={HERO.tablet} data-hero-phone={HERO.phone} data-hero-phone-flows={HERO.phoneFlows} data-tablet={HERO.media.tablet}>
         <noscript><picture><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></noscript>
+        <!-- the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) -->
+        <template class="hero-still"><picture><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></template>
         <Fragment set:html={flows} />
         <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
         <HoldButton class="hero-pause" />

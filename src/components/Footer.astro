@@ -68,7 +68,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
     <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><b>{s.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
-    <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
+    <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="An email address like name@company.com" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
     <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
   </form>
 </div>

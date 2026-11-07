@@ -368,12 +368,22 @@ if (stage) {
     added.forEach((n) => n.remove());
     added = [];
   };
+  // a drawing that can't load (offline, blocked): the still office the page shows without script (the same picture
+  // as its <noscript>, cloned from a <template>, so no text is turned into HTML) stands in, and the dashes' layer and
+  // the pause button go, so no beams hang over an empty stage. The next change of cut tries again.
+  const still = $('template.hero-still', stage);
+  const failed = (on) => {
+    $$('svg.ob-over', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
+    $$('.hero-pause', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
+    if (on && still) { const pic = still.content.firstElementChild.cloneNode(true); stage.prepend(pic); added = [pic]; }
+  };
   const load = () => {
     const cut = phone.matches ? 'phone' : (tablet.matches ? 'tablet' : 'full');
     if (cut === shown) return;
     shown = cut;
     const mine = ++ticket;
     clear();
+    failed(false);
     Promise.all(files[cut].map((url) => window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))))
       .then((texts) => {
         if (mine !== ticket) return;   // the screen changed while it loaded (even if it has changed back since)
@@ -387,7 +397,7 @@ if (stage) {
         if (cut === 'phone') { if (added[0].dataset.items) stopCloud = startCaptions(added[0]); }
         else if (cloud) stopCloud = startCloud(cloud);
       })
-      .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
+      .catch(() => { if (mine === ticket) { shown = null; failed(true); } });
   };
   load();
   [phone, tablet].forEach((m) => m.addEventListener('change', load));

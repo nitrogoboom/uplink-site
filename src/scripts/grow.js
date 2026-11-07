@@ -8,7 +8,12 @@
    Two sets of step buttons do the same job: the dots under the picture (phones, tablets) and the list in the left
    column (desktop, .grow-item); CSS shows one. While the story plays, the open row's foot fills over the step's time.
    The site-wide pause (HoldButton.astro, core.js held) pauses it the same way as its own button, and lets it go on
-   when released; while held it doesn't start on its own. Its own play button still plays it.
+   when released, unless you've used its own controls since; while held it doesn't start on its own. Its own play
+   button still plays it. Paused, off screen or held, a step keeps the time it has played and goes on from there.
+   Once the story ends it stands still (its loops and the dome's orbits too) until you play it again. Reduced motion
+   switched on mid-visit pauses it.
+   The steps are marked aria-current="step" (one of a set is the open one, not a pressed toggle). At the ends the
+   arrows are aria-disabled, not disabled, so a keyboard user's focus stays on them.
    Builds no HTML: everything is in the page (Grow.astro); this only sets classes, attributes and text.
    ========================================================================== */
 
@@ -111,13 +116,32 @@ if (grow && svg) {
     teamRaf = window.requestAnimationFrame(f);
   };
 
-  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), run from the clock ----
-  let ringRun = null, ringAt = 0, ringRaf = 0;
+  // ---- the open step's clock: how long it has played. It holds while the story waits (paused, off screen, the
+  // site's pause), so the step goes on from there, not from the start. A step picked by hand shows done (DWELL). ----
+  let playedAt = 0, runSince = 0;   // ms of the step already played; when it last set off (0: holding)
+  const played = () => playedAt + (runSince ? performance.now() - runSince : 0);
+  const hold = () => { playedAt = played(); runSince = 0; };
+
+  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), read from the clock. Its frame
+  // loop runs only while a step plays: it stops at the step's end, on a pause and off screen ----
+  let ringRaf = 0;
   const RING = 311.02;   // the play ring's length in its own units (2π × 49.5, as its stroke-dasharray in grow.css)
   const drawRing = (k) => { ring.style.strokeDashoffset = String(RING * (1 - Math.min(1, Math.max(0, k)))); };
-  const ringNow = () => (ringRun ? ringRun.a + (ringRun.b - ringRun.a) * Math.min(1, (performance.now() - ringRun.t0) / DWELL) : ringAt);
-  const ringTick = () => { ringRaf = 0; if (!ringRun) return; ringAt = ringNow(); drawRing(ringAt); ringRaf = window.requestAnimationFrame(ringTick); };   // runs only while a step plays
+  const ringAt = () => (cur < 0 ? 0 : (cur + Math.min(1, played() / DWELL)) / N);
+  const ringTick = () => { drawRing(ringAt()); ringRaf = runSince && played() < DWELL ? window.requestAnimationFrame(ringTick) : 0; };
   const ringGo = () => { if (!ringRaf) ringRaf = window.requestAnimationFrame(ringTick); };
+  const ringStop = () => { window.cancelAnimationFrame(ringRaf); ringRaf = 0; drawRing(ringAt()); };
+
+  // ---- the open row's foot (desktop list), from the same clock: it fills while the step plays, waits where it is
+  // while the step does, and goes once the step is done or was picked by hand ----
+  const bar = () => {
+    const k = played(), d = cur >= 0 ? items[cur] : null, on = !!d && k < DWELL && (k > 0 || runSince > 0);
+    items.forEach((x) => { if (x !== d || !on) x.classList.remove('is-timing', 'is-waiting'); });
+    if (!on) return;
+    d.style.setProperty('--grow-at', `${-Math.round(k)}ms`);
+    d.classList.remove('is-timing'); void d.offsetWidth; d.classList.add('is-timing');   // from where the clock is
+    d.classList.toggle('is-waiting', !runSince);
+  };
 
   // ---- a step's beats: 'risk' (red tags, card on Watch for) or 'fix' (green tags, card on We handle) ----
   const beat = (b, animate) => {
@@ -161,12 +185,12 @@ if (grow && svg) {
     steps.forEach((c, k) => { c.classList.toggle('is-on', k === Math.max(0, i)); c.removeAttribute('data-beat'); });
     place.textContent = i < 0 ? '' : places[i];
     if (i >= 0) { if (animate) steps[i].dataset.beat = 'build'; else beat('fix', false); }
-    [dots, items].forEach((set) => set.forEach((d, j) => { d.setAttribute('aria-pressed', String(j === i)); d.classList.toggle('is-done', j < i); }));
-    items.forEach((d) => d.classList.remove('is-timing'));
-    if (timed && i >= 0 && items[i]) { void items[i].offsetWidth; items[i].classList.add('is-timing'); }   // the bar starts over
-    prev.disabled = i <= 0; next.disabled = i >= LAST;
-    if (timed && i >= 0) { ringRun = { a: i / N, b: (i + 1) / N, t0: performance.now() }; ringGo(); }
-    else { const k = !animate && i === from ? ringNow() : i < 0 ? 0 : (i + 1) / N; ringRun = null; ringAt = k; drawRing(k); }
+    [dots, items].forEach((set) => set.forEach((d, j) => { if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); d.classList.toggle('is-done', j < i); }));
+    prev.setAttribute('aria-disabled', String(i <= 0)); next.setAttribute('aria-disabled', String(i >= LAST));
+    // the clock: a step the story plays starts at 0 (tick sets it going); one picked by hand shows done; a pause
+    // (the same step, shown at once) keeps what it played
+    if (timed) { playedAt = 0; runSince = 0; } else if (i !== from || animate) { playedAt = i < 0 ? 0 : DWELL; runSince = 0; }
+    ringStop(); bar();
   };
 
   // ---- playing ----
@@ -174,7 +198,7 @@ if (grow && svg) {
     const end = cur >= LAST;
     playIcon.setAttribute('d', playing ? PAUSE : end ? REPLAY : PLAY);
     play.setAttribute('aria-label', playing ? 'Pause' : end ? 'Play again' : 'Play');
-    stage.classList.toggle('is-paused', !playing && !end && started);
+    stage.classList.toggle('is-paused', !playing && started);   // paused, and at the end: nothing loops
   };
   const go = (i, animate) => {
     cur = i;
@@ -186,23 +210,28 @@ if (grow && svg) {
       beats.push(window.setTimeout(() => beat('fix', true), FIX_AT));
     }
   };
-  const stop = () => { playing = false; window.clearTimeout(timer); icon(); };
+  const stop = () => { playing = false; window.clearTimeout(timer); hold(); ringStop(); bar(); icon(); };
+  // the step plays on for what's left of it, while the story plays and is on screen; otherwise its clock holds
   const tick = () => {
     window.clearTimeout(timer);
-    if (!playing || !visible) return;
+    if (!playing || !visible) { hold(); ringStop(); bar(); return; }
+    if (!runSince) runSince = performance.now();
     timer = window.setTimeout(() => {
-      if (cur >= LAST) { stop(); return; }
+      if (cur >= LAST) { stop(); orbitsRun(); return; }   // the end: it stands still
       go(cur + 1, true); tick();
-    }, cur < 0 ? 0 : DWELL);
+    }, cur < 0 ? 0 : Math.max(0, DWELL - played()));
+    ringGo(); bar();
   };
   const start = () => { started = true; playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
   const jump = (i) => { stop(); started = true; go(Math.max(0, Math.min(LAST, i)), true); icon(); };
 
-  [dots, items].forEach((set) => set.forEach((d, i) => d.addEventListener('click', () => jump(i))));
-  prev.addEventListener('click', () => jump(cur - 1));
-  next.addEventListener('click', () => jump(cur + 1));
+  // your own choice wins over the site's pause: once you've played, paused or picked a step, releasing the site's
+  // pause leaves Grow as you left it
+  let heldStopped = false;
+  [dots, items].forEach((set) => set.forEach((d, i) => d.addEventListener('click', () => { heldStopped = false; jump(i); })));
+  [prev, next].forEach((b, n) => b.addEventListener('click', () => { if (b.getAttribute('aria-disabled') !== 'true') { heldStopped = false; jump(cur + (n ? 1 : -1)); } }));
   const pause = () => { stop(); beats.forEach(window.clearTimeout); beats = []; show(cur, false, false); icon(); };
-  play.addEventListener('click', () => { if (playing) pause(); else start(); });
+  play.addEventListener('click', () => { heldStopped = false; if (playing) pause(); else start(); });
 
   grow.style.setProperty('--grow-dwell', `${DWELL}ms`);   // the list row's timing bar runs one step
   grow.classList.add('is-live');
@@ -246,21 +275,31 @@ if (grow && svg) {
       if (!run && raf) { window.cancelAnimationFrame(raf); raf = 0; }
     };
   });
-  const orbitsRun = () => orbits.forEach((o) => o(visible && !stage.classList.contains('is-paused') && !(held.on && !playing)));
+  const orbitsRun = () => orbits.forEach((o) => o(visible && !reduceMotion.matches && !stage.classList.contains('is-paused') && !(held.on && !playing)));
   play.addEventListener('click', orbitsRun);
+  [...dots, ...items, prev, next].forEach((b) => b.addEventListener('click', orbitsRun));
 
   // starts as the section's first pixel arrives, so it's already moving when you see it; off screen it waits
   whenOnScreen(section, (on) => {
     visible = on;
-    if (on && !started && !reduceMotion.matches && !held.on) start(); else if (on && playing) tick(); else window.clearTimeout(timer);
+    if (on && !started && !reduceMotion.matches && !held.on) start(); else if (playing) tick();   // tick holds the clock off screen
     orbitsRun();
   });
 
   // the site-wide pause: hold it where it is; on release, go on only if the hold is what stopped it
-  let heldStopped = false;
   held.ev.addEventListener('change', () => {
     if (held.on && playing) { heldStopped = true; pause(); }
     else if (!held.on && (heldStopped || (!started && visible)) && !reduceMotion.matches) { heldStopped = false; start(); }
+    orbitsRun();
+  });
+
+  // reduced motion switched on mid-visit: it pauses where it is (before it has started, the finished world, as on
+  // a first visit with reduced motion); switched off, it stays put until you play it
+  reduceMotion.addEventListener('change', () => {
+    if (reduceMotion.matches) {
+      heldStopped = false;
+      if (playing) pause(); else if (!started) { started = true; go(LAST, false); icon(); }
+    }
     orbitsRun();
   });
 }
