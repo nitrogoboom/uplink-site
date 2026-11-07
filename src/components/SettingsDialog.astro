@@ -1,15 +1,18 @@
 ---
-// SHARED · Settings pop-up (every page), opened by the header's gear or the ? key.
+// SHARED · Settings pop-up (every page), opened by the header's gear or the ? key. The gear and the close button are
+// invoker commands (commandfor) and a click on the backdrop closes it (closedby="any"), so it works in browsers that
+// have them before core.js runs, or if it never loads; core.js takes over when it runs. With script off the gear
+// hides (header.css): the one setting needs script.
 // Keyboard shortcuts: the single-key switch (off if they clash with a screen reader or voice control) and the keys
 // there are. More display options go here later (light or dark, English or French). Text size is the browser's own
 // zoom and font setting. core.js applies a choice at once and remembers it on this device (localStorage
 // uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.switch).
 import Icon from './Icon.astro';
 ---
-<dialog class="dialog" id="settings-dialog" aria-labelledby="st-title">
+<dialog class="dialog" id="settings-dialog" aria-labelledby="st-title" closedby="any">
   <div class="dlg-head">
     <h2 id="st-title">Settings</h2>
-    <button class="hbtn" type="button" data-close aria-keyshortcuts="Escape"><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close (Esc)</span></button>
+    <button class="hbtn" type="button" data-close commandfor="settings-dialog" command="close" aria-keyshortcuts="Escape"><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close (Esc)</span></button>
   </div>
   <div class="dlg-body">
     <section class="keys-group" aria-labelledby="st-keys">

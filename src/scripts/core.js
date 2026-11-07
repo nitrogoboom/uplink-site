@@ -139,15 +139,21 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 
 /* ======================================================================
    Dialogs (native <dialog>: focus is held inside, Esc closes)
+   Settings' gear and close button are also invoker commands (commandfor, command="show-modal" / "close") and it
+   carries closedby="any", so in a browser that has them it works before this script runs, or if it never does
+   (SettingsDialog.astro). Once this script runs it opens and closes the pop-ups itself, the same in every browser
+   (its click cancels the command), and a click on the backdrop goes through its own check below. Book is opened by
+   links, which without script go to the form on /contact.
    ====================================================================== */
 // On touch screens the first field would bring the keyboard up over the sheet before it is read, so there focus
 // starts on the close button (a screen reader still reads the dialog's title) and a tap on a field brings the keyboard.
 const coarse = window.matchMedia('(pointer: coarse)');
 const openedAt = new WeakMap();   // dialog -> when it opened
+const openers = new WeakMap();    // dialog -> what opened it, which gets focus back when it closes
 function openDialog(id, opener) {
   const dlg = document.getElementById(id);
   if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
-  dlg._opener = opener || document.activeElement;
+  openers.set(dlg, opener || document.activeElement);
   dlg.showModal();
   openedAt.set(dlg, performance.now());
   // a group of options (radios) is entered at its chosen one, as Tab does
@@ -159,7 +165,9 @@ function openDialog(id, opener) {
 
 $$('dialog').forEach((dlg) => {
   // click on the dimmed backdrop closes; not the second click of a double-click (or a quick second tap) on what
-  // opened it, which lands on the backdrop of the pop-up the first click opened
+  // opened it, which lands on the backdrop of the pop-up the first click opened (review B12). The browser's own light
+  // dismiss (closedby="any") can't tell the two apart, so it's off once this script runs.
+  dlg.setAttribute('closedby', 'closerequest');
   let downOnBackdrop = false;
   dlg.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === dlg; });
   dlg.addEventListener('click', (e) => {
@@ -171,15 +179,15 @@ $$('dialog').forEach((dlg) => {
   // fade-out, so the toast would wait there and flash up the next time the pop-up opens)
   dlg.addEventListener('close', () => {
     $$(':scope > .toasts > .toast', dlg).forEach((t) => t.remove());
-    const back = dlg._opener;
-    dlg._opener = null;
+    const back = openers.get(dlg);
+    openers.delete(dlg);
     if (back && document.contains(back) && typeof back.focus === 'function') back.focus();
   });
 });
 
-// With script, these open a pop-up instead of going to their page, so screen readers say so ("has pop-up dialog").
-// Without script they are plain links again, and nothing claims otherwise.
-$$('[data-open]').forEach((el) => { if (document.getElementById(el.dataset.open)) el.setAttribute('aria-haspopup', 'dialog'); });
+// No aria-haspopup="dialog" on what opens a pop-up (review J8): on Windows any aria-haspopup makes a button or link a
+// menu button to screen readers, VoiceOver doesn't announce it, and the WAI-ARIA APG modal dialog pattern doesn't use
+// it. The pop-up names itself as it opens and takes focus.
 
 document.addEventListener('click', (e) => {
   const opener = e.target.closest('[data-open]');
@@ -270,19 +278,23 @@ $$('form[data-validate]').forEach((form) => {
   const fields = $$('input, select, textarea', form).filter((el) => el.willValidate);
 
   // The field's error text is linked only while the field is invalid, so a
-  // screen reader does not read it out on an empty, untouched field.
+  // screen reader does not read it out on an empty, untouched field. Only the
+  // error's id comes and goes: a hint the field is described by stays (review J9).
+  const linkError = (el, on) => {
+    const err = $('.field-error', el.parentElement);
+    if (!err || !err.id) return;
+    const ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter((id) => id && id !== err.id);
+    if (on) ids.push(err.id);
+    if (ids.length) el.setAttribute('aria-describedby', ids.join(' '));
+    else el.removeAttribute('aria-describedby');
+  };
   const check = (el) => {
     if (el.required && el.value !== '' && el.value.trim() === '') el.setCustomValidity('empty');
     else el.setCustomValidity('');
     const ok = el.checkValidity();
-    const err = $('.field-error', el.parentElement);
-    if (ok) {
-      el.removeAttribute('aria-invalid');
-      el.removeAttribute('aria-describedby');
-    } else {
-      el.setAttribute('aria-invalid', 'true');
-      if (err && err.id) el.setAttribute('aria-describedby', err.id);
-    }
+    if (ok) el.removeAttribute('aria-invalid');
+    else el.setAttribute('aria-invalid', 'true');
+    linkError(el, !ok);
     return ok;
   };
   fields.forEach((el) => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid')) check(el); }));
@@ -297,7 +309,7 @@ $$('form[data-validate]').forEach((form) => {
     const dlg = form.closest('dialog');
     if (dlg) dlg.close();
     form.reset();
-    fields.forEach((el) => { el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); });
+    fields.forEach((el) => { el.removeAttribute('aria-invalid'); linkError(el, false); });
 
     if (kind === 'book') {
       toast({ title: 'Check-up requested', text: 'We will email you within one business day to pick a time.' });

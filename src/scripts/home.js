@@ -448,7 +448,14 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
     svcRow.scrollBy({ left: r.left + r.width / 2 - (box.left + box.width / 2), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
     if (aim === current) aim = null;
   };
-  svcRow.addEventListener('scrollend', () => { aim = null; });
+  // a slide that ends (or a swipe that cuts it short) forgets its aim. Safari before 26.2 has no scrollend: there a
+  // scroll that has been still for 150ms has ended (review J15)
+  const settle = () => { aim = null; };
+  if ('onscrollend' in window) svcRow.addEventListener('scrollend', settle);
+  else {
+    let quiet = 0;
+    svcRow.addEventListener('scroll', () => { window.clearTimeout(quiet); quiet = window.setTimeout(settle, 150); }, { passive: true });
+  }
   steps.forEach((b) => b.addEventListener('click', () => go((aim ?? current) + +b.dataset.step)));
   $('.svc-dots', svcHint)?.addEventListener('click', (e) => {
     const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
