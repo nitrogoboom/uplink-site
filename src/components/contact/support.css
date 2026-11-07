@@ -20,7 +20,7 @@
   .help-cards .card { align-items: flex-start; }
   /* one row, however many cards, from 16:9 up. The centred block (tokens.css) keeps
      each card the same size at 1920 x 1080 and 3440 x 1440. */
-  @media (min-aspect-ratio: 16/9) {
+  @media (aspect-ratio >= 16 / 9) {
     .svc-cards { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: var(--sp-4); }
     .svc-cards > li:last-child:nth-child(3n+1) { grid-column: auto; }
   }

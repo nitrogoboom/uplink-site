@@ -8,7 +8,7 @@
     "rule-empty-line-before": null,
     "declaration-empty-line-before": null,
     "custom-property-empty-line-before": null,
-    "media-feature-range-notation": "prefix",
+    "media-feature-range-notation": "context",
     "selector-class-pattern": null,
     "import-notation": "string",
     "alpha-value-notation": "number",

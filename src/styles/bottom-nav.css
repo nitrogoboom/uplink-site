@@ -71,10 +71,10 @@
    (width - 884) / 2 with words. The site check (checks/site.spec.mjs) checks it at every 10px; it fails under 8px.
    Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
    padding would overlap). */
-@media (min-width: 700px) and (max-width: 779px) {
+@media (43.75em <= width < 48.75em) {
   .tab { padding-inline: var(--sp-2); }
   .site-header .container { gap: var(--sp-2); }
 }
 /* the buttons' words come back where they fit with 24px a side: 884 + 2 x 24 = 932, so from 940px (each button keeps
    its name in aria-label, Header.astro) */
-@media (min-width: 700px) and (max-width: 939px) { .hdr-actions .hbtn-text { display: none; } }
+@media (43.75em <= width < 58.75em) { .hdr-actions .hbtn-text { display: none; } }

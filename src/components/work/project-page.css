@@ -15,7 +15,7 @@
 .proj-page .case .stack > .chip { align-self: flex-start; }
 .proj-page [data-case-field="story"] { max-width: var(--measure-lead); font-size: var(--fs-5); line-height: var(--lh-snug); }
 .proj-page .facts { font-size: var(--fs-3); }
-@media (min-width: 900px) {
+@media (width >= 56.25em) {
   .proj-page-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: auto auto 1fr;

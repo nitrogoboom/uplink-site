@@ -24,7 +24,7 @@ const two = (k: number) => String(k).padStart(2, '0');
     <div class="picker-art">
       <div class="tags"><span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span></div>
       <picture>
-        <source media="(max-width: 1199px)" srcset={`/assets/img/${s.image}-compact.svg`}>
+        <source media="(width < 75em)" srcset={`/assets/img/${s.image}-compact.svg`}>
         <img src={`/assets/img/${s.image}.svg`} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'} alt={s.alt} width="640" height="480">
       </picture>
     </div>

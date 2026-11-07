@@ -312,7 +312,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   /* bigger text (Settings): the footer grows past one screen to fit its panels */
   :root[data-text].js .fc { height: auto; min-height: var(--fold-h); }
   :root[data-text].js .fc-map { height: auto; min-height: 26rem; }
-  @media (max-height: 820px) {
+  @media (height <= 51.25em) {
     .js .fc-stage { padding-top: var(--sp-6); }
     .fc-body { margin-top: var(--sp-5); }
   }

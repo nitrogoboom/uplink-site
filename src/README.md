@@ -103,13 +103,15 @@ All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the token
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
 
-| Name | Query |
-| --- | --- |
-| `smallPhone` | Below 600 px. The drawings switch to their phone cut. |
-| `phone` | Below 700 px. |
-| `tablet` | 700 px to 1099 px. |
-| `desktop` | 1100 px and up. |
-| `fold` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
+Every breakpoint is in `em`, in range syntax: `(width < 43.75em)`. In a media query, 1em is the browser's default font size (16 px unless the visitor changed it), not the page's root font size. So a bigger default font, or zoom, counts as a narrower screen. The one-off queries written out in a component's CSS, and the `media` of a `<source>` or `<link>`, follow the same rule. Lint refuses the old `min-width` form (`media-feature-range-notation` in `.stylelintrc.json`).
+
+| Name | Query | At a 16 px default |
+| --- | --- | --- |
+| `smallPhone` | `width < 37.5em` | Below 600 px. The drawings switch to their phone cut. |
+| `phone` | `width < 43.75em` | Below 700 px. |
+| `tablet` | `43.75em <= width < 68.75em` | 700 px to 1099 px. |
+| `desktop` | `width >= 68.75em` | 1100 px and up. |
+| `fold` | `width >= 68.75em` and `height >= 43.75em` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
 
 After you move CSS, prove nothing changed with `npm run verify:styles -- OLD_URL NEW_URL`. It compares every element's computed style between two builds.
 

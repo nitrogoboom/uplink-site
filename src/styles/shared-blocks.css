@@ -73,5 +73,5 @@
 /* desktop (>= 1100 wide and >= 700 tall): FAQ beside its heading */
 @media (--fold) {
   .split .faq { max-width: none; }   /* lines up with the blocks above and below; answers keep their reading width */
-  @media (max-height: 760px) { .faq { gap: var(--sp-2); } }
+  @media (height <= 47.5em) { .faq { gap: var(--sp-2); } }
 }

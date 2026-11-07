@@ -29,10 +29,10 @@
     radial-gradient(45% 55% at 8% 92%, var(--c-glow-accent), transparent 70%);
 }
 /* two columns (landscape tablets and up): the hero is one screen tall */
-@media (min-width: 900px) and (min-height: 560px) and (orientation: landscape) {
+@media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
   .hero { --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)); --hero-pad-top: var(--sp-5); }
 }
 /* the home hero on a tall desktop: the news cards sit closer to the bottom edge */
-@media (min-width: 1100px) and (min-height: 800px) and (orientation: landscape) {
+@media (width >= 68.75em) and (height >= 50em) and (orientation: landscape) {
   .hero.fold { --hero-pad-bottom: var(--sp-5); }
 }

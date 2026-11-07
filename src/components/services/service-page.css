@@ -24,7 +24,7 @@
 @media (--tablet-up) {
   .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (min-width: 900px) {
+@media (width >= 56.25em) {
   .svc-page-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     grid-template-rows: auto auto 1fr auto;

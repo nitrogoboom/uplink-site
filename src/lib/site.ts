@@ -38,8 +38,8 @@ export const HERO = {
   still: '/assets/img/hero-office-phone.svg',
   media: {
     phone: MEDIA.smallPhone,
-    tablet: '(min-width: 600px) and (max-width: 1299px) and (max-height: 1099px)',
-    full: '(min-width: 1300px), (min-width: 600px) and (min-height: 1100px)',
+    tablet: '(37.5em <= width < 81.25em) and (height < 68.75em)',
+    full: '(width >= 81.25em), (width >= 37.5em) and (height >= 68.75em)',
   },
 };
 
