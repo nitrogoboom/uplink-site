@@ -261,6 +261,15 @@ for (const page of PAGES) {
 // toasts and footer panels stayed at their first, invisible animation frame, and the phone services row stopped
 // following a swipe). axe gets the open dialog, which a pass over the page at load can't see (a closed <dialog> isn't
 // rendered). With the pause on, every looping animation must be paused once the drawings have loaded.
+// wait until an element's own animations have stopped running (finished, or held by a pause), up to 5 s, so a busy
+// runner can't catch a 250ms fade-in half way; a fade held by the pause stays at its first frame and still fails
+const settled = (q, sel) =>
+  q
+    .waitForFunction((s) => {
+      const e = document.querySelector(s);
+      return !!e && e.getAnimations().every((a) => a.playState !== 'running');
+    }, sel, { timeout: 5000 })
+    .catch(() => {});
 const shownStyle = (sel) => {
   const e = document.querySelector(sel);
   if (!e) return null;
@@ -301,7 +310,7 @@ for (const page of PAGES) {
           await opener.scrollIntoViewIfNeeded();
           await opener.click();
           await q.waitForFunction((d) => document.getElementById(d)?.open, id, { timeout: 5000 }).catch(() => {});
-          await q.waitForTimeout(600); // the opening animation is 250ms (--dur-2)
+          await settled(q, `#${id}`); // the opening animation is 250ms (--dur-2)
           const st = await q.evaluate(shownStyle, `#${id}`);
           rep.push(`${id}: ${JSON.stringify(st)}`);
           if (!st || st.opacity < 0.99 || st.w < 100 || st.h < 100) fails.push(`${name}: #${id} isn't shown once open: ${JSON.stringify(st)}`);
@@ -310,7 +319,8 @@ for (const page of PAGES) {
           // a toast in the dialog: Settings' shortcuts switch says what it did, then leaves on its own (3 s)
           if (id === 'settings-dialog' && (await q.locator('#sc-toggle').count())) {
             await q.locator('#sc-toggle').click();
-            await q.waitForTimeout(600);
+            await q.waitForSelector(`#${id} .toast`, { timeout: 5000 }).catch(() => {});
+            await settled(q, `#${id} .toast`);
             const t = await q.evaluate(shownStyle, `#${id} .toast`);
             if (!t || t.opacity < 0.99) fails.push(`${name}: the shortcuts toast isn't shown: ${JSON.stringify(t)}`);
             const gone = await q.waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 }).then(() => true, () => false);
@@ -358,7 +368,7 @@ for (const page of PAGES) {
         if (w >= 700 && page !== MISSING) {
           await q.$eval('#footer', (e) => e.scrollIntoView());
           await q.locator('.fc-tile').nth(1).click();
-          await q.waitForTimeout(800); // its animation is 360ms (--dur-fc-panel)
+          await settled(q, '.fc-panel.is-on'); // its animation is 360ms (--dur-fc-panel)
           const p = await q.evaluate(shownStyle, '.fc-panel.is-on');
           rep.push(`footer panel: ${JSON.stringify(p)}`);
           if (!p || p.opacity < 0.99 || p.h < 50) fails.push(`${name}: the footer tab's panel isn't shown: ${JSON.stringify(p)}`);
