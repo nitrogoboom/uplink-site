@@ -22,8 +22,22 @@
 import { MEDIA } from '../lib/media.js';
 
 const root = document.documentElement;
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+// For the type check (JSDoc, tsconfig checkJs) what they find is an HTML element, or the type of the variable it goes
+// in (an SVG part, a <dialog>): what a selector finds is up to the markup.
+/**
+ * @template {Element} [E=HTMLElement]
+ * @param {string} sel
+ * @param {ParentNode} [ctx]
+ * @returns {E | null}
+ */
+const $ = (sel, ctx = document) => /** @type {E | null} */ (ctx.querySelector(sel));
+/**
+ * @template {Element} [E=HTMLElement]
+ * @param {string} sel
+ * @param {ParentNode} [ctx]
+ * @returns {E[]}
+ */
+const $$ = (sel, ctx = document) => /** @type {E[]} */ (Array.from(ctx.querySelectorAll(sel)));
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 /* ---------- error reports ---------------------------------------------- */
@@ -35,6 +49,7 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 // still loads, so it isn't a fault to hear about). Five reports a page at most.
 // CSP blocks are reported by the browser itself (public/_headers).
 let reportsLeft = 5;
+/** @type {(message: string, source?: string, line?: number, column?: number) => void} */
 const reportError = (message, source, line, column) => {
   if (!message || message === 'Script error.' || /ResizeObserver loop|^Transition was (aborted|skipped)/.test(message)) return;
   if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
@@ -42,11 +57,15 @@ const reportError = (message, source, line, column) => {
   navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
 };
 window.addEventListener('error', (e) => reportError(e.message, e.filename, e.lineno, e.colno));
+// a rejection's reason is whatever was thrown (typed any), and lint can't see a JSDoc cast, so its any-rules are off here
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 window.addEventListener('unhandledrejection', (e) => reportError(e.reason?.message || String(e.reason), e.reason?.stack?.split('\n')[1]?.trim()));
 
 /* ---------- storage (can be unavailable) ------------------------------ */
 const store = {
+  /** @param {string} key */
   get(key) { try { return window.localStorage.getItem(key); } catch { return null; } },
+  /** @param {string} key @param {string} value */
   set(key, value) { try { window.localStorage.setItem(key, value); } catch { /* ignore */ } }
 };
 
@@ -56,9 +75,10 @@ const store = {
 // The one script it may load from elsewhere is the analytics beacon (BEACON, below).
 const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
 const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', {
-  createHTML: (s) => s,
-  createScriptURL: (u) => { if (u === BEACON) return u; throw new TypeError('script not allowed: ' + u); }
+  createHTML: (/** @type {string} */ s) => s,
+  createScriptURL: (/** @type {string} */ u) => { if (u === BEACON) return u; throw new TypeError('script not allowed: ' + u); }
 }) : null;
+/** @type {(s: string) => string} */
 const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
 
 /* ---------- icons used by script-built UI ------------------------------ */
@@ -82,6 +102,7 @@ function toastRegion() {
   return dlg ? $(':scope > .toasts', dlg) || pageToasts : pageToasts;
 }
 
+/** @param {{ title: string, text?: string, tone?: 'ok' | 'info', timeout?: number }} t */
 function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
   const region = toastRegion();
   if (!region) return;
@@ -115,14 +136,17 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 
   // focus that came into the toast (Tab to its button) goes back where it came from when the toast leaves, or to
   // the pop-up's close button or the page's main content, never to the page's <body>
-  let timer = null, from = null;
+  /** @type {ReturnType<typeof setTimeout> | undefined} */
+  let timer;
+  /** @type {HTMLElement | null} */
+  let from = null;
   const leave = () => {
     clearTimeout(timer);
     if (el.dataset.leaving !== undefined) return;
     el.dataset.leaving = '';
     if (el.contains(document.activeElement)) {
       const dlg = region.closest('dialog');
-      const to = [from, dlg && $('[data-close]', dlg), $('#main')].find((x) => x && document.contains(x) && !el.contains(x) && typeof x.focus === 'function');
+      const to = /** @type {(HTMLElement | null)[]} */ ([from, dlg && $('[data-close]', dlg), $('#main')]).find((x) => x && document.contains(x) && !el.contains(x) && typeof x.focus === 'function');
       if (to) to.focus({ preventScroll: true });
     }
     const done = () => el.remove();
@@ -132,7 +156,7 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
   btn.addEventListener('click', leave);
   el.addEventListener('mouseenter', () => clearTimeout(timer));
   el.addEventListener('mouseleave', arm);
-  el.addEventListener('focusin', (e) => { clearTimeout(timer); if (e.relatedTarget && !el.contains(e.relatedTarget)) from = e.relatedTarget; });
+  el.addEventListener('focusin', (e) => { clearTimeout(timer); const r = /** @type {HTMLElement | null} */ (e.relatedTarget); if (r && !el.contains(r)) from = r; });
   el.addEventListener('focusout', arm);
   arm();
 }
@@ -148,12 +172,15 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 // On touch screens the first field would bring the keyboard up over the sheet before it is read, so there focus
 // starts on the close button (a screen reader still reads the dialog's title) and a tap on a field brings the keyboard.
 const coarse = window.matchMedia('(pointer: coarse)');
+/** @type {WeakMap<HTMLDialogElement, number>} */
 const openedAt = new WeakMap();   // dialog -> when it opened
+/** @type {WeakMap<HTMLDialogElement, HTMLElement | null>} */
 const openers = new WeakMap();    // dialog -> what opened it, which gets focus back when it closes
+/** @param {string} id @param {HTMLElement | null} [opener] */
 function openDialog(id, opener) {
-  const dlg = document.getElementById(id);
+  const dlg = /** @type {HTMLDialogElement | null} */ (document.getElementById(id));
   if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
-  openers.set(dlg, opener || document.activeElement);
+  openers.set(dlg, opener || /** @type {HTMLElement | null} */ (document.activeElement));
   dlg.showModal();
   openedAt.set(dlg, performance.now());
   // a group of options (radios) is entered at its chosen one, as Tab does
@@ -163,7 +190,7 @@ function openDialog(id, opener) {
   return true;
 }
 
-$$('dialog').forEach((dlg) => {
+/** @type {HTMLDialogElement[]} */ ($$('dialog')).forEach((dlg) => {
   // click on the dimmed backdrop closes; not the second click of a double-click (or a quick second tap) on what
   // opened it, which lands on the backdrop of the pop-up the first click opened (review B12). The browser's own light
   // dismiss (closedby="any") can't tell the two apart, so it's off once this script runs.
@@ -190,23 +217,25 @@ $$('dialog').forEach((dlg) => {
 // it. The pop-up names itself as it opens and takes focus.
 
 document.addEventListener('click', (e) => {
-  const opener = e.target.closest('[data-open]');
+  const target = /** @type {Element} */ (e.target);
+  const opener = /** @type {HTMLElement | null} */ (target.closest('[data-open]'));
   // Ctrl, Cmd, Shift or Alt on a link means a new tab, a new window or a download: let the link do that
   if (opener && opener.matches('a[href]') && (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey)) return;
   if (opener) {
     if (opener.dataset.open === 'book-dialog') presetService(opener.dataset.service || '');
-    if (openDialog(opener.dataset.open, opener)) e.preventDefault();
+    if (openDialog(/** @type {string} */ (opener.dataset.open), opener)) e.preventDefault();
     return;
   }
-  const closer = e.target.closest('[data-close]');
+  const closer = target.closest('[data-close]');
   if (closer) {
     const dlg = closer.closest('dialog');
     if (dlg) dlg.close();
   }
 });
 
+/** @param {string} name */
 function presetService(name) {
-  const sel = document.getElementById('book-service');
+  const sel = /** @type {HTMLSelectElement | null} */ (document.getElementById('book-service'));
   if (!sel) return;
   const opt = name && Array.from(sel.options).find((o) => o.value === name || o.textContent === name);
   sel.selectedIndex = opt ? opt.index : 0;
@@ -220,7 +249,7 @@ function presetService(name) {
 const HOLD_KEY = 'uplink-held';
 const held = { on: false, ev: new EventTarget() };
 const holdBtns = $$('[data-hold]');
-const setHeld = (on) => {
+const setHeld = (/** @type {boolean} */ on) => {
   held.on = on;
   root.classList.toggle('is-held', on);
   holdBtns.forEach((b) => b.setAttribute('aria-pressed', String(on)));
@@ -239,7 +268,7 @@ const SC_KEY = 'uplink.shortcuts';
 if (store.get(SC_KEY) === 'off') root.dataset.shortcuts = 'off';
 const shortcutsOn = () => root.dataset.shortcuts !== 'off';
 
-const scToggle = document.getElementById('sc-toggle');
+const scToggle = /** @type {HTMLInputElement | null} */ (document.getElementById('sc-toggle'));
 if (scToggle) {
   scToggle.checked = shortcutsOn();
   scToggle.addEventListener('change', () => {
@@ -249,13 +278,14 @@ if (scToggle) {
   });
 }
 
+/** @param {HTMLElement} el */
 function isTyping(el) {
   if (!el || el === document.body) return false;
   if (el.isContentEditable) return true;
   if (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') return true;
   if (el.tagName === 'INPUT') {
     const nonText = ['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file'];
-    return !nonText.includes(el.type);
+    return !nonText.includes(/** @type {HTMLInputElement} */ (el).type);
   }
   return false;
 }
@@ -263,7 +293,7 @@ function isTyping(el) {
 document.addEventListener('keydown', (e) => {
   if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
   if (!shortcutsOn()) return;
-  if (isTyping(e.target)) return;
+  if (isTyping(/** @type {HTMLElement} */ (e.target))) return;
   if (document.querySelector('dialog[open]')) return;
 
   if (e.key === '?') { e.preventDefault(); openDialog('settings-dialog'); }
@@ -273,22 +303,23 @@ document.addEventListener('keydown', (e) => {
    Forms: inline validation, then a confirmation toast.
    This prototype does not send anything anywhere yet.
    ====================================================================== */
-$$('form[data-validate]').forEach((form) => {
+/** @type {HTMLFormElement[]} */ ($$('form[data-validate]')).forEach((form) => {
   form.noValidate = true;
-  const fields = $$('input, select, textarea', form).filter((el) => el.willValidate);
+  /** @typedef {HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement} Field */
+  const fields = /** @type {Field[]} */ ($$('input, select, textarea', form)).filter((el) => el.willValidate);
 
   // The field's error text is linked only while the field is invalid, so a
   // screen reader does not read it out on an empty, untouched field. Only the
   // error's id comes and goes: a hint the field is described by stays (review J9).
-  const linkError = (el, on) => {
-    const err = $('.field-error', el.parentElement);
+  const linkError = (/** @type {Field} */ el, /** @type {boolean} */ on) => {
+    const err = $('.field-error', /** @type {HTMLElement} */ (el.parentElement));
     if (!err || !err.id) return;
     const ids = (el.getAttribute('aria-describedby') || '').split(/\s+/).filter((id) => id && id !== err.id);
     if (on) ids.push(err.id);
     if (ids.length) el.setAttribute('aria-describedby', ids.join(' '));
     else el.removeAttribute('aria-describedby');
   };
-  const check = (el) => {
+  const check = (/** @type {Field} */ el) => {
     if (el.required && el.value !== '' && el.value.trim() === '') el.setCustomValidity('empty');
     else el.setCustomValidity('');
     const ok = el.checkValidity();
@@ -329,9 +360,10 @@ if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia(MEDIA.phone);
   const barOn = () => phone.matches;
+  /** @type {number | null} */
   let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
-  const show = (on) => botnav.classList.toggle('is-hidden', !on);
+  const show = (/** @type {boolean} */ on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
     if (!barOn()) { show(true); return; }
@@ -351,7 +383,7 @@ if (botnav) {
 /* ---------- replay ----------------------------------------------------- */
 // Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
 // read, so it costs no forced layout (offsetWidth would).
-const replay = (el, cls) => {
+const replay = (/** @type {Element} */ el, /** @type {string} */ cls) => {
   if (el.classList.contains(cls)) el.getAnimations().forEach((a) => { a.cancel(); a.play(); });
   else el.classList.add(cls);
 };
@@ -359,6 +391,7 @@ const replay = (el, cls) => {
 /* ---------- off-screen pause ------------------------------------------ */
 // Marks el with .is-idle while none of it is on screen (base.css pauses
 // its looping animations) and tells onChange(onScreen) about each change.
+/** @param {Element | null | undefined} el @param {(onScreen: boolean) => void} [onChange] */
 function whenOnScreen(el, onChange) {
   if (!el || !('IntersectionObserver' in window)) return null;
   const io = new IntersectionObserver(([en]) => {
@@ -373,9 +406,9 @@ function whenOnScreen(el, onChange) {
 // A picture that fails (offline, blocked) gets .is-broken (base.css: see-through, so no broken-image box; its alt
 // text still reaches screen readers). An error doesn't bubble, so it's caught on the way down; one that came before
 // this script ran is found by decode(), which fails only for a picture that can't be shown.
-const broken = (img) => img.classList.add('is-broken');
+const broken = (/** @type {HTMLImageElement} */ img) => img.classList.add('is-broken');
 document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) broken(e.target); }, true);
-$$('img').forEach((img) => { if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img)); });
+/** @type {HTMLImageElement[]} */ ($$('img')).forEach((img) => { if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img)); });
 
 /* ---------- Cloudflare Web Analytics ----------------------------------- */
 // Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and
@@ -388,7 +421,7 @@ $$('img').forEach((img) => { if (img.complete && !img.naturalWidth) img.decode()
 const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053';   // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; see notes.md)
 const startBeacon = () => {
   if (navigator.webdriver) return;
-  const canon = $('link[rel="canonical"]');
+  const canon = /** @type {HTMLLinkElement | null} */ ($('link[rel="canonical"]'));
   if (!canon || new URL(canon.href).hostname !== window.location.hostname) return;
   const s = document.createElement('script');
   s.defer = true;
@@ -396,7 +429,7 @@ const startBeacon = () => {
   s.src = ttPolicy ? ttPolicy.createScriptURL(BEACON) : BEACON;
   document.body.append(s);
 };
-const whenIdle = (fn) => ('requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : window.setTimeout(fn, 1500));
+const whenIdle = (/** @type {() => void} */ fn) => ('requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1500));
 if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 

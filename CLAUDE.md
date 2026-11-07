@@ -31,6 +31,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - A page's own script goes inside `<Base>`: `<Fragment slot="scripts"><script>import '../scripts/x.js'</script></Fragment>`. Every page script imports `core.js`.
 - Icons: `<Icon name="…" />`.
 - HTML written by a script goes through `html()` from `core.js` (Trusted Types).
+- JavaScript in `src/` is type-checked (`checkJs`): JSDoc types on parameters and on lookups (`src/README.md`, "Scripts"). Lint's type-aware rules run there too: mark a promise you don't wait for with `void`.
 - Styles from script: `el.style.x = …`. Markup carries classes only; the CSP has no `'unsafe-inline'` and the build fails on a `style=""` attribute.
 - `public/_headers` is a template; `scripts/headers.mjs` fills in the hashes and Early Hints at build. Hashes are always generated.
 - A link whose visible parts sit in separate boxes gets `<Pause />` between them. A `<Pause />` inside a sideways-scrolling row needs `position: relative` on its box (it's absolute, and would widen the page).

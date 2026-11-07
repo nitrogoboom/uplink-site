@@ -96,9 +96,9 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `npm run build` | Builds the site into `dist/`. After Astro builds, it shrinks the drawings with SVGO, writes a Markdown copy of every page, and writes `dist/_headers` and `dist/_redirects`. |
 | `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787: headers, the 404 page, and redirects included. Runs `wrangler dev`. |
 | `npm run preview` | Astro's own preview server. It doesn't apply the headers or redirects, so use `npm run serve` instead. |
-| `npm run check` | Checks types and runs Astro's diagnostics. |
+| `npm run check` | Checks types and runs Astro's diagnostics: the TypeScript, the Astro components, and the JavaScript in `src/` (the page scripts and `src/lib`, typed with JSDoc; `checkJs` in `tsconfig.json`). The site checks, the build scripts, and the Worker aren't type-checked. |
 | `npm test` | Tests the build's after-steps and the Worker with Node's built-in test runner (`scripts/test/`). |
-| `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks only JSON and YAML; the code is formatted by hand. |
+| `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks only JSON and YAML; the code is formatted by hand. On `src/scripts/` and `src/lib/`, ESLint also runs typescript-eslint's rules that need types (`recommendedTypeCheckedOnly`), such as a promise left floating (`no-floating-promises`) or handed to a listener (`no-misused-promises`). |
 | `npm run format` | Fixes what the linters can fix on their own. |
 | `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the site check, the link check, and the smoke check. It starts its own `wrangler dev` on a free port for the checks and stops it after, so a server you already have running is never the one checked. Needs Node and Playwright's Chromium, no Python. It doesn't run the screenshot comparison, the workflow lint, the preview upload, or the deploy. |
 | `npm run verify` | Runs the site check in a browser. See [Site checks](#site-checks). |

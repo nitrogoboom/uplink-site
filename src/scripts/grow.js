@@ -29,21 +29,25 @@ const C30 = Math.cos(Math.PI / 6);
 
 const section = $('#grow');
 const grow = section && $('.grow', section);
+/** @type {SVGSVGElement | null} */
 const svg = grow && $('.grow-stage svg', grow);
 if (grow && svg) {
-  const stage = $('.grow-stage', grow);
+  // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
+  const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));
   const steps = $$('.grow-card', grow);
   const N = steps.length, LAST = N - 1;
-  const pcs = $$('.pc', svg).map((g) => ({ g, s: Number(g.dataset.s) - 1, o: Number(g.dataset.o) }));
-  const tags = $$('.grow-tag', grow).map((el) => ({ el, step: Number(el.dataset.step), k: Number(el.dataset.k), at: $(`.tg-a[data-a="${el.dataset.at}"]`, svg), icon: $('.grow-tag-i', el), text: $('.grow-tag-t', el) }));
+  const pcs = /** @type {SVGGElement[]} */ ($$('.pc', svg)).map((g) => ({ g, s: Number(g.dataset.s) - 1, o: Number(g.dataset.o) }));
+  const tags = $$('.grow-tag', grow).map((el) => ({ el, step: Number(el.dataset.step), k: Number(el.dataset.k), at: $(`.tg-a[data-a="${el.dataset.at}"]`, svg), icon: /** @type {HTMLElement} */ ($('.grow-tag-i', el)), text: /** @type {HTMLElement} */ ($('.grow-tag-t', el)) }));
   const dots = $$('.grow-dot', grow), items = $$('.grow-item', grow);
   const [prev, next] = $$('.grow-step-btn', grow);
-  const play = $('.grow-play', grow), playIcon = $('.grow-play-i path', grow), ring = $('.grow-ring circle', grow);
-  const place = $('.grow-place', grow), team = $('.grow-team', grow);
+  const play = /** @type {HTMLElement} */ ($('.grow-play', grow)), playIcon = /** @type {SVGPathElement} */ ($('.grow-play-i path', grow)), ring = /** @type {SVGCircleElement} */ ($('.grow-ring circle', grow));
+  const place = /** @type {HTMLElement} */ ($('.grow-place', grow)), team = /** @type {HTMLElement} */ ($('.grow-team', grow));
   const teams = steps.map((c) => Number(c.dataset.team) || 0);
   const places = steps.map((c) => c.dataset.place);
-  const full = svg.getAttribute('viewBox').split(' ').map(Number);
-  let built = -1, cur = -1, playing = false, started = false, visible = false, timer = 0, glowT = 0, beats = [];
+  const full = /** @type {string} */ (svg.getAttribute('viewBox')).split(' ').map(Number);
+  let built = -1, cur = -1, playing = false, started = false, visible = false, timer = 0, glowT = 0;
+  /** @type {number[]} */
+  let beats = [];
 
   // ---- tags: placed on the drawing's anchors, kept inside the picture, and never on top of each other: when a
   // step's two tags would overlap (a close camera brings anchors together), the upper one moves up clear of the
@@ -59,7 +63,7 @@ if (grow && svg) {
       return { t, w, h, x: Math.min(r.width - w / 2 - pad, Math.max(w / 2 + pad, p.x - r.left)), y: Math.max(h + top, p.y - r.top - 3) };
     });
     for (let s = 0; s < steps.length; s++) {
-      const pair = spots.filter((q) => q && q.t.step === s).sort((a, b) => b.y - a.y);   // lower one first
+      const pair = /** @type {NonNullable<typeof spots[number]>[]} */ (spots.filter((q) => q && q.t.step === s)).sort((a, b) => b.y - a.y);   // lower one first
       for (let k = 1; k < pair.length; k++) {
         const lo = pair[k - 1], hi = pair[k];
         const across = Math.abs(lo.x - hi.x) < (lo.w + hi.w) / 2 + gap, down = lo.y - hi.y < hi.h + gap;
@@ -73,7 +77,7 @@ if (grow && svg) {
 
   // ---- the camera: close on what's built, pulling back as the world grows ----
   let vb = full.slice(), camRaf = 0;
-  const target = (i) => {
+  const target = (/** @type {number} */ i) => {
     if (i < 0) return full;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     pcs.forEach(({ g, s }) => { if (s > i) return; const b = g.getBBox(); x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height); });
@@ -83,10 +87,10 @@ if (grow && svg) {
     const y = Math.max(full[1], Math.min(full[1] + full[3] - side, (y0 + y1) / 2 - side / 2));
     return [x, y, side, side];
   };
-  const camTo = (to, animate) => {
+  const camTo = (/** @type {number[]} */ to, /** @type {boolean} */ animate) => {
     window.cancelAnimationFrame(camRaf);
     const from = vb.slice(), t0 = performance.now(), dur = animate && !reduceMotion.matches ? 1400 : 0;
-    const step = (now) => {
+    const step = (/** @type {number} */ now) => {
       const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
       vb = from.map((v, n) => v + (to[n] - v) * e);
       svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
@@ -101,14 +105,14 @@ if (grow && svg) {
   // bare ground, from the number it shows; going back, to a step already reached, paused, or with reduced motion, it
   // changes at once, with the list. ----
   let teamNow = 0, teamRaf = 0, reached = -1;
-  const setTeam = (v) => { teamNow = v; team.textContent = v ? `Team of ${v}` : ''; };
-  const count = (i, animate) => {
+  const setTeam = (/** @type {number} */ v) => { teamNow = v; team.textContent = v ? `Team of ${v}` : ''; };
+  const count = (/** @type {number} */ i, /** @type {boolean} */ animate) => {
     window.cancelAnimationFrame(teamRaf);
     const n = i < 0 ? 0 : teams[i], a = teamNow, climb = animate && i > reached && n > a && !reduceMotion.matches;
     reached = i < 0 ? -1 : Math.max(reached, i);
     if (!climb) { setTeam(n); return; }
     const t0 = performance.now();
-    const f = (now) => {
+    const f = (/** @type {number} */ now) => {
       const k = Math.min(1, Math.max(0, (now - t0) / COUNT));
       setTeam(Math.round(a + (n - a) * k));
       if (k < 1) teamRaf = window.requestAnimationFrame(f);
@@ -126,7 +130,7 @@ if (grow && svg) {
   // loop runs only while a step plays: it stops at the step's end, on a pause and off screen ----
   let ringRaf = 0;
   const RING = 311.02;   // the play ring's length in its own units (2π × 49.5, as its stroke-dasharray in grow.css)
-  const drawRing = (k) => { ring.style.strokeDashoffset = String(RING * (1 - Math.min(1, Math.max(0, k)))); };
+  const drawRing = (/** @type {number} */ k) => { ring.style.strokeDashoffset = String(RING * (1 - Math.min(1, Math.max(0, k)))); };
   const ringAt = () => (cur < 0 ? 0 : (cur + Math.min(1, played() / DWELL)) / N);
   const ringTick = () => { drawRing(ringAt()); ringRaf = runSince && played() < DWELL ? window.requestAnimationFrame(ringTick) : 0; };
   const ringGo = () => { if (!ringRaf) ringRaf = window.requestAnimationFrame(ringTick); };
@@ -144,7 +148,7 @@ if (grow && svg) {
   };
 
   // ---- a step's beats: 'risk' (red tags, card on Watch for) or 'fix' (green tags, card on We handle) ----
-  const beat = (b, animate) => {
+  const beat = (/** @type {'risk' | 'fix'} */ b, /** @type {boolean} */ animate) => {
     if (built >= 0) steps[built].dataset.beat = b;
     tags.forEach((t) => {
       const on = t.step === built;
@@ -153,7 +157,7 @@ if (grow && svg) {
       const fixed = b === 'fix';
       t.el.classList.toggle('is-fixed', fixed);
       t.icon.textContent = fixed ? '✓' : '!';
-      t.text.textContent = fixed ? t.el.dataset.fix : t.el.dataset.risk;
+      t.text.textContent = /** @type {string} */ (fixed ? t.el.dataset.fix : t.el.dataset.risk);
       t.el.style.transitionDelay = animate ? `${t.k * 180}ms` : '0ms';
       if (animate && fixed) { t.el.classList.add('is-flip'); window.setTimeout(() => t.el.classList.remove('is-flip'), 260 + t.k * 180); }
     });
@@ -161,7 +165,7 @@ if (grow && svg) {
   };
 
   // ---- grow (or shrink) the world to step i (-1 = bare ground) ----
-  const show = (i, animate, timed) => {
+  const show = (/** @type {number} */ i, /** @type {boolean} */ animate, /** @type {boolean} */ timed) => {
     const from = built;
     built = i;
     window.clearTimeout(glowT);
@@ -183,7 +187,7 @@ if (grow && svg) {
     count(i, animate);
     tags.forEach((t) => t.el.classList.remove('is-on', 'is-fixed', 'is-flip'));
     steps.forEach((c, k) => { c.classList.toggle('is-on', k === Math.max(0, i)); c.removeAttribute('data-beat'); });
-    place.textContent = i < 0 ? '' : places[i];
+    place.textContent = i < 0 ? '' : /** @type {string} */ (places[i]);
     if (i >= 0) { if (animate) steps[i].dataset.beat = 'build'; else beat('fix', false); }
     [dots, items].forEach((set) => set.forEach((d, j) => { if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current'); d.classList.toggle('is-done', j < i); }));
     prev.setAttribute('aria-disabled', String(i <= 0)); next.setAttribute('aria-disabled', String(i >= LAST));
@@ -200,9 +204,9 @@ if (grow && svg) {
     play.setAttribute('aria-label', playing ? 'Pause' : end ? 'Play again' : 'Play');
     stage.classList.toggle('is-paused', !playing && started);   // paused, and at the end: nothing loops
   };
-  const go = (i, animate) => {
+  const go = (/** @type {number} */ i, /** @type {boolean} */ animate) => {
     cur = i;
-    beats.forEach(window.clearTimeout); beats = [];
+    beats.forEach((b) => window.clearTimeout(b)); beats = [];
     const motion = animate && !reduceMotion.matches;
     show(i, motion, playing);
     if (motion && i >= 0) {
@@ -223,14 +227,14 @@ if (grow && svg) {
     ringGo(); bar();
   };
   const start = () => { started = true; playing = true; if (cur >= LAST) go(-1, false); icon(); tick(); };
-  const jump = (i) => { stop(); started = true; go(Math.max(0, Math.min(LAST, i)), true); icon(); };
+  const jump = (/** @type {number} */ i) => { stop(); started = true; go(Math.max(0, Math.min(LAST, i)), true); icon(); };
 
   // your own choice wins over the site's pause: once you've played, paused or picked a step, releasing the site's
   // pause leaves Grow as you left it
   let heldStopped = false;
   [dots, items].forEach((set) => set.forEach((d, i) => d.addEventListener('click', () => { heldStopped = false; jump(i); })));
   [prev, next].forEach((b, n) => b.addEventListener('click', () => { if (b.getAttribute('aria-disabled') !== 'true') { heldStopped = false; jump(cur + (n ? 1 : -1)); } }));
-  const pause = () => { stop(); beats.forEach(window.clearTimeout); beats = []; show(cur, false, false); icon(); };
+  const pause = () => { stop(); beats.forEach((b) => window.clearTimeout(b)); beats = []; show(cur, false, false); icon(); };
   play.addEventListener('click', () => { heldStopped = false; if (playing) pause(); else start(); });
 
   grow.style.setProperty('--grow-dwell', `${DWELL}ms`);   // the list row's timing bar runs one step
@@ -238,20 +242,20 @@ if (grow && svg) {
   if (reduceMotion.matches) { started = true; go(LAST, false); } else go(-1, false);
   icon();
   window.requestAnimationFrame(placeTags);
-  if (document.fonts) document.fonts.ready.then(placeTags);
+  if (document.fonts) void document.fonts.ready.then(placeTags);
   window.addEventListener('resize', placeTags);
   // ---- the dome's horizontal rings turn: a band of light runs round each (bright near side, faint far side) ----
   // Their frame loop runs only while the section is on screen and not paused.
   const orbits = $$('.dome-orbit', svg).map((g) => {
     const R = Number(g.dataset.r), u = Number(g.dataset.u), ox = Number(g.dataset.ox), oy = Number(g.dataset.oy);
     const NS = 'http://www.w3.org/2000/svg', TAIL = 1.6, PIECES = 14;
-    const P = (x, y, z) => `${(ox + (x - y) * C30 * u).toFixed(1)},${(oy + ((x + y) * u) / 2 - z * u).toFixed(1)}`;
-    const rings = g.dataset.lat.split(',').map(Number).map((k, n) => {
+    const P = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ z) => `${(ox + (x - y) * C30 * u).toFixed(1)},${(oy + ((x + y) * u) / 2 - z * u).toFixed(1)}`;
+    const rings = /** @type {string} */ (g.dataset.lat).split(',').map(Number).map((k, n) => {
       const h = R * k, r = Math.sqrt(R * R - h * h);
       const pieces = Array.from({ length: PIECES }, () => { const p = document.createElementNS(NS, 'path'); g.append(p); return p; });
       return { h, r, pieces, period: n ? 11000 : 8000, phase: n * 2.4 };
     });
-    const draw = (t) => rings.forEach((ringR) => {
+    const draw = (/** @type {number} */ t) => rings.forEach((ringR) => {
       const head = ringR.phase + (t / ringR.period) * Math.PI * 2;
       ringR.pieces.forEach((p, i) => {
         const a1 = head - (TAIL * i) / PIECES, a0 = a1 - TAIL / PIECES, mid = (a0 + a1) / 2;
@@ -264,13 +268,13 @@ if (grow && svg) {
       });
     });
     let t = 0, last = 0, raf = 0;
-    const orbit = (now) => {
+    const orbit = (/** @type {number} */ now) => {
       const dt = last ? Math.min(64, now - last) : 0; last = now;
       t += dt; draw(t);
       raf = window.requestAnimationFrame(orbit);
     };
     draw(1500);
-    return (run) => {
+    return (/** @type {boolean} */ run) => {
       if (run && !raf && !reduceMotion.matches) { last = 0; raf = window.requestAnimationFrame(orbit); }
       if (!run && raf) { window.cancelAnimationFrame(raf); raf = 0; }
     };

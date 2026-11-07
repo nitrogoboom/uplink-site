@@ -10,6 +10,7 @@ import { $ } from './core.js';
    ====================================================================== */
 const soonName = $('[data-soon-name]');
 if (soonName) {
+  /** @type {Record<string, string>} */
   const names = {
     'client-portal': 'The client portal', 'remote-support': 'Remote support', 'system-status': 'System status',
     'careers': 'Careers', 'blog': 'The blog', 'terms': 'The terms of service',

@@ -1,5 +1,17 @@
 {
   "extends": "astro/tsconfigs/strict",
+  "compilerOptions": { "checkJs": true },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "site", "tools", "editing-room", "src/legacy"]
+  "exclude": [
+    "dist",
+    "site",
+    "tools",
+    "editing-room",
+    "src/legacy",
+    "out",
+    "checks",
+    "scripts",
+    "worker",
+    "postcss.config.mjs"
+  ]
 }

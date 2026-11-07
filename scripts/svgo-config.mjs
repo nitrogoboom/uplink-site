@@ -44,9 +44,10 @@ export const SVGO = {
 };
 
 const SHAPES = ['path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'use', 'image', 'g', 'stop'];
-const has = (svg, tag) => new RegExp(`<${tag}[\\s/>]`).test(svg);
+const has = (/** @type {string} */ svg, /** @type {string} */ tag) => new RegExp(`<${tag}[\\s/>]`).test(svg);
 
 // the shape tags a drawing's own <style> names in a selector (".ob-tile polygon" -> polygon), not in a declaration
+/** @param {string} svg */
 export function styledTags(svg) {
   const css = [...svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('').replace(/\/\*[\s\S]*?\*\//g, '');
   const tags = new Set();
@@ -67,6 +68,7 @@ export function styledTags(svg) {
 // in node_modules/.cache, under a hash of the drawing, these settings and SVGO's version.
 const CACHE = 'node_modules/.cache/uplink-svgo';
 const SALT = createHash('sha1').update(JSON.stringify(SVGO)).update(VERSION).digest('hex');
+/** @param {string} svg */
 export function shrink(svg, name = 'drawing') {
   const file = join(CACHE, `${createHash('sha1').update(SALT).update(svg).digest('hex')}.svg`);
   if (existsSync(file)) return readFileSync(file, 'utf-8');
@@ -84,7 +86,7 @@ export function shrink(svg, name = 'drawing') {
 }
 
 // the bytes the site serves for a file in public/ (a drawing after shrink(), anything else as it is)
-export const shipped = (path) => {
+export const shipped = (/** @type {string} */ path) => {
   const text = readFileSync(`public${path}`, 'utf-8');
   return path.endsWith('.svg') ? shrink(text, path) : text;
 };

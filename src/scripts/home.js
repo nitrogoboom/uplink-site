@@ -11,8 +11,8 @@ import './grow.js';
 // Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
 // in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
 // spot (a forced layout). Old browsers: after the next paint, which is clean unless something else ran between.
-const afterLayout = (fn) => {
-  if (!('ResizeObserver' in window)) { window.requestAnimationFrame(() => window.setTimeout(fn, 0)); return; }
+const afterLayout = (/** @type {() => void} */ fn) => {
+  if (!('ResizeObserver' in window)) { requestAnimationFrame(() => setTimeout(fn, 0)); return; }   // window is "never" here to the type check
   const ro = new ResizeObserver(() => { ro.disconnect(); fn(); });
   ro.observe(document.documentElement);
 };
@@ -45,6 +45,7 @@ const APPS = [
 // A timer that runs tick every `every` ms only while it may: el on screen, the tab showing, motion allowed, the
 // pause button off, and ready() (default: always). It stops and starts itself as those change. start() restarts
 // the count (after a hover or a tap); off() lets go of the timer and every listener, when the cut is swapped out.
+/** @param {Element} el @param {() => void} tick @param {number} every @param {() => boolean} [ready] */
 const loopWhileSeen = (el, tick, every, ready = () => true) => {
   let timer = 0, onScreen = true;
   const stop = () => { window.clearInterval(timer); timer = 0; };
@@ -70,20 +71,21 @@ const loopWhileSeen = (el, tick, every, ready = () => true) => {
 };
 const CLOUD_EVERY = 3200;   // ms each app shows before the next
 const WORDS_SWAP = 180;     // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
-const startCloud = (cloud) => {
-  const svg = cloud.ownerSVGElement;
-  const focus = svg.querySelector('.ob-focus');
-  const appText = svg.querySelector('.ob-app');
-  const stateText = svg.querySelector('.ob-state');
-  const detailText = svg.querySelector('.ob-detail');
-  const base = cloud.querySelector('.ob-link-base');
-  const flow = cloud.querySelector('.ob-link');
-  const end = svg.querySelector('.ob-link-end');
+// the hero drawing's parts (tools/gen_office.py) are all there
+const startCloud = (/** @type {SVGGElement} */ cloud) => {
+  const svg = /** @type {SVGSVGElement} */ (cloud.ownerSVGElement);
+  const focus = /** @type {SVGElement} */ (svg.querySelector('.ob-focus'));
+  const appText = /** @type {SVGElement} */ (svg.querySelector('.ob-app'));
+  const stateText = /** @type {SVGElement} */ (svg.querySelector('.ob-state'));
+  const detailText = /** @type {SVGElement} */ (svg.querySelector('.ob-detail'));
+  const base = /** @type {SVGPathElement} */ (cloud.querySelector('.ob-link-base'));
+  const flow = /** @type {SVGPathElement} */ (cloud.querySelector('.ob-link'));
+  const end = /** @type {SVGElement} */ (svg.querySelector('.ob-link-end'));
   const START = { x: +(cloud.dataset.sx || 878), y: +(cloud.dataset.sy || 46) };
   const LINK = cloud.dataset.link || 'curve';
-  const tile = (id) => svg.querySelector('.ob-tile[data-tile="' + id + '"]');
-  const topCentre = (t) => {
-    const pts = t.querySelector('.f-t').getAttribute('points').trim().split(/\s+/).map((p) => p.split(',').map(Number));
+  const tile = (/** @type {string} */ id) => svg.querySelector('.ob-tile[data-tile="' + id + '"]');
+  const topCentre = (/** @type {Element} */ t) => {
+    const pts = /** @type {string} */ (/** @type {Element} */ (t.querySelector('.f-t')).getAttribute('points')).trim().split(/\s+/).map((p) => p.split(',').map(Number));
     return { x: pts.reduce((a, p) => a + p[0], 0) / pts.length, y: pts.reduce((a, p) => a + p[1], 0) / pts.length };
   };
   // The state word is right-aligned, so the dot before it moves with the word's width.
@@ -91,33 +93,35 @@ const startCloud = (cloud) => {
   // nothing is measured straight after the text changes (that would force a layout).
   // For SVG it reports only the size, so: the word's right edge (its x) minus its width.
   const dot = svg.querySelector('.ob-state-dot');
+  /** @type {ResizeObserver | null} */
   let dotSized = null;
   if (dot && 'ResizeObserver' in window) {
-    const right = +stateText.parentNode.getAttribute('x');
+    const words = /** @type {Element} */ (stateText.parentNode);
+    const right = +(/** @type {string} */ (words.getAttribute('x')));
     dotSized = new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1)));
-    dotSized.observe(stateText.parentNode);
+    dotSized.observe(words);
   }
   let index = -1;
   let swap = 0;
-  const show = (i) => {
+  const show = (/** @type {number} */ i) => {
     i = (i + APPS.length) % APPS.length;
     if (i === index) return;
     const first = index < 0;
     index = i;
     const app = APPS[i];
-    svg.querySelectorAll('.ob-tile').forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
-    cloud.querySelectorAll('.ob-seg, .ob-pip').forEach((s) => s.classList.toggle('is-on', s.dataset.app === app.id));
+    /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
+    /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg, .ob-pip')).forEach((s) => s.classList.toggle('is-on', s.dataset.app === app.id));
     const t = tile(app.id);
     if (t && LINK !== 'none') {
       const p = topCentre(t);
       const dPath = LINK === 'elbow' ? 'M' + START.x + ',' + START.y + ' H' + p.x + ' V' + p.y : 'M' + START.x + ',' + START.y + ' C' + (START.x + 70) + ',' + START.y + ' ' + p.x + ',' + (p.y - 110) + ' ' + p.x + ',' + p.y;
       base.setAttribute('d', dPath);
       flow.setAttribute('d', dPath);
-      end.setAttribute('cx', p.x);
-      end.setAttribute('cy', p.y);
+      end.setAttribute('cx', String(p.x));
+      end.setAttribute('cy', String(p.y));
       const len = base.getTotalLength();
-      base.style.strokeDasharray = len;
-      base.style.setProperty('--len', len);
+      base.style.strokeDasharray = String(len);
+      base.style.setProperty('--len', String(len));
       replay(base, 'is-draw');
     }
     const write = () => {
@@ -132,12 +136,12 @@ const startCloud = (cloud) => {
     swap = window.setTimeout(write, WORDS_SWAP);
   };
   const loop = loopWhileSeen(svg, () => show(index + 1), CLOUD_EVERY);
-  const pick = (id) => { loop.stop(); show(APPS.findIndex((a) => a.id === id)); };
-  svg.querySelectorAll('.ob-tile').forEach((t) => {
+  const pick = (/** @type {string | undefined} */ id) => { loop.stop(); show(APPS.findIndex((a) => a.id === id)); };
+  /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => {
     t.addEventListener('pointerenter', () => pick(t.dataset.tile));
     t.addEventListener('pointerleave', loop.start);
   });
-  cloud.querySelectorAll('.ob-seg-hit').forEach((h) => {
+  /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg-hit')).forEach((h) => {
     h.addEventListener('pointerenter', () => pick(h.dataset.app));
     h.addEventListener('pointerleave', loop.start);
   });
@@ -168,6 +172,7 @@ const CAP_EVERY = 2200;     // ms between caption changes, the two captions taki
 const CAP_SWAP = 170;       // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
 const CAP_SECOND = 1100;    // ms from the first caption to the second
 const CLOUD_TITLE = 'Cloud workspace';
+/** @param {string} tag @param {string} cls @param {Element} parent */
 const make = (tag, cls, parent) => {
   const el = document.createElementNS(SVG_NS, tag);
   el.setAttribute('class', cls);
@@ -175,6 +180,7 @@ const make = (tag, cls, parent) => {
   return el;
 };
 // a caption line's words; the cloud's names its app first, in a tspan
+/** @param {Element} el @param {string} text @param {string} [app] */
 const fill = (el, text, app) => {
   if (!app) { el.textContent = text; return; }
   const name = document.createElementNS(SVG_NS, 'tspan');
@@ -182,34 +188,41 @@ const fill = (el, text, app) => {
   name.textContent = app;
   el.replaceChildren(name, text);
 };
-const startCaptions = (svg) => {
+const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   const vb = svg.viewBox.baseVal;
-  const [cloudX, cloudY] = svg.dataset.cloud.split(',').map(Number);
-  const items = JSON.parse(svg.dataset.items);
-  let size = null, width = 0, cloudFill = '';
+  const [cloudX, cloudY] = /** @type {string} */ (svg.dataset.cloud).split(',').map(Number);
+  // the drawing's own list (tools/gen_office.py); lint can't see a JSDoc cast, so it would call this an any
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const items = /** @type {{ t: string, s: string, c: string, x: number, y: number }[]} */ (JSON.parse(/** @type {string} */ (svg.dataset.items)));
+  /** @type {ReturnType<typeof readSizes>} */
+  let size;   // read once, at the first measure()
+  let width = 0, cloudFill = '';
+  /** @type {Map<string, number>} */
   const lengths = new Map();   // each caption text's length in drawing units, at the current width
   const readSizes = () => {
     const css = window.getComputedStyle(svg);
     const rootPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    const px = (name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
+    const px = (/** @type {string} */ name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
     return { t: px('--cap-title'), s: px('--cap-sub'), edge: px('--cap-edge'), gap: px('--cap-gap'), line: px('--cap-line'), dot: px('--cap-dot'), halo: px('--cap-halo') };
   };
-  const spot = (name) => {
+  const spot = (/** @type {string} */ name) => {
     const g = make('g', 'ob-cap ob-cap-' + name, svg);
-    const lead = make('path', 'ob-cap-lead', g);
+    const lead = /** @type {SVGPathElement} */ (make('path', 'ob-cap-lead', g));
     const ring = make('circle', 'ob-cap-ring', g);
     const end = make('circle', 'ob-cap-end', g);
     const words = make('g', 'ob-cap-words', g);
-    return { g, lead, ring, end, t: make('text', 'ob-cap-t', words), s: make('text', 'ob-cap-s', words) };
+    return { g, lead, ring, end, t: /** @type {SVGTextElement} */ (make('text', 'ob-cap-t', words)), s: /** @type {SVGTextElement} */ (make('text', 'ob-cap-s', words)) };
   };
   const spots = { cloud: spot('cloud'), office: spot('office') };
   const at = { cloud: -1, office: -1 };
   // words: cloud hangs from the drawing's top edge, office stands on its bottom edge
+  /** @typedef {ReturnType<typeof spot>} Spot */
+  /** @param {Spot} sp @param {boolean} top @param {string} tKey @param {string} sKey */
   const place = (sp, top, tKey, sKey) => {
     if (!width || !lengths.has(tKey)) return null;   // not measured yet (hidden, or mid-swap): measure() places it
     const k = vb.width / width;   // drawing units per screen px
     const tf = size.t * k, sf = size.s * k, x = vb.x + size.edge * k;
-    [[sp.t, tf], [sp.s, sf]].forEach(([el, f]) => {
+    /** @type {[SVGTextElement, number][]} */ ([[sp.t, tf], [sp.s, sf]]).forEach(([el, f]) => {
       el.setAttribute('font-size', f.toFixed(1));
       el.setAttribute('x', x.toFixed(1));
       el.style.strokeWidth = (size.halo * k).toFixed(1) + 'px';
@@ -219,16 +232,17 @@ const startCaptions = (svg) => {
     else { sy = vb.y + vb.height - size.edge * k - sf * 0.28; ty = sy - size.gap * k - sf * 1.05; }
     sp.t.setAttribute('y', ty.toFixed(1));
     sp.s.setAttribute('y', sy.toFixed(1));
-    return { k, x, ty, tf, tw: lengths.get(tKey), sw: lengths.get(sKey) };
+    return { k, x, ty, tf, tw: /** @type {number} */ (lengths.get(tKey)), sw: /** @type {number} */ (lengths.get(sKey)) };   // measured together
   };
+  /** @param {Spot} sp @param {string} d @param {string} colour @param {number} x @param {number} y @param {number} k */
   const draw = (sp, d, colour, x, y, k) => {
     sp.lead.setAttribute('d', d);
     sp.lead.setAttribute('stroke', colour);
     sp.lead.setAttribute('stroke-width', (size.line * k).toFixed(1));
     const len = sp.lead.getTotalLength();
-    sp.lead.style.strokeDasharray = len;
-    sp.lead.style.setProperty('--len', len);
-    [sp.end, sp.ring].forEach((c) => { c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', (size.dot * k).toFixed(1)); });
+    sp.lead.style.strokeDasharray = String(len);
+    sp.lead.style.setProperty('--len', String(len));
+    [sp.end, sp.ring].forEach((c) => { c.setAttribute('cx', String(x)); c.setAttribute('cy', String(y)); c.setAttribute('r', (size.dot * k).toFixed(1)); });
     sp.end.setAttribute('fill', colour);
     sp.end.setAttribute('stroke-width', (size.dot * 0.6 * k).toFixed(1));
     sp.ring.setAttribute('stroke', colour);
@@ -246,7 +260,7 @@ const startCaptions = (svg) => {
       if (!L) return;
       const x0 = L.x + L.tw + size.gap * 2 * L.k, y0 = L.ty - L.tf * 0.32;   // a level tail from the title, then to the cloud
       draw(sp, `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`, cloudFill, cloudX, cloudY, L.k);
-      svg.querySelectorAll('.ob-tile').forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
+      /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
     },
     office: () => {
       const sp = spots.office, it = items[at.office];
@@ -262,8 +276,8 @@ const startCaptions = (svg) => {
   };
   // each caption's pending swap: its timeout, then its frame (a new step on the same caption cancels both first)
   const swaps = { cloud: { t: 0, f: 0 }, office: { t: 0, f: 0 } };
-  const cancel = (sw) => { window.clearTimeout(sw.t); window.cancelAnimationFrame(sw.f); };
-  const step = (name, animate) => {
+  const cancel = (/** @type {{ t: number, f: number }} */ sw) => { window.clearTimeout(sw.t); window.cancelAnimationFrame(sw.f); };
+  const step = (/** @type {'cloud' | 'office'} */ name, /** @type {boolean} */ animate) => {
     at[name] = (at[name] + 1) % (name === 'cloud' ? APPS.length : items.length);
     const sp = spots[name], sw = swaps[name];
     cancel(sw);
@@ -284,14 +298,15 @@ const startCaptions = (svg) => {
   // Every caption text, set at this width's sizes in a hidden group and read together after a layout pass: one layout
   // the browser makes anyway, instead of a forced one for each caption as it changes.
   let job = 0;
-  const measure = (w) => {
+  const measure = (/** @type {number} */ w) => {
     const mine = ++job;
     if (!size) size = readSizes();
     const k = vb.width / w;
     const box = make('g', 'ob-cap ob-cap-cloud', svg);
     box.setAttribute('visibility', 'hidden');
+    /** @type {(key: string, cls: string, f: number, text: string, app?: string) => [string, SVGTextElement]} */
     const probe = (key, cls, f, text, app) => {
-      const el = make('text', cls, box);
+      const el = /** @type {SVGTextElement} */ (make('text', cls, box));
       el.setAttribute('font-size', (f * k).toFixed(1));
       fill(el, text, app);
       return [key, el];
@@ -318,7 +333,7 @@ const startCaptions = (svg) => {
   // Re-measure only when the drawing's width changes. Phones fire `resize` each time the address bar shows or
   // hides, which would replay the line and dot mid-scroll; the drawing keeps its width then.
   let lastW = 0;
-  const relayout = (w) => {
+  const relayout = (/** @type {number} */ w) => {
     if (!w || Math.abs(w - lastW) < 0.5) return;
     lastW = w;
     measure(w);
@@ -349,15 +364,20 @@ const startCaptions = (svg) => {
 };
 if (stage) {
   const phone = window.matchMedia(MEDIA.smallPhone);   // HERO.media.phone
-  const tablet = window.matchMedia(stage.dataset.tablet);
-  const files = {
+  // Hero.astro writes every one of these data- attributes
+  const tablet = window.matchMedia(/** @type {string} */ (stage.dataset.tablet));
+  const files = /** @type {Record<'full' | 'tablet' | 'phone', string[]>} */ ({
     full: [stage.dataset.hero],
     tablet: [stage.dataset.heroTablet],
     phone: [stage.dataset.heroPhone, stage.dataset.heroPhoneFlows]
-  };
+  });
+  /** @type {string | null} */
   let shown = null;
+  /** @type {Element[]} */
   let added = [];
+  /** @type {(IntersectionObserver | null)[]} */
   let observers = [];
+  /** @type {(() => void) | null} */
   let stopCloud = null;
   let ticket = 0;   // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
   const clear = () => {
@@ -371,11 +391,12 @@ if (stage) {
   // a drawing that can't load (offline, blocked): the still office the page shows without script (the same picture
   // as its <noscript>, cloned from a <template>, so no text is turned into HTML) stands in, and the dashes' layer and
   // the pause button go, so no beams hang over an empty stage. The next change of cut tries again.
+  /** @type {HTMLTemplateElement | null} */
   const still = $('template.hero-still', stage);
-  const failed = (on) => {
+  const failed = (/** @type {boolean} */ on) => {
     $$('svg.ob-over', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
     $$('.hero-pause', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
-    if (on && still) { const pic = still.content.firstElementChild.cloneNode(true); stage.prepend(pic); added = [pic]; }
+    if (on && still) { const pic = /** @type {Element} */ (/** @type {Element} */ (still.content.firstElementChild).cloneNode(true)); stage.prepend(pic); added = [pic]; }
   };
   const load = () => {
     const cut = phone.matches ? 'phone' : (tablet.matches ? 'tablet' : 'full');
@@ -393,8 +414,10 @@ if (stage) {
         // looping animations pause off screen: the drawing, and the dashes' layer (the cut's own on phones)
         const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
         observers = layers.map((el) => whenOnScreen(el));
+        /** @type {SVGGElement | null} */
         const cloud = $('svg.ob .ob-cloud', stage);
-        if (cut === 'phone') { if (added[0].dataset.items) stopCloud = startCaptions(added[0]); }
+        const first = /** @type {SVGSVGElement} */ (added[0]);
+        if (cut === 'phone') { if (first.dataset.items) stopCloud = startCaptions(first); }
         else if (cloud) stopCloud = startCloud(cloud);
       })
       .catch(() => { if (mine === ticket) { shown = null; failed(true); } });
@@ -423,16 +446,18 @@ const svcDots = $$('.svc-dots .pip');
 const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const cards = Array.from(svcRow.children);
-  const steps = $$('.svc-step', svcHint);
+  const hint = /** @type {HTMLElement} */ (svcHint);   // Services.astro has it with the dots
+  const steps = $$('.svc-step', hint);
   const row = window.matchMedia(MEDIA.phone);
   let current = 0;
+  /** @type {number | null} */
   let aim = null;   // the card a step is sliding to, so a quick second click steps on from there
-  const centre = (best) => {
+  const centre = (/** @type {number} */ best) => {
     current = best;
     if (best === aim) aim = null;
     cards.forEach((li, i) => li.classList.toggle('is-centre', i === best));
     svcDots.forEach((dot, i) => dot.classList.toggle('on', i === best));
-    steps.forEach((b) => b.setAttribute('aria-disabled', String(current + +b.dataset.step < 0 || current + +b.dataset.step >= cards.length)));
+    steps.forEach((b) => b.setAttribute('aria-disabled', String(current + +(/** @type {string} */ (b.dataset.step)) < 0 || current + +(/** @type {string} */ (b.dataset.step)) >= cards.length)));
     if (best > 0) svcHint?.classList.add('is-swiped');
   };
   const io = new IntersectionObserver((entries) => {
@@ -441,7 +466,7 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   cards.forEach((li) => io.observe(li));
   centre(0);
   // scrolls the row only (scrollIntoView would also move the page); the li itself never transforms, so its box is true
-  const go = (i) => {
+  const go = (/** @type {number} */ i) => {
     aim = Math.max(0, Math.min(cards.length - 1, i));
     const li = cards[aim];
     const r = li.getBoundingClientRect(), box = svcRow.getBoundingClientRect();
@@ -453,23 +478,24 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const settle = () => { aim = null; };
   if ('onscrollend' in window) svcRow.addEventListener('scrollend', settle);
   else {
-    let quiet = 0;
-    svcRow.addEventListener('scroll', () => { window.clearTimeout(quiet); quiet = window.setTimeout(settle, 150); }, { passive: true });
+    /** @type {ReturnType<typeof setTimeout> | undefined} */
+    let quiet;   // (window is "never" here to the type check, which knows only browsers with scrollend)
+    svcRow.addEventListener('scroll', () => { clearTimeout(quiet); quiet = setTimeout(settle, 150); }, { passive: true });
   }
-  steps.forEach((b) => b.addEventListener('click', () => go((aim ?? current) + +b.dataset.step)));
-  $('.svc-dots', svcHint)?.addEventListener('click', (e) => {
+  steps.forEach((b) => b.addEventListener('click', () => go((aim ?? current) + +(/** @type {string} */ (b.dataset.step)))));
+  $('.svc-dots', hint)?.addEventListener('click', (e) => {
     const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
     go(near.indexOf(Math.min(...near)));
   });
   // keyboard focus only (above); a browser without :focus-visible slides on any focus, as before
-  const byKeyboard = (el) => { try { return el.matches(':focus-visible'); } catch { return true; } };
-  svcRow.addEventListener('focusin', (e) => { if (row.matches && byKeyboard(e.target)) go(cards.indexOf(e.target.closest('li'))); });
+  const byKeyboard = (/** @type {Element} */ el) => { try { return el.matches(':focus-visible'); } catch { return true; } };
+  svcRow.addEventListener('focusin', (e) => { if (row.matches && byKeyboard(/** @type {Element} */ (e.target))) go(cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li')))); });
   svcRow.addEventListener('keydown', (e) => {
     if (!row.matches || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey) return;
-    const next = cards[cards.indexOf(e.target.closest('li')) + (e.key === 'ArrowLeft' ? -1 : 1)];
+    const next = cards[cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li'))) + (e.key === 'ArrowLeft' ? -1 : 1)];
     if (!next) return;
     e.preventDefault();
-    $('a', next).focus({ preventScroll: true });
+    /** @type {HTMLElement} */ ($('a', next)).focus({ preventScroll: true });
   });
 }
 
