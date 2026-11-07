@@ -1,8 +1,9 @@
 // Playwright Test settings for the site checks. Run them through scripts/check.mjs (the npm scripts do), which picks
-// one check (a project here) and hands it its arguments; README "Tools" lists them.
+// one check (a project here) and hands it its arguments; README "Tools" lists them. The site check (npm run verify)
+// also runs the zoom check; verify:zoom runs the zoom check alone.
 import { defineConfig } from '@playwright/test';
 
-export const CHECKS = ['site', 'links', 'spacing', 'styles', 'visual', 'smoke', 'pagespeed', 'audit'];
+export const CHECKS = ['site', 'zoom', 'links', 'spacing', 'styles', 'visual', 'smoke', 'pagespeed', 'audit'];
 
 export default defineConfig({
   testDir: '.',
@@ -14,5 +15,5 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: [['list', { printSteps: false }]],
   use: { browserName: 'chromium', headless: true },
-  projects: CHECKS.map((name) => ({ name, testMatch: `${name}.spec.mjs` })),
+  projects: CHECKS.map((name) => ({ name, testMatch: name === 'site' ? ['site.spec.mjs', 'zoom.spec.mjs'] : `${name}.spec.mjs` })),
 });
