@@ -91,7 +91,7 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 
 1. Foundations: `tokens.css`, `fonts.css`, `base.css`, `layout.css`, and `type.css`.
 2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
-3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares), `fold-foot.css`, and `compact-cuts.css`.
+3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares), `fold-foot.css`, and `compact-cuts.css`. A one-screen section is one screen as a floor (`min-height: var(--fold-inner)`): its picture takes the height its words leave, down to a floor in rem, and longer words make the section taller.
 4. Blocks more than one page uses: `hero.css`, `facts.css`, and `detail-pages.css`.
 5. Last: `page-transitions.css`, `motion.css`, and `print.css`.
 

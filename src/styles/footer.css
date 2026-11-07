@@ -230,7 +230,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 @keyframes fc-ring { from { transform: scale(0.75); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
 @keyframes fc-ping { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.5); opacity: 0; } }
 
-/* desktop: stage beside the map, the footer is exactly one screen */
+/* desktop: stage beside the map, the footer one screen tall (a floor: see the fold rule at the end) */
 @media (--desktop) {
   .fc-dock { order: 1; }   /* first in the markup (Footer.astro), under the panels on screen */
   .fc-base { order: 2; }
@@ -301,11 +301,11 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 }
 
 @media (--fold) {
-  .js .fc { height: var(--fold-h); min-height: 40rem; }
+  .js .fc { min-height: max(var(--fold-h), 40rem); }   /* one screen as a floor: a panel whose words need more grows it */
   .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .js .fc-panels { padding-top: var(--sp-2); }
   .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
-  .js .fc-map { min-height: 0; height: 100%; }
+  .js .fc-map { min-height: 16rem; height: 100%; }
   @media (height <= 51.25em) {
     .js .fc-stage { padding-top: var(--sp-6); }
     .fc-body { margin-top: var(--sp-5); }

@@ -35,14 +35,15 @@
 .work-grid .card { flex: 1; width: 100%; font: inherit; }
 .empty-note { margin-top: var(--sp-5); }
 
-/* desktop (>= 1100 wide and >= 700 tall): intro and filters in a side column, projects fill the rest */
+/* desktop (>= 1100 wide and >= 700 tall): intro and filters in a side column, projects fill the rest. One screen is a
+   floor: cards whose words need more room make the grid taller; the pictures take what is left, down to a floor */
 @media (--fold) {
-  .work-layout { height: var(--fold-inner); }
+  .work-layout { min-height: var(--fold-inner); }
   .work-main { height: 100%; min-height: 0; }
   .work-grid { height: 100%; grid-template-rows: repeat(2, minmax(0, 1fr)); }
   .work-grid > li, .work-grid .card { min-height: 0; }
   .work-grid .card-media img { position: absolute; inset: 0; }
-  .work-grid .card-media { aspect-ratio: 16 / 10; flex: 1; min-height: 0; }
+  .work-grid .card-media { aspect-ratio: auto; flex: 1; min-height: 8rem; }
   .page-intro .work-layout { display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); column-gap: var(--sp-8); align-items: center; }
   .work-side .filters { flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
   .work-side .filter { width: 100%; justify-content: space-between; border-radius: var(--r-2); }

@@ -41,6 +41,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Order matters: a later file wins a tie. `src/styles/global.css` is the cascade order. A section's CSS sits beside its component, with its desktop layout at the end of that file; a block more than one page uses lives in `src/styles/`.
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
 - Breakpoints are in `em`, in range syntax (`(width < 43.75em)`): the names in `src/lib/media.js`, and one-off queries the same way. Zoom and a bigger default font then count as a narrower screen.
+- A box sized to the screen sets a minimum height (`min-height: var(--fold-inner)`), never a fixed one. The picture inside takes what is left (`flex: 1; min-height: <rem floor>`, and no room of its own: an absolute `<img>`), so words that need more room grow the box instead of being cut.
 - Text size (WCAG 1.4.4) is the browser's own zoom; the site has no text-size option (review C13). New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings

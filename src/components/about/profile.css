@@ -10,11 +10,13 @@
 .profile-text { grid-area: text; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
 .profile-text .stats { margin-top: var(--sp-4); }
 
-/* desktop (>= 1100 wide and >= 700 tall): one screen tall */
+/* desktop (>= 1100 wide and >= 700 tall): one screen tall, as a floor: words that need more room make it taller.
+   The picture takes what the words leave, down to its own floor, and asks for no room of its own (absolute) */
 @media (--fold) {
-  .profile { height: var(--fold-inner); align-items: stretch; }
+  .profile { min-height: var(--fold-inner); align-items: stretch; }
   .profile-card { min-height: 0; }
-  .profile-art { aspect-ratio: auto; flex: 1; min-height: 0; }
+  .profile-art { aspect-ratio: auto; flex: 1; min-height: 12rem; }
+  .profile-art img { position: absolute; inset: 0; }
   .profile-text { justify-content: center; }
   .profile-text .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
