@@ -282,7 +282,16 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
 - A push to `main` that passes the build job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
+
+### Repository rules
+
+Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
+
+- **main: no force push or delete.** Applies to everyone.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
+
+Secret scanning with push protection, private vulnerability reporting, and CodeQL (default setup) are on under Settings > Code security.
 
 ### Roll back a bad deploy
 

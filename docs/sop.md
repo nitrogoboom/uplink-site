@@ -51,6 +51,8 @@ A *release* is the first production launch, and any later change to layout, navi
 
 > **Note:** A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing. A branch push without a pull request also runs nothing.
 
+> **Note:** A ruleset requires a pull request and a passing `build` for `main`, and blocks force pushes. Repository admins can bypass the pull request rule, which is how notes go straight to `main`. See "Repository rules" in the [README](../README.md#repository-rules).
+
 ## Standards we meet
 
 | Area | Standard | Where it's shown |

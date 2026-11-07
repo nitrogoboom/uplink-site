@@ -1,6 +1,6 @@
 # Secrets and keys
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This page lists every secret, key, and token the site uses: what it's for, where it's kept, and how to change it. It never holds a value. When you add or move a secret, update this page in the same pull request.
 
@@ -27,6 +27,8 @@ These come with the forms in [PR #38](https://github.com/nitrogoboom/uplink-site
 | `FORM_FROM` | The address the forms send from, on a domain on Cloudflare. | A Worker variable | PR #38, once the domain is on Cloudflare |
 | `EMAIL` binding | Connects Cloudflare Email Service, which sends the form emails. Not a secret. | `wrangler.jsonc` | PR #38 |
 | `SITE_PASSWORD` | The password for the optional site-wide lock, which is off. | A Worker secret | `tools/site-lock/worker.js` |
+
+> **Note:** The environments `production` (deploys from `main` only) and `preview` exist but are empty. The Cloudflare secrets move there, with a separate token for previews (`notes.md`).
 
 ## Values that aren't secrets
 
