@@ -632,3 +632,30 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   await ctx.close();
   verdict([...fails, ...errs]);
 });
+
+// M5: forms. Without script the copy buttons (which only script can work) don't show; every pattern has a title (the
+// browser's own message for a pattern is "match the requested format", which says nothing without one); the Book
+// pop-up's team size and Contact's topic start on a blank, required "Choose…", not on a guess; the Book pop-up says
+// fields are required unless marked optional, as Contact does
+test('forms: copy buttons without script, pattern titles, blank required choices (M5)', async ({ browser }) => {
+  const fails = [];
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('contact'));
+  const s = await q.evaluate(() => ({
+    copy: [...document.querySelectorAll('.copy-btn')].filter((b) => b.getClientRects().length).length,
+    untitled: [...document.querySelectorAll('input[pattern]')].filter((i) => !i.title).map((i) => `#${i.id}`),
+    choose: ['book-size', 'c-topic'].map((id) => {
+      const sel = document.getElementById(id);
+      return { id, required: sel.required, first: sel.options[0].value, picked: sel.value };
+    }),
+    note: /required unless marked optional/i.test(document.getElementById('book-dialog').textContent),
+  }));
+  if (s.copy) fails.push(`contact without script: ${s.copy} copy button(s) shown that can't copy`);
+  if (s.untitled.length) fails.push(`input(s) with a pattern and no title: ${s.untitled.join(', ')}`);
+  for (const c of s.choose) if (!c.required || c.first !== '' || c.picked !== '') fails.push(`#${c.id} doesn't start on a blank, required choice: ${JSON.stringify(c)}`);
+  if (!s.note) fails.push('the Book pop-up doesn\'t say fields are required unless marked optional');
+  console.log(`forms: ${JSON.stringify(s)}`);
+  await ctx.close();
+  verdict(fails);
+});
