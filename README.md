@@ -94,7 +94,7 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | `npm test` | Tests the build's after-steps and the Worker with Node's built-in test runner (`scripts/test/`). |
 | `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks only JSON and YAML; the code is formatted by hand. |
 | `npm run format` | Fixes what the linters can fix on their own. |
-| `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the site check, and the link check. Starts `npm run serve` if it isn't already running. Needs Node and Playwright's Chromium, no Python. It doesn't run the screenshot comparison, the preview upload, or the deploy. |
+| `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the site check, the link check, and the smoke check. It starts its own `wrangler dev` on a free port for the checks and stops it after, so a server you already have running is never the one checked. Needs Node and Playwright's Chromium, no Python. It doesn't run the screenshot comparison, the workflow lint, the preview upload, or the deploy. |
 | `npm run verify` | Runs the site check in a browser. See [Site checks](#site-checks). |
 | `npm run verify:links`, `verify:text`, `verify:spacing`, `verify:styles`, `visual-diff` | Run the other site checks. See [Site checks](#site-checks). |
 | `npm run release-audit` | Runs the release audit. See [Site checks](#site-checks) and [`docs/sop.md`](docs/sop.md). |
