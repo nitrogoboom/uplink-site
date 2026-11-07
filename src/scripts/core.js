@@ -72,7 +72,8 @@ const ICON = {
 /* ======================================================================
    Toasts
    ====================================================================== */
-const pageToasts = $('.toasts');
+// the page's own region is the one straight under <body> (each dialog holds one too, and they come first)
+const pageToasts = $(':scope > .toasts', document.body);
 
 // A modal pop-up makes the rest of the page inert, so while one is open the toast is placed inside it to stay
 // visible and announced. Each pop-up has its own empty live region in its markup (Base.astro's .toasts for the page,

@@ -644,6 +644,47 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   verdict([...fails, ...errs]);
 });
 
+// B6 follow-up: a toast with no pop-up open goes to the page's own region (straight under <body>), not into a closed
+// dialog's, where it is invisible and unheard: Contact's copy button, and the Book form's confirmation, which comes
+// once its pop-up has closed
+test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ browser }) => {
+  const fails = [];
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  const errs = [];
+  watch(q, 'page toasts', errs);
+  const toastShown = (text) =>
+    q
+      .waitForFunction(
+        (text) =>
+          [...document.querySelectorAll('.toast')].some(
+            (t) => t.textContent.includes(text) && t.parentElement.parentElement === document.body && Number(getComputedStyle(t).opacity) > 0.99 && t.getClientRects().length > 0,
+          ),
+        text,
+        { timeout: 3000 },
+      )
+      .then(() => true, () => false);
+  const where = (text) =>
+    q.evaluate((text) => {
+      const t = [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes(text));
+      return t ? `${t.parentElement.parentElement.tagName.toLowerCase()}#${t.parentElement.parentElement.id}, opacity ${getComputedStyle(t).opacity}` : 'none';
+    }, text);
+  await q.goto(url('contact'));
+  await q.waitForLoadState('networkidle');
+  await q.locator('.copy-btn').first().click(); // copied, or selected where the clipboard is refused: a toast either way
+  if (!(await toastShown(''))) fails.push(`contact: the copy button's toast isn't shown on the page (${await where('')})`);
+  await q.goto(url('index'));
+  await q.waitForLoadState('networkidle');
+  await q.locator('[data-open="book-dialog"]:visible').first().click();
+  await q.fill('#book-name', 'Test Person');
+  await q.fill('#book-email', 'test@example.com');
+  await q.selectOption('#book-size', { index: 1 });
+  await q.locator('#book-dialog [type="submit"]').click();
+  if (!(await toastShown('Check-up requested'))) fails.push(`the Book form's confirmation isn't shown on the page (${await where('Check-up requested')})`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
 // J13: drawings that can't load. The hero shows the still office in place of its drawing, with no dashes (beams)
 // over an empty stage and no pause button; a card picture that fails leaves no broken-image box.
 test('hero and pictures when drawings fail to load (J13)', async ({ browser }) => {
