@@ -112,3 +112,80 @@ test('svgo-config.mjs: keeps what the scripts and screen readers rely on', () =>
   assert.ok(out.includes('.is-on{opacity:1}'), 'a <style> rule for a class scripts add later');
   assert.ok(out.includes('display="none"'), 'hidden parts the hero shows from script');
 });
+
+test('headers.mjs: hashes an inline module script but not one with src; refuses a style="" in a drawing it inserts', () => {
+  const extra = '<script type="module">import "/a.js"</script><script src="/b.js">ignored()</script>';
+  const dir = base({ 'contact.html': `<!doctype html><html><head>${extra}</head><body></body></html>` });
+  try {
+    run('headers.mjs', dir);
+    const out = readFileSync(join(dir, '_headers'), 'utf-8');
+    assert.ok(out.includes(sha('import "/a.js"')), 'an inline module runs, so it gets a hash');
+    assert.ok(!out.includes(sha('ignored()')), 'a script with src runs the file, not its text');
+  } finally { rmSync(dir, { recursive: true }); }
+  const drawing = base({ 'assets/img/campus.svg': '<svg xmlns="http://www.w3.org/2000/svg"><rect style="fill:red"/></svg>' });
+  try { assert.match(fails('headers.mjs', drawing), /style="" attributes the CSP would block: assets\/img\/campus\.svg/); }
+  finally { rmSync(drawing, { recursive: true }); }
+});
+
+test('headers.mjs: refuses a home page without its drawings or font preloads', () => {
+  const preload = '<link rel="preload" href="/assets/fonts/body.woff2" as="font" type="font/woff2" crossorigin>';
+  const drawings = '<div data-hero="/assets/img/hero.svg"></div><div data-fc-map="/assets/img/campus.svg"></div>';
+  for (const home of [`${preload}<div data-hero="/assets/img/hero.svg"></div>`, drawings]) {   // no campus map; no fonts
+    const dir = base({ 'index.html': `<!doctype html><html><head></head><body>${home}</body></html>` });
+    try { assert.match(fails('headers.mjs', dir), /no data-hero\* \/ data-fc-map drawings or font preloads found/); }
+    finally { rmSync(dir, { recursive: true }); }
+  }
+});
+
+test("headers.mjs: refuses a _headers past Cloudflare's limits (100 rules, 2,000 characters a line)", () => {
+  const many = Object.fromEntries(Array.from({ length: 101 }, (_, i) => [`p${i}.html`, '<!doctype html><p>x</p>']));
+  const dir = base(many);
+  try { assert.match(fails('headers.mjs', dir), /_headers over Cloudflare's limits: \d+ rules \(max 100\)/); }
+  finally { rmSync(dir, { recursive: true }); }
+  const long = base({ '_headers': TEMPLATE + `/x\n  X-Long: ${'a'.repeat(2001)}\n` });
+  try { assert.match(fails('headers.mjs', long), /longest line \d+ \(max 2000\)/); }
+  finally { rmSync(long, { recursive: true }); }
+});
+
+test('markdown.mjs: labels, forms, FAQ, tables, chips, links; pages in folders; 404, soon and home skipped', () => {
+  const head = (path, description) => `<!doctype html><html><head><link rel="canonical" href="https://example.test${path}">
+<meta name="description" content="${description}"></head><body>`;
+  const page = `${head('/contact', 'Call, write or book a visit: we answer within one business day.')}
+<main><p class="lead-in">Before the title</p><h1>Contact</h1>
+<p>Call, write or book a visit: we answer within one business day.</p>
+<div><span class="label">Clients supported</span><strong>120+</strong></div>
+<div><span class="card-title">Hours</span><ul><li>Monday to Friday</li></ul></div>
+<p><span class="label">Office move</span><span class="sr-only">. </span>Law office</p>
+<span class="chip">BUILD</span><ul><li><span class="chip">Known for</span></li></ul>
+<section id="message"><form><h2>Write to us</h2><input name="email"></form></section>
+<details><summary>Do you work weekends?</summary><p>For emergencies, yes.</p></details>
+<table><tr><th>Name</th><th>Kept</th></tr><tr><td>Email <small>if you give it</small></td><td>a | b</td></tr></table>
+<p><a href="https://other.test/x">Outside</a> <a href="/services"><svg></svg></a></p></main></body></html>`;
+  const dir = site({
+    'contact.html': page,
+    'services/backup.html': `${head('/services/backup', 'Backups that run every night and get tested.')}<main><h1>Backup</h1></main></body></html>`,
+    'index.html': '<main><h1>Home</h1></main>', '404.html': '<main><h1>404</h1></main>', 'soon.html': '<main><h1>Soon</h1></main>',
+  });
+  try {
+    assert.match(run('markdown.mjs', dir), /markdown: 2 pages/);
+    const md = readFileSync(join(dir, 'contact.md'), 'utf-8');
+    assert.match(md, /^# Contact\n\nPage: https:\/\/example\.test\/contact\n\nBefore the title\n/, 'no summary when the page says it; text before the title moves under it');
+    assert.ok(md.includes('Clients supported: **120+**'), 'a label beside its value: one line');
+    assert.ok(md.includes('**Hours**\n\n- Monday to Friday'), 'a label over a list: a bold line of its own');
+    assert.match(md, /Office move: +Law office/, 'the <Pause /> after a label is left out');
+    assert.ok(!md.includes('BUILD') && md.includes('- Known for'), 'a chip is dropped, except as a list item');
+    assert.ok(md.includes('## Write to us\n\nUse the form on the page: https://example.test/contact#message'), 'a form: where it is');
+    assert.ok(!md.includes('email'), "the form's fields stay out");
+    assert.ok(md.includes('**Do you work weekends?**\n\nFor emergencies, yes.'), 'FAQ: question in bold, answer under it');
+    assert.ok(md.includes('| Name | Kept |\n| --- | --- |\n| Email (if you give it) | a \\| b |'), 'a table, its <small> note in brackets');
+    assert.ok(md.includes('[Outside](https://other.test/x)') && !md.includes('](https://example.test/services)'), 'an outside link as is; a link with no text left out');
+    assert.match(readFileSync(join(dir, 'services/backup.md'), 'utf-8'), /^# Backup\n\n> Backups that run every night and get tested\.\n/, 'a page in a folder');
+    for (const skipped of ['index.md', '404.md', 'soon.md']) assert.throws(() => readFileSync(join(dir, skipped)), `${skipped} not written`);
+  } finally { rmSync(dir, { recursive: true }); }
+});
+
+test('markdown.mjs: refuses a page with no <main> or no canonical', () => {
+  const dir = site({ 'about.html': '<!doctype html><html><body><main><h1>About</h1></main></body></html>' });
+  try { assert.match(fails('markdown.mjs', dir), /markdown: about\.html has no <main> or no canonical/); }
+  finally { rmSync(dir, { recursive: true }); }
+});

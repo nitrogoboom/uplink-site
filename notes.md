@@ -2,6 +2,9 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Review of November 7, 2026
+- [ ] Work through `docs/review-2026-11-07.md` (about 90 verified items, in batches; status lives in that file).
+
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
 
 Quick, visible:
@@ -39,7 +42,7 @@ Rule from now on:
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
 - [ ] Open PR #76 (clean up old pull request previews on Cloudflare every 3 days): its build passed; it waits for the owner's merge, then a one-preview delete test.
-- [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
+- [ ] Small, left as they are: `box()` is defined five times (`gen_campus.py`, `gen_grow.py`, `gen_hq.py`, `gen_office.py`, `iso.py`), each a little different (review C11); `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
 - [ ] Real Safari: Playwright's WebKit (27.2) refuses a style of its own for every `<select>` under our CSP (one each, even on a bare page with nothing of ours; Chromium doesn't), so twice a page from the booking dialog's dropdowns. The release audit expects that many and the Worker drops that report (November 6, 2026). Open: look at Safari's console on a Mac (Develop menu) for "Refused to apply a stylesheet"; if it's there too, report it to WebKit (bugs.webkit.org).
 

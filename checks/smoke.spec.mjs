@@ -4,12 +4,15 @@
 //   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable, sitemap named
 //   npm run smoke -- https://uplinkit.ca --launch --old https://uplink-site.johnoreilly.workers.dev
 //                                                                       and the old address redirects here
+//   npm run smoke -- http://localhost:8787                              the local build (npm run serve): CI runs this.
+//                                                                       Its sitemap names the live host and http stays
+//                                                                       http, so those two checks are left out
 // Checks:
-//   every page in sitemap.xml answers 200 over https, as text/html, with the security headers
-//   plain http:// redirects (301/308) to the same https:// address
+//   every page in sitemap.xml answers 200, as text/html, with the security headers
+//   plain http:// redirects (301/308) to the same https:// address (not on localhost)
 //   a made-up address answers 404 with the site's 404 page; /404 itself answers 404
 //   /api/report refuses a GET (405); robots.txt, llms.txt and a .md copy answer
-//   sitemap.xml names this address (not another host)
+//   sitemap.xml names this address (not another host; not on localhost)
 //   noindex: present while it's a test build; with --launch, gone, and robots.txt names the sitemap
 //   --old: the old address redirects to the same path here
 // Fails on any of them. Cloudflare refuses a client with no user agent of its own (403), so requests name one.
@@ -32,6 +35,7 @@ test('smoke', async () => {
   const launch = flag('--launch');
   const old = option('--old')?.replace(/\/$/, '');
   const host = new URL(base).host;
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(base).hostname); // npm run serve, as in CI
   const fails = [];
   const ok = (cond, what) => cond || fails.push(what);
 
@@ -40,7 +44,7 @@ test('smoke', async () => {
   const urls = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   ok(urls.length > 0, 'sitemap.xml lists no pages');
   const other = urls.filter((u) => new URL(u).host !== host);
-  ok(!other.length, `sitemap.xml names another host: ${other[0] || ''}`);
+  ok(local || !other.length, `sitemap.xml names another host: ${other[0] || ''}`);
 
   for (const u of urls) {
     const path = new URL(u).pathname;
@@ -57,8 +61,10 @@ test('smoke', async () => {
   }
   console.log(`${urls.length} pages checked`);
 
-  [status, h] = await get(`http://${host}/services`);
-  ok([301, 308].includes(status) && h.get('location') === `https://${host}/services`, `http:// redirect: ${status} to ${h.get('location')}`);
+  if (!local) {
+    [status, h] = await get(`http://${host}/services`);
+    ok([301, 308].includes(status) && h.get('location') === `https://${host}/services`, `http:// redirect: ${status} to ${h.get('location')}`);
+  }
   [status, , body] = await get(`${base}/no-such-page-smoke-test`);
   ok(status === 404, `made-up address: ${status}, not 404`);
   ok(body.includes('404') || body.toLowerCase().includes('not found'), 'made-up address: not the site 404 page');

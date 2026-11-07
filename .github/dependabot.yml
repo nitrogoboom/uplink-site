@@ -1,10 +1,15 @@
 # Weekly dependency updates. Minor and patch bumps come as one pull request; a major gets its own.
+# cooldown: a release is proposed only once it is a week old (5 days for a patch), so a hijacked or broken release
+# has time to be found and pulled before it reaches this repository.
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+      semver-patch-days: 5
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -12,6 +17,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+      semver-patch-days: 5
     groups:
       actions:
         patterns: ['*']
@@ -20,6 +28,9 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
+      semver-patch-days: 5
     groups:
       minor-and-patch:
         update-types: [minor, patch]
