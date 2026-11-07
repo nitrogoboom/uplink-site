@@ -1,6 +1,6 @@
 # Home page: what a screen reader hears
 
-*Recorded November 5, 2026, from the built site.*
+*Recorded November 5, 2026, from the built site. Footer updated November 7, 2026, for its `<details>` sections (review J7).*
 
 This page records what a screen reader gets from the Home page, in order, at desktop and phone size. Use it to check that a change to Home still reads well, and as the reference for the listen in the [release checklist](sop.md#c-by-hand-15-minutes).
 
@@ -19,10 +19,10 @@ A screen-reader user moves line by line (arrow keys, or swiping on a phone), or 
 | Main | — | The page content |
 | Region | Each section's heading | The five sections |
 | Content info | "Site footer" | The footer |
-| Navigation | "Legal" | The footer's base bar |
+| Navigation | "Footer" | The footer's six sections and its base bar |
 | Navigation | "Main (bottom bar)" | The tab bar (phone) |
 
-The headings are one H1, four H2 sections plus the footer's H2, and H3 for the Grow card and the open footer panel.
+The headings are one H1, four H2 sections plus the footer's H2, and H3 for the Grow card and the footer panel that shows.
 
 ## Desktop, top to bottom
 
@@ -104,20 +104,17 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 ### Footer
 
 36. Heading level 2: "Site footer".
-37. Button: "Previous footer section".
-38. Tab list "Footer sections", 6 tabs: "Contact. Start here" (selected), "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", "Follow. 5 channels".
-39. Button: "Next footer section".
-40. Tab panel "Contact. Start here", the selected tab's panel:
+37. Navigation "Footer". Six groups, each with a button that says whether it's open or closed (a `<details>` summary), in this order: "Contact. Start here", "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", "Follow. 5 channels". One opens at a time. An open one reads its panel right after its button. With none open, the Contact panel shows on screen and is read after its button, which still says closed:
     - "Contact". Heading level 3: "Reach us".
     - "Call, email or drop by. The help desk is open 7 am to 7 pm ET, Monday to Friday."
     - "Call or email". Links: "1-855-555-0142", "hello@uplinkit.ca".
     - "Office". "Toronto, 100 King St W, Suite 4200". "7 am to 7 pm ET, Monday to Friday".
     - "Follow", a list of 5 links: "LinkedIn", "YouTube", "Facebook", "Instagram", "X".
-41. Image: "Map of the Uplink campus. The spot for the footer section you pick is lit up." The map loads when the footer scrolls near, so it's read only after that.
-42. Button: "Pause animations", not pressed.
-43. "Uplink, © 2026 Uplink Technology Inc."
-44. Navigation "Legal": links "Privacy", "Terms", "Accessibility".
-45. "All systems normal, Help desk open 7 am to 7 pm ET".
+38. Image: "Map of the Uplink campus. The spot for the footer section you pick is lit up." The map loads when the footer scrolls near, so it's read only after that.
+39. Button: "Pause animations", not pressed.
+40. "Uplink, © 2026 Uplink Technology Inc."
+41. List "Legal", still in the "Footer" navigation: links "Privacy", "Terms", "Accessibility".
+42. "All systems normal, Help desk open 7 am to 7 pm ET".
 
 ## Phone: what's different
 
@@ -126,7 +123,7 @@ On a phone, the order is the same, with these differences:
 - **Header:** no "Main" navigation. The page tabs move to the bottom bar, read last.
 - **We grow with you:** no step list after the lead. The steps come after the "Play" button instead, as group "Where your people work": button "Previous place" (dimmed on the first step), six buttons "1 of 6: Your office" to "6 of 6: Covered" (the current one is pressed), and button "Next place". Tablets read the same as phones here.
 - **Hero:** no "Managed IT, Ontario" line and no four-link services list. The lead is shorter: "We run your IT: help desk, security, cloud, network and phones."
-- **Footer:** no tabs, no map, and no map pause button. The footer is six buttons that open in place: "Contact. Start here", "Services. 7 links", "Company. 4 links", "Support. 4 links", "Resources. 4 links", and "Follow. 5 channels". Each button says whether it's open or closed (`aria-expanded`), and an open one reads its links next.
+- **Footer:** no map and no map pause button. The same six buttons open in place, and all start closed: with none open, no panel shows or is read.
 - **Bottom bar:** after the footer, navigation "Main (bottom bar)", a list of 5 links: "Home" (current page), "Services", "Work", "About", "Contact".
 
 ## What's never read
