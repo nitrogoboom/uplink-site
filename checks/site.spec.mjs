@@ -24,6 +24,7 @@
 // swap, print, and the drawings' ?v= addresses.
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): the footer tabs at 1440, and Home and /soon at each size.
+import { createHash } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
@@ -687,5 +688,21 @@ test('forms: copy buttons without script, pattern titles, blank required choices
   if (!s.note) fails.push('the Book pop-up doesn\'t say fields are required unless marked optional');
   console.log(`forms: ${JSON.stringify(s)}`);
   await ctx.close();
+  verdict(fails);
+});
+
+// B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
+// output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
+test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
+  const html = await (await fetch(BASE + '/')).text();
+  const urls = [...new Set([...html.matchAll(/data-[a-z-]+="(\/assets\/img\/[^"?]+\.svg)\?v=([0-9a-f]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`))];
+  const fails = urls.length < 4 ? [`Home inserts ${urls.length} drawing(s) with a ?v= (expected the hero cuts and the campus map)`] : [];
+  for (const u of urls) {
+    const [path, v] = u.split('?v=');
+    const body = Buffer.from(await (await fetch(BASE + path)).arrayBuffer());
+    const got = createHash('sha1').update(body).digest('hex').slice(0, 8);
+    if (got !== v) fails.push(`${path}: ?v=${v}, but the file served hashes to ${got}`);
+  }
+  console.log(`drawing addresses: ${urls.join(' ')}`);
   verdict(fails);
 });

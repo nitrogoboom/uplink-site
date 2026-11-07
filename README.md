@@ -109,7 +109,7 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
-| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
@@ -190,7 +190,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
 | `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
-| `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. SVGO leaves this file as written. |
+| `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
 A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.
@@ -218,6 +218,7 @@ After you change a drawing, run both checks on it. Each exits with status 1 on a
   - It skips leader lines in `.co` groups, `class="mark"` arrowheads, and `class="free"` parts tilted on purpose.
   - `<g class="curve">` holds a curved surface cut into flat strips, such as the side wall of the hero's cloud. Its strips aren't checked against each other.
   - `--step PX` counts vertex pairs exactly one grid step apart along an isometric axis, instead of listing them. Use it for drawings whose props sit on a grid finer than 2 px on screen. For the office: `--step 1.758` (0.0625 × 28.127).
+- A drawing's CSS, its own `<style>` or the site's, styles parts by class, never by tag: SVGO writes `<polygon>`, `<line>` and `<rect>` as `<path>` in the shipped file. `npm run build` stops on a drawing whose `<style>` breaks this rule.
 - **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`, and its first lines give the exact command. For Grow:
 
   ```bash
