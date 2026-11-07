@@ -81,6 +81,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
   - the header shows without its buttons, and the footer, bottom bar, skip link and dialogs drop out
   - the two animated drawings (hero, Grow) drop out, since they print half built
   - cards and headings don't split across pages
+  - since November 7, 2026 (review B22, M7): every Grow step's card prints, no section keeps a screen's height (a page printed scaled down is laid out at a desktop width), forms, copy buttons and pop-up openers drop out, and a one-line contact block stands in for the footer
 - [x] **No JavaScript**: every page shows its content, links and footer.
 - [x] Fixed: without script, Home's "Previous / Next service" arrows and the dots under the phone service row are hidden, since they can't do anything; the row still swipes (`src/components/home/services.css`).
 - [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed November 5, 2026; every other page already passed.

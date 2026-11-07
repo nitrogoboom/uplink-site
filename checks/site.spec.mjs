@@ -688,6 +688,47 @@ for (const [page, w, h] of [['index', 1440, 900], [MISSING, 390, 844]]) {
   });
 }
 
+// B22, M7: on paper every Grow step shows, sections take their content's height whatever the screen (a page printed
+// scaled down is laid out at a desktop width, where sections are a screen tall), forms, copy buttons and pop-up
+// openers go, and a contact line stands in for the footer
+for (const page of ['index', 'contact']) {
+  test(`print ${page} (B22, M7)`, async ({ browser }) => {
+    const fails = [];
+    const ctx = await browser.newContext({ bypassCSP: true, viewport: { width: 1600, height: 1010 } }); // for the test's own style
+    const q = await ctx.newPage();
+    await q.goto(url(page));
+    await q.waitForLoadState('networkidle');
+    await q.emulateMedia({ media: 'print' });
+    // the page's content laid out on two screen heights that meet the same media queries (desktop, landscape, wider
+    // than 3:2) and give the same root font size (tokens.css: the smaller of 1.11vw and 1.78vh, so both at least
+    // 1000 tall at 1600 wide): it must be the same length. Pictures are capped at 60vh on paper (a share of the page), so they're
+    // held to one size for this comparison.
+    await q.addStyleTag({ content: 'img, svg { max-height: 300px !important; }' });
+    const tall = async (hh) => {
+      await q.setViewportSize({ width: 1600, height: hh });
+      await q.waitForTimeout(300);
+      return q.evaluate(() => Math.round(document.querySelector('main').getBoundingClientRect().height));
+    };
+    const [a, b] = [await tall(1010), await tall(1060)];
+    if (a !== b) fails.push(`${page} on paper is ${a}px long on a 1010px-tall screen and ${b}px on a 1060px one: sections keep a screen's height`);
+    const s = await q.evaluate(() => {
+      const shown = (e) => e.getClientRects().length > 0;
+      return {
+        cards: [...document.querySelectorAll('.grow-card')].filter(shown).length,
+        of: document.querySelectorAll('.grow-card').length,
+        gone: [...document.querySelectorAll('form, .copy-btn, [data-open]')].filter(shown).map((e) => e.className || e.tagName),
+        contact: [...document.querySelectorAll('.print-contact')].filter(shown).map((e) => e.textContent).join(),
+      };
+    });
+    if (s.cards !== s.of) fails.push(`${page} on paper: ${s.cards} of ${s.of} Grow steps`);
+    if (s.gone.length) fails.push(`${page} on paper still shows: ${s.gone.join(', ')}`);
+    if (!/\d.*@/.test(s.contact)) fails.push(`${page} on paper: no contact line (phone, email) in place of the footer: "${s.contact}"`);
+    console.log(`print ${page}: ${a}px / ${b}px, ${JSON.stringify(s)}`);
+    await ctx.close();
+    verdict(fails);
+  });
+}
+
 // M5: forms. Without script the copy buttons (which only script can work) don't show; every pattern has a title (the
 // browser's own message for a pattern is "match the requested format", which says nothing without one); the Book
 // pop-up's team size and Contact's topic start on a blank, required "Choose…", not on a guess; the Book pop-up says

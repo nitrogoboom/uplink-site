@@ -37,7 +37,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `type` | The page's schema.org type, such as `FAQPage` or `AboutPage`. |
 | `ldPage` | More fields merged into the page's own JSON-LD node. |
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
-| `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. |
+| `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
 The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list.
 
