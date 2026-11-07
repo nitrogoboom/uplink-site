@@ -813,3 +813,18 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
   console.log(`drawing addresses: ${urls.join(' ')}`);
   verdict(fails);
 });
+
+// M9: every page links both icons, the .ico for browsers without SVG icons, and both answer with an image
+test('favicons: .ico and .svg linked and served (M9)', async () => {
+  const fails = [];
+  for (const path of ['/', '/about', '/services/help-desk']) {
+    const html = await (await fetch(BASE + path)).text();
+    if (!html.includes('<link rel="icon" href="/favicon.ico" sizes="32x32">')) fails.push(`${path}: no <link rel="icon"> for /favicon.ico`);
+    if (!html.includes('<link rel="icon" href="/favicon.svg" type="image/svg+xml">')) fails.push(`${path}: no <link rel="icon"> for /favicon.svg`);
+  }
+  for (const icon of ['/favicon.ico', '/favicon.svg']) {
+    const r = await fetch(BASE + icon);
+    if (!r.ok || !/^image\//.test(r.headers.get('content-type') || '')) fails.push(`${icon}: ${r.status} ${r.headers.get('content-type')}`);
+  }
+  verdict(fails);
+});

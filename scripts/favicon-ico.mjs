@@ -1,5 +1,5 @@
 // Writes public/favicon.ico from public/favicon.svg, by hand when the icon changes: node scripts/favicon-ico.mjs
-// Browsers use the SVG (Base.astro's <link rel="icon">), but some, and link previews, still ask for /favicon.ico
+// Base.astro links both (the .ico at sizes="32x32" for browsers without SVG icons, then the SVG), and some browsers and link previews ask for /favicon.ico
 // whatever the page says; without the file they got the whole 404 page. Chromium (Playwright) draws the SVG at 16,
 // 32 and 48 px on a clear background, and each PNG goes into the .ico as it is (every browser since Windows Vista
 // reads PNG inside an .ico).
