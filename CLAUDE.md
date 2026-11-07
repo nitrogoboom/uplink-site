@@ -42,7 +42,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
 - Breakpoints are in `em`, in range syntax (`(width < 43.75em)`): the names in `src/lib/media.js`, and one-off queries the same way. Zoom and a bigger default font then count as a narrower screen.
 - A box sized to the screen sets a minimum height (`min-height: var(--fold-inner)`), never a fixed one. The picture inside takes what is left (`flex: 1; min-height: <rem floor>`, and no room of its own: an absolute `<img>`), so words that need more room grow the box instead of being cut.
-- Headings and big numbers fit their column: `h1`/`h2` take `min(var(--fs-8|7), var(--fit))` (`--fit` is `14cqi`), measured against the nearest box marked `container-type: inline-size` (the list is in `src/styles/layout.css`). Mark only a box that takes its width from its parent; a shrink-to-fit box collapses.
+- Headings and big numbers fit their column: `h1`/`h2` take `min(var(--fs-8|7), var(--fit))`, measured against the nearest box marked `container-type: inline-size` (the list is in `src/styles/layout.css`; mark only a box that takes its width from its parent, a shrink-to-fit box collapses). A heading with a word of 10 letters or more needs `class={fit(text)}` (`src/lib/fit.js`): it shrinks to fit (`--fit-long`, 14cqi); others keep their size unless text is big and the column narrow (`--fit-short`, 21cqi). The site check fails a long-word heading without it.
 - Text size (WCAG 1.4.4) is the browser's own zoom; the site has no text-size option (review C13). New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings

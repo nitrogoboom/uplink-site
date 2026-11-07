@@ -6,7 +6,9 @@ import Icon, { type IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import './services.css';
 import { getServices } from '../../lib/site';
+import { fit } from '../../lib/fit';
 const SLOTS = 4;
+const TITLE = 'Everything your office runs on';
 const services = await getServices();
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
@@ -22,7 +24,7 @@ const tiles = [
     <div class="section-head section-head--split">
       <div>
         <p class="eyebrow">What we run</p>
-        <h2 id="services-title">Everything your office runs on</h2>
+        <h2 id="services-title" class={fit(TITLE)}>{TITLE}</h2>
       </div>
       <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
     </div>

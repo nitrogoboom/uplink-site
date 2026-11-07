@@ -16,6 +16,7 @@ import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
 import f from '../data/footer.json';
 import { CAMPUS, getServices } from '../lib/site';
+import { fit } from '../lib/fit';
 const services = await getServices();
 const spot = (k: string) => f.spots[k as keyof typeof f.spots];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
@@ -43,7 +44,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
   <div class="container fc-stage">
     <div class="fc-panels" id="fc-panels">
 <section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq" data-map-name={spot('hq').name} data-map-sub={spot('hq').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 class={fit(f.contact.title)} set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
   <div class="fc-facts">
     <div><p class="label">Call or email</p>
       <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
@@ -58,12 +59,12 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 </div></section>
 {panels.map((p) => (
 <section class="fc-panel" id={`fc-p-${p.id}`} role="tabpanel" aria-labelledby={`fc-t-${p.id}`} tabindex="-1" data-map={p.map} data-map-name={spot(p.map).name} data-map-sub={spot(p.map).sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{p.links.length} links</p><h3>{p.title}</h3></div><p class="fc-lead">{p.lead}</p><nav class="fc-body" aria-label={p.title}><ul class="fc-rows fc-rows--two">{p.links.map((l) => (
+<div class="fc-head"><p class="eyebrow">{p.links.length} links</p><h3 class={fit(p.title)}>{p.title}</h3></div><p class="fc-lead">{p.lead}</p><nav class="fc-body" aria-label={p.title}><ul class="fc-rows fc-rows--two">{p.links.map((l) => (
   <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={p.more.href}>{p.more.label}<Icon name="arrow" /></a></nav>
 </div></section>
 ))}
 <section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 class={fit(f.follow.title)} set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((s) => (
     <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><b>{s.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>

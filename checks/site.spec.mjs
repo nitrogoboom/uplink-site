@@ -30,6 +30,7 @@ import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
+import { LONG, longest } from '../src/lib/fit.js';
 
 const ALL = flag('--all');
 const OUT = join(ROOT, option('--out', 'out'));
@@ -817,9 +818,12 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
 // B18, B20: a heading or big number never breaks inside a word. Headings and stat numbers size to their column
 // (--fit, cqi), so "CYBERSECURITY" on /services/security at 1024 to 1099 and "3,400" on /about with a 32px default
 // font stay whole. Every page at five widths, plus the two cases the review found. A break after a hyphen
-// ("Ransomware-/ready") is a normal line break, not a split.
+// ("Ransomware-/ready") is a normal line break, not a split. And every heading with a word of LONG letters or more
+// carries the class fit (src/lib/fit.js), so one written into a page by hand without fit() can't slip through.
 const WORDS = () => {
   const out = [];
+  // headings without the class fit, for the long-word test in Node
+  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), .fc-head h3:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
   for (const h of document.querySelectorAll('h1, h2, .fc-panel.is-on h3, .stat-val')) {
     if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
     const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
@@ -832,7 +836,7 @@ const WORDS = () => {
       }
     }
   }
-  return out;
+  return [out, plain];
 };
 test('headings and numbers: no word split across lines (B18, B20)', async ({ browser }) => {
   test.setTimeout(300_000);
@@ -848,7 +852,8 @@ test('headings and numbers: no word split across lines (B18, B20)', async ({ bro
       if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
       await q.goto(url(page));
       await q.evaluate(() => document.fonts.ready);
-      const split = await q.evaluate(WORDS);
+      const [split, plain] = await q.evaluate(WORDS);
+      for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
       await ctx.close();
       return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
     })

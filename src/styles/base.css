@@ -44,9 +44,12 @@ h1, h2, h3, h4 {
   line-height: var(--lh-display);
   text-wrap: balance;
 }
-/* sized to their column as well as the screen: a long word shrinks to fit instead of splitting (review B18). Hyphens
-   are the backup for a word longer than --fit allows for: only words of 14 letters or more, since browsers hyphenate
-   any word that ends a line, needed or not */
+/* sized to their column as well as the screen (review B18): a heading with a long word (class fit, set at build time
+   by lib/fit.js) shrinks to fit its column instead of splitting; the rest keep their size step unless the text is big
+   and the column narrow. Hyphens are the backup for a word longer than that allows for: only words of 14 letters or
+   more, since browsers hyphenate any word that ends a line, needed or not */
+:is(h1, h2, h3) { --fit: var(--fit-short); }
+.fit { --fit: var(--fit-long); }
 h1 { font-size: min(var(--fs-8), var(--fit)); }
 h2 { font-size: min(var(--fs-7), var(--fit)); }
 h1, h2 { hyphens: auto; hyphenate-limit-chars: 14 6 6; }
