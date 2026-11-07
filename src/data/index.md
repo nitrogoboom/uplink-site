@@ -1,5 +1,5 @@
 # Uplink Technology
-<!-- The home page as Markdown, served at /index.md by src/pages/index.md.ts. {site} is the site address, {services} the service list from src/content/services/, {grow} the steps from src/data/grow.json. -->
+<!-- The home page as Markdown, served at /index.md by src/pages/index.md.ts. {site} is the site address, {services} the service list from src/content/services/, {grow} the steps from src/data/grow.json; {phone} {tel} {email} {street} {city} {hours} come from src/data/footer.json, as in privacy.md. -->
 
 > Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.
 
@@ -19,11 +19,11 @@ As a team spreads out, here's what to watch, and what we take care of.
 
 ## Contact
 
-- Phone: [1-855-555-0142](tel:+18555550142)
-- Email: hello@uplinkit.ca
-- Address: 100 King St W, Suite 4200, Toronto, ON, Canada
-- Hours: Monday to Friday, 7:00 to 19:00 Eastern Time
-- Language: English
+- Phone: [{phone}](tel:{tel})
+- Email: {email}
+- Address: {street}, {city}, ON, Canada
+- Hours: {hours}
+- Languages: English, French
 - Area served: Ontario
 
 ## Next step

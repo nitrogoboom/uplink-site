@@ -814,6 +814,25 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
   verdict(fails);
 });
 
+// C15: the Markdown copies say what the pages say: team names apart from their roles, a case study's services as
+// links, Contact's hours under a heading of their own, and Home's contact lines from the footer data
+test('Markdown copies: team, facts links, hours heading, Home contact (C15)', async () => {
+  const md = async (path) => (await fetch(BASE + path)).text();
+  const fails = [];
+  const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith('The people who pick up')) || '';
+  const people = team.split('\n').filter((l) => l.startsWith('- '));
+  if (!people.length || people.some((l) => !/^- [^,]+, \S/.test(l))) fails.push(`/about.md team lines run names into roles: ${people.join(' | ')}`);
+  if (!/^- Services: \[[^\]]+\]\(https?:\/\/[^)]+\/services\/[a-z-]+\)/m.test(await md('/work/office-move.md'))) fails.push('/work/office-move.md: Services are not links');
+  if (!/^## Hours and office\n\n- Monday to Friday: /m.test(await md('/contact.md'))) fails.push('/contact.md: the hours have no heading');
+  const home = await md('/index.md');
+  const html = await (await fetch(BASE + '/contact')).text();
+  const tel = html.match(/href="(tel:\+\d+)"/)?.[1];
+  if (!home.includes('- Languages: English, French')) fails.push('/index.md: not "Languages: English, French"');
+  if (!tel || !home.includes(`](${tel})`)) fails.push(`/index.md: phone link is not ${tel}, the one /contact shows`);
+  if (/\{[a-z]+\}/i.test(home)) fails.push(`/index.md: placeholder left: ${home.match(/\{[a-z]+\}/i)[0]}`);
+  verdict(fails);
+});
+
 // M9: every page links both icons, the .ico for browsers without SVG icons, and both answer with an image
 test('favicons: .ico and .svg linked and served (M9)', async () => {
   const fails = [];

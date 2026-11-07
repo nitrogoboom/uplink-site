@@ -82,7 +82,7 @@ The content types are defined in `content.config.ts`, and `footer.json`'s in `li
 | `data/faq.json`, `data/team.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
 | `data/footer.json` | The footer's lists, the contact details, and the map's spots. `lib/footer.ts` checks it against its schema and exports it typed. A heading with an emphasized word is `title` plus `accent` ("Reach" + "us"); the JSON holds no HTML. |
 | `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json` (`PLACEHOLDERS` in `lib/footer.ts`) by a Markdown plugin (`lib/placeholders.mjs`), so each value is escaped as text. A name with no value stops the build. Don't type an email address or phone number into them. |
-| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, and on Home also `{services}` and `{grow}`. |
+| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, the contact placeholders (`{phone}`, `{email}`, `{street}` …, as in the privacy page), and on Home also `{services}` and `{grow}`. Type no contact details into them. |
 
 Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
 
