@@ -37,7 +37,7 @@ A *release* is the first production launch, and any later change to layout, navi
 5. Check the preview on a phone.
 6. Read the run's summary. "Screenshot changes" lists every page that looks different from the live site. Make sure you meant each change. The pictures are in the run's `visual-diff` artifact.
 7. When CI passes, merge. The merge to `main` deploys to the live site: CI uploads the build as a new version, smoke checks it at its own address, and only then puts it live. Read the deploy job's summary: it names the version that went live, or says why nothing did.
-8. If the live site fails the smoke check straight after the deploy, CI rolls back to the version from before and the run fails. Fix the problem on a branch. If something else breaks, roll back by hand with `npx wrangler rollback`, then fix the problem on a branch. The steps are in the [README](../README.md#roll-back-a-bad-deploy).
+8. If the live address doesn't serve the new build within 2 minutes, or fails the smoke check straight after the deploy, CI rolls back to the version from before and the run fails. Fix the problem on a branch. If something else breaks, roll back by hand with `npx wrangler rollback`, then fix the problem on a branch. The steps are in the [README](../README.md#roll-back-a-bad-deploy).
 9. If the change is a release, run the [release checklist](#release-checklist) and save the record.
 10. Tag the release, replacing `YYYY.MM.DD` with the date and `COMMIT` with the merge commit:
 

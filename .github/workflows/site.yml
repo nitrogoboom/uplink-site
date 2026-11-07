@@ -148,9 +148,10 @@ jobs:
         with:
           name: dist
           path: dist
-      # upload a new version that takes no traffic, smoke check it at its own address, only then put it live; smoke
-      # check the live address and roll back to the version from before if that fails (scripts/deploy.mjs, review H3).
-      # Every step's result is in the run's summary
+      # upload a new version that takes no traffic, smoke check it at its own address, only then put it live; once the
+      # live address serves that build, smoke check it, and roll back to the version from before if it never serves it
+      # or fails (scripts/deploy.mjs, review H3). The smoke runs don't get the Cloudflare secrets. Every step's result
+      # is in the run's summary
       - name: Upload, check, deploy (rolled back if the live site then fails its smoke check)
         run: node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev
         env:

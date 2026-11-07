@@ -3,6 +3,7 @@
 #   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (the classList.add('js') line)
 #   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
 #   the Early Hints block   one rule per page
+#   the Markdown copies block   one rule per .md copy: noindex and a canonical Link to its page (kept at launch)
 # style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
 # writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
 # font-src allows data: because each SVG carries its own letters as a data: font.

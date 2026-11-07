@@ -15,7 +15,7 @@ One person can do both. Pick a quiet weekday morning, not a Friday.
 
 ## Before you begin
 
-Choose how the old `workers.dev` address is retired. The choice changes the code in step 3 of [The day before](#the-day-before). There are two ways:
+Choose how the old `workers.dev` address is retired. The choice changes the code in step 3 of [The day before](#the-day-before). There are two ways. Either way, keep preview URLs on: every deploy from `main` checks the new version at its own preview address (`https://VERSION-uplink-site.johnoreilly.workers.dev`) before it goes live, and stops if that address doesn't answer (`scripts/deploy.mjs`).
 
 | Option | What happens | What it costs |
 | --- | --- | --- |
@@ -36,7 +36,7 @@ Choose how the old `workers.dev` address is retired. The choice changes the code
    - `SECURITY.md`: point the `security.txt` link at `DOMAIN`.
    - `src/data/privacy.md`: if Bot Fight Mode goes on, change "The site sets no cookies". See item 17 in `docs/privacy-and-accessibility-2026-11-03.md`.
    - **With option A:** nothing in `wrangler.jsonc` or `worker/index.js`. Keep `run_worker_first` as `["/api/*", "/404"]` and `not_found_handling` as `"none"`. Keep the `http://` to `https://` lines in `worker/index.js`: preview addresses are still on `workers.dev`, and on `DOMAIN` the zone redirects first.
-   - **With option B:** set `run_worker_first` to `true` and keep `not_found_handling` as `"none"` (the Worker's 404 page works either way). Add a redirect to `worker/index.js` that sends any request for the `workers.dev` host to the same path on `DOMAIN` with a `301`. Keep the `http://` to `https://` lines.
+   - **With option B:** set `run_worker_first` to `true` and keep `not_found_handling` as `"none"` (the Worker's 404 page works either way). Add a redirect to `worker/index.js` that sends a request for exactly the host `uplink-site.johnoreilly.workers.dev` to the same path on `DOMAIN` with a `301`. Match that one host, never anything ending in `workers.dev`: preview addresses are `workers.dev` hosts too, and a redirect there would fail the deploy's check of every new version, so nothing could deploy. Keep the `http://` to `https://` lines.
 4. **Claude:** open the pull request, and let CI pass. Don't merge yet.
 5. **Both:** read the pull request's preview once, end to end.
 
@@ -58,6 +58,8 @@ The launch takes about an hour.
    ```
 
    The version live now answers on `DOMAIN` until the merge, still with `noindex`.
+
+   > **Note:** Not yet checked: if Cloudflare sends its own `X-Robots-Tag: noindex` on preview addresses, the deploy's `--preview --launch` smoke check fails ("noindex still on") and nothing deploys. Before the merge, run `curl -sI` on a page at the `launch` pull request's preview address. That branch has no `noindex` in `public/_headers`, so any `X-Robots-Tag` there comes from Cloudflare. If Cloudflare adds one, the preview smoke run needs to leave the `noindex` check to the live run.
 4. **Owner:** in Workers > uplink-site > Settings, check that the custom domain shows Active, with a certificate.
 5. **Claude:** merge the `launch` pull request. CI uploads the new version, smoke checks it, puts it live, and smoke checks `https://DOMAIN` with `--launch`. If that last check fails, CI rolls back and the run fails: read the deploy job's summary.
 6. **Claude:** run the smoke test yourself. Every line must pass.
@@ -67,7 +69,7 @@ The launch takes about an hour.
    ```
 
 7. **Owner and Claude:** retire the old address.
-   - **Option A:** in Workers > uplink-site > Settings > Domains & Routes, turn `workers.dev` off. Check that `https://uplink-site.johnoreilly.workers.dev` no longer answers. Then open a test pull request and check that its preview address still works.
+   - **Option A:** in Workers > uplink-site > Settings > Domains & Routes, turn `workers.dev` off, and leave Preview URLs on. Check that `https://uplink-site.johnoreilly.workers.dev` no longer answers. Then open a test pull request and check that its preview address still works. Without preview URLs, no deploy from `main` can go live.
    - **Option B:** check the redirect with the smoke test:
 
      ```bash
