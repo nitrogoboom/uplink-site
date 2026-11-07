@@ -8,13 +8,15 @@ import ServiceOptions from '../ServiceOptions.astro';
 import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
 import { phone, email } from '../../data/footer.json';
+import { fit } from '../../lib/fit';
+const TITLE = 'Talk to a real person';
 ---
 <section class="page-intro fold fold-always" id="message" aria-labelledby="contact-title">
   <div class="container">
     <div class="lobby">
       <div class="lobby-intro">
         <p class="eyebrow">Lobby</p>
-        <h1 id="contact-title">Talk to a real person</h1>
+        <h1 id="contact-title" class={fit(TITLE)}>{TITLE}</h1>
         <p class="lead">No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk options further down.</p>
       </div>
       <div class="lobby-chan">

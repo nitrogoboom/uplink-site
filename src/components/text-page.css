@@ -9,7 +9,10 @@
 .text-page .prose li::marker { color: var(--c-accent-text); }
 .text-page .prose strong { color: var(--c-text); font-weight: 600; }
 .text-page .prose a { color: var(--c-accent-text); overflow-wrap: anywhere; }
-/* tables fit the column at any text size (200% on a phone included): fixed columns, long words wrap */
-.text-page .prose table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--fs-3); overflow-wrap: anywhere; }
+/* tables fit the column at any text size (200% on a phone included): fixed columns, long words wrap. A word of 12
+   letters or more breaks at a syllable (a shorter one isn't hyphenated: browsers hyphenate any word that ends a line,
+   needed or not). Phones: a step smaller, so a column holds a whole word ("unsubscribe" at 320, B20) */
+.text-page .prose table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--fs-3); overflow-wrap: anywhere; hyphens: auto; hyphenate-limit-chars: 12 5 5; }
+@media (--phone) { .text-page .prose table { font-size: var(--fs-2); } }
 .text-page .prose :is(th, td) { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; text-align: left; vertical-align: top; border-bottom: 1px solid var(--c-line); }
 .text-page .prose th { color: var(--c-text); font-weight: 600; }

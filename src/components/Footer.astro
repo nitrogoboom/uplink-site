@@ -19,6 +19,7 @@ import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
 import f from '../data/footer.json';
 import { CAMPUS, getServices } from '../lib/site';
+import { fit } from '../lib/fit';
 const services = await getServices();
 const spot = (k: string) => f.spots[k as keyof typeof f.spots];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
@@ -40,7 +41,7 @@ const sections: { id: string; map: string; icon: IconName; name: string; count: 
   <summary class="fc-tile"><span class="icon-tile"><Icon name={s.icon} /></span><span class="fc-tile-n">{s.name}</span><Pause /><span class="fc-tile-c">{s.count}</span><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span></summary>
   <div class="fc-panel">
   {s.id === 'contact' && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 class={fit(f.contact.title)} set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
   <div class="fc-facts">
     <div><p class="label">Call or email</p>
       <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
@@ -54,11 +55,11 @@ const sections: { id: string; map: string; icon: IconName; name: string; count: 
 </div>
   </Fragment>)}
   {s.panel && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{s.count}</p><h3>{s.panel.title}</h3></div><p class="fc-lead">{s.panel.lead}</p><div class="fc-body"><ul class="fc-rows fc-rows--two">{s.panel.links.map((l) => (
+<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(s.panel.title)}>{s.panel.title}</h3></div><p class="fc-lead">{s.panel.lead}</p><div class="fc-body"><ul class="fc-rows fc-rows--two">{s.panel.links.map((l) => (
   <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a></div>
   </Fragment>)}
   {s.id === 'follow' && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(f.follow.title)} set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((x) => (
     <li><a class="fc-wall-item" href={x.href}><span class="icon-tile"><Icon name={x.icon as IconName} /></span><b>{x.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>

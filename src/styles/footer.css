@@ -65,7 +65,7 @@
 .fc-panel { display: flex; flex-direction: column; min-width: 0; padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
 .fc-head { display: none; flex-direction: column; gap: var(--sp-3); }   /* rows: the row above already names it */
 /* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
-.fc-head h3 { font-size: var(--fs-8); font-style: italic; line-height: var(--lh-display); }
+.fc-head h3 { font-size: min(var(--fs-8), var(--fit)); font-style: italic; line-height: var(--lh-display); }
 .fc-head h3 em { color: var(--c-accent-text); }
 .fc-lead { max-width: 46ch; font-size: var(--fs-3); color: var(--c-muted); }
 .fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-4); }
@@ -355,7 +355,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
     .fc { min-height: max(var(--fold-h), 40rem); }
     .fc-deck { padding-top: var(--sp-7); }
     .fc-sec::details-content { padding-top: var(--sp-2); }
-    .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
+    .fc-head h3 { font-size: min(var(--fs-8), 8.2svh, var(--fit)); }
     .fc-map { min-height: 16rem; }
     @media (height <= 51.25em) {
       .fc-deck { padding-top: var(--sp-6); }
