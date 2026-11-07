@@ -280,7 +280,16 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
 - A push to `main` that passes deploys to the live Worker.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
+
+### Repository rules
+
+Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
+
+- **main: no force push or delete.** Applies to everyone.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
+
+Secret scanning with push protection, private vulnerability reporting, and CodeQL (default setup) are on under Settings > Code security.
 
 ### Roll back a bad deploy
 

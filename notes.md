@@ -4,9 +4,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Outside review (6 Nov 2026, independent session, 7.5/10)
 
-Get main green first:
-- [ ] Then protect `main`: blocked. GitHub offers branch protection and rulesets on a private repository only with GitHub Pro (checked November 6, 2026: the API answers "Upgrade to GitHub Pro or make this repository public"). Left for now (owner, November 6, 2026): CI is the gate, as `deploy` runs only after `build` passes. Revisit with GitHub Pro.
-
 Quick, visible:
 - [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
 - [ ] Hero with pause already on from an earlier page: the build freezes on its first frame (on phones the furnished room with no network or cloud, and the caption lines don't draw; desktop too). Fix: when the drawing goes in while paused, finish its build animations.
@@ -21,7 +18,8 @@ Rule from now on:
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
-- [ ] GitHub: protect `main` (PR required, `build` must pass). Today a push straight to `main` deploys as soon as CI passes, with no review. While there, turn on secret scanning and push protection (Settings > Code security) if the plan offers them.
+- [ ] GitHub environments (made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`.
+- [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
 - [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
