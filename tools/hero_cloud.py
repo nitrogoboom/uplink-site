@@ -7,8 +7,13 @@ u * (cos30, 0.5) + v * (0, -1). The slab runs back along -y, which on screen is 
 Each outline segment sweeps one strip of the side wall; strips are shaded by their normal and merged when the shade
 repeats, so the wall is one smooth ramp with no seams, and the face carries its own soft gradient.
 The strips sit in <g class="curve">, so check.py doesn't read their outline steps (up to about 5px) as near-misses.
+Same output on every machine: each shape is snapped to a fine grid (set_precision) after every buffer and before it
+is simplified, so the last-bit float noise of the platform's maths library can't tip buffer or simplify one way or the
+other; every ring starts at
+its lowest vertex and every list of shapes is sorted by a full key, so nothing depends on the order GEOS returns.
 """
 import math
+import shapely
 from shapely.geometry import Point, Polygon, box
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
@@ -35,6 +40,7 @@ SIDE_DARK, SIDE_LIGHT = (tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in 
 FACE_TOP, FACE_BOT = pal.CLOUD_TOP, pal.CLOUD_BOT
 SHADES = 56                           # steps in the side-wall ramp (finer than the 8-bit colour can show)
 GID = 'hc'                            # id prefix for the gradients
+GRID = 1e-3                           # snap grid (plane units in face(), px after): far below the 0.01px the SVG prints
 
 
 def screen(u, v):
@@ -47,9 +53,24 @@ DX, DY = DEPTH * C30, -DEPTH * 0.5      # slab direction on screen: (+48.5, -28)
 def face():
     parts = [Point(cx, cy).buffer(r, SEG) for cx, cy, r in CIRCLES]
     parts.append(box(CIRCLES[0][0], 0, CIRCLES[-1][0], BASE_TOP))
-    shape = unary_union(parts).intersection(box(-100, 0, 400, 300))
-    shape = shape.buffer(FILLET, SEG).buffer(-FILLET, SEG)
-    return orient(shape.simplify(0.02), 1.0)
+    shape = snap(unary_union(parts).intersection(box(-100, 0, 400, 300)))
+    shape = snap(snap(shape.buffer(FILLET, SEG)).buffer(-FILLET, SEG))
+    return orient(steady(shape, 0.02), 1.0)
+
+
+def snap(shape):
+    """The shape on the GRID, each ring starting at its lowest vertex (where a ring starts changes what simplify keeps)."""
+    return shapely.normalize(shapely.set_precision(shape, GRID))
+
+
+def steady(shape, tol):
+    """simplify, made the same everywhere."""
+    return shapely.normalize(snap(shape).simplify(tol))
+
+
+def parts(shape):
+    """A shape's polygons in a fixed order (by their lowest vertex), whatever order GEOS returns them in."""
+    return sorted(getattr(shape, 'geoms', [shape]), key=lambda g: min(g.exterior.coords))
 
 
 def hexc(c):
@@ -90,7 +111,7 @@ def cloud_shapes():
         quad = Polygon([a, b, (b[0] + DX, b[1] + DY), (a[0] + DX, a[1] + DY)])
         strips.append(((u0 + u1 + v0 + v1) / 4, shade(n), quad))
     # far to near, then merge neighbours of the same shade into one shape
-    strips.sort(key=lambda s: s[0])
+    strips.sort(key=lambda s: (s[0], s[2].exterior.coords[0]))
     runs = []
     for key, sh, quad in strips:
         if runs and runs[-1][0] == sh and abs(runs[-1][2] - key) < 6:
@@ -100,11 +121,10 @@ def cloud_shapes():
     out = []
     for sh, quads, _ in runs:
         col = hexc(tuple(d + (l - d) * sh for d, l in zip(SIDE_DARK, SIDE_LIGHT)))
-        poly = unary_union(quads).buffer(0.05, join_style=2).simplify(0.04)
-        for g in (poly.geoms if hasattr(poly, 'geoms') else [poly]):
+        for g in parts(steady(unary_union(quads).buffer(0.05, join_style=2), 0.04)):
             out.append(f'<path d="{path(g.exterior.coords)}" fill="{col}" stroke="{col}" stroke-width="0.7" stroke-linejoin="round"/>')
     face_s = Polygon([screen(u, v) for u, v in ring])
-    sil = unary_union([face_s] + [q for _, _, q in strips]).buffer(0.05, join_style=2).simplify(0.04)
+    sil = steady(unary_union([face_s] + [q for _, _, q in strips]).buffer(0.05, join_style=2), 0.04)
     ys = [y for _, y in face_s.exterior.coords]
     top, bot = min(ys), max(ys)
     defs = (f'<defs><linearGradient id="{GID}-f" gradientUnits="userSpaceOnUse" x1="0" y1="{top:.1f}" x2="0" y2="{bot:.1f}">'
