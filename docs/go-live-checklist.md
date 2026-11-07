@@ -95,7 +95,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [ ] **(you)** PageSpeed on every page, phone and desktop: `npm run pagespeed -- https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
 - [ ] One WebPageTest run from Toronto on a slow phone profile, Home and Contact (webpagetest.org, free).
 - [ ] Decide: a performance budget in CI (Lighthouse CI) so a slow change fails the build instead of being found later.
-- [ ] **(domain)** Traffic against the free plan: while `run_worker_first` is `true`, every request runs the Worker (100,000 a day free). It can be narrowed once Always Use HTTPS is on, unless the old address is redirected by the Worker (option B in `launch-runbook.md`).
+- [ ] **(domain)** Traffic against the free plan: the Worker runs only for `/api/*`, `/404` and missing addresses (narrowed November 7, 2026, review H1), so the 100,000 a day free goes a long way. Redirecting the old address from the Worker (option B in `launch-runbook.md`) puts it back on every request.
 
 ## 6. SEO and sharing (structure only, not wording)
 

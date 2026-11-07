@@ -19,6 +19,8 @@
 # when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json: our
 # own pages only, not /api/ or the .md and .txt copies. A header, not an inline <script>, so the CSP needs nothing
 # new. Other browsers ignore it, and so does any response that isn't a page.
+# A missing address isn't served from this file's path rules: the Worker answers it with the 404 page and /404's
+# headers, so the rules below for a path (/*.md, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
 /*
   X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000

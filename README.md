@@ -250,7 +250,7 @@ These checks ask a deployed site over plain HTTP. They need no local server.
 
 | Command | What it checks |
 | --- | --- |
-| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects, the 404 status, the report endpoint, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
+| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects (the other spellings of an address, and `http://`), the 404 page (its status, asked again with `If-None-Match`, and for a missing `.md`, `.txt`, script, font, or drawing, with the pages' headers), the Worker's own headers, the report endpoint, the Speculation Rules, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone, and a page asked for over `http://` to redirect. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
 | `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
 
 ## Hosting
@@ -262,15 +262,21 @@ The site runs on Cloudflare Workers with static assets.
 
 ### The Worker
 
-`worker/index.js` is the site's only server code. Today, `run_worker_first` is `true` in `wrangler.jsonc`, so every request reaches the Worker before the static files. The Worker does three things:
+`worker/index.js` is the site's only server code. Most requests never run it: the static files answer them, with `_headers` and `_redirects` applied. `wrangler.jsonc` sends the Worker three kinds of request:
 
-- Redirects `http://` to `https://` with a `308`. `workers.dev` belongs to Cloudflare, so its "Always Use HTTPS" setting isn't ours to turn on.
-- Answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
-- Gives `/404` itself a 404 status.
+- **`/api/*`** (`run_worker_first`). The Worker answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
+- **`/404`** (`run_worker_first`). The 404 page is a file, `dist/404.html`, so asked for by name it would answer `200`. The Worker gives it a `404` status.
+- **An address with no file** (`not_found_handling: "none"`). The Worker answers with the same 404 page and the same headers as `/404`. With `"404-page"`, the static files would answer instead, but with the `_headers` rules of the missing path: a missing `.md` sent as Markdown, or a missing script cached for a year.
 
-Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied. A report it can't read gets a `400`, and anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead (`Cache-Control: no-store`), as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
+The Worker always fetches the 404 page afresh, without the visitor's `If-None-Match` or `If-Modified-Since`, and sends it without an `ETag`, so a second visit never gets an empty page. A `POST`, or any method other than `GET` and `HEAD`, to `/404` or to a missing address gets a `405`, as it does from the static files.
 
-> **Note:** Every request counts against the free plan's 100,000 Worker requests a day. At launch, turn on Always Use HTTPS on the real domain's zone and set `run_worker_first` back to `["/api/*", "/404"]`. The steps are in [`docs/launch-runbook.md`](docs/launch-runbook.md).
+For the requests it sees, the Worker also redirects `http://` to `https://` with a `308`, except for a server on your computer or local network (`localhost`, `*.localhost`, `*.local`, `0.0.0.0`, and private addresses). On `workers.dev`, the pages and files themselves aren't redirected: every major browser treats `.dev` addresses as HTTPS-only (the HSTS preload list), so only a tool such as `curl` asks for one over `http://`. At launch, Always Use HTTPS on the domain's zone redirects every request before it reaches the Worker or the files.
+
+Every response the Worker writes itself carries `X-Content-Type-Options: nosniff`, `Cache-Control: no-store`, and a CSP that lets it load nothing, because `_headers` doesn't reach a Worker's own responses. The 404 page keeps the headers it has as a file.
+
+A report it can't read gets a `400`. Anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead, as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
+
+The Workers logs keep the Worker's own lines, one per report, for 3 days on the free plan. Cloudflare's own record of each run, the invocation log, is off (`observability.logs.invocation_logs` in `wrangler.jsonc`).
 
 > **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
 
@@ -315,7 +321,7 @@ Secret scanning with push protection, private vulnerability reporting, CodeQL (d
 
 ### Response headers
 
-`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP), the cache rules, and the `Speculation-Rules` header. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them.
+`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP), the cache rules, and the `Speculation-Rules` header. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them: the Worker sets its own (see [The Worker](#the-worker)).
 
 The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`, served as `application/speculationrules+json`. When a pointer rests on a link to one of the site's pages for 200 ms (on phones, when the link comes into view), the browser fetches that page in the background, so the click doesn't wait for the HTML. Links to `/api/` and to the `.md` and `.txt` copies are left out. A header, unlike an inline `<script type="speculationrules">`, needs no change to the CSP. Other browsers ignore it.
 
