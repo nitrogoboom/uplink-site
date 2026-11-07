@@ -664,6 +664,30 @@ test('hero and pictures when drawings fail to load (J13)', async ({ browser }) =
   verdict(fails);
 });
 
+// B5: text in the fallback font takes the same room as Barlow, so nothing moves when the fonts arrive late. Linux has
+// no Arial, so the fallback faces need Liberation Sans (CI's runner has it: Playwright installs it with Chromium).
+for (const [page, w, h] of [['index', 1440, 900], [MISSING, 390, 844]]) {
+  test(`font swap: no layout shift, ${page} ${w} (B5)`, async ({ browser }) => {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h } });
+    await ctx.route('**/assets/fonts/*.woff2', async (r) => {
+      await new Promise((ok) => setTimeout(ok, 1500));
+      await r.continue();
+    });
+    await ctx.addInitScript(() => {
+      window.__cls = 0;
+      new PerformanceObserver((l) => l.getEntries().forEach((e) => { if (!e.hadRecentInput) window.__cls += e.value; })).observe({ type: 'layout-shift', buffered: true });
+    });
+    const q = await ctx.newPage();
+    await q.goto(url(page));
+    await q.waitForFunction(() => document.fonts.status === 'loaded' && [...document.fonts].some((f) => f.family.includes('Barlow') && f.status === 'loaded'), null, { timeout: 15000 });
+    await q.waitForTimeout(1000);
+    const cls = await q.evaluate(() => window.__cls);
+    await ctx.close();
+    console.log(`font swap ${page} ${w}: CLS ${cls.toFixed(4)}`);
+    verdict(cls > 0.01 ? [`${page} at ${w}: the late font moved the layout (CLS ${cls.toFixed(4)})`] : []);
+  });
+}
+
 // M5: forms. Without script the copy buttons (which only script can work) don't show; every pattern has a title (the
 // browser's own message for a pattern is "match the requested format", which says nothing without one); the Book
 // pop-up's team size and Contact's topic start on a blank, required "Choose…", not on a guess; the Book pop-up says
