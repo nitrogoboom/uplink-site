@@ -88,7 +88,7 @@
   .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
   .hero-top { grid-area: top; gap: var(--sp-3); }
-  .hero-menu h1 { font-size: var(--fs-hero-phone); }
+  .hero-menu h1 { font-size: min(var(--fs-hero-phone), var(--fit)); }
   .hero-top .eyebrow, .lead-long { display: none; }
   .lead-short { display: inline; }
   .hero-art .stage { grid-area: stage; }
@@ -146,7 +146,7 @@
 }
 /* tablets: the headline steps down so it stays on two lines in its column */
 @media (56.25em <= width < 68.75em) and (height >= 35em) and (orientation: landscape) {
-  .hero-menu h1 { font-size: min(var(--fs-8), 4.6vw); }
+  .hero-menu h1 { font-size: min(var(--fs-8), 4.6vw, var(--fit)); }
 }
 
 /* ---- desktop, tall enough for the menu ----------------------------------

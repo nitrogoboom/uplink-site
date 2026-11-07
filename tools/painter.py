@@ -32,6 +32,25 @@ def resolve(b, z0):
     x0 = b['A'][0][0] + y1; y0 = x1 - b['B'][0][0]
     return (x0, x1, y0, y1, z0, z0 + b['h'])
 
+def errors(bs, eps=0.01):
+    """Pairs of boxes in drawing order that poke into each other ('INTERSECT') or where the one drawn first is in
+    front ('ORDER', when their silhouettes overlap). Each item: dict(box=(x0, x1, y0, y1, z0, z1), sil=its outline on
+    screen). Yields (kind, a, b, overlap px²). tools/tests runs it on a generator's own BOXES too."""
+    for i, a in enumerate(bs):
+        for b in bs[i + 1:]:
+            A, B = a['box'], b['box']
+            if all(min(A[2*k+1], B[2*k+1]) - max(A[2*k], B[2*k]) > eps for k in range(3)):
+                yield 'INTERSECT', a, b, 0.0
+                continue
+            ov = a['sil'].intersection(b['sil']).area
+            if ov < 0.5: continue
+            # separating axis: who is in front (larger coordinate on separated axis)
+            for k in range(3):
+                if A[2*k+1] <= B[2*k] + eps: break                    # b in front: drawn after, as it should be
+                if B[2*k+1] <= A[2*k] + eps:                          # a in front, but drawn first
+                    yield 'ORDER', a, b, ov
+                    break
+
 def main():
     f, ox, oy, u, rules = sys.argv[1], *map(float, sys.argv[2:5]), sys.argv[5]
     spec = importlib.util.spec_from_file_location('rules', rules); R = importlib.util.module_from_spec(spec); spec.loader.exec_module(R)
@@ -44,26 +63,12 @@ def main():
     for b in bs:
         z = R.z0(b)
         b['box'] = None if z is None else resolve(b, z)
-    eps = 0.01
-    for i, a in enumerate(bs):
-        for j, b in enumerate(bs):
-            if j <= i or a['box'] is None or b['box'] is None: continue
-            ov = a['sil'].intersection(b['sil']).area
-            A, B = a['box'], b['box']
-            inter = all(min(A[2*k+1], B[2*k+1]) - max(A[2*k], B[2*k]) > eps for k in range(3))
-            if inter:
-                print(f'INTERSECT L{a["line"]} {R.label(a)} {fmt(A)}  <->  L{b["line"]} {R.label(b)} {fmt(B)}')
-                found += 1
-                continue
-            if ov < 0.5: continue
-            # separating axis: who is in front (larger coordinate on separated axis)
-            front = None
-            for k in range(3):
-                if A[2*k+1] <= B[2*k] + eps: front = 'b'; break
-                if B[2*k+1] <= A[2*k] + eps: front = 'a'; break
-            if front == 'a':   # a should be drawn after b, but a comes first in DOM
-                print(f'ORDER  L{a["line"]} {R.label(a)} is in front of L{b["line"]} {R.label(b)} but drawn before it (overlap {ov:.0f}px²)')
-                found += 1
+    for kind, a, b, ov in errors([x for x in bs if x['box'] is not None]):
+        if kind == 'INTERSECT':
+            print(f'INTERSECT L{a["line"]} {R.label(a)} {fmt(a["box"])}  <->  L{b["line"]} {R.label(b)} {fmt(b["box"])}')
+        else:
+            print(f'ORDER  L{a["line"]} {R.label(a)} is in front of L{b["line"]} {R.label(b)} but drawn before it (overlap {ov:.0f}px²)')
+        found += 1
     checked = sum(b['box'] is not None for b in bs)
     print(f'-- {len(bs)} boxes, {checked} checked, {found} findings', file=sys.stderr)
     if not checked:

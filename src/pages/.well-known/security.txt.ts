@@ -3,7 +3,7 @@
 // the build, so a site that stops being built stops advertising an inbox nobody reads. SECURITY.md says the same
 // for the repository.
 import type { APIRoute } from 'astro';
-import { inboxes } from '../../data/footer.json';
+import { inboxes } from '../../lib/footer';
 
 export const GET: APIRoute = ({ site }) => {
   const expires = new Date(Date.now() + 365 * 24 * 3600 * 1000).toISOString().replace(/\.\d+Z$/, 'Z');

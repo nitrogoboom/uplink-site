@@ -1,6 +1,7 @@
 """painter.py rules for campus.svg (the footer map): each box's base height, looked up from gen_campus.py by its left face.
 usage: python tools/painter.py public/assets/img/campus.svg 0 0 38 tools/rules_campus.py
-Windows sit on the walls and share no box's left face, so if painter ever groups some into a fake box, it gets None (skipped)."""
+Windows sit on the walls and share no box's left face, so if painter ever groups some into a fake box, it gets None (skipped).
+check: python tools/check.py public/assets/img/campus.svg"""
 import math
 import gen_campus
 from iso import C30

@@ -28,7 +28,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 You need the following:
 
 - Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
-- For the drawing tools only: Python 3.12. The site's checks, and CI, need only Node.
+- For the drawing tools only: Python 3.12 or later. The site's checks need only Node.
 
 ## Run the site locally
 
@@ -82,6 +82,12 @@ python -m playwright install chromium
 
 Python's Chromium is used only by `gen_og.py`, which screenshots the share picture.
 
+`requirements.txt` is locked: every package, the ones they need included, at one version with its hashes, so `pip` installs exactly what CI installs. You change `requirements.in` and then lock it again:
+
+```bash
+uv pip compile requirements.in --universal --python-version 3.12 --generate-hashes -o requirements.txt
+```
+
 ## Commands
 
 | Command | What it does |
@@ -108,7 +114,7 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | Path | What it holds |
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
-| `public/` | Files served as they are: the `_headers` template, the Speculation Rules (`speculation-rules.json`), fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
+| `public/` | Files served as they are: the `_headers` template, the Speculation Rules (`speculation-rules.json`), fonts, the drawings in `assets/img/`, `og.png`, and the favicon (both linked from `Base.astro`: `favicon.ico` for browsers without SVG icons, `favicon.svg` for the rest; `favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
 | `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `check-dist.mjs` is wrangler's build step (`build.command`): it refuses a `dist/` that `headers.mjs` didn't finish. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
@@ -130,7 +136,7 @@ Every service and project is in the page's HTML in full. Script only changes how
 
 ## Add a service
 
-1. Copy an existing file in `src/content/services/` and rename it `SLUG.json`. The slug becomes the page's address, `/services/SLUG`. The fields are typed in `src/content.config.ts`.
+1. Copy an existing file in `src/content/services/` and rename it `SLUG.json`. The slug becomes the page's address, `/services/SLUG`. The fields are typed in `src/content.config.ts`. A key it doesn't name, an `icon` missing from `src/components/icons.ts`, or an `image` without its drawings stops the build.
 2. Write the drawing's generator. Copy `tools/gen_voip.py` to `tools/gen_NAME.py` and change the scene. It writes `public/assets/img/NAME.svg`, the phone cut `NAME-compact.svg`, and the card cut `NAME-card.svg`. Set `image` in the JSON to `NAME`.
 3. Run the generator and its checks. See [Check a drawing](#check-a-drawing).
 4. Run `npm run build`.
@@ -145,15 +151,19 @@ The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/d
 
 ## Footer
 
-Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). On desktop, the footer is exactly one screen tall. It has three parts:
+Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). The footer is one `<nav aria-label="Footer">` holding six `<details name="footer">` sections: Contact, Services, Company, Support, Resources, and Follow. Each section's `<summary>` is its tile, and the rest is its panel. The browser opens one section at a time, so the footer works the same with or without script. Tab reaches each tile, and Enter or Space opens it.
 
-- **Stage:** the text for the selected section on the left, and a live campus map on the right.
-- **Dock:** a row of tiles: Contact, Services, Company, Support, Resources, and Follow. Use the arrow keys or the two key-cap buttons to switch tiles.
+On desktop, the footer is at least one screen tall. It has three parts:
+
+- **Stage:** the open section's panel on the left, and a live campus map on the right. One section is always open on tablet and desktop: `footer.js` opens Contact at load and again when a visitor shuts the one they picked. Without script, CSS shows Contact's panel while nothing is open.
+- **Tile row:** the six summaries.
 - **Base bar:** the brand, legal links, and status. Keyboard shortcuts live in the Settings dialog, which the header's gear opens.
 
-Below 700 px wide, the footer is six rows that open in place, with no map.
+On a tablet, the tile row comes first, then the map, then the panel. Below 700 px wide, the sections are six rows that open in place, with no map. A row grows open and shrinks shut where the browser can animate to `auto` (`interpolate-size`), and opens at once elsewhere and with reduced motion. The browser's own scroll anchoring keeps a tapped row in place while the one above it shuts.
 
-The lists come from `src/data/footer.json`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`. Each panel has a `data-map` value that names a spot on the map. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` fetches the map when the footer scrolls near. Without script, every panel shows in a stack and the tiles are hidden.
+The lists come from `src/data/footer.json`, checked by its schema in `src/lib/footer.ts`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`, and the layout is `src/styles/footer.css`: the summaries and panels are items of one grid (`.fc-deck`), so CSS alone places the tile row and the open panel. Each section has a `data-map` value that names a spot on the map. The map's label holds all six spots' words, and CSS shows the open section's. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` only fetches the map when the footer scrolls near, and flies its camera to the open section's spot on each `toggle` event. On tablet and desktop it keeps one section open (Contact unless another is picked); phones start with every row shut. It also checks the newsletter mockup.
+
+> **Note:** A browser that can't place a `<details>` panel (no `::details-content`: Firefox before 143, Safari before 18.4) shows the six rows on every screen, with no map. Without `<details name>` (Firefox before 130, Safari before 17.2), more than one row can be open at once. Firefox ESR 140 gets the rows; Safari and Chrome get the tiles. Only Chromium is tested here: check the footer on a real iPhone and in Firefox before a release.
 
 ## Drawing rules
 
@@ -188,12 +198,20 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | Tool | What it writes |
 | --- | --- |
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
-| `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
+| `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
 | `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
-A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.
+A generator that runs with nothing changed writes the same file, byte for byte, on any machine. A `git diff` shows only what you changed.
+
+To run every generator at once (all but `gen_og.py`, whose screenshots depend on the machine):
+
+```bash
+python tools/regen.py
+```
+
+CI's `drawings` job does the same on every pull request and push, and fails when `git diff` then shows any drawing: a hand edit, or a script changed without its output committed.
 
 **Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels. Its settings are `COMPACT` in each generator. Pages swap it in with `<picture>` where the drawing shows small: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`, which is the phone cut with its labels and their embedded letters removed (`isogen.card()`), at about half the size. On phones, the Home hero plays `office-compact-build.svg`. Its build starts part way, on the furnished room (`PHONE_AHEAD` in `gen_office.py`). With reduced motion, it stands still. Without script, phones show the same scene as a picture, `hero-office-phone.svg`.
 
@@ -205,7 +223,7 @@ When you change a drawing's labels or layout, check its phone cut too.
 | --- | --- |
 | `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `DESIGN.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
 | `iso.py` | The projection, `W(ox, oy, u)`. |
-| `isogen.py` | Writing a drawing: the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a subline wraps it), the card cut (`card()`), and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
+| `isogen.py` | Writing a drawing: boxes (`box()`, the one box writer, which can log each box to the generator's `BOXES`), the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a title or subline wraps it) and the floor gaps round their words (`label_text_gaps()`), the card cut (`card()`), `esc()` for any words written into a drawing, and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
 | `isoprops.py` | Shared props: office chair, monitor on a stand (with `screen_glass` and `app_window` for its screen), and VoIP desk phone. Also `on_front`, `on_side`, and `on_top`, which draw flat details exactly on a box face. Props sit on a grid (x and y in steps of 0.25, z in steps of 0.125) so their parts can never nearly touch. Keep the scene around them on the same grid. |
 | `hero_cloud.py` | The hero's cloud. |
 | `svgfont.py` | Embeds the Barlow letters a drawing uses. An SVG loaded with `<img>` can't see the page's fonts, so each drawing carries its own subset. The generators do this for you. The fonts are in `tools/fonts/` (SIL Open Font License). Needs `fonttools` and `brotli`. |
@@ -215,15 +233,20 @@ When you change a drawing's labels or layout, check its phone cut too.
 After you change a drawing, run both checks on it. Each exits with status 1 on any finding.
 
 - **`check.py FILE.svg`** finds edges that are near an isometric angle but not on it (`ANGLE`), vertices of different shapes that nearly meet (`SNAP`), and vertices that nearly touch another shape's edge (`TJOIN`). It also lists where each leader dot sits (`DOT`); those lines are for reading and don't fail the check. For an SVG inline in an HTML file, add the line range: `check.py FILE START_LINE END_LINE`.
-  - It skips leader lines in `.co` groups, `class="mark"` arrowheads, and `class="free"` parts tilted on purpose.
+  - It skips leader lines in `.co` groups and `class="mark"` parts (arrowheads, the map's routes), which cross the drawing on purpose, and the floor grid (`class="floor"` on a line or its group). `class="free"` parts, tilted on purpose, skip only `ANGLE`.
+  - A near-miss that a later opaque face covers can't be seen, so it isn't reported.
   - `<g class="curve">` holds a curved surface cut into flat strips, such as the side wall of the hero's cloud. Its strips aren't checked against each other.
   - `--step PX` counts vertex pairs exactly one grid step apart along an isometric axis, instead of listing them. Use it for drawings whose props sit on a grid finer than 2 px on screen. For the office: `--step 1.758` (0.0625 × 28.127).
 - A drawing's CSS, its own `<style>` or the site's, styles parts by class, never by tag: SVGO writes `<polygon>`, `<line>` and `<rect>` as `<path>` in the shipped file. `npm run build` stops on a drawing whose `<style>` breaks this rule.
-- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`, and its first lines give the exact command. For Grow:
+- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It also fails when it finds no boxes, or when the rules file resolves none of them, which usually means the origin or unit in the command is wrong. Each drawing has a `rules_NAME.py`. Its first lines give the exact commands for both checks, on every cut. For Grow:
 
   ```bash
   python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
+  python tools/check.py src/components/home/grow-world.svg
   ```
+
+- **Every check at once:** `python tools/regen.py --check` regenerates the drawings, then runs every command the rules files list. `--checks-only` skips the generators.
+- **The tools' own tests:** `python -m pytest tools/tests`. They cover the projection, the palette, `isogen`, `check.py` on small hand-made drawings, and depth order straight from each generator's `BOXES` (the check `painter.py` does on the SVG).
 
 ### Site checks
 
@@ -237,7 +260,7 @@ Each check fails, and exits with status 1, on any finding. Every check takes its
 
 | Command | What it checks |
 | --- | --- |
-| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). On Home: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall below the header, no panel overflow). The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440. On every page: script errors are watched until the network is idle and 3 seconds after (Home 5), while the screen turns and back, and while each of the page's own buttons is pressed; exactly one `h1`; every JSON-LD block parses; no sideways scroll at the footer, nor at 320, 390, 600, 768, 1024, and 1280 px wide; each pop-up the page opens shows, passes axe while open, closes on Esc, and gives focus back, and a toast leaves on its own; on Home at phone size the services row follows a swipe. All of it runs twice: as is and with the site's pause on, when on Home nothing may loop. The sideways check picks each Grow step by hand, so it doesn't wait on Grow's own timer. Plus an axe pass on each page, and checks of behaviour the November 7, 2026 review found broken (each test names its item): Grow asks for no frames and runs no loops once its story ends or while off screen, picks up a held or hidden step where it stopped, keeps your own pause, and pauses when reduced motion comes on; its Next button keeps keyboard focus at the last step; a double-click on a pop-up's opener leaves it open; each pop-up has its own live region and an "Esc" in its close button's name; the skip link moves focus to `<main>`; a toast dismissed with Enter gives focus back; with the drawings blocked, the hero shows the still office and no broken-image box shows; a late font moves nothing (CLS under 0.01 on Home at 1440 and the 404 at phone size); printed, Home and Contact show every Grow step, no form or button that opens a pop-up (cards that open one keep their words), a contact line, and no section a screen tall; and each drawing's `?v=` is the hash of the file served. Home runs at phone, tablet, 1440×900, and 3440×1440 (pop-ups and axe at phone and 1440, with a footer tab's panel at 1440), every other page at phone size, because Home is the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. A known bug that a later fix will close is marked as an expected failure (`KNOWN` in the spec, naming the review item); the test fails once the bug is gone, so the mark comes out with the fix. Screenshots go to `out/`. |
+| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). On Home: the hero builds, tiles respond to hover, the Grow section plays, and every footer tile works at 1440×900 (one screen tall below the header, no panel overflow, the map's label and camera on its spot; with none picked, or after one is shut, Contact is open and shows). The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440. On every page: script errors are watched until the network is idle and 3 seconds after (Home 5), while the screen turns and back, and while each of the page's own buttons is pressed; exactly one `h1`; every JSON-LD block parses; no sideways scroll at the footer, nor at 320, 390, 600, 768, 1024, and 1280 px wide; each pop-up the page opens shows, passes axe while open, closes on Esc, and gives focus back, and a toast leaves on its own; on Home at phone size the services row follows a swipe. All of it runs twice: as is and with the site's pause on, when on Home nothing may loop. The sideways check picks each Grow step by hand, so it doesn't wait on Grow's own timer. Plus an axe pass on each page, and checks of behaviour the November 7, 2026 review found broken (each test names its item): Grow asks for no frames and runs no loops once its story ends or while off screen, picks up a held or hidden step where it stopped, keeps your own pause, and pauses when reduced motion comes on; its Next button keeps keyboard focus at the last step; a double-click on a pop-up's opener leaves it open; each pop-up has its own live region and an "Esc" in its close button's name; the skip link moves focus to `<main>`; a toast dismissed with Enter gives focus back; with the drawings blocked, the hero shows the still office and no broken-image box shows; the footer works without script (one section open at a time), Tab reaches each of its summaries and Enter or Space opens one, focus inside it stays put through a resize from desktop to phone and a turn, it has one navigation landmark, and each summary reports its open state (on desktop the panel on screen is always the open one; on a phone every row starts shut); a late font moves nothing (CLS under 0.01 on Home at 1440 and the 404 at phone size); printed, Home and Contact show every Grow step, no footer, no form or button that opens a pop-up (cards that open one keep their words), a contact line, and no section a screen tall; and each drawing's `?v=` is the hash of the file served; no word in a heading or stat number breaks across lines (every page at 320, 768, 1060, 1440, and 2560, plus /services/security at 1024 to 1099 and /about at a 32 px default font); and Contact's queue ring keeps "1 day" on one line and its words inside the stroke from 1100 to 1920 wide, with WCAG text spacing too. Home runs at phone, tablet, 1440×900, and 3440×1440 (pop-ups and axe at phone and 1440, with a footer tile's panel at 1440), every other page at phone size, because Home is the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. A known bug that a later fix will close is marked as an expected failure (`KNOWN` in the spec, naming the review item); the test fails once the bug is gone, so the mark comes out with the fix. Screenshots go to `out/`. |
 | `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, the 404 page's included, and every `#section` link finds its id. It also rests the pointer on a link and checks that Chromium prefetches the page and uses the prefetch on the click, and that it doesn't prefetch `/api/` or `.md` links. CI runs it. `--external` also checks links to other sites. |
 | `npm run verify:spacing [-- PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
 | `npm run verify:styles -- BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
@@ -284,11 +307,12 @@ The Workers logs keep the Worker's own lines, one per report, for 3 days on the 
 
 GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
-- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), the link check (`npm run verify:links`), and the smoke check (`npm run smoke`) against the built site served by `wrangler dev`. It needs no Python. Playwright's Chromium is cached between runs, keyed on the `@playwright/test` version in `package-lock.json`.
+- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), the link check (`npm run verify:links`), and the smoke check (`npm run smoke`) against the built site served by `wrangler dev`. Playwright's Chromium is cached between runs, keyed on the `@playwright/test` version in `package-lock.json`.
+- Beside it, the `drawings` job installs the locked `requirements.txt` on Python 3.12, regenerates every drawing (`python tools/regen.py`) and fails if `git diff` then shows any, then runs the tools' tests and every drawing check (`python tools/regen.py --checks-only`). It runs alongside the build job, which takes longer, so it adds no time to a run. A failure there stops the deploy.
 - Every run also lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. Each pull request also gets a dependency review (`actions/dependency-review-action`), which fails on a new high-severity vulnerability. It runs only while the repository is public (it went public on November 7, 2026); on a private repository it needs GitHub Advanced Security.
 - Every step runs in `bash` with `pipefail`, and every job has a time limit (`timeout-minutes`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
-- A push to `main` that passes the build job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
+- A push to `main` that passes the build job, the drawings job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
 
@@ -336,6 +360,10 @@ Keep these rules in mind:
 ### Search engines
 
 The site is open to visitors but kept out of search results. `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
+
+The sitemap's `<lastmod>` dates and a case study's `datePublished` and `dateModified` come from git history (`src/lib/git-dates.mjs`). A static page dates from the files listed in `SOURCES` in `src/lib/site.ts`. A service or project page dates from its own JSON file only, so editing one project changes one page's date.
+
+> **Note:** A shallow clone (`git clone --depth N`) would give every page the cut-off commit's date. With `CI` set, the build stops on one. Elsewhere it warns once and leaves the dates out. Run `git fetch --unshallow` to put them back. CI checks out with `fetch-depth: 0`.
 
 ### Password lock
 

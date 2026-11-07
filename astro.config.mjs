@@ -1,5 +1,8 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import { satteri } from '@astrojs/markdown-satteri';
+import { placeholders } from './src/lib/placeholders.mjs';
+import { PLACEHOLDERS } from './src/lib/footer.ts';
 
 // The live address: the Worker's workers.dev name until it has a domain. Set the real domain here (or SITE_URL
 // in the environment) at launch. It goes into canonicals, Open Graph, the sitemap, llms.txt and JSON-LD.
@@ -17,4 +20,7 @@ export default defineConfig({
   // Astro 7's default ('jsx') drops the space between inline tags on separate lines, e.g. the hero title's
   // "<span>Your IT team,</span> <em>always online</em>". true keeps whitespace as written.
   compressHTML: true,
+  // Astro's own Markdown processor, plus the plugin that fills {phone}, {privacy} … in src/data/*.md from
+  // footer.json (src/lib/placeholders.mjs). Restart `npm run dev` after changing footer.json to see it there.
+  markdown: { processor: satteri({ mdastPlugins: [placeholders(PLACEHOLDERS)] }) },
 });

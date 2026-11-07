@@ -4,7 +4,7 @@
 import { getCollection } from 'astro:content';
 import { byOrder } from '../../content.config';
 import Icon from '../Icon.astro';
-import { phone } from '../../data/footer.json';
+import { phone } from '../../lib/footer';
 const faq = (await getCollection('faq')).sort(byOrder);
 ---
 <section class="section fold fold-always" id="faq" aria-labelledby="faq-title">

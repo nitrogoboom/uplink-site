@@ -9,6 +9,7 @@ import Icon from '../../components/Icon.astro';
 import ProjectCard from '../../components/work/ProjectCard.astro';
 import '../../components/services/service-page.css';
 import { PAGES, getServices, getProjects, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
+import { fit } from '../../lib/fit';
 
 export async function getStaticPaths() {
   const services = await getServices();
@@ -51,7 +52,7 @@ const ld = {
     <div class="container split">
       <div class="section-head">
         <p class="eyebrow">How it works</p>
-        <h2 id="how-title">{s.page.heading}</h2>
+        <h2 id="how-title" class={fit(s.page.heading)}>{s.page.heading}</h2>
       </div>
       <div class="stack-5 detail-body">
         <div class="prose">{s.page.body.map((t) => <p>{t}</p>)}</div>
@@ -62,7 +63,7 @@ const ld = {
     <div class="container split">
       <div class="section-head">
         <p class="eyebrow">Questions</p>
-        <h2 id="questions-title">Questions about {s.title}</h2>
+        <h2 id="questions-title" class={fit(`Questions about ${s.title}`)}>Questions about {s.title}</h2>
       </div>
       <div class="faq">
         {s.page.faq.map((f) => (

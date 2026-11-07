@@ -352,10 +352,10 @@ async function forms(paths) {
       await pg.waitForTimeout(500);
     }
     const form = pg.locator(sel);
-    // a form in a footer tab that isn't showing: pick that tab first, as a visitor would
+    // a form in a footer section that isn't open: open it first, as a visitor would
     await form.evaluate((f) => {
-      const p = f.closest('[role=tabpanel]');
-      if ((p && p.hidden !== false) || (p && !p.offsetParent)) document.querySelector(`[aria-controls="${p.id}"]`)?.click();
+      const d = f.closest('details');
+      if (d && !d.open) d.querySelector('summary').click();
     });
     await pg.waitForTimeout(600);
     const key = await form.evaluate((f) => f.id || f.getAttribute('aria-label') || f.querySelector('[type=submit]')?.textContent.trim());

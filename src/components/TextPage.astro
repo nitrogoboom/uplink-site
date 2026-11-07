@@ -1,10 +1,12 @@
 ---
 // A page that is mostly reading: privacy, accessibility. The words are Markdown in src/data/ (one file per page),
-// so they're edited as text. Contact details in them are placeholders, filled here from src/data/footer.json, so a
-// changed phone number or inbox changes everywhere at once:
-//   {privacy} {accessibility}   the inboxes (footer.json inboxes)
+// so they're edited as text. Contact details in them are placeholders, filled from src/data/footer.json while the
+// Markdown is rendered (src/lib/placeholders.mjs, a plugin in astro.config.mjs), so a changed phone number or inbox
+// changes everywhere at once and every value is escaped as text:
+//   {privacy} {accessibility}   the inboxes (footer.json inboxes); {email} the general one
 //   {phone} {tel}               the phone number as shown, and as dialled
 //   {street} {city} {hours}     the office and the help desk's hours
+// A placeholder still in the page (one in raw HTML, which the plugin doesn't read), as {name} or %7Bname%7D, stops the build.
 // <!-- comments --> in the Markdown stay out of the page's text (the privacy page marks what applies once the forms send).
 // Styles: text-page.css. Title and description: PAGES in src/lib/site.ts.
 //   md        the Markdown module (import * as md from '../data/x.md')
@@ -12,31 +14,29 @@
 //   lead      one sentence under the heading
 import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
-import f from '../data/footer.json';
+import { PLACEHOLDER } from '../lib/placeholders.mjs';
+import { fit } from '../lib/fit';
 import './text-page.css';
 interface Props { page: 'privacy' | 'accessibility'; md: { compiledContent: () => string | Promise<string> }; eyebrow: string; lead: string }
 const { page, md, eyebrow, lead } = Astro.props;
 const meta = PAGES[page];
-const fill: Record<string, string> = {
-  privacy: f.inboxes.privacy, accessibility: f.inboxes.accessibility, phone: f.phone.display,
-  tel: f.phone.href.replace(/^tel:/, ''), street: f.office.street, city: f.office.city, hours: `${f.hours.line}, ${f.hours.days}`,
-};
-// Markdown writes a placeholder inside a link's address as %7Bname%7D: fill both spellings
-const body = (await md.compiledContent()).replace(/(?:\{|%7B)([a-z]+)(?:\}|%7D)/gi, (all, key) => fill[key] ?? all);
-const unfilled = body.match(/\{[a-z]+\}/i);
-if (unfilled) throw new Error(`${meta.path}: no value for the placeholder ${unfilled[0]} (TextPage.astro)`);
+const body = await md.compiledContent();
+const unfilled = body.match(new RegExp(PLACEHOLDER.source, 'i'));
+if (unfilled) throw new Error(`${meta.path}: the placeholder ${unfilled[0]} was not filled (TextPage.astro)`);
+// a Markdown heading with a long word shrinks to fit its column, as the components' headings do (lib/fit.js)
+const html = body.replace(/<h2(\s[^>]*)?>([\s\S]*?)<\/h2>/g, (all, attrs = '', text) => (fit(text) ? `<h2 class="fit"${attrs}>${text}</h2>` : all));
 ---
 <Base title={meta.title} description={meta.description} page={page} path={meta.path}>
   <section class="page-intro" aria-labelledby={`${page}-title`}>
     <div class="container">
       <p class="eyebrow">{eyebrow}</p>
-      <h1 id={`${page}-title`}>{meta.name}</h1>
+      <h1 id={`${page}-title`} class={fit(meta.name)}>{meta.name}</h1>
       <p class="lead">{lead}</p>
     </div>
   </section>
   <section class="section text-page">
     <div class="container">
-      <div class="prose" set:html={body} />
+      <div class="prose" set:html={html} />
     </div>
   </section>
 </Base>

@@ -7,7 +7,7 @@ import sys
 from shapely.geometry import box as box_shape
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, key_group
+from isogen import FACES, HIGH, ORANGE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, key_group, esc
 import palette as pal
 
 w = W(43.3, 115, 20)                  # inside the group's translate(267.3,170.5)
@@ -93,12 +93,12 @@ def milestones(compact=False):
             q, word = txt.split(' ', 1)
             base = Y - TEXT_RISE * k
             texts.append(key_group(txt) + f'<text class="lt" x="{fmt(X)}" y="{fmt(base - 18 * k)}" font-size="{13 * k:.3g}" font-weight="600" '
-                         f'letter-spacing="{0.78 * k:.3g}" fill="{ORANGE}" text-anchor="middle">{q}</text>'
+                         f'letter-spacing="{0.78 * k:.3g}" fill="{ORANGE}" text-anchor="middle">{esc(q)}</text>'
                          f'<text class="lt" x="{fmt(X)}" y="{fmt(base)}" font-size="{11 * k:.3g}" font-weight="600" letter-spacing="{0.66 * k:.3g}" '
-                         f'fill="{WHITE}" text-anchor="middle">{word}</text>' + '</g>')
+                         f'fill="{WHITE}" text-anchor="middle">{esc(word)}</text>' + '</g>')
             continue
         texts.append(key_group(txt) + f'<text class="lt" x="{fmt(X)}" y="{fmt(Y - TEXT_RISE)}" font-size="11" font-weight="600" letter-spacing="0.66" '
-                     f'fill="{WHITE}" text-anchor="middle">{txt}</text>' + '</g>')
+                     f'fill="{WHITE}" text-anchor="middle">{esc(txt)}</text>' + '</g>')
     return dots + texts
 
 

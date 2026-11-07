@@ -39,7 +39,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
-The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list.
+The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
 
 A page adds its own script inside `<Base>`, like this:
 
@@ -56,14 +56,14 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | Component | What it is |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
-| `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` and the services collection. |
+| `Footer.astro` | The footer: one `<nav aria-label="Footer">` of six `<details name="footer">` sections (the summary is the tile, the rest its panel), the campus map, and the base bar, from `data/footer.json` (through `lib/footer.ts`) and the services collection. CSS lays it out (`styles/footer.css`). |
 | `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
-| `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
+| `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
 | `Pause.astro` | A pause for screen readers between two parts of one link, so the title doesn't run into the next words. Nothing shows on screen. |
 | `Sep.astro` | The " · " between two short phrases. Screen readers hear a comma instead of "dot". |
-| `Icon.astro` | Every inline icon, by name. Add new icons here. |
+| `Icon.astro`, `icons.ts` | Every inline icon, by name. Add new icons to `ICONS` in `icons.ts`; the content schemas accept only those names. |
 
 ### Section components
 
@@ -73,15 +73,16 @@ Section components live in `components/PAGE/`. Each section's CSS sits beside it
 
 ## Content
 
-The content types are defined in `content.config.ts`.
+The content types are defined in `content.config.ts`, and `footer.json`'s in `lib/footer.ts`. Every object is strict: a key the schema doesn't name stops the build, as do an `icon` that isn't in `components/icons.ts` and an `image` whose drawings aren't in `public/assets/img/`. Import the footer data from `lib/footer.ts`, never from the JSON.
 
 | File | What it holds |
 | --- | --- |
 | `content/services/SLUG.json` | One service. The slug is its address. Fields: `order`, `title`, `chip`, `tag`, `icon`, `image` (the drawing's name in `public/assets/img/`), `alt`, `lead`, `card`, `features` (three), `bestFor`, and `page`, which is the longer copy only the service's own page shows. Optional: `featured`, `footerLabel`, and `optionLabel`. |
 | `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
-| `data/faq.json`, `data/team.json`, `data/footer.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
-| `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json`. Don't type an email address or phone number into them. |
-| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, and on Home also `{services}` and `{grow}`. |
+| `data/faq.json`, `data/team.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
+| `data/footer.json` | The footer's lists, the contact details, and the map's spots. `lib/footer.ts` checks it against its schema and exports it typed. A heading with an emphasized word is `title` plus `accent` ("Reach" + "us"); the JSON holds no HTML. |
+| `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json` (`PLACEHOLDERS` in `lib/footer.ts`) by a Markdown plugin (`lib/placeholders.mjs`), so each value is escaped as text. A name with no value stops the build. Don't type an email address or phone number into them. |
+| `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, the contact placeholders (`{phone}`, `{email}`, `{street}` …, as in the privacy page), and on Home also `{services}` and `{grow}`. Type no contact details into them. |
 
 Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
 
@@ -98,6 +99,8 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 Each section's desktop layout sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules.
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
+
+Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`, where `cqi` is 1% of the nearest container's width. A heading whose longest word has 10 letters or more ("Cybersecurity", "Everything") carries the class `fit`, which components add at build time with `fit(text)` from `lib/fit.js` (`TextPage.astro` adds it to the Markdown's `h2`s): its `--fit` is `--fit-long` (14cqi), so a 13-letter word fits on one line. Every other heading gets `--fit-short` (21cqi), which keeps its size step except with big text in a narrow column; `fit(text)` gives a heading whose words all have 6 letters or fewer the class `fit-loose` (30cqi). `h3` follows the same rule. A heading's container must be its own column: the project page's title has a box of its own (`.case-title`), and Contact's form heading measures `.form-head`. A process step puts its title under the number when the step is narrower than 12rem. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing.
 
 ### Breakpoints
 
@@ -122,7 +125,7 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | Script | Where it runs | What it does |
 | --- | --- | --- |
 | `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
-| `footer.js` | Every page, from `Base.astro` | The footer's tiles and panels, and the campus map, which it fetches when the footer scrolls near. Does nothing on a page without the footer (the 404). |
+| `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `work.js` | Our work | The project filters. |

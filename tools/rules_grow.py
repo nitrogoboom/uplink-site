@@ -1,6 +1,7 @@
 """painter.py rules for the Grow drawings (gen_grow.py): each box's base height, looked up by its left face.
 The drawing comes from the file name (grow-world.svg is the world; the mockups' scenes go by their own names).
-usage: python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py"""
+usage: python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
+check: python tools/check.py src/components/home/grow-world.svg"""
 import pathlib, sys
 import gen_grow
 from iso import C30

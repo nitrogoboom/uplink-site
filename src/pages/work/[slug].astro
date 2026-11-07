@@ -5,7 +5,8 @@
 import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
-import { PAGES, breadcrumbs, businessNode, created, jsonLd, lastmod } from '../../lib/site';
+import { PAGES, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
+import { created, entryFile, lastmod } from '../../lib/git-dates.mjs';
 import '../../components/work/project-page.css';
 
 export async function getStaticPaths() {
@@ -18,7 +19,8 @@ const url = new URL(`/work/${id}`, Astro.site).href;
 const description = `${p.client}. ${p.result}.`;   // as the sitemap list and llms.txt say it (allPages in src/lib/site.ts)
 const services = await getEntries(p.services);
 const business = { '@id': `${Astro.site!.href}#business` };
-const source = `src/content/projects/${id}.json`;   // the case study's dates: when its entry was added and last changed
+// the case study's dates: when its entry was added and last changed (its sitemap <lastmod> is the same date)
+const source = entryFile('projects', id);
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [

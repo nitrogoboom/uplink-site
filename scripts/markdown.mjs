@@ -2,8 +2,9 @@
 // dist/services.md, dist/services/backup.html → dist/services/backup.md. AI agents read these instead of the HTML;
 // each page links to its copy with <link rel="alternate" type="text/markdown"> (Base.astro), and llms.txt lists them.
 // Only <main> is converted, so the header, footer and pop-ups stay out. Left out as well: drawings, buttons, chips,
-// eyebrows, breadcrumbs and anything aria-hidden. Kept: headings, prose, lists, the facts lists, the FAQ (question in bold,
-// answer under it). Links become full addresses.
+// eyebrows, breadcrumbs and anything aria-hidden. Kept: headings (a .sr-only one too), prose, lists, the facts lists (with
+// their links), the FAQ (question in bold, answer under it), and a hidden separator such as About's "name, role".
+// Links become full addresses.
 // Home is skipped: its Markdown is written by hand (src/data/index.md, served by src/pages/index.md.ts).
 // 404 and soon are skipped: they are not pages anyone should cite.
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
@@ -56,10 +57,10 @@ const md = (site, page) => {
     replacement: (_, node) => `\n\n## ${text(all(node, 'h2')[0]) || 'Form'}\n\nUse the form on the page: ${page}#${node.closest('[id]')?.id || ''}\n\n`,
   });
   td.addRule('summary', { filter: 'summary', replacement: (content) => `\n\n**${content.trim()}**\n\n` });
-  td.addRule('facts', {   // <dl class="facts">: one "Label: value" line each
+  td.addRule('facts', {   // <dl class="facts">: one "Label: value" line each; the value keeps its links
     filter: (node) => node.nodeName === 'DL',
     replacement: (_, node) => '\n\n' + all(node, 'div')
-      .map((row) => `- ${text(all(row, 'dt')[0])}: ${text(all(row, 'dd')[0])}`).join('\n') + '\n\n',
+      .map((row) => `- ${text(all(row, 'dt')[0])}: ${td.turndown(all(row, 'dd')[0]?.innerHTML || '').replace(/\s+/g, ' ').trim()}`).join('\n') + '\n\n',
   });
   td.addRule('table', {
     filter: 'table',

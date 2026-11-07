@@ -7,7 +7,7 @@
    Files (each page script imports core.js, so core always runs first):
      core.js      every page   helpers, toasts, pop-ups, forms, shortcuts, tab bar;
                                exports the helpers the page scripts import
-     footer.js    every page   footer roster + campus map
+     footer.js    every page   footer campus map (the sections are <details>)
      home.js      Home         hero, phone Services row; grow.js (We grow with you)
      work.js      Our work     filters
      contact.js   Contact      copy buttons, queue card

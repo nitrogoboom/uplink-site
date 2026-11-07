@@ -9,7 +9,7 @@ import sys
 from shapely.geometry import LineString, Polygon, box as box_shape
 from shapely.ops import unary_union
 from iso import W, C30, fmt
-from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, key_group, label_text_gaps
+from isogen import FACES, HIGH, ORANGE, BLUE, faces, label, doc, write, silhouette, floor_grid, disc_arcs, key_group, label_text_gaps, esc
 from isoprops import on_front, on_top, rect, screen_glass, app_window
 import palette as pal
 
@@ -204,7 +204,7 @@ def card(plat):
     for n, row in enumerate(CARD_ROWS):
         y = CARD['top'] + 37 + n * 19.6
         out.append(f'<g class="lt"><circle cx="{fmt(left + 16.5)}" cy="{fmt(y)}" r="3.6" fill="{pal.GREEN}"/><text x="{fmt(left + 24.5)}" y="{fmt(y + 5.1)}" '
-                   f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{row}</text></g>')
+                   f'font-size="14" font-weight="600" letter-spacing="0.06em" fill="{pal.WHITE}">{esc(row)}</text></g>')
     out.append('</g>')
     return out
 

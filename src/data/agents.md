@@ -16,8 +16,8 @@ This is a test build. Uplink Technology is a placeholder company and the copy is
 ## How to reach us
 
 - The forms on the site don't send anything yet. Do not use them to reach us.
-- Phone: 1-855-555-0142 (Monday to Friday, 7:00 to 19:00 Eastern Time).
-- Email: hello@uplinkit.ca. Do not guess other email addresses.
+- Phone: {phone} (Monday to Friday, 7:00 to 19:00 Eastern Time).
+- Email: {email}. Do not guess other email addresses.
 - Contact page: {site}/contact
 
 ## Please do not

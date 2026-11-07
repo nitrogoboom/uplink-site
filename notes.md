@@ -20,7 +20,7 @@ Design, nice to have:
 Rule from now on:
 - [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
 
-## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
+## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
 - [ ] GitHub environments (made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`.
 - [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
@@ -43,7 +43,7 @@ Rule from now on:
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
 - [ ] Open PR #76 (clean up old pull request previews on Cloudflare every 3 days): its build passed; it waits for the owner's merge, then a one-preview delete test.
-- [ ] Small, left as they are: `box()` is defined five times (`gen_campus.py`, `gen_grow.py`, `gen_hq.py`, `gen_office.py`, `iso.py`), each a little different (review C11); `ServiceCard`'s `on`/`first`/`heading` props have one caller.
+- [ ] Small, left as they are: `gen_campus.py` keeps its own `box()` (class-only faces that `footer.css` colours; every other generator draws through `isogen.box()`, review C11, November 7, 2026); `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
 - [ ] Real Safari: Playwright's WebKit (27.2) refuses a style of its own for every `<select>` under our CSP (one each, even on a bare page with nothing of ours; Chromium doesn't), so twice a page from the booking dialog's dropdowns. The release audit expects that many and the Worker drops that report (November 6, 2026). Open: look at Safari's console on a Mac (Develop menu) for "Refused to apply a stylesheet"; if it's there too, report it to WebKit (bugs.webkit.org).
 
@@ -60,7 +60,7 @@ Rule from now on:
 - [ ] 404 page: a three-panel heist comic, draft in `editing-room/404-comic/` (branch `404-comic-draft`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
 
 ## Look and feel
-- [ ] Footer on phones (live 5 Nov 2026, PR #73; rows ease open and shut since 6 Nov 2026, `--dur-fc-row-open`/`-shut`, `--ease-soft`): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android, including a row shutting while the page is still scrolling (iOS momentum).
+- [ ] Footer on `<details name="footer">` (layout plan phase 5, November 7, 2026): six rows under 700 px, tiles above. Rows ease open and shut with `::details-content` and `interpolate-size` (Chrome only; at once elsewhere), and the browser's own scroll anchoring holds a tapped row still. Open: try it on a real iPhone (Safari 18.4+ should get the tiles on an iPad or Mac) and Android, including a row shutting while the page is still scrolling (iOS momentum), and in Firefox ESR 140 (rows on every screen, no map).
 - [ ] Sideways scroll with text at 200% (found 6 Nov 2026, also on the build before that day's changes): Firefox at 390 wide, Home's services row (`.svc-big`) makes the page 458px wide; Edge at 320 wide, the Grow stage (`.grow-stage`) ends at 328px (8px). The text check (`verify:text`, retired with the Settings text size on November 7, 2026) ran Chromium only and not at 320, so it missed both. Check both again at 200% zoom with the zoom check (layout plan, phase 4).
 - [ ] Project cards on phones (6 Nov 2026): rows, option A from `editing-room/work-phone/` (`.card--project` in `surfaces.css`, `ProjectCard.astro`). Home's "Setups we built and still run" now fits one screen; five of the Work page's six per screen. Open: a look on a real iPhone and Android.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).

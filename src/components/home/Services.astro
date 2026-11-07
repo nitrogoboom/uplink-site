@@ -2,11 +2,13 @@
 // HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, then SLOTS short tiles;
 // the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
 // swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it. Styles: services.css (imported here). Desktop layout: at the end of its CSS.
-import Icon, { type IconName } from '../Icon.astro';
+import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
 import './services.css';
 import { getServices } from '../../lib/site';
+import { fit } from '../../lib/fit';
 const SLOTS = 4;
+const TITLE = 'Everything your office runs on';
 const services = await getServices();
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
@@ -22,7 +24,7 @@ const tiles = [
     <div class="section-head section-head--split">
       <div>
         <p class="eyebrow">What we run</p>
-        <h2 id="services-title">Everything your office runs on</h2>
+        <h2 id="services-title" class={fit(TITLE)}>{TITLE}</h2>
       </div>
       <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
     </div>
@@ -30,7 +32,7 @@ const tiles = [
       {tiles.map(({ id, size, data: s }) => (
         <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
           <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
-          <span class="svc-icon"><Icon name={s.icon as IconName} /></span>
+          <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"><span class="chip" aria-hidden="true">{s.chip}</span><span class="svc-title">{s.title}</span><Pause /><span class="svc-line">{s.card}</span></span>
           <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
         </a></li>

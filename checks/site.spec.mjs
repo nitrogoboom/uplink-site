@@ -1,35 +1,38 @@
 // The browser check against the built site (npm run verify; CI runs it on every push and pull request before deploy).
-// Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer tabs, the per-page checks at every size,
+// Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer tiles, the per-page checks at every size,
 // and an axe pass at phone and desktop. Every other page (every page the build wrote: lib.mjs pages) gets the
 // per-page checks at phone size and an axe pass. --all gives every page the full treatment. On every page, at
 // every size it runs at:
 //   script errors   watched until the network is idle and a few seconds after (3 s; Home 5 s, for the hero's
 //                   captions), then while the screen turns (portrait to landscape and back) and while each of the
-//                   page's own buttons is pressed (pause, Grow, filters, footer tabs, copy buttons)
+//                   page's own buttons is pressed (pause, Grow, filters, copy buttons)
 //   markup          exactly one <h1>; every JSON-LD block parses
 //   sideways scroll scrolled to its footer (the 404 page has none: Base.astro footer={false}, so to its end); and
 //                   separately at 320, 390, 600, 768, 1024 and 1280 wide, walked down a screen at a time
 //   pop-ups         each dialog a [data-open] link or button on the page opens: it shows (opacity 1, a real size),
 //                   axe passes with it open, Esc closes it and focus goes back; a toast shows and leaves on its own;
-//                   on desktop a footer tab's panel shows. All of it once more with the site's pause on (html.is-held,
-//                   saved as uplink-held), which must never hide a pop-up (review B1)
-// Fails on any of those, a hero tile that doesn't answer hover, a Grow section that doesn't play, a footer tab at
-// 1440x900 that isn't one screen tall or whose panel overflows, a header whose tabs come within 8px of the logo or
+//                   on desktop the panel a footer tile opens shows. All of it once more with the site's pause on
+//                   (html.is-held, saved as uplink-held), which must never hide a pop-up (review B1)
+// Fails on any of those, a hero tile that doesn't answer hover, a Grow section that doesn't play, a footer tile at
+// 1440x900 that isn't one screen tall, whose panel overflows or whose map spot doesn't show, keys that don't reach and
+// open the footer's sections, a header whose tabs come within 8px of the logo or
 // buttons (or scroll) at any width from 320 to 1440 in 10px steps and on wider screens,
 // anything serious or critical from axe, or a sitemap that doesn't list exactly the built pages.
 // Known failures are marked test.fail with the review item that fixes them (KNOWN, below): such a test fails the run
 // once the bug is fixed, as a reminder to drop the mark.
 // At the end, one test for each bug the November 7, 2026 review found and batch 2b fixed, named by its item (B2 …), so
 // it can't come back unseen: Grow's timing and frames, pop-ups and focus, forms, drawings that fail to load, the font
-// swap, print, and the drawings' ?v= addresses.
+// swap, print, and the drawings' ?v= addresses. And one for the footer on <details> (J7, B14, L7, M11): without
+// script, from the keyboard, through a resize and a turn, its landmarks and what a screen reader is told.
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
-// Screenshots go to out/ (--out): the footer tabs at 1440, and Home and /soon at each size.
+// Screenshots go to out/ (--out): the footer tiles at 1440, and Home and /soon at each size.
 import { createHash } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { BASE, MISSING, ROOT, SIZES, flag, option, pad, pages, verdict, watch } from './lib.mjs';
+import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
+import { LONG, longest } from '../src/lib/fit.js';
 
 const ALL = flag('--all');
 const OUT = join(ROOT, option('--out', 'out'));
@@ -39,7 +42,7 @@ const url = (page) => `${BASE}/${page === 'index' ? '' : page}`;
 const FOCUS = new Set(['index']); // pages checked in full; the rest get the quick look unless --all
 const full = (page) => ALL || FOCUS.has(page);
 
-test('index 1440: hero, Grow, footer tabs', async ({ browser }) => {
+test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   const fails = [];
   const errs = [];
   const rep = [];
@@ -81,34 +84,52 @@ test('index 1440: hero, Grow, footer tabs', async ({ browser }) => {
   await pg.waitForTimeout(400);
   // the map is fetched as the footer comes near (footer.js): wait for it, as a slow CI machine can take over a second
   await pg.waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 }).catch(() => fails.push('footer: the campus map never loaded'));
-  const tabs = await pg.$$eval('.fc-tile', (t) => t.map((x) => x.id));
-  if (!tabs.length) fails.push('footer: no tabs (.fc-tile) found');
-  for (const [i, t] of tabs.entries()) {
-    await pg.locator('#' + t).click();
+  // each tile (a <details>' summary, Footer.astro) opens its section: one screen tall, its panel above the tile row
+  // and not cut off, and the map's label and camera move to its spot
+  const fcTiles = pg.locator('.fc-tile');
+  const n = await fcTiles.count();
+  if (n !== 6) fails.push(`footer: ${n} tiles (.fc-tile), not 6`);
+  const seen = { hud: new Set(), vb: new Set() };
+  for (let i = 0; i < n; i++) {
+    await fcTiles.nth(i).click();
     await pg.waitForTimeout(850);
     const info = await pg.evaluate(() => {
       const f = document.getElementById('footer');
-      const p = document.querySelector('.fc-panel.is-on');
-      const s = document.querySelector('.fc-panels');
+      const open = [...document.querySelectorAll('.fc-sec[open]')];
+      const p = open[0]?.querySelector('.fc-panel');
+      const r = p ? p.getBoundingClientRect() : null;
+      const hud = [...document.querySelectorAll('.fc-hud-l')].filter((e) => e.getClientRects().length);
       return {
         h: f.offsetHeight,
         fold: innerHeight - document.querySelector('.site-header').offsetHeight,
-        panel: p.id,
-        map: p.dataset.map,
-        over: s.scrollHeight - s.clientHeight,
-        hud: document.querySelector('.fc-hud b').textContent,
-        vb: document.querySelector('svg.fc-w').getAttribute('viewBox'),
+        open: open.map((d) => d.id),
+        map: open[0]?.dataset.map,
+        panelH: r ? Math.round(r.height) : 0,
+        over: p ? Math.max(p.scrollHeight - p.clientHeight, Math.ceil(r.bottom - document.querySelector('.fc-tile').getBoundingClientRect().top)) : 0,
+        hud: hud.map((e) => e.querySelector('b').textContent).join(' | '),
+        vb: document.querySelector('svg.fc-w')?.getAttribute('viewBox'),
       };
     });
-    rep.push(`tab ${t}: ${JSON.stringify(info)}`);
+    rep.push(`tile ${i}: ${JSON.stringify(info)}`);
+    if (info.open.length !== 1 || info.panelH < 50) fails.push(`footer tile ${i} at 1440: open ${JSON.stringify(info.open)}, panel ${info.panelH}px tall`);
     if (Math.abs(info.h - info.fold) > 1)
-      fails.push(`footer tab ${t} at 1440: ${info.h}px tall, the screen below the header is ${info.fold}px`);
-    if (info.over > 0) fails.push(`footer tab ${t} at 1440: panel overflows by ${info.over}px`);
+      fails.push(`footer tile ${i} at 1440: ${info.h}px tall, the screen below the header is ${info.fold}px`);
+    if (info.over > 0) fails.push(`footer tile ${i} at 1440: panel overflows by ${info.over}px`);
+    seen.hud.add(info.hud);
+    seen.vb.add(info.vb);
     await pg.screenshot({ path: join(OUT, `f-1440-${i}.png`) });
   }
-  await pg.keyboard.press('ArrowRight');
-  await pg.waitForTimeout(300);
-  rep.push('arrow key -> ' + (await pg.evaluate(() => document.activeElement.id + ' / ' + document.querySelector('.fc-panel.is-on').id)));
+  if (seen.hud.size !== n || [...seen.hud].some((h) => !h || h.includes('|'))) fails.push(`footer: the map's label didn't name one spot per section: ${[...seen.hud].join(' / ')}`);
+  if (seen.vb.size !== n) fails.push(`footer: the map's camera didn't move to each section's spot (${seen.vb.size} views for ${n} sections)`);
+  // shut the open one: Contact opens again (footer.js), shows, and its tile looks picked
+  await fcTiles.nth(n - 1).click();
+  await pg.waitForTimeout(500);
+  const none = await pg.evaluate(() => {
+    const p = document.querySelector('.fc-sec:first-of-type .fc-panel');
+    return { open: [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id), contact: p.getBoundingClientRect().height, tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth };
+  });
+  rep.push(`after shutting the open section: ${JSON.stringify(none)}`);
+  if (none.open.join() !== 'fc-contact' || none.contact < 50 || none.tile !== '2px') fails.push(`footer after shutting the open section doesn't show Contact, open and picked: ${JSON.stringify(none)}`);
   await pg.close();
   console.log(rep.join('\n'));
   verdict([...fails, ...errs]);
@@ -178,22 +199,22 @@ for (const page of PAGES) {
       await q.waitForTimeout(500);
       const r = await q.evaluate(() => {
         const f = document.getElementById('footer');
-        const s = document.querySelector('.fc-panels');
         if (!f) return [document.documentElement.scrollWidth - innerWidth, 'none', '-', '-'];
-        return [document.documentElement.scrollWidth - innerWidth, f.offsetHeight, s.scrollHeight - s.clientHeight, f.classList.contains('fc-js')];
+        const s = [...f.querySelectorAll('.fc-panel')].find((p) => p.getClientRects().length);
+        return [document.documentElement.scrollWidth - innerWidth, f.offsetHeight, s ? s.scrollHeight - s.clientHeight : '-', f.querySelectorAll('.fc-sec[open]').length];
       });
       if (page === 'soon' || page === 'index') await q.screenshot({ path: join(OUT, `f-${page}-${n}.png`) });
       if (r[0] > 0) fails.push(`${page} ${n}: ${r[0]}px sideways scroll`);
       if (!footer && r[1] !== 'none') fails.push(`${page} ${n}: has a footer (the 404 has none)`);
-      // turn the screen and back (resize and orientation handlers), then press each of the page's own buttons once
-      // (not the pop-up openers, which the pop-up check opens, nor a form's Send): any script error counts
+      // turn the screen and back (resize and orientation handlers), then press each of the page's own buttons and
+      // summaries once (not the pop-up openers, which the pop-up check opens, nor a form's Send): any script error counts
       await q.setViewportSize({ width: h, height: w });
       await q.waitForTimeout(600);
       await q.setViewportSize({ width: w, height: h });
       await q.waitForTimeout(600);
       const controls = await q.evaluate(() => {
         const shown = (e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
-        const all = [...document.querySelectorAll('button:not([data-open]):not([type="submit"]):not(:disabled)')].filter((b) => !b.closest('dialog, form') && shown(b));
+        const all = [...document.querySelectorAll('button:not([data-open]):not([type="submit"]):not(:disabled), summary')].filter((b) => !b.closest('dialog, form') && shown(b));
         all.forEach((b, i) => b.setAttribute('data-check-ctl', String(i)));
         return all.length;
       });
@@ -204,7 +225,7 @@ for (const page of PAGES) {
       await q.keyboard.press('Escape');
       await q.waitForTimeout(1000);
       await q.close();
-      console.log(`${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} js ${r[3]} h1 ${m.h1} ld ${m.ld.length} controls ${controls}`);
+      console.log(`${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} open ${r[3]} h1 ${m.h1} ld ${m.ld.length} controls ${controls}`);
       verdict([...fails, ...errs]);
     });
   }
@@ -356,14 +377,14 @@ for (const page of PAGES) {
             if (running.length) fails.push(`${name}: ${running.length} loop(s) still running with the pause on at ${sel}: ${[...new Set(running)].join(', ')}`);
           }
         }
-        // desktop footer tabs: the panel a tab opens shows (the 404 page has no footer)
+        // desktop footer tiles: the panel a tile opens shows (the 404 page has no footer)
         if (w >= 700 && page !== MISSING) {
           await q.$eval('#footer', (e) => e.scrollIntoView());
           await q.locator('.fc-tile').nth(1).click();
-          await settled(q, '.fc-panel.is-on'); // its animation is 360ms (--dur-fc-panel)
-          const p = await q.evaluate(shownStyle, '.fc-panel.is-on');
+          await settled(q, '.fc-sec[open] .fc-panel'); // its animation is 360ms (--dur-fc-panel)
+          const p = await q.evaluate(shownStyle, '.fc-sec[open] .fc-panel');
           rep.push(`footer panel: ${JSON.stringify(p)}`);
-          if (!p || p.opacity < 0.99 || p.h < 50) fails.push(`${name}: the footer tab's panel isn't shown: ${JSON.stringify(p)}`);
+          if (!p || p.opacity < 0.99 || p.h < 50) fails.push(`${name}: the footer tile's panel isn't shown: ${JSON.stringify(p)}`);
         }
         await ctx.close();
         console.log(`${name}: ${rep.join('; ')}`);
@@ -632,6 +653,134 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   verdict([...fails, ...errs]);
 });
 
+// J7, B14, L7, M11: the footer is one <nav aria-label="Footer"> of six <details name="footer"> (Footer.astro). It works
+// without script, one section open at a time; Tab reaches each summary and Enter or Space opens it, then Tab goes on
+// into its links; focus inside it stays put through a resize from desktop to phone and a turn (it used to drop to
+// <body> as script moved the panels between tabs and rows); it holds the footer's only navigation landmark (it had
+// five); and a screen reader hears each summary as open or closed. On tablet and up the panel on screen is always the
+// open section's (Contact when none is picked), so no summary says "collapsed" over a panel that shows; phones start
+// with every row shut.
+test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, L7, M11)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const openIds = (q) => q.evaluate(() => [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id));
+  for (const [w, h] of [[390, 844], [1440, 900]]) {
+    const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h } });
+    const q = await ctx.newPage();
+    await q.goto(url('about'));
+    const tiles = q.locator('.fc-tile');
+    const n = await tiles.count();
+    if (n !== 6) fails.push(`no script, ${w}: ${n} footer sections, not 6`);
+    for (let i = 0; i < n; i++) {
+      await tiles.nth(i).click();
+      await q.waitForTimeout(500);
+      const s = await q.evaluate((i) => ({
+        id: document.querySelectorAll('.fc-sec')[i].id,
+        h: Math.round(document.querySelectorAll('.fc-sec .fc-panel')[i].getBoundingClientRect().height),
+      }), i);
+      const open = await openIds(q);
+      if (open.length !== 1 || open[0] !== s.id || s.h < 50) fails.push(`no script, ${w}: section ${s.id} clicked: open ${JSON.stringify(open)}, its panel ${s.h}px tall`);
+    }
+    rep.push(`no script ${w}: ${n} sections opened one at a time`);
+    await ctx.close();
+  }
+
+  // with script, on a phone every row starts shut
+  const ph = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const pq = await ph.newPage();
+  await pq.goto(url('about'));
+  await pq.waitForLoadState('networkidle');
+  const phoneOpen = await openIds(pq);
+  rep.push(`390 at load, open: ${JSON.stringify(phoneOpen)}`);
+  if (phoneOpen.length) fails.push(`390 at load: ${JSON.stringify(phoneOpen)} open, every row should start shut`);
+  await ph.close();
+
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  const errs = [];
+  watch(q, 'footer keys', errs);
+  await q.goto(url('about'));
+  await q.waitForLoadState('networkidle');
+  await q.$eval('#footer', (e) => e.scrollIntoView());
+  // tablet and up: the panel on screen is always the open one, so its summary never says "collapsed" while it shows:
+  // at load (nothing picked), and after a visitor shuts the section they opened
+  const shownState = async (when) => {
+    const s = await q.evaluate(() =>
+      [...document.querySelectorAll('.fc-sec')].filter((d) => d.querySelector('.fc-panel').getClientRects().length).map((d) => ({ id: d.id, open: d.open })),
+    );
+    rep.push(`1440 ${when}, panel shown: ${JSON.stringify(s)}`);
+    if (s.length !== 1 || !s[0].open) fails.push(`1440 ${when}: the panel on screen isn't its open section's: ${JSON.stringify(s)}`);
+  };
+  await shownState('at load');
+  await q.locator('.fc-tile').nth(1).click();
+  await q.waitForTimeout(400);
+  await q.locator('.fc-tile').nth(1).click();
+  await q.waitForTimeout(400);
+  await shownState('after shutting Services');
+  // Tab from the first summary to the end of the footer's nav reaches all six
+  await q.locator('.fc-tile').first().focus();
+  const reached = [];
+  for (let i = 0; i < 60; i++) {
+    const a = await q.evaluate(() => {
+      const a = document.activeElement;
+      return { tile: a.matches('.fc-tile') ? a.parentElement.id : null, inNav: !!a.closest('.fc-nav') };
+    });
+    if (!a.inNav) break;
+    if (a.tile) reached.push(a.tile);
+    await q.keyboard.press('Tab');
+  }
+  rep.push(`Tab reached ${reached.join(', ')}`);
+  if (new Set(reached).size !== 6) fails.push(`Tab reached ${new Set(reached).size} of the 6 footer summaries: ${reached.join(', ')}`);
+  // Enter and Space open a section; Tab then goes into its links
+  for (const [key, i] of [['Enter', 2], ['Space', 3]]) {
+    await q.locator('.fc-tile').nth(i).focus();
+    await q.keyboard.press(key);
+    await q.waitForTimeout(500);
+    const want = await q.evaluate((i) => document.querySelectorAll('.fc-sec')[i].id, i);
+    const open = await openIds(q);
+    if (open.length !== 1 || open[0] !== want) fails.push(`${key} on ${want}'s summary: open ${JSON.stringify(open)}`);
+  }
+  await q.keyboard.press('Tab');
+  const into = await q.evaluate(() => !!document.activeElement.closest('.fc-sec[open] .fc-panel'));
+  if (!into) fails.push(`Tab from the open summary went to ${await q.evaluate(() => document.activeElement.outerHTML.slice(0, 80))}, not into its panel`);
+  // focus on a link in the open panel, then desktop -> phone -> phone turned -> desktop: focus never leaves it
+  const sizes = [[390, 844], [844, 390], [1280, 800]];
+  for (const target of ['.fc-sec[open] .fc-panel a', '.fc-sec[open] > .fc-tile']) {
+    await q.setViewportSize({ width: 1280, height: 800 });
+    await q.waitForTimeout(300);
+    await q.locator(target).first().focus();
+    for (const [w, h] of sizes) {
+      await q.setViewportSize({ width: w, height: h });
+      await q.waitForTimeout(400);
+      const f = await q.evaluate((sel) => {
+        const a = document.activeElement;
+        return { same: a === document.querySelector(sel), body: a === document.body, shown: a.getClientRects().length > 0 };
+      }, target);
+      if (!f.same || !f.shown) fails.push(`focus on ${target} after the screen went to ${w}x${h}: ${JSON.stringify(f)}`);
+    }
+  }
+  // landmarks: one navigation landmark in the footer, named Footer, with the legal links inside it
+  const lm = await q.evaluate(() => ({
+    all: [...document.querySelectorAll('nav, [role=navigation]')].map((n) => n.getAttribute('aria-label')),
+    footer: [...document.querySelectorAll('footer :is(nav, [role=navigation])')].map((n) => n.getAttribute('aria-label')),
+    legal: !!document.querySelector('footer nav .fc-legal a'),
+  }));
+  rep.push(`navigation landmarks: ${lm.all.join(', ')}`);
+  if (lm.footer.length !== 1 || lm.footer[0] !== 'Footer' || !lm.legal) fails.push(`footer landmarks: ${JSON.stringify(lm)}`);
+  // what a screen reader gets: each summary a disclosure with its open state, named by its tile
+  const cdp = await ctx.newCDPSession(q);
+  const { nodes } = await cdp.send('Accessibility.getFullAXTree');
+  const sums = nodes
+    .filter((x) => /^DisclosureTriangle/.test(x.role?.value ?? '') && !x.ignored)
+    .map((x) => ({ name: x.name?.value, expanded: x.properties?.find((p) => p.name === 'expanded')?.value.value }));
+  rep.push(`summaries: ${JSON.stringify(sums)}`);
+  if (sums.length !== 6 || sums.filter((x) => x.expanded === true).length !== 1 || sums.some((x) => typeof x.expanded !== 'boolean' || !/\. /.test(x.name ?? '')))
+    fails.push(`the footer's summaries in the accessibility tree: ${JSON.stringify(sums)}`);
+  console.log(rep.join('\n'));
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
 // B6 follow-up: a toast with no pop-up open goes to the page's own region (straight under <body>), not into a closed
 // dialog's, where it is invisible and unheard: Contact's copy button, and the Book form's confirmation, which comes
 // once its pop-up has closed
@@ -759,8 +908,10 @@ for (const page of ['index', 'contact']) {
         gone: [...document.querySelectorAll('form, .copy-btn, .btn[data-open], button[data-open]')].filter(shown).map((e) => e.className || e.tagName),
         cardsOpen: [...document.querySelectorAll('main .card[data-open]')].map((e) => (shown(e) ? '' : e.textContent.trim())).filter(Boolean),
         contact: [...document.querySelectorAll('.print-contact')].filter(shown).map((e) => e.textContent).join(),
+        footer: [...document.querySelectorAll('.site-footer')].filter(shown).length,
       };
     });
+    if (s.footer) fails.push(`${page} on paper still shows the footer`);
     if (s.cards !== s.of) fails.push(`${page} on paper: ${s.cards} of ${s.of} Grow steps`);
     if (s.gone.length) fails.push(`${page} on paper still shows: ${s.gone.join(', ')}`);
     if (s.cardsOpen.length) fails.push(`${page} on paper drops a card's words: ${s.cardsOpen.join(' | ')}`);
@@ -811,5 +962,125 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
     if (got !== v) fails.push(`${path}: ?v=${v}, but the file served hashes to ${got}`);
   }
   console.log(`drawing addresses: ${urls.join(' ')}`);
+  verdict(fails);
+});
+
+// C15: the Markdown copies say what the pages say: team names apart from their roles, a case study's services as
+// links, Contact's hours under a heading of their own, and Home's contact lines from the footer data
+test('Markdown copies: team, facts links, hours heading, Home contact (C15)', async () => {
+  const md = async (path) => (await fetch(BASE + path)).text();
+  const fails = [];
+  const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith('The people who pick up')) || '';
+  const people = team.split('\n').filter((l) => l.startsWith('- '));
+  if (!people.length || people.some((l) => !/^- [^,]+, \S/.test(l))) fails.push(`/about.md team lines run names into roles: ${people.join(' | ')}`);
+  if (!/^- Services: \[[^\]]+\]\(https?:\/\/[^)]+\/services\/[a-z-]+\)/m.test(await md('/work/office-move.md'))) fails.push('/work/office-move.md: Services are not links');
+  if (!/^## Hours and office\n\n- Monday to Friday: /m.test(await md('/contact.md'))) fails.push('/contact.md: the hours have no heading');
+  const home = await md('/index.md');
+  const html = await (await fetch(BASE + '/contact')).text();
+  const tel = html.match(/href="(tel:\+\d+)"/)?.[1];
+  if (!home.includes('- Languages: English, French')) fails.push('/index.md: not "Languages: English, French"');
+  if (!tel || !home.includes(`](${tel})`)) fails.push(`/index.md: phone link is not ${tel}, the one /contact shows`);
+  if (/\{[a-z]+\}/i.test(home)) fails.push(`/index.md: placeholder left: ${home.match(/\{[a-z]+\}/i)[0]}`);
+  verdict(fails);
+});
+
+// M9: every page links both icons, the .ico for browsers without SVG icons, and both answer with an image
+test('favicons: .ico and .svg linked and served (M9)', async () => {
+  const fails = [];
+  for (const path of ['/', '/about', '/services/help-desk']) {
+    const html = await (await fetch(BASE + path)).text();
+    if (!html.includes('<link rel="icon" href="/favicon.ico" sizes="32x32">')) fails.push(`${path}: no <link rel="icon"> for /favicon.ico`);
+    if (!html.includes('<link rel="icon" href="/favicon.svg" type="image/svg+xml">')) fails.push(`${path}: no <link rel="icon"> for /favicon.svg`);
+  }
+  for (const icon of ['/favicon.ico', '/favicon.svg']) {
+    const r = await fetch(BASE + icon);
+    if (!r.ok || !/^image\//.test(r.headers.get('content-type') || '')) fails.push(`${icon}: ${r.status} ${r.headers.get('content-type')}`);
+  }
+  verdict(fails);
+});
+
+// B18, B20: a heading or big number never breaks inside a word. Headings and stat numbers size to their column
+// (--fit, cqi), so "CYBERSECURITY" on /services/security at 1024 to 1099 and "3,400" on /about with a 32px default
+// font stay whole. Every page at five widths and, with a 32px default font, at 320 and 390; plus /services/security
+// at 1024 to 1099, where the review found it. h3s in the page count too. A break after a hyphen
+// ("Ransomware-/ready") is a normal line break, not a split. And every heading with a word of LONG letters or more
+// carries the class fit (src/lib/fit.js), so one written into a page by hand without fit() can't slip through.
+const WORDS = () => {
+  const out = [];
+  // headings without the class fit, for the long-word test in Node
+  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
+  for (const h of document.querySelectorAll('h1, h2, main h3, .fc-panel.is-on h3, .stat-val')) {
+    if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
+    const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+    for (let t; (t = tw.nextNode()); ) {
+      for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
+        const r = document.createRange();
+        r.setStart(t, m.index);
+        r.setEnd(t, m.index + m[0].length);
+        if (new Set([...r.getClientRects()].filter((x) => x.width).map((x) => Math.round(x.top))).size > 1) out.push(`${h.tagName.toLowerCase()} "${m[0]}"`);
+      }
+    }
+  }
+  return [out, plain];
+};
+test('headings and numbers: no word split across lines (B18, B20)', async ({ browser }) => {
+  test.setTimeout(300_000);
+  const jobs = [
+    ...[320, 768, 1060, 1440, 2560].flatMap((w) => PAGES.map((page) => [page, w, 0])),
+    ...[1024, 1040, 1080, 1099].map((w) => ['services/security', w, 0]),
+    ...[320, 390].flatMap((w) => PAGES.map((page) => [page, w, 32])),
+  ];
+  const fails = (
+    await lanes(jobs, 4, async ([page, w, font]) => {
+      const ctx = await browser.newContext({ viewport: { width: w, height: w > 1000 ? 900 : 800 } });
+      const q = await ctx.newPage();
+      if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
+      await q.goto(url(page));
+      await q.evaluate(() => document.fonts.ready);
+      const [split, plain] = await q.evaluate(WORDS);
+      for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
+      await ctx.close();
+      return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
+    })
+  ).filter(Boolean);
+  console.log(`headings: ${jobs.length} page sizes, ${fails.length} with a split word`);
+  verdict(fails);
+});
+
+// B19, B7: Contact's queue ring holds its words. "1 day" stays on one line, and it and the label sit inside the
+// ring's stroke (the drawing's circle of radius 64 in 168: r 70, stroke 12; each line by its letters' height, 0.35em
+// either side of its middle), at the desktop widths where the review saw it break, and with WCAG 1.4.12 text spacing.
+const SPACING = '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
+test('queue ring: its words inside the ring, with text spacing too (B19, B7)', async ({ browser }) => {
+  const fails = [];
+  for (const w of [1100, 1280, 1440, 1920]) {
+    for (const spacing of [false, true]) {
+      const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, bypassCSP: spacing });
+      const q = await ctx.newPage();
+      await q.goto(url('contact'));
+      if (spacing) await q.addStyleTag({ content: SPACING });
+      await q.evaluate(() => document.fonts.ready);
+      const r = await q.evaluate(() => {
+        const ring = document.querySelector('.queue-ring'), box = ring.getBoundingClientRect();
+        const cx = box.left + box.width / 2, cy = box.top + box.height / 2, rad = (box.width * 64) / 168;
+        const out = [], val = ring.querySelector('.stat-val');
+        const lines = new Set([...val.getClientRects()].map((x) => Math.round(x.top))).size;
+        if (lines > 1) out.push(`"${val.textContent}" on ${lines} lines`);
+        for (const el of ring.querySelectorAll('.queue-ring-label > span:not(.sr-only)')) {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          const half = parseFloat(getComputedStyle(el).fontSize) * 0.35;
+          const far = Math.max(...[...range.getClientRects()].filter((x) => x.width).flatMap((x) => {
+            const mid = (x.top + x.bottom) / 2;
+            return [x.left, x.right].flatMap((px) => [mid - half, mid + half].map((py) => Math.hypot(px - cx, py - cy)));
+          }));
+          if (far > rad + 0.5) out.push(`"${el.textContent.trim()}" reaches ${far.toFixed(1)}px from the centre, past the stroke at ${rad.toFixed(1)}px`);
+        }
+        return out;
+      });
+      await ctx.close();
+      fails.push(...r.map((x) => `contact at ${w}${spacing ? ' with text spacing' : ''}: ${x}`));
+    }
+  }
   verdict(fails);
 });

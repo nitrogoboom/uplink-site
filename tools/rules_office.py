@@ -1,6 +1,17 @@
 """painter.py rules for office.svg: each box's base height, looked up from gen_office.py by its left face.
 usage: python tools/painter.py public/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py
-check: python tools/check.py public/assets/img/office.svg --step 1.758   (the props' 0.0625 grid is 1.758px here)"""
+check: python tools/check.py public/assets/img/office.svg --step 1.758   (the props' 0.0625 grid is 1.758px here)
+check: python tools/check.py public/assets/img/office-card.svg --step 1.758
+check: python tools/check.py public/assets/img/hero-office.svg --step 1.758
+check: python tools/check.py public/assets/img/hero-office-tablet.svg --step 1.758
+check: python tools/check.py public/assets/img/hero-office-phone.svg --step 1.758
+check: python tools/check.py public/assets/img/office-compact-build.svg --step 1.758
+The hero cuts and the card share the office's origin and unit (a crop changes only the viewBox), so the same rules read them:
+also: python tools/painter.py public/assets/img/office-card.svg 616.4 240.2 28.127 tools/rules_office.py
+also: python tools/painter.py public/assets/img/hero-office.svg 616.4 240.2 28.127 tools/rules_office.py
+also: python tools/painter.py public/assets/img/hero-office-tablet.svg 616.4 240.2 28.127 tools/rules_office.py
+also: python tools/painter.py public/assets/img/hero-office-phone.svg 616.4 240.2 28.127 tools/rules_office.py
+also: python tools/painter.py public/assets/img/office-compact-build.svg 616.4 240.2 28.127 tools/rules_office.py"""
 import gen_office
 from iso import C30
 

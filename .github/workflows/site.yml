@@ -1,6 +1,7 @@
 # Build and check on every push and pull request (types, the build scripts' tests, lint, build, then the built site
 # in a browser: the site check, the link check and the header check, Playwright Test in checks/; on a pull request
-# also a screenshot comparison with the live site); deploy to the Cloudflare Worker on main only if all of that passed.
+# also a screenshot comparison with the live site); beside it, the drawings job regenerates every drawing from its
+# Python script and checks it; deploy to the Cloudflare Worker on main only if all of that passed.
 # The workflows themselves are linted (zizmor); a pull request's new dependencies are reviewed where GitHub offers it.
 # Actions are pinned to a commit (the # vX.Y.Z beside each says which release), so a moved tag can't change what
 # runs here; Dependabot (.github/dependabot.yml) proposes the updates.
@@ -122,7 +123,7 @@ jobs:
           exit 1
 
   deploy:
-    needs: [build, workflows] # a high zizmor finding on main stops the deploy too
+    needs: [build, workflows, drawings] # a high zizmor finding, or a drawing out of step with its script, stops the deploy too
     if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -200,6 +201,34 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           BRANCH_URL: ${{ steps.upload.outputs.branch }}
           VERSION_URL: ${{ steps.upload.outputs.version }}
+
+  # the drawings: every SVG must be what its tools/gen_*.py writes today, and pass its checks. The generators run on a
+  # clean checkout and git diff fails on any drawing that changed (a hand edit, or a script changed without its
+  # output). Then the tools' tests, and check.py and painter.py as each tools/rules_*.py lists them. A minute or two,
+  # beside the build job. The Python packages are installed from requirements.txt, locked with hashes
+  drawings:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12' # README, "Before you begin"; requirements.txt is locked for 3.12 and up
+          cache: pip
+          cache-dependency-path: requirements.txt
+      - run: pip install --require-hashes -r requirements.txt
+      - name: Regenerate every drawing; any difference fails
+        run: |
+          python tools/regen.py
+          git diff --exit-code --stat public/assets/img src/components/home || {
+            echo "::error::these drawings differ from what their scripts write: run python tools/regen.py and commit the result"; exit 1; }
+          untracked=$(git ls-files --others --exclude-standard public/assets/img src/components/home)
+          if [ -n "$untracked" ]; then echo "::error::the generators wrote drawings that aren't in git: $untracked"; exit 1; fi
+      - run: python -m pytest -q tools/tests
+      - name: Check every drawing (check.py, painter.py)
+        run: python tools/regen.py --checks-only
 
   # the workflows themselves: zizmor (https://docs.zizmor.sh) fails on any high-severity finding, such as a template
   # injection or an unpinned action

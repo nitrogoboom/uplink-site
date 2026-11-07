@@ -19,10 +19,11 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Content is data
 
 - A service is `src/content/services/SLUG.json`, a project `src/content/projects/SLUG.json`; the slug is the address. The `page` field holds the copy only that item's own page shows. Smaller lists are `src/data/*.json`, kept in file order through `byOrder`.
+- Schemas are strict (`src/content.config.ts`; `footer.json`'s in `src/lib/footer.ts`): an unknown key, an icon not in `src/components/icons.ts` or an `image` with no drawing fails the build. Import footer data from `src/lib/footer.ts`, not the JSON; the JSON holds no HTML.
 - Every card, footer link, select option, page, sitemap line and JSON-LD block reads from those files. Change words in the data, once.
 - The seven static pages' `<title>` and description live in `PAGES` in `src/lib/site.ts`.
-- Privacy and accessibility are Markdown in `src/data/`. Contact details there are placeholders (`{privacy}`, `{phone}`, `{street}` …) filled from `src/data/footer.json`. When the site starts collecting something new or a processor changes, update `src/data/privacy.md` in the same PR.
-- Home's Markdown copy (`src/data/index.md`) and `src/data/agents.md` are hand-written. Every other page's `.md` copy is generated from its `<main>`; `data-md-skip` leaves a decorative part out.
+- Privacy and accessibility are Markdown in `src/data/`. Contact details there are placeholders (`{privacy}`, `{phone}`, `{street}` …) filled from `src/data/footer.json` while the Markdown renders (`src/lib/placeholders.mjs`, a plugin in `astro.config.mjs`); a name with no value fails the build. When the site starts collecting something new or a processor changes, update `src/data/privacy.md` in the same PR.
+- Home's Markdown copy (`src/data/index.md`) and `src/data/agents.md` are hand-written, with the same contact placeholders. Every other page's `.md` copy is generated from its `<main>`; `data-md-skip` leaves a decorative part out. Two parts in separate boxes that read as one line get a hidden separator (`<span class="sr-only">, </span>`, or `<Pause />`) so neither a screen reader nor the copy runs them together.
 
 ## Markup and scripts
 
@@ -42,6 +43,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
 - Breakpoints are in `em`, in range syntax (`(width < 43.75em)`): the names in `src/lib/media.js`, and one-off queries the same way. Zoom and a bigger default font then count as a narrower screen.
 - A box sized to the screen sets a minimum height (`min-height: var(--fold-inner)`), never a fixed one. The picture inside takes what is left (`flex: 1; min-height: <rem floor>`, and no room of its own: an absolute `<img>`), so words that need more room grow the box instead of being cut.
+- Headings and big numbers fit their column: `h1`/`h2` take `min(var(--fs-8|7), var(--fit))`, measured against the nearest box marked `container-type: inline-size` (the list is in `src/styles/layout.css`; mark only a box that takes its width from its parent, a shrink-to-fit box collapses). A heading with a word of 10 letters or more needs `class={fit(text)}` (`src/lib/fit.js`): it shrinks to fit (`--fit-long`, 14cqi); others keep their size unless text is big and the column narrow (`--fit-short`, 21cqi; `fit-loose`, 30cqi, when every word has 6 letters or fewer). h3 follows the same rule. The site check fails a long-word heading without it.
 - Text size (WCAG 1.4.4) is the browser's own zoom; the site has no text-size option (review C13). New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings
@@ -49,6 +51,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Every illustration is written by `tools/gen_*.py`. Change the numbers in the script and rerun it; the SVGs are outputs. That includes the hero (`gen_office.py`), Grow (`gen_grow.py`) and the footer map (`gen_campus.py`).
 - True isometric, per "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it (each `rules_NAME.py` gives the exact command), and look at its `NAME-compact.svg` phone cut.
 - Timings in a drawing become classes in a `<style>` block (`hoist_styles` in `tools/isogen.py`).
+- `python tools/regen.py --check` reruns every generator and every check; CI's `drawings` job fails if a committed SVG differs from its script's output. Commit the regenerated SVGs with the script change. Tool tests: `python -m pytest tools/tests`.
 
 ## Checking a change
 
