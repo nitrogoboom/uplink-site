@@ -3,6 +3,7 @@
 //   PAGES       the static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The .astro pages read their
 //               title and description from here, so the sitemap and llms.txt say the same thing.
 //   getServices(), getProjects()  the collections in their own order.
+//   workFilters(), workFilterCss()  the /work filters (a radio group) and the CSS that makes them work without script.
 //   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
 //   allPages()  every indexable page: the seven in PAGES plus one per service and project, with a lastmod.
 //               A static page dates from its SOURCES below; a service or project from its own entry file
@@ -104,6 +105,21 @@ export const breadcrumbs = (trail: [string, string][]) => ({ '@type': 'Breadcrum
 export const getServices = async () => (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data);   // in file order
+
+// The /work filters (components/work/Projects.astro): "All", then one radio per project tag, in the order the projects
+// first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
+// tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head>, and
+// scripts/headers.mjs hashes it for the CSP like any inline <style>. A browser without :has() ignores the rules and
+// shows every project (projects.css then hides the filters).
+export const WORK_FILTER = 'work-filter';   // the radios' name
+export const workFilters = async () => {
+  const projects = await getProjects();
+  const tags = [...new Set(projects.map((p) => p.data.tag))];
+  return [{ key: 'all', label: 'All', count: projects.length },
+    ...tags.map((t) => ({ key: t.toLowerCase(), label: t, count: projects.filter((p) => p.data.tag === t).length }))];
+};
+export const workFilterCss = async () => (await workFilters()).filter((f) => f.key !== 'all').map(({ key }) =>
+  `.work-layout:has(input[name="${WORK_FILTER}"][value="${key}"]:checked) .work-grid > li:not([data-tags~="${key}"]) { display: none; }`).join('\n');
 
 // The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
 // on purpose: a footer tweak is not a reason for a crawler to refetch every page. A service or project page dates

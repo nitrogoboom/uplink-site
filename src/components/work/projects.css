@@ -1,8 +1,12 @@
 /*--- WORK · 1. Projects: filters and cards. Desktop layout at the end. ---*/
 /* ---------- WORK ----------------------------------------------------- */
-.filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
-:root:not(.js) .filters { display: none; }   /* filtering needs script (work.js); without it every project shows */
+/* the filters: a radio group (Projects.astro). Each label is a chip; its radio is hidden but keeps focus and the arrow
+   keys. The rules that hide the other cards come from the data (workFilterCss() in lib/site.ts, in the page's <head>) */
+.filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); position: relative; min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+/* without :has() choosing one would change nothing (every project shows), so the filters go */
+@supports not selector(:has(*)) { .filters { display: none; } }
 .filter {
+  position: relative;   /* holds the hidden radio and the ", " pause (both absolute) inside the chip */
   display: inline-flex; align-items: center; gap: var(--sp-3);
   min-height: var(--tap);
   padding-inline: var(--sp-4) var(--sp-3);
@@ -11,15 +15,24 @@
   background: var(--c-surface);
   font-weight: 600;
   font-size: var(--fs-2);
+  cursor: pointer;
   transition: background-color var(--dur-1) var(--ease);
 }
 .filter:hover { background: var(--c-surface-2); }
-.filter[aria-pressed="true"] { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); }
+.filter:has(:checked) { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); }
+.filter:has(:focus-visible) { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }   /* the site's ring (base.css), on the chip */
 .filter .count { display: inline-grid; place-items: center; min-width: var(--sp-5); height: var(--sp-5); padding-inline: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); font-size: var(--fs-1); }
-.filter[aria-pressed="true"] .count { background: var(--c-ink-tint); }
+.filter:has(:checked) .count { background: var(--c-ink-tint); }
+/* forced colours (Windows contrast themes) paint every chip alike: the checked one takes the theme's Highlight.
+   Layout plan phase 9 moves this into a site-wide preferences.css */
+@media (forced-colors: active) {
+  .filter { transition: none; }   /* the words change at once: a fading background would leave them unreadable a moment */
+  .filter:has(:checked) { background: Highlight; border-color: Highlight; color: HighlightText; }
+  .filter:has(:checked) .count { background: Canvas; color: CanvasText; }
+}
 @media (--phone) {
   .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); padding-block: var(--sp-1); scrollbar-width: none; }
-  .filters > li { flex: none; }
+  .filters > .filter { flex: none; }
 }
 .work-layout { display: flex; flex-direction: column; gap: var(--sp-6); }
 .work-side { display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
@@ -31,9 +44,7 @@
 @media (--tablet-up) { .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (--desktop) { .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
 .work-grid > li { display: flex; }
-.work-grid > li[hidden] { display: none; }
 .work-grid .card { flex: 1; width: 100%; font: inherit; }
-.empty-note { margin-top: var(--sp-5); }
 
 /* desktop (>= 1100 wide and >= 700 tall): intro and filters in a side column, projects fill the rest. One screen is a
    floor: cards whose words need more room make the grid taller; the pictures take what is left, down to a floor */
