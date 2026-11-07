@@ -579,3 +579,56 @@ test('Grow phone: Next keeps focus at the last step; steps are aria-current (B14
   await ctx.close();
   verdict([...fails, ...errs]);
 });
+
+// B12: a double-click on what opens a pop-up leaves it open (the second click used to land on its backdrop and shut it).
+// B6, M11: each pop-up has its own empty live region from the start (one made with its first toast isn't announced),
+// and its close button's name holds the "Esc" it shows. M11: the skip link's target takes focus. B14: a toast
+// dismissed from the keyboard gives focus back, not to <body>.
+test('pop-ups: double-click, live regions, Esc in the name, skip link, toast focus (B12, B6, M11, B14)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  for (const id of ['settings-dialog', 'book-dialog']) {
+    await q.locator(`[data-open="${id}"]:visible`).first().dblclick();
+    await q.waitForTimeout(600);
+    const open = await q.evaluate((id) => document.getElementById(id).open, id);
+    if (!open) fails.push(`#${id}: a double-click on its opener left it shut`);
+    const region = await q.evaluate((id) => {
+      const r = document.querySelector(`#${id} > .toasts`);
+      return r ? { live: r.getAttribute('aria-live'), kids: r.children.length } : null;
+    }, id);
+    if (!region || region.live !== 'polite') fails.push(`#${id}: no aria-live="polite" .toasts of its own: ${JSON.stringify(region)}`);
+    const tree = await q.locator(`#${id}`).ariaSnapshot();
+    const close = tree.match(/button "([^"]*Close[^"]*)"/);
+    if (!close || !close[1].includes('Esc')) fails.push(`#${id}: its close button is named ${close ? `"${close[1]}"` : '(not found)'}, without the "Esc" it shows`);
+    await q.keyboard.press('Escape');
+    await q.waitForTimeout(300);
+  }
+  // fresh page: the regions are in the markup, not made later
+  await q.reload();
+  const marked = await q.evaluate(() => [...document.querySelectorAll('dialog')].map((d) => !!d.querySelector(':scope > .toasts[aria-live]')));
+  if (marked.includes(false)) fails.push(`a dialog has no live region before its first toast: ${JSON.stringify(marked)}`);
+  // the skip link
+  await q.keyboard.press('Tab');
+  await q.keyboard.press('Enter');
+  await q.waitForTimeout(200);
+  const skip = await q.evaluate(() => document.activeElement?.id || document.activeElement?.tagName);
+  if (skip !== 'main') fails.push(`Skip to content: focus went to ${skip}, not <main>`);
+  // a toast, dismissed with Enter
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('#sc-toggle').click();
+  await q.waitForTimeout(400);
+  await q.keyboard.press('Tab');
+  const inToast = await q.evaluate(() => !!document.activeElement?.closest('.toast'));
+  if (!inToast) fails.push('Tab from the shortcuts switch didn\'t reach the toast it showed');
+  await q.keyboard.press('Enter');
+  await q.waitForTimeout(500);
+  const after = await q.evaluate(() => {
+    const a = document.activeElement;
+    return { body: a === document.body, inDialog: !!a.closest('#settings-dialog'), what: `${a.tagName.toLowerCase()}#${a.id}` };
+  });
+  if (after.body || !after.inDialog) fails.push(`toast dismissed with Enter: focus went to ${after.what}`);
+  console.log(`pop-ups: regions ${JSON.stringify(marked)}, skip -> ${skip}, toast dismissed -> ${after.what}`);
+  // the toast check toggled the shortcuts off: on again, for whoever is next in this context (nothing is)
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});

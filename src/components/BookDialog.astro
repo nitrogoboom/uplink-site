@@ -9,7 +9,7 @@ import Icon from './Icon.astro';
   <form data-validate="book" method="dialog">
     <div class="dlg-head">
       <h2 id="book-title">Book your free check-up</h2>
-      <button class="hbtn" type="button" data-close><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close</span></button>
+      <button class="hbtn" type="button" data-close aria-keyshortcuts="Escape"><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close (Esc)</span></button>
     </div>
     <div class="dlg-body">
       <p class="muted">We scan your network, devices and accounts, walk you through what we find, then talk options. It takes 30 minutes and there is no contract to look.</p>
@@ -52,4 +52,5 @@ import Icon from './Icon.astro';
       <button class="btn btn--primary" type="submit">Request check-up</button>
     </div>
   </form>
+  <div class="toasts" aria-live="polite"></div>
 </dialog>

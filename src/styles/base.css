@@ -93,4 +93,7 @@ a:hover { text-decoration-color: currentColor; }
   transform: translateY(-200%);
 }
 .skip-link:focus { transform: none; }
+/* the skip link's target takes focus (tabindex="-1" in Base.astro), so the next Tab goes on from the content;
+   a ring round the whole of <main> would only get in the way */
+main:focus { outline: none; }
 
