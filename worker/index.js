@@ -28,14 +28,15 @@
 const MAX_BODY = 8 * 1024;
 const MAX_REPORTS = 20;
 const EXTENSION = /^(chrome|moz|safari-web)-extension$/;   // an extension's address, as bare() leaves it
-const cut = (v, n = 300) => (v == null ? undefined : String(v).slice(0, n));
+// a field as text: only a string or a number counts (a report is the sender's word; an object's toString can throw)
+const cut = (v, n = 300) => (typeof v === 'string' || typeof v === 'number' ? String(v).slice(0, n) : undefined);
 // a line or column number, or nothing (a report is the sender's word: never log what it sends as is)
 const num = (v) => (Number.isInteger(v) && v >= 0 ? v : undefined);
 // an address without its ?query or #fragment (a query can carry personal data; the path is what we need)
 const bare = (u) => {
-  if (!u) return undefined;
+  if (!u || (typeof u !== 'string' && typeof u !== 'number')) return undefined;
   try {
-    const url = new URL(u);
+    const url = new URL(String(u));
     if (url.origin === 'null') return cut(url.protocol.slice(0, -1));   // data:, an extension's own address: the scheme only
     return cut(url.origin + url.pathname);
   } catch {
@@ -43,6 +44,7 @@ const bare = (u) => {
   }
 };
 
+const isObject = (v) => typeof v === 'object' && v !== null && !Array.isArray(v);
 // one Reporting API report, { type, url, body }, as a record
 const fromReport = (r) => ({
   kind: cut(r.type, 40),
@@ -55,7 +57,7 @@ const fromReport = (r) => ({
 // the shapes a report arrives in, as one flat record
 function records(type, body) {
   if (type.includes('application/reports+json')) {   // Reporting API: an array of { type, url, body }
-    return (Array.isArray(body) ? body : []).slice(0, MAX_REPORTS).map(fromReport);
+    return (Array.isArray(body) ? body : []).slice(0, MAX_REPORTS).filter(isObject).map(fromReport);
   }
   if (type.includes('application/csp-report')) {     // report-uri: { "csp-report": { … } }
     if (!body?.['csp-report'] && body?.body) return [fromReport(body)];   // WebKit: one Reporting API report under this type
@@ -102,7 +104,12 @@ async function report(request, env) {
   const ours = (r) => (r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`));
   const extension = (r) => EXTENSION.test(r.source || '') || EXTENSION.test(r.blocked || '');
   const webkitSelect = (r) => r.directive === 'style-src-attr' && r.blocked === 'inline' && !r.source && r.line === undefined;
-  const keep = records(request.headers.get('Content-Type') || '', body).filter((r) => ours(r) && !extension(r) && !webkitSelect(r));
+  let keep;
+  try {   // the type checks above should leave nothing to throw; if a shape still does, it's a bad report, not a crash
+    keep = records(request.headers.get('Content-Type') || '', body).filter((r) => ours(r) && !extension(r) && !webkitSelect(r));
+  } catch {
+    return new Response(null, { status: 400 });
+  }
   if (!keep.length) return new Response(null, { status: 204 });
   if (env?.REPORTS) {
     const { success } = await env.REPORTS.limit({ key: request.headers.get('CF-Connecting-IP') || '' });
@@ -123,16 +130,27 @@ async function notFoundPage(request, env) {
 // http:// to https://, the same address. 308 keeps a POST a POST. Local servers (npm run serve) stay on http.
 const LOCAL = ['localhost', '127.0.0.1', '[::1]'];
 
+async function route(request, env) {
+  const url = new URL(request.url);
+  if (url.protocol === 'http:' && !LOCAL.includes(url.hostname)) {
+    url.protocol = 'https:';
+    return Response.redirect(url.href, 308);
+  }
+  if (url.pathname === '/api/report') return report(request, env);
+  if (url.pathname === '/404') return notFoundPage(request, env);
+  if (url.pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
+  return env.ASSETS.fetch(request);
+}
+
+// The Worker sees every request, so a throw anywhere would be Cloudflare's error page instead of the site: anything
+// unexpected is logged and the request goes on to the static assets as if the Worker weren't there.
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    if (url.protocol === 'http:' && !LOCAL.includes(url.hostname)) {
-      url.protocol = 'https:';
-      return Response.redirect(url.href, 308);
+    try {
+      return await route(request, env);
+    } catch (e) {
+      console.error(JSON.stringify({ worker_error: cut(e?.message) ?? 'unknown', path: cut(new URL(request.url).pathname) }));
+      return env.ASSETS.fetch(request);
     }
-    if (url.pathname === '/api/report') return report(request, env);
-    if (url.pathname === '/404') return notFoundPage(request, env);
-    if (url.pathname.startsWith('/api/')) return new Response('Not found', { status: 404 });
-    return env.ASSETS.fetch(request);
   },
 };

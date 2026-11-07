@@ -131,3 +131,66 @@ test('a body over the cap is refused even without a Content-Length', async () =>
     headers: { 'Content-Type': 'application/json', Origin: 'https://example.test' } });
   assert.equal((await worker.fetch(req)).status, 413);
 });
+
+// A report is whatever the sender posts. Every shape JSON can carry, in every field, must get an answer (204 or 400),
+// never a crash: a throw in the Worker would be Cloudflare's error page, not ours (review B0, B11).
+const bad = { toString: 1 };   // String() on this throws: toString is not a function
+const odd = [null, 1, 'x', true, [], [null], bad, { toString: null, valueOf: null }];
+const FUZZ = [
+  ...['application/reports+json', 'application/csp-report', 'application/json'].flatMap((type) => [
+    ...odd.map((v) => [type, v]),
+    ...odd.map((v) => [type, [v]]),
+    ...odd.map((v) => [type, [v, { type: 'csp-violation', url: 'https://example.test/' }]]),
+  ]),
+  ...odd.flatMap((v) => [
+    ['application/reports+json', [{ type: v, url: 'https://example.test/', body: { effectiveDirective: 'script-src' } }]],
+    ['application/reports+json', [{ type: 'csp-violation', url: v }]],
+    ['application/reports+json', [{ type: 'csp-violation', url: 'https://example.test/', body: v }]],
+    ['application/reports+json', [{ type: 'csp-violation', body: { documentURL: v, blockedURL: v, effectiveDirective: v, sourceFile: v, lineNumber: v } }]],
+    ['application/csp-report', { 'csp-report': v }],
+    ['application/csp-report', { 'csp-report': { 'document-uri': v, 'blocked-uri': v, 'violated-directive': v, 'source-file': v } }],
+    ['application/csp-report', { 'csp-report': { 'document-uri': 'https://example.test/', 'blocked-uri': v, 'effective-directive': v } }],
+    ['application/csp-report', { type: v, url: v, body: { documentURL: v } }],
+    ['application/json', { kind: 'error', page: v, message: v, source: v, line: v, column: v }],
+    ['application/json', { kind: 'error', page: '/', message: v }],
+  ]),
+];
+
+test('odd reports never crash the Worker: each gets 204 or 400, and logs only strings and numbers', async () => {
+  const crashes = [];
+  for (const [type, body] of FUZZ) {
+    const what = `${type} ${JSON.stringify(body)}`;
+    try {
+      const [res, lines] = await call(post(type, body));
+      if (![204, 400].includes(res.status)) crashes.push(`${what}: ${res.status}`);
+      for (const { report } of lines) {
+        for (const [k, v] of Object.entries(report)) if (!['string', 'number'].includes(typeof v)) crashes.push(`${what}: ${k} logged as ${typeof v}`);
+      }
+    } catch (e) {
+      crashes.push(`${what}: threw ${e.message}`);
+    }
+  }
+  assert.deepEqual(crashes, [], `${crashes.length} of ${FUZZ.length} cases`);
+});
+
+test('[null], [1] and ["x"] as a Reporting API post: nothing to log, no crash', async () => {
+  for (const body of [[null], [1], ['x']]) {
+    const [res, lines] = await call(post('application/reports+json', body));
+    assert.equal(res.status, 204, JSON.stringify(body));
+    assert.equal(lines.length, 0);
+  }
+});
+
+test('any other error inside the Worker falls back to the static assets', async () => {
+  const env = {
+    REPORTS: { limit: async () => { throw new Error('rate limit binding down'); } },
+    ASSETS: { fetch: async () => new Response('from the assets', { status: 404 }) },
+  };
+  const err = console.error;
+  console.error = () => {};
+  try {
+    const [res] = await call(post('application/json', { kind: 'error', page: '/', message: 'x' }), env);
+    assert.equal(res.status, 404);
+    assert.equal(await res.text(), 'from the assets');
+  } finally { console.error = err; }
+});
