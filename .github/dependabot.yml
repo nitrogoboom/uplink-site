@@ -1,5 +1,5 @@
 # Weekly dependency updates. Minor and patch bumps come as one pull request; a major gets its own.
-# cooldown: a release is proposed only once it is a week old (5 days for a patch), so a hijacked or broken release
+# cooldown: a release is proposed only once it is a week old (5 days for an npm or pip patch; Actions take one wait only), so a hijacked or broken release
 # has time to be found and pulled before it reaches this repository.
 version: 2
 updates:
@@ -19,7 +19,6 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
-      semver-patch-days: 5
     groups:
       actions:
         patterns: ['*']
