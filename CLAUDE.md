@@ -4,6 +4,8 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 
 ## Where things are written down
 
+- `docs/review-2026-11-07.md`: the current work list from the November 7, 2026 review. Each item has an ID (B1, H4 …), evidence, a fix and a status. Work from it, and tick an item only when its check passes.
+- Docs can lag the code. When a doc and the code disagree, the code and its tests are right: fix the doc in the same PR. Treat any rule below as a claim to check, not a law.
 - `notes.md`: open items. Start here. Add new items there; remove a line when it's done.
 - `README.md`: every command, tool and flag, the repo layout, drawing rules, hosting. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
 - `src/README.md`: the source map: pages, `Base.astro` props, components, content fields, CSS order, breakpoints, scripts.
@@ -38,7 +40,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Values come from tokens in `src/styles/tokens.css`: colours, sizes, timings. Lint refuses raw spacing.
 - Order matters: a later file wins a tie. `src/styles/global.css` is the cascade order. A section's CSS sits beside its component, with its desktop layout at the end of that file; a block more than one page uses lives in `src/styles/`.
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
-- Text size (WCAG 1.4.4): Settings scales the `--fs-*` tokens by `--text` (`html[data-text]`). A box that pins a height to the screen gets a `:root[data-text]` rule in its own CSS so it grows (with `safe center`). A font size capped by the screen multiplies its cap by `var(--text)`. New display options (light/dark, EN/FR) go in Settings.
+- Text size (WCAG 1.4.4), **being removed** (review item C13, owner decision November 7, 2026: drop the Settings text-size option and fix browser zoom instead; don't add new `[data-text]` rules): Settings scales the `--fs-*` tokens by `--text` (`html[data-text]`). A box that pins a height to the screen gets a `:root[data-text]` rule in its own CSS so it grows (with `safe center`). A font size capped by the screen multiplies its cap by `var(--text)`. New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings
 
