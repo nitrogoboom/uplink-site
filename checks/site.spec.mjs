@@ -29,7 +29,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { BASE, MISSING, ROOT, SIZES, flag, option, pad, pages, verdict, watch } from './lib.mjs';
+import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
 
 const ALL = flag('--all');
 const OUT = join(ROOT, option('--out', 'out'));
@@ -811,5 +811,86 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
     if (got !== v) fails.push(`${path}: ?v=${v}, but the file served hashes to ${got}`);
   }
   console.log(`drawing addresses: ${urls.join(' ')}`);
+  verdict(fails);
+});
+
+// B18, B20: a heading or big number never breaks inside a word. Headings and stat numbers size to their column
+// (--fit, cqi), so "CYBERSECURITY" on /services/security at 1024 to 1099 and "3,400" on /about with a 32px default
+// font stay whole. Every page at five widths, plus the two cases the review found. A break after a hyphen
+// ("Ransomware-/ready") is a normal line break, not a split.
+const WORDS = () => {
+  const out = [];
+  for (const h of document.querySelectorAll('h1, h2, .fc-panel.is-on h3, .stat-val')) {
+    if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
+    const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
+    for (let t; (t = tw.nextNode()); ) {
+      for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
+        const r = document.createRange();
+        r.setStart(t, m.index);
+        r.setEnd(t, m.index + m[0].length);
+        if (new Set([...r.getClientRects()].filter((x) => x.width).map((x) => Math.round(x.top))).size > 1) out.push(`${h.tagName.toLowerCase()} "${m[0]}"`);
+      }
+    }
+  }
+  return out;
+};
+test('headings and numbers: no word split across lines (B18, B20)', async ({ browser }) => {
+  test.setTimeout(300_000);
+  const jobs = [
+    ...[320, 768, 1060, 1440, 2560].flatMap((w) => PAGES.map((page) => [page, w, 0])),
+    ...[1024, 1040, 1080, 1099].map((w) => ['services/security', w, 0]),
+    ...[320, 390].map((w) => ['about', w, 32]),
+  ];
+  const fails = (
+    await lanes(jobs, 4, async ([page, w, font]) => {
+      const ctx = await browser.newContext({ viewport: { width: w, height: w > 1000 ? 900 : 800 } });
+      const q = await ctx.newPage();
+      if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
+      await q.goto(url(page));
+      await q.evaluate(() => document.fonts.ready);
+      const split = await q.evaluate(WORDS);
+      await ctx.close();
+      return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
+    })
+  ).filter(Boolean);
+  console.log(`headings: ${jobs.length} page sizes, ${fails.length} with a split word`);
+  verdict(fails);
+});
+
+// B19, B7: Contact's queue ring holds its words. "1 day" stays on one line, and it and the label sit inside the
+// ring's stroke (the drawing's circle of radius 64 in 168: r 70, stroke 12; each line by its letters' height, 0.35em
+// either side of its middle), at the desktop widths where the review saw it break, and with WCAG 1.4.12 text spacing.
+const SPACING = '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
+test('queue ring: its words inside the ring, with text spacing too (B19, B7)', async ({ browser }) => {
+  const fails = [];
+  for (const w of [1100, 1280, 1440, 1920]) {
+    for (const spacing of [false, true]) {
+      const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, bypassCSP: spacing });
+      const q = await ctx.newPage();
+      await q.goto(url('contact'));
+      if (spacing) await q.addStyleTag({ content: SPACING });
+      await q.evaluate(() => document.fonts.ready);
+      const r = await q.evaluate(() => {
+        const ring = document.querySelector('.queue-ring'), box = ring.getBoundingClientRect();
+        const cx = box.left + box.width / 2, cy = box.top + box.height / 2, rad = (box.width * 64) / 168;
+        const out = [], val = ring.querySelector('.stat-val');
+        const lines = new Set([...val.getClientRects()].map((x) => Math.round(x.top))).size;
+        if (lines > 1) out.push(`"${val.textContent}" on ${lines} lines`);
+        for (const el of ring.querySelectorAll('.queue-ring-label > span:not(.sr-only)')) {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          const half = parseFloat(getComputedStyle(el).fontSize) * 0.35;
+          const far = Math.max(...[...range.getClientRects()].filter((x) => x.width).flatMap((x) => {
+            const mid = (x.top + x.bottom) / 2;
+            return [x.left, x.right].flatMap((px) => [mid - half, mid + half].map((py) => Math.hypot(px - cx, py - cy)));
+          }));
+          if (far > rad + 0.5) out.push(`"${el.textContent.trim()}" reaches ${far.toFixed(1)}px from the centre, past the stroke at ${rad.toFixed(1)}px`);
+        }
+        return out;
+      });
+      await ctx.close();
+      fails.push(...r.map((x) => `contact at ${w}${spacing ? ' with text spacing' : ''}: ${x}`));
+    }
+  }
   verdict(fails);
 });

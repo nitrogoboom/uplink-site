@@ -18,6 +18,12 @@
 .fold-always { min-height: var(--fold-h); }
 .fold > .container { width: 100%; }
 
+/* a heading's column: headings and big numbers inside size to its width (--fit, cqi). Only boxes that take their width
+   from their parent: on a box sized by its content (a centred, shrink-to-fit one) the containment shrinks it to nothing.
+   Stat tiles and the queue ring mark themselves (shared-blocks.css, message.css) */
+.section-head, .page-intro > .container, .hero-menu, .profile-text, .work-side, .picker-head, .svc-overview-head,
+.lobby > *, .cta-band > :first-child, .fc-panel, .card { container-type: inline-size; }
+
 .section-head {
   display: flex;
   flex-direction: column;

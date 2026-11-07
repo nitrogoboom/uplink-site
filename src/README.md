@@ -99,6 +99,8 @@ Each section's desktop layout sits at the end of its own CSS file, so it always 
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
 
+Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`; `--fit` is `14cqi`, 14% of the nearest container's width, so a 13-letter word fits on one line. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing.
+
 ### Breakpoints
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.

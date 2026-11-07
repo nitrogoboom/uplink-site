@@ -82,6 +82,8 @@
   --fs-6: 1.75rem;    /* 28  sub-headings, dialog titles, big buttons */
   --fs-7: clamp(2rem, 1.35rem + 2.2vw, 2.75rem);   /* 32-44  section headings */
   --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
+  --fit:  14cqi;   /* the most a heading or big number may be: a 13-letter word ("Cybersecurity") fits its column
+                     (cqi: 1% of the nearest container's width; layout.css marks the columns) */
 
   --lh-display: 0.95;  /* page and section headings */
   --lh-tight:   1;     /* one line in a fixed-height box: buttons, key caps, tiles */

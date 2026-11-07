@@ -33,7 +33,7 @@
 @keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
 .fc-head { display: flex; flex-direction: column; gap: var(--sp-3); }
 /* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
-.fc-head h3 { font-size: var(--fs-8); font-style: italic; line-height: var(--lh-display); }
+.fc-head h3 { font-size: min(var(--fs-8), var(--fit)); font-style: italic; line-height: var(--lh-display); }
 .fc-head h3 em { color: var(--c-accent-text); }
 .fc-lead { max-width: 46ch; margin-top: var(--sp-4); font-size: var(--fs-4); color: var(--c-muted); }
 .fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-6); }
@@ -304,7 +304,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
   .js .fc { min-height: max(var(--fold-h), 40rem); }   /* one screen as a floor: a panel whose words need more grows it */
   .js .fc-stage { flex: 1; min-height: 0; padding-block: var(--sp-7) var(--sp-5); }
   .js .fc-panels { padding-top: var(--sp-2); }
-  .fc-head h3 { font-size: min(var(--fs-8), 8.2svh); }
+  .fc-head h3 { font-size: min(var(--fs-8), 8.2svh, var(--fit)); }
   .js .fc-map { min-height: 16rem; height: 100%; }
   @media (height <= 51.25em) {
     .js .fc-stage { padding-top: var(--sp-6); }
