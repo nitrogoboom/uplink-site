@@ -1,5 +1,7 @@
-// Tests for worker/index.js, the /api/report endpoint (npm test). The Worker is a plain module: each test hands it
-// a Request and checks the answer and the one log line per report (console.log is caught for the test).
+// Tests for worker/index.js (npm test): the /api/report endpoint, the 404 page it sends for /404 and missing
+// addresses, its own headers and the http redirect, and the routing in wrangler.jsonc. The Worker is a plain module:
+// each test hands it a Request and checks the answer and the one log line per report (console.log is caught for the
+// test). How the routing really behaves is checked against wrangler dev by the smoke check (checks/smoke.spec.mjs).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import worker from '../../worker/index.js';
@@ -209,4 +211,129 @@ test('any other error inside the Worker falls back to the static assets', async 
   const res = await quiet(() => worker.fetch(new Request('https://example.test/404'), { ASSETS: assets(new Error('first try fails')) }));
   assert.equal(res.status, 200);
   assert.equal(await res.text(), 'from the assets');
+});
+
+// Like the static assets (wrangler.jsonc: not_found_handling "none"): a file answers 200 with an ETag, or 304 to a
+// matching If-None-Match; an address with no file answers a bare 404 with the headers of the _headers rules its path
+// matches. Each request is kept, to see what the Worker asked for.
+const PAGE_CSP = "default-src 'self'";
+const RULES = [
+  [/\.md$/, { 'Content-Type': 'text/markdown; charset=utf-8' }],
+  [/^\/_astro\//, { 'Cache-Control': 'public, max-age=31536000, immutable' }],
+  [/^\/assets\/img\//, { 'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'" }],
+];
+const site = (files = { '/404': '<h1>Not found</h1>', '/services': '<h1>Services</h1>' }) => {
+  const asked = [];
+  return {
+    asked,
+    fetch: async (req) => {
+      asked.push(req);
+      const path = new URL(req.url).pathname;
+      const headers = { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=0, must-revalidate', 'Content-Security-Policy': PAGE_CSP };
+      for (const [re, h] of RULES) if (re.test(path)) Object.assign(headers, h);
+      if (!(path in files)) return new Response(null, { status: 404, headers });
+      const etag = `"${path.length}"`;
+      if (req.headers.get('If-None-Match') === etag) return new Response(null, { status: 304, headers: { ...headers, ETag: etag } });
+      return new Response(req.method === 'HEAD' ? null : files[path], { status: 200,
+        headers: { ...headers, ETag: etag, 'Last-Modified': 'Sat, 07 Nov 2026 00:00:00 GMT' } });
+    },
+  };
+};
+
+test('B3: /404 asked again with If-None-Match or If-Modified-Since still gets the whole page, with nothing to revalidate', async () => {
+  const ASSETS = site();
+  const req = new Request('https://example.test/404', { headers: { 'If-None-Match': '"4"', 'If-Modified-Since': 'Sun, 08 Nov 2026 00:00:00 GMT' } });
+  const res = await worker.fetch(req, { ASSETS });
+  assert.equal(res.status, 404);
+  assert.equal(await res.text(), '<h1>Not found</h1>', 'not an empty 404 (the 304 the file would give)');
+  assert.equal(res.headers.get('ETag'), null);
+  assert.equal(res.headers.get('Last-Modified'), null);
+  assert.ok(ASSETS.asked.every((r) => !r.headers.has('If-None-Match') && !r.headers.has('If-Modified-Since')), 'the page is asked for without them');
+});
+
+test("B8: an address with no file gets the 404 page with /404's headers, not those of the rules its path matches", async () => {
+  for (const path of ['/nope', '/nope.md', '/_astro/nope.js', '/assets/img/nope.svg']) {
+    const res = await worker.fetch(new Request(`https://example.test${path}`, { headers: { 'If-None-Match': '"4"' } }), { ASSETS: site() });
+    assert.equal(res.status, 404, path);
+    assert.equal(res.headers.get('Content-Type'), 'text/html; charset=utf-8', `${path}: HTML, not the path's type`);
+    assert.equal(res.headers.get('Cache-Control'), 'public, max-age=0, must-revalidate', `${path}: not cached for a year`);
+    assert.equal(res.headers.get('Content-Security-Policy'), PAGE_CSP, `${path}: the page's CSP, not the drawings'`);
+    assert.equal(await res.text(), '<h1>Not found</h1>', `${path}: the 404 page`);
+  }
+  const head = await worker.fetch(new Request('https://example.test/nope.md', { method: 'HEAD' }), { ASSETS: site() });
+  assert.equal(head.status, 404);
+  assert.equal(head.headers.get('Content-Type'), 'text/html; charset=utf-8');
+  const found = await worker.fetch(new Request('https://example.test/services'), { ASSETS: site() });
+  assert.equal(found.status, 200, 'a file that exists is passed on as it is (with run_worker_first true, launch option B)');
+  assert.equal(await found.text(), '<h1>Services</h1>');
+});
+
+test('H7: every answer the Worker writes itself is nosniff, no-store and loads nothing; POST /404 is 405', async () => {
+  const env = { ASSETS: site(), REPORTS: { limit: async () => ({ success: false }) } };
+  const error = { kind: 'error', page: '/', message: 'x' };
+  const cases = [
+    [new Request('https://example.test/api/report'), 405],
+    [post('application/json', {}, '/api/other'), 404],
+    [post('application/json', 'not json'), 400],
+    [post('application/json', 'x'.repeat(9000)), 413],
+    [post('application/json', error, '/api/report', 'https://evil.test'), 403],
+    [post('application/json', { kind: 'other' }), 204],
+    [post('application/json', error), 429],
+    [new Request('http://example.test/services'), 308],
+    [new Request('https://example.test/404', { method: 'POST' }), 405],
+    [new Request('https://example.test/nope', { method: 'DELETE' }), 405],
+  ];
+  for (const [req, status] of cases) {
+    const what = `${req.method} ${req.url}`;
+    const res = await worker.fetch(req, env);
+    assert.equal(res.status, status, what);
+    assert.equal(res.headers.get('X-Content-Type-Options'), 'nosniff', what);
+    assert.equal(res.headers.get('Cache-Control'), 'no-store', what);
+    assert.equal(res.headers.get('Content-Security-Policy'), "default-src 'none'; frame-ancestors 'none'", what);
+  }
+  const res = await worker.fetch(new Request('https://example.test/404', { method: 'POST' }), env);
+  assert.equal(res.headers.get('Allow'), 'GET, HEAD');
+  const [down] = await quiet(() => call(post('application/json', error), { REPORTS: { limit: async () => { throw new Error('down'); } }, ASSETS: assets() }));
+  assert.equal(down.status, 503);
+  assert.equal(down.headers.get('X-Content-Type-Options'), 'nosniff', 'the 503 too');
+});
+
+test('H13: the Content-Type of a report is read whatever its case', async () => {
+  const report = [{ type: 'csp-violation', url: 'https://example.test/', body: { effectiveDirective: 'script-src', blockedURL: 'inline' } }];
+  const [res, lines] = await call(post('Application/Reports+JSON', report));
+  assert.equal(res.status, 204);
+  assert.equal(lines.length, 1);
+  const csp = { 'csp-report': { 'document-uri': 'https://example.test/', 'blocked-uri': 'inline', 'violated-directive': 'style-src' } };
+  assert.equal((await call(post('APPLICATION/CSP-REPORT', csp)))[1].length, 1);
+});
+
+test('H13: a post with more than 20 reports has its first 20 logged, as the comment says', async () => {
+  const many = Array.from({ length: 25 }, (_, i) => ({ type: 'csp-violation', url: `https://example.test/p${i}`, body: { effectiveDirective: 'script-src' } }));
+  const [res, lines] = await call(post('application/reports+json', many));
+  assert.equal(res.status, 204);
+  assert.deepEqual(lines.map((l) => l.report.page), many.slice(0, 20).map((r) => r.url));
+});
+
+test('H13: a dev server on this machine or the local network stays on http; anywhere else goes to https', async () => {
+  const env = { ASSETS: site() };
+  for (const host of ['localhost:8787', 'uplink.localhost:8787', '127.0.0.1:8787', '[::1]:8787', '0.0.0.0:8787', '192.168.1.20:8787',
+    '10.0.0.5:8787', '172.20.1.2:8787', '169.254.3.4', 'johns-mac.local:8787', '[fd12:3456::1]:8787', '[fe80::1]:8787']) {
+    assert.equal((await worker.fetch(new Request(`http://${host}/services`), env)).status, 200, host);
+  }
+  for (const host of ['example.test', '172.32.0.1', '8.8.8.8', 'localhost.example.test', '[2001:db8::1]']) {
+    const res = await worker.fetch(new Request(`http://${host}/services`), env);
+    assert.equal(res.status, 308, host);
+    assert.equal(res.headers.get('Location'), `https://${host}/services`);
+  }
+});
+
+// wrangler.jsonc as wrangler itself reads it
+const config = async () => (await import('wrangler')).unstable_readConfig({ config: 'wrangler.jsonc' });
+
+test('H1, H2: the Worker runs only for /api/*, /404 and addresses with no file; no invocation logs, console.log kept', async () => {
+  const { assets, observability } = await config();
+  assert.deepEqual(assets.run_worker_first, ['/api/*', '/404']);
+  assert.equal(assets.not_found_handling, 'none', 'a miss must reach the Worker ("404-page" would answer it from the assets, review B8)');
+  assert.equal(observability.enabled, true, 'the report lines are console.log, kept only with observability on');
+  assert.equal(observability.logs?.invocation_logs, false);
 });

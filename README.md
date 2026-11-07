@@ -108,8 +108,8 @@ Python's Chromium is used only by `gen_og.py`, which screenshots the share pictu
 | Path | What it holds |
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
-| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
-| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
+| `public/` | Files served as they are: the `_headers` template, the Speculation Rules (`speculation-rules.json`), fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `check-dist.mjs` is wrangler's build step (`build.command`): it refuses a `dist/` that `headers.mjs` didn't finish. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
@@ -238,7 +238,7 @@ Each check fails, and exits with status 1, on any finding. Every check takes its
 | Command | What it checks |
 | --- | --- |
 | `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). On Home: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall below the header, no panel overflow). The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. On every page: script errors are watched until the network is idle and 3 seconds after (Home 5), while the screen turns and back, and while each of the page's own buttons is pressed; exactly one `h1`; every JSON-LD block parses; no sideways scroll at the footer, nor at 320, 390, 600, 768, 1024, and 1280 px wide; each pop-up the page opens shows, passes axe while open, closes on Esc, and gives focus back, and a toast leaves on its own; on Home at phone size the services row follows a swipe. All of it runs twice: as is and with the site's pause on, when on Home nothing may loop. The sideways check picks each Grow step by hand, so it doesn't wait on Grow's own timer. Plus an axe pass on each page, and checks of behaviour the November 7, 2026 review found broken (each test names its item): Grow asks for no frames and runs no loops once its story ends or while off screen, picks up a held or hidden step where it stopped, keeps your own pause, and pauses when reduced motion comes on; its Next button keeps keyboard focus at the last step; a double-click on a pop-up's opener leaves it open; each pop-up has its own live region and an "Esc" in its close button's name; the skip link moves focus to `<main>`; a toast dismissed with Enter gives focus back; with the drawings blocked, the hero shows the still office and no broken-image box shows; a late font moves nothing (CLS under 0.01 on Home at 1440 and the 404 at phone size); printed, Home and Contact show every Grow step, no form or pop-up opener, a contact line, and no section a screen tall; and each drawing's `?v=` is the hash of the file served. Home runs at phone, tablet, 1440×900, and 3440×1440 (pop-ups and axe at phone and 1440, with a footer tab's panel at 1440), every other page at phone size, because Home is the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. A known bug that a later fix will close is marked as an expected failure (`KNOWN` in the spec, naming the review item); the test fails once the bug is gone, so the mark comes out with the fix. Screenshots go to `out/`. |
-| `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, the 404 page's included, and every `#section` link finds its id. CI runs it. `--external` also checks links to other sites. |
+| `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, the 404 page's included, and every `#section` link finds its id. It also rests the pointer on a link and checks that Chromium prefetches the page and uses the prefetch on the click, and that it doesn't prefetch `/api/` or `.md` links. CI runs it. `--external` also checks links to other sites. |
 | `npm run verify:text [-- --text N]` | Every page at four sizes with the text at 200% (or `N`×): no clipped, overlapping, or unreachable text, and no sideways scroll. `--text 1` runs it at the default size, where it should come back clear too. |
 | `npm run verify:spacing [-- PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
 | `npm run verify:styles -- BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
@@ -251,7 +251,7 @@ These checks ask a deployed site over plain HTTP. They need no local server.
 
 | Command | What it checks |
 | --- | --- |
-| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects, the 404 status, the report endpoint, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
+| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects (the other spellings of an address, and `http://`), the 404 page (its status, asked again with `If-None-Match`, and for a missing `.md`, `.txt`, script, font, or drawing, with the pages' headers), the Worker's own headers, the report endpoint, the Speculation Rules, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone, and a page asked for over `http://` to redirect. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
 | `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
 
 ## Hosting
@@ -263,15 +263,23 @@ The site runs on Cloudflare Workers with static assets.
 
 ### The Worker
 
-`worker/index.js` is the site's only server code. Today, `run_worker_first` is `true` in `wrangler.jsonc`, so every request reaches the Worker before the static files. The Worker does three things:
+`worker/index.js` is the site's only server code. Most requests never run it: the static files answer them, with `_headers` and `_redirects` applied. `wrangler.jsonc` sends the Worker three kinds of request:
 
-- Redirects `http://` to `https://` with a `308`. `workers.dev` belongs to Cloudflare, so its "Always Use HTTPS" setting isn't ours to turn on.
-- Answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
-- Gives `/404` itself a 404 status.
+- **`/api/*`** (`run_worker_first`). The Worker answers `POST /api/report`, where visitors' browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
+- **`/404`** (`run_worker_first`). The 404 page is a file, `dist/404.html`, so asked for by name it would answer `200`. The Worker gives it a `404` status.
+- **An address with no file** (`not_found_handling: "none"`). The Worker answers with the same 404 page and the same headers as `/404`. With `"404-page"`, the static files would answer instead, but with the `_headers` rules of the missing path: a missing `.md` sent as Markdown, or a missing script cached for a year.
 
-Everything else goes on to the static files, with `_headers`, `_redirects`, and the 404 page applied. A report it can't read gets a `400`, and anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead (`Cache-Control: no-store`), as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
+The Worker always fetches the 404 page afresh, without the visitor's `If-None-Match` or `If-Modified-Since`, and sends it without an `ETag`, so a second visit never gets an empty page. A `POST`, or any method other than `GET` and `HEAD`, to `/404` or to a missing address gets a `405`, as it does from the static files.
 
-> **Note:** Every request counts against the free plan's 100,000 Worker requests a day. At launch, turn on Always Use HTTPS on the real domain's zone and set `run_worker_first` back to `["/api/*", "/404"]`. The steps are in [`docs/launch-runbook.md`](docs/launch-runbook.md).
+For the requests it sees, the Worker also redirects `http://` to `https://` with a `308`, except for a server on your computer or local network (`localhost`, `*.localhost`, `*.local`, `0.0.0.0`, and private addresses). On `workers.dev`, the pages and files themselves aren't redirected: every major browser treats `.dev` addresses as HTTPS-only (the HSTS preload list), so only a tool such as `curl` asks for one over `http://`. At launch, Always Use HTTPS on the domain's zone redirects every request before it reaches the Worker or the files.
+
+Every response the Worker writes itself carries `X-Content-Type-Options: nosniff`, `Cache-Control: no-store`, and a CSP that lets it load nothing, because `_headers` doesn't reach a Worker's own responses. The 404 page keeps the headers it has as a file.
+
+A report it can't read gets a `400`. Anything else that goes wrong in the Worker sends the request on to the static files, so a bug there never shows Cloudflare's error page instead of the site. An `/api/` request, or one whose body the Worker has already read, gets a plain `503` instead, as the static files have nothing for it. `npm test` posts every odd shape a report can take to it (`scripts/test/worker.test.mjs`).
+
+The Workers logs keep the Worker's own lines, one per report, for 3 days on the free plan. Cloudflare's own record of each run, the invocation log, is off (`observability.logs.invocation_logs` in `wrangler.jsonc`).
+
+> **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
 
 ### Deploys
 
@@ -283,7 +291,16 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
 - A push to `main` that passes the build job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
+
+### Repository rules
+
+Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
+
+- **main: no force push or delete.** Applies to everyone.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
+
+Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
 
 ### Roll back a bad deploy
 
@@ -305,7 +322,9 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
 ### Response headers
 
-`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP) and the cache rules. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them.
+`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP), the cache rules, and the `Speculation-Rules` header. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them: the Worker sets its own (see [The Worker](#the-worker)).
+
+The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`, served as `application/speculationrules+json`. When a pointer rests on a link to one of the site's pages for 200 ms (on phones, when the link comes into view), the browser fetches that page in the background, so the click doesn't wait for the HTML. Links to `/api/` and to the `.md` and `.txt` copies are left out. A header, unlike an inline `<script type="speculationrules">`, needs no change to the CSP. Other browsers ignore it.
 
 The file is a template. `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also writes an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
 

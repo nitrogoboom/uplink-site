@@ -1,6 +1,6 @@
 # Launch runbook: move the site to its real domain
 
-*Last updated: November 6, 2026*
+*Last updated: November 7, 2026*
 
 This runbook gives the order of steps for launch day, who does each one, and how to back out. The reasons behind each step are in "Domain and hosting" in [`notes.md`](../notes.md) and in [`go-live-checklist.md`](go-live-checklist.md).
 
@@ -19,8 +19,8 @@ Choose how the old `workers.dev` address is retired. The choice changes the code
 
 | Option | What happens | What it costs |
 | --- | --- | --- |
-| **A. Turn `workers.dev` off** | The old address stops answering. | Nothing runs on every request. Links to the old address break. CI's screenshot comparison and pull request previews must stop relying on it. |
-| **B. Redirect `workers.dev` to `DOMAIN`** | The old address sends a `301` to the same page on `DOMAIN`. | The Worker must see every request, so `run_worker_first` stays `true`, and every request counts against the free plan's 100,000 a day. Needs a host redirect in `worker/index.js`, which doesn't exist yet. |
+| **A. Turn `workers.dev` off** | The old address stops answering. | No code change. Links to the old address break. CI's screenshot comparison and pull request previews must stop relying on it. |
+| **B. Redirect `workers.dev` to `DOMAIN`** | The old address sends a `301` to the same page on `DOMAIN`. | The Worker must see every request, so `run_worker_first` becomes `true`, and every request counts against the free plan's 100,000 a day. Needs a host redirect in `worker/index.js`, which doesn't exist yet. |
 
 ## The day before
 
@@ -35,8 +35,8 @@ Choose how the old `workers.dev` address is retired. The choice changes the code
    - `.github/workflows/site.yml`: change the live address the screenshot comparison uses from `uplink-site.johnoreilly.workers.dev` to `DOMAIN`. Change the same address in the example in the comment at the top of `scripts/ci.mjs`.
    - `SECURITY.md`: point the `security.txt` link at `DOMAIN`.
    - `src/data/privacy.md`: if Bot Fight Mode goes on, change "The site sets no cookies". See item 17 in `docs/privacy-and-accessibility-2026-11-03.md`.
-   - **With option A:** set `run_worker_first` back to `["/api/*", "/404"]` in `wrangler.jsonc`, and remove the `http://` to `https://` lines from `worker/index.js`, because the zone does that now.
-   - **With option B:** keep `run_worker_first` as `true`. Add a redirect to `worker/index.js` that sends any request for the `workers.dev` host to the same path on `DOMAIN` with a `301`. Keep the `http://` to `https://` lines.
+   - **With option A:** nothing in `wrangler.jsonc` or `worker/index.js`. Keep `run_worker_first` as `["/api/*", "/404"]` and `not_found_handling` as `"none"`. Keep the `http://` to `https://` lines in `worker/index.js`: preview addresses are still on `workers.dev`, and on `DOMAIN` the zone redirects first.
+   - **With option B:** set `run_worker_first` to `true` and keep `not_found_handling` as `"none"` (the Worker's 404 page works either way). Add a redirect to `worker/index.js` that sends any request for the `workers.dev` host to the same path on `DOMAIN` with a `301`. Keep the `http://` to `https://` lines.
 4. **Claude:** open the pull request, and let CI pass. Don't merge yet.
 5. **Both:** read the pull request's preview once, end to end.
 

@@ -15,6 +15,12 @@
 # X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
 # robots.txt still allows crawling, so search engines can read this, and names no sitemap (src/pages/robots.txt.ts).
 # At launch, delete the line and put the Sitemap line back in robots.txt (notes.md, "Before going live").
+# Speculation-Rules: Chrome and Edge fetch a page in the background when a pointer rests on a link to it (on phones,
+# when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json: our
+# own pages only, not /api/ or the .md and .txt copies. A header, not an inline <script>, so the CSP needs nothing
+# new. Other browsers ignore it, and so does any response that isn't a page.
+# A missing address isn't served from this file's path rules: the Worker answers it with the 404 page and /404's
+# headers, so the rules below for a path (/*.md, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
 /*
   X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000
@@ -26,6 +32,7 @@
   X-Permitted-Cross-Domain-Policies: none
   X-Frame-Options: DENY
   Reporting-Endpoints: csp="/api/report"
+  Speculation-Rules: "/speculation-rules.json"
   Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
@@ -41,6 +48,10 @@
 /*.txt
   ! Content-Type
   Content-Type: text/plain; charset=utf-8
+# Chrome reads speculation rules only under their own type (Cloudflare would send application/json).
+/speculation-rules.json
+  ! Content-Type
+  Content-Type: application/speculationrules+json
 
 # Astro names every bundled CSS and JS file by its content hash (/_astro/x.ab12cd34.css), so a year is safe.
 /_astro/*

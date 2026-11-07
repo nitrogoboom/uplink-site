@@ -9,8 +9,16 @@
 //                                                                       http, so those two checks are left out
 // Checks:
 //   every page in sitemap.xml answers 200, as text/html, with the security headers
-//   plain http:// redirects (301/308) to the same https:// address (not on localhost)
-//   a made-up address answers 404 with the site's 404 page; /404 itself answers 404
+//   plain http:// redirects (301/308) to the same https:// address (not on localhost): an address the Worker
+//                    answers, always; with --launch a page too (the zone's Always Use HTTPS). On workers.dev the
+//                    pages aren't redirected: browsers never ask a .dev host over http (README, "The Worker")
+//   a made-up address answers 404 with the site's 404 page; /404 itself answers 404, also when asked again with
+//                    If-None-Match / If-Modified-Since (not an empty page), and refuses a POST (405)
+//   a missing .md, .txt, /_astro/ file, font or drawing answers the same 404 page with the pages' headers: HTML,
+//                    the pages' CSP, not cached for a year
+//   the Worker's own answers (/api/report, other /api/ addresses) are nosniff and no-store, with a CSP of their own
+//   /index, /index.html, /services/, /services.html, /services/index.html and /services/index: 308 to the page
+//   pages name their speculation rules (Speculation-Rules), served as application/speculationrules+json
 //   /api/report refuses a GET (405); robots.txt, llms.txt and a .md copy answer
 //   sitemap.xml names this address (not another host; not on localhost)
 //   noindex: present while it's a test build; with --launch, gone, and robots.txt names the sitemap
@@ -23,8 +31,8 @@ const UA = { 'User-Agent': 'uplink-smoke-test' };
 const HEADERS = ['strict-transport-security', 'content-security-policy', 'x-content-type-options', 'referrer-policy', 'x-frame-options', 'permissions-policy', 'cross-origin-opener-policy', 'cross-origin-resource-policy', 'x-permitted-cross-domain-policies'];
 
 // [status, headers, body] without following redirects
-async function get(url, method = 'GET') {
-  const r = await fetch(url, { method, headers: UA, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
+async function get(url, method = 'GET', headers = {}) {
+  const r = await fetch(url, { method, headers: { ...UA, ...headers }, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
   return [r.status, r.headers, await r.text()];
 }
 
@@ -61,14 +69,62 @@ test('smoke', async () => {
   }
   console.log(`${urls.length} pages checked`);
 
+  const pageCsp = h.get('content-security-policy');   // the last page's
+  const speculation = h.get('speculation-rules');
   if (!local) {
-    [status, h] = await get(`http://${host}/services`);
-    ok([301, 308].includes(status) && h.get('location') === `https://${host}/services`, `http:// redirect: ${status} to ${h.get('location')}`);
+    for (const path of launch ? ['/api/report', '/services'] : ['/api/report']) {
+      [status, h] = await get(`http://${host}${path}`);
+      ok([301, 308].includes(status) && h.get('location') === `https://${host}${path}`, `http://${host}${path} redirect: ${status} to ${h.get('location')}`);
+    }
   }
+  const page404 = (b) => b.includes('404') || b.toLowerCase().includes('not found');
   [status, , body] = await get(`${base}/no-such-page-smoke-test`);
   ok(status === 404, `made-up address: ${status}, not 404`);
-  ok(body.includes('404') || body.toLowerCase().includes('not found'), 'made-up address: not the site 404 page');
-  ok((await get(`${base}/404`))[0] === 404, '/404 does not answer 404');
+  ok(page404(body), 'made-up address: not the site 404 page');
+  [status, h] = await get(`${base}/404`);
+  ok(status === 404, '/404 does not answer 404');
+  // asked again the way a browser revalidates (review B3): with the validators it was given, or made-up ones
+  const again = { 'If-None-Match': h.get('etag') || '"smoke"', 'If-Modified-Since': h.get('last-modified') || new Date().toUTCString() };
+  for (const path of ['/404', '/no-such-page-smoke-test']) {
+    [status, , body] = await get(base + path, 'GET', again);
+    ok(status === 404 && page404(body), `${path} asked again (If-None-Match): ${status}, ${body.length} bytes, not the 404 page`);
+  }
+  ok((await get(`${base}/404`, 'POST'))[0] === 405, '/404 POST is not 405');
+  // a missing file under a _headers path rule (review B8): the 404 page, as a page
+  for (const path of ['/no-such.md', '/no-such.txt', '/_astro/no-such.js', '/assets/fonts/no-such.woff2', '/assets/img/no-such.svg']) {
+    [status, h, body] = await get(base + path);
+    const type = h.get('content-type') || '', cache = h.get('cache-control') || '', csp = h.get('content-security-policy');
+    ok(status === 404 && page404(body), `${path}: ${status}, not the 404 page`);
+    ok(type.startsWith('text/html'), `${path}: 404 page sent as ${type}`);
+    ok(!/immutable|max-age=[1-9]/.test(cache), `${path}: 404 cached (${cache})`);
+    ok(csp === pageCsp, `${path}: 404 page under another CSP (${(csp || 'none').slice(0, 40)}…)`);
+  }
+  // the Worker's own answers (review H7)
+  for (const [path, want] of [['/api/report', 405], ['/api/no-such', 404]]) {
+    [status, h] = await get(base + path);
+    ok(status === want, `${path}: ${status}, not ${want}`);
+    const missing = ['x-content-type-options', 'content-security-policy'].filter((n) => !h.get(n));
+    if (h.get('cache-control') !== 'no-store') missing.push('Cache-Control: no-store');
+    ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
+  }
+  // the other spellings of an address (review H13)
+  for (const [from, to] of [['/index', '/'], ['/index.html', '/'], ['/services/', '/services'], ['/services.html', '/services'],
+    ['/services/index.html', '/services'], ['/services/index', '/services']]) {
+    [status, h] = await get(base + from);
+    ok(status === 308 && h.get('location') === to, `${from}: ${status} to ${h.get('location')}, not 308 to ${to}`);
+  }
+  // Speculation Rules (review L12): the header names a file of prefetch rules for our own pages only
+  const rulesPath = speculation?.match(/^"([^"]+)"$/)?.[1];
+  ok(rulesPath, `pages: Speculation-Rules header ${speculation ?? 'missing'}, not a quoted address`);
+  if (rulesPath) {
+    [status, h, body] = await get(new URL(rulesPath, base).href);
+    ok(status === 200 && h.get('content-type') === 'application/speculationrules+json', `${rulesPath}: ${status} as ${h.get('content-type')}`);
+    let rules;
+    try { rules = JSON.parse(body); } catch { ok(false, `${rulesPath}: not JSON`); }
+    const text = JSON.stringify(rules?.prefetch || []);
+    ok(rules?.prefetch?.length && rules.prefetch.every((r) => r.eagerness === 'moderate'), `${rulesPath}: no moderate prefetch rules`);
+    for (const left of ['/api/*', '/*.md']) ok(text.includes(`{"not":{"href_matches":"${left}"}}`), `${rulesPath}: ${left} not left out`);
+  }
   ok((await get(`${base}/api/report`))[0] === 405, '/api/report GET is not 405');
   for (const path of ['/robots.txt', '/llms.txt', '/services.md']) ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
   const robots = (await get(`${base}/robots.txt`))[2];

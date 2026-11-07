@@ -33,7 +33,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Styles from script: `el.style.x = …`. Markup carries classes only; the CSP has no `'unsafe-inline'` and the build fails on a `style=""` attribute.
 - `public/_headers` is a template; `scripts/headers.mjs` fills in the hashes and Early Hints at build. Hashes are always generated.
 - A link whose visible parts sit in separate boxes gets `<Pause />` between them. A `<Pause />` inside a sideways-scrolling row needs `position: relative` on its box (it's absolute, and would widen the page).
-- The Worker (`worker/index.js`) sees every request today (`run_worker_first: true`). What it does, and how that narrows at launch: README, "The Worker".
+- The Worker (`worker/index.js`) runs only for `/api/*`, `/404` and addresses with no file (`run_worker_first` and `not_found_handling: "none"` in `wrangler.jsonc`); every other request is a static file. What it does: README, "The Worker".
 
 ## CSS
 

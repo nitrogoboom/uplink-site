@@ -20,7 +20,7 @@ A *release* is the first production launch, and any later change to layout, navi
 | Content | Typed JSON and Markdown: services, projects, FAQ, team, footer, Grow | `src/content/`, `src/data/`, `src/content.config.ts` |
 | Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
 | Drawings | Python generators write every SVG. Builds and checks never run them. | `tools/gen_*.py`, Python 3.12, `requirements.txt` |
-| Hosting | Cloudflare Workers: static files, plus one small Worker. Today the Worker sees every request: it redirects `http://` to `https://`, answers `/api/report` (error and CSP reports), and gives `/404` its status. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
+| Hosting | Cloudflare Workers: static files, plus one small Worker. The Worker runs only for `/api/*`, `/404` and addresses with no file: it answers `/api/report` (error and CSP reports) and sends the 404 page with a 404 status and the pages' headers. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
 | CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. On a pull request, also a preview and a screenshot comparison. Node only, no Python. Actions are pinned to commits. | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
 | Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
@@ -50,6 +50,8 @@ A *release* is the first production launch, and any later change to layout, navi
     Give the release a few lines and a link to the record, as `v2026.11.03` does.
 
 > **Note:** A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing. A branch push without a pull request also runs nothing.
+
+> **Note:** A ruleset requires a pull request and a passing `build` for `main`, and blocks force pushes. Repository admins can bypass the pull request rule, which is how notes go straight to `main`. See "Repository rules" in the [README](../README.md#repository-rules).
 
 ## Standards we meet
 
