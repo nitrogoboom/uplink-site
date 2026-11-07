@@ -57,7 +57,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
 | `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` and the services collection. |
-| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the text size and the keyboard-shortcuts switch. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |

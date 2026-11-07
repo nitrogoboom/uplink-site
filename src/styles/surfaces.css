@@ -45,10 +45,6 @@
   .card--project > .card-body { grid-area: body; gap: var(--sp-1); padding: 0; overflow-wrap: break-word; }
   .card--project .card-title { font-size: var(--fs-4); text-wrap: balance; }   /* "Office move / in a weekend", not "…in a / weekend" */
   .card--project .card-meta { line-height: var(--lh-snug); }
-  /* bigger text (Settings) from 150%: the words would squeeze beside the drawing, so the card stacks again, with a
-     shorter picture than the wider screens' and the chip under it */
-  :root[data-text]:not([data-text="1.25"]) .card--project { grid-template: "media" auto "chip" auto "body" auto / minmax(0, 1fr); }
-  :root[data-text]:not([data-text="1.25"]) .card--project > .card-media { aspect-ratio: 2 / 1; min-height: 0; margin-bottom: var(--sp-3); }
 }
 
 .icon-tile {

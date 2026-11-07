@@ -28,8 +28,6 @@
 /* the label comes first in the HTML, so it is heard before the number; column-reverse shows the number on top */
 .queue-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: var(--sp-1); text-align: center; }
 .queue-ring-label .label { max-width: 10em; }   /* wraps under the number, inside the ring */
-/* bigger text (Settings): the ring grows with its words (never wider than its column) */
-:root[data-text] .queue-ring { width: min(100%, calc((var(--sp-9) + var(--sp-8)) * var(--text))); }
 .queue-ring-track { stroke: var(--c-line); }
 .queue-ring-arc { stroke: var(--c-accent-text); transition: stroke-dasharray var(--dur-3) var(--ease); }
 

@@ -82,13 +82,3 @@
 .hbtn svg { width: var(--icon); height: var(--icon); flex: none; }
 :root:not(.js) .hbtn-settings { display: none; }   /* the settings need script; without it there is nothing to open */
 
-/* bigger text (Settings, html[data-text]): the tagline and the buttons' words step aside, as on tablets (each button
-   keeps its name in aria-label), and the tabs scroll sideways when they don't fit instead of running into the buttons */
-:root[data-text] :is(.brand-sub, .hdr-actions .hbtn-text) { display: none; }
-:root[data-text] .tabs { overflow-x: auto; justify-content: safe center; scrollbar-width: none; }
-:root[data-text] .tab[aria-current]::after { bottom: 0; }   /* inside the scroll box, which clips the line below it */
-:root[data-text] .tab { padding-inline: var(--sp-3); }   /* so the bigger tabs fit from 1100px; tablets move them to the bottom bar */
-/* the smallest phones: the bigger name and three buttons need about 337px, so under 340px the logo mark stands alone
-   (the link keeps its full name in aria-label) */
-@media (width < 21.25em) { :root[data-text] .brand-text { display: none; } }
-

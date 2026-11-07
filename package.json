@@ -13,7 +13,6 @@
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "node scripts/check.mjs site",
     "verify:links": "node scripts/check.mjs links",
-    "verify:text": "node scripts/check.mjs text",
     "verify:spacing": "node scripts/check.mjs spacing",
     "verify:styles": "node scripts/check.mjs styles",
     "visual-diff": "node scripts/check.mjs visual",

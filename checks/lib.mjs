@@ -4,16 +4,16 @@
 // address that gets the 404 page in place of /404). It also reads the served sitemap.xml and throws unless it lists
 // exactly the built pages other than /soon and the 404, so a page can't drop out of the sitemap, or out of the checks,
 // unnoticed.
-// SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (site, spacing and text checks).
+// SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (site and spacing checks).
 import { existsSync, readdirSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
 
-// scripts/check.mjs passes its arguments here, as JSON: `npm run verify:text -- --text 1` gives ['--text', '1']
+// scripts/check.mjs passes its arguments here, as JSON: `npm run verify -- --out DIR` gives ['--out', 'DIR']
 export const ARGS = JSON.parse(process.env.CHECK_ARGS || '[]');
-const VALUED = new Set(['--base', '--out', '--text', '--only', '--min', '--old', '--dist']); // options that take a value
+const VALUED = new Set(['--base', '--out', '--only', '--min', '--old', '--dist']); // options that take a value
 export const flag = (name) => ARGS.includes(name);
 export const option = (name, fallback) => (ARGS.includes(name) ? ARGS[ARGS.indexOf(name) + 1] : fallback);
 export const positional = ARGS.filter((a, i) => !a.startsWith('--') && !VALUED.has(ARGS[i - 1]));

@@ -10,8 +10,7 @@ html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
 .picker-prev { grid-area: prev; min-width: 0; max-width: 100%; display: flex; flex-direction: column; }
 .picker-art { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .picker-prev img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: var(--sp-7) var(--sp-5) var(--sp-5); }
-.picker-prev .tags { position: absolute; top: var(--sp-4); left: var(--sp-4); right: var(--sp-4); display: flex; justify-content: space-between; gap: var(--sp-2); }
-:root[data-text] .picker-prev .tags { flex-wrap: wrap; }   /* bigger text (Settings): the two chips stack when they don't fit side by side */
+.picker-prev .tags { position: absolute; top: var(--sp-4); left: var(--sp-4); right: var(--sp-4); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-2); }   /* the two chips stack when they don't fit side by side */
 .feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
 .feat { display: flex; align-items: center; gap: var(--sp-4); }
 .feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent-text); }

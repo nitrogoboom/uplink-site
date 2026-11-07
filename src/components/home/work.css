@@ -7,7 +7,4 @@
   .work-wrap { display: flex; flex-direction: column; height: var(--fold-inner); }
   .work-wrap .card-row { flex: 1; min-height: 0; }
   .work-wrap .card-media { flex: 1; min-height: 0; aspect-ratio: auto; }
-  /* bigger text (Settings): the cards grow to fit their words; the pictures keep their own shape */
-  :root[data-text] .work-wrap { height: auto; min-height: var(--fold-inner); }
-  :root[data-text] .work-wrap .card-media { flex: none; aspect-ratio: 4 / 3; }
 }

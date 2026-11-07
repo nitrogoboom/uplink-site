@@ -125,13 +125,11 @@
 }
 
 /* phones: the player scrolls with the page and the card sits under it. Text keeps the site's sizes, so it grows
-   with the visitor's text size (Settings). */
+   with the visitor's zoom. */
 @media (--phone) {
   .grow-cards { margin-top: var(--sp-3); }
-  /* bigger text: the team count goes under the place (side by side they meet), and a tag wider than the picture
-     wraps instead of running past its edge (grow.js keeps it inside by its real size) */
-  :root[data-text] .grow-team { top: calc(var(--sp-3) + var(--fs-1) + var(--sp-2)); right: auto; left: var(--sp-4); }
-  :root[data-text] .grow-tag { width: max-content; max-width: calc(100% - var(--sp-3)); white-space: normal; }
+  /* a tag wider than the picture wraps instead of running past its edge (grow.js keeps it inside by its real size) */
+  .grow-tag { width: max-content; max-width: calc(100% - var(--sp-3)); white-space: normal; }
 }
 
 /* tablet: the player a little narrower and centred, the card in two columns under it */

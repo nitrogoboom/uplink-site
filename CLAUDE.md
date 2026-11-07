@@ -40,7 +40,8 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - Values come from tokens in `src/styles/tokens.css`: colours, sizes, timings. Lint refuses raw spacing.
 - Order matters: a later file wins a tie. `src/styles/global.css` is the cascade order. A section's CSS sits beside its component, with its desktop layout at the end of that file; a block more than one page uses lives in `src/styles/`.
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
-- Text size (WCAG 1.4.4), **being removed** (review item C13, owner decision November 7, 2026: drop the Settings text-size option and fix browser zoom instead; don't add new `[data-text]` rules): Settings scales the `--fs-*` tokens by `--text` (`html[data-text]`). A box that pins a height to the screen gets a `:root[data-text]` rule in its own CSS so it grows (with `safe center`). A font size capped by the screen multiplies its cap by `var(--text)`. New display options (light/dark, EN/FR) go in Settings.
+- Breakpoints are in `em`, in range syntax (`(width < 43.75em)`): the names in `src/lib/media.js`, and one-off queries the same way. Zoom and a bigger default font then count as a narrower screen.
+- Text size (WCAG 1.4.4) is the browser's own zoom; the site has no text-size option (review C13). New display options (light/dark, EN/FR) go in Settings.
 
 ## Drawings
 
@@ -51,7 +52,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Checking a change
 
 - Local first: `npm run dev`, then `npm run ci` (what CI runs).
-- After layout changes: `npm run build && npm run serve`, then `npm run verify` and `npm run verify:text` (`npm run verify:text -- --text 1` should come back clear too). `npm run verify -- --all` gives every page the full check.
+- After layout changes: `npm run build && npm run serve`, then `npm run verify`. `npm run verify -- --all` gives every page the full check.
 - Before a release: `npm run release-audit` and the checklist in `docs/sop.md`.
 - After a deploy: `npm run smoke -- ADDRESS`.
 

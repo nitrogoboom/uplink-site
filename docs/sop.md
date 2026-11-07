@@ -84,7 +84,7 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the preview alias, and the report endpoint, including every odd shape a report can take.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page: watched until the network is idle and a few seconds after, while the screen turns, and while each of the page's own buttons is pressed.
-- No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px, at normal and 200% text.
+- No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px.
 - Exactly one `h1` on every page, and every JSON-LD block parses.
 - Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own; the phone services row follows a swipe. All of it with the site's pause on too, when nothing on Home may loop.
 - The sitemap lists exactly the pages the build wrote, and every check covers all of them.
@@ -116,7 +116,7 @@ Run it on the pull request's preview or on the live site. Copy this section to `
 ### B. Release audit (machine, about 10 minutes)
 
 1. Run `npm run build`, then `npm run serve`.
-2. In a second terminal, run `npm run release-audit`, `npm run verify -- --all`, and `npm run verify:text`.
+2. In a second terminal, run `npm run release-audit` and `npm run verify -- --all`.
 3. Paste `out/audit/report.md` and the last line of the other two (the count of passed tests) into the record.
 
 A clean run ticks every box here. A failure names the page and the problem.
@@ -125,7 +125,7 @@ A clean run ticks every box here. A failure names the page and the problem.
 - [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page. Focus is visible on every stop, never off screen, and never stuck. Each dialog opens from the keyboard, Esc closes it, and focus returns. The stops per page are in `out/audit/keyboard/`.
 - [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. It fails on a link whose parts run together with no pause, or one link name that goes to two pages. Transcripts are in `out/audit/reader/`.
 - [ ] **axe on every page, on phone and desktop (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical.
-- [ ] **200% text (1.4.4):** `npm run verify:text` passes.
+- [ ] **200% text (1.4.4):** with the browser zoomed to 200%, in a phone-size and a desktop window, no text is cut off or overlapped and nothing scrolls sideways. Check it by hand until the zoom check replaces the text check (layout plan, phase 4).
 - [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves. With it off, the pause button stops every loop, and nothing flashes more than three times a second.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email address. Every problem field has its message in words, tied to the field, and focus goes to the first one.
 - [ ] **HTML (4.1.1):** Home passes the W3C validator with no HTML errors. When a release changes other pages' markup, check every page with `npm run release-audit -- --html-all`. The validator's CSS checker doesn't know some current CSS yet. The report lists those once and doesn't count them.

@@ -242,18 +242,6 @@ if (scToggle) {
   });
 }
 
-/* ---------- text size (Settings pop-up) -------------------------------- */
-// html[data-text] scales the type tokens (tokens.css). Base.astro's head sets it from storage before the page paints;
-// a choice here applies at once and is saved. The default leaves no attribute and nothing saved.
-const TEXT_KEY = 'uplink.text';
-$$('input[name="text-size"]').forEach((input) => {
-  input.checked = input.value === (root.dataset.text || '1');
-  input.addEventListener('change', () => {
-    if (input.value === '1') { delete root.dataset.text; store.set(TEXT_KEY, ''); }
-    else { root.dataset.text = input.value; store.set(TEXT_KEY, input.value); }
-  });
-});
-
 function isTyping(el) {
   if (!el || el === document.body) return false;
   if (el.isContentEditable) return true;
@@ -323,14 +311,13 @@ $$('form[data-validate]').forEach((form) => {
 /* ---------- phone tab bar: out of the way while reading ----------------- */
 // Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
 // It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put. The bar shows on phones, and on tablets with bigger text
-// (bottom-nav.css); elsewhere it is hidden, so the listener does nothing there.
+// The header stays put. The bar shows on phones only (bottom-nav.css); elsewhere it is hidden, so the listener does
+// nothing there.
 const botnav = $('.botnav');
 if (botnav) {
   const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia(MEDIA.phone);
-  const tablet = window.matchMedia(MEDIA.tablet);
-  const barOn = () => phone.matches || (tablet.matches && root.dataset.text !== undefined);
+  const barOn = () => phone.matches;
   let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (on) => botnav.classList.toggle('is-hidden', !on);
@@ -346,7 +333,7 @@ if (botnav) {
     lastY = y;
   };
   window.addEventListener('scroll', () => { if (!queued && barOn()) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
-  [phone, tablet].forEach((m) => m.addEventListener('change', () => { lastY = window.scrollY; show(true); }));
+  phone.addEventListener('change', () => { lastY = window.scrollY; show(true); });
   botnav.addEventListener('focusin', () => show(true));
 }
 

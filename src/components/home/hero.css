@@ -146,7 +146,7 @@
 }
 /* tablets: the headline steps down so it stays on two lines in its column */
 @media (56.25em <= width < 68.75em) and (height >= 35em) and (orientation: landscape) {
-  .hero-menu h1 { font-size: calc(min(var(--fs-8) / var(--text), 4.6vw) * var(--text)); }   /* the cap grows with the text size too */
+  .hero-menu h1 { font-size: min(var(--fs-8), 4.6vw); }
 }
 
 /* ---- desktop, tall enough for the menu ----------------------------------
@@ -169,12 +169,6 @@
      hero's height is a floor, not a cap, so it grows, and the menu centres only while it fits (safe), so its top
      never slides up under the header */
   .hero-menu { min-height: 0; justify-content: safe center; }
-  /* bigger text (Settings): the hero grows past one screen instead of cutting its headline off at the top */
-  :root[data-text] .hero-grid { height: auto; min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); grid-template-rows: auto 1fr; }
-  :root[data-text] .hero-menu { justify-content: safe center; }
-  /* the office keeps its own shape at the top of its column (stretched to the taller text, it would float far down) */
-  :root[data-text] .hero-art .stage { aspect-ratio: 40 / 31; }
-  :root[data-text] .hero-dock { align-self: start; }
   /* the menu is its own group: the column's --sp-6 gap plus this, --sp-8 under the button */
   .hero-menu .hero-services { display: block; margin-top: var(--sp-6); }
   /* icons and text line up with the headline; the highlight hangs outside */
@@ -195,10 +189,6 @@
     }
     /* the hero's own height, written out: the grid's height is only a floor, so 100% of it wouldn't resolve */
     .hero-art .stage { aspect-ratio: 40 / 31; height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); }
-    /* bigger text: the hero has no set height then, so the office takes the height the hero would have had (its
-       width comes from its height, and 100% of a growing box would feed back into itself) */
-    :root[data-text] .hero-grid { justify-content: safe center; grid-template-rows: auto; }
-    :root[data-text] .hero-art .stage { height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), 56rem); }
     .hero-menu { margin-right: var(--sp-6); }   /* menu to office: sp-6 + sp-6, as wide as the sp-8 gap above */
     .hero-dock { grid-template-columns: minmax(0, 1fr); align-content: end; }
   }

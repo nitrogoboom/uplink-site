@@ -15,7 +15,7 @@
 //                   saved as uplink-held), which must never hide a pop-up (review B1)
 // Fails on any of those, a hero tile that doesn't answer hover, a Grow section that doesn't play, a footer tab at
 // 1440x900 that isn't one screen tall or whose panel overflows, a header whose tabs come within 8px of the logo or
-// buttons (or scroll) at any width from 320 to 1440 in 10px steps and on wider screens, at the default and 200% text,
+// buttons (or scroll) at any width from 320 to 1440 in 10px steps and on wider screens,
 // anything serious or critical from axe, or a sitemap that doesn't list exactly the built pages.
 // Known failures are marked test.fail with the review item that fixes them (KNOWN, below): such a test fails the run
 // once the bug is fixed, as a reminder to drop the mark.
@@ -114,49 +114,37 @@ test('index 1440: hero, Grow, footer tabs', async ({ browser }) => {
   verdict([...fails, ...errs]);
 });
 
-// header fit: at every 10px from 320 to 1440 (and four wider screens), at the default and the biggest text size, the
-// tabs keep 8px clear of the logo and the buttons and don't scroll, and nothing scrolls sideways. Room for a new header
-// button has to be made in bottom-nav.css (its measured rules), not found here later.
-for (const text of ['', '2']) {
-  test(`header fit, text ${text || 'default'}`, async ({ browser }) => {
-    const fails = [];
-    const ctx = await browser.newContext();
-    await ctx.addInitScript((t) => {
-      try {
-        localStorage.setItem('uplink.text', t);
-      } catch {
-        /* no storage: the default size */
-      }
-    }, text);
-    const q = await ctx.newPage();
-    await q.setViewportSize({ width: 1440, height: 900 });
-    await q.goto(url('about'));
-    let worst = null;
-    const widths = [...Array.from({ length: 113 }, (_, i) => 320 + i * 10), 1600, 1920, 2560, 3440];
-    for (const w of widths) {
-      await q.setViewportSize({ width: w, height: 900 });
-      await q.waitForTimeout(60);
-      const r = await q.evaluate(() => {
-        const t = document.querySelector('.tabs'),
-          u = t.querySelector('ul').getBoundingClientRect(),
-          b = document.querySelector('.brand').getBoundingClientRect(),
-          a = document.querySelector('.hdr-actions').getBoundingClientRect();
-        const on = getComputedStyle(t).display !== 'none';
-        return {
-          room: Math.round(on ? Math.min(u.left - b.right, a.left - u.right) : a.left - b.right),
-          cut: on ? t.scrollWidth - t.clientWidth : 0,
-          side: document.documentElement.scrollWidth - innerWidth,
-        };
-      });
-      if (worst === null || r.room < worst[1]) worst = [w, r.room];
-      if (r.room < 8 || r.cut > 0 || r.side > 0)
-        fails.push(`header at ${w}px, text ${text || 'default'}: ${r.room}px room, tabs cut ${r.cut}px, sideways ${r.side}px`);
-    }
-    console.log(`header fit, text ${text || 'default'}: tightest ${worst[1]}px at ${worst[0]}px wide`);
-    await ctx.close();
-    verdict(fails);
-  });
-}
+// header fit: at every 10px from 320 to 1440 (and four wider screens), the tabs keep 8px clear of the logo and the
+// buttons and don't scroll, and nothing scrolls sideways. Room for a new header button has to be made in
+// bottom-nav.css (its measured rules), not found here later.
+test('header fit', async ({ browser }) => {
+  const fails = [];
+  const q = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await q.goto(url('about'));
+  let worst = null;
+  const widths = [...Array.from({ length: 113 }, (_, i) => 320 + i * 10), 1600, 1920, 2560, 3440];
+  for (const w of widths) {
+    await q.setViewportSize({ width: w, height: 900 });
+    await q.waitForTimeout(60);
+    const r = await q.evaluate(() => {
+      const t = document.querySelector('.tabs'),
+        u = t.querySelector('ul').getBoundingClientRect(),
+        b = document.querySelector('.brand').getBoundingClientRect(),
+        a = document.querySelector('.hdr-actions').getBoundingClientRect();
+      const on = getComputedStyle(t).display !== 'none';
+      return {
+        room: Math.round(on ? Math.min(u.left - b.right, a.left - u.right) : a.left - b.right),
+        cut: on ? t.scrollWidth - t.clientWidth : 0,
+        side: document.documentElement.scrollWidth - innerWidth,
+      };
+    });
+    if (worst === null || r.room < worst[1]) worst = [w, r.room];
+    if (r.room < 8 || r.cut > 0 || r.side > 0) fails.push(`header at ${w}px: ${r.room}px room, tabs cut ${r.cut}px, sideways ${r.side}px`);
+  }
+  console.log(`header fit: tightest ${worst[1]}px at ${worst[0]}px wide`);
+  await q.close();
+  verdict(fails);
+});
 
 // each page at its sizes (each in its own tab, so they can't disturb each other)
 for (const page of PAGES) {

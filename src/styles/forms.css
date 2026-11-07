@@ -100,27 +100,3 @@ select.input:hover { border-color: var(--c-text); }
   .switch input:checked { background: Highlight; border-color: Highlight; }
   .switch input:checked::after { background: HighlightText; }
 }
-
-/* option buttons: one choice from a short row (radios; arrow keys move between them). Columns are sized in em, so
-   a bigger text size wraps the row instead of squeezing it */
-.seg-field { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; margin: 0; padding: 0; border: 0; }
-.seg-field > legend { padding: 0; margin-bottom: var(--sp-3); }   /* the browser's fieldset and legend padding off: the heading lines up with the rest of the pop-up; a legend takes no flex gap */
-.seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(4.5em, 1fr)); gap: var(--sp-2); font-size: var(--fs-2); }
-.seg-opt { position: relative; display: flex; }
-.seg-opt input { position: absolute; inset: 0; margin: 0; opacity: 0; }
-.seg-opt span {
-  flex: 1;
-  display: grid; place-items: center;
-  min-height: var(--tap);
-  padding-inline: var(--sp-2);
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-2);
-  background: var(--c-surface);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  transition: background-color var(--dur-1) var(--ease);
-}
-.seg-opt:hover span { background: var(--c-surface-2); }
-.seg-opt input:checked + span { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); }
-.seg-opt input:focus-visible + span { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }
-

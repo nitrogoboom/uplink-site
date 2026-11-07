@@ -53,11 +53,10 @@ To stop floods, our site counts how many reports come from one IP address in a s
 
 ### Settings saved on your device
 
-If you change a setting, the site remembers it in your browser, so it's the same next time you visit. It saves up to three settings:
+If you change a setting, the site remembers it in your browser, so it's the same next time you visit. It saves up to two settings:
 
 | Saved as | What it remembers |
 | --- | --- |
-| uplink.text | the text size you picked in Settings |
 | uplink.shortcuts | whether keyboard shortcuts are on or off |
 | uplink-held | whether you paused the animations |
 
@@ -143,4 +142,4 @@ If you're not happy with our answer, you can complain to the Office of the Priva
 
 If the site starts collecting something new, we'll update this page first and change the date below. If a change affects how we use information you've already given us, we'll ask you again.
 
-Last updated: 5 November 2026
+Last updated: 7 November 2026
