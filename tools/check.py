@@ -7,7 +7,9 @@ Reports:
   SNAP   vertices of different shapes that almost (not exactly) coincide (two shapes on one source line count too)
   TJOIN  vertices that almost (not exactly) touch another shape's edge
   A vertex (or the part of an edge) that sits inside an opaque filled face drawn later can't be seen, so a near-miss
-  there is not reported (SNAP or TJOIN).
+  there is not reported (SNAP or TJOIN). Opaque means filled, with no opacity or fill-opacity under 1 in its
+  attributes. A stylesheet's opacity isn't seen, so a near-miss covered only by a part made see-through in CSS
+  (the campus windows) would be missed; today none is.
   DOT    leader dots (.co circles) and what filled faces they sit on
 Leader lines (in a .co group) and class="mark" (arrowheads, routes, 2D markers) cross the drawing on purpose, so
 none of ANGLE, SNAP or TJOIN reads them; class="free" (parts tilted on purpose) skips ANGLE only.
