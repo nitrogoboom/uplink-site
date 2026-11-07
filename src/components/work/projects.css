@@ -23,12 +23,16 @@
 .filter:has(:focus-visible) { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }   /* the site's ring (base.css), on the chip */
 .filter .count { display: inline-grid; place-items: center; min-width: var(--sp-5); height: var(--sp-5); padding-inline: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); font-size: var(--fs-1); }
 .filter:has(:checked) .count { background: var(--c-ink-tint); }
-/* forced colours (Windows contrast themes) paint every chip alike: the checked one takes the theme's Highlight.
+/* forced colours (Windows contrast themes) paint every chip alike: the checked one takes the theme's Highlight. It
+   opts out of the forcing (forced-color-adjust: none, as in header.css and buttons.css), or the theme's backplate
+   puts Canvas behind its HighlightText words and they turn into a solid block. The focus ring is CanvasText: with
+   radios the focused chip is the checked one, and the forced ring (currentColor, HighlightText) would match the page.
    Layout plan phase 9 moves this into a site-wide preferences.css */
 @media (forced-colors: active) {
   .filter { transition: none; }   /* the words change at once: a fading background would leave them unreadable a moment */
-  .filter:has(:checked) { background: Highlight; border-color: Highlight; color: HighlightText; }
+  .filter:has(:checked) { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
   .filter:has(:checked) .count { background: Canvas; color: CanvasText; }
+  .filter:has(:focus-visible) { outline-color: CanvasText; }
 }
 @media (--phone) {
   .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); padding-block: var(--sp-1); scrollbar-width: none; }

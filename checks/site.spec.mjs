@@ -32,6 +32,7 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { PNG } from 'pngjs';
 import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
 import { LONG, longest } from '../src/lib/fit.js';
 
@@ -1049,6 +1050,93 @@ test('work filters: a radio group that works without script, keys, forced colour
   rep.push(`axe with a filter chosen: ${v.length} violation(s)`);
   await ctx.close();
   console.log(`work filters:\n  ${rep.join('\n  ')}`);
+  verdict(fails);
+});
+
+// B4, WCAG 2.4.7: in forced colours, dark and light, without script, as pixels (the theme's readability backplate
+// sits behind the words in Canvas, which computed styles don't show): the checked chip's word is legible (its box
+// holds two clearly different colours, not one solid block), and the focus ring round the focused chip (with radios,
+// always the checked one) isn't the page's Canvas colour. On paper a chosen filter doesn't filter: the filters don't
+// print, so every project does.
+test('work filters: forced colours legible as pixels, focus ring, print shows every project (B4)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const far = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2])) > 96;
+  const pixels = (buf) => {
+    const png = PNG.sync.read(buf);
+    const out = [];
+    for (let i = 0; i < png.data.length; i += 4) out.push([png.data[i], png.data[i + 1], png.data[i + 2]]);
+    return { w: png.width, h: png.height, px: out };
+  };
+  for (const scheme of ['dark', 'light']) {
+    for (const [w, h] of [[390, 844], [1440, 900]]) {
+      const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h }, deviceScaleFactor: 2 });
+      const q = await ctx.newPage();
+      await q.emulateMedia({ forcedColors: 'active', colorScheme: scheme });
+      await q.goto(url('work'));
+      await q.evaluate(() => document.fonts.ready);
+      const chip = q.locator('.filters .filter:has(:checked), .filters .filter[aria-pressed="true"]').first();
+      if (!(await chip.count()) || !(await chip.isVisible())) {
+        fails.push(`forced colours ${scheme} ${w}: no checked filter on screen`);
+        await ctx.close();
+        continue;
+      }
+      await chip.scrollIntoViewIfNeeded();
+      // the word's own box (its text node), shot as pixels: the commonest colour, and the share far from it
+      const word = await chip.evaluate((c) => {
+        const t = [...c.childNodes].find((n) => n.nodeType === 3 && n.textContent.trim());
+        const r = document.createRange();
+        r.selectNodeContents(t);
+        const b = r.getBoundingClientRect();
+        return { text: t.textContent.trim(), x: b.x, y: b.y, width: b.width, height: b.height };
+      });
+      const shot = pixels(await q.screenshot({ clip: { x: word.x, y: word.y, width: word.width, height: word.height } }));
+      const tally = new Map();
+      for (const p of shot.px) tally.set(p.join(), (tally.get(p.join()) || 0) + 1);
+      const main = [...tally].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+      const ink = shot.px.filter((p) => far(p, main)).length / shot.px.length;
+      if (ink < 0.08) fails.push(`forced colours ${scheme} ${w}: the checked chip's "${word.text}" is one block of rgb(${main}) (${(ink * 100).toFixed(1)}% of it another colour)`);
+      // the focus ring: Tab into the group from just before it lands on the checked radio
+      await chip.locator('input').focus();
+      await q.keyboard.press('Shift+Tab');
+      await q.keyboard.press('Tab');
+      const ring = await chip.evaluate((c) => {
+        const probe = document.createElement('div');
+        probe.style.backgroundColor = 'Canvas';
+        probe.style.forcedColorAdjust = 'none';
+        document.body.append(probe);
+        const canvas = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        const s = getComputedStyle(c);
+        const b = c.getBoundingClientRect();
+        return { focused: c.contains(document.activeElement), style: s.outlineStyle, color: s.outlineColor, width: parseFloat(s.outlineWidth), offset: parseFloat(s.outlineOffset), canvas, x: b.x, y: b.y, w: b.width, h: b.height };
+      });
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
+      if (!ring.focused) fails.push(`forced colours ${scheme} ${w}: Tab into the filters didn't focus the checked one`);
+      else if (ring.style === 'none' || !far(rgb(ring.color), rgb(ring.canvas))) fails.push(`forced colours ${scheme} ${w}: the focus ring is ${ring.style} ${ring.color}, on a Canvas of ${ring.canvas}`);
+      else {
+        // and as pixels: a line across the chip's middle, just outside its left edge, in the ring's band
+        const at = ring.x - ring.offset - ring.width / 2;
+        const band = pixels(await q.screenshot({ clip: { x: at - 0.5, y: ring.y + ring.h / 2 - 2, width: 1, height: 4 } }));
+        const seen = band.px.filter((p) => far(p, rgb(ring.canvas))).length / band.px.length;
+        if (seen < 0.5) fails.push(`forced colours ${scheme} ${w}: no focus ring to be seen beside the chip (${(seen * 100).toFixed(0)}% off Canvas ${ring.canvas})`);
+      }
+      rep.push(`forced colours ${scheme} ${w}: "${word.text}" ${(ink * 100).toFixed(1)}% ink on rgb(${main}); ring ${ring.style} ${ring.color} on ${ring.canvas}`);
+      await ctx.close();
+    }
+  }
+  // print, with a filter chosen
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('work'));
+  const labels = q.locator('.filters label');
+  if (await labels.count()) await labels.nth(1).click();
+  await q.emulateMedia({ media: 'print' });
+  const p = await q.$$eval('.work-grid > li', (ls) => ({ all: ls.length, shown: ls.filter((l) => l.getClientRects().length).length }));
+  if (p.shown !== p.all) fails.push(`print with a filter chosen: ${p.shown} of ${p.all} projects print`);
+  rep.push(`print with a filter chosen: ${p.shown} of ${p.all} projects`);
+  await ctx.close();
+  console.log(`work filters, forced colours and print:\n  ${rep.join('\n  ')}`);
   verdict(fails);
 });
 
