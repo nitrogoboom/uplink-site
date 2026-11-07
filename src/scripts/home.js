@@ -26,8 +26,9 @@ const afterLayout = (fn) => {
    (HERO in src/lib/site.ts, preloaded for the same screens), so a screen
    downloads only its own: the full hero; the tablet cut (fewer, bigger
    labels) where the hero shows narrow (data-tablet); and on phones the
-   phone cut, animated, with its dashes in a second file. Phones with
-   reduced motion fetch nothing and keep the still picture (compact-cuts.css).
+   phone cut, animated, with its dashes in a second file. With reduced
+   motion every cut stands still (its own CSS) and the phone captions
+   come at once, without their timer.
    The hero cuts go in ahead of the dashes' layer (svg.ob-over), then the
    cloud starts. A turn or resize that changes the cut swaps the file.
    ------------------------------------------------------------------ */
@@ -165,7 +166,6 @@ const startCloud = (cloud) => {
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const CAP_EVERY = 2200;     // ms between caption changes, the two captions taking turns (each one every 4.4s)
 const CAP_SWAP = 170;       // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
-const CAP_FIRST = 3300;     // ms before the first caption: the drawing builds first (office_parts/build.css)
 const CAP_SECOND = 1100;    // ms from the first caption to the second
 const CLOUD_TITLE = 'Cloud workspace';
 const make = (tag, cls, parent) => {
@@ -307,7 +307,10 @@ const startCaptions = (svg) => {
         probes.forEach(([key, el]) => lengths.set(key, el.getComputedTextLength()));
         cloudFill = window.getComputedStyle(probes[0][1]).fill;
         width = w;
-        if (begun) { write.cloud(); write.office(); }
+        // only the captions already shown: the office's comes 1.1 s after the cloud's (CAP_SECOND), and before that
+        // at.office is -1, with no item to write (a width change in that gap threw and left this box behind)
+        if (at.cloud >= 0) write.cloud();
+        if (at.office >= 0) write.office();
       }
       box.remove();
     });
@@ -323,14 +326,16 @@ const startCaptions = (svg) => {
   const onResize = () => relayout(svg.getBoundingClientRect().width);
   const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
   if (sized) sized.observe(svg); else { window.addEventListener('resize', onResize); afterLayout(onResize); }
-  // first words once the drawing has built (about 3.2s; at once with reduced motion), the office's 1.1s after
+  // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
+  // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
+  const capFirst = Number(svg.dataset.words) || 0;
   let second = 0;
   const first = window.setTimeout(() => {
     begun = true;
     step('cloud', !quick);
     second = window.setTimeout(() => { step('office', !quick); loop.start(); }, quick ? 0 : CAP_SECOND);
-  }, quick ? 0 : CAP_FIRST);
+  }, quick ? 0 : capFirst);
   return () => {   // the cut is swapped out: let go of the timers and listeners
     loop.off();
     window.clearTimeout(first);
@@ -364,12 +369,11 @@ if (stage) {
     added = [];
   };
   const load = () => {
-    const cut = phone.matches ? (reduceMotion.matches ? null : 'phone') : (tablet.matches ? 'tablet' : 'full');
+    const cut = phone.matches ? 'phone' : (tablet.matches ? 'tablet' : 'full');
     if (cut === shown) return;
     shown = cut;
     const mine = ++ticket;
     clear();
-    if (!cut) return;
     Promise.all(files[cut].map((url) => window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))))
       .then((texts) => {
         if (mine !== ticket) return;   // the screen changed while it loaded (even if it has changed back since)
@@ -386,7 +390,7 @@ if (stage) {
       .catch(() => { /* no drawing: the stage stays empty and the page still reads */ });
   };
   load();
-  [phone, tablet, reduceMotion].forEach((m) => m.addEventListener('change', load));
+  [phone, tablet].forEach((m) => m.addEventListener('change', load));
 }
 
 /* ======================================================================
@@ -399,7 +403,10 @@ if (stage) {
    A tap on any card opens it. "Swipe" fades once they have left the first card.
    No swipe with a mouse: the arrows step one card, a click on the dots
    jumps to the nearest dot's card, and Left / Right move focus card to card.
-   A card that takes focus slides to the middle. The snap does the rest.
+   A card that takes keyboard focus slides to the middle. The snap does the rest.
+   Not on a mouse press: that focuses the link too, and the slide would carry
+   the card out from under the pointer before the button comes up, so the click
+   would never land. A click on a side card opens it, as a tap does.
    ====================================================================== */
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots .pip');
@@ -437,7 +444,9 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
     const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
     go(near.indexOf(Math.min(...near)));
   });
-  svcRow.addEventListener('focusin', (e) => { if (row.matches) go(cards.indexOf(e.target.closest('li'))); });
+  // keyboard focus only (above); a browser without :focus-visible slides on any focus, as before
+  const byKeyboard = (el) => { try { return el.matches(':focus-visible'); } catch { return true; } };
+  svcRow.addEventListener('focusin', (e) => { if (row.matches && byKeyboard(e.target)) go(cards.indexOf(e.target.closest('li'))); });
   svcRow.addEventListener('keydown', (e) => {
     if (!row.matches || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey) return;
     const next = cards[cards.indexOf(e.target.closest('li')) + (e.key === 'ArrowLeft' ? -1 : 1)];

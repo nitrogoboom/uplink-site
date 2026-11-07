@@ -67,7 +67,11 @@
 }
 .grow-play-i { width: var(--sp-4); height: var(--sp-4); fill: currentColor; }
 .grow-ring { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; transform: rotate(-90deg); pointer-events: none; }
-.grow-ring circle { fill: none; stroke: var(--c-accent); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; vector-effect: non-scaling-stroke; }
+/* the ring's dash is its whole length in its own units (2π × 49.5 = 311.02; grow.js fills it by that), so it fills
+   once over the six steps at any size. Its line is in those units too: 4.55 is 2px on the 44px ring (the button's
+   42px inside its border, plus 1px each side). (A non-scaling stroke would measure the dash in screen pixels: on a
+   44px ring, full by step 3.) */
+.grow-ring circle { fill: none; stroke: var(--c-accent); stroke-width: 4.55; stroke-linecap: round; stroke-dasharray: 311.02; stroke-dashoffset: 311.02; }
 
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
    the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */

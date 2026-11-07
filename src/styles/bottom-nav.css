@@ -42,7 +42,10 @@
   .botnav { display: block; }
   /* room for the bar under the page: kept in the footer's base bar (the last thing on every page), so its band colour
      runs down behind the bar instead of a strip of page background */
-  .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }   /* 96px: on the scale (docs/spacing.md R0) */
+  /* a page with no footer (Base.astro footer={false}: the 404) keeps that room under <main>: its one-screen section
+     (--fold-h, already short of the bar) ends where the bar starts, and the page is exactly one screen */
+  .no-footer main { padding-bottom: calc(var(--botnav-h) + env(safe-area-inset-bottom, 0px)); }   /* 64px */
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
@@ -53,7 +56,8 @@
   :root[data-text] .tabs { display: none; }
   :root[data-text] .site-header .container { justify-content: space-between; }
   :root[data-text] .botnav { display: block; }
-  :root[data-text] .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-5) + env(safe-area-inset-bottom, 0px)); }
+  :root[data-text] .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
+  :root[data-text] .no-footer main { padding-bottom: calc(var(--botnav-h) + env(safe-area-inset-bottom, 0px)); }
   :root[data-text] { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
 }
 
@@ -64,7 +68,7 @@
 }
 /* Tablet header, measured (16px root): logo 99px, five tabs 419px at 12px padding, three icon buttons 154px (318px
    with their words), gutters and gaps 48px. The room each side of the tabs is (width - 720) / 2 with icon buttons and
-   (width - 884) / 2 with words. verify_footer.py checks it at every 10px; it fails under 8px.
+   (width - 884) / 2 with words. The site check (checks/site.spec.mjs) checks it at every 10px; it fails under 8px.
    Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
    padding would overlap). */
 @media (min-width: 700px) and (max-width: 779px) {

@@ -12,7 +12,7 @@ Every change to the site is checked automatically before it goes live. Each page
 
 Before each bigger release, we run a fuller set of automated checks. They:
 
-1. Open every page in the three browser engines behind Chrome, Firefox, and Safari, on desktop and phone screens.
+1. Open every page in the three browser engines behind Chrome, Firefox, and Safari on a desktop screen, and on simulated phones.
 2. Read every page from top to bottom the way a screen reader would.
 3. Move through every page using only the keyboard.
 
@@ -31,7 +31,7 @@ A person also checks what a machine can't judge: the site on real phones, how a 
 
 - **Forms don't send yet.** We're still finishing the contact form, "Book a check-up", and the newsletter sign-up. Until they work, please email or call us (details below).
 - **Some links go to a "coming soon" page.** These include the client portal, the blog, and our social media pages.
-- **The checks by a person aren't finished.** Every page passes our automated tests, including the screen-reader read-through. A person hasn't yet tried every page on real phones or listened to it with a real screen reader, such as NVDA or VoiceOver. That's next.
+- **The checks by a person aren't finished.** Every page passes our automated accessibility checks, including the screen-reader read-through. The code check still finds one small error on the home page, which we're fixing. A person hasn't yet tried every page on real phones or listened to it with a real screen reader, such as NVDA or VoiceOver. That's next.
 
 If something on the site doesn't work for you, please tell us. We'll fix it, or get you the same information another way.
 
@@ -44,4 +44,4 @@ We'd like to hear how accessible you find our site and our services. You can rea
 - Mail: Accessibility, Uplink Technology, {street}, {city}, ON
 - The [contact form](/contact#message), once it works
 
-Last updated: 5 November 2026
+Last updated: 6 November 2026

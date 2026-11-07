@@ -150,7 +150,9 @@
     .svc-menu > .is-centre .svc-tile { z-index: 1; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-front); }
     .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) { opacity: 1; }
   }
-  .svc-hint { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * (var(--sp-4) + var(--sp-8))); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
+  /* the hint sits up inside the row's bottom padding, and WebKit hit-tests the scrolling row over it (the arrows and
+     dots got no clicks in Safari), so it is lifted over the row, as the heading is */
+  .svc-hint { position: relative; z-index: 3; display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * (var(--sp-4) + var(--sp-8))); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
   /* "Swipe" fades once they have swiped (home.js); the dots stay */
   .svc-swipe { display: flex; align-items: center; gap: var(--sp-2); transition: opacity var(--dur-2) var(--ease); }
   .svc-swipe svg { width: var(--sp-4); height: var(--sp-4); }

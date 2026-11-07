@@ -1,6 +1,6 @@
 # Security, privacy, and accessibility on the Uplink site
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This page explains how the Uplink Technology website protects its visitors and who it's built to serve. For each protection, you'll find:
 - what it guards against
@@ -289,7 +289,7 @@ The [accessibility statement](/accessibility) describes the site's support and h
 | Motion | If your system asks for reduced motion, nothing animates. Otherwise, every looping animation has a pause button, and nothing flashes more than three times a second. | 2.2.2, 2.3.1 |
 | Forms | Every field has a visible label. Optional fields say so. Common fields support autofill. Errors are written out, tied to their field, and focus moves to the first one. | 1.3.5, 3.3.1, 3.3.2 |
 | Status messages | Updates such as the number of projects shown after you filter are announced by screen readers without moving focus | 4.1.3 |
-| Valid code | The home page passes the W3C validator at each release. Every page is checked when a release changes their markup. | 4.1.1 |
+| Valid code | The home page goes through the W3C validator at each release, and every page does when a release changes their markup. One error is open on the home page today: an attribute on the Grow play button's ring (`notes.md`). | 4.1.1 |
 
 ### Works the way you browse
 

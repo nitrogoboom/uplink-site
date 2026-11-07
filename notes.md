@@ -2,14 +2,28 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Outside review (6 Nov 2026, independent session, 7.5/10)
+
+Quick, visible:
+- [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
+- [ ] Hero with pause already on from an earlier page: the build freezes on its first frame (on phones the furnished room with no network or cloud, and the caption lines don't draw; desktop too). Fix: when the drawing goes in while paused, finish its build animations.
+
+Design, nice to have:
+- [ ] Desktop: the small secondary text under hero items and footer lines is low-contrast (it passes AA). Raise its size a step or its colour toward `--c-text`.
+- [ ] Home services row mixes three tall cards with four short tiles; the tall ones are mostly empty. Even out the row, or give the tall cards their drawing.
+- [ ] Trusted Types policy passes every string (`createHTML: (s) => s` in `core.js`). Fix: only accept the site's own drawings (for example, a string that starts with `<svg` from a same-origin `/assets/img/` fetch), and say so in the docs.
+
+Rule from now on:
+- [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
+
 ## Production readiness (3 Nov 2026, no domain needed; talk in `conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
-- [ ] GitHub: protect `main` (PR required, `build` must pass). Today a push straight to `main` deploys as soon as CI passes, with no review. While there, turn on secret scanning and push protection (Settings > Code security) if the plan offers them.
+- [ ] GitHub environments (made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`.
+- [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
 - [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
 - [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
-- [ ] Decide later: move the browser checks (`tools/verify_*.py`) to Playwright Test on Node, so CI needs no Python.
 - [ ] Decide later, on hold: who edits copy. Today it's Claude editing on your behalf about 90% of the time, which suits copy as JSON and Markdown in git (`src/content/`, `src/data/`): every change is reviewed, checked by CI and can be undone. A CMS only earns its place if staff will edit the site themselves.
 - [ ] Decide later, on hold: if the real company has a site today, map its old addresses to the new ones (redirects) before the domain moves.
 
@@ -24,7 +38,10 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
+- [ ] Open PR #76 (clean up old pull request previews on Cloudflare every 3 days): its build passed; it waits for the owner's merge, then a one-preview delete test.
 - [ ] Small, left as they are: `box()` is defined twice (`gen_hq.py`, `gen_office.py`), each a little different; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
+- [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
+- [ ] Real Safari: Playwright's WebKit (27.2) refuses a style of its own for every `<select>` under our CSP (one each, even on a bare page with nothing of ours; Chromium doesn't), so twice a page from the booking dialog's dropdowns. The release audit expects that many and the Worker drops that report (November 6, 2026). Open: look at Safari's console on a Mac (Develop menu) for "Refused to apply a stylesheet"; if it's there too, report it to WebKit (bugs.webkit.org).
 
 ## Page structure
 - [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
@@ -37,14 +54,15 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 ## Drawings
 - [ ] 404 page: a three-panel heist comic, draft in `editing-room/404-comic/` (branch `404-comic-draft`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
-- [ ] Hero on phones with reduced motion (and without script): they still show `office-compact.svg`, the older plan. Make the still from the same scene (`render('phone')` with the animation off) when the hero drawing is final.
 
 ## Look and feel
-- [ ] Footer on phones (live 5 Nov 2026, PR #73): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android.
+- [ ] Footer on phones (live 5 Nov 2026, PR #73; rows ease open and shut since 6 Nov 2026, `--dur-fc-row-open`/`-shut`, `--ease-soft`): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android, including a row shutting while the page is still scrolling (iOS momentum).
+- [ ] Sideways scroll with text at 200% (found 6 Nov 2026, also on the build before that day's changes): Firefox at 390 wide, Home's services row (`.svc-big`) makes the page 458px wide; Edge at 320 wide, the Grow stage (`.grow-stage`) ends at 328px (8px). `verify:text` runs Chromium only and not at 320, so it misses both.
+- [ ] Project cards on phones (6 Nov 2026): rows, option A from `editing-room/work-phone/` (`.card--project` in `surfaces.css`, `ProjectCard.astro`). Home's "Setups we built and still run" now fits one screen; five of the Work page's six per screen. Open: a look on a real iPhone and Android.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 
 ## Checks to repeat
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `python tools/pagespeed.py`. Phones with reduced motion still paint the picture as LCP.
+- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `npm run pagespeed`. Reduced-motion phones now show the same scene, and the hero text stays the LCP there too (6 Nov 2026).
 
 ## Before going live
 Forms and content:
@@ -62,9 +80,9 @@ Domain and hosting:
 - [ ] Put the real domain's DNS on Cloudflare and add the domain to the Worker. Then redirect or switch off `workers.dev` (both ways are in `docs/launch-runbook.md`).
 - [ ] Remove `X-Robots-Tag: noindex` from `public/_headers`, put the `Sitemap:` line back in `robots.txt` (`src/pages/robots.txt.ts` says how; left out while every page is noindex), and set `SITE_URL` to the real domain (environment, or the default in `astro.config.mjs`).
 - [ ] Markdown copies (`/services.md` and the rest): when `noindex` comes off, give each a `Link: <page>; rel="canonical"` header (decided 2 Nov 2026), written per copy by `scripts/headers.mjs`.
-- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`. Check the Browser Integrity Check doesn't block agents reading `llms.txt` and the `.md` copies (on `workers.dev` it 403s Python's urllib).
+- [ ] Cloudflare zone: Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`. Check the Browser Integrity Check doesn't block agents reading `llms.txt` and the `.md` copies (on `workers.dev` it 403s a client with no user agent of its own).
 - [ ] HTTPS: turn on Always Use HTTPS on the real domain's zone (SSL/TLS > Edge Certificates). Then, unless the Worker redirects `workers.dev` (option B in the runbook), set `run_worker_first` back to `["/api/*", "/404"]` in `wrangler.jsonc` and drop the http-to-https lines in `worker/index.js`. Today every request runs the Worker so it can send `http://` to `https://` (`workers.dev` has no such setting), and each one counts against the free plan's 100,000 Worker requests a day. Then check plain `http://` still redirects.
 - [ ] HSTS: add `includeSubDomains; preload` once every subdomain is HTTPS, then submit to hstspreload.org.
-- [ ] Web Analytics: the beacon token in `core.js` was registered for the old `pages.dev` host. Add the real domain (and `uplink-site.johnoreilly.workers.dev` until then) to that site in Cloudflare, or make a new site and swap the token.
+- [ ] Web Analytics: the site in Cloudflare was set up for the old `pages.dev` host, but data already arrives from `uplink-site.johnoreilly.workers.dev` under the token in `core.js` (checked 6 Nov 2026). At launch, add the real domain to that site (or make a new site and swap the token), and drop the "old pages.dev host" remarks in `core.js` and `docs/secrets.md`.
 - [ ] Search Console: verify the domain, submit the sitemap.
 - [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).

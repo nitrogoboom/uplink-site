@@ -30,12 +30,14 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 /* ---------- error reports ---------------------------------------------- */
 // A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
 // What goes: the page's path, the message, the script's address and line. Never form contents or anything typed.
-// Left out: "Script error." (an outside script's error, which the browser hides) and "ResizeObserver loop" (a
-// browser notice that a resize took two frames, not a fault). Five reports a page at most.
+// Left out: "Script error." (an outside script's error, which the browser hides), "ResizeObserver loop" (a
+// browser notice that a resize took two frames, not a fault) and a page-change animation the browser gave up on
+// ("Transition was aborted …", say when a phone's screen size changes mid-change: page-transitions.css; the page
+// still loads, so it isn't a fault to hear about). Five reports a page at most.
 // CSP blocks are reported by the browser itself (public/_headers).
 let reportsLeft = 5;
 const reportError = (message, source, line, column) => {
-  if (!message || message === 'Script error.' || /ResizeObserver loop/.test(message)) return;
+  if (!message || message === 'Script error.' || /ResizeObserver loop|^Transition was (aborted|skipped)/.test(message)) return;
   if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
   const body = { kind: 'error', page: location.pathname, message: String(message).slice(0, 300), source, line, column };
   navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
@@ -367,8 +369,11 @@ function whenOnScreen(el, onChange) {
 // HTML, which cost the phone score). It still reads the timings the browser kept from the start.
 // Only the live address reports: Cloudflare refuses others, so the beacon loads only where the page's
 // canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
+// Not in a browser driven by a test (navigator.webdriver): our own checks after each deploy were about 140 of a
+// page's visits a week in Web Analytics.
 const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053';   // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; see notes.md)
 const startBeacon = () => {
+  if (navigator.webdriver) return;
   const canon = $('link[rel="canonical"]');
   if (!canon || new URL(canon.href).hostname !== window.location.hostname) return;
   const s = document.createElement('script');

@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This repository holds the website for Uplink Technology, a made-up IT company. The content is placeholder text, and the look is inspired by the Overwatch 2 menus. This page explains how to run the site, how it's organized, and how to use the tools that build and check it.
 
@@ -28,7 +28,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 You need the following:
 
 - Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
-- For the drawing and check tools only: Python 3.12, the version CI uses.
+- For the drawing tools only: Python 3.12. The site's checks, and CI, need only Node.
 
 ## Run the site locally
 
@@ -55,16 +55,32 @@ npm run serve
 
 Then open http://localhost:8787.
 
-### Install the Python tools
+### Install the browsers for the checks
 
-The drawing generators and the browser checks are Python. To install them:
+The site checks run in Playwright Test, which `npm install` installs. They need a browser of their own. To install it:
+
+```bash
+npx playwright install chromium
+```
+
+The release audit also needs Firefox and WebKit:
+
+```bash
+npx playwright install firefox webkit
+```
+
+Claude Code's sandbox on Windows can't start Firefox from Playwright's usual folder (`%LOCALAPPDATA%\ms-playwright`: Windows refuses to load its `mozglue` library there). So Claude's sessions keep their browsers in `%USERPROFILE%\.cache\ms-playwright` instead, set by `PLAYWRIGHT_BROWSERS_PATH` in `.claude/settings.local.json` (on this machine only, not in git). The install commands above, run from a Claude session, put the browsers there; your own terminal keeps the usual folder.
+
+### Install the Python drawing tools
+
+The drawing generators are Python. You need them only to change a drawing. To install them:
 
 ```bash
 pip install -r requirements.txt
-python -m playwright install chromium firefox webkit
+python -m playwright install chromium
 ```
 
-Firefox and WebKit are needed only for the release audit.
+Python's Chromium is used only by `gen_og.py`, which screenshots the share picture.
 
 ## Commands
 
@@ -78,10 +94,11 @@ Firefox and WebKit are needed only for the release audit.
 | `npm test` | Tests the build's after-steps and the Worker with Node's built-in test runner (`scripts/test/`). |
 | `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks only JSON and YAML; the code is formatted by hand. |
 | `npm run format` | Fixes what the linters can fix on their own. |
-| `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the browser check, and the link check. Starts `npm run serve` if it isn't already running. Needs the Python tools. It doesn't run the screenshot comparison, the preview upload, or the deploy. |
-| `npm run verify` | Runs the browser check: `python tools/verify_footer.py out`. |
-| `npm run verify:spacing` | Runs the spacing check: `python tools/verify_spacing.py`. |
-| `npm run release-audit` | Runs the release audit (`tools/audit.py`). See [`docs/sop.md`](docs/sop.md). |
+| `npm run ci` | Runs what CI runs, in order: check, tests, lint, build, the site check, and the link check. Starts `npm run serve` if it isn't already running. Needs Node and Playwright's Chromium, no Python. It doesn't run the screenshot comparison, the preview upload, or the deploy. |
+| `npm run verify` | Runs the site check in a browser. See [Site checks](#site-checks). |
+| `npm run verify:links`, `verify:text`, `verify:spacing`, `verify:styles`, `visual-diff` | Run the other site checks. See [Site checks](#site-checks). |
+| `npm run release-audit` | Runs the release audit. See [Site checks](#site-checks) and [`docs/sop.md`](docs/sop.md). |
+| `npm run smoke`, `npm run pagespeed` | Check a deployed site. See [Live-site checks](#live-site-checks). |
 | `npm run deploy` | Deploys to the live Worker by hand. It runs `npm run ci` first, which builds the site and runs every check, and deploys only if they pass. |
 
 > **Note:** CI deploys for you when a change is merged to `main`, so you rarely need `npm run deploy`. It deploys whatever branch you have checked out, so run it from `main`.
@@ -91,9 +108,10 @@ Firefox and WebKit are needed only for the release audit.
 | Path | What it holds |
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
-| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon. |
-| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. Tests are in `scripts/test/`. |
-| `tools/` | The drawing generators and every check, in Python. Run them from the project root. See [Tools](#tools). |
+| `public/` | Files served as they are: the `_headers` template, fonts, the drawings in `assets/img/`, `og.png`, and the favicon (`favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
+| `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
+| `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
@@ -128,7 +146,7 @@ The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/d
 
 ## Footer
 
-Every page has the same footer. On desktop, it's exactly one screen tall. It has three parts:
+Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). On desktop, the footer is exactly one screen tall. It has three parts:
 
 - **Stage:** the text for the selected section on the left, and a live campus map on the right.
 - **Dock:** a row of tiles: Contact, Services, Company, Support, Resources, and Follow. Use the arrow keys or the two key-cap buttons to switch tiles.
@@ -154,7 +172,7 @@ Every drawing follows these rules. The values are measured in the files.
 
 ## Tools
 
-Every tool runs from the project root.
+The drawing tools are Python, in `tools/`. The site checks are Node, in `checks/`, and run through npm. Every tool runs from the project root.
 
 ### The projection
 
@@ -171,14 +189,14 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | Tool | What it writes |
 | --- | --- |
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
-| `gen_office.py public` | The office floor plan: `office.svg`, `office-compact.svg`, and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
+| `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. Also writes an animated reference copy, `out/drawings/office-build.svg`, which isn't deployed. The animation CSS and the hand-drawn cloud are in `tools/office_parts/`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
 | `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. SVGO leaves this file as written. |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
 A generator that runs with nothing changed writes the same file, byte for byte. A `git diff` shows only what you changed.
 
-**Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels. Its settings are `COMPACT` in each generator. Pages swap it in with `<picture>` where the drawing shows small: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`, which is the phone cut with its labels and their embedded letters removed (`isogen.card()`), at about half the size. On phones, the Home hero plays `office-compact-build.svg`. With reduced motion, it shows the still `office-compact.svg`, which is still the older plan.
+**Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels. Its settings are `COMPACT` in each generator. Pages swap it in with `<picture>` where the drawing shows small: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`, which is the phone cut with its labels and their embedded letters removed (`isogen.card()`), at about half the size. On phones, the Home hero plays `office-compact-build.svg`. Its build starts part way, on the furnished room (`PHONE_AHEAD` in `gen_office.py`). With reduced motion, it stands still. Without script, phones show the same scene as a picture, `hero-office-phone.svg`.
 
 When you change a drawing's labels or layout, check its phone cut too.
 
@@ -207,27 +225,34 @@ After you change a drawing, run both checks on it. Each exits with status 1 on a
   python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
   ```
 
-### Browser checks
+### Site checks
 
-These checks open the built site in a real browser. Start `npm run serve` first, unless a tool says it starts the server itself.
+These checks open the built site in a browser. Each is a Playwright Test spec in `checks/`, which `scripts/check.mjs` runs for npm. Start `npm run serve` first.
 
-| Tool | What it checks |
+- Pass a check's arguments after `--`, for example `npm run verify -- --all`.
+- To check another address than http://localhost:8787, add `--base URL`.
+- Playwright's own options go after a second `--`, for example `npm run verify -- --all -- --headed`.
+
+Each check fails, and exits with status 1, on any finding. Every check reads its pages from the served `sitemap.xml`, then adds `/soon` and an address that gets the 404 page. It fails if the sitemap lists fewer than five pages. The page list and screen sizes are in `checks/lib.mjs` (`pages`, `SIZES`, `MISSING`). A failed check leaves its details in `out/test-results/`.
+
+| Command | What it checks |
 | --- | --- |
-| `verify_footer.py out/ [PORT]` | The main browser check, which CI runs before every deploy. It checks: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall, no panel overflow, the map moves). Home at phone, tablet, 1440×900, and 3440×1440 with no sideways scroll, and an axe pass at phone and desktop. The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. Every other sitemap page, plus `/soon` and the 404 page, once at phone size, with an axe pass. It fails on any script error, crash, CSP or Trusted Types block, a hero or Grow section that doesn't respond, sideways scroll, a serious or critical axe finding, or a sitemap with fewer than five pages. Home gets the full check because it's the page being worked on (`FOCUS` in the script). Add `--all` to give every page the full check. |
-| `verify_text.py [PORT] [--text N]` | Every page at four sizes with the text at 200% (or `N`×): no clipped, overlapping, or unreachable text, and no sideways scroll. |
-| `verify_spacing.py [BASE_URL] [PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
-| `verify_styles.py BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
-| `check_links.py [BASE] [--external]` | Every link, picture, script, and preload on every page answers, and every `#section` link finds its id. CI runs it. `--external` also checks links to other sites. |
-| `visual_diff.py OLD_URL NEW_URL [--strict]` | Screenshots every page of both sites at phone, tablet, and desktop, with the drawings masked, and lists what looks different (`out/visual/`). CI runs it on each pull request against the live site and puts the list in the run's summary. It reports and never fails, unless you add `--strict`. |
-| `audit.py` | The release audit (`npm run release-audit`). It runs every page in Chromium, Firefox, WebKit, and emulated phones, plus a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. It takes a few minutes, so run it before a release, not on every build. The report is `out/audit/report.md`. |
-| `site_pages.py` | Not a check. The page list and screen sizes the other checks share (`SIZES`, `MISSING`). |
+| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). It checks: the hero builds, tiles respond to hover, the Grow section plays, and every footer tab works at 1440×900 (one screen tall below the header, no panel overflow). Home at phone, tablet, 1440×900, and 3440×1440 with no sideways scroll, and an axe pass at phone and desktop. The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440, at normal and 200% text. Every other page once at phone size, with an axe pass. It fails on any script error, crash, CSP or Trusted Types block, a hero or Grow section that doesn't respond, sideways scroll, or a serious or critical axe finding. Home gets the full check because it's the page being worked on (`FOCUS` in the spec). Add `--all` to give every page the full check. Screenshots go to `out/`. |
+| `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, and every `#section` link finds its id. CI runs it. `--external` also checks links to other sites. |
+| `npm run verify:text [-- --text N]` | Every page at four sizes with the text at 200% (or `N`×): no clipped, overlapping, or unreachable text, and no sideways scroll. `--text 1` runs it at the default size, where it should come back clear too. |
+| `npm run verify:spacing [-- PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
+| `npm run verify:styles -- BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
+| `npm run visual-diff -- OLD_URL NEW_URL [--strict]` | Screenshots every page of both sites at phone, tablet, and desktop, with the drawings masked, and lists what looks different (`out/visual/`). CI runs it on each pull request against the live site and puts the list in the run's summary. It reports and never fails, unless you add `--strict`. |
+| `npm run release-audit [-- --only PARTS] [--html-all]` | The release audit (`checks/audit.spec.mjs`). It runs every page in Chromium, Firefox, WebKit, and emulated phones, plus a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. It takes a few minutes, so run it before a release, not on every build. The report is `out/audit/report.md`. |
 
 ### Live-site checks
 
-| Tool | What it checks |
+These checks ask a deployed site over plain HTTP. They need no local server.
+
+| Command | What it checks |
 | --- | --- |
-| `smoke.py ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site over plain HTTP: every sitemap page, the security headers, `noindex`, redirects, the 404 status, the report endpoint, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone. `--old` checks that the old address redirects to the new one. |
-| `pagespeed.py ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the live sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
+| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects, the 404 status, the report endpoint, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone. `--old` checks that the old address redirects to the new one. |
+| `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
 
 ## Hosting
 
@@ -252,11 +277,11 @@ Everything else goes on to the static files, with `_headers`, `_redirects`, and 
 
 GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
-- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, `verify_footer.py`, and `check_links.py` against the built site served by `wrangler dev`.
+- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), and the link check (`npm run verify:links`) against the built site served by `wrangler dev`. It needs no Python.
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
 - A push to `main` that passes deploys to the live Worker.
-- A pull request also runs `visual_diff.py` against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.
+- A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
 - Cloudflare keeps every preview, each with its own address, until it's deleted. Every 3 days, `.github/workflows/clean-previews.yml` deletes previews older than 3 days. It keeps every deployed version, so rollback still works, and the newest preview of each open pull request. It deletes nothing in git.
 
 ### Clean up previews by hand
@@ -278,6 +303,15 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 The run's summary in the Actions tab lists each preview and what happened to it.
 
 > **Note:** The delete needs the API token in the `cloudflare` environment. Cloudflare refuses it with a `wrangler login` (error 10405), so `scripts/clean-previews.mjs` can only list from your computer.
+
+### Repository rules
+
+Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
+
+- **main: no force push or delete.** Applies to everyone.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
+
+Secret scanning with push protection, private vulnerability reporting, and CodeQL (default setup) are on under Settings > Code security.
 
 ### Roll back a bad deploy
 

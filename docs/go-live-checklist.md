@@ -1,6 +1,6 @@
 # Go-live checklist
 
-*Started November 5, 2026. Last updated: November 5, 2026.*
+*Started November 5, 2026. Last updated: November 6, 2026.*
 
 This checklist covers what to check before the site moves to its real domain, beyond what CI and the release audit already prove. For those, see [What CI proves](sop.md#what-ci-proves) and the [release checklist](sop.md#release-checklist). For the launch-day steps, see [`launch-runbook.md`](launch-runbook.md).
 
@@ -68,7 +68,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 - [x] **Lighthouse, all 20 sitemap pages, phone and desktop** (November 5, 2026, local build).
   - Accessibility 100, Best practices 100 everywhere.
-  - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`).
+  - Home desktop was the exception at 97: the Grow step dots were 22 px wide, under the 24 px of WCAG 2.2 (2.5.8). Fixed: their padding goes from `--sp-2` to `--sp-3` (`src/components/home/grow.css`). Since November 6, 2026, desktop shows the steps as a list in the left column instead of the dots; phones and tablets keep the dots.
   - SEO 66–69 only because of the intended `noindex`.
 - [x] **Reflow at 320 px wide (WCAG 1.4.10, the same as 400% zoom)**: no sideways scroll on any page at 320×800 or 320×256.
 - [x] Checked: at 320×256 (a phone on its side with big zoom) the header and bottom bar take half the screen until you scroll. The bottom bar already slides away on scroll down (`core.js`, `.botnav.is-hidden`), so the reading space comes back. Left as is.
@@ -86,13 +86,13 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed November 5, 2026; every other page already passed.
   - The hero's height is now a floor, not a cap, and its text centres only while it fits (`safe center`). With the WCAG spacing, the h1 stays below the header at 1280, 1440 and 3440.
   - The desktop service tiles' rows grow when their words do, so no icon is cut off (`src/components/home/hero.css`, `src/components/home/services.css`).
-  - `tools/verify_styles.py`: nothing else on any page moved, at all four sizes.
+  - The styles check (then `tools/verify_styles.py`, now `npm run verify:styles`): nothing else on any page moved, at all four sizes.
 - [x] **Cache headers** (November 5, 2026, local and live match). HTML revalidates, and `/_astro/*` is immutable for a year.
 - [ ] Risk: the fonts in `/assets/fonts/` have no hash in their names but are cached immutable for a year (`public/_headers`). If a font file ever changes, give it a new name.
 
 ## 5. Performance
 
-- [ ] **(you)** PageSpeed on every page, phone and desktop: `python tools/pagespeed.py https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
+- [ ] **(you)** PageSpeed on every page, phone and desktop: `npm run pagespeed -- https://uplink-site.johnoreilly.workers.dev --strict`. Needs `PSI_API_KEY` in `.dev.vars`, which this PC doesn't have.
 - [ ] One WebPageTest run from Toronto on a slow phone profile, Home and Contact (webpagetest.org, free).
 - [ ] Decide: a performance budget in CI (Lighthouse CI) so a slow change fails the build instead of being found later.
 - [ ] **(domain)** Traffic against the free plan: while `run_worker_first` is `true`, every request runs the Worker (100,000 a day free). It can be narrowed once Always Use HTTPS is on, unless the old address is redirected by the Worker (option B in `launch-runbook.md`).
@@ -108,14 +108,14 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 - [x] Cutover runbook written (November 5, 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
 - [ ] **(you)** Practise one rollback on a quiet day (steps at the end of the runbook). It briefly puts the previous version live.
-- [x] Smoke test written (November 5, 2026): `python tools/smoke.py <address> [--launch] [--old <old address>]`. It checks:
+- [x] Smoke test written (November 5, 2026), moved to Node on November 6, 2026: `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]`. It checks:
   - every sitemap page: 200, html, security headers
   - noindex present today, gone with `--launch`
   - `http://` and the old address redirect
   - made-up addresses and `/404` give 404
   - the report endpoint, `robots.txt`, `llms.txt` and one `.md` copy (`/services.md`) answer
   - the sitemap names this host
-  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since Python can't see it.
+  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since the smoke test can't see it.
 - [ ] **(you)** Alerts, not just logs. Workers logs keep 3 days and ping nobody. Add a notification for errors (Cloudflare Notifications, or a small daily summary of `/api/report` lines to email), plus the outside uptime check (`notes.md`).
 
 ## 8. People

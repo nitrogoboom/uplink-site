@@ -6,9 +6,9 @@ Side jobs, finished or in progress. Nothing here is part of the site build.
 
 A three-panel heist comic for the 404 page. Script, status and next steps in its `README.md`.
 
-## `footer-phone/` (mockups, in progress)
+## `footer-phone/` (done, built into the site November 5, 2026)
 
-The footer on phones: the tabs sit above the map and the links below it, so every tap means scrolling. Round 1 has three fixes beside today's footer, clickable, with a measure under each phone. Where it stands in its `README.md`.
+The footer on phones: the tabs sat above the map and the links below it, so every tap meant scrolling. Option C without the map is on the site: under 700 px, six rows that open in place (PR #73). The rounds and the measures in its `README.md`.
 
 ## `grow-list/` (done, built into the site November 6, 2026)
 
@@ -30,3 +30,7 @@ The Navy & Amber colour work.
 - `palette/final/` is the measured result (`build.py` checks the twelve contrast and harmony criteria and writes `tokens.css`, `notes.md`, `preview.html` beside it). Rerun it if a colour changes.
 - `palette/inputs/` holds the logo colour sheet (`logo-palette.html`).
 - `BRIEF.md`, `proposal-a/`, `proposal-b/`, `proposal-c/` and `review/` are the record of how the palette was chosen. The rules in `BRIEF.md` ("work only in this folder", "don't commit") applied to that job and are over. Don't take design direction from the proposals; proposal C plus the review is what `final/` and `DESIGN.md` carry.
+
+## `work-phone/` (done, picked A, built November 6, 2026)
+
+"Setups we built and still run" on phones: one tall project card per screen. Round 1 turned the cards into rows (A, and B with each project's result) beside today's, on Home and the Work page, with a measure under each phone. A was picked and built; what changed from the mockup is in its `README.md`.

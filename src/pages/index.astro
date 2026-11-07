@@ -30,9 +30,8 @@ const business = {
       page="home" path="/">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={jsonLd(business)} />
-    <link rel="preload" href="/assets/img/office-compact.svg" as="image" media={`${HERO.media.phone} and (prefers-reduced-motion: reduce)`} fetchpriority="high">
-    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>
-    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={`${HERO.media.phone} and (prefers-reduced-motion: no-preference)`}>
+    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone}>
+    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={HERO.media.phone}>
     <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet}>
     <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full}>
   </Fragment>

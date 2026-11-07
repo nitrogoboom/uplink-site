@@ -1,6 +1,6 @@
 # Launch runbook: move the site to its real domain
 
-*Last updated: November 5, 2026*
+*Last updated: November 6, 2026*
 
 This runbook gives the order of steps for launch day, who does each one, and how to back out. The reasons behind each step are in "Domain and hosting" in [`notes.md`](../notes.md) and in [`go-live-checklist.md`](go-live-checklist.md).
 
@@ -32,7 +32,7 @@ Choose how the old `workers.dev` address is retired. The choice changes the code
    - `SITE_URL`: set it to `https://DOMAIN`, as the default in `astro.config.mjs` or in the CI environment.
    - `scripts/headers.mjs`: add a `Link: <PAGE>; rel="canonical"` header to each `.md` copy (see `notes.md`).
    - `wrangler.jsonc`: add `routes` with the custom domain.
-   - `.github/workflows/site.yml` and `scripts/ci.mjs`: change the live address the screenshot comparison uses from `uplink-site.johnoreilly.workers.dev` to `DOMAIN`.
+   - `.github/workflows/site.yml`: change the live address the screenshot comparison uses from `uplink-site.johnoreilly.workers.dev` to `DOMAIN`. Change the same address in the example in the comment at the top of `scripts/ci.mjs`.
    - `SECURITY.md`: point the `security.txt` link at `DOMAIN`.
    - `src/data/privacy.md`: if Bot Fight Mode goes on, change "The site sets no cookies". See item 17 in `docs/privacy-and-accessibility-2026-11-03.md`.
    - **With option A:** set `run_worker_first` back to `["/api/*", "/404"]` in `wrangler.jsonc`, and remove the `http://` to `https://` lines from `worker/index.js`, because the zone does that now.
@@ -49,14 +49,14 @@ The launch takes about an hour.
    - SSL/TLS: **Full (strict)**, and **Always Use HTTPS** on.
    - Minimum TLS version 1.2, with HTTP/3 and Early Hints on.
    - Auto Minify and Rocket Loader off. They would break the CSP hashes.
-   - Browser Integrity Check: make sure it doesn't block agents that read `llms.txt` and the `.md` copies. On `workers.dev`, it returns 403 to Python's `urllib`.
+   - Browser Integrity Check: make sure it doesn't block agents that read `llms.txt` and the `.md` copies. On `workers.dev`, it returns 403 to a client that sends no user agent of its own.
    - DNSSEC on. Then add the DS record at the registrar.
 3. **Claude:** merge the `launch` pull request. CI deploys it, and the Worker answers on `DOMAIN`.
 4. **Owner:** in Workers > uplink-site > Settings, check that the custom domain shows Active, with a certificate.
 5. **Claude:** run the smoke test. Every line must pass.
 
    ```bash
-   python tools/smoke.py https://DOMAIN --launch
+   npm run smoke -- https://DOMAIN --launch
    ```
 
 6. **Owner and Claude:** retire the old address.
@@ -64,7 +64,7 @@ The launch takes about an hour.
    - **Option B:** check the redirect with the smoke test:
 
      ```bash
-     python tools/smoke.py https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev
+     npm run smoke -- https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev
      ```
 
 7. **Owner:** add the DNS records the domain needs, even before it sends mail. They stop anyone from faking mail from it:
@@ -75,7 +75,11 @@ The launch takes about an hour.
 
    When Cloudflare Email Service starts sending mail, replace these with its records.
 8. **Owner:** in Web Analytics, add `DOMAIN` to the site. Or make a new site and give Claude the token for `core.js`.
-9. **Claude:** check the real domain in a browser. `tools/verify_footer.py` only checks a local server, so open Home, one service page, and Contact in a real browser, and watch the console for CSP blocks.
+9. **Claude:** check the real domain in a browser. Run the site check against it, then open Home, one service page, and Contact in a real browser and watch the console for CSP blocks:
+
+   ```bash
+   npm run verify -- --base https://DOMAIN
+   ```
 
 ## Straight after launch
 
@@ -116,14 +120,14 @@ Do this once before launch, on a quiet day with nothing else deploying. It brief
 
    ```bash
    npx wrangler rollback
-   python tools/smoke.py https://uplink-site.johnoreilly.workers.dev
+   npm run smoke -- https://uplink-site.johnoreilly.workers.dev
    ```
 
 3. Go back to the current version, replacing `VERSION_ID` with the ID from step 1, and run the smoke test again:
 
    ```bash
    npx wrangler rollback VERSION_ID
-   python tools/smoke.py https://uplink-site.johnoreilly.workers.dev
+   npm run smoke -- https://uplink-site.johnoreilly.workers.dev
    ```
 
 4. Write the date, and how long it took, in `docs/go-live-checklist.md`.

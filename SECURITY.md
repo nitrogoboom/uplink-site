@@ -2,6 +2,8 @@
 
 If you find a security problem with the Uplink Technology website, email **security@uplinkit.ca**. The same address is in the site's [`/.well-known/security.txt`](https://uplink-site.johnoreilly.workers.dev/.well-known/security.txt).
 
+You can also report it privately on GitHub: the repository's **Security** tab > **Report a vulnerability**.
+
 Don't open a public issue for a security problem.
 
 ## What to include

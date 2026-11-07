@@ -1,12 +1,14 @@
 ---
 // PAGE NOT FOUND. Cloudflare serves 404.html for any missing address, at any depth; every link on the site is
 // root-relative, so nothing special is needed here. No canonical or Open Graph (no `path`). Styles: shared (.page-intro).
+// One full screen on every size and no footer (footer={false}): .fold-always holds the section to the screen under
+// the header (and above the phone tab bar); it grows past that only when its content needs more (bigger text).
 import Base from '../layouts/Base.astro';
 ---
 <Base title="Page not found · Uplink Technology"
       description="There is no page at this address."
-      page="notfound" robots="noindex">
-  <section class="page-intro" aria-labelledby="nf-title">
+      page="notfound" robots="noindex" footer={false}>
+  <section class="page-intro fold fold-always" aria-labelledby="nf-title">
     <div class="container">
       <p class="eyebrow">Error 404</p>
       <h1 id="nf-title">Page not found</h1>
