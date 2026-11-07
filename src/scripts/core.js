@@ -370,6 +370,14 @@ function whenOnScreen(el, onChange) {
   return io;
 }
 
+/* ---------- pictures that can't load ------------------------------------ */
+// A picture that fails (offline, blocked) gets .is-broken (base.css: see-through, so no broken-image box; its alt
+// text still reaches screen readers). An error doesn't bubble, so it's caught on the way down; one that came before
+// this script ran is found by decode(), which fails only for a picture that can't be shown.
+const broken = (img) => img.classList.add('is-broken');
+document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) broken(e.target); }, true);
+$$('img').forEach((img) => { if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img)); });
+
 /* ---------- Cloudflare Web Analytics ----------------------------------- */
 // Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and
 // the browser is idle, so it never competes with the first screen (Cloudflare's own injection put it in the

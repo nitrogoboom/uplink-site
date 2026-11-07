@@ -633,6 +633,36 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   verdict([...fails, ...errs]);
 });
 
+// J13: drawings that can't load. The hero shows the still office in place of its drawing, with no dashes (beams)
+// over an empty stage and no pause button; a card picture that fails leaves no broken-image box.
+test('hero and pictures when drawings fail to load (J13)', async ({ browser }) => {
+  const fails = [];
+  const block = async (ctx) => {
+    await ctx.route(/\/assets\/img\/(hero-office[^/]*|[a-z]+-card)\.svg/, (r) => r.abort());
+  };
+  const { ctx, q } = await home(browser, { init: block });
+  await q.waitForTimeout(800);
+  const s = await q.evaluate(() => {
+    const stage = document.querySelector('.hero-art .stage');
+    const img = stage.querySelector('img');
+    const shownEl = (e) => !!e && e.getClientRects().length > 0 && getComputedStyle(e).display !== 'none' && Number(getComputedStyle(e).opacity) > 0;
+    const broken = [...document.images].filter((i) => i.complete && !i.naturalWidth && i.getClientRects().length && Number(getComputedStyle(i).opacity) > 0);
+    return {
+      still: img ? { src: img.getAttribute('src'), loaded: img.complete && img.naturalWidth > 0, shown: shownEl(img) } : null,
+      beams: [...stage.querySelectorAll('svg.ob-over')].filter(shownEl).length,
+      pause: shownEl(stage.querySelector('.hero-pause')),
+      broken: broken.map((i) => i.getAttribute('src')),
+    };
+  });
+  if (!s.still?.loaded || !s.still.shown) fails.push(`hero: no still office in place of the drawing: ${JSON.stringify(s.still)}`);
+  if (s.beams) fails.push(`hero: ${s.beams} dashes layer(s) shown over a stage with no drawing`);
+  if (s.pause) fails.push('hero: the pause button shows with nothing to pause');
+  if (s.broken.length) fails.push(`${s.broken.length} broken-image box(es): ${s.broken.join(', ')}`);
+  console.log(`drawings blocked: ${JSON.stringify(s)}`);
+  await ctx.close();
+  verdict(fails);
+});
+
 // M5: forms. Without script the copy buttons (which only script can work) don't show; every pattern has a title (the
 // browser's own message for a pattern is "match the requested format", which says nothing without one); the Book
 // pop-up's team size and Contact's topic start on a blank, required "Choose…", not on a guess; the Book pop-up says

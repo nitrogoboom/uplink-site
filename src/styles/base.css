@@ -96,4 +96,6 @@ a:hover { text-decoration-color: currentColor; }
 /* the skip link's target takes focus (tabindex="-1" in Base.astro), so the next Tab goes on from the content;
    a ring round the whole of <main> would only get in the way */
 main:focus { outline: none; }
+/* a picture that couldn't load (core.js): no broken-image box */
+img.is-broken { opacity: 0; }
 
