@@ -289,7 +289,7 @@ Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
 - **main: no force push or delete.** Applies to everyone.
 - **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
 
-Secret scanning with push protection, private vulnerability reporting, and CodeQL (default setup) are on under Settings > Code security.
+Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
 
 ### Roll back a bad deploy
 
