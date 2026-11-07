@@ -12,15 +12,11 @@
 //   lead      one sentence under the heading
 import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
-import f from '../data/footer.json';
+import { PLACEHOLDERS as fill } from '../lib/footer';
 import './text-page.css';
 interface Props { page: 'privacy' | 'accessibility'; md: { compiledContent: () => string | Promise<string> }; eyebrow: string; lead: string }
 const { page, md, eyebrow, lead } = Astro.props;
 const meta = PAGES[page];
-const fill: Record<string, string> = {
-  privacy: f.inboxes.privacy, accessibility: f.inboxes.accessibility, phone: f.phone.display,
-  tel: f.phone.href.replace(/^tel:/, ''), street: f.office.street, city: f.office.city, hours: `${f.hours.line}, ${f.hours.days}`,
-};
 // Markdown writes a placeholder inside a link's address as %7Bname%7D: fill both spellings
 const body = (await md.compiledContent()).replace(/(?:\{|%7B)([a-z]+)(?:\}|%7D)/gi, (all, key) => fill[key] ?? all);
 const unfilled = body.match(/\{[a-z]+\}/i);

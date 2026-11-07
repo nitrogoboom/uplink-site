@@ -130,7 +130,7 @@ Every service and project is in the page's HTML in full. Script only changes how
 
 ## Add a service
 
-1. Copy an existing file in `src/content/services/` and rename it `SLUG.json`. The slug becomes the page's address, `/services/SLUG`. The fields are typed in `src/content.config.ts`.
+1. Copy an existing file in `src/content/services/` and rename it `SLUG.json`. The slug becomes the page's address, `/services/SLUG`. The fields are typed in `src/content.config.ts`. A key it doesn't name, an `icon` missing from `src/components/icons.ts`, or an `image` without its drawings stops the build.
 2. Write the drawing's generator. Copy `tools/gen_voip.py` to `tools/gen_NAME.py` and change the scene. It writes `public/assets/img/NAME.svg`, the phone cut `NAME-compact.svg`, and the card cut `NAME-card.svg`. Set `image` in the JSON to `NAME`.
 3. Run the generator and its checks. See [Check a drawing](#check-a-drawing).
 4. Run `npm run build`.
@@ -153,7 +153,7 @@ Every page has the same footer, except the 404 page, which is one screen with no
 
 Below 700 px wide, the footer is six rows that open in place, with no map.
 
-The lists come from `src/data/footer.json`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`. Each panel has a `data-map` value that names a spot on the map. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` fetches the map when the footer scrolls near. Without script, every panel shows in a stack and the tiles are hidden.
+The lists come from `src/data/footer.json`, checked by its schema in `src/lib/footer.ts`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`. Each panel has a `data-map` value that names a spot on the map. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` fetches the map when the footer scrolls near. Without script, every panel shows in a stack and the tiles are hidden.
 
 ## Drawing rules
 

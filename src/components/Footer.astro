@@ -3,7 +3,7 @@
 // panel; each panel's data-map names a spot on the campus map (hq, services, company, support, resources, follow),
 // and data-map-name / data-map-sub the words the map's label shows for it. The map is drawn by tools/gen_campus.py
 // (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near the screen.
-// The lists and the spots' words come from src/data/footer.json; the Services panel's links from the services
+// The lists and the spots' words come from src/data/footer.json (through src/lib/footer.ts, its schema); the Services panel's links from the services
 // collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js (every panel shows, stacked, without it).
 // Phones (under 700 px): no map, and the roster turns into six rows that open in place. footer.js moves each panel
 // under its own row and switches the tabs to buttons with aria-expanded; it puts them back when the screen widens.
@@ -14,17 +14,16 @@ import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
 import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
-import f from '../data/footer.json';
+import { footer as f } from '../lib/footer';
 import { CAMPUS, getServices } from '../lib/site';
 const services = await getServices();
-const spot = (k: string) => f.spots[k as keyof typeof f.spots];
+const spot = (k: keyof typeof f.spots) => f.spots[k];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
-type Link = { label: string; href: string };
-const panels = f.panels.map((p) => ({ ...p, links: (p.id === 'services' ? serviceLinks : (p.links as Link[])) }));
+const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : p.links ?? [] }));
 const roster: { id: string; icon: IconName; name: string; count: string }[] = [
   { id: 'contact', icon: 'bubble', name: 'Contact', count: 'Start here' },
-  ...panels.map((p) => ({ id: p.id, icon: p.icon as IconName, name: p.tile, count: `${p.links.length} links` })),
-  { id: 'follow', icon: f.follow.icon as IconName, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
+  ...panels.map((p) => ({ id: p.id, icon: p.icon, name: p.tile, count: `${p.links.length} links` })),
+  { id: 'follow', icon: f.follow.icon, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
 ];
 ---
 <footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
@@ -43,7 +42,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
   <div class="container fc-stage">
     <div class="fc-panels" id="fc-panels">
 <section class="fc-panel is-on" id="fc-p-contact" role="tabpanel" aria-labelledby="fc-t-contact" tabindex="-1" data-map="hq" data-map-name={spot('hq').name} data-map-sub={spot('hq').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 set:html={f.contact.title} /></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3>{f.contact.title} <em>{f.contact.accent}</em></h3></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
   <div class="fc-facts">
     <div><p class="label">Call or email</p>
       <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
@@ -53,7 +52,7 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
       <p class="fc-cl fc-cl--two"><Icon name="clock" /><span>{f.hours.line}<small>{f.hours.days}</small></span></p></div>
   </div>
   <div class="fc-follow"><span class="label">Follow</span><ul class="fc-socials">{f.follow.socials.map((s) => (
-    <li><a class="fc-soc" href={s.href} aria-label={s.name} title={s.name}><Icon name={s.icon as IconName} /></a></li>))}</ul></div>
+    <li><a class="fc-soc" href={s.href} aria-label={s.name} title={s.name}><Icon name={s.icon} /></a></li>))}</ul></div>
 </div>
 </div></section>
 {panels.map((p) => (
@@ -63,9 +62,9 @@ const roster: { id: string; icon: IconName; name: string; count: string }[] = [
 </div></section>
 ))}
 <section class="fc-panel" id="fc-p-follow" role="tabpanel" aria-labelledby="fc-t-follow" tabindex="-1" data-map="follow" data-map-name={spot('follow').name} data-map-sub={spot('follow').sub}><div class="fc-panel-in">
-<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3 set:html={f.follow.title} /></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
+<div class="fc-head"><p class="eyebrow">{f.follow.socials.length} channels</p><h3>{f.follow.title} <em>{f.follow.accent}</em></h3></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
   <ul class="fc-wall">{f.follow.socials.map((s) => (
-    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon as IconName} /></span><b>{s.name}</b></a></li>))}</ul>
+    <li><a class="fc-wall-item" href={s.href}><span class="icon-tile"><Icon name={s.icon} /></span><b>{s.name}</b></a></li>))}</ul>
   <form class="fc-nl" action="/soon" data-fc-nl novalidate>
     <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
     <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="An email address like name@company.com" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>

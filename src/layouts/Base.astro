@@ -28,7 +28,7 @@ import BookDialog from '../components/BookDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
 import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { MEDIA } from '../lib/media.js';
-import contact from '../data/footer.json';
+import { footer as contact } from '../lib/footer';
 
 export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
 interface Props {

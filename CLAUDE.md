@@ -19,6 +19,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Content is data
 
 - A service is `src/content/services/SLUG.json`, a project `src/content/projects/SLUG.json`; the slug is the address. The `page` field holds the copy only that item's own page shows. Smaller lists are `src/data/*.json`, kept in file order through `byOrder`.
+- Schemas are strict (`src/content.config.ts`; `footer.json`'s in `src/lib/footer.ts`): an unknown key, an icon not in `src/components/icons.ts` or an `image` with no drawing fails the build. Import footer data from `src/lib/footer.ts`, not the JSON; the JSON holds no HTML.
 - Every card, footer link, select option, page, sitemap line and JSON-LD block reads from those files. Change words in the data, once.
 - The seven static pages' `<title>` and description live in `PAGES` in `src/lib/site.ts`.
 - Privacy and accessibility are Markdown in `src/data/`. Contact details there are placeholders (`{privacy}`, `{phone}`, `{street}` …) filled from `src/data/footer.json`. When the site starts collecting something new or a processor changes, update `src/data/privacy.md` in the same PR.

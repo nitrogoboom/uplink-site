@@ -56,14 +56,14 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | Component | What it is |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
-| `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` and the services collection. |
+| `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` (through `lib/footer.ts`) and the services collection. |
 | `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
 | `Pause.astro` | A pause for screen readers between two parts of one link, so the title doesn't run into the next words. Nothing shows on screen. |
 | `Sep.astro` | The " · " between two short phrases. Screen readers hear a comma instead of "dot". |
-| `Icon.astro` | Every inline icon, by name. Add new icons here. |
+| `Icon.astro`, `icons.ts` | Every inline icon, by name. Add new icons to `ICONS` in `icons.ts`; the content schemas accept only those names. |
 
 ### Section components
 
@@ -73,13 +73,14 @@ Section components live in `components/PAGE/`. Each section's CSS sits beside it
 
 ## Content
 
-The content types are defined in `content.config.ts`.
+The content types are defined in `content.config.ts`, and `footer.json`'s in `lib/footer.ts`. Every object is strict: a key the schema doesn't name stops the build, as do an `icon` that isn't in `components/icons.ts` and an `image` whose drawings aren't in `public/assets/img/`. Import the footer data from `lib/footer.ts`, never from the JSON.
 
 | File | What it holds |
 | --- | --- |
 | `content/services/SLUG.json` | One service. The slug is its address. Fields: `order`, `title`, `chip`, `tag`, `icon`, `image` (the drawing's name in `public/assets/img/`), `alt`, `lead`, `card`, `features` (three), `bestFor`, and `page`, which is the longer copy only the service's own page shows. Optional: `featured`, `footerLabel`, and `optionLabel`. |
 | `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
-| `data/faq.json`, `data/team.json`, `data/footer.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
+| `data/faq.json`, `data/team.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
+| `data/footer.json` | The footer's lists, the contact details, and the map's spots. `lib/footer.ts` checks it against its schema and exports it typed. A heading with an emphasized word is `title` plus `accent` ("Reach" + "us"); the JSON holds no HTML. |
 | `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json`. Don't type an email address or phone number into them. |
 | `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, and on Home also `{services}` and `{grow}`. |
 

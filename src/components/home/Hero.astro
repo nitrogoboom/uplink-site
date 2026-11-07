@@ -24,7 +24,7 @@ const news = [
 // the header holds the one main menu.
 const featured = (await getServices()).filter((s) => s.data.featured);
 const menu = [
-  ...featured.map(({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon as IconName, title: s.title, sub: s.card })),
+  ...featured.map(({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card })),
   { href: PAGES.services.path, icon: 'grid' as IconName, title: 'All services', sub: 'Help desk, security, cloud, networks, phones' },
 ];
 const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
