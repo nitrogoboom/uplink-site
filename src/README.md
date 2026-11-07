@@ -57,7 +57,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
 | `Footer.astro` | The footer's tiles, panels, and campus map, from `data/footer.json` and the services collection. |
-| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the text size and the keyboard-shortcuts switch. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown and fills in the contact placeholders from `data/footer.json`. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
@@ -91,7 +91,7 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 
 1. Foundations: `tokens.css`, `fonts.css`, `base.css`, `layout.css`, and `type.css`.
 2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
-3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares), `fold-foot.css`, and `compact-cuts.css`.
+3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares), `fold-foot.css`, and `compact-cuts.css`. A one-screen section is one screen as a floor (`min-height: var(--fold-inner)`): its picture takes the height its words leave, down to a floor in rem, and longer words make the section taller.
 4. Blocks more than one page uses: `hero.css`, `facts.css`, and `detail-pages.css`.
 5. Last: `page-transitions.css`, `motion.css`, and `print.css`.
 
@@ -103,13 +103,15 @@ All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the token
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
 
-| Name | Query |
-| --- | --- |
-| `smallPhone` | Below 600 px. The drawings switch to their phone cut. |
-| `phone` | Below 700 px. |
-| `tablet` | 700 px to 1099 px. |
-| `desktop` | 1100 px and up. |
-| `fold` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
+Every breakpoint is in `em`, in range syntax: `(width < 43.75em)`. In a media query, 1em is the browser's default font size (16 px unless the visitor changed it), not the page's root font size. So a bigger default font, or zoom, counts as a narrower screen. The one-off queries written out in a component's CSS, and the `media` of a `<source>` or `<link>`, follow the same rule. Lint refuses the old `min-width` form (`media-feature-range-notation` in `.stylelintrc.json`).
+
+| Name | Query | At a 16 px default |
+| --- | --- | --- |
+| `smallPhone` | `width < 37.5em` | Below 600 px. The drawings switch to their phone cut. |
+| `phone` | `width < 43.75em` | Below 700 px. |
+| `tablet` | `43.75em <= width < 68.75em` | 700 px to 1099 px. |
+| `desktop` | `width >= 68.75em` | 1100 px and up. |
+| `fold` | `width >= 68.75em` and `height >= 43.75em` | 1100 px and up, and at least 700 px tall. One section per screen, and the root font scales with the screen. |
 
 After you move CSS, prove nothing changed with `npm run verify:styles -- OLD_URL NEW_URL`. It compares every element's computed style between two builds.
 

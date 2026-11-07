@@ -8,7 +8,7 @@
   /* height-led layouts: big pictures take the room that is left, never more */
   :root { --fold-inner: calc(var(--fold-h) - 2 * var(--sp-7)); }
   /* short laptop screens: a little less air around each section */
-  @media (max-height: 760px) {
+  @media (height <= 47.5em) {
     .fold { padding-block: var(--sp-5); }
     :root { --fold-inner: calc(var(--fold-h) - 2 * var(--sp-5)); }
   }

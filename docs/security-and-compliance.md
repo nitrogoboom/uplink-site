@@ -239,7 +239,7 @@ The site follows Canada's Personal Information Protection and Electronic Documen
 
 The site sets no cookies. Visit counts come from Cloudflare Web Analytics, which doesn't use cookies or follow visitors across sites. Its script loads after the page has finished loading, so it never slows the page down. Because there's nothing to consent to, the site shows no cookie banner.
 
-If you change a display setting, such as text size, the site remembers it in your browser's own storage. That setting never leaves your device, and you can clear it by clearing the site's data in your browser.
+If you change a setting, such as pausing animations or turning keyboard shortcuts off, the site remembers it in your browser's own storage. That setting never leaves your device, and you can clear it by clearing the site's data in your browser.
 
 **Verify it**
 
@@ -282,7 +282,7 @@ The [accessibility statement](/accessibility) describes the site's support and h
 | Keyboard shortcuts | Single-key shortcuts can be turned off. They never fire while you type or while a pop-up is open. | 2.1.4 |
 | Contrast | Text has at least 4.5:1 contrast, and the edges of controls have at least 3:1 | 1.4.3, 1.4.11 |
 | Colour | Colour is never the only signal. Errors also have words and an icon. | 1.4.1 |
-| Text size | A built-in setting enlarges text to 200% without breaking the layout, and browser zoom to 200% works too | 1.4.4 |
+| Text size | Browser zoom to 200% enlarges text without breaking the layout (on very wide desktop screens zoom does less until the layout plan's phase 4; see the accessibility page's known limits) | 1.4.4 |
 | Text spacing | The page holds up when you increase line, letter, word, and paragraph spacing | 1.4.12 |
 | Reflow | Every page works at 320 pixels wide without scrolling sideways | 1.4.10 |
 | Target size | Touch targets are at least 44 pixels, and never smaller than 24 | 2.5.8 |
@@ -303,7 +303,7 @@ You can check most of these yourself:
 1. **Keyboard:** put your mouse aside and press Tab through a page. Every stop shows a visible outline, and you can reach and use everything.
 2. **Screen reader:** turn on [NVDA](https://www.nvaccess.org/) on Windows or VoiceOver on Mac and iPhone. Read a page from the top, then jump between headings.
 3. **Automated scan:** run [axe DevTools](https://www.deque.com/axe/devtools/), [WAVE](https://wave.webaim.org/), or Lighthouse's **Accessibility** audit. On November 5, 2026, Lighthouse scored 100 for accessibility on every sitemap page on phone and desktop, after one fix to the home page.
-4. **Text size:** zoom the browser to 200%, or use the site's own text setting. Nothing is cut off or overlaps.
+4. **Text size:** zoom the browser to 200%. Nothing is cut off or overlaps.
 5. **Narrow screens:** in DevTools, open the device toolbar and set the width to 320 pixels. Nothing scrolls sideways.
 6. **Reduced motion:** turn on your system's reduced-motion setting and reload. Nothing moves.
 7. **Contrast themes:** in DevTools, open **Rendering** and emulate `forced-colors: active`.

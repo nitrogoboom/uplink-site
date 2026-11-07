@@ -61,7 +61,7 @@ Rule from now on:
 
 ## Look and feel
 - [ ] Footer on phones (live 5 Nov 2026, PR #73; rows ease open and shut since 6 Nov 2026, `--dur-fc-row-open`/`-shut`, `--ease-soft`): under 700 px the footer is six rows that open in place, no map. Open: try it on a real iPhone and Android, including a row shutting while the page is still scrolling (iOS momentum).
-- [ ] Sideways scroll with text at 200% (found 6 Nov 2026, also on the build before that day's changes): Firefox at 390 wide, Home's services row (`.svc-big`) makes the page 458px wide; Edge at 320 wide, the Grow stage (`.grow-stage`) ends at 328px (8px). `verify:text` runs Chromium only and not at 320, so it misses both.
+- [ ] Sideways scroll with text at 200% (found 6 Nov 2026, also on the build before that day's changes): Firefox at 390 wide, Home's services row (`.svc-big`) makes the page 458px wide; Edge at 320 wide, the Grow stage (`.grow-stage`) ends at 328px (8px). The text check (`verify:text`, retired with the Settings text size on November 7, 2026) ran Chromium only and not at 320, so it missed both. Check both again at 200% zoom with the zoom check (layout plan, phase 4).
 - [ ] Project cards on phones (6 Nov 2026): rows, option A from `editing-room/work-phone/` (`.card--project` in `surfaces.css`, `ProjectCard.astro`). Home's "Setups we built and still run" now fits one screen; five of the Work page's six per screen. Open: a look on a real iPhone and Android.
 - [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
 

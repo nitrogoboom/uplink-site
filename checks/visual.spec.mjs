@@ -2,7 +2,9 @@
 // pixel. CI runs it on each pull request (new: the PR's build; old: the live site, i.e. main) and lists what changed in
 // the run's summary, with the pictures as an artifact. It reports; it doesn't fail, because most changes are meant. A
 // person looks at the list and says whether each one was.
-// usage: npm run visual-diff -- OLD_URL NEW_URL [--strict]     (--strict fails if anything changed)
+// usage: npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]
+//   --strict fails if anything changed; --wide adds 1280 x 720 and 2560 x 1440 (the smallest and a big one-screen-per-
+//   section desktop) for a layout change
 // Drawings, photos and the footer map are masked (painted over in both shots): their animation frames differ run to
 // run. Reduce Motion is on, so the page itself holds still. Writes out/visual/report.md and, for each page and size
 // that changed, old, new and diff pictures (the diff shows changed pixels in red over a faded new shot).
@@ -16,6 +18,7 @@ const SIZES = [
   ['phone', 390, 844],
   ['tablet', 820, 1180],
   ['1440', 1440, 900],
+  ...(flag('--wide') ? [['1280', 1280, 720], ['2560', 2560, 1440]] : []),
 ];
 const MASK = 'img, picture, svg, video, canvas, .stage'; // anything that animates or loads its own picture
 const OUT = join(ROOT, 'out/visual');
@@ -63,7 +66,7 @@ function compare(aFile, bFile, diffFile) {
 test('screenshots against the old build', async ({ browser }) => {
   test.setTimeout(1_800_000);
   const [old, neu] = positional.map((u) => u.replace(/\/$/, ''));
-  if (!old || !neu) throw new Error('usage: npm run visual-diff -- OLD_URL NEW_URL [--strict]');
+  if (!old || !neu) throw new Error('usage: npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]');
   mkdirSync(OUT, { recursive: true });
   for (const f of readdirSync(OUT)) if (f.endsWith('.png')) rmSync(join(OUT, f));
   const paths = await pages(neu);

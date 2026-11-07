@@ -22,9 +22,8 @@
 .svc-icon svg { width: var(--sp-7); height: var(--sp-7); }
 .svc-text { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }
 .svc-text .chip { align-self: center; }
-.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
+.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; overflow-wrap: anywhere; hyphens: auto; }   /* a long word breaks rather than being cut */
 .svc-line { max-width: 32ch; color: var(--c-muted); }
-:root[data-text] .svc-title { overflow-wrap: anywhere; hyphens: auto; }   /* bigger text (Settings): a long word breaks rather than being cut */
 /* the bar along the bottom of the card you point at */
 .svc-go {
   display: flex;
@@ -60,10 +59,6 @@
   .svc-small .svc-title { font-size: var(--fs-5); }
   /* the line stays for screen readers: the .sr-only clip (base.css), here only from tablet up */
   .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-}
-/* tablets, bigger text (Settings): cards and tiles two to a row, so a name fits its card */
-@media (--tablet) {
-  :root[data-text] :is(.svc-big, .svc-small) { grid-column: span 6; }
 }
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up. Its shadow is a layer on the li
    that only fades and scales with it, so the big blur is drawn once, not on every frame of the lift. */
@@ -194,7 +189,7 @@
 /* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of four short tiles (the last is All services).
    Only in a window at least 3:2 wide: the cards take the window's shape, so a taller one would stretch them into poles
    (3:2 keeps a tall card under about 2.1 times its width). Taller windows keep the tablet grid above. */
-@media (min-width: 1100px) and (min-height: 700px) and (min-aspect-ratio: 3 / 2) {
+@media (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
   /* one screen, as a floor: a tile whose words outgrow its share (wider spacing, WCAG 1.4.12) makes its row taller
      and the section with it, instead of cutting its icon off */
   .svc-wrap { display: flex; flex-direction: column; min-height: var(--fold-inner); }
@@ -204,10 +199,6 @@
   .svc-big .svc-art { flex: 1; aspect-ratio: auto; }
   .svc-big .svc-line { font-size: var(--fs-4); }
   .svc-small .svc-tile { padding-top: 0; }
-  /* bigger text (Settings): the cards grow to fit their words; the big cards' pictures keep their own shape */
-  :root[data-text] .svc-wrap { height: auto; min-height: var(--fold-inner); }
-  :root[data-text] .svc-menu { grid-template-rows: repeat(4, auto); }
-  :root[data-text] .svc-big .svc-art { flex: none; aspect-ratio: 4 / 3; }
 }
 
 /* without script the arrows and dots can't do anything (home.js drives them): the row still swipes and scrolls */

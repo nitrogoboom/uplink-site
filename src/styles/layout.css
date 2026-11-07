@@ -12,12 +12,10 @@
 /* the band's top and bottom lines are drawn inside it (inset shadows, not borders), so they take no room:
    a band that is one screen (.fold, with a --fold-inner child) fits it exactly instead of running 2px over */
 .section--band { background: var(--c-bg-band); box-shadow: inset 0 1px var(--c-line), inset 0 -1px var(--c-line); }
-/* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size */
-.fold { display: flex; flex-direction: column; justify-content: center; }
+/* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size.
+   safe: content too tall for the screen (zoom) overflows downward only, never off the top where nothing scrolls to it */
+.fold { display: flex; flex-direction: column; justify-content: safe center; }
 .fold-always { min-height: var(--fold-h); }
-/* bigger text (Settings, html[data-text]): what is centred in a section overflows downward only, never off the top
-   of the page where nothing scrolls to it. Each section that pins a height to the screen lets it grow (its own CSS) */
-:root[data-text] .fold { justify-content: safe center; }
 .fold > .container { width: 100%; }
 
 .section-head {

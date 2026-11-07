@@ -2,12 +2,12 @@
 // one check (a project here) and hands it its arguments; README "Tools" lists them.
 import { defineConfig } from '@playwright/test';
 
-export const CHECKS = ['site', 'links', 'text', 'spacing', 'styles', 'visual', 'smoke', 'pagespeed', 'audit'];
+export const CHECKS = ['site', 'links', 'spacing', 'styles', 'visual', 'smoke', 'pagespeed', 'audit'];
 
 export default defineConfig({
   testDir: '.',
   outputDir: '../out/test-results',
-  fullyParallel: true, // the site and text checks: one test per page and size, six at a time
+  fullyParallel: true, // the site check: one test per page and size, six at a time
   workers: 6,
   retries: 0,
   timeout: 120_000, // a test; the checks that run as one long test set their own

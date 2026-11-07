@@ -471,17 +471,16 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
    number of wheel steps tall, so the wheel's stops land on fold edges.
    Proof is as tall as its words, which CSS can't round, so it rounds
    its own height up to the next step here; the footer after it then
-   starts on a stop too. Off below desktop and with bigger text, where
-   sections take their own height.
+   starts on a stop too. Off below desktop, where sections take their
+   own height.
    ------------------------------------------------------------------ */
 const proof = $('#proof');
 if (proof?.firstElementChild && 'ResizeObserver' in window) {
   const fold = window.matchMedia(MEDIA.fold);
   const inner = proof.firstElementChild;
   const fit = () => {
-    const root = document.documentElement;
-    if (!fold.matches || root.dataset.text) { proof.style.minHeight = ''; return; }
-    const step = parseFloat(getComputedStyle(root).getPropertyValue('--wheel-step'));
+    if (!fold.matches) { proof.style.minHeight = ''; return; }
+    const step = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wheel-step'));
     const pad = getComputedStyle(proof);
     const h = inner.getBoundingClientRect().height + parseFloat(pad.paddingTop) + parseFloat(pad.paddingBottom);
     proof.style.minHeight = step > 0 ? `${Math.ceil(h / step - 0.001) * step}px` : '';
