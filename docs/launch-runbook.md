@@ -30,9 +30,9 @@ Choose how the old `workers.dev` address is retired. The choice changes the code
    - `public/_headers`: delete the `X-Robots-Tag: noindex` line.
    - `src/pages/robots.txt.ts`: add the `Sitemap:` line back. Its comment says how.
    - `SITE_URL`: set it to `https://DOMAIN`, as the default in `astro.config.mjs` or in the CI environment.
-   - `scripts/headers.mjs`: add a `Link: <PAGE>; rel="canonical"` header to each `.md` copy (see `notes.md`).
+   - The `.md` copies need nothing: `scripts/headers.mjs` already gives each one its own `noindex` and a canonical `Link` to its page, and the canonical follows `SITE_URL`.
    - `wrangler.jsonc`: add `routes` with the custom domain.
-   - `.github/workflows/site.yml`: change the live address the screenshot comparison uses from `uplink-site.johnoreilly.workers.dev` to `DOMAIN`. Change the same address in the example in the comment at the top of `scripts/ci.mjs`.
+   - `.github/workflows/site.yml`: change the live address the screenshot comparison uses from `uplink-site.johnoreilly.workers.dev` to `DOMAIN`. In the deploy job, change `node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev` to `node scripts/deploy.mjs https://DOMAIN --launch`, so both of its smoke runs expect the launched site. Change the same address in the example in the comment at the top of `scripts/ci.mjs`.
    - `SECURITY.md`: point the `security.txt` link at `DOMAIN`.
    - `src/data/privacy.md`: if Bot Fight Mode goes on, change "The site sets no cookies". See item 17 in `docs/privacy-and-accessibility-2026-11-03.md`.
    - **With option A:** nothing in `wrangler.jsonc` or `worker/index.js`. Keep `run_worker_first` as `["/api/*", "/404"]` and `not_found_handling` as `"none"`. Keep the `http://` to `https://` lines in `worker/index.js`: preview addresses are still on `workers.dev`, and on `DOMAIN` the zone redirects first.
@@ -51,15 +51,22 @@ The launch takes about an hour.
    - Auto Minify and Rocket Loader off. They would break the CSP hashes.
    - Browser Integrity Check: make sure it doesn't block agents that read `llms.txt` and the `.md` copies. On `workers.dev`, it returns 403 to a client that sends no user agent of its own.
    - DNSSEC on. Then add the DS record at the registrar.
-3. **Claude:** merge the `launch` pull request. CI deploys it, and the Worker answers on `DOMAIN`.
+3. **Owner:** attach `DOMAIN` to the Worker before the merge. CI deploys with `wrangler versions deploy`, which doesn't apply the `routes` in `wrangler.jsonc`. From the `launch` branch, signed in to Cloudflare, run:
+
+   ```bash
+   npx wrangler triggers deploy
+   ```
+
+   The version live now answers on `DOMAIN` until the merge, still with `noindex`.
 4. **Owner:** in Workers > uplink-site > Settings, check that the custom domain shows Active, with a certificate.
-5. **Claude:** run the smoke test. Every line must pass.
+5. **Claude:** merge the `launch` pull request. CI uploads the new version, smoke checks it, puts it live, and smoke checks `https://DOMAIN` with `--launch`. If that last check fails, CI rolls back and the run fails: read the deploy job's summary.
+6. **Claude:** run the smoke test yourself. Every line must pass.
 
    ```bash
    npm run smoke -- https://DOMAIN --launch
    ```
 
-6. **Owner and Claude:** retire the old address.
+7. **Owner and Claude:** retire the old address.
    - **Option A:** in Workers > uplink-site > Settings > Domains & Routes, turn `workers.dev` off. Check that `https://uplink-site.johnoreilly.workers.dev` no longer answers. Then open a test pull request and check that its preview address still works.
    - **Option B:** check the redirect with the smoke test:
 
@@ -67,15 +74,15 @@ The launch takes about an hour.
      npm run smoke -- https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev
      ```
 
-7. **Owner:** add the DNS records the domain needs, even before it sends mail. They stop anyone from faking mail from it:
+8. **Owner:** add the DNS records the domain needs, even before it sends mail. They stop anyone from faking mail from it:
    - CAA records naming the certificate authorities Cloudflare uses.
    - SPF: `v=spf1 -all`.
    - DMARC: a `_dmarc` record with `p=reject`.
    - A null MX record (`0 .`).
 
    When Cloudflare Email Service starts sending mail, replace these with its records.
-8. **Owner:** in Web Analytics, add `DOMAIN` to the site. Or make a new site and give Claude the token for `core.js`.
-9. **Claude:** check the real domain in a browser. Run the site check against it, then open Home, one service page, and Contact in a real browser and watch the console for CSP blocks:
+9. **Owner:** in Web Analytics, add `DOMAIN` to the site. Or make a new site and give Claude the token for `core.js`.
+10. **Claude:** check the real domain in a browser. Run the site check against it, then open Home, one service page, and Contact in a real browser and watch the console for CSP blocks:
 
    ```bash
    npm run verify -- --base https://DOMAIN
@@ -101,7 +108,7 @@ The launch takes about an hour.
 
 | What broke | How to undo it | How long it takes |
 | --- | --- | --- |
-| A bad deploy: page errors or a broken layout | Run `npx wrangler rollback`, then fix the problem on a branch. | Seconds |
+| A bad deploy: page errors or a broken layout | If the smoke check caught it, CI has rolled back already (the deploy job's summary says so). Otherwise run `npx wrangler rollback`. Then fix the problem on a branch. | Seconds |
 | The domain doesn't answer, or the certificate fails | Remove the custom domain from the Worker. `workers.dev` still works; with option A, turn it back on first. | Minutes |
 | The move to Cloudflare's nameservers went wrong | Put the old nameservers back at the registrar. | Up to the old TTL: 5 minutes, if you lowered it the day before |
 | Pages indexed too early, or the wrong pages in search | Put `X-Robots-Tag: noindex` back and deploy. For urgent ones, use Search Console > Removals. | One deploy |

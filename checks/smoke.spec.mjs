@@ -7,8 +7,15 @@
 //   npm run smoke -- http://localhost:8787                              the local build (npm run serve): CI runs this.
 //                                                                       Its sitemap names the live host and http stays
 //                                                                       http, so those two checks are left out
+//   npm run smoke -- https://ab12cd34-uplink-site.johnoreilly.workers.dev --preview
+//                                                                       a version that takes no traffic yet, at its own
+//                                                                       preview address (scripts/deploy.mjs runs this
+//                                                                       before it deploys): the sitemap, robots.txt and
+//                                                                       canonicals name the live address, and the
+//                                                                       http:// check waits for the live run
 // Checks:
-//   every page in sitemap.xml answers 200, as text/html, with the security headers
+//   every page in sitemap.xml answers 200, as text/html, with the security headers, and without the ones the site
+//                    dropped (X-Permitted-Cross-Domain-Policies, review H9)
 //   plain http:// redirects (301/308) to the same https:// address (not on localhost): an address the Worker
 //                    answers, always; with --launch a page too (the zone's Always Use HTTPS). On workers.dev the
 //                    pages aren't redirected: browsers never ask a .dev host over http (README, "The Worker")
@@ -20,7 +27,8 @@
 //   /index, /index.html, /services/, /services.html, /services/index.html and /services/index: 308 to the page
 //   pages name their speculation rules (Speculation-Rules), served as application/speculationrules+json
 //   /api/report refuses a GET (405); robots.txt, llms.txt and a .md copy answer
-//   sitemap.xml names this address (not another host; not on localhost)
+//   the .md copies of /services and home: noindex (with --launch too) and a canonical Link to the page (review M4)
+//   sitemap.xml names this address (not another host; not on localhost; with --preview, the live address)
 //   noindex: present while it's a test build; with --launch, gone, and robots.txt names the sitemap
 //   --old: the old address redirects to the same path here
 // Fails on any of them. Cloudflare refuses a client with no user agent of its own (403), so requests name one.
@@ -28,7 +36,8 @@ import { test } from '@playwright/test';
 import { flag, option, positional } from './lib.mjs';
 
 const UA = { 'User-Agent': 'uplink-smoke-test' };
-const HEADERS = ['strict-transport-security', 'content-security-policy', 'x-content-type-options', 'referrer-policy', 'x-frame-options', 'permissions-policy', 'cross-origin-opener-policy', 'cross-origin-resource-policy', 'x-permitted-cross-domain-policies'];
+const HEADERS = ['strict-transport-security', 'content-security-policy', 'x-content-type-options', 'referrer-policy', 'x-frame-options', 'permissions-policy', 'cross-origin-opener-policy', 'cross-origin-resource-policy'];
+const DROPPED = ['x-permitted-cross-domain-policies']; // Flash and Acrobat were all that read it (review H9)
 
 // [status, headers, body] without following redirects
 async function get(url, method = 'GET', headers = {}) {
@@ -38,9 +47,10 @@ async function get(url, method = 'GET', headers = {}) {
 
 test('smoke', async () => {
   test.setTimeout(300_000);
-  if (!positional[0]) throw new Error('usage: npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]');
+  if (!positional[0]) throw new Error('usage: npm run smoke -- ADDRESS [--launch] [--preview] [--old OLD_ADDRESS]');
   const base = positional[0].replace(/\/$/, '');
   const launch = flag('--launch');
+  const preview = flag('--preview'); // a version's own address: the build names the live one (scripts/deploy.mjs)
   const old = option('--old')?.replace(/\/$/, '');
   const host = new URL(base).host;
   const local = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(base).hostname); // npm run serve, as in CI
@@ -51,7 +61,10 @@ test('smoke', async () => {
   ok(status === 200, `sitemap.xml: ${status}`);
   const urls = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   ok(urls.length > 0, 'sitemap.xml lists no pages');
-  const other = urls.filter((u) => new URL(u).host !== host);
+  // the address the build names (SITE_URL): in the sitemap, robots.txt and the canonicals. A deployed site's own,
+  // except a preview's, which names the live one
+  const site = urls.length ? new URL(urls[0]).origin : base;
+  const other = urls.filter((u) => new URL(u).host !== (preview ? new URL(site).host : host));
   ok(local || !other.length, `sitemap.xml names another host: ${other[0] || ''}`);
 
   for (const u of urls) {
@@ -64,6 +77,8 @@ test('smoke', async () => {
     ok((h.get('content-type') || '').includes('text/html'), `${path}: content-type ${h.get('content-type')}`);
     const missing = HEADERS.filter((n) => !h.get(n));
     ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
+    const extra = DROPPED.filter((n) => h.has(n));
+    ok(!extra.length, `${path}: still sends ${extra.join(', ')}`);
     const noindex = (h.get('x-robots-tag') || '').includes('noindex');
     ok(noindex !== launch, `${path}: noindex ${launch ? 'still on' : 'missing (test build)'}`);
   }
@@ -71,7 +86,7 @@ test('smoke', async () => {
 
   const pageCsp = h.get('content-security-policy');   // the last page's
   const speculation = h.get('speculation-rules');
-  if (!local) {
+  if (!local && !preview) {
     for (const path of launch ? ['/api/report', '/services'] : ['/api/report']) {
       [status, h] = await get(`http://${host}${path}`);
       ok([301, 308].includes(status) && h.get('location') === `https://${host}${path}`, `http://${host}${path} redirect: ${status} to ${h.get('location')}`);
@@ -127,8 +142,17 @@ test('smoke', async () => {
   }
   ok((await get(`${base}/api/report`))[0] === 405, '/api/report GET is not 405');
   for (const path of ['/robots.txt', '/llms.txt', '/services.md']) ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
+  // the Markdown copies (review M4): out of search results for good, not only while it's a test build, and each
+  // names its page. The canonical is the build's address (site), as in the page's own <link rel="canonical">
+  for (const [copy, page] of [['/services.md', '/services'], ['/index.md', '/']]) {
+    [status, h] = await get(base + copy);
+    ok(status === 200, `${copy}: ${status}`);
+    ok((h.get('x-robots-tag') || '').includes('noindex'), `${copy}: no X-Robots-Tag: noindex (${h.get('x-robots-tag')})`);
+    const want = `<${site}${page}>; rel="canonical"`;
+    ok((h.get('link') || '').split(/,\s*(?=<)/).includes(want), `${copy}: Link ${h.get('link')}, not ${want}`);
+  }
   const robots = (await get(`${base}/robots.txt`))[2];
-  if (launch) ok(robots.includes(`Sitemap: ${base}/sitemap.xml`), 'robots.txt has no Sitemap line for this address');
+  if (launch) ok(robots.includes(`Sitemap: ${site}/sitemap.xml`), `robots.txt has no Sitemap line for ${site}`);
 
   if (old) {
     [status, h] = await get(`${old}/services`);

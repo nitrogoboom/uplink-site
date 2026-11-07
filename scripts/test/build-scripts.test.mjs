@@ -41,6 +41,8 @@ const TEMPLATE = `/*
   Content-Security-Policy: script-src 'self' {script-hashes}; style-src 'self' {style-hashes}
 # @early-hints (written by scripts/headers.mjs)
 # @end early-hints
+# @markdown-copies (written by scripts/headers.mjs)
+# @end markdown-copies
 `;
 const base = (extra = {}) => site({
   'index.html': HOME,
@@ -260,4 +262,42 @@ test("footer.css: the campus map's edge rule names a class of every polygon the 
   assert.ok(polygons.length > 100, 'the map has its polygons');
   const missed = [...new Set(polygons.filter((c) => !c.split(' ').some((k) => listed.includes(k))))];
   assert.deepEqual(missed, [], `polygon classes with no edge rule (listed: ${listed.join(', ')})`);
+});
+
+// review M4: a .md copy is never what a search should show, launched or not. headers.mjs gives each copy a rule of its
+// own (not the site-wide noindex, which comes off at launch): noindex, and its page as the canonical address
+test('headers.mjs: every .md copy gets its own noindex and a canonical Link to its page (review M4)', () => {
+  const canon = (path) => `<link rel="canonical" href="https://example.test${path}">`;
+  const dir = base({
+    'index.html': HOME.replace('<head>', `<head>${canon('/')}`),
+    'services.html': `<!doctype html><html><head>${canon('/services')}</head><body><p>Services</p></body></html>`,
+    'services/backup.html': `<!doctype html><html><head>${canon('/services/backup')}</head><body></body></html>`,
+    'index.md': '# Home', 'services.md': '# Services', 'services/backup.md': '# Backup',
+    'agents.md': '# Notes for agents',   // no page of its own: noindex, no canonical
+  });
+  try {
+    run('headers.mjs', dir);
+    const out = readFileSync(join(dir, '_headers'), 'utf-8');
+    const rule = (path) => out.match(new RegExp(`^${path.replaceAll('.', '\\.')}\\n((?: {2}.*\\n)+)`, 'm'))?.[1] ?? '';
+    for (const [md, page] of [['/index.md', '/'], ['/services.md', '/services'], ['/services/backup.md', '/services/backup']]) {
+      const r = rule(md);
+      assert.match(r, /^ {2}X-Robots-Tag: noindex$/m, `${md}: noindex of its own`);
+      assert.match(r, new RegExp(`^ {2}Link: <https://example\\.test${page}>; rel="canonical"$`, 'm'), `${md}: canonical ${page}`);
+      assert.ok(!r.includes('rel=preload'), `${md}: no Early Hints on a copy`);
+    }
+    assert.match(rule('/agents.md'), /^ {2}X-Robots-Tag: noindex$/m, '/agents.md: noindex');
+    assert.ok(!rule('/agents.md').includes('canonical'), '/agents.md: no page, so no canonical');
+  } finally { rmSync(dir, { recursive: true }); }
+  const lost = base({ 'about.html': '<!doctype html><html><head></head><body></body></html>', 'about.md': '# About' });
+  try { assert.match(fails('headers.mjs', lost), /about\.md: its page about\.html has no <link rel="canonical">/); }
+  finally { rmSync(lost, { recursive: true }); }
+});
+
+// review H9: X-Permitted-Cross-Domain-Policies only ever told Flash and Acrobat what they may load; nothing reads it now
+test('public/_headers: no X-Permitted-Cross-Domain-Policies (review H9)', () => {
+  const dir = base({ '_headers': readFileSync('public/_headers', 'utf-8') });
+  try {
+    run('headers.mjs', dir);
+    assert.ok(!/x-permitted-cross-domain-policies/i.test(readFileSync(join(dir, '_headers'), 'utf-8')), 'X-Permitted-Cross-Domain-Policies still sent');
+  } finally { rmSync(dir, { recursive: true }); }
 });

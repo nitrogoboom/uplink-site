@@ -8,6 +8,11 @@
 //                     has no 'unsafe-inline'.
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
 //                     before the HTML. The font list is read from the home page's preloads (Base.astro).
+//   the Markdown copies block   one rule per .md file (services.md, services/backup.md, index.md for home …):
+//                     X-Robots-Tag: noindex, and Link: <PAGE>; rel="canonical" naming its page, read from that page's
+//                     own <link rel="canonical"> (so it follows SITE_URL). A copy is never what a search should show,
+//                     so this noindex stays after launch, when the site-wide one comes off (review M4). A .md with no
+//                     page beside it (agents.md) gets the noindex only; a page with no canonical stops the build.
 // It also writes dist/_redirects: the other spellings of each page's address (/services/, /services.html,
 // /services/index.html, /services/index, /index.html, /index) to the one address, as 308 (permanent). Cloudflare's
 // own html_handling sends most of those as 307 (temporary), which caches and crawlers don't keep; a _redirects line
@@ -30,11 +35,13 @@ if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.include
 const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
 const pages = [];
+const copies = [];
 const walk = (dir) => {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
     if (statSync(p).isDirectory()) walk(p);
     else if (name.endsWith('.html')) pages.push(p);
+    else if (name.endsWith('.md')) copies.push(p);
   }
 };
 walk(DIST);
@@ -68,6 +75,17 @@ const paths = pages
   .sort();
 const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
+// each Markdown copy: services.md names services.html's canonical, index.md names index.html's (home, /)
+const markdown = copies.map((f) => {
+  const md = relative(DIST, f).split(sep).join('/');
+  const page = md.replace(/\.md$/, '.html');
+  let canonical = null;   // no page beside it (agents.md): noindex only
+  try { canonical = readFileSync(join(DIST, page), 'utf-8').match(/<link rel="canonical" href="([^"]+)"/)?.[1]; }
+  catch { /* stays null */ }
+  if (canonical === undefined) throw new Error(`${md}: its page ${page} has no <link rel="canonical">, so the copy can't name it`);
+  return `/${md}\n  X-Robots-Tag: noindex\n${canonical ? `  Link: <${canonical}>; rel="canonical"\n` : ''}`;
+}).sort().join('');
+
 // every page, plus /404 (served at its own name too, by the Worker): its trailing-slash, .html and index spellings
 // (Cloudflare would send /index and /services/index.html on as 307s)
 const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html / 308', '/index / 308']
@@ -75,16 +93,19 @@ const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html /
 writeFileSync(join(DIST, '_redirects'), redirects.join('\n') + '\n');
 
 const src = readFileSync(join(DIST, '_headers'), 'utf-8');
-if (!src.includes('{script-hashes}') || !src.includes('{style-hashes}') || !/# @early-hints[^\n]*\n[\s\S]*?# @end early-hints\n/.test(src)) {
-  throw new Error('public/_headers needs the {script-hashes} and {style-hashes} placeholders and the @early-hints block');
+// a block the template marks with "# @NAME …" and "# @end NAME" lines; what's between them is written here
+const block = (name) => new RegExp(`(# @${name}[^\\n]*\\n)[\\s\\S]*?(# @end ${name}\\n)`);
+if (!src.includes('{script-hashes}') || !src.includes('{style-hashes}') || !block('early-hints').test(src) || !block('markdown-copies').test(src)) {
+  throw new Error('public/_headers needs the {script-hashes} and {style-hashes} placeholders and the @early-hints and @markdown-copies blocks');
 }
 const out = src
   .replaceAll('{script-hashes}', [...hashes].join(' '))
   .replaceAll('{style-hashes}', [...styles].join(' '))
-  .replace(/(# @early-hints[^\n]*\n)[\s\S]*?(# @end early-hints\n)/, `$1${hints}$2`);
+  .replace(block('early-hints'), (_, start, end) => start + hints + end)
+  .replace(block('markdown-copies'), (_, start, end) => start + markdown + end);
 writeFileSync(join(DIST, '_headers'), out);
 
 const rules = out.split('\n').filter((l) => /^\S/.test(l) && !l.startsWith('#')).length;
 const longest = Math.max(...out.split('\n').map((l) => l.length));
 if (rules > 100 || longest > 2000) throw new Error(`_headers over Cloudflare's limits: ${rules} rules (max 100), longest line ${longest} (max 2000)`);
-console.log(`_headers: ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`);
+console.log(`_headers: ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${copies.length} Markdown copies, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`);

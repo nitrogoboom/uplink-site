@@ -29,7 +29,6 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
-  X-Permitted-Cross-Domain-Policies: none
   X-Frame-Options: DENY
   Reporting-Endpoints: csp="/api/report"
   Speculation-Rules: "/speculation-rules.json"
@@ -48,6 +47,11 @@
 /*.txt
   ! Content-Type
   Content-Type: text/plain; charset=utf-8
+# Each Markdown copy names its page as the canonical address and stays out of search results, after launch too:
+# the copies are for AI agents, and the page is what a search should show (review M4). This noindex is not the
+# test build's one above: keep it at launch.
+# @markdown-copies (written by scripts/headers.mjs, one rule per .md file)
+# @end markdown-copies
 # Chrome reads speculation rules only under their own type (Cloudflare would send application/json).
 /speculation-rules.json
   ! Content-Type
