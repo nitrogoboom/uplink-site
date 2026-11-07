@@ -11,7 +11,7 @@ const services = await getEntries(p.services);   // each links to the service's 
 const size = svgSize(`${p.image}.svg`);
 ---
 <article class="case-src" id={`case-${id}`} aria-labelledby={`case-${id}-t`}>
-  <h1 id={`case-${id}-t`} class={fit(p.name)} data-case-field="name">{p.name}</h1>
+  <div class="case-title"><h1 id={`case-${id}-t`} class={fit(p.name)} data-case-field="name">{p.name}</h1></div>
   <div class="case">
     <div class="case-fig">
       <div class="case-img well"><img src={`/assets/img/${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy"></div>

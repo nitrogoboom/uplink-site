@@ -817,14 +817,15 @@ test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
 
 // B18, B20: a heading or big number never breaks inside a word. Headings and stat numbers size to their column
 // (--fit, cqi), so "CYBERSECURITY" on /services/security at 1024 to 1099 and "3,400" on /about with a 32px default
-// font stay whole. Every page at five widths, plus the two cases the review found. A break after a hyphen
+// font stay whole. Every page at five widths and, with a 32px default font, at 320 and 390; plus /services/security
+// at 1024 to 1099, where the review found it. h3s in the page count too. A break after a hyphen
 // ("Ransomware-/ready") is a normal line break, not a split. And every heading with a word of LONG letters or more
 // carries the class fit (src/lib/fit.js), so one written into a page by hand without fit() can't slip through.
 const WORDS = () => {
   const out = [];
   // headings without the class fit, for the long-word test in Node
-  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), .fc-head h3:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
-  for (const h of document.querySelectorAll('h1, h2, .fc-panel.is-on h3, .stat-val')) {
+  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
+  for (const h of document.querySelectorAll('h1, h2, main h3, .fc-panel.is-on h3, .stat-val')) {
     if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
     const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
     for (let t; (t = tw.nextNode()); ) {
@@ -843,7 +844,7 @@ test('headings and numbers: no word split across lines (B18, B20)', async ({ bro
   const jobs = [
     ...[320, 768, 1060, 1440, 2560].flatMap((w) => PAGES.map((page) => [page, w, 0])),
     ...[1024, 1040, 1080, 1099].map((w) => ['services/security', w, 0]),
-    ...[320, 390].map((w) => ['about', w, 32]),
+    ...[320, 390].flatMap((w) => PAGES.map((page) => [page, w, 32])),
   ];
   const fails = (
     await lanes(jobs, 4, async ([page, w, font]) => {

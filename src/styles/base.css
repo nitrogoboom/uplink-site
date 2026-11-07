@@ -50,10 +50,11 @@ h1, h2, h3, h4 {
    more, since browsers hyphenate any word that ends a line, needed or not */
 :is(h1, h2, h3) { --fit: var(--fit-short); }
 .fit { --fit: var(--fit-long); }
+.fit-loose { --fit: var(--fit-loose); }
 h1 { font-size: min(var(--fs-8), var(--fit)); }
 h2 { font-size: min(var(--fs-7), var(--fit)); }
 h1, h2 { hyphens: auto; hyphenate-limit-chars: 14 6 6; }
-h3 { font-size: var(--fs-5); line-height: var(--lh-title); }
+h3 { font-size: min(var(--fs-5), var(--fit)); line-height: var(--lh-title); }
 h4 { font-size: var(--fs-4); line-height: var(--lh-title); }
 h3, h4 { font-style: normal; }   /* italic is for page and section titles (h1, h2); sub-headings stand upright */
 

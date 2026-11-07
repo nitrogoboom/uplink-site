@@ -84,6 +84,7 @@
   --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
   --fit-long:  14cqi;   /* the most a heading with a long word may be (class fit, lib/fit.js): a 13-letter word
                           ("Cybersecurity") fits its column. cqi: 1% of the nearest container's width (layout.css) */
+  --fit-loose: 30cqi;   /* a heading whose words are all 6 letters or fewer (class fit-loose) */
   --fit-short: 21cqi;   /* every other heading: a 9-letter word fits (display caps are about 0.5em a letter); binds only
                           with big text in a narrow column (Contact's 72px h1 keeps its size at 1440) */
 
