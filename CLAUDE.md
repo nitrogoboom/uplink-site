@@ -58,7 +58,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Branches, pushes, previews
 
 - One branch per session. Commit locally as often as you like. Each push to a PR runs CI (about 3 minutes) and each merge to `main` deploys, so push when a phone preview is wanted and merge when the batch is done.
-- A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://BRANCH-uplink-site.johnoreilly.workers.dev` (branch lowercased, non-alphanumerics to `-`, repeats and end dashes dropped, max 30 chars). Find it with `gh pr view N --comments` or `gh pr checks N`. Previews never touch the live Worker.
+- A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (branch lowercased, non-alphanumerics to `-`, repeats and end dashes dropped, `b-` in front if it doesn't start with a letter; over 30 chars, cut to 23 plus `-` and a 6-character hash). Find it with `gh pr view N --comments` or `gh pr checks N`. Previews never touch the live Worker.
 - Changes to only root `*.md` or `docs/` run no CI and deploy nothing, so notes can go straight to `main`.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
 

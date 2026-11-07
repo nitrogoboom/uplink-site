@@ -276,11 +276,13 @@ Everything else goes on to the static files, with `_headers`, `_redirects`, and 
 
 GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
-- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), and the link check (`npm run verify:links`) against the built site served by `wrangler dev`. It needs no Python.
+- CI runs on every pull request and on every push to `main`. It runs `npm ci`, the type check, the tests, lint, the build, the site check (`npm run verify`), the link check (`npm run verify:links`), and the smoke check (`npm run smoke`) against the built site served by `wrangler dev`. It needs no Python. Playwright's Chromium is cached between runs, keyed on the `@playwright/test` version in `package-lock.json`.
+- Every run also lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. A pull request's dependency review (`actions/dependency-review-action`) is skipped while the repository is private: GitHub offers it on private repositories only with GitHub Advanced Security.
+- Every step runs in `bash` with `pipefail`, and every job has a time limit (`timeout-minutes`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
-- A push to `main` that passes deploys to the live Worker.
-- A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://BRANCH-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the deploy and preview jobs are skipped.
+- A push to `main` that passes deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
+- A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy.
 
 ### Roll back a bad deploy
 

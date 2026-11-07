@@ -33,7 +33,7 @@ A *release* is the first production launch, and any later change to layout, navi
 1. Create a branch from `main`. Keep one topic per branch.
 2. Work locally with `npm run dev`.
 3. Before you push, run `npm run ci`. It runs the same checks as CI, except the screenshot comparison, the preview, and the deploy.
-4. Push the branch and open a pull request. CI runs and posts a preview address, `https://BRANCH-uplink-site.johnoreilly.workers.dev`.
+4. Push the branch and open a pull request. CI runs and posts a preview address, `https://ALIAS-uplink-site.johnoreilly.workers.dev` (`node scripts/preview-alias.mjs BRANCH` prints the alias).
 5. Check the preview on a phone.
 6. Read the run's summary. "Screenshot changes" lists every page that looks different from the live site. Make sure you meant each change. The pictures are in the run's `visual-diff` artifact.
 7. When CI passes, merge. The merge to `main` deploys to the live site.
@@ -79,10 +79,15 @@ Ontario's own guide: [How to make websites accessible](https://www.ontario.ca/pa
 Don't repeat these by hand. CI fails the build if any of them break:
 
 - Types and Astro errors (`astro check`), and lint on JavaScript, TypeScript, Astro, CSS, JSON, and YAML.
-- The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, and the report endpoint.
+- The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the preview alias, and the report endpoint, including every odd shape a report can take.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
-- No script errors and no CSP blocks on any page.
-- No sideways scroll on any page at phone size, or on Home at four sizes. The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px, at normal and 200% text.
+- No script errors and no CSP blocks on any page: watched until the network is idle and a few seconds after, while the screen turns, and while each of the page's own buttons is pressed.
+- No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px, at normal and 200% text.
+- Exactly one `h1` on every page, and every JSON-LD block parses.
+- Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own. All of it with the site's pause on too.
+- The sitemap lists exactly the pages the build wrote, and every check covers all of them.
+- The security headers and `noindex` on every page, the 404 status, and the report endpoint (`npm run smoke` against the local build).
+- The workflows pass zizmor's high-severity audits.
 - The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
 - Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`npm run verify:links`).
 - **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop (1440×900), every other page on phone. At release, `npm run verify -- --all` adds desktop for every page.
