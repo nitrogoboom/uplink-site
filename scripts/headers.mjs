@@ -9,8 +9,9 @@
 //   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
 //                     before the HTML. The font list is read from the home page's preloads (Base.astro).
 // It also writes dist/_redirects: the other spellings of each page's address (/services/, /services.html,
-// /index.html) to the one address, as 308 (permanent). Cloudflare's own html_handling sends those as 307
-// (temporary), which caches and crawlers don't keep; a _redirects line wins over it.
+// /services/index.html, /services/index, /index.html, /index) to the one address, as 308 (permanent). Cloudflare's
+// own html_handling sends most of those as 307 (temporary), which caches and crawlers don't keep; a _redirects line
+// wins over it.
 // It refuses to finish if a page or a drawing a script inserts (hero cuts, campus map) has a style="" attribute: no hash covers one, so the CSP
 // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
 import { createHash } from 'node:crypto';
@@ -67,8 +68,10 @@ const paths = pages
   .sort();
 const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
-// every page, plus /404 (served at its own name too, by the Worker): its trailing-slash and .html spellings
-const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html / 308'] : [`${p}/ ${p} 308`, `${p}.html ${p} 308`]));
+// every page, plus /404 (served at its own name too, by the Worker): its trailing-slash, .html and index spellings
+// (Cloudflare would send /index and /services/index.html on as 307s)
+const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html / 308', '/index / 308']
+  : [`${p}/ ${p} 308`, `${p}.html ${p} 308`, `${p}/index.html ${p} 308`, `${p}/index ${p} 308`]));
 writeFileSync(join(DIST, '_redirects'), redirects.join('\n') + '\n');
 
 const src = readFileSync(join(DIST, '_headers'), 'utf-8');

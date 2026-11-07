@@ -72,6 +72,17 @@ test('headers.mjs: hashes every inline script and style, skips JSON-LD, writes E
   } finally { rmSync(dir, { recursive: true }); }
 });
 
+test('headers.mjs: /index and a page\'s /index.html and /index spellings go to the page with a 308 too (review H13)', () => {
+  const dir = base();
+  try {
+    run('headers.mjs', dir);
+    const redirects = readFileSync(join(dir, '_redirects'), 'utf-8').split('\n');
+    for (const line of ['/index / 308', '/services/index.html /services 308', '/services/index /services 308']) {
+      assert.ok(redirects.includes(line), `redirect: ${line}`);
+    }
+  } finally { rmSync(dir, { recursive: true }); }
+});
+
 // a dist/ the way a plain `astro build` leaves it (the template copied as is), then finished by headers.mjs
 test('check-dist.mjs (wrangler build.command): refuses an unfinished dist/, passes a finished one (review H11)', async () => {
   const dir = base();
