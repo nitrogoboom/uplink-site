@@ -1,5 +1,6 @@
 // ESLint (flat config): the recommended JS, TypeScript and Astro rules, for the page scripts, the build scripts and
-// the Astro components. Formatting is left alone (the code is hand-formatted; see .prettierignore).
+// the Astro components. Formatting is Prettier's (npm run format); none of these
+// configs turns on a formatting rule, so the two don't fight.
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
