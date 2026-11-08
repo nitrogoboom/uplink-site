@@ -2,6 +2,11 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
+## Light theme
+- [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
+- [ ] Light theme, optional: a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
+- [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
+
 ## Review of November 7, 2026
 - [ ] Finish `docs/review-2026-11-07.md`: only C12 is left (merge the docs, trim file headers). Status lives in that file.
 - [ ] Parked from the November 7 review (owner's lean process, November 8, 2026: not bugs, or refactors that can wait): J3, J4, J5 (Grow animation internals: layouts per frame, JS orbits, timeout chains), J6 (Trusted Types hardening: the policy in `core.js` passes every string, `createHTML: (s) => s`; accept only the site's own drawings, such as an `<svg` string from a same-origin `/assets/img/` fetch, and say so in the docs), C2 (`@layer`), C3 (build post-steps as an Astro integration), C7 (Lightning CSS + browserslist), C8 (relative colour tints), L4 (one cached stylesheet instead of inline CSS), L5 (hashed drawing file names), L11 (307 vs 308 on odd paths). Details in `docs/review-2026-11-07.md`.

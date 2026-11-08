@@ -200,3 +200,81 @@ select.input:hover {
     background: HighlightText;
   }
 }
+
+/* option buttons: one choice from a short row (Settings: theme). Native radios in a fieldset, so the arrow keys move
+   between them and a screen reader says "radio, 1 of 3"; the input sits over its label, invisible, and the label
+   draws the button. Brought back from the old text-size option (git 030a4f5^). The chosen one takes the palette's
+   selected look (amber tint and an even amber border, docs/palette.md rule 11), not a fill: the shortcuts switch
+   below is the pop-up's one amber fill. */
+.seg-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.seg-field > legend {
+  margin-bottom: var(--sp-3);
+  padding: 0;
+} /* the browser's fieldset and legend padding off: the heading lines up with the rest of the pop-up */
+.seg {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6em, 1fr));
+  gap: var(--sp-2);
+  font-size: var(--fs-2);
+}
+.seg-opt {
+  position: relative;
+  display: flex;
+}
+.seg-opt input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.seg-opt span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap);
+  padding-inline: var(--sp-2);
+  border: 1px solid var(--c-edge);
+  border-radius: var(--r-2);
+  background: var(--c-surface);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  transition:
+    background-color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.seg-opt svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+} /* an option's icon beside its word (the theme's screen, sun and moon); the word still names it */
+.seg-opt:hover span {
+  background: var(--c-surface-2);
+}
+.seg-opt input:checked + span {
+  border-color: var(--c-accent);
+  background: var(--c-accent-tint);
+  box-shadow: inset 0 0 0 1px var(--c-accent); /* a 2px border: the choice shows by more than its colour (WCAG 1.4.1) */
+}
+.seg-opt input:focus-visible + span {
+  outline: 2px solid var(--c-accent-text);
+  outline-offset: 2px;
+}
+@media (forced-colors: active) {
+  .seg-opt input:checked + span {
+    forced-color-adjust: none;
+    border-color: Highlight;
+    background: Highlight;
+    color: HighlightText;
+  }
+}

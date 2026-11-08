@@ -38,7 +38,18 @@ const $ = (sel, ctx = document) => /** @type {E | null} */ (ctx.querySelector(se
  * @returns {E[]}
  */
 const $$ = (sel, ctx = document) => /** @type {E[]} */ (Array.from(ctx.querySelectorAll(sel)));
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+// Less motion: the visitor's own choice (Settings, Reduce motion; below) if they made one, else the device's setting
+// (prefers-reduced-motion).
+// Shaped like the MediaQueryList it replaced, so every script asks it the same way: .matches, and 'change' events.
+const deviceReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+class MotionChoice extends EventTarget {
+  get matches() {
+    const choice = store.get(MOTION_KEY);
+    return choice === 'reduce' || (choice !== 'full' && deviceReduce.matches);
+  }
+}
+const MOTION_KEY = 'uplink.motion';
+const reduceMotion = new MotionChoice();
 
 /* ---------- error reports ---------------------------------------------- */
 // A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
@@ -312,6 +323,88 @@ holdBtns.forEach((b) =>
 showHold();
 reduceMotion.addEventListener('change', showHold);
 
+/* ---------- theme (Settings: System, Light or Dark) --------------------- */
+// html[data-theme] is "light" or "dark"; theme-light.css holds the light colours. Base.astro's head script sets it
+// before the page paints, from the saved choice or the device's setting; this keeps it right after that: a choice in
+// Settings applies at once and is saved, System follows the device when it changes (prefers-color-scheme), another
+// tab's choice arrives by the storage event, and a page restored from the back/forward cache re-reads it (review
+// J12). Without script the page stays dark. Drawings follow by CSS; theme.ev's 'change' is for parts a script drew
+// in one colour (home.js's hero captions).
+const THEME_KEY = 'uplink.theme';
+const THEMES = ['system', 'light', 'dark'];
+const deviceLight = window.matchMedia('(prefers-color-scheme: light)');
+const theme = { ev: new EventTarget() };
+const themeChoice = () => {
+  const t = store.get(THEME_KEY);
+  return t && THEMES.includes(t) ? t : 'system';
+};
+const themeInputs = /** @type {HTMLInputElement[]} */ ($$('input[name="theme"]'));
+const applyTheme = () => {
+  const choice = themeChoice();
+  const t = choice === 'system' ? (deviceLight.matches ? 'light' : 'dark') : choice;
+  themeInputs.forEach((i) => {
+    i.checked = i.value === choice;
+  });
+  if (root.dataset.theme === t) return;
+  root.dataset.theme = t;
+  // the page colour, for the browser's own bar (as Base.astro's head script)
+  $('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#E8EFF7' : '#0E1A27');
+  theme.ev.dispatchEvent(new Event('change'));
+};
+themeInputs.forEach((i) =>
+  i.addEventListener('change', () => {
+    store.set(THEME_KEY, i.value);
+    applyTheme();
+  }),
+);
+deviceLight.addEventListener('change', applyTheme);
+window.addEventListener('storage', (e) => {
+  if (e.key === THEME_KEY) applyTheme();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) applyTheme();
+});
+applyTheme();
+
+/* ---------- Reduce motion (Settings) --------------------------------------- */
+// html[data-motion]: "reduce" when the visitor turns it on, or their device asks for less motion and they haven't turned
+// it off; "full" when they turned it off (saved as uplink.motion: reduce or full). The visitor's choice wins over the
+// device's, for this site only. Base.astro's head script sets it before the page paints; this keeps it right after
+// that, as the theme does: the switch, the device's setting changing, another tab (storage) and the back/forward cache
+// (pageshow). The CSS keys off the attribute (postcss.config.mjs follows every prefers-reduced-motion rule to it), and
+// the scripts ask reduceMotion (top), which says 'change' when the answer changes. With the device asking for less
+// motion, the hint says so, and turning the switch off is the visitor's own choice to see the animations here.
+const moToggle = /** @type {HTMLInputElement | null} */ (document.getElementById('mo-toggle'));
+let motionWas = reduceMotion.matches;
+const applyMotion = () => {
+  const on = reduceMotion.matches;
+  if (on) root.dataset.motion = 'reduce';
+  else if (store.get(MOTION_KEY) === 'full') root.dataset.motion = 'full';
+  else delete root.dataset.motion;
+  if (moToggle) {
+    moToggle.checked = on;
+    const dev = document.getElementById('mo-device');
+    if (dev) dev.hidden = !deviceReduce.matches;
+  }
+  if (on !== motionWas) {
+    motionWas = on;
+    reduceMotion.dispatchEvent(new Event('change'));
+  }
+};
+moToggle?.addEventListener('change', () => {
+  store.set(MOTION_KEY, moToggle.checked ? 'reduce' : 'full');
+  applyMotion();
+  toast({ title: moToggle.checked ? 'Motion reduced' : 'Motion on', tone: 'info', timeout: 3000 });
+});
+deviceReduce.addEventListener('change', applyMotion);
+window.addEventListener('storage', (e) => {
+  if (e.key === MOTION_KEY) applyMotion();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) applyMotion();
+});
+applyMotion();
+
 /* ======================================================================
    Keyboard shortcuts
    ====================================================================== */
@@ -539,4 +632,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, held, html, reduceMotion, replay, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, held, html, reduceMotion, replay, theme, toast, openDialog, shortcutsOn, whenOnScreen };

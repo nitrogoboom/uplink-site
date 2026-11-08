@@ -121,8 +121,34 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
       <meta name="twitter:card" content="summary_large_image" />
     </Fragment>}
     <meta name="theme-color" content="#0E1A27" />
+    <!-- Before the page paints: html.js, the theme (Settings: System, Light or Dark) and Reduce motion (core.js keeps
+         both up to date; html[data-motion] is how the CSS sees it, postcss.config.mjs).
+         uplink.theme holds the visitor's choice; anything else, or no storage, follows the device. The light colours
+         are in theme-light.css; #E8EFF7 is the light page colour, for the browser's own bar. -->
     <script is:inline>
-      document.documentElement.classList.add('js');
+      (function (r) {
+        r.classList.add('js');
+        let t = null;
+        try {
+          t = localStorage.getItem('uplink.theme');
+        } catch {
+          /* no storage: follow the device */
+        }
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        r.dataset.theme = t;
+        // Settings, Reduce motion: "reduce" if the visitor turned it on (uplink.motion), or their device asks for less
+        // motion and they haven't turned it off; "full" if they turned it off
+        let m = null;
+        try {
+          m = localStorage.getItem('uplink.motion');
+        } catch {
+          /* no storage: follow the device */
+        }
+        if (m === 'reduce' || (m !== 'full' && matchMedia('(prefers-reduced-motion: reduce)').matches))
+          r.dataset.motion = 'reduce';
+        else if (m === 'full') r.dataset.motion = 'full';
+        if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#E8EFF7');
+      })(document.documentElement);
     </script>
     {fonts.map((f) => (
       <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin />

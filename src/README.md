@@ -21,6 +21,7 @@ Each file in `pages/` is one address. Most pages are a stack of sections, with o
 | `contact.astro` | `/contact` | Message and Support |
 | `privacy.astro`, `accessibility.astro` | `/privacy`, `/accessibility` | The Markdown in `data/privacy.md` or `data/accessibility.md`, rendered by `components/TextPage.astro` |
 | `soon.astro`, `404.astro` | `/soon`, and any missing address | One section each, written inline |
+| `light.astro` | `/light` | A test copy of Home in the light theme: the same sections with `light` set, so they show the light drawings, and `styles/theme-light.css`. `noindex`, no canonical, not in the sitemap. See `docs/light-theme-2026-11-08.md`. |
 | `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts`, `.well-known/security.txt.ts` | Those files | Built from the data: `lib/site.ts`, the content collections, and `data/*.md` |
 
 ### The shared layout
@@ -57,7 +58,8 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
 | `Footer.astro` | The footer: one `<nav aria-label="Footer">` of six `<details name="footer">` sections (the summary is the tile, the rest its panel), the campus map, and the base bar, from `data/footer.json` (through `lib/footer.ts`) and the services collection. CSS lays it out (`styles/footer.css`). |
-| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the theme (System, Light or Dark: radios in a fieldset, `.seg` in `forms.css`), the Reduce motion switch and the keyboard-shortcuts switch. Text size is the browser's own zoom. |
+| `Drawing.astro` | A drawing shown as a picture, in both themes: the dark `NAME.svg` and the light `NAME-light.svg`, one hidden by `theme-light.css`. Takes `src`, optional `sources` (a `<picture>`'s cuts), and the `<img>`'s own attributes. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
@@ -92,7 +94,7 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 
 `styles/global.css` imports the shared stylesheets in cascade order. Order matters: when two rules tie, the later file wins. The order is:
 
-1. Foundations: `tokens.css`, `fonts.css`, `base.css`, `layout.css`, and `type.css`.
+1. Foundations: `tokens.css`, the light theme (`theme-light.css`, `theme-drawings.css`), `fonts.css`, `base.css`, `layout.css`, and `type.css`.
 2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
 3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares, and `.fold-foot` for content after a section's main block), and `compact-cuts.css`. A one-screen section is one screen as a floor (`min-height: var(--fold-inner)`): its picture takes the height its words leave, down to a floor in rem, and longer words make the section taller.
 4. Blocks more than one page uses: `hero-section.css` (the `.hero` section: Home's hero, the service and case-study pages; Home's own hero layout is `components/home/hero.css`), `facts.css`, and `detail-pages.css`.
@@ -102,6 +104,8 @@ Each section's desktop layout sits at the end of its own CSS file, so it always 
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
 
+The site has a light and a dark theme (Settings: System, Light or Dark). `html[data-theme]` is `light` or `dark`: `Base.astro`'s head script sets it before the page paints, from the saved choice (`uplink.theme`) or the device's setting, and `core.js` keeps it right after that (a choice, a change of device setting, another tab, the back/forward cache). Without script the page is dark. `tokens.css` holds the dark values (the drawings read them, `tools/palette.py`). `styles/theme-light.css` holds the light values of the same tokens on `:root[data-theme='light']`, the few rules a token swap alone doesn't cover, and the rule that shows a picture's theme copy. `styles/theme-drawings.css` recolours the drawings inside the page (the Home hero and Grow); `tools/gen_light.py` writes it. Pictures go through `components/Drawing.astro`. Why each light value differs from the palette: `docs/light-theme-2026-11-08.md`.
+
 The visitor's display settings: with "increase contrast" on (`prefers-contrast: more`), `tokens.css` raises the faint lines (`--c-line`, `--c-line-2`) to `--c-edge` (3:1). In forced colours (Windows contrast themes), the theme paints fills away, so a state shown only by a fill (a current dot, step, tab or pressed icon) opts out of the forcing (`forced-color-adjust: none`) and takes the theme's system colours (`Highlight` and `HighlightText` for the current one, `GrayText` or `CanvasText` for the rest). Each sits in a `@media (forced-colors: active)` block beside the rule it fixes; the site check tests them (B4).
 
 Text sizes are in `rem`, and `html` has no font size of its own, so 1rem is the visitor's own font size (16 px unless they changed it) on every screen. Browser zoom and the browser's font setting then grow every text, and the zoom check (`checks/zoom.spec.mjs`) holds it. Only pictures, gaps, and page width may follow the screen (`vw`, `svh`).
@@ -109,6 +113,8 @@ Text sizes are in `rem`, and `html` has no font size of its own, so 1rem is the 
 Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`, where `cqi` is 1% of the nearest container's width. A heading whose longest word has 10 letters or more ("Cybersecurity", "Everything") carries the class `fit`, which components add at build time with `fit(text)` from `lib/fit.js` (`TextPage.astro` adds it to the Markdown's `h2`s): its `--fit` is `--fit-long` (14cqi), so a 13-letter word fits on one line. Every other heading gets `--fit-short` (21cqi), which keeps its size step except with big text in a narrow column; `fit(text)` gives a heading whose words all have 6 letters or fewer the class `fit-loose` (30cqi). `h3` follows the same rule. A heading's container must be its own column: the project page's title has a box of its own (`.case-title`), and Contact's form heading measures `.form-head`. Home's service tile titles (`.svc-title`, not headings) follow the same rule against their text box (`.svc-text`). A process step puts its title under the number when the step is narrower than 12rem. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing. No heading may get smaller on screen as zoom goes up (the zoom check measures it). Zoom narrows the window in CSS pixels, so a size that is a share of the window or of a column stays the same on screen at best: keep any `vw` part of a size with a rem part that isn't negative (`--fs-7` and `--fs-8` grow only between 27rem and 45rem wide, so 200% zoom on a 1440 window still doubles them), never let a narrower layout use a smaller size than the wider one before it, and give a heading's column a rem floor. So the service and project pages' title column is at least 30rem, stat numbers are `--fs-7` (38cqi only stops them outgrowing a tile; About's tiles go from four in a row to two when they can't hold 44px), and the Home headline is `--fs-hero-phone` below its two-column layout (40px on phones, a share of the window up to `--fs-8` wider) and 16.5cqi of its column in it, so it keeps two lines.
 
 ### Breakpoints
+
+Reduced motion: write plain `@media (prefers-reduced-motion: reduce)` (or `no-preference`) rules. A build step in `postcss.config.mjs` (`motion-choice`) scopes each one to `html[data-motion]` and gives it a copy, so the visitor's choice in Settings (Reduce motion: `reduce` or `full`) wins over the device's. `Base.astro`'s head script and `core.js` set the attribute. Scripts ask `reduceMotion` from `core.js` (`.matches`, and a `change` event), never `matchMedia` directly. See `docs/motion-setting-2026-11-08.md`.
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
 
@@ -130,7 +136,7 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 
 | Script | Where it runs | What it does |
 | --- | --- | --- |
-| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
+| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the theme (`theme.ev` says when it changes), the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
 | `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. On desktop it rounds any Home section whose words make it taller than its one-screen floor up to the next 100px wheel step, so every section still starts on the wheel grid. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |

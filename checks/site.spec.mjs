@@ -1702,77 +1702,80 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
 // part of its control, so every state (Grow: done, current, not reached; services: current, off) is at least 3:1
 // against what is behind it. The dot's colour is its fill at its alpha times its own and its ancestors' opacity; the
 // backdrop is the pixel under its centre, read from a screenshot with the dots hidden.
-test('non-text contrast: Grow and services dots, every state, 3:1 (WCAG 1.4.11)', async ({ browser }) => {
+test('non-text contrast: Grow and services dots, every state, 3:1, both themes (WCAG 1.4.11)', async ({ browser }) => {
   const fails = [];
   const rep = [];
-  const q = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await q.goto(url('index'));
-  await q.waitForLoadState('networkidle');
-  const lum = (c) => {
-    const [r, g, b] = c.map((v) => {
-      const s = v / 255;
-      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  };
-  const ratio = (a, b) => {
-    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
-    return (x + 0.05) / (y + 0.05);
-  };
-  const look = async (name, sel, state) => {
-    await q.locator(sel).first().scrollIntoViewIfNeeded();
-    await q.mouse.move(0, 0);
-    await q.waitForTimeout(400); // the dots' colour and opacity transitions
-    const dots = await q.$$eval(sel, (els) =>
-      els.map((e) => {
-        const m = getComputedStyle(e)
-          .backgroundColor.match(/[\d.]+/g)
-          .map(Number);
-        let a = m[3] ?? 1;
-        for (let n = e; n; n = n.parentElement) a *= Number(getComputedStyle(n).opacity);
-        const r = e.getBoundingClientRect();
-        return { state: e.dataset.state, fill: m.slice(0, 3), a, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  for (const scheme of ['dark', 'light']) {
+    const q = await browser.newPage({ viewport: { width: 390, height: 844 }, colorScheme: scheme });
+    await q.goto(url('index'));
+    await q.waitForLoadState('networkidle');
+    const lum = (c) => {
+      const [r, g, b] = c.map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a, b) => {
+      const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+      return (x + 0.05) / (y + 0.05);
+    };
+    const look = async (name, sel, state) => {
+      await q.locator(sel).first().scrollIntoViewIfNeeded();
+      await q.mouse.move(0, 0);
+      await q.waitForTimeout(400); // the dots' colour and opacity transitions
+      const dots = await q.$$eval(sel, (els) =>
+        els.map((e) => {
+          const m = getComputedStyle(e)
+            .backgroundColor.match(/[\d.]+/g)
+            .map(Number);
+          let a = m[3] ?? 1;
+          for (let n = e; n; n = n.parentElement) a *= Number(getComputedStyle(n).opacity);
+          const r = e.getBoundingClientRect();
+          return { state: e.dataset.state, fill: m.slice(0, 3), a, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+        }),
+      );
+      const hide = (v) =>
+        q.$$eval(sel, (els, v) => els.forEach((e) => e.style.setProperty('visibility', v, 'important')), v);
+      await hide('hidden');
+      const png = PNG.sync.read(await q.screenshot());
+      await hide('');
+      const seen = new Set();
+      for (const d of dots) {
+        const k = state(d);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        const i = (Math.round(d.y) * png.width + Math.round(d.x)) * 4;
+        const back = [png.data[i], png.data[i + 1], png.data[i + 2]];
+        const ink = d.fill.map((v, j) => v * d.a + back[j] * (1 - d.a));
+        const r = ratio(ink, back);
+        rep.push(`${name} ${k}: ${r.toFixed(2)}:1 (rgb ${ink.map(Math.round)} on rgb ${back})`);
+        if (r < 3) fails.push(`${name} ${k} dot ${r.toFixed(2)}:1 against rgb ${back}, under 3:1`);
+      }
+    };
+    // Grow: pick the third step, so two are done, one is current and three are not reached
+    await q.locator('#grow').scrollIntoViewIfNeeded();
+    await q.locator('#grow .grow-dot:visible').nth(2).click();
+    await q.$$eval('#grow .grow-dot', (bs) =>
+      bs.forEach((b) => {
+        const pip = /** @type {HTMLElement} */ (b.querySelector('.pip'));
+        pip.dataset.state = b.matches('[aria-current="step"]')
+          ? 'current'
+          : b.classList.contains('is-done')
+            ? 'done'
+            : 'not reached';
       }),
     );
-    const hide = (v) =>
-      q.$$eval(sel, (els, v) => els.forEach((e) => e.style.setProperty('visibility', v, 'important')), v);
-    await hide('hidden');
-    const png = PNG.sync.read(await q.screenshot());
-    await hide('');
-    const seen = new Set();
-    for (const d of dots) {
-      const k = state(d);
-      if (seen.has(k)) continue;
-      seen.add(k);
-      const i = (Math.round(d.y) * png.width + Math.round(d.x)) * 4;
-      const back = [png.data[i], png.data[i + 1], png.data[i + 2]];
-      const ink = d.fill.map((v, j) => v * d.a + back[j] * (1 - d.a));
-      const r = ratio(ink, back);
-      rep.push(`${name} ${k}: ${r.toFixed(2)}:1 (rgb ${ink.map(Math.round)} on rgb ${back})`);
-      if (r < 3) fails.push(`${name} ${k} dot ${r.toFixed(2)}:1 against rgb ${back}, under 3:1`);
-    }
-  };
-  // Grow: pick the third step, so two are done, one is current and three are not reached
-  await q.locator('#grow').scrollIntoViewIfNeeded();
-  await q.locator('#grow .grow-dot:visible').nth(2).click();
-  await q.$$eval('#grow .grow-dot', (bs) =>
-    bs.forEach((b) => {
-      const pip = /** @type {HTMLElement} */ (b.querySelector('.pip'));
-      pip.dataset.state = b.matches('[aria-current="step"]')
-        ? 'current'
-        : b.classList.contains('is-done')
-          ? 'done'
-          : 'not reached';
-    }),
-  );
-  await look('Grow', '#grow .grow-dot .pip', (d) => d.state);
-  await q.$$eval('.svc-dots .pip', (ps) =>
-    ps.forEach((p) => (p.dataset.state = p.classList.contains('on') ? 'current' : 'off')),
-  );
-  await look('services', '.svc-dots .pip', (d) => d.state);
-  for (const want of ['Grow done', 'Grow current', 'Grow not reached', 'services current', 'services off'])
-    if (!rep.some((r) => r.startsWith(want + ':'))) fails.push(`${want}: no such dot on the page`);
-  await q.close();
+    await look(`${scheme} Grow`, '#grow .grow-dot .pip', (d) => d.state);
+    await q.$$eval('.svc-dots .pip', (ps) =>
+      ps.forEach((p) => (p.dataset.state = p.classList.contains('on') ? 'current' : 'off')),
+    );
+    await look(`${scheme} services`, '.svc-dots .pip', (d) => d.state);
+    for (const want of ['Grow done', 'Grow current', 'Grow not reached', 'services current', 'services off'])
+      if (!rep.some((r) => r.startsWith(`${scheme} ${want}:`)))
+        fails.push(`${scheme} ${want}: no such dot on the page`);
+    await q.close();
+  }
   console.log(`dot contrast:\n  ${rep.join('\n  ')}`);
   verdict(fails);
 });
@@ -1828,6 +1831,181 @@ test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.1
 
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
+// Settings: theme (System, Light or Dark). The rest of this check runs on a dark device (playwright.config.mjs), the
+// site's own look; this one covers the light theme. Base.astro's head script sets html[data-theme] before the page
+// paints, even with the page's modules blocked; System follows the device and changes with it; a choice made with the
+// arrow keys applies at once, is saved, survives a reload and reaches another open tab; the browser's bar colour
+// follows; each picture shows only its theme's copy and only that copy is fetched; and axe passes on every page in
+// light, at phone and desktop size, with Settings open on Home.
+test('theme: System, Light and Dark in Settings; light passes axe on every page', async ({ browser }) => {
+  const fails = [];
+  const page_bg = (q) => q.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const state = (q) =>
+    q.evaluate(() => ({
+      theme: document.documentElement.dataset.theme,
+      saved: localStorage.getItem('uplink.theme'),
+      bar: document.querySelector('meta[name="theme-color"]')?.getAttribute('content'),
+      checked: document.querySelector('input[name="theme"]:checked')?.value,
+    }));
+
+  // the head script alone: modules blocked, a light device
+  {
+    const ctx = await browser.newContext({ colorScheme: 'light' });
+    const q = await ctx.newPage();
+    await q.route('**/_astro/*.js', (r) => r.abort());
+    await q.goto(url('index'));
+    const s = await state(q);
+    if (s.theme !== 'light' || s.bar !== '#E8EFF7')
+      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #E8EFF7`);
+    if ((await page_bg(q)) !== 'rgb(232, 239, 247)') fails.push(`light page ground: ${await page_bg(q)}`);
+    await ctx.close();
+  }
+
+  // the choice: a dark device, System, then Light with the arrow keys, a reload, another tab, then System again
+  const ctx = await browser.newContext({ colorScheme: 'dark', viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('index'));
+  let s = await state(q);
+  if (s.theme !== 'dark' || s.checked !== 'system' || s.saved !== null)
+    fails.push(`first visit on a dark device: ${JSON.stringify(s)}, want dark, System, nothing saved`);
+  const other = await ctx.newPage();
+  await other.goto(url('services'));
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('input[name="theme"][value="system"]').focus();
+  await q.keyboard.press('ArrowRight'); // System -> Light
+  s = await state(q);
+  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#E8EFF7')
+    fails.push(`Light by the arrow key: ${JSON.stringify(s)}`);
+  const results = await axe(q).include('#settings-dialog').analyze();
+  for (const v of axeFails(results.violations)) fails.push(`axe, Settings open in light: ${v.id} (${v.nodes.length})`);
+  await other
+    .waitForFunction(() => document.documentElement.dataset.theme === 'light', null, { timeout: 3000 })
+    .catch(() => fails.push("another open tab didn't take the choice (storage event)"));
+  await q.reload();
+  s = await state(q);
+  if (s.theme !== 'light' || s.checked !== 'light') fails.push(`after a reload: ${JSON.stringify(s)}`);
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('input[name="theme"][value="system"]').check();
+  if ((await state(q)).theme !== 'dark') fails.push('System on a dark device: not dark');
+  await q.emulateMedia({ colorScheme: 'light' });
+  await q
+    .waitForFunction(() => document.documentElement.dataset.theme === 'light', null, { timeout: 3000 })
+    .catch(() => fails.push("System: the device turned light and the page didn't follow"));
+  await ctx.close();
+
+  // pictures: only the theme's copy shows, and only it is fetched; then axe on every page, light
+  for (const [w, h] of [
+    [390, 844],
+    [1440, 900],
+  ]) {
+    const lc = await browser.newContext({ colorScheme: 'light', viewport: { width: w, height: h } });
+    const lq = await lc.newPage();
+    const fetched = [];
+    lq.on('request', (r) => r.url().includes('/assets/img/') && fetched.push(r.url().split('/').pop().split('?')[0]));
+    for (const page of PAGES.filter((p) => p !== MISSING)) {
+      await lq.goto(url(page));
+      const shown = await lq.$$eval('.th-dark, .th-light', (es) =>
+        es.filter((e) => getComputedStyle(e).display !== 'none').map((e) => e.className),
+      );
+      if (shown.some((c) => c.includes('th-dark'))) fails.push(`${page} ${w}: a dark picture shows in light`);
+      const v = axeFails((await axe(lq).analyze()).violations);
+      for (const x of v) fails.push(`axe ${page} ${w} light: ${x.id} (${x.nodes.length}) ${x.nodes[0]?.target}`);
+    }
+    // the hero and the footer map are one drawing, recoloured in place (theme-drawings.css, footer.css)
+    const wrong = [...new Set(fetched)].filter(
+      (n) => !n.includes('-light') && !/^(hero-office|office-compact|campus)/.test(n),
+    );
+    if (wrong.length) fails.push(`${w}: dark pictures fetched in light: ${wrong.join(' ')}`);
+    await lc.close();
+  }
+  verdict(fails);
+});
+
+// Settings: Reduce motion. On a device that doesn't ask for less motion, the switch is off and the drawings run; turned
+// on, html[data-motion] is "reduce", the choice is saved, and nothing on the page animates (no running animation once
+// the footer map has come in, and transitions are instant); it survives a reload. On a device that asks for less motion
+// the switch starts on and nothing moves; turned off, html[data-motion] is "full" and the site animates, for this site
+// only, after a reload too. Without script, that device still gets no animation (the CSS keeps its
+// prefers-reduced-motion queries; postcss.config.mjs only scopes them and adds the attribute's copies).
+test('motion: Reduce motion in Settings stops every animation, is saved, and wins over the device', async ({
+  browser,
+}) => {
+  const fails = [];
+  // scroll to the footer and wait for its map (footer.js fetches it when it comes near, and its loops start once it's
+  // on screen), so both counts see the map: on a busy runner a fixed wait could count before it arrived
+  const running = async (q) => {
+    await q.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await q.waitForSelector('[data-fc-map] svg', { state: 'attached', timeout: 15000 });
+    await q.waitForTimeout(1500);
+    return q.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
+  };
+  const state = (q) =>
+    q.evaluate(() => {
+      const sw = /** @type {HTMLInputElement} */ (document.getElementById('mo-toggle'));
+      return {
+        motion: document.documentElement.dataset.motion ?? null,
+        saved: localStorage.getItem('uplink.motion'),
+        on: sw.checked,
+        locked: sw.disabled,
+      };
+    });
+
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('index'));
+  await q.waitForLoadState('networkidle');
+  let s = await state(q);
+  if (s.motion !== null || s.on || s.locked)
+    fails.push(`first visit: ${JSON.stringify(s)}, want motion on, switch off`);
+  if ((await running(q)) === 0) fails.push('first visit: nothing animates, so this check proves nothing');
+  await q.evaluate(() => window.scrollTo(0, 0));
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('label[for="mo-toggle"]').click();
+  s = await state(q);
+  if (s.motion !== 'reduce' || s.saved !== 'reduce' || !s.on) fails.push(`switched on: ${JSON.stringify(s)}`);
+  await q.reload();
+  await q.waitForLoadState('networkidle');
+  s = await state(q);
+  if (s.motion !== 'reduce' || !s.on) fails.push(`after a reload: ${JSON.stringify(s)}`);
+  const n = await running(q);
+  if (n) fails.push(`Reduce motion on: ${n} animation(s) still running`);
+  const t = await q.evaluate(() => getComputedStyle(document.querySelector('.btn')).transitionDuration);
+  if (parseFloat(t) > 0.001) fails.push(`Reduce motion on: a button still eases (${t})`);
+  await ctx.close();
+
+  const dev = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const d = await dev.newPage();
+  await d.goto(url('index'));
+  await d.waitForLoadState('networkidle');
+  s = await state(d);
+  if (s.motion !== 'reduce' || !s.on || s.locked)
+    fails.push(`device asks for less motion: ${JSON.stringify(s)}, want on`);
+  if (await running(d)) fails.push('device asks for less motion: something animates');
+  await d.evaluate(() => window.scrollTo(0, 0));
+  await d.locator('[data-open="settings-dialog"]:visible').first().click();
+  await d.locator('label[for="mo-toggle"]').click();
+  await d.reload();
+  await d.waitForLoadState('networkidle');
+  s = await state(d);
+  if (s.motion !== 'full' || s.saved !== 'full' || s.on)
+    fails.push(`device asks for less, visitor turned it off: ${JSON.stringify(s)}, want full`);
+  if ((await running(d)) === 0) fails.push('device asks for less, visitor turned it off: nothing animates');
+  await dev.close();
+
+  const nojs = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: 'reduce',
+    javaScriptEnabled: false,
+  });
+  const z = await nojs.newPage();
+  await z.goto(url('index'));
+  await z.waitForLoadState('networkidle');
+  const zn = await z.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
+  if (zn) fails.push(`no script, device asks for less motion: ${zn} animation(s) running`);
+  await nojs.close();
+  verdict(fails);
+});
+
 test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
   const html = await (await fetch(BASE + '/')).text();
   const urls = [

@@ -2,6 +2,7 @@
 // ABOUT · 1. Who we are (first screen): intro text and the HQ building card. The text comes first in the HTML, so
 // a screen reader hears the heading before the card; the grid areas (profile.css) put the card on the left on screen.
 // Styles: profile.css (industry chips included), plus .facts (src/styles/facts.css). Desktop layout: at the end of its CSS.
+import Drawing from '../Drawing.astro';
 import './profile.css';
 ---
 
@@ -33,15 +34,15 @@ import './profile.css';
       </div>
       <aside class="profile-card panel" aria-label="Uplink at a glance">
         <div class="profile-art well">
-          <picture
-            ><source media="(width < 100em)" srcset="/assets/img/hq-compact.svg" />
-            <img
-              src="/assets/img/hq.svg"
-              fetchpriority="high"
-              alt="Illustration of the Uplink office building with the help desk floor highlighted"
-              width="640"
-              height="480"
-          /></picture>
+          <Drawing
+            src="/assets/img/hq.svg"
+            sources={[{ media: '(width < 100em)', srcset: '/assets/img/hq-compact.svg' }]}
+            fetchpriority="high"
+            loading="lazy"
+            alt="Illustration of the Uplink office building with the help desk floor highlighted"
+            width="640"
+            height="480"
+          />
           <span class="chip chip--accent">Since 2011</span>
         </div>
         <div class="stack-2">

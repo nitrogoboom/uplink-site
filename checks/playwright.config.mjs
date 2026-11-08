@@ -15,7 +15,9 @@ export default defineConfig({
   timeout: 120_000, // a test; the checks that run as one long test set their own
   forbidOnly: !!process.env.CI,
   reporter: [['list', { printSteps: false }]],
-  use: { browserName: 'chromium', headless: true },
+  // a dark device: the site's own look, and what every check but the theme test (site.spec.mjs) expects. Playwright's
+  // default is light, which would now give every page the light theme (Settings: System)
+  use: { browserName: 'chromium', headless: true, colorScheme: 'dark' },
   projects: CHECKS.map((name) => ({
     name,
     testMatch: name === 'site' ? ['site.spec.mjs', 'zoom.spec.mjs'] : `${name}.spec.mjs`,

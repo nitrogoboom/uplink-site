@@ -95,7 +95,11 @@ test('screenshots against the old build', async ({ browser }) => {
   const jobs = paths.flatMap((path) => SIZES.map((s) => [path, ...s]));
   const rows = (
     await lanes(jobs, 4, async ([path, size, w, h]) => {
-      const ctx = await browser.newContext({ viewport: { width: w, height: h }, reducedMotion: 'reduce' });
+      const ctx = await browser.newContext({
+        viewport: { width: w, height: h },
+        reducedMotion: 'reduce',
+        colorScheme: 'dark',
+      });
       const name = `${path.replace(/^\/|\/$/g, '').replaceAll('/', '_') || 'index'}-${size}`;
       const [a, b] = [join(OUT, `${name}-old.png`), join(OUT, `${name}-new.png`)];
       await shot(ctx, old + path, a);

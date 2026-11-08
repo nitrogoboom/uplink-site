@@ -6,6 +6,7 @@
 // tools/gen_office.py; don't edit by hand.
 // The dashes come in as text (?raw): a plain import would also write a copy to dist/_astro that nothing uses.
 // Without script, office.svg shows (on phones hero-office-phone.svg, the phone cut as a still). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
+import Drawing from '../Drawing.astro';
 import flows from './hero-flows.svg?raw';
 import './hero.css';
 import Icon from '../Icon.astro';
@@ -105,11 +106,14 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
         >
         <!-- the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) -->
         <template class="hero-still"
-          ><picture
-            ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
-            <img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"
-          /></picture></template
-        >
+          ><Drawing
+            src="/assets/img/office.svg"
+            sources={[{ media: HERO.media.phone, srcset: HERO.still, width: 962, height: 900 }]}
+            class="hero-nojs"
+            alt={still}
+            width="1200"
+            height="800"
+        /></template>
         <Fragment set:html={flows} />
         <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
         <HoldButton class="hero-pause" />
@@ -117,7 +121,7 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
       <div class="hero-dock">
         {news.map((n) => <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
           <span class="news-thumb well"
-            ><img src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" fetchpriority="low"
+            ><Drawing src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="news-text"
             ><span class="news-title">{n.title}</span

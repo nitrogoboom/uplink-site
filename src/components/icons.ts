@@ -57,6 +57,11 @@ export const ICONS = {
     d: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
   },
   screen: { d: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>' },
+  // Settings: the theme's Light and Dark (System is screen)
+  sun: {
+    d: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  },
+  moon: { d: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>' },
 } satisfies Record<string, Def>;
 export type IconName = keyof typeof ICONS;
 export const ICON_NAMES = Object.keys(ICONS) as [IconName, ...IconName[]];

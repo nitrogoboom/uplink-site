@@ -1,0 +1,171 @@
+/* ==========================================================================
+   Light theme: the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens.
+   It applies when <html data-theme="light">: the visitor chose Light in Settings, or chose System (the default) and
+   their device is set to light. Base.astro's head script sets the attribute before the page paints; core.js changes
+   it. Without script the page stays dark, the site's own look. Screen only: print keeps its own colours
+   (tokens.css). Where the palette's light value didn't hold up, the change and the reason are noted beside it
+   (docs/light-theme-2026-11-08.md). The drawings: theme-drawings.css (inside the page) and .th-dark / .th-light
+   (pictures, Drawing.astro), at the end.
+   The look follows the dark theme's: every neutral is navy (hue 250), never a plain grey; a card is the ground's own
+   colour lifted, not a different one; depth comes from soft, layered, navy-tinted shadows and light from above, not
+   from outlines (docs/palette.md, "Light mode").
+   ========================================================================== */
+
+@media screen {
+  :root[data-theme='light'] {
+    color-scheme: light;
+
+    /* grounds, text and lines (5.1) */
+    --c-bg: #e8eff7; /* navy, OKLCH 0.95 / 0.013: tinted enough to read as the brand's navy, not grey */
+    --c-bg-band: #dce5ee; /* the same navy one step down (0.92 / 0.016) */
+    --c-solid: #fff; /* the top layer only: dialogs, toasts, menus */
+    --c-surface: #f8fbff; /* a card: the ground's navy lifted to 0.99 / 0.006, never plain white (1.12:1 on the page) */
+    --c-surface-2: rgb(34 46 58 / 0.06); /* palette 0.045: too faint to see an icon tile on a card */
+    --c-well: rgb(34 46 58 / 0.045);
+    --c-line: rgb(34 46 58 / 0.13); /* a soft edge: the card's shadow does the separating, as light does in dark */
+    --c-line-2: rgb(34 46 58 / 0.24);
+    --c-edge: rgb(34 46 58 / 0.58);
+    --c-text: #0e1a27;
+    --c-muted: #4d5863;
+    --c-glass: #e8eff7; /* the page colour, solid, as the dark header: no blur cost on scroll */
+    --c-glass-2: #f8fbff; /* phone tab bar: a card */
+    --c-backdrop: rgb(34 46 58 / 0.4);
+
+    /* action, links and status (5.2) */
+    --c-accent: #ffad51;
+    --c-on-accent: #0e1a27;
+    --c-accent-text: #88520a;
+    --c-accent-tint: rgb(255 173 81 / 0.18);
+    --c-accent-faint: rgb(255 173 81 / 0.08);
+    --c-accent-ring: rgb(136 82 10 / 0.3);
+    --c-ink-tint: rgb(14 26 39 / 0.16);
+    --c-sky: #005d8a;
+    --c-sky-tint: rgb(0 93 138 / 0.07);
+    --c-ok: #004f2e;
+    --c-ok-tint: rgb(0 79 46 / 0.1);
+    --c-alert: #b24438;
+
+    /* atmosphere (5.3) */
+    --c-glow-accent: rgb(255 173 81 / 0.12);
+    --c-glow-sky: rgb(0 93 138 / 0.07);
+    --c-glow-sky-2: rgb(0 93 138 / 0.08);
+    --c-cool-surface: rgb(216 239 255 / 0.4);
+    --c-cool-surface-2: rgb(216 239 255 / 0.7);
+    --c-cool-muted: #455a69;
+
+    /* drawings (5.4): the footer map and anything styled by these */
+    --iso-top: #fff;
+    --iso-left: #d2d8de;
+    --iso-right: #bbc2c9;
+    --iso-edge: #37424e;
+    --iso-hi-edge: #7c4900;
+    --iso-sky-top: #97c8ea;
+    --iso-sky-left: #4a93c1;
+    --iso-sky-right: #005d8a;
+    --iso-green-dark: #00683f;
+    --iso-ground: #e6ecf2;
+    --iso-grid: #c5ccd3; /* palette #d2d8de: gone on the #e6ecf2 ground, one step darker */
+    --iso-window: #a1a9b1;
+    --iso-led: #198152; /* DESIGN-GAP in the palette: the online dot needs a darker green on a light ground */
+    --iso-shadow: #0e1a27;
+
+    /* select arrows: stroke is --c-muted, written in */
+    --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234D5863' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    --chevron-up: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234D5863' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
+
+    /* depth: the same falloff, much softer, tinted to the light navy (a near-black shadow reads as dirt on white) */
+    --shadow-1: 0 12px 32px -12px rgb(14 26 39 / 0.18);
+    --shadow-2: 0 32px 64px -24px rgb(14 26 39 / 0.22);
+    --shadow-ink: 212deg 40% 20%;
+    /* a card at rest: lit from above (a 1px highlight on its top edge), then three soft layers of navy shadow, each
+       about twice the last (the dark theme's --shadow-front method, at a card's height) */
+    --shadow-card:
+      inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215deg 40% 30% / 0.05), 0 2px 4px hsl(215deg 40% 30% / 0.05),
+      0 6px 14px -4px hsl(215deg 40% 30% / 0.08);
+  }
+}
+
+/* more contrast (as tokens.css): decorative lines take the edge colour */
+@media screen and (prefers-contrast: more) {
+  :root[data-theme='light'] {
+    --c-line: var(--c-edge);
+    --c-line-2: var(--c-edge);
+  }
+}
+
+/* ---- fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
+@media screen {
+  /* Cards and panels: a flat fill on a soft navy shadow with a top highlight (--shadow-card); no gradient (a fade
+     down the card read as cheap). A rule that gives one a shadow of its own (the Services row's middle card, a hover)
+     still wins: it comes later in the cascade */
+  :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-wall-item, .fc-soc, .svc-tile, .fc-tile, .feat) {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
+     (#fff on #b24438 5.6:1, on #004f2e 9.7:1; the dark label was 3.2:1 on red) */
+  :root[data-theme='light'] .grow-tag {
+    color: #fff;
+  }
+  :root[data-theme='light'] .grow-tag-i {
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  /* not in forced colours (Windows contrast themes): there the system colours mark the chosen one (B4), and these
+     rules would outrank them */
+  @media (forced-colors: none) {
+    /* A mark that says "chosen" or "you are here" is drawn in amber ink, as the open footer tile already is: bright amber
+       on white is under 3:1 (WCAG 1.4.11), amber ink is 5-6:1. The fills stay amber. (docs/light-theme-home-review-2026-11-08.md
+       items 1-2, docs/light-theme-site-review-2026-11-08.md S1-S2) */
+    :root[data-theme='light'] :is(.pip.on, [aria-current='step'] > .pip) {
+      background: var(--c-accent-text); /* the current dot, Services row and Grow */
+    }
+    :root[data-theme='light'] .grow-dot.is-done .pip {
+      background: var(--c-accent-text); /* Grow's steps already shown: amber ink, dimmed to 0.8 (3.8:1; was 1.35) */
+      opacity: 0.8;
+    }
+    :root[data-theme='light'] .grow-item[aria-current='step'] {
+      border-color: #c37600; /* amber 500 (palette 4.2), 3.3:1: amber ink beside the amber tile read as brown */
+    }
+    :root[data-theme='light'] .seg-opt input:checked + span {
+      border-color: var(--c-accent-text); /* Settings, the chosen theme */
+      box-shadow: inset 0 0 0 1px var(--c-accent-text);
+    }
+    :root[data-theme='light'] .filter:has(:checked) {
+      border-color: var(--c-accent-text); /* /work, the chosen filter: the amber fill stays, with an edge */
+      box-shadow: inset 0 0 0 1px var(--c-accent-text);
+    }
+  }
+
+  /* Grow, a step's "Watch for" row once it turns to fixes: a fade costs more on a light page, so 0.65 here matches the
+     dark theme's 0.45 (3:1, was 2.1) */
+  :root[data-theme='light'] .grow-card[data-beat='fix'] .grow-watch {
+    opacity: 0.65;
+  }
+
+  /* Home's news cards: their border was the cool fill's own colour (1:1); the card line gives them an edge */
+  :root[data-theme='light'] .news {
+    border-color: var(--c-line);
+  }
+
+  /* Grow steps already built: the dark mode's 0.7 fade takes amber ink under 4.5:1 on the light page, so it stays solid */
+  :root[data-theme='light'] .grow-item.is-done :is(.grow-item-t, .grow-item-m) {
+    opacity: 1;
+  }
+}
+
+/* Pictures: Drawing.astro writes the dark and the light copy of a drawing; only the theme's own shows. Both are
+   lazy where the drawing was, and a lazy picture that isn't shown isn't fetched. Without script: dark. */
+:root:not([data-theme='light']) .th-light,
+:root[data-theme='light'] .th-dark {
+  display: none;
+}
+
+/* Amber buttons: bright amber on white has no edge of its own (1.6-1.8:1), so it read as a glow. A 1px amber 500
+   border (palette 4.2; 3.3:1 on the page) gives it one; the fill and its label (9.5:1) stay. Not in forced colours,
+   where the system draws the button's border. (docs/light-theme-home-review-2026-11-08.md item 7) */
+@media screen and (forced-colors: none) {
+  :root[data-theme='light'] .btn--primary {
+    border-color: #c37600;
+  }
+}

@@ -2,6 +2,7 @@
 // SERVICES · 1. Overview (first screen): what managed IT with Uplink is, then one card per service from the
 // collection: its chip, then its title as an h2 holding the link to the service's own page, the link covering the
 // card (.card-link in surfaces.css; review M3, M10). Styles: overview.css. Desktop layout: at the end of its CSS.
+import Drawing from '../Drawing.astro';
 import './overview.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
@@ -25,7 +26,7 @@ const services = await getServices();
       {services.map(({ id, data: s }) => <li>
         <div class="card">
           <span class="card-media well"
-            ><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy" /><span
+            ><Drawing src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy" /><span
               class="chip"
               >{s.chip}</span
             ></span

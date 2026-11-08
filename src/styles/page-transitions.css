@@ -10,6 +10,13 @@
     navigation: none;
   }
 }
+/* Settings, Reduce motion (html[data-motion]): @view-transition can't follow an attribute (postcss.config.mjs), so the
+   swap between pages still happens, with nothing moving: the old page is gone and the new one is there at once */
+:root[data-motion='reduce']::view-transition-group(*),
+:root[data-motion='reduce']::view-transition-old(*),
+:root[data-motion='reduce']::view-transition-new(*) {
+  animation: none !important;
+}
 
 .site-header {
   view-transition-name: site-header;

@@ -4,6 +4,7 @@
 // swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it. Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 // A tile's link reads "Support. Managed help desk. Real people… View service": the chip and "View service" are heard
 // too, so the name starts with the word the eye reads first and voice control finds it (review M10).
+import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
 import './services.css';
@@ -42,7 +43,7 @@ const tiles = [
       {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
         <a class="svc-tile" href={`/services/${id}`}>
           <span class="svc-art"
-            ><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
+            ><Drawing src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"

@@ -4,7 +4,7 @@
    phones, and Proof's wheel-grid height. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, held, html, reduceMotion, replay, whenOnScreen } from './core.js';
+import { $, $$, held, html, reduceMotion, replay, theme, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
@@ -467,6 +467,10 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   const onResize = () => relayout(svg.getBoundingClientRect().width);
   const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
+  // a new theme: measure again, which re-reads the cloud caption's colour (cloudFill) and redraws what's shown
+  theme.ev.addEventListener('change', () => {
+    if (lastW) measure(lastW);
+  });
   if (sized) sized.observe(svg);
   else {
     window.addEventListener('resize', onResize);

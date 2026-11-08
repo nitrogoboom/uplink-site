@@ -9,6 +9,7 @@
 //   project   the collection entry
 //   level     the heading level: 2 where the cards sit right under the page's h1, else 3
 //   first     the picture loads eagerly (the first card on screen)
+import Drawing from '../Drawing.astro';
 import type { CollectionEntry } from 'astro:content';
 import Sep from '../Sep.astro';
 import { cardSize } from '../../lib/site';
@@ -28,12 +29,12 @@ const H = level === 2 ? 'h2' : 'h3';
 
 <div class="card card--project">
   <span class="card-media well"
-    ><img
+    ><Drawing
       src={`/assets/img/${p.image}-card.svg`}
       alt=""
       {...cardSize(p.image)}
       fetchpriority={first ? 'high' : undefined}
-      loading={first ? undefined : 'lazy'}
+      loading="lazy"
   /></span>
   <span class="card-body"
     ><H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H
