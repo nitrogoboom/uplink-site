@@ -1867,6 +1867,36 @@ test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.1
   verdict(fails);
 });
 
+// A touch screen at desktop size (no hover: a touch laptop) gets the desktop services row without the hover bar: the
+// bar showed all the time under every tile's words and pushed the section past one screen (owner, November 8, 2026).
+// "View service" stays in each tile's link name (M10).
+test('services row on a touch screen at desktop size: one screen, no bar in sight, names kept', async ({ browser }) => {
+  const fails = [];
+  for (const [w, h] of [
+    [1280, 800],
+    [1440, 900],
+  ]) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, hasTouch: true });
+    const q = await ctx.newPage();
+    await q.goto(url('index'));
+    await q.evaluate(() => document.fonts.ready);
+    const r = await q.evaluate(() => ({
+      hover: matchMedia('(hover: hover)').matches,
+      sec: Math.round(/** @type {Element} */ (document.querySelector('#services')).getBoundingClientRect().height),
+      bars: [...document.querySelectorAll('#services .svc-go')].filter((g) => g.getBoundingClientRect().height > 1)
+        .length,
+      names: [...document.querySelectorAll('#services .svc-tile')].filter((t) => !/view service/i.test(t.textContent))
+        .length,
+    }));
+    if (r.hover) fails.push(`${w}x${h}: the touch context reports hover, so this check proves nothing`);
+    if (r.sec > h) fails.push(`${w}x${h}: services section is ${r.sec}px, past one ${h}px screen`);
+    if (r.bars) fails.push(`${w}x${h}: ${r.bars} "View service" bar(s) in sight`);
+    if (r.names) fails.push(`${w}x${h}: ${r.names} tile(s) lost "View service" from their name`);
+    await ctx.close();
+  }
+  verdict(fails);
+});
+
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
 // Settings: theme (System, Light or Dark). The rest of this check runs on a dark device (playwright.config.mjs), the
