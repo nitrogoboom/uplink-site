@@ -19,4 +19,11 @@ export default defineConfig(
   { files: ['checks/**/*.mjs'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   // the Worker runs on Cloudflare: the web platform's globals (fetch, Request, Response, URL), no DOM
   { files: ['worker/**/*.js'], languageOptions: { globals: globals.serviceworker } },
+  // the rules that need types (a promise left floating, a promise handed to a listener), for the code the type check
+  // covers (tsconfig.json: checkJs, which leaves out checks/, scripts/ and worker/)
+  {
+    files: ['src/scripts/**/*.js', 'src/lib/**/*.{js,mjs,ts}'],
+    extends: [tseslint.configs.recommendedTypeCheckedOnly],
+    languageOptions: { parserOptions: { projectService: true } },
+  },
 );

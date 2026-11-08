@@ -132,3 +132,5 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | `soon.js` | Coming soon | Names the page that isn't built yet. |
 
 Every page script imports `core.js`, so `core.js` always runs first.
+
+The scripts are type-checked (`npm run check`; `checkJs` in `tsconfig.json`), with JSDoc for the types: `/** @param {number} i */` on a parameter, `/** @type {HTMLDialogElement | null} */` on a variable, and `/** @type {SVGElement} */ (expr)` (the parentheses matter) to say what a lookup finds. `$` and `$$` give an HTML element unless the variable they go in says otherwise. A promise you don't wait for is marked with `void`. `globals.d.ts` holds the browser types TypeScript's library lacks (Trusted Types).

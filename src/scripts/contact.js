@@ -10,13 +10,13 @@ import { $, $$, toast } from './core.js';
    ====================================================================== */
 $$('[data-copy]').forEach((btn) => {
   btn.addEventListener('click', () => {
-    const value = btn.dataset.copy;
+    const value = /** @type {string} */ (btn.dataset.copy);   // every copy button has one
     const target = document.getElementById(btn.dataset.copyTarget || '');
     const fallback = () => {
       if (target) {
         const range = document.createRange();
         range.selectNodeContents(target);
-        const sel = window.getSelection();
+        const sel = /** @type {Selection} */ (window.getSelection());
         sel.removeAllRanges();
         sel.addRange(range);
       }
@@ -44,6 +44,6 @@ if (contactForm) {
     if (q) q.dataset.state = 'queued';
     const arc = $('[data-queue-arc]');
     if (arc) arc.setAttribute('stroke-dasharray', '330 440');
-    $$('[data-queue-text]').forEach((el) => { el.textContent = el.dataset.queueText; });
+    $$('[data-queue-text]').forEach((el) => { el.textContent = /** @type {string} */ (el.dataset.queueText); });
   });
 }

@@ -25,6 +25,8 @@
 // swap, print, and the drawings' ?v= addresses. And one for the footer on <details> (J7, B14, L7, M11): without
 // script, from the keyboard, through a resize and a turn, its landmarks and what a screen reader is told. And one for
 // the /work filters as a radio group (M11, B4): without script, from the keyboard, in forced colours, and axe.
+// Batch 4 adds three: Settings before or without script and focus back to the opener (J8), a field's own hint kept in
+// aria-describedby (J9), and the phone services row in a browser with no scrollend (J15).
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): the footer tiles at 1440, and Home and /soon at each size.
 import { createHash } from 'node:crypto';
@@ -820,6 +822,188 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
   await q.selectOption('#book-size', { index: 1 });
   await q.locator('#book-dialog [type="submit"]').click();
   if (!(await toastShown('Check-up requested'))) fails.push(`the Book form's confirmation isn't shown on the page (${await where('Check-up requested')})`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// J8: the header's gear opens Settings as an invoker command (commandfor, command="show-modal"), so it works before
+// or without the page's scripts (a script that fails to load, say an old cached page asking for a bundle a deploy
+// has replaced). Esc, its close button (command="close") and a click on the backdrop (closedby="any") shut it, and
+// focus goes back to the gear. With script off altogether the gear stays hidden (header.css: the one setting needs
+// script), and the Book links stay links that go to the form on /contact. With script, the close buttons give focus
+// back to whatever opened the pop-up (core.js keeps the opener in a WeakMap).
+test('pop-ups before or without script: Settings opens and closes, focus goes back; Book links reach the form (J8)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const blocked = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  await blocked.route('**/_astro/*.js', (r) => r.abort());
+  const b = await blocked.newPage();
+  await b.goto(url('index'));
+  const gear = b.locator('.hbtn-settings');
+  for (const how of ['Esc', 'its close button', 'the backdrop']) {
+    await gear.click();
+    await b.waitForTimeout(500); // the opening animation is 250ms (--dur-2)
+    const st = await b.evaluate(() => document.getElementById('settings-dialog').open && document.getElementById('settings-dialog').getBoundingClientRect().height);
+    if (!st) {
+      fails.push(`page scripts blocked: the gear didn't open Settings (to shut it with ${how})`);
+      continue;
+    }
+    if (how === 'Esc') await b.keyboard.press('Escape');
+    else if (how === 'its close button') await b.locator('#settings-dialog .dlg-head .hbtn').click();
+    else await b.mouse.click(8, 450);
+    await b.waitForTimeout(300);
+    const after = await b.evaluate(() => ({ open: document.getElementById('settings-dialog').open, back: !!document.activeElement?.classList.contains('hbtn-settings') }));
+    rep.push(`page scripts blocked, ${how}: ${JSON.stringify(after)}`);
+    if (after.open) fails.push(`page scripts blocked: ${how} didn't shut Settings`);
+    else if (!after.back) fails.push(`page scripts blocked: focus didn't go back to the gear after ${how}`);
+  }
+  await blocked.close();
+
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('index'));
+  if (await q.locator('.hbtn-settings').isVisible()) fails.push('no script: the gear shows, with nothing in Settings that works without script');
+  const book = q.locator('[data-open="book-dialog"]:visible').first();
+  await book.click();
+  await q.waitForLoadState();
+  const there = await q.evaluate(() => ({ path: location.pathname + location.hash, form: !!document.querySelector('#message form[data-validate]') }));
+  rep.push(`no script, Book: ${JSON.stringify(there)}`);
+  if (there.path !== '/contact#message' || !there.form) fails.push(`no script: a Book link went to ${there.path}, not the form at /contact#message`);
+  await ctx.close();
+
+  // with script: each close button gives focus back to what opened the pop-up
+  const { ctx: c2, q: p, errs } = await home(browser);
+  for (const [id, opener, close] of [
+    ['settings-dialog', '.hbtn-settings', '#settings-dialog .dlg-head .hbtn'],
+    ['book-dialog', '.hero [data-open="book-dialog"]', '#book-dialog .dlg-actions [data-close]'],
+  ]) {
+    await p.locator(opener).first().click();
+    await p.waitForTimeout(500);
+    await p.locator(close).click();
+    await p.waitForTimeout(300);
+    const after = await p.evaluate(([id, sel]) => ({ open: document.getElementById(id).open, back: document.activeElement === document.querySelector(sel) }), [id, opener]);
+    rep.push(`script, ${id}: ${JSON.stringify(after)}`);
+    if (after.open) fails.push(`script: the close button didn't shut #${id}`);
+    else if (!after.back) fails.push(`script: focus didn't go back to ${opener} after #${id} closed`);
+  }
+  console.log(`pop-ups (J8): ${rep.join('; ')}`);
+  await c2.close();
+  verdict([...fails, ...errs]);
+});
+
+// J8 follow-up: with script, a pop-up's close button (Settings' is also command="close") shuts it once. core.js closes
+// it and cancels the command; the command running after it made Chromium warn "A command attempted to close an
+// already closed Dialog" on every click. No console warning or error from opening and closing either pop-up.
+test('pop-ups: a close button closes once, with nothing in the console (J8)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  const said = [];
+  q.on('console', (m) => { if (m.type() === 'warning' || m.type() === 'error') said.push(`${m.type()}: ${m.text()}`); });
+  for (const [opener, close] of [
+    ['.hbtn-settings', '#settings-dialog .dlg-head .hbtn'],
+    ['.hero [data-open="book-dialog"]', '#book-dialog .dlg-head .hbtn'],
+    ['.hero [data-open="book-dialog"]', '#book-dialog .dlg-actions [data-close]'],
+  ]) {
+    await q.locator(opener).first().click();
+    await q.waitForTimeout(500);
+    await q.locator(close).click();
+    await q.waitForTimeout(300);
+    const open = await q.evaluate(() => [...document.querySelectorAll('dialog')].filter((d) => d.open).map((d) => d.id));
+    if (open.length) fails.push(`${close} left ${open.join(', ')} open`);
+  }
+  for (const s of said) fails.push(`console ${s}`);
+  console.log(`close buttons (J8): ${said.length} console message(s)`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// J9: a form error adds its id to the field's aria-describedby and takes only that id away again, so a field's own
+// hint stays linked. No validated field has a hint today, so the check gives Book's email one.
+test('form errors keep a field\'s own hint in aria-describedby (J9)', async ({ browser }) => {
+  const fails = [];
+  const { ctx, q, errs } = await home(browser);
+  await q.locator('[data-open="book-dialog"]:visible').first().click();
+  await q.evaluate(() => {
+    const i = document.getElementById('book-email');
+    const s = document.createElement('span');
+    s.id = 'book-email-hint';
+    s.textContent = 'We only use it to reply.';
+    i.before(s);
+    i.setAttribute('aria-describedby', 'book-email-hint');
+  });
+  const ids = () => q.evaluate(() => ['book-email', 'book-name'].map((id) => document.getElementById(id).getAttribute('aria-describedby')));
+  const seen = [];
+  await q.fill('#book-email', 'nope');
+  await q.locator('#book-name').focus(); // blur: the email is checked
+  seen.push(await ids());
+  await q.fill('#book-email', 'test@example.com'); // input on an invalid field: checked again
+  seen.push(await ids());
+  await q.locator('#book-dialog [type="submit"]').click(); // the name is empty: its error only
+  seen.push(await ids());
+  await q.fill('#book-name', 'Test Person');
+  await q.fill('#book-email', 'nope');
+  await q.locator('#book-name').focus();
+  await q.fill('#book-email', 'test@example.com');
+  await q.selectOption('#book-size', { index: 1 });
+  await q.locator('#book-dialog [type="submit"]').click(); // sent: the form resets
+  await q.waitForTimeout(300);
+  seen.push(await ids());
+  const want = [
+    ['book-email-hint book-email-err', null],
+    ['book-email-hint', null],
+    ['book-email-hint', 'book-name-err'],
+    ['book-email-hint', null],
+  ];
+  const step = ['email wrong', 'email fixed', 'sent with no name', 'sent'];
+  want.forEach((w, i) => {
+    if (JSON.stringify(seen[i]) !== JSON.stringify(w)) fails.push(`${step[i]}: aria-describedby of email, name is ${JSON.stringify(seen[i])}, expected ${JSON.stringify(w)}`);
+  });
+  console.log(`form errors (J9): ${JSON.stringify(seen)}`);
+  await ctx.close();
+  verdict([...fails, ...errs]);
+});
+
+// J15: Safari before 26.2 has no scrollend. A swipe that cuts short a Prev or Next slide must not leave the row
+// stepping on from the card it was sliding to: the next press steps from the card showing. The check takes scrollend
+// away before the page's scripts run.
+test('services row without scrollend: Next steps from the card showing (J15)', async ({ browser }) => {
+  const fails = [];
+  const noScrollend = (ctx) =>
+    ctx.addInitScript(() => {
+      // Window's own handlers are on window itself (a global object), the others' on their prototypes
+      for (const P of [window, Document.prototype, HTMLElement.prototype, SVGElement.prototype]) delete P.onscrollend;
+      const add = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (type, ...rest) {
+        if (type !== 'scrollend') add.call(this, type, ...rest);
+      };
+    });
+  const { ctx, q, errs } = await home(browser, { w: 390, h: 844, init: noScrollend });
+  if (await q.evaluate(() => 'onscrollend' in window)) fails.push('the check could not take scrollend away');
+  const row = q.locator('.svc-menu');
+  await row.scrollIntoViewIfNeeded();
+  const middle = () =>
+    row.evaluate((e) => {
+      const mid = e.getBoundingClientRect().left + e.clientWidth / 2;
+      const d = (x) => Math.abs(x.getBoundingClientRect().left + x.getBoundingClientRect().width / 2 - mid);
+      const kids = [...e.children];
+      return kids.indexOf(kids.reduce((a, b) => (d(b) < d(a) ? b : a)));
+    });
+  await row.evaluate((e) => e.scrollBy({ left: e.querySelector('li').offsetWidth * 2, behavior: 'instant' }));
+  await q.waitForTimeout(800);
+  const start = await middle();
+  // Next starts a slide to the card after; a swipe back to the first card cuts it short
+  await q.evaluate(() => {
+    document.querySelector('.svc-step[data-step="1"]').click();
+    document.querySelector('.svc-menu').scrollTo({ left: 0, behavior: 'instant' });
+  });
+  await q.waitForTimeout(1000);
+  const swiped = await middle();
+  await q.locator('.svc-step[data-step="1"]').click();
+  await q.waitForTimeout(1200);
+  const next = await middle();
+  console.log(`services row without scrollend (J15): start ${start}, after the swipe ${swiped}, after Next ${next}`);
+  if (start !== 2 || swiped !== 0) fails.push(`setup: the row showed card ${start}, then ${swiped} after the swipe (expected 2, then 0)`);
+  else if (next !== 1) fails.push(`Next after a swipe to card 0 went to card ${next}, not 1`);
   await ctx.close();
   verdict([...fails, ...errs]);
 });

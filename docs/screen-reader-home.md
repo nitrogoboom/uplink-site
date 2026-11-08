@@ -1,6 +1,6 @@
 # Home page: what a screen reader hears
 
-*Recorded November 5, 2026, from the built site. Footer updated November 7, 2026, for its `<details>` sections (review J7).*
+*Recorded November 5, 2026, from the built site. Footer updated November 7, 2026, for its `<details>` sections (review J7). Openers no longer say "has pop-up dialog" (review J8, November 7, 2026).*
 
 This page records what a screen reader gets from the Home page, in order, at desktop and phone size. Use it to check that a change to Home still reads well, and as the reference for the listen in the [release checklist](sop.md#c-by-hand-15-minutes).
 
@@ -36,14 +36,14 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 3. Navigation "Main", a list of 5 links: "Home" (current page), "Services", "Our work", "About", "Contact".
 4. Link: "Get support, for existing clients".
 5. Link: "Client portal, sign in".
-6. Button: "Accessibility settings", has pop-up dialog. It opens Settings: keyboard shortcuts.
+6. Button: "Accessibility settings". It opens Settings: keyboard shortcuts.
 
 ### Your IT team, always online
 
 7. "Managed IT, Ontario".
 8. Heading level 1: "Your IT team, always online".
 9. "We run the technology behind your business: help desk, security, cloud, network and phones. You run the business."
-10. Link: "Get started", has pop-up dialog.
+10. Link: "Get started". It opens the Book pop-up.
 11. "Free check-up. No contract to look."
 12. "Services", then a list "Services" of 4 links:
     - "Managed help desk. Real people who pick up and fix it, by phone, email or chat."
@@ -52,7 +52,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
     - "All services. Help desk, security, cloud, networks, phones"
 13. Image: "Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace".
 14. Button: "Pause animations", not pressed.
-15. Link, has pop-up dialog: "IT and security check-up. Free. 30 minutes. We look first, then quote."
+15. Link: "IT and security check-up. Free. 30 minutes. We look first, then quote."
 16. Link: "Windows 10 support has ended. Guide. Your upgrade plan, step by step".
 
 ### Everything your office runs on
@@ -98,7 +98,7 @@ The headings are one H1, four H2 sections plus the footer's H2, and H3 for the G
 
 32. Heading level 2: "Start with a free check-up".
 33. "Thirty minutes, no contract. We show you what we find and what we would fix first."
-34. Link, has pop-up dialog: "Book a check-up".
+34. Link: "Book a check-up". It opens the Book pop-up.
 35. Link: "1-855-555-0142".
 
 ### Footer

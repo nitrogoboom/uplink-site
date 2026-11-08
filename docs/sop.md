@@ -24,7 +24,7 @@ A *release* is the first production launch, and any later change to layout, navi
 | CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. Beside them, the drawings job (Python). On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
 | Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
-| Code checks | TypeScript (`astro check`), ESLint, Stylelint, Prettier (JSON and YAML only) | `eslint.config.js`, `.stylelintrc.json` |
+| Code checks | TypeScript (`astro check`, the page scripts and `src/lib` included through `checkJs`), ESLint (with type-aware rules on `src/scripts` and `src/lib`), Stylelint, Prettier (JSON and YAML only) | `tsconfig.json`, `eslint.config.js`, `.stylelintrc.json` |
 | Site checks | Playwright Test and axe-core (`@axe-core/playwright`), in Chromium | `checks/*.spec.mjs` (`npm run verify`, `npm run verify:links`, and the rest in the README) |
 | Release audit | Playwright Test in Chromium, Firefox, and WebKit; Guidepup Virtual Screen Reader; the W3C Nu HTML Checker | `checks/audit.spec.mjs` (`npm run release-audit`) |
 

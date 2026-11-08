@@ -10,8 +10,10 @@
 //                    elsewhere: one warning, and no dates (the sitemap leaves <lastmod> out, the Article its dates)
 import { execFileSync } from 'node:child_process';
 
+/** @type {(args: string[], cwd?: string) => string} */
 const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 
+/** @type {Map<string, boolean>} */
 const verdicts = new Map();   // cwd → true (dates can be trusted) or false (left out), checked once per folder
 
 /**
