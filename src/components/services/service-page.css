@@ -24,9 +24,11 @@
 @media (--tablet-up) {
   .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
+/* the title's column is at least 30rem (or the whole width): a share of the window alone narrows at zoom, and the
+   title, sized to its column (14cqi with a long word), would shrink on screen as zoom grows (review C1) */
 @media (width >= 56.25em) {
   .svc-page-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(min(30rem, 100%), 5fr) minmax(0, 7fr);
     grid-template-rows: auto auto 1fr auto;
     grid-template-areas: "crumbs prev" "head prev" "cta prev" "detail detail";
     column-gap: var(--sp-7);

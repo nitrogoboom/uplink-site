@@ -15,9 +15,11 @@
 .proj-page .case .stack > .chip { align-self: flex-start; }
 .proj-page [data-case-field="story"] { max-width: var(--measure-lead); font-size: var(--fs-5); line-height: var(--lh-snug); }
 .proj-page .facts { font-size: var(--fs-3); }
+/* the title's column is at least 30rem (or the whole width): a share of the window alone narrows at zoom, and the
+   title, sized to its column (14cqi with a long word), would shrink on screen as zoom grows (review C1) */
 @media (width >= 56.25em) {
   .proj-page-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(min(30rem, 100%), 5fr) minmax(0, 7fr);
     grid-template-rows: auto auto 1fr;
     grid-template-areas: "crumbs fig" "title fig" "body fig";
     column-gap: var(--sp-7);

@@ -23,7 +23,6 @@
   :root { --fold-h: initial !important; --fold-inner: initial !important; --fold-pitch: initial !important; }
   .site-header { position: static; }
   .fold, .fold-always, .hero, .hero-grid { min-height: 0 !important; height: auto !important; }
-  .fold::after { content: none !important; }
   .grow.is-live .grow-card { display: grid !important; }
   .grow-row { opacity: 1 !important; }
   .work-grid > li { display: flex !important; }   /* the /work filters don't print, so a chosen one doesn't filter */

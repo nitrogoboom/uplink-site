@@ -18,5 +18,8 @@
   .profile-art { aspect-ratio: auto; flex: 1; min-height: 12rem; }
   .profile-art img { position: absolute; inset: 0; }
   .profile-text { justify-content: center; }
+  /* four in a row while each tile holds its number at --fs-7 (44px, shared-blocks.css); in a narrower column (1280
+     wide, or zoomed), two rows of two, so the number keeps its size and zoom makes it bigger on screen (review C1) */
   .profile-text .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  @container (width < 46rem) { .profile-text .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 }

@@ -1081,8 +1081,7 @@ for (const page of ['index', 'contact']) {
     await q.waitForLoadState('networkidle');
     await q.emulateMedia({ media: 'print' });
     // the page's content laid out on two screen heights that meet the same media queries (desktop, landscape, wider
-    // than 3:2) and give the same root font size (tokens.css: the smaller of 1.11vw and 1.78vh, so both at least
-    // 1000 tall at 1600 wide): it must be the same length. Pictures are capped at 60vh on paper (a share of the page), so they're
+    // than 3:2, and the same --fold-pad step in tokens.css: both under 1080 tall): it must be the same length. Pictures are capped at 60vh on paper (a share of the page), so they're
     // held to one size for this comparison.
     await q.addStyleTag({ content: 'img, svg { max-height: 300px !important; }' });
     const tall = async (hh) => {
@@ -1425,6 +1424,99 @@ test('headings and numbers: no word split across lines (B18, B20)', async ({ bro
     })
   ).filter(Boolean);
   console.log(`headings: ${jobs.length} page sizes, ${fails.length} with a split word`);
+  verdict(fails);
+});
+
+// C1 (layout phase 4: text in rem, the room round it from the screen). Home on desktop windows people use: the hero is
+// one wheel step tall and its menu and news cards are on the first screen; every Home section starts on the 100px
+// wheel grid (its top under the header a multiple of 100). The hero's news cards at 1100 to 1240 wide (where the
+// office column is narrowest): no word in a card split across lines, and the words and tag inside the card. The footer
+// map's label sits on the drawing's base, not in empty space under it.
+const FIRST = [[1100, 700], [1100, 800], [1165, 800], [1280, 720], [1280, 800], [1366, 768], [1440, 900], [1470, 956], [1536, 864], [1920, 1080], [2560, 1440], [3440, 720], [3440, 900], [3440, 1080], [3440, 1440]];
+test('Home: hero on the first screen, sections on the wheel grid (C1)', async ({ browser }) => {
+  const fails = (
+    await lanes(FIRST, 4, async ([w, h]) => {
+      const q = await browser.newPage({ viewport: { width: w, height: h } });
+      await q.goto(url('index'));
+      await q.waitForLoadState('networkidle');
+      await q.evaluate(() => document.fonts.ready);
+      const r = await q.evaluate(() => {
+        const out = [];
+        const head = document.querySelector('.site-header').getBoundingClientRect().height;
+        const probe = document.createElement('div');
+        probe.style.height = 'var(--fold-pitch)';
+        document.body.append(probe);
+        const pitch = probe.getBoundingClientRect().height;
+        probe.remove();
+        const hero = document.querySelector('#top').getBoundingClientRect();
+        if (hero.height > pitch + 1) out.push(`hero ${Math.round(hero.height)}px tall, more than one wheel step (${Math.round(pitch)}px)`);
+        for (const sel of ['.hero-menu .menu li:last-child', '.hero-cta', '.hero-dock']) {
+          const e = document.querySelector(sel);
+          if (!e || !e.getClientRects().length) continue;
+          const b = e.getBoundingClientRect().bottom;
+          if (b > innerHeight + 1) out.push(`${sel} ends at ${Math.round(b)}px, below the first screen (${innerHeight}px)`);
+        }
+        for (const s of document.querySelectorAll('main > section.fold')) {
+          const t = s.getBoundingClientRect().top + scrollY - head;
+          if (Math.abs(t - Math.round(t / 100) * 100) > 1) out.push(`#${s.id} starts ${Math.round(t)}px under the header, off the 100px wheel grid`);
+        }
+        return out;
+      });
+      await q.close();
+      return r.length ? `${w}x${h}: ${r.join('; ')}` : null;
+    })
+  ).filter(Boolean);
+  verdict(fails);
+});
+test('Home: hero news cards whole at 1100 to 1240 wide (C1)', async ({ browser }) => {
+  const jobs = [800, 900, 1080].flatMap((h) => [1100, 1120, 1140, 1160, 1180, 1200, 1220, 1240].map((w) => [w, h]));
+  const fails = (
+    await lanes(jobs, 4, async ([w, h]) => {
+      const q = await browser.newPage({ viewport: { width: w, height: h } });
+      await q.goto(url('index'));
+      await q.evaluate(() => document.fonts.ready);
+      const r = await q.evaluate(() => {
+        const out = [];
+        for (const card of document.querySelectorAll('.hero-dock .news')) {
+          const c = card.getBoundingClientRect();
+          for (const el of card.querySelectorAll('.news-title, .news-tag, .news-text p')) {
+            const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+            for (let t; (t = tw.nextNode()); ) {
+              for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
+                const g = document.createRange();
+                g.setStart(t, m.index);
+                g.setEnd(t, m.index + m[0].length);
+                const rects = [...g.getClientRects()].filter((x) => x.width);
+                if (new Set(rects.map((x) => Math.round(x.top))).size > 1) out.push(`"${m[0]}" split across lines`);
+                for (const x of rects) if (x.right > c.right + 1 || x.left < c.left - 1) out.push(`"${m[0]}" cut by its card`);
+              }
+            }
+          }
+        }
+        return [...new Set(out)];
+      });
+      await q.close();
+      return r.length ? `${w}x${h}: ${r.join(', ')}` : null;
+    })
+  ).filter(Boolean);
+  verdict(fails);
+});
+test('footer map: its label on the drawing (C1)', async ({ browser }) => {
+  const fails = [];
+  for (const [w, h] of [[1440, 900], [1920, 1080], [2560, 1440], [3440, 1440]]) {
+    const q = await browser.newPage({ viewport: { width: w, height: h } });
+    await q.goto(url('contact'));
+    await q.$eval('#footer', (e) => e.scrollIntoView());
+    await q.waitForFunction(() => document.querySelector('.fc-map > svg'));
+    await q.waitForTimeout(1500); // the camera settles on the open section's spot
+    const r = await q.evaluate(() => {
+      const m = document.querySelector('.fc-map'), vb = m.querySelector(':scope > svg').viewBox.baseVal, b = m.getBoundingClientRect();
+      const drawn = vb.height * Math.min(b.width / vb.width, b.height / vb.height); // drawn centred, its whole shape shown
+      return { gap: b.top + (b.height + drawn) / 2 - document.querySelector('.fc-hud').getBoundingClientRect().bottom };
+    });
+    await q.close();
+    if (Math.abs(r.gap) > 4) fails.push(`${w}x${h}: the map label sits ${Math.round(Math.abs(r.gap))}px ${r.gap > 0 ? 'above' : 'below'} the drawing's base`);
+  }
   verdict(fails);
 });
 

@@ -45,7 +45,9 @@
   html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
   .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
 }
-@media (--tablet) {
+/* tablets and narrow desktops: the desktop header (tagline, 24px tab padding) needs 1230px at a 16px root, so it
+   starts at 1240px (77.5em); under that it keeps this one. The header-fit check (checks/site.spec.mjs) holds it */
+@media (43.75em <= width < 77.5em) {
   .brand-sub { display: none; }
   .site-header .container { gap: var(--sp-3); }
   .tab { padding-inline: var(--sp-3); }

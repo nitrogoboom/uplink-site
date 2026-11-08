@@ -28,7 +28,7 @@ const TITLE = 'Talk to a real person';
         </div>
         <div class="chan panel">
           <span class="icon-tile" aria-hidden="true"><Icon name="mail" /></span>
-          <span class="chan-text"><span class="chan-title">Email</span><a class="chan-value" id="mail-val" href={`mailto:${email}`}>{email}</a></span>
+          <span class="chan-text"><span class="chan-title">Email</span><a class="chan-value" id="mail-val" href={`mailto:${email}`}>{email.split('@')[0]}@<wbr />{email.split('@')[1]}</a></span>
           <button class="iconbtn copy-btn" type="button" data-copy={email} data-copy-target="mail-val" aria-label="Copy email address"><Icon name="copy" /></button>
         </div>
         <a class="chan panel card" href="/contact#message" data-open="book-dialog">

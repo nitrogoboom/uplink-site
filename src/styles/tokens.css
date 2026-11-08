@@ -3,7 +3,7 @@
    Every size, colour and timing on the site comes from this file.
    Layout concept: game-client chrome (sticky top bar) around calm scrolling
    sections. Heroes and the header run full width; cards and lists sit in one
-   centred block (--container, 94rem on desktop; docs/layout-reference.md).
+   centred block (--container: 1600px, or 85% of a wider desktop screen; docs/layout-reference.md).
    ========================================================================== */
 
 :root {
@@ -80,8 +80,11 @@
   --fs-4: 1.125rem;   /* 18  lead, buttons */
   --fs-5: 1.375rem;   /* 22  card titles */
   --fs-6: 1.75rem;    /* 28  sub-headings, dialog titles, big buttons */
-  --fs-7: clamp(2rem, 1.35rem + 2.2vw, 2.75rem);   /* 32-44  section headings */
-  --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
+  /* the two heading sizes grow with the window only between a big phone (27rem, 432px) and 45rem (720px), and are at
+     their cap from there: so 200% zoom on a 1440 window (720 CSS px) still doubles them, and a 1280 one gives about
+     180% (review C1). Phones keep their size. */
+  --fs-7: clamp(2rem, 0.875rem + 4.17vw, 2.75rem);    /* 32-44  section headings */
+  --fs-8: clamp(2.75rem, 0.125rem + 9.72vw, 4.5rem);  /* 44-72  page headings */
   --fit-long:  14cqi;   /* the most a heading with a long word may be (class fit, lib/fit.js): a 13-letter word
                           ("Cybersecurity") fits its column. cqi: 1% of the nearest container's width (layout.css) */
   --fit-loose: 30cqi;   /* a heading whose words are all 6 letters or fewer (class fit-loose) */
@@ -131,7 +134,7 @@
   --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
   --chevron-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
   --container:  80rem;
-  --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on desktop (grow.css) */
+  --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on a desktop under 700px tall (grow.css); taller: below */
   --gutter:    1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
   --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
@@ -188,7 +191,10 @@
   --loop-grow-rim: 2.4s;
 
   /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
-  --fs-hero-phone: 2.5rem;    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */
+  /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
+     under --fs-8 so the hero fits one screen; wider, a share of the window up to --fs-8. All vw, no negative rem part,
+     so a narrower window at zoom never makes it smaller on screen (review C1) */
+  --fs-hero-phone: clamp(2.5rem, 9.26vw, var(--fs-8));
   --cap-title: var(--fs-4);
   --cap-sub: var(--fs-2);
   --cap-edge: var(--sp-3);    /* words to the drawing's edge */
@@ -234,17 +240,25 @@
   }
 }
 
-/* Desktop screens: the whole layout scales with the screen.
-   Reference screen is 1440 x 900 at a 16px root. A bigger screen scales
-   everything up by whichever is smaller, width or height, so a section
-   always fits one screen. 3440 x 1440 ends up at about 25.6px. */
+/* Desktop screens tall enough for one section per screen. Text never follows the screen: 1rem is the visitor's own
+   font size (16px unless they changed it), so zoom and their font setting work on every screen (review C1). What
+   follows the screen is the room round the text: the centred block's width (here), the space round a one-screen
+   section (--fold-pad, below) and the pictures, which take what the text leaves (fold.css). */
 @media (--fold) {
-  html { font-size: clamp(14px, min(1.1111vw, 1.7778vh), 40px); }
   :root {
-    --container: calc(94rem + 2 * var(--gutter));  /* one centred block: the full width at 16:9, side margin on wider screens.
-                                                       The header, hero and footer stage and base bar run full width. */
+    --container: max(94rem + 2 * var(--gutter), 85vw);  /* one centred block: the full width up to 1600px, then 85% of the
+                                                          screen. The header, hero and footer stage and base bar run full width. */
     --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
+    /* the tallest the Home hero (home/hero.css) and the Grow picture (home/grow.css) get: shares of the screen, not
+       rem, so the pictures fill big screens whatever the text size. 62vw: the hero stops growing taller only on a
+       near-square window; never under 50rem, the room its menu needs */
+    --hero-max: max(62vw, 50rem);
+    --grow-stage-max: min(49vw, 78svh);
+    --fold-pad: var(--sp-7);   /* top and bottom of a one-screen section (fold.css): a step of the scale that grows
+                                  with the screen's height, so big screens keep their air */
   }
+  @media (height <= 47.5em) { :root { --fold-pad: var(--sp-5); } }  /* short laptops: 1280 x 720 */
+  @media (height >= 67.5em) { :root { --fold-pad: var(--sp-8); } }  /* 1080 tall and up */
   /* the wheel grid: a fold a whole number of notches tall, so the wheel's stops land on fold edges. Older browsers
      without round() keep --fold-h. */
   @supports (height: round(up, 1px, 1px)) {

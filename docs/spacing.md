@@ -1,12 +1,12 @@
 # Spacing and line height
 
-*Last updated: November 5, 2026*
+*Last updated: November 7, 2026*
 
 This page sets the rules for space and line height on the site: which spacing step goes where, and how the rules are checked. Read it before you add or change a margin, padding, gap, or line height.
 
 The spacing scale is `--sp-1` to `--sp-9`, and the type scale is `--fs-1` to `--fs-8`. Both are in `src/styles/tokens.css`.
 
-The pixel values on this page are at the 1440×900 reference, with a 16 px root. On bigger desktops, the root grows, so every value grows with it.
+The pixel values on this page are at a 16 px root: the browser's default font size. The root is the visitor's own font size on every screen, so a value grows with their zoom and font setting, never with the screen. What grows with a big screen is the room round the text: the width of the centred block, the padding of a one-screen section (R1), and the pictures.
 
 | Token | `--sp-1` | `--sp-2` | `--sp-3` | `--sp-4` | `--sp-5` | `--sp-6` | `--sp-7` | `--sp-8` | `--sp-9` |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -31,7 +31,7 @@ An exception needs a `stylelint-disable` comment that says why. There are two to
 There are two kinds of section, and each has one rhythm:
 
 - **Flow section** (`.section`): `--section-y` at the top and bottom. That's `--sp-8` on phone and tablet, and `--sp-9` on desktop.
-- **Fold section** (desktop, one screen tall, `fold.css`): `--sp-7`, or `--sp-5` on short screens. The content is centred, so the gap you see is bigger.
+- **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad` (`tokens.css`), a step that follows the screen's height: `--sp-5` up to 760 px tall, `--sp-7` up to 1080 px, and `--sp-8` from 1080 px. The content is centred, so the gap you see is bigger.
 
 Two more cases:
 
@@ -94,7 +94,7 @@ Keep the 4 px scale. Don't move to a Fibonacci scale (8, 13, 21, 34, 55, 89). Th
 
 - **Problems come from picking the wrong step, not from the steps.** Every spacing fix so far was made by choosing a different existing token.
 - **Fibonacci drops the steps the site uses most.** `--sp-4` (16) and `--sp-5` (24) are the two most used tokens, with about 106 and 98 uses. Neither is a Fibonacci number, and neither are 4 and 12, which carry chip and icon spacing.
-- **13 and 21 are off the 4 px grid.** The controls are 44 px (`--tap`), 48 px (`--control-h`), and 64 px (`--header-h`, `--control-lg`). Body lines are 25.6 px. Fibonacci gaps would never line up with any of them, and they turn into fractions on scaled desktops.
+- **13 and 21 are off the 4 px grid.** The controls are 44 px (`--tap`), 48 px (`--control-h`), and 64 px (`--header-h`, `--control-lg`). Body lines are 25.6 px. Fibonacci gaps would never line up with any of them.
 - **The top of the scale already grows like Fibonacci.** 16, 24, 32, 48, 64, and 96 step up by ×1.33 to ×1.5. Fibonacci steps by ×1.6. Big gaps already feel proportional, and the small ones need the even grid.
 - **Moving would change every value on the site:** about 530 token uses. The styles check (`npm run verify:styles`) would show every page changed.
 
