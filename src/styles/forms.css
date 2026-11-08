@@ -253,6 +253,11 @@ select.input:hover {
     background-color var(--dur-1) var(--ease),
     border-color var(--dur-1) var(--ease);
 }
+.seg-opt svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+} /* an option's icon beside its word (the theme's screen, sun and moon); the word still names it */
 .seg-opt:hover span {
   background: var(--c-surface-2);
 }
