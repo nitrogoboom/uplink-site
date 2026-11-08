@@ -3,7 +3,8 @@
 // the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
 // swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it. Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 // A tile's link reads "Support. Managed help desk. Real people… View service": the chip and "View service" are heard
-// too, so the name starts with the word the eye reads first and voice control finds it (review M10).
+// too, so the name starts with the word the eye reads first and voice control finds it (review M10). A tall card also
+// lists its service's three features (`features`, the copy its own page shows), on desktop only, where it has the room.
 import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
@@ -48,7 +49,13 @@ const tiles = [
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"
             ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
-            ><Pause /><span class="svc-line">{s.card}</span></span
+            ><Pause /><span class="svc-line">{s.card}</span
+            >{size === 'big' && <span class="svc-feats">
+              {s.features.map((f) => <span class="svc-feat"
+                ><Pause /><span class="svc-feat-t">{f.title}</span><span class="sr-only">: </span
+                ><span class="svc-feat-d">{f.detail}</span></span
+              >)}
+            </span>}</span
           >
           <span class="svc-go"><span class="sr-only"></span>View service<Icon name="chevronR" /></span>
         </a>
