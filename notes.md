@@ -45,6 +45,7 @@ Design, nice to have:
 - [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
 
 ## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
+- [ ] Dependabot's pip relock drops the Windows-only `colorama` line from `requirements.txt` (seen in #110, November 8, 2026), so a `pip install --require-hashes` on Windows fails after its pip bumps. Relock with the command in `requirements.in` after each one, until Dependabot locks with `--universal`.
 - [ ] TypeScript 7 (Dependabot #63, November 8, 2026): `astro check` refuses it, so `.github/dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7, or switch to `@astrojs/ts-content-mapper` (Astro's experimental type check for 7.1+), then drop the ignore.
 - [ ] Small, left as they are: `gen_campus.py` keeps its own `box()` (class-only faces that `footer.css` colours; every other generator draws through `isogen.box()`, review C11, November 7, 2026); `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 - [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.

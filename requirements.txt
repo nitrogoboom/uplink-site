@@ -145,6 +145,10 @@ brotli==1.2.1 \
     --hash=sha256:fb6a4d400aa531c73a718b337116fad77ba8dc6df34fa615c808bfc55ffb19ca \
     --hash=sha256:ff02e697d947f518e9e99f2b25698045a5ddffa95049c4d95b5a8cf3618d9008
     # via -r requirements.in
+colorama==0.4.6 ; sys_platform == 'win32' \
+    --hash=sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44 \
+    --hash=sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6
+    # via pytest
 fonttools==4.68.0 \
     --hash=sha256:039142b75a068c93f8596ef68787f82c74940b9153d24c224ab31e750eb083a2 \
     --hash=sha256:03c9ef1272e464747f67c623f76449b888da6d5de7fb46275bb36488b9ceedba \
