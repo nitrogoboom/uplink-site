@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Light theme (test): the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens.
+   Only the light Home copy (/light) imports this, and only <html data-theme="light"> takes it, so the dark site is
+   unchanged. Screen only: print keeps its own colours (tokens.css). Where the palette's light value didn't hold up
+   on Home, the change and the reason are noted beside it (docs/light-theme-2026-11-08.md).
+   ========================================================================== */
+
+@media screen {
+  :root[data-theme='light'] {
+    color-scheme: light;
+
+    /* grounds, text and lines (5.1) */
+    --c-bg: #f2f7fc;
+    --c-bg-band: #e6ecf2;
+    --c-solid: #fff;
+    --c-surface: rgb(255 255 255 / 0.72);
+    --c-surface-2: rgb(34 46 58 / 0.06); /* palette 0.045: too faint to see an icon tile on a white card */
+    --c-well: rgb(34 46 58 / 0.05);
+    --c-line: rgb(34 46 58 / 0.12);
+    --c-line-2: rgb(34 46 58 / 0.24);
+    --c-edge: rgb(34 46 58 / 0.58);
+    --c-text: #0e1a27;
+    --c-muted: #4d5863;
+    --c-glass: #f2f7fc; /* solid, as the dark header: no blur cost on scroll */
+    --c-glass-2: #fff;
+    --c-backdrop: rgb(34 46 58 / 0.4);
+
+    /* action, links and status (5.2) */
+    --c-accent: #ffad51;
+    --c-on-accent: #0e1a27;
+    --c-accent-text: #88520a;
+    --c-accent-tint: rgb(255 173 81 / 0.18);
+    --c-accent-faint: rgb(255 173 81 / 0.08);
+    --c-accent-ring: rgb(136 82 10 / 0.3);
+    --c-ink-tint: rgb(14 26 39 / 0.16);
+    --c-sky: #005d8a;
+    --c-sky-tint: rgb(0 93 138 / 0.07);
+    --c-ok: #004f2e;
+    --c-ok-tint: rgb(0 79 46 / 0.1);
+    --c-alert: #b24438;
+
+    /* atmosphere (5.3) */
+    --c-glow-accent: rgb(255 173 81 / 0.12);
+    --c-glow-sky: rgb(0 93 138 / 0.07);
+    --c-glow-sky-2: rgb(0 93 138 / 0.08);
+    --c-cool-surface: rgb(216 239 255 / 0.4);
+    --c-cool-surface-2: rgb(216 239 255 / 0.7);
+    --c-cool-muted: #455a69;
+
+    /* drawings (5.4): the footer map and anything styled by these */
+    --iso-top: #fff;
+    --iso-left: #d2d8de;
+    --iso-right: #bbc2c9;
+    --iso-edge: #37424e;
+    --iso-hi-edge: #7c4900;
+    --iso-sky-top: #97c8ea;
+    --iso-sky-left: #4a93c1;
+    --iso-sky-right: #005d8a;
+    --iso-green-dark: #00683f;
+    --iso-ground: #e6ecf2;
+    --iso-grid: #c5ccd3; /* palette #d2d8de: gone on the #e6ecf2 ground, one step darker */
+    --iso-window: #a1a9b1;
+    --iso-led: #198152; /* DESIGN-GAP in the palette: the online dot needs a darker green on a light ground */
+    --iso-shadow: #0e1a27;
+
+    /* select arrows: stroke is --c-muted, written in */
+    --chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234D5863' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+    --chevron-up: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%234D5863' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
+
+    /* depth: the same falloff, much softer, tinted to the light navy (a near-black shadow reads as dirt on white) */
+    --shadow-1: 0 12px 32px -12px rgb(14 26 39 / 0.18);
+    --shadow-2: 0 32px 64px -24px rgb(14 26 39 / 0.22);
+    --shadow-ink: 212deg 40% 20%;
+  }
+}
+
+/* more contrast (as tokens.css): decorative lines take the edge colour */
+@media screen and (prefers-contrast: more) {
+  :root[data-theme='light'] {
+    --c-line: var(--c-edge);
+    --c-line-2: var(--c-edge);
+  }
+}
+
+/* ---- Home fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
+@media screen {
+  /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
+     (#fff on #b24438 5.6:1, on #004f2e 9.7:1; the dark label was 3.2:1 on red) */
+  :root[data-theme='light'] .grow-tag {
+    color: #fff;
+  }
+  :root[data-theme='light'] .grow-tag-i {
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  /* Grow steps already built: the dark mode's 0.7 fade takes amber ink under 4.5:1 on the light page, so it stays solid */
+  :root[data-theme='light'] .grow-item.is-done :is(.grow-item-t, .grow-item-m) {
+    opacity: 1;
+  }
+}

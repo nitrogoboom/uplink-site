@@ -21,6 +21,7 @@ Each file in `pages/` is one address. Most pages are a stack of sections, with o
 | `contact.astro` | `/contact` | Message and Support |
 | `privacy.astro`, `accessibility.astro` | `/privacy`, `/accessibility` | The Markdown in `data/privacy.md` or `data/accessibility.md`, rendered by `components/TextPage.astro` |
 | `soon.astro`, `404.astro` | `/soon`, and any missing address | One section each, written inline |
+| `light.astro` | `/light` | A test copy of Home in the light theme: the same sections with `light` set, so they show the light drawings, and `styles/theme-light.css`. `noindex`, no canonical, not in the sitemap. See `docs/light-theme-2026-11-08.md`. |
 | `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts`, `.well-known/security.txt.ts` | Those files | Built from the data: `lib/site.ts`, the content collections, and `data/*.md` |
 
 ### The shared layout
@@ -37,6 +38,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `type` | The page's schema.org type, such as `FAQPage` or `AboutPage`. |
 | `ldPage` | More fields merged into the page's own JSON-LD node. |
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
+| `theme` | `'light'` sets `<html data-theme="light">` and a light `theme-color`. Only `/light` uses it; the page also imports `styles/theme-light.css`, which holds the light tokens. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
 The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
@@ -101,6 +103,8 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 Each section's desktop layout sits at the end of its own CSS file, so it always comes after that section's phone and tablet rules.
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
+
+The light theme (test, `/light` only) is `styles/theme-light.css`: the palette's light values for the same tokens, on `:root[data-theme='light']`, plus a few Home rules the swap alone doesn't cover. Only `light.astro` imports it, so the dark pages don't carry it.
 
 The visitor's display settings: with "increase contrast" on (`prefers-contrast: more`), `tokens.css` raises the faint lines (`--c-line`, `--c-line-2`) to `--c-edge` (3:1). In forced colours (Windows contrast themes), the theme paints fills away, so a state shown only by a fill (a current dot, step, tab or pressed icon) opts out of the forcing (`forced-color-adjust: none`) and takes the theme's system colours (`Highlight` and `HighlightText` for the current one, `GrayText` or `CanvasText` for the rest). Each sits in a `@media (forced-colors: active)` block beside the rule it fixes; the site check tests them (B4).
 

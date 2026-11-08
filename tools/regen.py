@@ -1,6 +1,6 @@
 """Run every drawing generator, then (with --check) every drawing check.
 
-    python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py
+    python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py, then their 16 light copies (gen_light.py)
     python tools/regen.py --check    # then check.py and painter.py, as each rules_NAME.py lists them
     python tools/regen.py --checks-only
 
@@ -20,7 +20,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOOLS = ROOT / 'tools'
 SCENES = ['backup', 'cloud', 'helpdesk', 'hq', 'network', 'security', 'strategy', 'voip']
 GENERATORS = ([[f'tools/gen_{s}.py', f'public/assets/img/{s}.svg'] for s in SCENES]
-              + [['tools/gen_office.py', 'public'], ['tools/gen_grow.py'], ['tools/gen_campus.py']])
+              + [['tools/gen_office.py', 'public'], ['tools/gen_grow.py'], ['tools/gen_campus.py'],
+                 ['tools/gen_light.py']])   # last: the light copies are made from the SVGs above
 
 
 def commands():

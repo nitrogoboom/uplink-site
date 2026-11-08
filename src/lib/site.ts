@@ -45,6 +45,16 @@ export const HERO = {
   },
 };
 
+// the light test page's hero cuts (/light): the same drawings with their colours swapped by tools/gen_light.py
+export const HERO_LIGHT = {
+  ...HERO,
+  full: fresh('/assets/img/hero-office-light.svg'),
+  tablet: fresh('/assets/img/hero-office-tablet-light.svg'),
+  phone: fresh('/assets/img/office-compact-build-light.svg'),
+  phoneFlows: fresh('/assets/img/office-compact-flows-light.svg'),
+  still: '/assets/img/hero-office-phone-light.svg',
+};
+
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
 export const CAMPUS = fresh('/assets/img/campus.svg');
 

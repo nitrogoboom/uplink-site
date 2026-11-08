@@ -1,0 +1,33 @@
+---
+// LIGHT HOME (test): a copy of Home in the palette's light mode (docs/palette.md, light columns), to judge the light
+// theme before it goes into Settings. Home itself (index.astro) is unchanged. The same sections as Home, each told
+// to use the light copies of its drawings (tools/gen_light.py); the light tokens are in src/styles/theme-light.css,
+// on <html data-theme="light">. Kept out of search and the sitemap (noindex, no canonical), like /soon.
+import Base from '../layouts/Base.astro';
+import { HERO_LIGHT as HERO, PAGES } from '../lib/site';
+import Hero from '../components/home/Hero.astro';
+import Services from '../components/home/Services.astro';
+import Grow from '../components/home/Grow.astro';
+import Work from '../components/home/Work.astro';
+import Proof from '../components/home/Proof.astro';
+import '../styles/theme-light.css';
+---
+
+<Base title={PAGES.home.title} description={PAGES.home.description} page="home" robots="noindex, follow" theme="light">
+  <Fragment slot="head">
+    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone} />
+    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={HERO.media.phone} />
+    <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet} />
+    <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full} />
+  </Fragment>
+  <Hero light />
+  <Services light />
+  <Grow light />
+  <Work light />
+  <Proof />
+  <Fragment slot="scripts">
+    <script>
+      import '../scripts/home.js';
+    </script>
+  </Fragment>
+</Base>

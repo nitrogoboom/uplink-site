@@ -17,11 +17,13 @@ interface Props {
   project: CollectionEntry<'projects'>;
   level?: 2 | 3;
   first?: boolean;
+  light?: boolean; // the light test page (/light): the light card drawing (tools/gen_light.py)
 }
 const {
   project: { id, data: p },
   level = 3,
   first = false,
+  light = false,
 } = Astro.props;
 const H = level === 2 ? 'h2' : 'h3';
 ---
@@ -29,7 +31,7 @@ const H = level === 2 ? 'h2' : 'h3';
 <div class="card card--project">
   <span class="card-media well"
     ><img
-      src={`/assets/img/${p.image}-card.svg`}
+      src={`/assets/img/${p.image}-card${light ? '-light' : ''}.svg`}
       alt=""
       {...cardSize(p.image)}
       fetchpriority={first ? 'high' : undefined}

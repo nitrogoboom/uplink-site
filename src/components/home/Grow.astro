@@ -12,7 +12,8 @@
 // Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
 // with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
 // Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
-import raw from './grow-world.svg?raw';
+import rawDark from './grow-world.svg?raw';
+import rawLight from './grow-world-light.svg?raw';
 import { optimize } from 'svgo';
 import { SVGO } from '../../../scripts/svgo-config.mjs';
 import Icon from '../Icon.astro';
@@ -21,7 +22,9 @@ import './grow.css';
 
 const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
 
-const world = optimize(raw, SVGO)
+// light: the light test page (/light) inlines the light copy (tools/gen_light.py)
+const { light = false } = Astro.props as { light?: boolean };
+const world = optimize(light ? rawLight : rawDark, SVGO)
   .data.replace(/<style>[\s\S]*?<\/style>/g, '')
   .replace(' id="plain"', '');
 const last = steps.length - 1;

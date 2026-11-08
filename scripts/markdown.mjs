@@ -12,7 +12,7 @@ import { join, relative, sep } from 'node:path';
 import TurndownService from 'turndown';
 
 const DIST = process.env.DIST || 'dist'; // another folder only for the tests (scripts/test/)
-const SKIP = ['index.html', '404.html', 'soon.html'];
+const SKIP = ['index.html', '404.html', 'soon.html', 'light.html'];
 
 const pages = [];
 const walk = (dir) => {

@@ -33,7 +33,7 @@ export const get = (url, init = {}) =>
   fetch(url, { ...init, headers: { ...UA, ...init.headers }, signal: AbortSignal.timeout(30_000) });
 
 export const DIST = join(ROOT, option('--dist', 'dist'));
-const NOT_IN_SITEMAP = ['/soon', '/404']; // soon is noindex; the 404 page is served at any missing address
+const NOT_IN_SITEMAP = ['/soon', '/404', '/light']; // light: the light Home test copy, noindex // soon is noindex; the 404 page is served at any missing address
 
 // the built pages' addresses: dist/index.html -> '/', dist/services/backup.html -> '/services/backup'
 export function builtPages(dir = DIST) {

@@ -13,6 +13,9 @@ const SLOTS = 4;
 const TITLE = 'Everything your office runs on';
 const MORE = 'All services';
 const services = await getServices();
+// light: the light test page (/light) shows the light card drawings (tools/gen_light.py)
+const { light = false } = Astro.props as { light?: boolean };
+const sfx = light ? '-light' : '';
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
 const featured = services.filter((s) => s.data.featured);
@@ -42,7 +45,7 @@ const tiles = [
       {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
         <a class="svc-tile" href={`/services/${id}`}>
           <span class="svc-art"
-            ><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
+            ><img src={`/assets/img/${s.image}-card${sfx}.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"

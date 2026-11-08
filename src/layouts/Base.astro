@@ -42,6 +42,7 @@ interface Props {
   ldPage?: Record<string, unknown>; // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
   ldGraph?: object[]; // more nodes for the page's JSON-LD graph (e.g. the Services listed)
   footer?: boolean; // false: no footer (the 404)
+  theme?: 'light'; // the light test page (/light): <html data-theme="light">; light tokens come from theme-light.css
 }
 const {
   title,
@@ -54,6 +55,7 @@ const {
   ldPage = {},
   ldGraph = [],
   footer = true,
+  theme,
 } = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
 // the page's Markdown copy, for AI agents (scripts/markdown.mjs writes it; Home's is src/data/index.md)
@@ -92,7 +94,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
 ---
 
 <!doctype html>
-<html lang="en-CA">
+<html lang="en-CA" data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -120,7 +122,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
       />
       <meta name="twitter:card" content="summary_large_image" />
     </Fragment>}
-    <meta name="theme-color" content="#0E1A27" />
+    <meta name="theme-color" content={theme === 'light' ? '#F2F7FC' : '#0E1A27'} />
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
