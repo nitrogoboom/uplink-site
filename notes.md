@@ -98,3 +98,4 @@ Domain and hosting:
 - [ ] Search Console: verify the domain, submit the sitemap.
 - [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).
 - [ ] Smoke from a cloud session (November 8, 2026): the environment must allow the site's host, and Node needs `NODE_USE_ENV_PROXY=1` to use the proxy. The `http://` redirect check can't run there (the proxy carries HTTPS only); it passes from a normal machine.
+- [ ] Home services, small tiles (review of PR #103, November 8, 2026): the 32 px icon also applies at 1920 and 2560 wide, where it looks small; cap its media query by height (for example `height < 56em`). With a mouse at 768×1024 the section runs 6 px past the screen.
