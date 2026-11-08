@@ -128,9 +128,9 @@ for (const file of pages) {
   const main = attr(html, /<main[^>]*>([\s\S]*?)<\/main>/);
   const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/);
   const description = attr(html, /<meta name="description" content="([^"]*)"/)
-    .replace(/&amp;/g, '&')
     .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"');
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&'); // last, so "&amp;quot;" stays "&quot;" (decoded once, not twice)
   if (!main || !canonical) throw new Error(`markdown: ${relative(DIST, file)} has no <main> or no canonical`);
   const site = new URL(canonical).origin;
   let body = md(site, canonical)
