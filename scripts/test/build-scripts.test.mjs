@@ -188,6 +188,7 @@ test('markdown.mjs: labels, forms, FAQ, tables, chips, links; pages in folders; 
 <div><span class="card-title">Hours</span><ul><li>Monday to Friday</li></ul></div>
 <p><span class="label">Office move</span><span class="sr-only">. </span>Law office</p>
 <span class="chip">BUILD</span><ul><li><span class="chip">Known for</span></li></ul>
+<ul><li><div class="card"><span class="card-body"><h2 class="card-title"><a class="card-link" href="/work/move">Office move</a></h2><span>Law office<span class="sr-only">, </span><span aria-hidden="true"> · </span>18 staff</span></span><span class="chip">Build</span></div></li></ul>
 <section id="message"><form><h2>Write to us</h2><input name="email"></form></section>
 <details><summary>Do you work weekends?</summary><p>For emergencies, yes.</p></details>
 <table><tr><th>Name</th><th>Kept</th></tr><tr><td>Email <small>if you give it</small></td><td>a | b</td></tr></table>
@@ -205,6 +206,7 @@ test('markdown.mjs: labels, forms, FAQ, tables, chips, links; pages in folders; 
     assert.ok(md.includes('**Hours**\n\n- Monday to Friday'), 'a label over a list: a bold line of its own');
     assert.match(md, /Office move: +Law office/, 'the <Pause /> after a label is left out');
     assert.ok(!md.includes('BUILD') && md.includes('- Known for'), 'a chip is dropped, except as a list item');
+    assert.ok(md.includes('- [Office move](https://example.test/work/move): Law office, 18 staff\n'), 'a linked card: one line, its heading not kept');
     assert.ok(md.includes('## Write to us\n\nUse the form on the page: https://example.test/contact#message'), 'a form: where it is');
     assert.ok(!md.includes('email'), "the form's fields stay out");
     assert.ok(md.includes('**Do you work weekends?**\n\nFor emergencies, yes.'), 'FAQ: question in bold, answer under it');
