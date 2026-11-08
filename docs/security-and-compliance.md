@@ -1,6 +1,6 @@
 # Security, privacy, and accessibility on the Uplink site
 
-*Last updated: November 6, 2026*
+*Last updated: November 7, 2026*
 
 This page explains how the Uplink Technology website protects its visitors and who it's built to serve. For each protection, you'll find:
 - what it guards against
@@ -142,7 +142,6 @@ Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Resource-Policy: same-origin
-X-Permitted-Cross-Domain-Policies: none
 ```
 
 `X-Content-Type-Options`
@@ -163,8 +162,7 @@ X-Permitted-Cross-Domain-Policies: none
 `Cross-Origin-Resource-Policy`
 : Stops other sites from loading the site's files into their own pages, which closes off some side-channel attacks. The share picture, `og.png`, is the one exception (`cross-origin`), because some apps show it directly.
 
-`X-Permitted-Cross-Domain-Policies`
-: Tells Adobe products such as Acrobat that the site allows no cross-domain access.
+The site doesn't send `X-Permitted-Cross-Domain-Policies`. Only Flash and Adobe Acrobat ever read it, so it was dropped on November 7, 2026 (review H9). The smoke check fails if it comes back.
 
 The site doesn't send `Cross-Origin-Embedder-Policy`. It's needed only for features the site doesn't use, and it could block the analytics script, which comes from another domain.
 

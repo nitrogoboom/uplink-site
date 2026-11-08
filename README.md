@@ -105,7 +105,7 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `npm run verify:links`, `verify:spacing`, `verify:styles`, `visual-diff` | Run the other site checks. See [Site checks](#site-checks). |
 | `npm run release-audit` | Runs the release audit. See [Site checks](#site-checks) and [`docs/sop.md`](docs/sop.md). |
 | `npm run smoke`, `npm run pagespeed` | Check a deployed site. See [Live-site checks](#live-site-checks). |
-| `npm run deploy` | Deploys to the live Worker by hand. It runs `npm run ci` first, which builds the site and runs every check, and deploys only if they pass. |
+| `npm run deploy` | Deploys to the live Worker by hand. It runs `npm run ci` first, which builds the site and runs every check, and deploys only if they pass. It deploys in one step (`wrangler deploy`), without CI's check of the new version at its own address or its rollback (see [Deploys](#deploys)). |
 
 > **Note:** CI deploys for you when a change is merged to `main`, so you rarely need `npm run deploy`. It deploys whatever branch you have checked out, so run it from `main`.
 
@@ -115,7 +115,7 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: the `_headers` template, the Speculation Rules (`speculation-rules.json`), fonts, the drawings in `assets/img/`, `og.png`, and the favicon (both linked from `Base.astro`: `favicon.ico` for browsers without SVG icons, `favicon.svg` for the rest; `favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes). |
-| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes and the Early Hints block, and writes `dist/_redirects`. `check-dist.mjs` is wrangler's build step (`build.command`): it refuses a `dist/` that `headers.mjs` didn't finish. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
+| `scripts/` | The build's after-steps. `svgo.mjs` shrinks the drawings in `dist/` (settings in `svgo-config.mjs`), and stops the build if a drawing's own `<style>` names a tag SVGO rewrites, such as `polygon`, which becomes `path`. Style a drawing's parts by class. `svgo-config.mjs` also gives the bytes the site serves for a drawing (`shipped()`), whose hash is the `?v=` on each drawing a page inserts (`src/lib/site.ts`). `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` with the script and style hashes, the build's ID (`X-Build`), the Early Hints block and the Markdown copies' rules, and writes `dist/_redirects`. `deploy.mjs` is CI's deploy on `main` (see [Deploys](#deploys)). `check-dist.mjs` is wrangler's build step (`build.command`): it refuses a `dist/` that `headers.mjs` didn't finish. `ci.mjs` is `npm run ci`. `check.mjs` runs one site check with its arguments (the npm check commands). Tests are in `scripts/test/`. |
 | `tools/` | The drawing generators and their checks, in Python. Run them from the project root. See [Tools](#tools). |
 | `checks/` | The site checks, as Playwright Test specs (`NAME.spec.mjs`), their shared page list and sizes (`lib.mjs`), and their settings (`playwright.config.mjs`). See [Site checks](#site-checks). |
 | `worker/index.js` | The Worker script. See [Hosting](#hosting). |
@@ -201,7 +201,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
 | `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
-| `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). |
+| `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). The map is decoration, so it has `aria-hidden="true"` and no role or label: screen readers skip it, and the footer's own words say what it shows (`tools/tests/test_campus.py`). |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
 A generator that runs with nothing changed writes the same file, byte for byte, on any machine. A `git diff` shows only what you changed.
@@ -274,7 +274,7 @@ These checks ask a deployed site over plain HTTP. They need no local server.
 
 | Command | What it checks |
 | --- | --- |
-| `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers, `noindex`, redirects (the other spellings of an address, and `http://`), the 404 page (its status, asked again with `If-None-Match`, and for a missing `.md`, `.txt`, script, font, or drawing, with the pages' headers), the Worker's own headers, the report endpoint, the Speculation Rules, `robots.txt`, `llms.txt`, and a Markdown copy. Run it after a deploy. `--launch` expects `noindex` to be gone, and a page asked for over `http://` to redirect. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
+| `npm run smoke -- ADDRESS [--launch] [--preview] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers (and that `X-Permitted-Cross-Domain-Policies` is gone), `noindex`, redirects (the other spellings of an address, and `http://`), the 404 page (its status, asked again with `If-None-Match`, and for a missing `.md`, `.txt`, script, font, or drawing, with the pages' headers), the Worker's own headers, the report endpoint, the Speculation Rules, `robots.txt`, `llms.txt`, and the Markdown copies of `/services` and Home (`noindex` and a canonical `Link` to the page, with `--launch` too). Run it after a deploy. `--launch` expects `noindex` to be gone from the pages, and a page asked for over `http://` to redirect. `--preview` checks a version at its own preview address, before it takes traffic: the sitemap, `robots.txt`, and the canonicals name the live address, and the `http://` redirect is left for the live run. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
 | `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
 
 ## Hosting
@@ -302,7 +302,7 @@ A report it can't read gets a `400`. Anything else that goes wrong in the Worker
 
 The Workers logs keep the Worker's own lines, one per report, for 3 days on the free plan. Cloudflare's own record of each run, the invocation log, is off (`observability.logs.invocation_logs` in `wrangler.jsonc`).
 
-> **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
+> **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
 
 ### Deploys
 
@@ -313,7 +313,21 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - Every run also lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. Each pull request also gets a dependency review (`actions/dependency-review-action`), which fails on a new high-severity vulnerability. It runs only while the repository is public (it went public on November 7, 2026); on a private repository it needs GitHub Advanced Security.
 - Every step runs in `bash` with `pipefail`, and every job has a time limit (`timeout-minutes`).
 - A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
-- A push to `main` that passes the build job, the drawings job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`.
+- A push to `main` that passes the build job, the drawings job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`. The deploy job runs `node scripts/deploy.mjs LIVE_ADDRESS` on the `dist/` the build job checked, in these steps:
+  1. It notes the version that is live now (`wrangler deployments status --json`).
+  2. It uploads the build as a new version that takes no traffic (`wrangler versions upload`). The version answers at its own preview address.
+  3. It runs the smoke check against that address (`npm run smoke -- VERSION_URL --preview`). If that fails, the job stops and fails, and the live site is unchanged. It then reads the build's marker there: a hash of the home page's `X-Build` header, its CSP header, the hashed `/_astro/` files the home page names, and `sitemap.xml`. It reads the live address's marker too.
+  4. It puts the new version on all traffic (`wrangler versions deploy VERSION_ID@100%`). If wrangler reports an error, the script reads the deployment status again. If the new version is live at any percentage, or the status can't be read, it goes on to step 5. Otherwise it stops and fails.
+  5. Every 5 seconds, for up to 2 minutes by the clock, it reads the marker at the live address until it matches the preview's. If the live address already gave that marker before the deploy (the same build again, such as a rerun), it says so in the summary and waits 15 seconds instead. Then it runs the smoke check against the live address, and once more 30 seconds later if that fails.
+  6. If the marker never matches, or the live check still fails, it rolls back to the version from step 1 (`wrangler rollback VERSION_ID`) and fails the job.
+
+  The run's summary says which step it reached, and names both versions. Any arguments after the address go to both smoke runs, except `--old OLD_ADDRESS`, which fits the live address only. At launch the address becomes `https://DOMAIN` and `--launch` follows it. The smoke runs don't get `CLOUDFLARE_API_TOKEN` or `CLOUDFLARE_ACCOUNT_ID`. `npm test` runs the script against a fake `wrangler`, a fake smoke check, and two local servers for the preview and live addresses (`scripts/test/deploy.test.mjs`).
+
+  `X-Build` is the build's ID, sent with every static file: a hash of every file in `dist/`, the finished `_headers`, and the Worker (`worker/` and `wrangler.jsonc`). `scripts/headers.mjs` writes it at build. Any change that ships, a header or the Worker alone included, changes it, so two builds share a marker only when nothing that ships differs. Then step 5 can't see the switch, and the summary says so. `DEPLOY_POLL`, `DEPLOY_WAIT`, `DEPLOY_SETTLE` and `DEPLOY_RETRY` (seconds) change the timings.
+
+  > **Note:** `wrangler versions deploy` doesn't apply routes, custom domains, cron triggers, `workers_dev`, or `preview_urls` from `wrangler.jsonc`, as `wrangler deploy` did. After a change to those (the custom domain at launch), run `npx wrangler triggers deploy` once, or deploy by hand with `npx wrangler deploy`. Keep `preview_urls` on: every deploy checks the new version at its preview address.
+
+  > **Note:** The first deploy of a new Worker has no live version to roll back to, so the script stops before it changes anything. It also stops if `wrangler deployments status` fails. In either case, deploy by hand with `npx wrangler deploy` after `npm run build`, then let the next push to `main` use the checked flow.
 - A pull request also runs the screenshot comparison (`npm run visual-diff`) against the live site, uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the end of the build job, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
 - Cloudflare keeps every preview, each with its own address, until it's deleted. Every 3 days, `.github/workflows/clean-previews.yml` deletes previews older than 3 days. It keeps every deployed version, so rollback still works, and the newest preview of each open pull request. It deletes nothing in git.
@@ -349,6 +363,8 @@ Secret scanning with push protection, private vulnerability reporting, CodeQL (d
 
 ### Roll back a bad deploy
 
+The deploy job rolls back on its own when the live site fails the smoke check straight after a deploy (see [Deploys](#deploys)). Roll back by hand when something breaks that the smoke check doesn't catch, or when the run's summary says "Rollback failed".
+
 1. List the recent deploys:
 
    ```bash
@@ -367,11 +383,11 @@ Secret scanning with push protection, private vulnerability reporting, CodeQL (d
 
 ### Response headers
 
-`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Permitted-Cross-Domain-Policies, X-Frame-Options, and the CSP), the cache rules, and the `Speculation-Rules` header. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them: the Worker sets its own (see [The Worker](#the-worker)).
+`public/_headers` sets the security headers on every static file (HSTS, `nosniff`, Referrer-Policy, Permissions-Policy, Cross-Origin-Opener-Policy, Cross-Origin-Resource-Policy, X-Frame-Options, and the CSP), the cache rules, and the `Speculation-Rules` header. Responses the Worker writes itself, such as the `308` redirect and `/api/report`, don't get them: the Worker sets its own (see [The Worker](#the-worker)).
 
 The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`, served as `application/speculationrules+json`. When a pointer rests on a link to one of the site's pages for 200 ms (on phones, when the link comes into view), the browser fetches that page in the background, so the click doesn't wait for the HTML. Links to `/api/` and to the `.md` and `.txt` copies are left out. A header, unlike an inline `<script type="speculationrules">`, needs no change to the CSP. Other browsers ignore it.
 
-The file is a template. `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also writes an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
+The file is a template. `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also fills in `X-Build`, the build's ID (see [Deploys](#deploys)), writes an Early Hints `Link` rule for each page, and a rule for each Markdown copy (see [Search engines](#search-engines)). Don't paste a hash in by hand.
 
 Keep these rules in mind:
 
@@ -382,6 +398,10 @@ Keep these rules in mind:
 ### Search engines
 
 The site is open to visitors but kept out of search results. `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
+
+The Markdown copies (`/services.md`, `/index.md` for Home, and the rest) stay out of search results after launch too. `scripts/headers.mjs` gives each `.md` file a rule of its own in `dist/_headers`, with `X-Robots-Tag: noindex` and a `Link: <PAGE>; rel="canonical"` header that names its page. The address comes from that page's own `<link rel="canonical">`, so it follows `SITE_URL`. `/agents.md` has no page, so it gets the `noindex` only. Keep this `noindex` at launch: it isn't the line in `public/_headers`.
+
+> **Note:** Each page takes two of Cloudflare's 100 `_headers` rules: its Early Hints rule and its Markdown copy's rule. `headers.mjs` stops the build past 100.
 
 The sitemap's `<lastmod>` dates and a case study's `datePublished` and `dateModified` come from git history (`src/lib/git-dates.mjs`). A static page dates from the files listed in `SOURCES` in `src/lib/site.ts`. A service or project page dates from its own JSON file only, so editing one project changes one page's date.
 

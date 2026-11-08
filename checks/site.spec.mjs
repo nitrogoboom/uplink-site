@@ -88,6 +88,12 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   await pg.waitForTimeout(400);
   // the map is fetched as the footer comes near (footer.js): wait for it, as a slow CI machine can take over a second
   await pg.waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 }).catch(() => fails.push('footer: the campus map never loaded'));
+  // review M6: the map is decoration (the footer's own words say what it shows), so the inserted map stays out of the
+  // accessibility tree: aria-hidden, no role or name, and nothing of it in the map box's tree but the hold button
+  const mapA11y = await pg.$eval('svg.fc-w', (s) => ['aria-hidden', 'role', 'aria-label'].map((a) => `${a}=${s.getAttribute(a)}`).join(' ')).catch(() => '');
+  const mapTree = await pg.locator('.fc-map').ariaSnapshot().catch(() => '');
+  if (mapA11y && (mapA11y !== 'aria-hidden=true role=null aria-label=null' || /\bimg\b/.test(mapTree)))
+    fails.push(`footer: the campus map is in the accessibility tree (${mapA11y}; tree: ${mapTree.replace(/\s+/g, ' ')}) (review M6)`);
   // each tile (a <details>' summary, Footer.astro) opens its section: one screen tall, its panel above the tile row
   // and not cut off, and the map's label and camera move to its spot
   const fcTiles = pg.locator('.fc-tile');

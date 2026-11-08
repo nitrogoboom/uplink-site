@@ -10,17 +10,18 @@ over it. Its ring and its route (if any) carry the same data-k; footer.js lights
 The loops run out of step by --d, each shape's animation delay (footer.css reads var(--d)); the lit and blinking
 windows come from a seeded random sequence, so a rerun draws the same campus.
 The words for each spot are content, in src/data/footer.json (spots).
+The map is decoration: aria-hidden, with no role, label or <title>, so a screen reader skips it on every page (review
+M6). The footer's sections and the HUD (Footer.astro) carry the words; footer.js inserts the file as it is.
 Keep the classes footer.css and footer.js use (plat, grid, edge, ring, ring2, route, flow, dist, b, tree, win, lit,
 blink, led, w2, dot, mast, beacon, sig, bob, tk-n, mk-*) and the group order: back to front (painter.py).
 """
 import math, pathlib
 from decimal import Decimal, ROUND_HALF_UP
-from isogen import hoist_styles, esc
+from isogen import hoist_styles
 
 C30, U = math.cos(math.pi / 6), 38
 VB0 = (-600, -120, 1200, 860)       # the whole map; each spot's camera zooms into it
 MARK_LIFT = 52                      # px from a spot's top to the marker's centre
-TITLE = 'Map of the Uplink campus. The spot for the footer section you pick is lit up.'
 BOXES = []                          # every box drawn, in order (rules_campus.py reads it for painter.py)
 
 
@@ -210,7 +211,7 @@ def build():
              '<polygon class="mk-d" points="0,-15 11,0 0,15 -11,0"/><polygon class="mk-i" points="0,-6 4.5,0 0,6 -4.5,0"/></g></g>')
     body, css = hoist_styles('\n'.join(s))
     return '\n'.join([
-        f'<svg xmlns="http://www.w3.org/2000/svg" class="fc-w" viewBox="{" ".join(map(str, VB0))}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="{esc(TITLE)}">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" class="fc-w" viewBox="{" ".join(map(str, VB0))}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">',
         f'<style>{css}</style>', body, '</svg>', ''])
 
 

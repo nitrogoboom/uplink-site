@@ -21,7 +21,7 @@ A *release* is the first production launch, and any later change to layout, navi
 | Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
 | Drawings | Python generators write every SVG. The build never runs them; CI's drawings job regenerates them, fails on any difference, and checks them. | `tools/gen_*.py`, `tools/regen.py`, Python 3.12, `requirements.txt` (locked from `requirements.in`) |
 | Hosting | Cloudflare Workers: static files, plus one small Worker. The Worker runs only for `/api/*`, `/404` and addresses with no file: it answers `/api/report` (error and CSP reports) and sends the 404 page with a 404 status and the pages' headers. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
-| CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy. Beside them, the drawings job (Python). On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
+| CI/CD | GitHub Actions: check, tests, lint, build, site check, link check, deploy (a new version is smoke checked at its own address before it takes traffic, and rolled back if the live site then fails the smoke check). Beside them, the drawings job (Python). On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
 | Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
 | Code checks | TypeScript (`astro check`, the page scripts and `src/lib` included through `checkJs`), ESLint (with type-aware rules on `src/scripts` and `src/lib`), Stylelint, Prettier (JSON and YAML only) | `tsconfig.json`, `eslint.config.js`, `.stylelintrc.json` |
@@ -36,8 +36,8 @@ A *release* is the first production launch, and any later change to layout, navi
 4. Push the branch and open a pull request. CI runs and posts a preview address, `https://ALIAS-uplink-site.johnoreilly.workers.dev` (`node scripts/preview-alias.mjs BRANCH` prints the alias).
 5. Check the preview on a phone.
 6. Read the run's summary. "Screenshot changes" lists every page that looks different from the live site. Make sure you meant each change. The pictures are in the run's `visual-diff` artifact.
-7. When CI passes, merge. The merge to `main` deploys to the live site.
-8. If the live site breaks, roll back with `npx wrangler rollback`, then fix the problem on a branch. The steps are in the [README](../README.md#roll-back-a-bad-deploy).
+7. When CI passes, merge. The merge to `main` deploys to the live site: CI uploads the build as a new version, smoke checks it at its own address, and only then puts it live. Read the deploy job's summary: it names the version that went live, or says why nothing did.
+8. If the live address doesn't serve the new build within 2 minutes, or fails the smoke check straight after the deploy, CI rolls back to the version from before and the run fails. Fix the problem on a branch. If something else breaks, roll back by hand with `npx wrangler rollback`, then fix the problem on a branch. The steps are in the [README](../README.md#roll-back-a-bad-deploy).
 9. If the change is a release, run the [release checklist](#release-checklist) and save the record.
 10. Tag the release, replacing `YYYY.MM.DD` with the date and `COMMIT` with the merge commit:
 
@@ -81,7 +81,7 @@ Ontario's own guide: [How to make websites accessible](https://www.ontario.ca/pa
 Don't repeat these by hand. CI fails the build if any of them break:
 
 - Types and Astro errors (`astro check`), and lint on JavaScript, TypeScript, Astro, CSS, JSON, and YAML.
-- The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the preview alias, and the report endpoint, including every odd shape a report can take.
+- The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the preview alias, the deploy order (a version that fails its smoke check never goes live; one that breaks the live site is rolled back), and the report endpoint, including every odd shape a report can take.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page: watched until the network is idle and a few seconds after, while the screen turns, and while each of the page's own buttons is pressed.
 - No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px.

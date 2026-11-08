@@ -39,8 +39,11 @@ const HOME = `<!doctype html><html><head>
 <body><div data-hero="/assets/img/hero.svg?v=1"></div><div data-fc-map="/assets/img/campus.svg"></div></body></html>`;
 const TEMPLATE = `/*
   Content-Security-Policy: script-src 'self' {script-hashes}; style-src 'self' {style-hashes}
+  X-Build: {build}
 # @early-hints (written by scripts/headers.mjs)
 # @end early-hints
+# @markdown-copies (written by scripts/headers.mjs)
+# @end markdown-copies
 `;
 const base = (extra = {}) => site({
   'index.html': HOME,
@@ -87,7 +90,7 @@ test('headers.mjs: /index and a page\'s /index.html and /index spellings go to t
 test('check-dist.mjs (wrangler build.command): refuses an unfinished dist/, passes a finished one (review H11)', async () => {
   const dir = base();
   try {
-    assert.match(fails('check-dist.mjs', dir), /still has \{script-hashes\} and \{style-hashes\} in it.*npm run build/s);
+    assert.match(fails('check-dist.mjs', dir), /still has \{script-hashes\} and \{style-hashes\} and \{build\} in it.*npm run build/s);
     run('headers.mjs', dir);
     run('check-dist.mjs', dir);
     rmSync(join(dir, '_redirects'));
@@ -260,4 +263,79 @@ test("footer.css: the campus map's edge rule names a class of every polygon the 
   assert.ok(polygons.length > 100, 'the map has its polygons');
   const missed = [...new Set(polygons.filter((c) => !c.split(' ').some((k) => listed.includes(k))))];
   assert.deepEqual(missed, [], `polygon classes with no edge rule (listed: ${listed.join(', ')})`);
+});
+
+// review M4: a .md copy is never what a search should show, launched or not. headers.mjs gives each copy a rule of its
+// own (not the site-wide noindex, which comes off at launch): noindex, and its page as the canonical address
+test('headers.mjs: every .md copy gets its own noindex and a canonical Link to its page (review M4)', () => {
+  const canon = (path) => `<link rel="canonical" href="https://example.test${path}">`;
+  const dir = base({
+    'index.html': HOME.replace('<head>', `<head>${canon('/')}`),
+    'services.html': `<!doctype html><html><head>${canon('/services')}</head><body><p>Services</p></body></html>`,
+    'services/backup.html': `<!doctype html><html><head>${canon('/services/backup')}</head><body></body></html>`,
+    'index.md': '# Home', 'services.md': '# Services', 'services/backup.md': '# Backup',
+    'agents.md': '# Notes for agents',   // no page of its own: noindex, no canonical
+  });
+  try {
+    run('headers.mjs', dir);
+    const out = readFileSync(join(dir, '_headers'), 'utf-8');
+    const rule = (path) => out.match(new RegExp(`^${path.replaceAll('.', '\\.')}\\n((?: {2}.*\\n)+)`, 'm'))?.[1] ?? '';
+    for (const [md, page] of [['/index.md', '/'], ['/services.md', '/services'], ['/services/backup.md', '/services/backup']]) {
+      const r = rule(md);
+      assert.match(r, /^ {2}X-Robots-Tag: noindex$/m, `${md}: noindex of its own`);
+      assert.match(r, new RegExp(`^ {2}Link: <https://example\\.test${page}>; rel="canonical"$`, 'm'), `${md}: canonical ${page}`);
+      assert.ok(!r.includes('rel=preload'), `${md}: no Early Hints on a copy`);
+    }
+    assert.match(rule('/agents.md'), /^ {2}X-Robots-Tag: noindex$/m, '/agents.md: noindex');
+    assert.ok(!rule('/agents.md').includes('canonical'), '/agents.md: no page, so no canonical');
+  } finally { rmSync(dir, { recursive: true }); }
+  const lost = base({ 'about.html': '<!doctype html><html><head></head><body></body></html>', 'about.md': '# About' });
+  try { assert.match(fails('headers.mjs', lost), /about\.md: its page about\.html has no <link rel="canonical">/); }
+  finally { rmSync(lost, { recursive: true }); }
+});
+
+// review H9: X-Permitted-Cross-Domain-Policies only ever told Flash and Acrobat what they may load; nothing reads it now
+test('public/_headers: no X-Permitted-Cross-Domain-Policies (review H9)', () => {
+  const dir = base({ '_headers': readFileSync('public/_headers', 'utf-8') });
+  try {
+    run('headers.mjs', dir);
+    assert.ok(!/x-permitted-cross-domain-policies/i.test(readFileSync(join(dir, '_headers'), 'utf-8')), 'X-Permitted-Cross-Domain-Policies still sent');
+  } finally { rmSync(dir, { recursive: true }); }
+});
+
+// review H3: X-Build names the build, so the deploy can tell which version the live address serves. It covers every
+// file in dist/ (but _headers itself), the finished headers and the Worker, so a change to any one of them changes it
+test('headers.mjs: X-Build is a hash of dist/, the headers and the Worker; any one change gives another (review H3)', () => {
+  const worker = mkdtempSync(join(tmpdir(), 'uplink-worker-'));
+  const ids = [];
+  const build = (extra, workerText = 'export default {}') => {
+    writeFileSync(join(worker, 'index.js'), workerText);
+    const dir = base({ '_headers': TEMPLATE, ...extra });
+    try {
+      execFileSync('node', ['scripts/headers.mjs'], { env: { ...process.env, DIST: dir, WORKER_DIR: worker }, stdio: 'pipe' });
+      const out = readFileSync(join(dir, '_headers'), 'utf-8');
+      const id = out.match(/^\/\*\n(?: {2}.*\n)*? {2}X-Build: ([0-9a-f]{16})$/m)?.[1];
+      assert.ok(id, `an X-Build line in the /* rule:\n${out}`);
+      assert.ok(!out.includes('{build}'), 'placeholder filled');
+      ids.push(id);
+    } finally { rmSync(dir, { recursive: true }); }
+  };
+  try {
+    build({});
+    build({});                                                                       // the same build: the same ID
+    build({ '_headers': TEMPLATE.replace('/*\n', '/*\n  X-New: 1\n') });             // a header only
+    build({ 'agents.md': '# Notes' });                                               // a Markdown file
+    build({ 'assets/img/campus.svg': '<svg xmlns="http://www.w3.org/2000/svg"><style>.b{fill:red}</style></svg>' });
+    build({ 'assets/fonts/a.woff2': 'font' });                                       // a font
+    build({}, 'export default { fetch() {} }');                                      // the Worker only
+    build({ 'contact.html': '<!doctype html><p>x</p>' });                            // a page, and with it _redirects
+  } finally { rmSync(worker, { recursive: true }); }
+  assert.equal(ids[0], ids[1], 'the same build gives the same ID');
+  assert.equal(new Set(ids).size, ids.length - 1, `each change gives a new ID: ${ids.join(' ')}`);
+});
+
+test('check-dist.mjs: refuses a dist/ whose _headers still has {build} in it', () => {
+  const dir = base({ '_headers': TEMPLATE.replace(/\{[a-z]+-hashes\}/g, 'x') });
+  try { assert.match(fails('check-dist.mjs', dir), /still has \{build\} in it/); }
+  finally { rmSync(dir, { recursive: true }); }
 });

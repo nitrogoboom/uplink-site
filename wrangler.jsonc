@@ -1,6 +1,10 @@
 // Cloudflare Workers, static assets: the built site in dist/ is served as is, _headers and _redirects included.
 //   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787)
-//   npx wrangler deploy   deploy (CI does this on a push to main; see .github/workflows/site.yml)
+//   npx wrangler deploy   deploy by hand, in one step. CI deploys on a push to main another way: versions upload, a
+//                         smoke check of that version, then versions deploy (scripts/deploy.mjs). That way doesn't
+//                         apply routes, custom domains, cron triggers, workers_dev or preview_urls from this file:
+//                         after a change to those, run `npx wrangler triggers deploy` or `npx wrangler deploy` once.
+//                         preview_urls must stay true: the deploy checks each version at its preview address.
 // The one script, worker/index.js, runs only where the files can't answer well on their own; everything else never
 // starts it (no Worker time, no log line, nothing counted against the free plan's 100,000 requests a day):
 //   run_worker_first   /api/* (the reports from visitors' browsers) and /404 by name (a file, so it would be 200)
