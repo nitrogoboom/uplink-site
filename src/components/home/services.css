@@ -480,18 +480,21 @@
     grid-column: 4;
   }
   /* the three drawings share one height, so the titles under them line up whatever their words: what the screen
-     leaves after the tallest card's words (about 43rem, with a pointer's slimmer bar below), never under 6rem; words
-     that need more grow the card */
+     leaves after the tallest card's words (about 44.5rem, with a pointer's slimmer bar below), never under 6rem; words
+     that need more take it from the drawing first (it may shrink to 6rem), so a few pixels more text on another
+     machine don't push the section a whole step taller */
   .svc-big .svc-art {
-    flex: none;
+    flex: 1 1 0;
     aspect-ratio: auto;
-    height: max(6rem, 100svh - 43rem);
+    min-height: 6rem;
+    max-height: max(6rem, 100svh - 44.5rem);
   }
   /* on paper there is no screen to share: the drawing keeps its own shape */
   @media print {
     .svc-big .svc-art {
+      flex: none;
       aspect-ratio: 4 / 3;
-      height: auto;
+      max-height: none;
     }
   }
   .svc-big .svc-line {
@@ -569,7 +572,7 @@
     white-space: nowrap;
   }
   .svc-big .svc-art {
-    height: max(6rem, 100svh - 40rem);
+    max-height: max(6rem, 100svh - 43rem);
   }
 }
 
