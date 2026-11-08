@@ -498,26 +498,25 @@
   }
   .svc-feats {
     display: grid;
-    gap: var(--sp-3);
+    gap: var(--sp-4);
     align-self: stretch;
     margin-top: var(--sp-3);
     padding-top: var(--sp-4);
     border-top: 1px solid var(--c-line);
     text-align: left;
   }
+  /* body font, sentence case: short list lines read better than the condensed display face */
   .svc-feat-t {
     display: block;
-    font-family: var(--font-display);
     font-size: var(--fs-3);
-    font-weight: 700;
-    letter-spacing: var(--tracking-1);
-    line-height: var(--lh-title);
-    text-transform: uppercase;
+    font-weight: 600;
+    line-height: var(--lh-snug);
     color: var(--c-text);
   }
   .svc-feat-d {
     display: block;
     font-size: var(--fs-2);
+    line-height: var(--lh-snug);
     color: var(--c-muted);
   }
   .svc-small .svc-tile {
