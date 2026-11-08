@@ -480,11 +480,12 @@
     grid-column: 4;
   }
   /* the three drawings share one height, so the titles under them line up whatever their words: what the screen
-     leaves after the tallest card's words (about 46rem), never under 6rem; words that need more grow the card */
+     leaves after the tallest card's words (about 43rem, with a pointer's slimmer bar below), never under 6rem; words
+     that need more grow the card */
   .svc-big .svc-art {
     flex: none;
     aspect-ratio: auto;
-    height: max(6rem, 100svh - 46rem);
+    height: max(6rem, 100svh - 43rem);
   }
   /* on paper there is no screen to share: the drawing keeps its own shape */
   @media print {
@@ -531,8 +532,26 @@
     width: var(--sp-6);
     height: var(--sp-6);
   }
+}
+
+/* desktop with a pointer: a slimmer bar (2.25rem, --sp-7 less --sp-3, not --control-h; it is part of the tile's link, not a target of its
+   own), so less room is kept under a tall card's features and the drawing gets it. A short tile keeps no room at all:
+   its icon and name sit centred, and slide up out of the bar's way while it shows (WCAG 1.4.13). */
+@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-go {
+    min-height: calc(var(--sp-7) - var(--sp-3));
+  }
+  .svc-big .svc-text {
+    padding-bottom: var(--sp-7);
+  }
   .svc-small .svc-text {
-    padding-top: var(--sp-2);
+    padding-bottom: 0;
+  }
+  .svc-small :is(.svc-icon, .svc-text) {
+    transition: transform var(--dur-2) var(--ease);
+  }
+  .svc-small .svc-tile:is(:hover, :focus-visible) :is(.svc-icon, .svc-text) {
+    transform: translateY(calc(-1 * var(--sp-5)));
   }
 }
 
