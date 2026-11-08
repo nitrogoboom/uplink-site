@@ -13,6 +13,11 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    # TypeScript 7: astro check refuses it ("does not currently support TypeScript 7.0", November 8, 2026). Drop this
+    # once @astrojs/check supports it, or the site moves to @astrojs/ts-content-mapper.
+    ignore:
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:
