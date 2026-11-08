@@ -21,7 +21,7 @@ Quick, visible:
 - [ ] Backup for the hero (later): if the drawing still ends up blank or never builds, show the still office (`template.hero-still`, already used when the fetch fails) instead of an empty stage.
 
 Design, nice to have:
-- [ ] Home services, tall cards (November 8, 2026): on desktop each lists its three features, and the three drawings share one height (`100svh - 46rem`, never under 6rem) so the titles line up. At 1280×800 and 1366×768 the drawings come out small (96 px); look on a real laptop and decide whether short screens should drop the features instead.
+- [ ] Home services on desktop (November 8, 2026): tall cards put their words first (titles and features line up) and the drawing fills what is left below; short tiles are one row, icon beside name, with an arrow on hover instead of the bar. Look on a real laptop at 1280×800 and 1366×768.
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)

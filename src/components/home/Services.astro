@@ -5,6 +5,7 @@
 // A tile's link reads "Support. Managed help desk. Real people… View service": the chip and "View service" are heard
 // too, so the name starts with the word the eye reads first and voice control finds it (review M10). A tall card also
 // lists its service's three features (`features`, the copy its own page shows), on desktop only, where it has the room.
+// A hyphen in a name doesn't break ("Wi‑Fi" stays whole): it becomes a non-breaking hyphen (U+2011), read the same.
 import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
@@ -48,7 +49,8 @@ const tiles = [
           /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"
-            ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
+            ><span class="chip">{s.chip}<Pause /></span
+            ><span class:list={['svc-title', fit(s.title)]}>{s.title.replaceAll('-', '\u2011')}</span
             ><Pause /><span class="svc-line">{s.card}</span
             >{size === 'big' && <span class="svc-feats">
               {s.features.map((f) => <span class="svc-feat"

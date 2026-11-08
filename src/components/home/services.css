@@ -479,18 +479,22 @@
   .svc-small {
     grid-column: 4;
   }
-  /* the three drawings share one height, so the titles under them line up whatever their words: what the screen
-     leaves after the tallest card's words (about 46rem), never under 6rem; words that need more grow the card */
+  /* words first, so the three titles and lists start on one line; the drawing fills what is left below them (never
+     under 6rem: words that need more grow the card). It is decorative (alt=""), so only the look moves */
   .svc-big .svc-art {
-    flex: none;
+    order: 1;
+    flex: 1;
     aspect-ratio: auto;
-    height: max(6rem, 100svh - 46rem);
+    min-height: 6rem;
   }
-  /* on paper there is no screen to share: the drawing keeps its own shape */
+  .svc-big .svc-text {
+    padding-bottom: var(--sp-3);
+  }
+  /* on paper there is no screen to fill: the drawing keeps its own shape */
   @media print {
     .svc-big .svc-art {
+      flex: none;
       aspect-ratio: 4 / 3;
-      height: auto;
     }
   }
   .svc-big .svc-line {
@@ -524,15 +528,53 @@
   }
 }
 
-/* desktop with a pointer: the room kept for the bar (above) comes out of the icon, so a short tile still fits its
-   quarter of the screen (1280x800, 1366x768). From 60em tall (1920x1080 and up) there is room for the full icon. */
-@media (hover: hover) and (width >= 68.75em) and (43.75em <= height < 60em) and (aspect-ratio >= 3 / 2) {
+/* desktop: a short tile is one row, its icon beside its name, both centred. On hover or focus an arrow slides in on
+   the right instead of the bar along the foot, so no room is kept under the words and the arrow covers none of them
+   (WCAG 1.4.13). "View service" stays in the link's name (M10): the label is there, at no size */
+@media (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-small .svc-tile {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--sp-4);
+    padding: var(--sp-4) calc(var(--sp-5) + var(--icon) + var(--sp-3)) var(--sp-4) var(--sp-5);
+  }
   .svc-small .svc-icon svg {
     width: var(--sp-6);
     height: var(--sp-6);
   }
   .svc-small .svc-text {
-    padding-top: var(--sp-2);
+    flex: 1;
+    align-self: auto;
+    min-width: 0;
+    align-items: flex-start;
+    padding: 0;
+    text-align: left;
+  }
+  .svc-small .svc-title {
+    text-wrap: balance;
+  }
+}
+/* tall desktop screens (1920x1080 and up): room for the full icon */
+@media (width >= 68.75em) and (height >= 60em) and (aspect-ratio >= 3 / 2) {
+  .svc-small .svc-icon svg {
+    width: var(--sp-7);
+    height: var(--sp-7);
+  }
+}
+@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-small .svc-go {
+    inset: 0 0 0 auto;
+    padding-inline: var(--sp-2) var(--sp-5); /* as wide as the room the tile keeps for it (above) */
+    background: none;
+    border-top: 0;
+    font-size: 0;
+    clip-path: inset(0 0 0 100%);
+    transform: translateX(var(--sp-3));
+  }
+  .svc-small .svc-go svg {
+    width: var(--icon);
+    height: var(--icon);
   }
 }
 
