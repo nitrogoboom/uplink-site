@@ -120,6 +120,9 @@ const SIZE = () => {
   return { root: parseFloat(getComputedStyle(document.documentElement).fontSize), body: p ? parseFloat(getComputedStyle(p).fontSize) : 0 };
 };
 
+// two frames on: what the page lays out from script (ResizeObserver, a picked step) is in place. Motion is reduced.
+const FRAMES = () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+
 async function open(browser, path, { w, h, zoom = 1, font }) {
   const ctx = await browser.newContext({ viewport: { width: Math.round(w / zoom), height: Math.round(h / zoom) }, deviceScaleFactor: zoom, reducedMotion: 'reduce' });
   const pg = await ctx.newPage();
@@ -129,7 +132,7 @@ async function open(browser, path, { w, h, zoom = 1, font }) {
   }
   await pg.goto(BASE + path, { waitUntil: 'networkidle' });
   await pg.evaluate(() => document.fonts.ready);
-  await pg.waitForTimeout(400);
+  await pg.evaluate(FRAMES);
   return { ctx, pg };
 }
 
@@ -161,7 +164,7 @@ for (const path of PATHS) {
           g.scrollIntoView();
           g.querySelectorAll('.grow-dot')[i].click();
         }, i);
-        await pg.waitForTimeout(400);
+        await pg.evaluate(FRAMES);
         const s = await pg.evaluate(PROBE);
         for (const k of ['clip', 'over', 'away']) r[k].push(...s[k].filter((x) => !r[k].includes(x)).map((x) => `(Grow step ${i + 1}) ${x}`));
         r.sideways = Math.max(r.sideways, s.sideways);

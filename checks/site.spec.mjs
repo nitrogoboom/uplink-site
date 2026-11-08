@@ -3,8 +3,8 @@
 // and an axe pass at phone and desktop. Every other page (every page the build wrote: lib.mjs pages) gets the
 // per-page checks at phone size and an axe pass. --all gives every page the full treatment. On every page, at
 // every size it runs at:
-//   script errors   watched until the network is idle and a few seconds after (3 s; Home 5 s, for the hero's
-//                   captions), then while the screen turns (portrait to landscape and back) and while each of the
+//   script errors   watched until the network is idle and while the page's timers run on (3 s; Home 5 s, for the
+//                   hero's captions; Playwright's clock runs them, so the check doesn't wait them out), then while the screen turns (portrait to landscape and back) and while each of the
 //                   page's own buttons is pressed (pause, Grow, copy buttons)
 //   markup          exactly one <h1>; every JSON-LD block parses
 //   sideways scroll scrolled to its footer (the 404 page has none: Base.astro footer={false}, so to its end); and
@@ -186,10 +186,12 @@ for (const page of PAGES) {
       const q = await browser.newPage({ viewport: { width: w, height: h } });
       watch(q, `${page} ${n}`, errs);
       // a script error can come late (a timer, a drawing fetched after load): wait for the network to go quiet, then
-      // a few seconds more. Home: long enough for the hero's first two captions (about 1.1s and 2.2s in).
+      // run the page's timers a few seconds on (Playwright's clock, so no real wait). Home: long enough for the hero's
+      // first two captions (about 1.1s and 2.2s in).
+      await q.clock.install();
       await q.goto(url(page));
       await q.waitForLoadState('networkidle');
-      await q.waitForTimeout(page === 'index' ? 5000 : 3000);
+      await q.clock.runFor(page === 'index' ? 5000 : 3000);
       const m = await q.evaluate(() => ({
         h1: document.querySelectorAll('h1').length,
         ld: [...document.querySelectorAll('script[type="application/ld+json"]')].map((e) => {
@@ -206,7 +208,7 @@ for (const page of PAGES) {
       const footer = page !== MISSING; // the 404 has no footer
       if (footer) await q.$eval('#footer', (e) => e.scrollIntoView());
       else await q.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-      await q.waitForTimeout(500);
+      await q.clock.runFor(500);
       const r = await q.evaluate(() => {
         const f = document.getElementById('footer');
         if (!f) return [document.documentElement.scrollWidth - innerWidth, 'none', '-', '-'];
@@ -219,9 +221,9 @@ for (const page of PAGES) {
       // turn the screen and back (resize and orientation handlers), then press each of the page's own buttons and
       // summaries once (not the pop-up openers, which the pop-up check opens, nor a form's Send): any script error counts
       await q.setViewportSize({ width: h, height: w });
-      await q.waitForTimeout(600);
+      await q.clock.runFor(600);
       await q.setViewportSize({ width: w, height: h });
-      await q.waitForTimeout(600);
+      await q.clock.runFor(600);
       const controls = await q.evaluate(() => {
         const shown = (e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
         const all = [...document.querySelectorAll('button:not([data-open]):not([type="submit"]):not(:disabled), summary')].filter((b) => !b.closest('dialog, form') && shown(b));
@@ -230,10 +232,10 @@ for (const page of PAGES) {
       });
       for (let i = 0; i < controls; i++) {
         await q.locator(`[data-check-ctl="${i}"]`).click({ timeout: 2000 }).catch(() => {}); // covered or gone: not this check's business
-        await q.waitForTimeout(150);
+        await q.clock.runFor(150);
       }
       await q.keyboard.press('Escape');
-      await q.waitForTimeout(1000);
+      await q.clock.runFor(1000);
       await q.close();
       console.log(`${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} open ${r[3]} h1 ${m.h1} ld ${m.ld.length} controls ${controls}`);
       verdict([...fails, ...errs]);
@@ -245,6 +247,9 @@ for (const page of PAGES) {
 // whatever starts once it's on screen (Grow, the footer map) has started. KNOWN: failures found by this check and
 // fixed in a later batch of the review (docs/review-2026-11-07.md); the test is expected to fail until then.
 const WIDTHS = [320, 390, 600, 768, 1024, 1280];
+// in the page: two frames on, how far the page is wider than the screen
+const WIDE = () =>
+  new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done(document.documentElement.scrollWidth - innerWidth))));
 const KNOWN = {
   'index 320': 'B13: the Grow player has no column template, so an active dot makes Home 8px too wide at 320',
 };
@@ -257,21 +262,25 @@ for (const page of PAGES) {
       await q.goto(url(page));
       await q.waitForLoadState('networkidle');
       let worst = 0;
+      // each screen: scrolled to, two frames for what it starts (an IntersectionObserver answers in the next frame)
       for (let y = 0, end = 1; y < end; y += 600) {
         end = await q.evaluate((top) => {
           window.scrollTo(0, top);
           return document.documentElement.scrollHeight;
         }, y);
-        await q.waitForTimeout(250);
-        worst = Math.max(worst, await q.evaluate(() => document.documentElement.scrollWidth - innerWidth));
+        worst = Math.max(worst, await q.evaluate(WIDE));
+      }
+      // the footer map (tablet and up) comes over the network once the footer is near: measured once it's in
+      if (await q.locator('.fc-map').first().isVisible()) {
+        await q.waitForSelector('.fc-map > svg', { state: 'attached', timeout: 10_000 }).catch(() => {});
+        worst = Math.max(worst, await q.evaluate(WIDE));
       }
       // Grow: don't leave it to its own timer (a slow machine may not have stepped yet). Pick each step by hand, the
       // list on desktop or the dots below, and measure with each one active
       const steps = q.locator('#grow :is(.grow-dot, .grow-item):visible');
       for (let i = 0, n = await steps.count(); i < n; i++) {
         await steps.nth(i).click();
-        await q.waitForTimeout(300);
-        worst = Math.max(worst, await q.evaluate(() => document.documentElement.scrollWidth - innerWidth));
+        worst = Math.max(worst, await q.evaluate(WIDE));
       }
       await q.close();
       if (worst > 0 || known) console.log(`sideways ${page} ${width}: ${worst}px${known ? ` (known: ${known})` : ''}`);
@@ -282,8 +291,8 @@ for (const page of PAGES) {
 
 // pop-ups: each dialog the page can open, with the site's pause off and on (review B1: with it on, the dialogs,
 // toasts and footer panels stayed at their first, invisible animation frame, and the phone services row stopped
-// following a swipe). axe gets the open dialog, which a pass over the page at load can't see (a closed <dialog> isn't
-// rendered). With the pause on, every looping animation must be paused once the drawings have loaded.
+// following a swipe). axe gets the whole page at load (pause off), and then each open dialog, which a pass over the page
+// can't see (a closed <dialog> isn't rendered). With the pause on, every looping animation must be paused once the drawings have loaded.
 // wait until an element's own animations have stopped running (finished, or held by a pause), up to 5 s, so a busy
 // runner can't catch a 250ms fade-in half way; a fade held by the pause stays at its first frame and still fails
 const settled = (q, sel) =>
@@ -318,10 +327,30 @@ for (const page of PAGES) {
         }, held);
         const q = await ctx.newPage();
         watch(q, `${page} ${n}${held ? ', paused' : ''} (pop-ups)`, errs); // starts with the page: watch() knows the 404's own status
+        await q.clock.install(); // the toast's 3 s are run on, not waited for
         await q.goto(url(page));
         await q.waitForLoadState('networkidle');
         const isHeld = await q.evaluate(() => document.documentElement.classList.contains('is-held'));
         if (isHeld !== held) fails.push(`${name}: html.is-held is ${isHeld}, expected ${held}`);
+        // axe on the whole page as it loads (once, with the pause off); each open dialog gets its own pass below
+        if (!held) {
+          const v = (await new AxeBuilder({ page: q }).analyze()).violations;
+          const serious = v.filter((x) => x.impact === 'serious' || x.impact === 'critical');
+          console.log(
+            [
+              `axe ${pad(page, 22)} ${pad(n, 6)} ${v.length} violation(s), ${serious.length} serious/critical`,
+              ...v.map(
+                (x) =>
+                  `    [${x.impact}] ${x.id}: ${x.help}\n      ` +
+                  x.nodes
+                    .slice(0, 4)
+                    .map((y) => y.target.join(' ') + (y.any[0] ? ' · ' + y.any[0].message : ''))
+                    .join('\n      '),
+              ),
+            ].join('\n'),
+          );
+          for (const x of serious) fails.push(`axe ${page} ${n}: [${x.impact}] ${x.id}`);
+        }
         const ids = await q.evaluate(() => [...new Set([...document.querySelectorAll('[data-open]')].map((e) => e.dataset.open))].filter((id) => document.getElementById(id)));
         if (!ids.length) fails.push(`${name}: nothing opens a dialog (the header's Settings button should)`);
         for (const id of ids) {
@@ -346,11 +375,12 @@ for (const page of PAGES) {
             await settled(q, `#${id} .toast`);
             const t = await q.evaluate(shownStyle, `#${id} .toast`);
             if (!t || t.opacity < 0.99) fails.push(`${name}: the shortcuts toast isn't shown: ${JSON.stringify(t)}`);
+            await q.clock.runFor(3000); // its time on screen; then it fades out (a CSS animation, in real time)
             const gone = await q.waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 }).then(() => true, () => false);
             if (!gone) fails.push(`${name}: the shortcuts toast never left`);
           }
           await q.keyboard.press('Escape');
-          await q.waitForTimeout(300);
+          await q.waitForFunction((d) => !document.getElementById(d).open, id, { timeout: 2000 }).catch(() => {});
           const after = await q.evaluate((d) => ({ open: document.getElementById(d).open, back: document.activeElement?.dataset?.open === d }), id);
           if (after.open) fails.push(`${name}: Esc didn't close #${id}`);
           else if (!after.back) fails.push(`${name}: focus didn't go back to what opened #${id}`);
@@ -361,8 +391,8 @@ for (const page of PAGES) {
         if ((await row.count()) && (await row.evaluate((e) => e.scrollWidth > e.clientWidth + 10))) {
           await row.scrollIntoViewIfNeeded();
           await row.evaluate((e) => e.scrollBy({ left: e.querySelector('li').offsetWidth * 2, behavior: 'instant' }));
-          await q.waitForTimeout(800);
-          const c = await row.evaluate((e) => {
+          // read until the middle card is the big one, or 3 s have gone
+          const middle = () => row.evaluate((e) => {
             const mid = e.getBoundingClientRect().left + e.clientWidth / 2;
             const li = [...e.children].reduce((a, b) => {
               const d = (x) => Math.abs(x.getBoundingClientRect().left + x.getBoundingClientRect().width / 2 - mid);
@@ -372,6 +402,8 @@ for (const page of PAGES) {
             const art = li.querySelector('.svc-art, .svc-icon');
             return { i: [...e.children].indexOf(li), scale: Math.round(scale * 100) / 100, art: art ? Number(getComputedStyle(art).opacity) : 1 };
           });
+          let c = await middle();
+          for (const end = Date.now() + 3000; (c.i < 1 || c.scale < 0.98 || c.art < 0.95) && Date.now() < end; c = await middle()) await q.waitForTimeout(100);
           rep.push(`services row after a swipe: ${JSON.stringify(c)}`);
           if (c.i < 1 || c.scale < 0.98 || c.art < 0.95) fails.push(`${name}: the services row didn't follow the swipe (the middle card: ${JSON.stringify(c)})`);
         }
@@ -401,35 +433,6 @@ for (const page of PAGES) {
         verdict([...fails, ...errs]);
       });
     }
-  }
-}
-
-// axe: the page's CSP blocks an injected script, so this context bypasses it (the site's own scripts still run)
-for (const page of PAGES) {
-  for (const { n, w, h } of full(page) ? [SIZES[0], SIZES[2]] : [SIZES[0]]) {
-    test(`axe ${page} ${n}`, async ({ browser }) => {
-      const ctx = await browser.newContext({ bypassCSP: true, viewport: { width: w, height: h } });
-      const q = await ctx.newPage();
-      await q.goto(url(page));
-      await q.waitForTimeout(1500);
-      const v = (await new AxeBuilder({ page: q }).analyze()).violations;
-      await ctx.close();
-      const serious = v.filter((x) => x.impact === 'serious' || x.impact === 'critical');
-      console.log(
-        [
-          `axe ${pad(page, 22)} ${pad(n, 6)} ${v.length} violation(s), ${serious.length} serious/critical`,
-          ...v.map(
-            (x) =>
-              `    [${x.impact}] ${x.id}: ${x.help}\n      ` +
-              x.nodes
-                .slice(0, 4)
-                .map((y) => y.target.join(' ') + (y.any[0] ? ' · ' + y.any[0].message : ''))
-                .join('\n      '),
-          ),
-        ].join('\n'),
-      );
-      verdict(serious.map((x) => `axe ${page} ${n}: [${x.impact}] ${x.id}`));
-    });
   }
 }
 
