@@ -45,6 +45,12 @@
 .pip { display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
 .pip.on, [aria-current="step"] > .pip { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .pip { transition: none; } }
+/* forced colours (Windows contrast themes) paint the fills away and the dots vanish (B4): they opt out and take the
+   theme's colours, the current one long in Highlight, the rest GrayText */
+@media (forced-colors: active) {
+  .pip { forced-color-adjust: none; background: GrayText; }
+  .pip.on, [aria-current="step"] > .pip { background: Highlight; }
+}
 
 /* stat tiles */
 /* as many tiles a row as fit at 8rem each, but never three (four tiles would leave one alone): zoom and a bigger font

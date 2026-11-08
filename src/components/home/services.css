@@ -20,9 +20,12 @@
 .svc-art img { position: absolute; inset: var(--sp-5) var(--sp-5) 0; width: calc(100% - 2 * var(--sp-5)); height: calc(100% - var(--sp-5)); object-fit: contain; }
 .svc-icon { display: none; color: var(--c-accent-text); }
 .svc-icon svg { width: var(--sp-7); height: var(--sp-7); }
-.svc-text { display: flex; flex-direction: column; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }
+.svc-text { display: flex; flex-direction: column; align-self: stretch; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }   /* the tile's width: the title's column (container, layout.css) */
 .svc-text .chip { align-self: center; }
-.svc-title { font-family: var(--font-display); font-size: var(--fs-6); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; overflow-wrap: anywhere; hyphens: auto; }   /* a long word breaks rather than being cut */
+/* the title fits its column as a heading does (base.css): class fit (lib/fit.js) for a long word ("Cybersecurity" at
+   200% zoom), --fit-short for the rest; :where() so the fit classes win. A word still too long breaks rather than being cut */
+:where(.svc-title) { --fit: var(--fit-short); }
+.svc-title { font-family: var(--font-display); font-size: min(var(--fs-6), var(--fit)); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; overflow-wrap: anywhere; hyphens: auto; }
 .svc-line { max-width: 32ch; color: var(--c-muted); }
 /* the bar along the bottom of the card you point at */
 .svc-go {
@@ -30,7 +33,7 @@
   align-items: center;
   align-self: stretch;
   gap: var(--sp-1);
-  height: var(--control-h);
+  min-height: var(--control-h);   /* a label that wraps (big zoom) grows the bar instead of being cut */
   margin-top: auto;
   padding-inline: var(--sp-5);
   background: var(--c-bg);
@@ -56,17 +59,19 @@
   .svc-small .svc-tile { justify-content: center; padding-top: var(--sp-5); }
   .svc-small .svc-text { padding: var(--sp-3) var(--sp-5) var(--sp-5); }
   .svc-small .svc-text .chip { display: none; }
-  .svc-small .svc-title { font-size: var(--fs-5); }
+  .svc-small .svc-title { font-size: min(var(--fs-5), var(--fit)); }
+  .svc-small .svc-go { padding-inline: var(--sp-3); }   /* "View service" on one line in a narrow tile (200% zoom) */
   /* the line stays for screen readers: the .sr-only clip (base.css), here only from tablet up */
   .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 }
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up. Its shadow is a layer on the li
    that only fades and scales with it, so the big blur is drawn once, not on every frame of the lift. */
 @media (hover: hover) and (--tablet-up) {
-  .svc-go { position: absolute; inset: auto 0 0; transform: translateY(100%); transition: transform var(--dur-2) var(--ease); }
+  /* hidden as well as moved out: no sliver of it shows at the tile's foot, whatever the rounding (200% zoom) */
+  .svc-go { position: absolute; inset: auto 0 0; visibility: hidden; transform: translateY(100%); transition: transform var(--dur-2) var(--ease), visibility var(--dur-2); }
   .svc-big .svc-text { padding-bottom: calc(var(--control-h) + var(--sp-4)); }
   .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); }
-  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { transform: none; }
+  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { visibility: visible; transform: none; }
   .svc-menu > li { position: relative; }
   .svc-menu > li::after {
     content: "";
@@ -112,7 +117,7 @@
   .svc-art { flex: none; aspect-ratio: 16 / 11; }
   .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
   .svc-more .svc-text { flex: none; }
-  .svc-title { font-size: var(--fs-5); }
+  .svc-title { font-size: min(var(--fs-5), var(--fit)); }
   .svc-line { font-size: var(--fs-2); }
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
   .svc-tile { background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band); transition: none; }

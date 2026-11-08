@@ -93,3 +93,5 @@
 .hold:hover { background: var(--c-surface-2); }
 .hold-icon { width: calc(var(--icon) * 0.6); height: calc(var(--icon) * 0.7); border-inline: calc(var(--icon) * 0.2) solid currentColor; }
 .hold[aria-pressed="true"] .hold-icon { border: 0; background: currentColor; clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
+/* forced colours paint the play triangle's fill away, leaving an empty button (B4): it keeps the button's text colour */
+@media (forced-colors: active) { .hold[aria-pressed="true"] .hold-icon { forced-color-adjust: none; background: ButtonText; } }

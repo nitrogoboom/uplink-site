@@ -5,7 +5,7 @@
 .grow { display: grid; grid-template-columns: minmax(0, 1fr); }
 
 /* the player: the picture and its controls, one unit */
-.grow-player { display: grid; gap: var(--sp-2); min-width: 0; }
+.grow-player { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); min-width: 0; }   /* one column no wider than the player: the dots row can't widen the page (B13) */
 .grow-stage {
   position: relative;
   width: 100%;
@@ -80,10 +80,15 @@
 .grow-step-btn[aria-disabled="true"]:hover { background: transparent; color: var(--c-muted); }
 .grow-dots { display: flex; align-items: center; }
 .grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-3); border: 0; border-radius: var(--r-2); background: none; }
+/* under 360px the arrows and six dots (312px) are wider than the player: dots 24px wide, still a 24px target (B13) */
+@media (width < 22.5em) { .grow-dot { padding-inline: var(--sp-2); } }
 /* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
    amber, dimmed */
 .grow-dot.is-done .pip { background: var(--c-accent); opacity: 0.45; }
 @media (hover: hover) { .grow-dot:not([aria-current="step"]):hover .pip { opacity: 1; } }
+/* forced colours (Windows contrast themes) paint the pips' fills away (B4): the shared rule (shared-blocks.css) draws
+   the open one long in Highlight and the rest in GrayText; the ones already built in CanvasText */
+@media (forced-colors: active) { .grow-dot.is-done .pip { background: CanvasText; opacity: 1; } }
 
 /* the cards: every step's card in a list without script; with it (.is-live) only the open one */
 .grow-cards { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); list-style: none; }
@@ -136,6 +141,11 @@
 @media (--tablet) {
   .grow-player { justify-self: center; width: min(80%, 36rem); }
   .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
+}
+/* phones and tablets: the square picture no taller than the screen under the header (a phone on its side: 390px tall,
+   L9), centred; never under --grow-stage-min, so big zoom keeps a picture to read */
+@media (--below-desktop) {
+  .grow-stage { justify-self: center; width: min(100%, max(var(--grow-stage-min), var(--fold-h))); }
 }
 
 /* desktop: one screen; on the left the heading, the step list and the card, on the right the picture as tall as the
@@ -196,6 +206,14 @@
   .grow-item[aria-current="step"] .grow-item-n { background: var(--c-accent); color: var(--c-on-accent); }
   .grow-item[aria-current="step"] .grow-item-m { color: var(--c-accent-text); }
   @media (hover: hover) { .grow-item:not([aria-current="step"]):hover { background: var(--c-surface); color: var(--c-text); } }
+  /* forced colours (B4): every row gets the theme's border, so the open one is filled with Highlight and its number
+     tile cut out of it. It opts out of the forcing, or the theme's backplate blocks out the words (as projects.css) */
+  @media (forced-colors: active) {
+    .grow-item { transition: none; }
+    .grow-item[aria-current="step"] { forced-color-adjust: none; border-color: Highlight; background: Highlight; color: HighlightText; }
+    .grow-item[aria-current="step"] .grow-item-n { background: HighlightText; color: Highlight; }
+    .grow-item[aria-current="step"] .grow-item-m { color: HighlightText; }
+  }
   /* while the story plays, the open row's foot fills over the step's time (grow.js sets --grow-dwell and .is-timing) */
   .grow-item::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--c-accent); transform: scaleX(0); transform-origin: left; }
   .grow-item.is-timing::after { animation: grow-item-fill var(--grow-dwell) linear var(--grow-at, 0ms) forwards; }   /* --grow-at: the time the step has played */

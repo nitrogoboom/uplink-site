@@ -41,9 +41,8 @@ const CASES = [
 ];
 const SOME = ['/', '/services', '/services/security', '/about', '/contact', '/work', '/privacy'];
 const PATHS = flag('--all') ? await pages(BASE) : SOME;
-const KNOWN = {
-  '/ 1280x1024 zoom 400%': 'B13: the Grow player has no column template, so an active dot makes Home 8px too wide at 320',
-};
+/** @type {Record<string, string>} */
+const KNOWN = {};
 
 // runs in the page: the findings, and the size of body text and the root
 const PROBE = () => {

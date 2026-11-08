@@ -84,7 +84,7 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - The tests for the build's after-steps and the Worker (`npm test`): the CSP hashes, the refusal of `style=""`, the Markdown copies, the SVGO settings, the preview alias, the deploy order (a version that fails its smoke check never goes live; one that breaks the live site is rolled back), and the report endpoint, including every odd shape a report can take.
 - No `style=""` attributes, and every inline script and style is hashed into the CSP (`scripts/headers.mjs`).
 - No script errors and no CSP blocks on any page: watched until the network is idle and while the page's timers run a few seconds on, while the screen turns, and while each of the page's own buttons is pressed.
-- No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide (review B13, Home at 320, is marked as a known failure until it's fixed). The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px.
+- No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide. The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px.
 - Exactly one `h1` on every page, and every JSON-LD block parses.
 - Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own; the phone services row follows a swipe. All of it with the site's pause on too, when nothing on Home may loop.
 - The sitemap lists exactly the pages the build wrote, and every check covers all of them.

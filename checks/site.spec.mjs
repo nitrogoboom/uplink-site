@@ -250,9 +250,8 @@ const WIDTHS = [320, 390, 600, 768, 1024, 1280];
 // in the page: two frames on, how far the page is wider than the screen
 const WIDE = () =>
   new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done(document.documentElement.scrollWidth - innerWidth))));
-const KNOWN = {
-  'index 320': 'B13: the Grow player has no column template, so an active dot makes Home 8px too wide at 320',
-};
+/** @type {Record<string, string>} */
+const KNOWN = {};
 for (const page of PAGES) {
   for (const width of WIDTHS) {
     test(`sideways ${page} ${width}`, async ({ browser }) => {
@@ -1332,6 +1331,60 @@ test('work filters: forced colours legible as pixels, focus ring, print shows ev
   verdict(fails);
 });
 
+// B4: forced colours (Windows contrast themes) keep the other states the filters' test doesn't cover: Grow's open step
+// (its dot on phones, its row on desktop), the services row's current dot, the pressed pause button's play icon and
+// the bottom bar's current tab. Each, as the browser paints it, is filled (at least half opaque: the theme keeps a
+// fill's alpha, so a 9% tint stays a 9% tint), differs from its neighbour in the off state, and isn't the colour of
+// the page (a dot painted Canvas on Canvas is gone).
+test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  for (const scheme of ['dark', 'light']) {
+    for (const [w, h] of [[390, 844], [1440, 900]]) {
+      // motion on: the pause buttons show only then
+      const ctx = await browser.newContext({ viewport: { width: w, height: h }, forcedColors: 'active', colorScheme: scheme });
+      const q = await ctx.newPage();
+      await q.goto(url('index'));
+      await q.waitForLoadState('networkidle');
+      await q.locator('#grow').scrollIntoViewIfNeeded();
+      await q.locator('#grow :is(.grow-dot, .grow-item):visible').nth(2).click();
+      const hold = q.locator('.hold:visible').first();
+      if (await hold.count()) await hold.click();
+      await q.waitForTimeout(500); // the dots' and rows' colour transitions
+      const s = await q.evaluate(() => {
+        const bg = (e) => (e ? getComputedStyle(e).backgroundColor : 'none');
+        const probe = document.createElement('div');
+        probe.style.backgroundColor = 'Canvas';
+        probe.style.forcedColorAdjust = 'none';
+        document.body.append(probe);
+        const canvas = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        const vis = (sel) => [...document.querySelectorAll(sel)].filter((e) => e.checkVisibility());
+        const pair = (on, off) => ({ on: bg(vis(on)[0]), off: bg(vis(off)[0]), shown: vis(on).length > 0 });
+        return {
+          canvas,
+          states: {
+            'Grow dot': pair('#grow .grow-dot[aria-current] .pip', '#grow .grow-dot:not([aria-current]) .pip'),
+            'Grow row': pair('#grow .grow-item[aria-current]', '#grow .grow-item:not([aria-current])'),
+            'services dot': pair('.svc-dots .pip.on', '.svc-dots .pip:not(.on)'),
+            'pause icon': { on: bg(vis('.hold[aria-pressed="true"] .hold-icon')[0]), off: canvas, shown: vis('.hold[aria-pressed="true"] .hold-icon').length > 0 },
+            'current tab': pair('.botnav .bn[aria-current]', '.botnav .bn:not([aria-current])'),
+          },
+        };
+      });
+      for (const [k, v] of Object.entries(s.states)) {
+        if (!v.shown) continue; // not at this width (the dots on phones, the rows on desktop)
+        const alpha = Number((v.on.match(/rgba\([^)]*,\s*([\d.]+)\)/) || [0, 1])[1]); // the theme keeps a fill's alpha
+        if (v.on === v.off || v.on === s.canvas || alpha < 0.5) fails.push(`forced colours ${scheme} ${w}: ${k} on ${v.on}, off ${v.off}, page ${s.canvas}`);
+        rep.push(`${scheme} ${w} ${k}: on ${v.on}, off ${v.off}`);
+      }
+      await ctx.close();
+    }
+  }
+  console.log(`forced colours:\n  ${rep.join('\n  ')}`);
+  verdict(fails);
+});
+
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
 test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
@@ -1385,14 +1438,15 @@ test('favicons: .ico and .svg linked and served (M9)', async () => {
 // B18, B20: a heading or big number never breaks inside a word. Headings and stat numbers size to their column
 // (--fit, cqi), so "CYBERSECURITY" on /services/security at 1024 to 1099 and "3,400" on /about with a 32px default
 // font stay whole. Every page at five widths and, with a 32px default font, at 320 and 390; plus /services/security
-// at 1024 to 1099, where the review found it. h3s in the page count too. A break after a hyphen
+// at 1024 to 1099, where the review found it, and Home at 1440 x 900 with 200% browser zoom ("CYBERSECURIT / Y" on a
+// Home service tile). h3s and the Home service tiles' titles (.svc-title) count too. A break after a hyphen
 // ("Ransomware-/ready") is a normal line break, not a split. And every heading with a word of LONG letters or more
 // carries the class fit (src/lib/fit.js), so one written into a page by hand without fit() can't slip through.
 const WORDS = () => {
   const out = [];
   // headings without the class fit, for the long-word test in Node
-  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
-  for (const h of document.querySelectorAll('h1, h2, main h3, .fc-panel.is-on h3, .stat-val')) {
+  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit), .svc-title:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
+  for (const h of document.querySelectorAll('h1, h2, main h3, .fc-panel.is-on h3, .stat-val, .svc-title')) {
     if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
     const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
     for (let t; (t = tw.nextNode()); ) {
@@ -1413,10 +1467,12 @@ for (const page of PAGES) {
       ...[320, 768, 1060, 1440, 2560].map((w) => [w, 0]),
       ...(page === 'services/security' ? [1024, 1040, 1080, 1099].map((w) => [w, 0]) : []),
       ...[320, 390].map((w) => [w, 32]),
+      ...(page === 'index' ? [[1440, 0, 2]] : []), // 200% zoom: a 720 x 450 screen drawn at 2 device px each (as zoom.spec.mjs)
     ];
     const fails = (
-      await lanes(jobs, 4, async ([w, font]) => {
-        const ctx = await browser.newContext({ viewport: { width: w, height: w > 1000 ? 900 : 800 } });
+      await lanes(jobs, 4, async ([w, font, zoom = 1]) => {
+        const h = w > 1000 ? 900 : 800;
+        const ctx = await browser.newContext({ viewport: { width: w / zoom, height: h / zoom }, deviceScaleFactor: zoom });
         const q = await ctx.newPage();
         if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
         await q.goto(url(page));
@@ -1424,7 +1480,7 @@ for (const page of PAGES) {
         const [split, plain] = await q.evaluate(WORDS);
         for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
         await ctx.close();
-        return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
+        return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}${zoom > 1 ? ` (${zoom * 100}% zoom)` : ''}: ${split.join(', ')}` : null;
       })
     ).filter(Boolean);
     verdict(fails);

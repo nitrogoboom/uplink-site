@@ -135,6 +135,7 @@
   --chevron-up:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23BBC2C9' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 10l4-4 4 4'/%3E%3C/svg%3E");
   --container:  80rem;
   --grow-stage-max: 44rem;   /* the Home Grow picture's tallest on a desktop under 700px tall (grow.css); taller: below */
+  --grow-stage-min: 18rem;   /* the Home Grow picture's least on phones and tablets, where it is capped at the screen's height */
   --gutter:    1rem;   /* 1.5rem tablet, 3rem desktop */
   --section-y:  var(--sp-8);  /* 96 desktop */
   --fold-h:     calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));  /* one screen under the header; phones also lose the tab bar (below) */
@@ -224,6 +225,12 @@
 }
 @media (--desktop) {
   :root { --gutter: 3rem; --section-y: var(--sp-9); }
+}
+
+/* More contrast (the system's "increase contrast" setting, L8): the faint decorative lines (card borders, dividers,
+   about 1.3:1) take the palette's edge role, 3:1 (editing-room/palette/DESIGN.md). Before print, so paper keeps its own */
+@media (prefers-contrast: more) {
+  :root { --c-line: var(--c-edge); --c-line-2: var(--c-edge); }
 }
 
 /* Print: dark ink on white paper (print.css does the layout) */

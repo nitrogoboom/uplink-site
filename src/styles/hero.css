@@ -18,6 +18,7 @@
   --hero-pad-bottom: var(--sp-7);
   padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
+@media (prefers-contrast: more) { .hero { --c-line: var(--c-edge); } }   /* its lines as everywhere else (tokens.css, L8) */
 .hero::before {
   content: "";
   position: absolute;
