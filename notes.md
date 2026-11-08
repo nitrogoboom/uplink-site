@@ -3,6 +3,7 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Light theme
+- [ ] Home, light: decide on the contrast fixes in `docs/light-theme-home-review-2026-11-08.md` (1–3 fail WCAG in light only; 4–5 faint edges; 6–8 optional), then run the same review on the other pages.
 - [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
 - [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
