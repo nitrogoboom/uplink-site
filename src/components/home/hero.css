@@ -53,7 +53,7 @@
 /* a picture card with the picture as a panel: edge to edge on the left, a line, then the words with --sp-4 all
    round (R5, small card). The panel is as tall as the card and the words sit centred beside it as one block, so
    nothing leaves a gap under it; the two cards in a row stretch to one height (the dock is a grid). Picked from
-   editing-room/news-cards/ (round 2, C). */
+   the news-cards mockups (round 2, C; archive/editing-room branch). */
 .news { flex-direction: row; align-items: stretch; gap: var(--sp-4); padding: 0; overflow: hidden; }
 .news-thumb { flex: none; display: grid; place-items: center; width: calc(var(--sp-9) + var(--sp-5)); padding: var(--sp-3); border-radius: 0; border-right: 1px solid var(--c-line); }
 .news-thumb img { width: 100%; height: auto; max-height: 100%; }

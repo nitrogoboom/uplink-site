@@ -9,7 +9,7 @@
 :root {
   color-scheme: dark;
 
-  /* ---- colour: Navy & Amber, dark (editing-room/palette/DESIGN.md; values from palette/final/tokens.css) */
+  /* ---- colour: Navy & Amber, dark (docs/palette.md) */
   --c-bg:         #0E1A27;  /* page */
   --c-bg-band:    #14202D;  /* alternate section band */
   --c-solid:      #222E3A;  /* dialogs, toasts, menus */
@@ -228,7 +228,7 @@
 }
 
 /* More contrast (the system's "increase contrast" setting, L8): the faint decorative lines (card borders, dividers,
-   about 1.3:1) take the palette's edge role, 3:1 (editing-room/palette/DESIGN.md). Before print, so paper keeps its own */
+   about 1.3:1) take the palette's edge role, 3:1 (docs/palette.md). Before print, so paper keeps its own */
 @media (prefers-contrast: more) {
   :root { --c-line: var(--c-edge); --c-line-2: var(--c-edge); }
 }

@@ -1,33 +1,20 @@
-// Password lock for the whole site, as a Worker in front of the static assets. Off by default.
-// The site has its own Worker (worker/index.js), so this file can't simply become "main". worker/index.js runs only
-// for /api/*, /404 and missing addresses, and serves files with env.ASSETS.fetch. To turn the lock on, set
-// run_worker_first to true in wrangler.jsonc (so every request runs it), and copy passwordOk() and the 401 response
-// from here into the top of its fetch. Then set the password and deploy:
-//   npx wrangler secret put SITE_PASSWORD
-//   npx wrangler deploy
-// The browser asks for a username and password. Any username works; the password must match the secret.
-// With no secret set, the site stays locked. To test locally: npx wrangler dev --var SITE_PASSWORD:some-test-value
+// Password lock for the whole site. Off, and not deployed: to turn it on, copy lock() and passwordOk() into
+// worker/index.js after the http-to-https redirect and the /api/report line. Steps in README, "Password lock".
 
 const REALM = 'Uplink mockup';
 
-export default {
-  async fetch(request, env) {
-    if (env.SITE_PASSWORD && await passwordOk(request, env.SITE_PASSWORD)) {
-      const res = await env.ASSETS.fetch(request);
-      const out = new Response(res.body, res);
-      out.headers.set('X-Robots-Tag', 'noindex, nofollow');
-      return out;
-    }
-    return new Response('Password required.', {
-      status: 401,
-      headers: {
-        'WWW-Authenticate': `Basic realm="${REALM}", charset="UTF-8"`,
-        'Cache-Control': 'no-store',
-        'X-Robots-Tag': 'noindex, nofollow',
-      },
-    });
-  },
-};
+/** The 401 that makes the browser ask for the password, or null when the request carries the right one. */
+export async function lock(request, env) {
+  if (env.SITE_PASSWORD && await passwordOk(request, env.SITE_PASSWORD)) return null;
+  return new Response('Password required.', {
+    status: 401,
+    headers: {
+      'WWW-Authenticate': `Basic realm="${REALM}", charset="UTF-8"`,
+      'Cache-Control': 'no-store',
+      'X-Robots-Tag': 'noindex, nofollow',
+    },
+  });
+}
 
 async function passwordOk(request, expected) {
   const header = request.headers.get('Authorization') || '';

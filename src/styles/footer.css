@@ -218,7 +218,7 @@ a.fc-cl:hover { color: var(--c-accent-text); }
 .fc-w .grid > * { stroke: var(--iso-grid); stroke-width: 0.8; stroke-opacity: 0.6; }
 .fc-w .edge { fill: none; stroke: var(--c-sky); stroke-width: 1.4; stroke-opacity: 0.6; }
 .fc-w .win { fill: var(--iso-window); fill-opacity: 0.6; stroke: var(--c-sky); stroke-width: 0.9; stroke-opacity: 0.5; }
-.fc-w .win.lit { fill: var(--iso-sky-left); fill-opacity: 0.38; }   /* cool lit window (DESIGN.md 5.4) */
+.fc-w .win.lit { fill: var(--iso-sky-left); fill-opacity: 0.38; }   /* cool lit window (docs/palette.md 5.4) */
 .fc-w .on .win { fill: var(--c-on-accent); fill-opacity: 0.35; stroke: var(--iso-light); stroke-opacity: 0.55; }
 .fc-w .on .win.lit { fill: var(--iso-light); fill-opacity: 0.75; }
 .fc-w .tk-1 .f-t { fill: var(--iso-sky-top); } .fc-w .tk-1 .f-l { fill: var(--iso-sky-left); } .fc-w .tk-1 .f-r { fill: var(--iso-sky-right); }

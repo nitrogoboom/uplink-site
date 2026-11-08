@@ -8,24 +8,6 @@
       "port": 4321
     },
     {
-      "name": "grow-mockups",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8790", "--bind", "127.0.0.1", "--directory", "editing-room/grow-options"],
-      "port": 8790
-    },
-    {
-      "name": "news-cards",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8791", "--bind", "127.0.0.1", "--directory", "editing-room/news-cards"],
-      "port": 8791
-    },
-    {
-      "name": "grow-list",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "8792", "--bind", "127.0.0.1", "--directory", "editing-room/grow-list"],
-      "port": 8792
-    },
-    {
       "name": "built",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["wrangler", "dev", "--port", "8787"],

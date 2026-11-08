@@ -1,4 +1,4 @@
-# DESIGN.md: Navy & Amber
+# Palette: Navy & Amber
 
 A portable colour spec. Hand this file to an agent to recolour a site, a document, a deck, an email or a drawing.
 
@@ -7,7 +7,9 @@ A portable colour spec. Hand this file to an agent to recolour a site, a documen
 It does not belong to one project. Each project maps its own names onto the roles below. See "Name maps" at the end.
 
 - Version: 1.1 (2026-10-28). 1.1 adds two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
-- Colour values: approved by an independent colour-theory and accessibility review. All 12 checks pass. Measured by `palette/final/build.py`.
+- Colour values: approved by an independent colour-theory and accessibility review. All 12 checks pass. Measured by `editing-room/palette/final/build.py` on the `archive/editing-room` branch.
+
+> **Note:** This file was `editing-room/palette/DESIGN.md` until November 8, 2026 (review C9). The proposals, the review and the build scripts behind it stay on the `archive/editing-room` branch.
 
 ---
 
@@ -318,7 +320,7 @@ Notes for this project:
 - Logo files: `Documents/Design.MD/svs-design/assets/logo/` (copy them; don't use the rest of that folder).
 - The drawings come from `tools/gen_*.py`. Their colours come from `tools/palette.py`, which reads the roles from `tokens.css` and computes the 5.5 shades (names there match 5.5 in capitals: `pal.APP_BAR`). A recolour: change `tokens.css`, rerun the gen scripts; never edit SVGs.
 - Landed on 28 Oct 2026 (dark mode only). The site has no light mode yet.
-- Ready-made values in the site's names: `palette/final/tokens.css` (the source for `tokens.css`).
+- Ready-made values in the site's names: `editing-room/palette/final/tokens.css` on the `archive/editing-room` branch (the source for `tokens.css`).
 
 ### Adding a new project
 

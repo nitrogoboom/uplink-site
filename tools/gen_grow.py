@@ -4,7 +4,7 @@ over all of it, then the dome). Every part carries data-s, the step it arrives o
 step; src/scripts/grow.js shows a step's parts as it plays. Nothing moves or rebuilds: later steps only add.
 Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_grow.py                       (writes src/components/home/grow-world.svg)
-       python tools/gen_grow.py editing-room/grow-options/places   (also the five separate scenes the mockups used)
+       python tools/gen_grow.py OUT_DIR   (also the five separate scenes the mockups used)
 World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
 Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch
 (except each person's head, a half step in: see person()).
@@ -410,7 +410,7 @@ def build(name):
 
 
 SITE = pathlib.Path(__file__).resolve().parent.parent / 'src' / 'components' / 'home' / 'grow-world.svg'
-SCENE_NAMES = ['office', 'home', 'road', 'second', 'all']   # the mockups' separate scenes (editing-room/grow-options)
+SCENE_NAMES = ['office', 'home', 'road', 'second', 'all']   # the mockups' separate scenes (archive/editing-room branch)
 
 if __name__ == '__main__':
     write(SITE, build('world'), card_cut=False)
