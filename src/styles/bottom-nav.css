@@ -30,6 +30,12 @@
 .bn svg { width: var(--icon); height: var(--icon); }
 .bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
 .bn[aria-current] svg { color: var(--c-accent-text); }
+/* forced colours paint its fill away and leave an amber icon that ignores the theme (B4): the current tab is filled
+   with Highlight, as the header tab's bar (header.css) */
+@media (forced-colors: active) {
+  .bn[aria-current] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
+  .bn[aria-current] svg { color: HighlightText; }
+}
 
 @media (--phone) {
   .tabs, .hdr-actions .hbtn-text { display: none; }

@@ -27,7 +27,7 @@
    opts out of the forcing (forced-color-adjust: none, as in header.css and buttons.css), or the theme's backplate
    puts Canvas behind its HighlightText words and they turn into a solid block. The focus ring is CanvasText: with
    radios the focused chip is the checked one, and the forced ring (currentColor, HighlightText) would match the page.
-   Layout plan phase 9 moves this into a site-wide preferences.css */
+   Each forced-colours fix sits beside the rule it fixes (src/README.md, Styles) */
 @media (forced-colors: active) {
   .filter { transition: none; }   /* the words change at once: a fading background would leave them unreadable a moment */
   .filter:has(:checked) { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
