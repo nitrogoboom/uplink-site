@@ -7,7 +7,7 @@ This repository holds the website for Uplink Technology, a made-up IT company. T
 The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI framework. Cloudflare Workers serves it as static files. Two ideas shape the code:
 
 - **Content is data.** Every service, project, and list is a typed JSON or Markdown file. Pages, cards, menus, the sitemap, and the structured data all read from those files.
-- **Drawings are code.** Every illustration is written by a Python script. You change the numbers in the script and run it again; you never edit the SVG by hand.
+- **Drawings are code.** Every illustration is written by a Python script. You change the numbers in the script and run it again; you never edit an output SVG by hand. The one SVG you do edit by hand is a part, not an output: `tools/office_parts/hero_cloud.svg`, which `gen_office.py` fills in and copies into the hero.
 
 ## Related documents
 
@@ -122,8 +122,7 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
 | `.github/workflows/clean-previews.yml` | Deletes old pull request previews from Cloudflare every 3 days (`scripts/clean-previews.mjs`). |
-| `editing-room/` | Design work that isn't part of the build: mockups, drafts, and the colour work. `editing-room/palette/DESIGN.md` is the live colour spec. See [`editing-room/README.md`](editing-room/README.md). |
-| `docs/` | Reference pages, records, and dated decisions. |
+| `docs/` | Reference pages, records, and dated decisions. `docs/palette.md` is the colour spec. |
 
 ### Links and addresses
 
@@ -171,7 +170,7 @@ The lists come from `src/data/footer.json`, checked by its schema in `src/lib/fo
 Every drawing follows these rules. The values are measured in the files.
 
 - **True isometric.** One axis runs right and down at 30°, one runs left and down at 30°, and verticals go straight up.
-- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. The colour roles come from `editing-room/palette/DESIGN.md`. Scripts use names, never hex values.
+- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. The colour roles come from `docs/palette.md`. Scripts use names, never hex values.
 - **Box faces.** Every box has a top of `pal.TOP` (#4D5863), a left side of `pal.LEFT` (#37424E), and a right side of `pal.RIGHT` (#222E3A). The top is lightest and the right is darkest. Edges are `pal.EDGE` (#E6ECF2), width 1, opacity 0.3.
 - **Highlight faces:** `pal.HI_TOP`, `pal.HI_LEFT`, and `pal.HI_RIGHT` (#FFCD9B, #FFAD51, #C37600).
 - **Accents:** `pal.AMBER` (#FFAD51) and `pal.SKY` (#97C8EA).
@@ -200,7 +199,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | --- | --- |
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene from a world-space description. Scenes: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, and `voip`. Also writes the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
 | `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
-| `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/`). |
+| `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/` on the `archive/editing-room` branch). |
 | `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). The map is decoration, so it has `aria-hidden="true"` and no role or label: screen readers skip it, and the footer's own words say what it shows (`tools/tests/test_campus.py`). |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
@@ -222,7 +221,7 @@ When you change a drawing's labels or layout, check its phone cut too.
 
 | Module | What it provides |
 | --- | --- |
-| `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `DESIGN.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
+| `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `docs/palette.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
 | `iso.py` | The projection, `W(ox, oy, u)`. |
 | `isogen.py` | Writing a drawing: boxes (`box()`, the one box writer, which can log each box to the generator's `BOXES`), the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a title or subline wraps it) and the floor gaps round their words (`label_text_gaps()`), the card cut (`card()`), `esc()` for any words written into a drawing, and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
 | `isoprops.py` | Shared props: office chair, monitor on a stand (with `screen_glass` and `app_window` for its screen), and VoIP desk phone. Also `on_front`, `on_side`, and `on_top`, which draw flat details exactly on a box face. Props sit on a grid (x and y in steps of 0.25, z in steps of 0.125) so their parts can never nearly touch. Keep the scene around them on the same grid. |
@@ -417,4 +416,26 @@ The sitemap's `<lastmod>` dates and a case study's `datePublished` and `dateModi
 
 ### Password lock
 
-The password lock is off. `tools/site-lock/worker.js` puts the whole site behind a browser password prompt. Its header comment explains how to turn it on and set the `SITE_PASSWORD` secret.
+The password lock is off. `tools/site-lock/worker.js` holds `lock()`, which puts the whole site behind a browser password prompt. It isn't deployed on its own: you copy it into `worker/index.js`.
+
+To turn the lock on:
+
+1. In `wrangler.jsonc`, set `assets.run_worker_first` to `true`, so every request runs the Worker.
+2. Copy `lock()` and `passwordOk()` from `tools/site-lock/worker.js` into `worker/index.js`.
+3. In `route()` in `worker/index.js`, add this line after the `/api/report` line:
+
+   ```js
+   const denied = await lock(request, env); if (denied) return denied;
+   ```
+
+   The line must come after the http-to-https redirect, so the browser never sends the password over plain http. It must also come after `/api/report`, so visitors' browsers can still send their reports.
+4. Set the password and deploy:
+
+   ```sh
+   npx wrangler secret put SITE_PASSWORD
+   npx wrangler deploy
+   ```
+
+The browser asks for a username and password. Any username works; the password must match `SITE_PASSWORD`. With no secret set, the site stays locked. To test locally, run `npx wrangler dev --var SITE_PASSWORD:SOME_TEST_VALUE`.
+
+To turn the lock off, undo steps 1 to 3, deploy, and run `npx wrangler secret delete SITE_PASSWORD`.
