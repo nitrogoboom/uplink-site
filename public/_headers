@@ -4,6 +4,8 @@
 #   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
 #   the Early Hints block   one rule per page
 #   the Markdown copies block   one rule per .md copy: noindex and a canonical Link to its page (kept at launch)
+#   the build placeholder   X-Build, the build's ID: a hash of dist/, these headers and the Worker. The deploy reads
+#                           it to tell which build the live address serves (scripts/deploy.mjs). Only a hash.
 # style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
 # writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
 # font-src allows data: because each SVG carries its own letters as a data: font.
@@ -33,6 +35,7 @@
   X-Frame-Options: DENY
   Reporting-Endpoints: csp="/api/report"
   Speculation-Rules: "/speculation-rules.json"
+  X-Build: {build}
   Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the

@@ -127,7 +127,7 @@ jobs:
     needs: [build, workflows, drawings] # a high zizmor finding, or a drawing out of step with its script, stops the deploy too
     if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20 # about 2 minutes; each smoke run may take up to 5 and the live one can run twice
+    timeout-minutes: 30 # about 2 minutes; at worst about 25: each smoke run may take up to 5 and the live one can run twice, and the wait for the live build up to 2
     environment: cloudflare
     # a deploy that has started finishes; the next waits for it. GitHub keeps one waiting deploy, so a third quick
     # push replaces the second while it waits, and the newest build is the one that goes live

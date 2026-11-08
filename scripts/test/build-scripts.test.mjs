@@ -39,6 +39,7 @@ const HOME = `<!doctype html><html><head>
 <body><div data-hero="/assets/img/hero.svg?v=1"></div><div data-fc-map="/assets/img/campus.svg"></div></body></html>`;
 const TEMPLATE = `/*
   Content-Security-Policy: script-src 'self' {script-hashes}; style-src 'self' {style-hashes}
+  X-Build: {build}
 # @early-hints (written by scripts/headers.mjs)
 # @end early-hints
 # @markdown-copies (written by scripts/headers.mjs)
@@ -89,7 +90,7 @@ test('headers.mjs: /index and a page\'s /index.html and /index spellings go to t
 test('check-dist.mjs (wrangler build.command): refuses an unfinished dist/, passes a finished one (review H11)', async () => {
   const dir = base();
   try {
-    assert.match(fails('check-dist.mjs', dir), /still has \{script-hashes\} and \{style-hashes\} in it.*npm run build/s);
+    assert.match(fails('check-dist.mjs', dir), /still has \{script-hashes\} and \{style-hashes\} and \{build\} in it.*npm run build/s);
     run('headers.mjs', dir);
     run('check-dist.mjs', dir);
     rmSync(join(dir, '_redirects'));
@@ -300,4 +301,41 @@ test('public/_headers: no X-Permitted-Cross-Domain-Policies (review H9)', () => 
     run('headers.mjs', dir);
     assert.ok(!/x-permitted-cross-domain-policies/i.test(readFileSync(join(dir, '_headers'), 'utf-8')), 'X-Permitted-Cross-Domain-Policies still sent');
   } finally { rmSync(dir, { recursive: true }); }
+});
+
+// review H3: X-Build names the build, so the deploy can tell which version the live address serves. It covers every
+// file in dist/ (but _headers itself), the finished headers and the Worker, so a change to any one of them changes it
+test('headers.mjs: X-Build is a hash of dist/, the headers and the Worker; any one change gives another (review H3)', () => {
+  const worker = mkdtempSync(join(tmpdir(), 'uplink-worker-'));
+  const ids = [];
+  const build = (extra, workerText = 'export default {}') => {
+    writeFileSync(join(worker, 'index.js'), workerText);
+    const dir = base({ '_headers': TEMPLATE, ...extra });
+    try {
+      execFileSync('node', ['scripts/headers.mjs'], { env: { ...process.env, DIST: dir, WORKER_DIR: worker }, stdio: 'pipe' });
+      const out = readFileSync(join(dir, '_headers'), 'utf-8');
+      const id = out.match(/^\/\*\n(?: {2}.*\n)*? {2}X-Build: ([0-9a-f]{16})$/m)?.[1];
+      assert.ok(id, `an X-Build line in the /* rule:\n${out}`);
+      assert.ok(!out.includes('{build}'), 'placeholder filled');
+      ids.push(id);
+    } finally { rmSync(dir, { recursive: true }); }
+  };
+  try {
+    build({});
+    build({});                                                                       // the same build: the same ID
+    build({ '_headers': TEMPLATE.replace('/*\n', '/*\n  X-New: 1\n') });             // a header only
+    build({ 'agents.md': '# Notes' });                                               // a Markdown file
+    build({ 'assets/img/campus.svg': '<svg xmlns="http://www.w3.org/2000/svg"><style>.b{fill:red}</style></svg>' });
+    build({ 'assets/fonts/a.woff2': 'font' });                                       // a font
+    build({}, 'export default { fetch() {} }');                                      // the Worker only
+    build({ 'contact.html': '<!doctype html><p>x</p>' });                            // a page, and with it _redirects
+  } finally { rmSync(worker, { recursive: true }); }
+  assert.equal(ids[0], ids[1], 'the same build gives the same ID');
+  assert.equal(new Set(ids).size, ids.length - 1, `each change gives a new ID: ${ids.join(' ')}`);
+});
+
+test('check-dist.mjs: refuses a dist/ whose _headers still has {build} in it', () => {
+  const dir = base({ '_headers': TEMPLATE.replace(/\{[a-z]+-hashes\}/g, 'x') });
+  try { assert.match(fails('check-dist.mjs', dir), /still has \{build\} in it/); }
+  finally { rmSync(dir, { recursive: true }); }
 });

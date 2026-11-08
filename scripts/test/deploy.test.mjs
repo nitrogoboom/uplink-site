@@ -44,16 +44,17 @@ const where = args.includes('--preview') ? 'preview' : 'live';
 process.exit(process.env.FAKE_SMOKE_FAIL === where ? 1 : 0);
 `;
 
-// a site that serves one build: its home page names a hashed /_astro/ file, its CSP and sitemap are its own
+// a site that serves one build: its home page names a hashed /_astro/ file, its CSP, sitemap and X-Build are its own.
+// 'new:old' serves the new build's files under the old build's X-Build (a change the files alone can't show)
 const build = (name) => ({
   '/': [`<!doctype html><link rel="stylesheet" href="/_astro/index.${name}.css"><script src="/_astro/page.${name}.js"></script>`, 'text/html'],
   '/sitemap.xml': [`<urlset><url><loc>https://example.test/</loc><lastmod>${name}</lastmod></url></urlset>`, 'application/xml'],
 });
 const serve = (pick) => new Promise((resolve) => {
   const server = createServer((req, res) => {
-    const name = pick();
+    const [name, id = name] = pick().split(':');
     const [body, type] = build(name)[req.url] || ['not found', 'text/plain'];
-    res.writeHead(build(name)[req.url] ? 200 : 404, { 'Content-Type': type, 'Content-Security-Policy': `style-src 'self' 'sha256-${name}'` });
+    res.writeHead(build(name)[req.url] ? 200 : 404, { 'Content-Type': type, 'Content-Security-Policy': `style-src 'self' 'sha256-${name}'`, 'X-Build': id });
     res.end(body);
   });
   server.listen(0, '127.0.0.1', () => resolve(server));
@@ -62,7 +63,7 @@ const address = (server) => `http://127.0.0.1:${server.address().port}`;
 
 // opts: smoke (where it fails), args (after the live address), deployExit, deployLands ('no': status never shows the
 // new version), liveBuild (a function of the state file's last line: which build the live server serves)
-const deploy = async ({ smoke = 'none', args = [], deployExit = 0, deployLands = 'yes', liveBuild } = {}) => {
+const deploy = async ({ smoke = 'none', args = [], deployExit = 0, deployLands = 'yes', liveBuild, env = {} } = {}) => {
   const dir = mkdtempSync(join(tmpdir(), 'uplink-deploy-test-'));
   const tool = (name, text) => { const p = join(dir, name); writeFileSync(p, text); chmodSync(p, 0o755); return p; };
   const log = join(dir, 'calls.log'), summary = join(dir, 'summary.md'), state = join(dir, 'state');
@@ -72,7 +73,7 @@ const deploy = async ({ smoke = 'none', args = [], deployExit = 0, deployLands =
   try {
     const child = spawn(process.execPath, ['scripts/deploy.mjs', address(live), ...args], {
       env: { ...process.env, DEPLOY_WRANGLER: tool('wrangler', WRANGLER), DEPLOY_SMOKE: tool('smoke', SMOKE), DEPLOY_POLL: '0',
-        DEPLOY_POLLS: '3', DEPLOY_RETRY: '0', FAKE_LOG: log, FAKE_STATE: state, FAKE_SMOKE_FAIL: smoke, FAKE_PREVIEW: address(preview),
+        DEPLOY_WAIT: '1', DEPLOY_SETTLE: '0', DEPLOY_RETRY: '0', ...env, FAKE_LOG: log, FAKE_STATE: state, FAKE_SMOKE_FAIL: smoke, FAKE_PREVIEW: address(preview),
         FAKE_DEPLOY_EXIT: String(deployExit), FAKE_DEPLOY_LANDS: deployLands, GITHUB_STEP_SUMMARY: summary, GITHUB_SHA: 'abc123def4567890',
         CLOUDFLARE_API_TOKEN: 'fake-token', CLOUDFLARE_ACCOUNT_ID: 'fake-account' },
     });
@@ -153,6 +154,32 @@ test('the live address serves the new build only after a while: waits for it, th
   const { code, calls, out, live } = await deploy({ liveBuild: (s) => (s === 'deployed' && ++asks > 4 ? 'new' : 'old') });
   assert.equal(code, 0, out);
   assert.equal(smokes(calls, live).length, 1);
+});
+
+test('the old build differs only in X-Build (a header or Worker change): still told apart, so it waits and rolls back', async () => {
+  const { code, calls, live, summary } = await deploy({ liveBuild: () => 'new:old' });
+  assert.notEqual(code, 0);
+  assert.equal(smokes(calls, live).length, 0);
+  assert.ok(did(calls, 'wrangler', 'rollback', 'old-version'));
+  assert.match(summary, /another build/);
+});
+
+test('the live address already serves this exact build: says so, waits DEPLOY_SETTLE, then checks', async () => {
+  const t0 = Date.now();
+  const { code, calls, out, live, summary } = await deploy({ liveBuild: () => 'new', env: { DEPLOY_SETTLE: '1' } });
+  assert.equal(code, 0, out);
+  assert.match(summary, /can't tell the builds apart/);
+  assert.equal(smokes(calls, live).length, 1);
+  assert.ok(Date.now() - t0 >= 1000, 'the settle wait');
+});
+
+test('the wait for the live build is capped by the clock (DEPLOY_WAIT), however often it asks', async () => {
+  const t0 = Date.now();
+  const { code, summary } = await deploy({ liveBuild: () => 'old', env: { DEPLOY_WAIT: '1.5', DEPLOY_POLL: '0' } });
+  const took = Date.now() - t0;
+  assert.notEqual(code, 0);
+  assert.ok(took >= 1500 && took < 6000, `took ${took} ms`);
+  assert.match(summary, /after 1\.5 s/);
 });
 
 test('the smoke runs never see the Cloudflare credentials', async () => {

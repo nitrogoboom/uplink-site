@@ -8,23 +8,25 @@
 // 2. Uploads dist/ and the Worker as a new version (wrangler versions upload). It takes no traffic yet, but answers
 //    at its own preview address, which wrangler writes to its output file (WRANGLER_OUTPUT_FILE_PATH).
 // 3. Runs the smoke check (checks/smoke.spec.mjs) against that address, with --preview. A failure stops here: the live
-//    site is unchanged. Then reads the build's marker there (below).
+//    site is unchanged. Then reads the build's marker there (below), and the live address's.
 // 4. Puts that version on 100% of traffic (wrangler versions deploy VERSION_ID@100%). If wrangler reports an error,
 //    it reads the deployment status again: when the new version is live at any percentage (or the status can't be
 //    read), it carries on to step 5, so a half-done deploy is still checked and rolled back; otherwise it stops.
-// 5. Asks the live address for the build's marker every DEPLOY_POLL seconds, up to DEPLOY_POLLS times, until it is the
-//    one the preview address gave (a deploy takes a few seconds to reach every Cloudflare location). Then it runs the
-//    smoke check against the live address, and once more DEPLOY_RETRY seconds later if that fails.
+// 5. Asks the live address for the build's marker every DEPLOY_POLL seconds, for up to DEPLOY_WAIT seconds by the clock,
+//    until it is the one the preview address gave (a deploy takes a few seconds to reach every Cloudflare location).
+//    If the live address already gave that marker before the deploy (the same build again, such as a rerun), this
+//    check can't tell the builds apart: the summary says so, and it waits DEPLOY_SETTLE seconds instead. Then it runs
+//    the smoke check against the live address, and once more DEPLOY_RETRY seconds later if that fails.
 // 6. If the marker never matched, or the live check still fails: rolls back to the version from step 1 (wrangler
 //    rollback VERSION_ID) and exits 1.
 // It exits 0 only when the new version is live and passed. Each step's result goes to the run's summary
 // ($GITHUB_STEP_SUMMARY) as well as the log. It needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, as wrangler does;
 // the smoke runs don't get them. --old ADDRESS (smoke check: the old address redirects here) goes to the live run only.
-// The build's marker: a hash of the home page's CSP header, the hashed /_astro/ files it names, and sitemap.xml (each
-// page's lastmod). The live address can't say which version answers it, but these come from the build, and nothing
-// on Cloudflare's side rewrites them (a zone feature that rewrites HTML, such as Email Address Obfuscation, would leave
-// all three alone). Two builds with the same CSS, scripts, inline hashes and page dates share a marker, so for such a
-// change the check passes at once: the smoke check then tests a site that is the same either way.
+// The build's marker: a hash of the home page's X-Build header (the build's ID, scripts/headers.mjs: every file in
+// dist/, the headers and the Worker), its CSP header, the hashed /_astro/ files it names, and sitemap.xml. Any change
+// that ships changes X-Build, so two builds share a marker only when nothing that ships differs. Nothing on
+// Cloudflare's side rewrites these (a zone feature that rewrites HTML, such as Email Address Obfuscation, would leave
+// them alone).
 // Settings `versions deploy` doesn't apply from wrangler.jsonc, as `wrangler deploy` did: routes, custom domains,
 // cron triggers, workers_dev and preview_urls. When those change (the custom domain at launch), run
 // `npx wrangler triggers deploy` once, or deploy by hand with `npx wrangler deploy` (README, "Deploys").
@@ -45,7 +47,8 @@ if (!/^https?:\/\/[^/]+\/?$/.test(live || '')) {
   process.exit(2);
 }
 const POLL = Number(process.env.DEPLOY_POLL ?? 5);
-const POLLS = Number(process.env.DEPLOY_POLLS ?? 24);   // 2 minutes at 5 s
+const WAIT = Number(process.env.DEPLOY_WAIT ?? 120);    // seconds by the clock; each ask gives up after 15 s
+const SETTLE = Number(process.env.DEPLOY_SETTLE ?? 15);
 const RETRY = Number(process.env.DEPLOY_RETRY ?? 30);
 const command = (name, fallback) => (process.env[name] ? [process.env[name]] : fallback);
 const WRANGLER = command('DEPLOY_WRANGLER', [process.execPath, join(ROOT, 'node_modules/wrangler/bin/wrangler.js')]);
@@ -87,14 +90,15 @@ const liveVersions = () => {
 };
 // the build's marker at an address (see the top of this file); null if it doesn't answer
 const UA = { 'User-Agent': 'uplink-deploy' };   // Cloudflare refuses a client with no user agent of its own (403)
-const marker = async (address) => {
+const marker = async (address, ms = 15_000) => {
   try {
-    const get = (path) => fetch(new URL(path, address), { headers: UA, signal: AbortSignal.timeout(15_000) });
+    const signal = AbortSignal.timeout(Math.max(1, ms));
+    const get = (path) => fetch(new URL(path, address), { headers: UA, signal });
     const [home, sitemap] = await Promise.all([get('/'), get('/sitemap.xml')]);
     if (!home.ok || !sitemap.ok) return null;
     const assets = [...new Set((await home.text()).match(/\/_astro\/[^"'\s)>]+/g) || [])].sort();
-    return createHash('sha256').update(JSON.stringify([home.headers.get('content-security-policy'), assets, await sitemap.text()]))
-      .digest('hex').slice(0, 16);
+    const parts = [home.headers.get('x-build'), home.headers.get('content-security-policy'), assets, await sitemap.text()];
+    return createHash('sha256').update(JSON.stringify(parts)).digest('hex').slice(0, 16);
   } catch { return null; }
 };
 const sha = (process.env.GITHUB_SHA || '').slice(0, 12) || 'a local build';
@@ -124,6 +128,8 @@ if (!smoke(preview, ['--preview', ...previewArgs])) stop(`version \`${id}\` fail
 const want = await marker(preview);
 if (!want) stop(`couldn't read the build's marker at ${preview} (its home page and sitemap.xml). It takes no traffic; the live site is unchanged.`);
 note(`Version \`${id}\` passed the smoke check at its preview address (build marker \`${want}\`).`);
+const same = (await marker(live)) === want;   // the live address serves this very build already (a rerun)
+if (same) note(`The live address already serves build marker \`${want}\`, so this check can't tell the builds apart: the live smoke check waits ${SETTLE} s instead.`);
 
 // 4. all traffic to it
 if (!wrangler(['versions', 'deploy', `${id}@100%`, '--yes', '--message', message]).ok) {
@@ -136,15 +142,22 @@ if (!wrangler(['versions', 'deploy', `${id}@100%`, '--yes', '--message', message
   note(`Deployed version \`${id}\` to 100% of ${live}.`);
 }
 
-// 5. wait for the live address to serve this build, then smoke it, once more if it fails
+// 5. wait for the live address to serve this build (by the clock: DEPLOY_WAIT seconds at most), then smoke it, once
+// more if it fails. When it served this build already, the marker can't show the switch: wait DEPLOY_SETTLE instead
 let seen = null;
-for (let i = 0; i < POLLS && seen !== want; i++) {
-  await sleep(POLL * 1000);
-  seen = await marker(live);
+if (same) {
+  await sleep(SETTLE * 1000);
+  seen = want;
+} else {
+  const end = Date.now() + WAIT * 1000;
+  while (seen !== want && Date.now() < end) {
+    await sleep(Math.min(POLL * 1000, Math.max(0, end - Date.now())));
+    seen = await marker(live, Math.min(15_000, end - Date.now()));
+  }
 }
 let why;
 if (seen !== want) {
-  why = `${live} still served another build after ${POLLS * POLL} s (build marker \`${seen || 'none'}\`, not \`${want}\`)`;
+  why = `${live} still served another build after ${WAIT} s (build marker \`${seen || 'none'}\`, not \`${want}\`)`;
 } else {
   let passed = smoke(live, smokeArgs);
   if (!passed) {
