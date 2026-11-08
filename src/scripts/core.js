@@ -298,8 +298,8 @@ function presetService(name) {
 /* ---------- pause (WCAG 2.2.2) ------------------------------------------ */
 // Every pause button (HoldButton.astro: the hero's on Home, the footer map's on every page) holds every moving part
 // on the page. html.is-held pauses the drawings' CSS animations, nothing else (base.css); page scripts stop their
-// timers on held.ev's 'change' (home.js, grow.js). One choice for the whole site, kept for next time. Nothing moves
-// with reduced motion, so the buttons hide then.
+// timers on held.ev's 'change' (home.js, grow.js). A drawing that builds in while held shows built (settle, below).
+// One choice for the whole site, kept for next time. Nothing moves with reduced motion, so the buttons hide then.
 const HOLD_KEY = 'uplink-held';
 const held = { on: false, ev: new EventTarget() };
 const holdBtns = $$('[data-hold]');
@@ -567,7 +567,8 @@ if (botnav) {
 
 /* ---------- replay ----------------------------------------------------- */
 // Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
-// read, so it costs no forced layout (offsetWidth would).
+// read, so it costs no forced layout (offsetWidth would). While the pause is on it shows the animation's end
+// instead (settle): held on its first frame, a line that draws in would never show.
 const replay = (/** @type {Element} */ el, /** @type {string} */ cls) => {
   if (el.classList.contains(cls))
     el.getAnimations().forEach((a) => {
@@ -575,6 +576,17 @@ const replay = (/** @type {Element} */ el, /** @type {string} */ cls) => {
       a.play();
     });
   else el.classList.add(cls);
+  if (held.on) settle(el);
+};
+
+/* ---------- settle ----------------------------------------------------- */
+// While the pause is on, jumps every animation in el (and inside it) that ends to its end, so a drawing that builds
+// in shows built; the loops stay held (html.is-held, base.css). Nothing happens when the pause is off.
+const settle = (/** @type {Element} */ el) => {
+  if (!held.on) return;
+  el.getAnimations({ subtree: true }).forEach((a) => {
+    if (a.effect && a.effect.getComputedTiming().iterations !== Infinity) a.finish();
+  });
 };
 
 /* ---------- off-screen pause ------------------------------------------ */
@@ -632,4 +644,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, held, html, reduceMotion, replay, theme, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, held, html, reduceMotion, replay, settle, theme, toast, openDialog, shortcutsOn, whenOnScreen };
