@@ -37,7 +37,7 @@ const tiles = [
           <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <span class="svc-text"><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span><Pause /><span class="svc-line">{s.card}</span></span>
-          <span class="svc-go"><Pause />View service<Icon name="chevronR" /></span>
+          <span class="svc-go"><span class="sr-only"> </span>View service<Icon name="chevronR" /></span>
         </a></li>
       ))}
       <li class="svc-small svc-more"><a class="svc-tile" href="/services">
