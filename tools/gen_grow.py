@@ -1,14 +1,8 @@
-"""Draws the Home "We grow with you" world (src/components/home/grow-world.svg, inlined by Grow.astro): one business
-that grows in six steps by where its people work (the office, a home, the road, a second office, the ring and cloud
-over all of it, then the dome). Every part carries data-s, the step it arrives on, and data-o, its order inside the
-step; src/scripts/grow.js shows a step's parts as it plays. Nothing moves or rebuilds: later steps only add.
-Edit the numbers below and run again; don't hand-edit the SVG.
+"""Draws the Home "We grow with you" world, src/components/home/grow-world.svg (README, "Generators"): one business in
+six steps. Every part carries data-s, its step, and data-o, its order in the step; grow.js plays them, and later steps
+only add (nothing moves or rebuilds). Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_grow.py                       (writes src/components/home/grow-world.svg)
        python tools/gen_grow.py OUT_DIR   (also the five separate scenes the mockups used)
-World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
-Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch
-(except each person's head, a half step in: see person()).
-No words in the drawing: the page writes its tags over it at the anchors (<circle class="tg-a" data-a="...">).
 Check: python tools/check.py src/components/home/grow-world.svg
        python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
 """
@@ -20,6 +14,12 @@ from isogen import FACES, HIGH, ORANGE, BLUE, INK, EDGE, silhouette, floor_grid,
 from isoprops import tree
 import palette as pal
 
+# World: 1 unit = 20px. Origin = floor disc centre. x runs right-down, y left-down, z up.
+# Everything sits on the isoprops grid (x, y in 0.25s, z in 0.125s), so no two edges can nearly touch
+# (except each person's head, a half step in: see person()).
+# The six steps, by where the business's people work: the office, a home, the road, a second office, the ring and
+# cloud over all of it, then the dome. No words in the drawing: the page writes its tags over it at the anchors
+# (<circle class="tg-a" data-a="...">).
 w = W(0, 0, 20)
 SIZE = 480                            # each scene's width and height in the page (px)
 PAD = 14                              # space round the drawing inside its square (px)

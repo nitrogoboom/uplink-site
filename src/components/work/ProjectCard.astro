@@ -1,11 +1,9 @@
 ---
 // One project as a card linking to its case study: Home's "Our work", the Work grid and a service page's
-// "Where we've done this". The name is a heading holding the link (h2 on /work, h3 under a section's h2), and the
-// link covers the whole card (.card-link in surfaces.css), so heading navigation lands on each project and the link
-// is named by the name alone (review M3). The client line and the tag chip are read after it as plain text (M10);
-// " · " is a short pause (Sep), and a hidden comma keeps the chip apart from the client line. The chip comes last in the markup but shows first: on phones the grid puts it above
-// the name, wider screens over the picture's corner. Each part of the client line after the first ("40 staff") keeps
-// its words together. Styles: .card and .card--project in src/styles/surfaces.css.
+// "Where we've done this". A card in a list of cards (src/README.md, "Section components"; review M3, M10).
+// " · " is a short pause (Sep), and a hidden comma keeps the chip apart from the client line. The chip comes last in
+// the markup but shows first: on phones the grid puts it above the name, wider screens over the picture's corner. Each
+// part of the client line after the first ("40 staff") keeps its words together. Styles: .card--project in surfaces.css.
 //   project   the collection entry
 //   level     the heading level: 2 where the cards sit right under the page's h1, else 3
 //   first     the picture loads eagerly (the first card on screen)

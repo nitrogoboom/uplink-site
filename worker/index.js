@@ -1,35 +1,6 @@
-// The site's one Worker script. Everything else is the built site in dist/, served as static assets with _headers
-// and _redirects applied, and none of those requests run this script. It runs only for what the assets can't answer
-// well on their own (wrangler.jsonc):
-//   /api/*    run_worker_first: POST /api/report (below); any other /api/ address is a 404
-//   /404      run_worker_first: the 404 page by name, with a 404 status (as a file, dist/404.html, it would be 200)
-//   a miss    not_found_handling "none": an address with no file comes here instead of getting the 404 page from
-//             the assets, so it gets the same page as /404 with /404's headers, not those of the _headers rules its
-//             path matches (/*.md's type, /_astro/*'s year-long cache, /assets/img/*'s drawing CSP)
-// It also sends plain http:// to https:// for those requests. The pages and files themselves aren't redirected here:
-// browsers never ask workers.dev over http (.dev is on every browser's HSTS preload list), and on our own zone at
-// launch Always Use HTTPS redirects every request before it reaches the Worker or the assets (README, "The Worker").
-//
-// POST /api/report: problems real visitors' browsers hit, so we hear about them.
-//   CSP blocks       the browser posts these itself (public/_headers: report-to csp, report-uri for older browsers)
-//   script errors    core.js posts uncaught errors and rejected promises (navigator.sendBeacon)
-// Each report becomes one line in the Workers logs (Cloudflare dashboard > Workers > uplink-site > Logs; observability
-// is on in wrangler.jsonc, with Cloudflare's own record of each run, the invocation log, turned off). Nothing else is
-// kept. What a line holds, and what it never holds, is in the privacy page (src/data/privacy.md): the page and script
-// addresses without their ?query, the message, the user agent (cut to 200 characters). This code never logs the IP
-// address or form contents. A body over 8 KB is refused (413); a post with more than 20 reports has only its first
-// 20 read (browsers batch them, and the first are as good as any).
-// Only this site's reports count: a post whose Origin header is another site's gets 403, a script error needs our own
-// Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. WebKit (Safari)
-// posts its CSP reports with "Origin: null", so null is let through: a report about another page is still dropped,
-// and a script error still needs our own Origin. Reports about a browser extension's own scripts (Chrome strips their
-// address to "chrome-extension") are dropped too: they aren't the site's, and they'd bury the ones that are. So is
-// WebKit's refusal of its own style for each <select> (style-src-attr, "inline", no script named: it does it on a bare
-// page with nothing of ours, checked November 6, 2026), two on every page. Each visitor address may have 30 posts a
-// minute logged (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past that, 429. A post
-// with nothing to log isn't counted. Without the binding (the tests) there is no limit.
-// Every answer this script writes itself (not the 404 page, which is the assets' own) carries nosniff, no-store and a
-// policy that lets it load nothing (OWN, below): _headers doesn't reach a Worker's own responses.
+// The site's one Worker script: it runs only for /api/*, /404 and addresses with no file (wrangler.jsonc); every
+// other request is a static file from dist/. Routing, the http:// redirect, the 404 page and its own headers:
+// README, "The Worker".
 //
 // PR #38 (open, paused until a sending domain exists) adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
 
@@ -133,6 +104,24 @@ async function capped(request) {
   return new TextDecoder().decode(all);
 }
 
+// POST /api/report: problems real visitors' browsers hit, so we hear about them.
+//   CSP blocks       the browser posts these itself (public/_headers: report-to csp, report-uri for older browsers)
+//   script errors    core.js posts uncaught errors and rejected promises (navigator.sendBeacon)
+// Each report becomes one line in the Workers logs (Cloudflare dashboard > Workers > uplink-site > Logs; observability
+// is on in wrangler.jsonc, with Cloudflare's own record of each run, the invocation log, turned off). Nothing else is
+// kept. What a line holds, and what it never holds, is in the privacy page (src/data/privacy.md): the page and script
+// addresses without their ?query, the message, the user agent (cut to 200 characters). This code never logs the IP
+// address or form contents. A body over 8 KB is refused (413); a post with more than 20 reports has only its first
+// 20 read (browsers batch them, and the first are as good as any).
+// Only this site's reports count: a post whose Origin header is another site's gets 403, a script error needs our own
+// Origin (sendBeacon always sends one), and a CSP report about a page on another site is dropped. WebKit (Safari)
+// posts its CSP reports with "Origin: null", so null is let through: a report about another page is still dropped,
+// and a script error still needs our own Origin. Reports about a browser extension's own scripts (Chrome strips their
+// address to "chrome-extension") are dropped too: they aren't the site's, and they'd bury the ones that are. So is
+// WebKit's refusal of its own style for each <select> (style-src-attr, "inline", no script named: it does it on a bare
+// page with nothing of ours, checked November 6, 2026), two on every page. Each visitor address may have 30 posts a
+// minute logged (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past that, 429. A post
+// with nothing to log isn't counted. Without the binding (the tests) there is no limit.
 async function report(request, env) {
   if (request.method !== 'POST') return reply(405, 'Method not allowed', { Allow: 'POST' });
   const site = new URL(request.url).origin;

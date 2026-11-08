@@ -1,15 +1,7 @@
-// What CI runs, on this machine, in one go (npm run ci): types, the build scripts' tests, lint, build, then the
-// built site served the way Cloudflare serves it, checked in a browser (npm run verify: checks/site.spec.mjs and
-// checks/zoom.spec.mjs, screenshots in out/), for broken links (npm run verify:links) and for its headers (npm run smoke
-// against the local server). Not the screenshot comparison: CI runs that on pull requests only, and by hand it's
+// What CI runs, on this machine, in one go (npm run ci): each step, what runs side by side, and its own wrangler dev on
+// a free port: README, "Commands". Needs Chromium for Playwright once: npx playwright install chromium.
+// Not the screenshot comparison: CI runs that on pull requests only; by hand it's
 // npm run visual-diff -- https://uplink-site.johnoreilly.workers.dev http://localhost:8787.
-// Steps that don't depend on each other run side by side: the tests and lint beside the type check and the build; then
-// the site check, and the link and smoke checks together, against one server. Each step's output is printed whole when it ends, with its time (the site
-// check's as it comes); any
-// failure fails the run (the others still finish, so you see every failure at once).
-// Starts its own `wrangler dev` on a free port for the checks, so a server you already have on :8787 (perhaps serving
-// an older build) is never what gets checked, and stops it after.
-// Needs Chromium for Playwright once: npx playwright install chromium.
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:net';
 

@@ -1,16 +1,12 @@
-"""Shared kit for the drawings: office chair, monitor on a stand, desk phone (VoIP), and the helpers that put
-flat details (screens, keypads, card contents) exactly on an iso face.
+"""Shared kit for the drawings: office chair, monitor on a stand, desk phone (VoIP), and the helpers that put flat
+details exactly on an iso face (README, "Shared drawing code", which gives the grid rule).
 
 Every prop is built in its own local frame, centred on (0, 0) on the floor or desk top, then turned to face
 one of '+x', '-x', '+y', '-y' and moved into place. It comes back as (name, box) pairs already in back-to-front
 order for that facing, ready for isogen.faces() and isogen.silhouette(). Sizes are in help-desk units
 (1 unit = 23px); pass s to scale for a drawing at another scale (s = 23 / that drawing's u * how big you want it).
-
-The viewer looks at the +x and +y faces, so a part with larger x + y is nearer.
-
-Grid rule: every prop's corners sit on x, y = multiples of 0.25 and z = multiples of 0.125 (place them on the
-same grid). On screen that puts any two corners either exactly together or at least about 2.9px apart at
-23px a unit, so parts can't nearly-touch (check.py stays clean) however a prop is turned or placed.
+The viewer looks at the +x and +y faces, so a part with larger x + y is nearer. On the grid, any two corners sit
+exactly together or at least about 2.9px apart at 23px a unit, however a prop is turned or placed.
 """
 from iso import C30
 import palette as pal

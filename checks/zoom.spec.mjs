@@ -1,33 +1,18 @@
 // Zoom check (WCAG 1.4.4 resize text, 1.4.10 reflow; review C1): pages at browser zoom and at a bigger default font,
-// looking for what W3C's failure F69 names. Browser zoom is emulated the way the browser does it: the page gets a
-// screen of (screen ÷ zoom) CSS pixels drawn at (zoom) device pixels each. The default font is the browser setting
-// (Chrome: Settings, Appearance, Font size), set over the DevTools protocol (Page.setFontSizes).
-// For each page and case below, it fails on:
-//   root size     the root font size (1rem) is not the default font size: 16px, or the 24px or 32px set
-//   text growth   at zoom, body text on screen is not at least (zoom) times its size at 100% on the same screen
-//   clipped       text partly cut by a box that hides its overflow (text wholly outside the box is tucked away on
-//                 purpose, a label that slides in on hover: left out)
-//   overlapping   the middle half of two lines of text drawn over each other
-//   out of reach  text or a control (link, button, field) above or left of the page's start, where nothing scrolls
-//                 to it; in a fixed bar (the phone tab bar), off the screen
-//   sideways      the page is wider than the screen
-// Text in drawings (SVG), hidden and screen-reader-only text, and things faded out are left out. Text in a bar (the
-// sticky header, the phone tab bar) is checked against its own bar only, not against the page that scrolls under it.
-// Home is also read with its Grow section at each of its steps (picked with its dots).
-// Pages: Home, Services, a service page, About, Contact, Work and Privacy (a table); --all: every page the build wrote.
+// looking for what W3C's failure F69 names. The cases and what fails: README, "Site checks"; the details sit beside
+// CASES and PROBE below. Known failures are marked test.fail with the review item that fixes them (KNOWN, below).
+// usage: npm run build && npm run serve   then   npm run verify:zoom [-- --all] [--base URL]
+//   (npm run verify runs it too, after the site check)
+import { test } from '@playwright/test';
+import { BASE, MISSING, flag, pad, pages } from './lib.mjs';
+
 // Cases: a 1280 x 720 laptop at 100% (the shortest one-screen desktop: its sections grow past one screen rather than
 // cut their words); 200% zoom on a 1280 x 720 laptop, a 1920 x 1080 and a 2560 x 1440 desktop and an 820 x 1180 tablet (the
 // phone layout, 410 CSS pixels wide); 400% zoom on a 1280 x 1024 desktop (320 x 256 CSS pixels, the reflow case WCAG
 // names); a 20px default font on a 430 x 932 phone, 24px on a 1920 x 1080 desktop and 32px on a 2560 x 1440 one (both
 // wide enough for the one-screen layout at that font). Each case keeps at least 20em (320px at 16px) of width, the
 // narrowest the site checks: a phone at 200% zoom or with a 24px font is narrower than that (notes.md).
-// One test per page and case; each fails on any finding. Known failures are marked test.fail with the review item
-// that fixes them (KNOWN, below). Then one test per page and desktop screen for headings at zoom steps (end of file).
-// usage: npm run build && npm run serve   then   npm run verify:zoom [-- --all] [--base URL]
-//   (npm run verify runs it too, after the site check)
-import { test } from '@playwright/test';
-import { BASE, MISSING, flag, pad, pages } from './lib.mjs';
-
+// Pages: Home, Services, a service page, About, Contact, Work and Privacy (a table); --all: every page the build wrote.
 const CASES = [
   { n: '1280x720', w: 1280, h: 720 },
   { n: '1280x720 zoom 200%', w: 1280, h: 720, zoom: 2 },
@@ -44,6 +29,18 @@ const PATHS = flag('--all') ? await pages(BASE) : SOME;
 /** @type {Record<string, string>} */
 const KNOWN = {};
 
+// For each page and case below, it fails on:
+//   root size     the root font size (1rem) is not the default font size: 16px, or the 24px or 32px set
+//   text growth   at zoom, body text on screen is not at least (zoom) times its size at 100% on the same screen
+//   clipped       text partly cut by a box that hides its overflow (text wholly outside the box is tucked away on
+//                 purpose, a label that slides in on hover: left out)
+//   overlapping   the middle half of two lines of text drawn over each other
+//   out of reach  text or a control (link, button, field) above or left of the page's start, where nothing scrolls
+//                 to it; in a fixed bar (the phone tab bar), off the screen
+//   sideways      the page is wider than the screen
+// Text in drawings (SVG), hidden and screen-reader-only text, and things faded out are left out. Text in a bar (the
+// sticky header, the phone tab bar) is checked against its own bar only, not against the page that scrolls under it.
+// Home is also read with its Grow section at each of its steps (picked with its dots).
 // runs in the page: the findings, and the size of body text and the root
 const PROBE = () => {
   const out = { clip: [], over: [], away: [], sideways: document.documentElement.scrollWidth - innerWidth };
@@ -149,6 +146,8 @@ const SIZE = () => {
 // two frames on: what the page lays out from script (ResizeObserver, a picked step) is in place. Motion is reduced.
 const FRAMES = () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
 
+// Browser zoom as the browser does it: a screen of (screen ÷ zoom) CSS pixels drawn at (zoom) device pixels each. The
+// default font is the browser setting (Chrome: Settings, Appearance, Font size), set over the DevTools protocol.
 async function open(browser, path, { w, h, zoom = 1, font }) {
   const ctx = await browser.newContext({
     viewport: { width: Math.round(w / zoom), height: Math.round(h / zoom) },

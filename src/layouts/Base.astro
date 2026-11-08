@@ -1,25 +1,8 @@
 ---
-// The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it.
-//   title, description  the page's own
-//   page                which tab is current (home, services, work, about, contact; notfound, soon, privacy and accessibility have none)
-//   path                the page's address ('/', '/services'); gives it a canonical and Open Graph tags.
-//                       Leave it out for pages that should carry neither (soon, 404).
-//   robots              e.g. 'noindex, follow'
-//   ogType              Open Graph type: 'website' (the default) or 'article' (a case study)
-//   type                the page's schema.org type (FAQPage, CollectionPage, AboutPage, ContactPage): writes JSON-LD
-//                       for the page and its breadcrumb, pointing at Home's business block by @id.
-//   ldPage, ldGraph     more JSON-LD: fields for the page node, and more nodes (the Services page adds its FAQ and
-//                       the Service list from the collections).
-//   footer              false leaves the footer out (the 404: one screen, nothing under it). <body> gets .no-footer,
-//                       so <main> keeps the room under the page for the phone tab bar (bottom-nav.css). Default true.
-//                       With the footer comes a one-line contact block for paper (.print-contact, print.css): print
-//                       leaves the footer out.
-// Anything else a page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
-// The shared CSS (global.css) is imported here; the build inlines it in a <style> block in every page (astro.config.mjs). The page's own CSS is
-// imported by its section components. Scripts: core.js and footer.js run on every page (ES modules; footer.js does
-// nothing on a page without the footer);
-// a page adds its own with a <script> that imports it, inside <Fragment slot="scripts"> so it lands at the end of
-// <body> (a script after </Base> would come after </html>, which isn't valid HTML).
+// The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it. Its props, and how a
+// page adds its own script (inside <Fragment slot="scripts">): src/README.md, "The shared layout". Anything else a
+// page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
+// the shared CSS; the build inlines it in a <style> block in every page (astro.config.mjs)
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -35,13 +18,16 @@ interface Props {
   title: string;
   description: string;
   page: Page;
-  path?: string;
+  path?: string; // gives a canonical and Open Graph tags; leave it out for pages that carry neither (soon, 404)
   robots?: string;
   ogType?: 'website' | 'article';
+  // writes JSON-LD for the page and its breadcrumb, pointing at Home's business block by @id
   type?: 'FAQPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
   ldPage?: Record<string, unknown>; // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
   ldGraph?: object[]; // more nodes for the page's JSON-LD graph (e.g. the Services listed)
-  footer?: boolean; // false: no footer (the 404)
+  // false: no footer (the 404). <body> gets .no-footer, so <main> keeps the room under the page for the phone tab bar
+  // (bottom-nav.css). With the footer comes a one-line contact block for paper (.print-contact, print.css).
+  footer?: boolean;
 }
 const {
   title,

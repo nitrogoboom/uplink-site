@@ -1,10 +1,5 @@
-// Deletes old pull request previews from Cloudflare, so they don't pile up. Each push to a pull request uploads a
-// preview version of the Worker (site.yml, `wrangler versions upload --preview-alias BRANCH`), and Cloudflare keeps
-// every one, with its own address, until deleted. Git is never touched: no branch, pull request or commit.
-// Deleted: preview versions (ones uploaded with a branch alias) older than KEEP_DAYS, except
-//   - any version that is or was deployed (the live site and every rollback target), and
-//   - the newest preview of a branch with an open pull request (its preview address keeps working).
-// Run by .github/workflows/clean-previews.yml (every 3 days, and by hand). Dry run unless DRY_RUN=false.
+// Deletes old pull request previews from Cloudflare, run by .github/workflows/clean-previews.yml (every 3 days, and
+// by hand). What it deletes and keeps: README, "Deploys" and "Clean up previews by hand". Dry run unless DRY_RUN=false.
 // Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, OPEN_BRANCHES (file: one open pull request branch a line), KEEP_DAYS (3), ONLY_ALIAS (one alias only),
 // DRY_RUN ('false' to delete), GITHUB_STEP_SUMMARY (optional: the list goes there too).
 import { appendFileSync, readFileSync } from 'node:fs';

@@ -1,13 +1,8 @@
 // When a page's source files were first added and last changed, from git history: the sitemap's <lastmod>
-// (allPages() in site.ts) and a case study's datePublished and dateModified (src/pages/work/[slug].astro).
-// A service or project page dates from its own entry file only (entryFile()), so editing one project changes one URL.
-//
+// (allPages() in site.ts) and a case study's datePublished and dateModified (README, "Search engines").
 // A shallow clone (git clone --depth N) stops at a cut-off commit that seems to add every file, so its dates would
-// all be that commit's. So, before any date is read, the history is checked once:
-//   full history     dates as git has them
-//   shallow, or no git checkout at all
-//                    in CI (CI set in the environment): the build stops, with how to fetch the full history
-//                    elsewhere: one warning, and no dates (the sitemap leaves <lastmod> out, the Article its dates)
+// all be that commit's: the history is checked once, before any date is read (CI: the build stops; elsewhere: one
+// warning, and no dates).
 import { execFileSync } from 'node:child_process';
 
 /** @type {(args: string[], cwd?: string) => string} */

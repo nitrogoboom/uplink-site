@@ -1,25 +1,9 @@
-"""Light theme for the drawings (Settings, light or dark; docs/light-theme-2026-11-08.md).
+"""Light theme for the drawings: NAME-light.svg beside each dark picture, and src/styles/theme-drawings.css for the
+drawings inside the page (README, "Generators"; why each colour: docs/light-theme-2026-11-08.md). The dark drawings
+stay the source, so tools/regen.py runs this last. How a colour is swapped: above SWAP.
 
     python tools/gen_light.py           write them
     python tools/gen_light.py --check   fail if a written file differs from what this script makes now
-
-The dark drawings stay the source: a change to a gen_*.py reaches the light theme on the next run of this script
-(tools/regen.py runs it last). Two outputs, one colour table:
-  - Pictures (<img>, <picture>): NAME-light.svg beside each dark NAME.svg in public/assets/img/, the dark SVG with its
-    colours swapped. Drawing.astro shows one or the other by theme.
-  - Drawings inside the page (the Home hero, which home.js fetches in, its dashes, and the Grow world): no copies.
-    src/styles/theme-drawings.css swaps their colours with CSS when <html data-theme="light">: an attribute
-    selector per colour (author CSS beats an SVG's fill="" attribute), and a light copy of each colour rule in the
-    drawings' own <style>. So the switch is instant, and home.js and grow.js keep one drawing.
-
-How a colour is swapped (docs/palette.md, light columns of 5.1 and 5.4):
-  1. Roles with a light value in the palette take it (box faces, blue and green boxes, ground, grid, edges).
-  2. Text and the page colour flip: label ink becomes dark, halos and dot rims become the light page.
-  3. Bright ink on a light ground darkens to its ink step (amber lines to amber 500, sky lines to the logo blue,
-     green dots to green 600), so lines and dots keep their weight against the light faces.
-  4. Any other navy shade (5.5) keeps its place between the box faces: its dark lightness is mapped onto the light
-     box faces' lightness (right 0.295 -> 0.81, left 0.375 -> 0.88, top 0.455 -> 1.0) and redrawn with navy(L).
-Screens stay dark (a monitor is dark in a lit room too), so what is drawn on them keeps its dark-mode colours.
 """
 import pathlib
 import re
@@ -50,6 +34,14 @@ def picture_sources():
                   if p.name not in _INLINE_NAMES and p.name != 'campus.svg' and not p.stem.endswith('-light'))
 
 
+# How a colour is swapped (docs/palette.md, light columns of 5.1 and 5.4):
+#   1. Roles with a light value in the palette take it (box faces, blue and green boxes, ground, grid, edges).
+#   2. Text and the page colour flip: label ink becomes dark, halos and dot rims become the light page.
+#   3. Bright ink on a light ground darkens to its ink step (amber lines to amber 500, sky lines to the logo blue,
+#      green dots to green 600), so lines and dots keep their weight against the light faces.
+#   4. Any other navy shade (5.5) keeps its place between the box faces: its dark lightness is mapped onto the light
+#      box faces' lightness (right 0.295 -> 0.81, left 0.375 -> 0.88, top 0.455 -> 1.0) and redrawn with navy(L).
+# Screens stay dark (a monitor is dark in a lit room too), so what is drawn on them keeps its dark-mode colours.
 # 1-3: fixed swaps, any attribute. Keys and values upper case.
 SWAP = {
     # plain box faces and their outline

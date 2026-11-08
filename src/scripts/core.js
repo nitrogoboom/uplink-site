@@ -1,16 +1,6 @@
 /* ==========================================================================
-   Uplink Technology · core script (every page)
-   Plain JS, no libraries. ES modules, bundled by Astro. Every feature is optional: the
-   pages read and work without script (links navigate, every service and
-   project is in the HTML, the drawings show finished).
-
-   Files (each page script imports core.js, so core always runs first):
-     core.js      every page   helpers, toasts, pop-ups, forms, shortcuts, tab bar;
-                               exports the helpers the page scripts import
-     footer.js    every page   footer campus map (the sections are <details>)
-     home.js      Home         hero, phone Services row; grow.js (We grow with you)
-     contact.js   Contact      copy buttons, queue card
-     soon.js      soon.html    names the missing page
+   Uplink Technology · core script (every page; each page script imports it, so it runs first). What it holds:
+   src/README.md, "Scripts". Every feature is optional: the pages read and work without script.
 
    Keyboard map (single keys, can be switched off in Settings):
      ?          open Settings (the keys)      all pages

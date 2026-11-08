@@ -1,14 +1,12 @@
 ---
-// SHARED · A drawing shown as a picture, in the visitor's theme (Settings: light or dark). It writes two copies, the
-// dark NAME.svg and the light NAME-light.svg (tools/gen_light.py), each with a class, .th-dark or .th-light, and
-// theme-light.css hides the one that isn't the theme's (display: none). A lazy picture that isn't shown isn't fetched,
-// so a page loads one copy; the theme changes at once, with nothing for a script to swap. Without script: dark.
+// SHARED · A drawing shown as a picture, in the visitor's theme: the dark NAME.svg and the light NAME-light.svg, one
+// hidden by theme-light.css (src/README.md, "Shared components"). A lazy picture that isn't shown isn't fetched, so a
+// page loads one copy, and the theme changes at once with nothing for a script to swap. Without script: dark.
 //   src       the dark drawing's address, /assets/img/NAME.svg
 //   sources   <source>s for a <picture> (another cut on narrower screens): { media, srcset, width?, height? }, dark
 //             addresses
 //   class     the <img>'s class (the theme's class goes on the <picture> when there is one)
 //   anything else goes on the <img> as written (alt, width, height, loading, fetchpriority)
-// Drawings inside the page (the Home hero and Grow) don't use this: theme-drawings.css recolours them in place.
 import type { HTMLAttributes } from 'astro/types';
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {

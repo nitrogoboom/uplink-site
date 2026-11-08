@@ -1,16 +1,5 @@
-"""The hero's 3D cloud: a flat cloud face pushed back into a slab, drawn in true isometric.
-Used by gen_office.py (it fills {{CLOUD_SHAPES}} in tools/office_parts/hero_cloud.svg). Edit the numbers and rerun
-gen_office.py; don't hand-edit the SVG.
-
-The face is a union of circles on a plane that runs along the room's x axis (u across, v up). Screen = origin +
-u * (cos30, 0.5) + v * (0, -1). The slab runs back along -y, which on screen is DEPTH * (cos30, -0.5).
-Each outline segment sweeps one strip of the side wall; strips are shaded by their normal and merged when the shade
-repeats, so the wall is one smooth ramp with no seams, and the face carries its own soft gradient.
-The strips sit in <g class="curve">, so check.py doesn't read their outline steps (up to about 5px) as near-misses.
-Same output on every machine: each shape is snapped to a fine grid (set_precision) after every buffer and before it
-is simplified, so the last-bit float noise of the platform's maths library can't tip buffer or simplify one way or the
-other; every ring starts at
-its lowest vertex and every list of shapes is sorted by a full key, so nothing depends on the order GEOS returns.
+"""The hero's 3D cloud: a flat cloud face pushed back into a slab, drawn in true isometric. gen_office.py fills
+{{CLOUD_SHAPES}} in tools/office_parts/hero_cloud.svg with it: edit the numbers and rerun gen_office.py.
 """
 import math
 import shapely
@@ -20,6 +9,11 @@ from shapely.ops import unary_union
 import palette as pal
 
 C30 = math.cos(math.pi / 6)
+# The face is a union of circles on a plane that runs along the room's x axis (u across, v up). Screen = origin +
+# u * (cos30, 0.5) + v * (0, -1). The slab runs back along -y, which on screen is DEPTH * (cos30, -0.5).
+# Each outline segment sweeps one strip of the side wall; strips are shaded by their normal and merged when the shade
+# repeats, so the wall is one smooth ramp with no seams, and the face carries its own soft gradient.
+# The strips sit in <g class="curve">, so check.py doesn't read their outline steps (up to about 5px) as near-misses.
 ORIGIN = (899.6, 8.8)                 # screen point of u = 0, v = 0 (bottom-left of the face)
 DEPTH = 56.0                          # slab thickness, in plane units (48.5 px across, 28 px up on screen)
 
@@ -40,6 +34,10 @@ SIDE_DARK, SIDE_LIGHT = (tuple(int(c[i:i + 2], 16) for i in (1, 3, 5)) for c in 
 FACE_TOP, FACE_BOT = pal.CLOUD_TOP, pal.CLOUD_BOT
 SHADES = 56                           # steps in the side-wall ramp (finer than the 8-bit colour can show)
 GID = 'hc'                            # id prefix for the gradients
+# Same output on every machine: each shape is snapped to a fine grid (set_precision) after every buffer and before it
+# is simplified, so the last-bit float noise of the platform's maths library can't tip buffer or simplify one way or
+# the other; every ring starts at its lowest vertex and every list of shapes is sorted by a full key, so nothing
+# depends on the order GEOS returns.
 GRID = 1e-3                           # snap grid (plane units in face(), px after): far below the 0.01px the SVG prints
 
 

@@ -1,32 +1,8 @@
-// Release audit: the machine half of the checklist in docs/sop.md, section 5. Run it before a release, not on every
-// build (it takes a few minutes). Against `npm run serve` (or any address of the built site with --base).
+// Release audit: the machine half of the release checklist (docs/sop.md, "Release checklist"). Run it before a
+// release, not on every build (it takes minutes), against `npm run serve` or --base. Each part is described above it.
 // usage: npm run release-audit [-- --base http://localhost:8787] [--only browsers,keyboard,reader,motion,forms,html] [--html-all]
-//
-// What each part does (every page in the sitemap, plus /soon and the 404 page):
-//   browsers   Chromium, Firefox and WebKit (Safari's engine) at 1440x900, plus an iPhone (WebKit) and an Android phone
-//              (Chromium) as Playwright emulates them: script errors, CSP blocks, sideways scroll, a screenshot of each
-//              page's first screen. Emulation is not a real phone; the SOP still asks for one pass on real ones.
-//   keyboard   Tabs through each page from the top, like a keyboard user: every stop's name, whether focus is visible
-//              (its outline, shadow, border or background changes from the unfocused look), whether it is on screen,
-//              and whether Tab ever gets stuck. Opens each dialog from the keyboard, checks Esc closes it and focus
-//              returns.
-//   reader     Reads each page top to bottom with Guidepup's Virtual Screen Reader (the words a screen reader says,
-//              built from the accessibility tree), saves it as a transcript, and flags what sounds wrong: run-on link
-//              names, the same link name going two places, very long names. Not NVDA or VoiceOver word for word: each
-//              says it a little differently, but the order and the words are these.
-//   motion     With Reduce Motion on, nothing may keep moving. With it off, anything that loops longer than 5 s needs a
-//              way to stop (WCAG 2.2.2), and nothing may flash more than 3 times a second (2.3.1).
-//   forms      Submits each form empty, then with a bad email: is each error in words, tied to its field
-//              (aria-describedby or the field's own message), and does focus go to the first problem?
-//   html       Sends Home's HTML to the W3C Nu validator (validator.w3.org/nu) and lists its errors; --html-all sends
-//              every page. The pages are public anyway; nothing else leaves this machine. W3C's free service limits
-//              requests per address: on November 3, 2026 a day of repeated full runs (20 pages each) got "429 Too Many
-//              Requests". So it's Home only by default (one request a run), and while fixing things, skip it:
-//              --only browsers,keyboard,reader,motion,forms.
-//
-// Writes out/audit/report.md (the summary to paste into docs/releases/) and, per page, the reader transcript and the
-// keyboard stops in out/audit/reader/ and out/audit/keyboard/, screenshots in out/audit/shots/. Fails if anything
-// fails. Needs: npx playwright install chromium firefox webkit (the reader is bundled from node_modules with esbuild).
+// Writes out/audit/report.md (the summary to paste into docs/releases/), with per-page files in out/audit/reader/,
+// keyboard/ and shots/. Needs: npx playwright install chromium firefox webkit (the reader is bundled with esbuild).
 import { mkdirSync, statSync, existsSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
@@ -64,6 +40,9 @@ function watch(pg, where, errs) {
 }
 
 // ---------------------------------------------------------------- browsers
+// Chromium, Firefox and WebKit (Safari's engine) at 1440x900, plus an iPhone (WebKit) and an Android phone
+// (Chromium) as Playwright emulates them: script errors, CSP blocks, sideways scroll, a screenshot of each
+// page's first screen. Emulation is not a real phone; the SOP still asks for one pass on real ones.
 
 async function browsers(paths) {
   const runs = [
@@ -123,6 +102,10 @@ async function browsers(paths) {
 }
 
 // ---------------------------------------------------------------- keyboard
+// Tabs through each page from the top, like a keyboard user: every stop's name, whether focus is visible
+// (its outline, shadow, border or background changes from the unfocused look), whether it is on screen,
+// and whether Tab ever gets stuck. Opens each dialog from the keyboard, checks Esc closes it and focus
+// returns.
 
 // every focusable element gets a number and its unfocused look, so each Tab stop can be compared with it
 const MARK = () => {
@@ -274,6 +257,10 @@ async function keyboard(paths) {
 }
 
 // ---------------------------------------------------------------- reader
+// Reads each page top to bottom with Guidepup's Virtual Screen Reader (the words a screen reader says,
+// built from the accessibility tree), saves it as a transcript, and flags what sounds wrong: run-on link
+// names, the same link name going two places, very long names. Not NVDA or VoiceOver word for word: each
+// says it a little differently, but the order and the words are these.
 
 const READ = async () => {
   const v = window.VSR.virtual;
@@ -357,6 +344,8 @@ async function reader(paths) {
 }
 
 // ---------------------------------------------------------------- motion
+// With Reduce Motion on, nothing may keep moving. With it off, anything that loops longer than 5 s needs a
+// way to stop (WCAG 2.2.2), and nothing may flash more than 3 times a second (2.3.1).
 
 const MOVING = () =>
   document
@@ -441,6 +430,8 @@ async function motion(paths) {
 }
 
 // ---------------------------------------------------------------- forms
+// Submits each form empty, then with a bad email: is each error in words, tied to its field
+// (aria-describedby or the field's own message), and does focus go to the first problem?
 
 const FORM_STATE = (f) => {
   const fields = [...f.querySelectorAll('input, select, textarea')].filter(
@@ -543,6 +534,11 @@ async function forms(paths) {
 }
 
 // ---------------------------------------------------------------- html
+// Sends Home's HTML to the W3C Nu validator (validator.w3.org/nu) and lists its errors; --html-all sends
+// every page. The pages are public anyway; nothing else leaves this machine. W3C's free service limits
+// requests per address: on November 3, 2026 a day of repeated full runs (20 pages each) got "429 Too Many
+// Requests". So it's Home only by default (one request a run), and while fixing things, skip it:
+// --only browsers,keyboard,reader,motion,forms.
 
 // the service answers 429 when it's busy or we've sent a lot today: wait as it asks, then try again
 async function validate(page) {

@@ -1,27 +1,8 @@
-"""Draws the office floor plan from one world-space description, in these cuts, which share every shape:
-  public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
-  public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
-                                      badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
-  public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
-  public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
-  src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
-  public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, no words;
-                                         home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply).
-                                         Its build starts PHONE_AHEAD in, on the furnished room. With reduced motion
-                                         it stands still (hero.css) and the captions come at once.
-  public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
-  public/assets/img/hero-office-phone.svg  the phone cut as a still, dashes in, nothing moving: Home's no-script hero on phones
+"""Draws the office floor plan and the Home hero from one world-space description, in cuts that share every shape
+(README, "Generators" and "Which cut shows where"; each output is listed where it's written, at the end).
 usage: python tools/gen_office.py public
-Edit the numbers below and run again; don't hand-edit any of them.
-The hero and its tablet and phone cuts have their own floor layout for now ('hero layout' below: desk rows, lounge,
-guest Wi-Fi, reception, entrance); office and compact (the card) still draw the plan above. To move them over, send them through hero_groups() too.
-World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
-Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
-to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
-The hero's animation (classes, --d delays, data-tile) and its 3D cloud are kept as the page's JS and CSS expect:
-  tools/office_parts/hero.css              the animation CSS inside the animated cuts
-  tools/office_parts/hero_cloud.svg        hero only: sync lines, the cloud's group and its label (fixed screen points)
-  tools/hero_cloud.py                      the cloud's shapes (face and side wall), filled in at {{CLOUD_SHAPES}}
+Edit the numbers below and run again; don't hand-edit any of them. Keep the hero's classes, --d delays and data-tile
+as the page's JS and CSS expect; its animation CSS and the cloud's frame are input parts in tools/office_parts/.
 """
 import html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
@@ -41,6 +22,9 @@ def part(name):
     text = (PARTS / name).read_text(encoding='utf-8').rstrip('\n')
     return re.sub(r'\{\{pal:(\w+)\}\}', lambda m: getattr(pal, m.group(1)), text)
 
+# World: 1 unit = 28.127px, W(616.4, 240.2). Floor x 0..22, y 0..15; x runs right-down, y left-down, z up.
+# Chairs, monitors and desk phones are the shared kit (isoprops) at PROP_S; furniture sits on that kit's grid scaled
+# to this drawing (x, y in 0.125s, z in 0.0625s) so parts meet exactly or stay a clear pixel apart.
 # ---- the room ---------------------------------------------------------------
 FLOOR = (22, 15)                       # floor size; grid every 1 unit
 SLAB = 0.45                            # floor thickness
@@ -117,6 +101,7 @@ COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
     (LABELS[2][0], (640.3, 682.1), pal.SKY, 'WORKSTATIONS', 'managed + patched', 'left'),
 ]
 # ---- hero layout (the hero's three cuts only for now; office, build and compact keep the plan above) ------------
+# To move office and compact (the card) over to this layout, send them through hero_groups() too.
 # Back half, the work area: 3 desks on the back wall and 2 in front (a walkway by the meeting room), gaps between them and a 1.75-wide aisle, set right so the meeting
 # room's glass doesn't hide them; a utility wall on the left (filing cabinet, printer, coffee counter); a small
 # network closet (4 x 3) round the rack and UPS in the back-right corner.
@@ -850,6 +835,19 @@ def phone_still():
 
 
 if __name__ == '__main__':
+    # The outputs:
+    # public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
+    # public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
+    #   badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
+    # public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
+    # public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
+    # src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
+    # public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, no words;
+    #   home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply).
+    #   Its build starts PHONE_AHEAD in, on the furnished room. With reduced motion
+    #   it stands still (hero.css) and the captions come at once.
+    # public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
+    # public/assets/img/hero-office-phone.svg  the phone cut as a still, dashes in, nothing moving: Home's no-script hero on phones
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
     # the card cut: the compact one without its labels or their letters (isogen.card). The compact cut itself is

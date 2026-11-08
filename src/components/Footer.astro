@@ -1,16 +1,6 @@
 ---
-// SHARED · Footer (every page). One <nav aria-label="Footer"> holding six <details name="footer">, in reading order
-// on every screen: the <summary> is the section's tile, the rest is its panel. The browser opens one at a time
-// (name="footer") and gives each summary its open or closed state; no script moves or relabels anything.
-// Tablet and desktop: the summaries form the tile row and the open panel fills the stage beside (desktop) or under
-// (tablet) the campus map; with nothing open, Contact shows (footer.css, :has()). Phones (under 700 px): no map, and
-// the sections are six rows that open in place.
-// Each section's data-map names its spot on the campus map (hq, services, company, support, resources, follow). The
-// map's label holds all six spots' words, and footer.css shows the open section's. The map is drawn by
-// tools/gen_campus.py (CAMPUS in src/lib/site.ts); footer.js fetches it into data-fc-map when the footer comes near
-// the screen and flies its camera to the open section's spot. Without script there is no map; the sections work.
-// The lists and the spots' words come from src/data/footer.json (through src/lib/footer.ts, its schema); the Services
-// panel's links from the services collection. Styles: src/styles/footer.css. Script: src/scripts/footer.js.
+// SHARED · Footer (every page): one <nav aria-label="Footer"> of six <details name="footer">, in reading order on every
+// screen; no script moves or relabels anything. Layout, map and data: src/README.md, "The footer".
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';

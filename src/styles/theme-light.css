@@ -1,14 +1,8 @@
 /* ==========================================================================
-   Light theme: the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens.
-   It applies when <html data-theme="light">: the visitor chose Light in Settings, or chose System (the default) and
-   their device is set to light. Base.astro's head script sets the attribute before the page paints; core.js changes
-   it. Without script the page stays dark, the site's own look. Screen only: print keeps its own colours
-   (tokens.css). Where the palette's light value didn't hold up, the change and the reason are noted beside it
-   (docs/light-theme-2026-11-08.md). The drawings: theme-drawings.css (inside the page) and .th-dark / .th-light
-   (pictures, Drawing.astro), at the end.
-   The look follows the dark theme's: every neutral is navy (hue 250), never a plain grey; a card is the ground's own
-   colour lifted, not a different one; depth comes from soft, layered, navy-tinted shadows and light from above, not
-   from outlines (docs/palette.md, "Light mode").
+   Light theme: the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens, on
+   <html data-theme="light"> (src/README.md, "Styles"). Screen only: print keeps its own colours (tokens.css). Where
+   the palette's light value didn't hold up, the change and the reason are noted beside it
+   (docs/light-theme-2026-11-08.md). The drawings' rules (.th-dark / .th-light, Drawing.astro) are at the end.
    ========================================================================== */
 
 @media screen {
