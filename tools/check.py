@@ -1,25 +1,6 @@
-"""Generic geometry checks.
+"""Geometry checks on one drawing: ANGLE, SNAP and TJOIN findings (exit 1 on any), and DOT lines that only list where
+each leader dot sits. What each reports and what it skips: README, "Check a drawing".
 usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
-Reports:
-  (exits 1 on any finding; DOT lines only list where each leader dot sits; the floor grid, class="floor" on a shape or
-   its group, is skipped: it is clipped round the objects, so its ends sit a hair from their edges by design)
-  ANGLE  edges that are close to (but not exactly on) an iso axis (30/150/90 deg)
-  SNAP   vertices of different shapes that almost (not exactly) coincide (two shapes on one source line count too)
-  TJOIN  vertices that almost (not exactly) touch another shape's edge
-  A vertex (or the part of an edge) that sits inside an opaque filled face drawn later can't be seen, so a near-miss
-  there is not reported (SNAP or TJOIN). Opaque means filled, with no opacity or fill-opacity under 1 in its
-  attributes. A stylesheet's opacity isn't seen, so a near-miss covered only by a part made see-through in CSS
-  (the campus windows) would be missed; today none is.
-  DOT    leader dots (.co circles) and what filled faces they sit on
-Leader lines (in a .co group) and class="mark" (arrowheads, routes, 2D markers) cross the drawing on purpose, so
-none of ANGLE, SNAP or TJOIN reads them; class="free" (parts tilted on purpose) skips ANGLE only.
-Two narrow exceptions, both opt-in by the drawing:
-  <g class="curve">  a curved surface cut into flat strips (the hero cloud's side wall). Its strips are not iso
-                     edges (no ANGLE) and their outline points sit a couple of px apart by design, so SNAP and TJOIN
-                     skip pairs where both shapes are in curve groups. Pairs with any other shape are still checked.
-  --step PX          the drawing's props sit on a grid whose step renders under 2px (office: 0.0625 x 28.127 =
-                     1.758px), so parts one step apart look like near-misses. A SNAP pair exactly one step apart
-                     along an iso axis (within the 0.1px rounding of the file) is counted, not listed.
 """
 import sys, math
 from iso import load, classify
@@ -51,9 +32,15 @@ def own_classes(sh):
 def is_leader(sh):
     return 'co' in group_classes(sh)
 
+# <g class="curve">: a curved surface cut into flat strips (the hero cloud's side wall). Its strips are not iso edges
+# (no ANGLE) and their outline points sit a couple of px apart by design, so SNAP and TJOIN skip pairs where both
+# shapes are in curve groups. Pairs with any other shape are still checked.
 def is_curve(sh):
     return 'curve' in group_classes(sh)
 
+# --step PX: the drawing's props sit on a grid whose step renders under 2px (office: 0.0625 x 28.127 = 1.758px), so
+# parts one step apart look like near-misses. A SNAP pair exactly one step apart along an iso axis (within the 0.1px
+# rounding of the file) is counted, not listed.
 def one_step(p, q, step):
     # q - p is one grid step along an iso axis: vertical, or 30 deg either side of horizontal
     dx, dy = q[0] - p[0], q[1] - p[1]
@@ -88,6 +75,8 @@ def occluders(shapes):
         out.append((k, s, Polygon(s.subs[0]).buffer(0)))
     return out
 
+# Opaque means filled, with no opacity or fill-opacity under 1 in its attributes. A stylesheet's opacity isn't seen, so a
+# near-miss covered only by a part made see-through in CSS (the campus windows) would be missed; today none is.
 def hidden(p, s, faces, order):
     """p is covered by an opaque face drawn after shape s (other than s), at least 0.15px inside it."""
     P = Point(p)

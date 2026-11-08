@@ -1,32 +1,6 @@
-// The browser check against the built site (npm run verify; CI runs it on every push and pull request before deploy).
-// Home (the page being worked on, FOCUS) gets everything: hero, Grow, footer tiles, the per-page checks at every size,
-// and an axe pass at phone and desktop. Every other page (every page the build wrote: lib.mjs pages) gets the
-// per-page checks at phone size and an axe pass. --all gives every page the full treatment. On every page, at
-// every size it runs at:
-//   script errors   watched until the network is idle and while the page's timers run on (3 s; Home 5 s, for the
-//                   hero's captions; Playwright's clock runs them, so the check doesn't wait them out), then while the screen turns (portrait to landscape and back) and while each of the
-//                   page's own buttons is pressed (pause, Grow, copy buttons)
-//   markup          exactly one <h1>; every JSON-LD block parses
-//   sideways scroll scrolled to its footer (the 404 page has none: Base.astro footer={false}, so to its end); and
-//                   separately at 320, 390, 600, 768, 1024 and 1280 wide, walked down a screen at a time
-//   pop-ups         each dialog a [data-open] link or button on the page opens: it shows (opacity 1, a real size),
-//                   axe passes with it open, Esc closes it and focus goes back; a toast shows and leaves on its own;
-//                   on desktop the panel a footer tile opens shows. All of it once more with the site's pause on
-//                   (html.is-held, saved as uplink-held), which must never hide a pop-up (review B1)
-// Fails on any of those, a hero tile that doesn't answer hover, a Grow section that doesn't play, a footer tile at
-// 1440x900 that isn't one screen tall, whose panel overflows or whose map spot doesn't show, keys that don't reach and
-// open the footer's sections, a header whose tabs come within 8px of the logo or
-// buttons (or scroll) at any width from 320 to 1440 in 10px steps and on wider screens,
-// anything serious or critical from axe (or moderate, off its allow-list; WCAG 2.2 AA rules), or a sitemap that doesn't list exactly the built pages.
-// Known failures are marked test.fail with the review item that fixes them (KNOWN, below): such a test fails the run
-// once the bug is fixed, as a reminder to drop the mark.
-// At the end, one test for each bug the November 7, 2026 review found and batch 2b fixed, named by its item (B2 …), so
-// it can't come back unseen: Grow's timing and frames, pop-ups and focus, forms, drawings that fail to load, the font
-// swap, print, and the drawings' ?v= addresses. And one for the footer on <details> (J7, B14, L7, M11): without
-// script, from the keyboard, through a resize and a turn, its landmarks and what a screen reader is told. And one for
-// the /work filters as a radio group (M11, B4): without script, from the keyboard, in forced colours, and axe.
-// Batch 4 adds three: Settings before or without script and focus back to the opener (J8), a field's own hint kept in
-// aria-describedby (J9), and the phone services row in a browser with no scrollend (J15).
+// The browser check against the built site (npm run verify; CI runs it before every deploy). Home (FOCUS) gets
+// everything, other pages the per-page checks at phone size; each review-bug test names its item. What it checks:
+// README, "Site checks". Known failures are marked test.fail with the item that fixes them (KNOWN, below).
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): the footer tiles at 1440, and Home and /soon at each size.
 import { createHash } from 'node:crypto';

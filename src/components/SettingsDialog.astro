@@ -1,18 +1,11 @@
 ---
-// SHARED · Settings pop-up (every page), opened by the header's gear or the ? key. The gear and the close button are
-// invoker commands (commandfor) and a click on the backdrop closes it (closedby="any"), so it works in browsers that
-// have them before core.js runs, or if it never loads; core.js takes over when it runs. With script off the gear
-// hides (header.css): the one setting needs script.
-// Motion: Reduce motion, a switch (core.js). It starts as the device's setting; the visitor's choice wins, for this
-// site only.
-// Theme: System (the default: follows the device's light or dark setting), Light or Dark, each with its icon
-// (screen, sun, moon in icons.ts) beside the word. Native radios in a
-// fieldset, so the arrow keys move between them and a screen reader reads the group and each option. Base.astro's head
-// script applies the saved choice before the page paints. Keyboard shortcuts: the single-key switch (off if they clash
-// with a screen reader or voice control) and the keys there are. More display options go here later (English or
-// French). Text size is the browser's own zoom and font setting. core.js applies a choice at once and remembers it on
-// this device (localStorage uplink.theme, uplink.motion, uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.seg,
-// .switch).
+// SHARED · Settings pop-up (every page; src/README.md, "Shared components"), opened by the header's gear or the ? key.
+// The gear and the close button are invoker commands (commandfor) and a click on the backdrop closes it
+// (closedby="any"), so it works before core.js runs, or if it never loads. With script off the gear hides (header.css):
+// the settings need script. Theme: native radios in a fieldset, so the arrow keys move between them and a screen
+// reader reads the group. The shortcuts switch is for when single keys clash with a screen reader or voice control.
+// core.js applies a choice at once and keeps it on this device (localStorage uplink.theme, uplink.motion,
+// uplink.shortcuts). More display options (English or French) go here later. Styles: dialogs.css, forms.css.
 import Icon from './Icon.astro';
 const THEMES = [
   ['system', 'System', 'screen'],

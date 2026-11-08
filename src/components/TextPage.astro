@@ -1,11 +1,6 @@
 ---
-// A page that is mostly reading: privacy, accessibility. The words are Markdown in src/data/ (one file per page),
-// so they're edited as text. Contact details in them are placeholders, filled from src/data/footer.json while the
-// Markdown is rendered (src/lib/placeholders.mjs, a plugin in astro.config.mjs), so a changed phone number or inbox
-// changes everywhere at once and every value is escaped as text:
-//   {privacy} {accessibility}   the inboxes (footer.json inboxes); {email} the general one
-//   {phone} {tel}               the phone number as shown, and as dialled
-//   {street} {city} {hours}     the office and the help desk's hours
+// A page that is mostly reading: privacy, accessibility, from Markdown in src/data/ (src/README.md, "Content"). Its
+// contact placeholders ({privacy}, {phone}, {street} …) are filled while the Markdown renders (src/lib/placeholders.mjs).
 // A placeholder still in the page (one in raw HTML, which the plugin doesn't read), as {name} or %7Bname%7D, stops the build.
 // <!-- comments --> in the Markdown stay out of the page's text (the privacy page marks what applies once the forms send).
 // Styles: text-page.css. Title and description: PAGES in src/lib/site.ts.

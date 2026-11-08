@@ -1,20 +1,11 @@
 /* ==========================================================================
-   Uplink Technology · Home · We grow with you (Grow.astro)
-   One business grows in six steps. A step's new parts drop in and glow (earlier ones stay), its risks show as red tags
-   and then flip to green fixes as its card goes from "Watch for" to "We handle". It plays once, from bare ground,
-   when the section comes on screen; the arrows and dots step through it by hand; the play button pauses, plays and
-   replays, and its edge times the whole story. The camera starts close on the office and pulls back as the world
-   grows. Reduced motion: the finished world, no movement; the controls still step through.
-   Two sets of step buttons do the same job: the dots under the picture (phones, tablets) and the list in the left
-   column (desktop, .grow-item); CSS shows one. While the story plays, the open row's foot fills over the step's time.
-   The site-wide pause (HoldButton.astro, core.js held) pauses it the same way as its own button, and lets it go on
-   when released, unless you've used its own controls since; while held it doesn't start on its own. Its own play
-   button still plays it. Paused, off screen or held, a step keeps the time it has played and goes on from there.
-   Once the story ends it stands still (its loops and the dome's orbits too) until you play it again. Reduced motion
-   switched on mid-visit pauses it.
-   The steps are marked aria-current="step" (one of a set is the open one, not a pressed toggle). At the ends the
-   arrows are aria-disabled, not disabled, so a keyboard user's focus stays on them.
-   Builds no HTML: everything is in the page (Grow.astro); this only sets classes, attributes and text.
+   Uplink Technology · Home · We grow with you (Grow.astro): plays the six-step world (src/README.md, "Scripts").
+   A step's new parts drop in and glow (earlier ones stay), its risks show as red tags and then flip to green fixes as
+   its card goes from "Watch for" to "We handle". It plays once, from bare ground, when the section comes on screen;
+   the arrows and dots step through it by hand; the play button pauses, plays and replays, and its edge times the
+   whole story. The camera starts close on the office and pulls back as the world grows. Reduced motion: the finished
+   world, no movement; the controls still step through. Once the story ends it stands still (its loops and the dome's
+   orbits too) until you play it again. Builds no HTML: this only sets classes, attributes and text.
    ========================================================================== */
 
 import { $, $$, held, reduceMotion, whenOnScreen } from './core.js';
@@ -291,6 +282,10 @@ if (grow && svg) {
       if (animate) steps[i].dataset.beat = 'build';
       else beat('fix', false);
     }
+    // Two sets of step buttons do the same job: the dots under the picture (phones, tablets) and the list in the left
+    // column (desktop, .grow-item); CSS shows one. They're marked aria-current="step" (one of a set is the open one,
+    // not a pressed toggle). At the ends the arrows are aria-disabled, not disabled, so a keyboard user's focus stays.
+    // While the story plays, the open row's foot fills over the step's time.
     [dots, items].forEach((set) =>
       set.forEach((d, j) => {
         if (j === i) d.setAttribute('aria-current', 'step');
@@ -502,6 +497,10 @@ if (grow && svg) {
   });
 
   // the site-wide pause: hold it where it is; on release, go on only if the hold is what stopped it
+  // The site-wide pause (HoldButton.astro, core.js held) pauses it the same way as its own button, and lets it go on
+  // when released, unless you've used its own controls since; while held it doesn't start on its own. Its own play
+  // button still plays it. Paused, off screen or held, a step keeps the time it has played and goes on from there.
+  // Reduced motion switched on mid-visit pauses it.
   held.ev.addEventListener('change', () => {
     if (held.on && playing) {
       heldStopped = true;

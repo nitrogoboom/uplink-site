@@ -1,21 +1,11 @@
-// PageSpeed check: ask Google's PageSpeed Insights (its servers, its Lighthouse) to test every page in the sitemap,
-// phone and desktop, and report if Home scores under the bar. A tool to run when you want it; CI doesn't run it.
+// PageSpeed check: Google's PageSpeed Insights tests every sitemap page on its own servers, phone and desktop, and
+// this fails if Home scores under the bar (README, "Live-site checks"). Run it when you want it; CI doesn't.
 //   npm run pagespeed -- https://uplink-site.johnoreilly.workers.dev           the live site
 //   npm run pagespeed -- https://VERSION-uplink-site.johnoreilly.workers.dev   a preview version
 //   npm run pagespeed -- ADDRESS --min 100 --strict                            every page held to the bar
 //   npm run pagespeed -- ADDRESS --sample                                      Home, one service, one project
-// The test runs on Google's machines, as pagespeed.web.dev does, so this PC's connection doesn't count.
-// It needs a PageSpeed Insights API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment.
-// The key lives in Google Cloud, project uplink-site, APIs & Services > Credentials > pagespeed-gate
-// (limited to the PageSpeed Insights API).
-// Pages come from the address's sitemap.xml. Home (GATED) must reach the bar on both; the other pages are drafts for
-// now, so they are shown but don't fail the check unless --strict.
-// A preview deploy is sent with `X-Robots-Tag: noindex` by Cloudflare, so the SEO score here leaves out the "Page is
-// blocked from indexing" audit (is-crawlable). Everything else counts.
-// Each page and the files it links are fetched once first: a fresh preview starts with a cold Cloudflare cache, and the
-// first visit would measure that, not the site.
-// Performance moves a point or so between runs, so a test under the bar is run again (up to RUNS times) and its best
-// run counts. Reports go to out/lighthouse/PAGE-STRATEGY.json.
+// The API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment. It lives in Google Cloud, project
+// uplink-site, APIs & Services > Credentials > pagespeed-gate (limited to the PageSpeed Insights API; docs/secrets.md).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from '@playwright/test';
@@ -24,9 +14,14 @@ import { ROOT, flag, option, pad, positional } from './lib.mjs';
 const API = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const CATS = ['performance', 'accessibility', 'best-practices', 'seo'];
 const STRATEGIES = ['mobile', 'desktop'];
+// Home (GATED) must reach the bar on both; the other pages are drafts for now, so they are shown but don't fail the
+// check unless --strict. Performance moves a point or so between runs, so a test under the bar is run again (up to
+// RUNS times) and its best run counts. Reports go to out/lighthouse/PAGE-STRATEGY.json.
 const GATED = ['/'];
 const RUNS = 3;
 const OUT = join(ROOT, 'out/lighthouse');
+// Each page and the files it links are fetched once first: a fresh preview starts with a cold Cloudflare cache, and the
+// first visit would measure that, not the site.
 const UA = { 'User-Agent': 'lighthouse-gate warm-up' }; // Cloudflare refuses a client with no user agent of its own
 
 function apiKey() {
@@ -78,7 +73,8 @@ async function run(url, strategy, key) {
   return (await r.json()).lighthouseResult;
 }
 
-// category scores out of 100; SEO without is-crawlable (see the note at the top)
+// category scores out of 100; SEO without is-crawlable: a preview deploy is sent with `X-Robots-Tag: noindex` by
+// Cloudflare, so the "Page is blocked from indexing" audit is left out. Everything else counts.
 function scores(report) {
   const out = {};
   for (const c of CATS) {

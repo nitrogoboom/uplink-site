@@ -1,37 +1,8 @@
-// Deploys the built site (dist/) to the live Worker so that a version that fails its checks never takes traffic, and
-// one that breaks the live address goes back out on its own (review H3). CI's deploy job runs it on a push to main,
-// after npm ci and with the tested dist/ in place:
+// CI's deploy on main: uploads dist/ as a version that takes no traffic, smoke-checks it, puts it live, and rolls back
+// on its own if the live address then fails (review H3). The steps, timings and marker: README, "Deploys".
 //   node scripts/deploy.mjs LIVE_ADDRESS [SMOKE_ARGUMENTS ...]
 //   e.g. node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev
 //        node scripts/deploy.mjs https://uplinkit.ca --launch            (after launch: both smoke runs get --launch)
-// 1. Notes the version live now (wrangler deployments status --json): the one a rollback goes back to.
-// 2. Uploads dist/ and the Worker as a new version (wrangler versions upload). It takes no traffic yet, but answers
-//    at its own preview address, which wrangler writes to its output file (WRANGLER_OUTPUT_FILE_PATH).
-// 3. Runs the smoke check (checks/smoke.spec.mjs) against that address, with --preview. A failure stops here: the live
-//    site is unchanged. Then reads the build's marker there (below), and the live address's.
-// 4. Puts that version on 100% of traffic (wrangler versions deploy VERSION_ID@100%). If wrangler reports an error,
-//    it reads the deployment status again: when the new version is live at any percentage (or the status can't be
-//    read), it carries on to step 5, so a half-done deploy is still checked and rolled back; otherwise it stops.
-// 5. Asks the live address for the build's marker every DEPLOY_POLL seconds, for up to DEPLOY_WAIT seconds by the clock,
-//    until it is the one the preview address gave (a deploy takes a few seconds to reach every Cloudflare location).
-//    If the live address already gave that marker before the deploy (the same build again, such as a rerun), this
-//    check can't tell the builds apart: the summary says so, and it waits DEPLOY_SETTLE seconds instead. Then it runs
-//    the smoke check against the live address, and once more DEPLOY_RETRY seconds later if that fails.
-// 6. If the marker never matched, or the live check still fails: rolls back to the version from step 1 (wrangler
-//    rollback VERSION_ID) and exits 1.
-// It exits 0 only when the new version is live and passed. Each step's result goes to the run's summary
-// ($GITHUB_STEP_SUMMARY) as well as the log. It needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, as wrangler does;
-// the smoke runs don't get them. --old ADDRESS (smoke check: the old address redirects here) goes to the live run only.
-// The build's marker: a hash of the home page's X-Build header (the build's ID, scripts/headers.mjs: every file in
-// dist/, the headers and the Worker), its CSP header, the hashed /_astro/ files it names, and sitemap.xml. Any change
-// that ships changes X-Build, so two builds share a marker only when nothing that ships differs. Nothing on
-// Cloudflare's side rewrites these (a zone feature that rewrites HTML, such as Email Address Obfuscation, would leave
-// them alone).
-// Settings `versions deploy` doesn't apply from wrangler.jsonc, as `wrangler deploy` did: routes, custom domains,
-// cron triggers, workers_dev and preview_urls. When those change (the custom domain at launch), run
-// `npx wrangler triggers deploy` once, or deploy by hand with `npx wrangler deploy` (README, "Deploys").
-// DEPLOY_WRANGLER and DEPLOY_SMOKE name other commands to run in place of wrangler and the smoke check: only for the
-// test (scripts/test/deploy.test.mjs), which runs this against fakes.
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -50,6 +21,8 @@ const POLL = Number(process.env.DEPLOY_POLL ?? 5);
 const WAIT = Number(process.env.DEPLOY_WAIT ?? 120); // seconds by the clock; each ask gives up after 15 s
 const SETTLE = Number(process.env.DEPLOY_SETTLE ?? 15);
 const RETRY = Number(process.env.DEPLOY_RETRY ?? 30);
+// DEPLOY_WRANGLER and DEPLOY_SMOKE name other commands to run in place of wrangler and the smoke check: only for the
+// test (scripts/test/deploy.test.mjs), which runs this against fakes.
 // a .cjs fake (the test's) runs under this Node, so it needs no shebang and runs on Windows too
 const command = (name, fallback) => {
   const cmd = process.env[name];
@@ -98,7 +71,10 @@ const liveVersions = () => {
     return null;
   }
 };
-// the build's marker at an address (see the top of this file); null if it doesn't answer
+// the build's marker at an address; null if it doesn't answer. A hash of the home page's X-Build header (the build's
+// ID, scripts/headers.mjs), its CSP header, the hashed /_astro/ files it names, and sitemap.xml. Nothing on
+// Cloudflare's side rewrites these (a zone feature that rewrites HTML, such as Email Address Obfuscation, would leave
+// them alone).
 const UA = { 'User-Agent': 'uplink-deploy' }; // Cloudflare refuses a client with no user agent of its own (403)
 const marker = async (address, ms = 15_000) => {
   try {

@@ -1,18 +1,5 @@
-// The site's page table and the helpers the generated files share (sitemap.xml, robots.txt, llms.txt,
-// index.md, agents.md).
-//   PAGES       the static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The .astro pages read their
-//               title and description from here, so the sitemap and llms.txt say the same thing.
-//   getServices(), getProjects()  the collections in their own order.
-//   workFilters(), workFilterCss()  the /work filters (a radio group) and the CSS that makes them work without script.
-//   jsonLd(), breadcrumbs()  the JSON-LD write-out and its breadcrumb list, for every page.
-//   allPages()  every indexable page: the seven in PAGES plus one per service and project, with a lastmod.
-//               A static page dates from its SOURCES below; a service or project from its own entry file
-//               (lastmod() and entryFile() in git-dates.mjs, which also refuses a shallow clone in CI).
-//   businessNode()  the business in short, for the JSON-LD of every page but Home.
-//   HERO        the home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it).
-//   NAV         the main tabs in order: the header and the phone tab bar read it.
-//   tabCurrent() a tab's aria-current: 'page' on its own page, 'true' on a page inside its section.
-//   svgSize()   a drawing's own width and height, read from the file, for the <img> that shows it (cardSize(): its card cut).
+// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml, robots.txt,
+// llms.txt, index.md, agents.md) share. src/README.md, "The shared layout"; each export is described where it's defined.
 import type { IconName } from '../components/Icon.astro';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -28,7 +15,8 @@ import { entryFile, lastmod } from './git-dates.mjs';
 // even when only SVGO's output changed.
 const fresh = (path: string) => `${path}?v=${createHash('sha1').update(shipped(path)).digest('hex').slice(0, 8)}`;
 
-// written by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
+// The home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it), written
+// by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
 // 440-680px wide there). phone: the hero scene framed closer for phones, no words (home.js writes its captions),
 // with its dashes in their own file; with reduced motion it stands still. still: the phone cut as a picture, for
 // phones without script (an <img>, so no ?v=).
@@ -48,6 +36,8 @@ export const HERO = {
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
 export const CAMPUS = fresh('/assets/img/campus.svg');
 
+// The static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The
+// .astro pages read their title and description from here, so the sitemap and llms.txt say the same thing.
 export const PAGES = {
   home: {
     path: '/',
@@ -197,6 +187,9 @@ const SOURCES: Record<keyof typeof PAGES, string[]> = {
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };
 
+// Every indexable page: the seven in PAGES plus one per service and project, with a lastmod. A static page dates from
+// its SOURCES above; a service or project from its own entry file (lastmod() and entryFile() in git-dates.mjs, which
+// also refuses a shallow clone in CI).
 export async function allPages(): Promise<SitePage[]> {
   const services = await getServices();
   const projects = await getProjects();

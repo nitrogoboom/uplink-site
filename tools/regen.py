@@ -1,13 +1,9 @@
-"""Run every drawing generator, then (with --check) every drawing check.
+"""Run every drawing generator, then (with --check) every drawing check. Run it from the project root. What CI's
+drawings job does with it, and why gen_og.py is left out: README, "Generators" and "Check a drawing".
 
     python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py, then the light theme (gen_light.py)
     python tools/regen.py --check    # then check.py and painter.py, as each rules_NAME.py lists them
     python tools/regen.py --checks-only
-
-Run it from the project root. Generators that run with nothing changed write the same bytes, so on a clean tree
-`git diff --exit-code public/assets/img src/components/home` afterwards lists any drawing that no longer matches its
-script. CI's drawings job does exactly that (.github/workflows/site.yml).
-gen_og.py is left out: it screenshots a page through Chromium and Google Fonts, so its PNGs depend on the machine.
 """
 import concurrent.futures
 import os

@@ -1,17 +1,6 @@
-"""Draws the footer's campus map (every page): one spot per footer section on a 16 x 16 platform.
-Writes public/assets/img/campus.svg. footer.js fetches it when the footer comes near the screen and puts it in the
-page, where src/styles/footer.css (.fc-w) colours and animates it. No phone cut: it is one drawing at every size.
-Edit the numbers below and run again; don't hand-edit the SVG.
+"""Draws the footer's campus map, public/assets/img/campus.svg: one spot per footer section (README, "Generators";
+src/README.md, "The footer"; the words are in src/data/footer.json). Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_campus.py
-World: screen = ((x - y) * cos30 * U, (x + y) * U / 2 - z * U); origin at the platform's back corner, x runs
-right-down, y left-down, z up. Each spot (<g class="dist" data-k="...">) carries its camera: data-vb, the viewBox
-that frames it (the whole map zoomed in by its zoom, kept inside the whole map), and data-mk, where the marker sits
-over it. Its ring and its route (if any) carry the same data-k; footer.js lights the three (.on) and flies there.
-The loops run out of step by --d, each shape's animation delay (footer.css reads var(--d)); the lit and blinking
-windows come from a seeded random sequence, so a rerun draws the same campus.
-The words for each spot are content, in src/data/footer.json (spots).
-The map is decoration: aria-hidden, with no role, label or <title>, so a screen reader skips it on every page (review
-M6). The footer's sections and the HUD (Footer.astro) carry the words; footer.js inserts the file as it is.
 Keep the classes footer.css and footer.js use (plat, grid, edge, ring, ring2, route, flow, dist, b, tree, win, lit,
 blink, led, w2, dot, mast, beacon, sig, bob, tk-n, mk-*) and the group order: back to front (painter.py).
 """
@@ -19,6 +8,13 @@ import math, pathlib
 from decimal import Decimal, ROUND_HALF_UP
 from isogen import hoist_styles
 
+# World: screen = ((x - y) * cos30 * U, (x + y) * U / 2 - z * U) on a 16 x 16 platform; origin at its back corner, x
+# runs right-down, y left-down, z up. Each spot (<g class="dist" data-k="...">) carries its camera: data-vb, the viewBox
+# that frames it (the whole map zoomed in by its zoom, kept inside the whole map), and data-mk, where the marker sits
+# over it. Its ring and its route (if any) carry the same data-k; footer.js lights the three (.on) and flies there.
+# The loops run out of step by --d, each shape's animation delay (footer.css reads var(--d)); the lit and blinking
+# windows come from a seeded random sequence, so a rerun draws the same campus.
+# The map is decoration: aria-hidden, with no role, label or <title> (review M6); footer.js inserts the file as it is.
 C30, U = math.cos(math.pi / 6), 38
 VB0 = (-600, -120, 1200, 860)       # the whole map; each spot's camera zooms into it
 MARK_LIFT = 52                      # px from a spot's top to the marker's centre

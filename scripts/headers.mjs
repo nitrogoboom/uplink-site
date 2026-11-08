@@ -1,30 +1,6 @@
-// Finishes dist/_headers after `astro build` (npm run build runs it). public/_headers is the hand-written
-// template; this fills in the parts that depend on the build:
-//   {script-hashes}   a 'sha256-…' for every inline <script> in the built pages (today: the one line in every
-//                     head that adds html.js). Change that line and the hash follows.
-//   {style-hashes}    the same for every inline <style>: Astro's inlined CSS, the drawings inlined in the home
-//                     page, and the <style> blocks in the hero drawings and the footer's campus map (home.js and
-//                     footer.js insert those SVGs into the page, so their styles count as the page's). style-src
-//                     has no 'unsafe-inline'.
-//   the Early Hints block   one rule per built page, so Cloudflare sends the first-screen fonts as a 103
-//                     before the HTML. The font list is read from the home page's preloads (Base.astro).
-//   the Markdown copies block   one rule per .md file (services.md, services/backup.md, index.md for home …):
-//                     X-Robots-Tag: noindex, and Link: <PAGE>; rel="canonical" naming its page, read from that page's
-//                     own <link rel="canonical"> (so it follows SITE_URL). A copy is never what a search should show,
-//                     so this noindex stays after launch, when the site-wide one comes off (review M4). A .md with no
-//                     page beside it (agents.md) gets the noindex only; a page with no canonical stops the build.
-//   {build}           the build's ID, sent as X-Build on every file: the first 16 hex digits of a SHA-256 over every
-//                     file in dist/ (its path and bytes; _redirects too, but not _headers itself), the finished
-//                     _headers with this placeholder still in it, and the Worker (worker/ and wrangler.jsonc). A
-//                     change to any of them, a header or the Worker alone included, gives a new ID. scripts/deploy.mjs
-//                     reads it to tell which build the live address serves. It is a hash of public files and code in a
-//                     public repository, so it gives nothing away.
-// It also writes dist/_redirects: the other spellings of each page's address (/services/, /services.html,
-// /services/index.html, /services/index, /index.html, /index) to the one address, as 308 (permanent). Cloudflare's
-// own html_handling sends most of those as 307 (temporary), which caches and crawlers don't keep; a _redirects line
-// wins over it.
-// It refuses to finish if a page or a drawing a script inserts (hero cuts, campus map) has a style="" attribute: no hash covers one, so the CSP
-// would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
+// Finishes dist/_headers from the public/_headers template after `astro build` (npm run build runs it): the script
+// and style hashes, the Early Hints and Markdown-copy rules, X-Build, and dist/_redirects (308s). README,
+// "Response headers", "Search engines" and "Deploys". Each part's details sit beside its code below.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -62,6 +38,10 @@ const sha = (text) => "'sha256-" + createHash('sha256').update(text).digest('bas
 const hashes = new Set();
 const styles = new Set();
 const attrs = [];
+// {style-hashes} covers every inline <style>: Astro's inlined CSS, the drawings inlined in the home page, and the
+// <style> blocks in the hero drawings and the footer's campus map (home.js and footer.js insert those SVGs into the
+// page, so their styles count as the page's). A style="" attribute stops the build: no hash covers one, so the CSP
+// would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
 const styleBlocks = (file, text) => {
   for (const m of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) styles.add(sha(m[1]));
   const n = [...text.matchAll(/<[a-zA-Z][^>]*\sstyle=["']/g)].length; // inside a tag, not prose about one
@@ -69,6 +49,7 @@ const styleBlocks = (file, text) => {
 };
 for (const file of pages) {
   const html = readFileSync(file, 'utf-8');
+  // {script-hashes}: today the one line in every head that adds html.js; change that line and the hash follows.
   // every inline script the browser runs: no src, and no type or a script type (JSON-LD and the like run nothing)
   for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
     const type = m[1].match(/\stype=["']?([^"'\s>]+)/)?.[1];
@@ -95,6 +76,8 @@ const paths = pages
   .sort();
 const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
+// A copy is never what a search should show, so its noindex stays after launch, when the site-wide one comes off
+// (review M4). A .md with no page beside it (agents.md) gets the noindex only; a page with no canonical stops the build.
 // each Markdown copy: services.md names services.html's canonical, index.md names index.html's (home, /)
 const markdown = copies
   .map((f) => {
@@ -113,6 +96,8 @@ const markdown = copies
   .sort()
   .join('');
 
+// Cloudflare's own html_handling sends most of these spellings as 307 (temporary), which caches and crawlers don't
+// keep; a _redirects line wins over it.
 // every page, plus /404 (served at its own name too, by the Worker): its trailing-slash, .html and index spellings
 // (Cloudflare would send /index and /services/index.html on as 307s)
 const redirects = [...paths, '/404'].flatMap((p) =>
@@ -142,7 +127,9 @@ const filled = src
   .replace(block('early-hints'), (_, start, end) => start + hints + end)
   .replace(block('markdown-copies'), (_, start, end) => start + markdown + end);
 
-// the build's ID (X-Build): every file in dist/ but _headers, the headers as they ship, and the Worker
+// the build's ID (X-Build): every file in dist/ but _headers, the headers as they ship, and the Worker. A change to
+// any of them, a header or the Worker alone included, gives a new ID; scripts/deploy.mjs reads it to tell which build
+// the live address serves. It is a hash of public files and code in a public repository, so it gives nothing away.
 const files = (dir, skip = () => false) =>
   readdirSync(dir)
     .sort()

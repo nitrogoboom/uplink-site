@@ -1,10 +1,6 @@
-// Screenshot comparison: every page of the new build next to the old one, at phone, tablet and desktop, pixel by
-// pixel. CI runs it on each pull request (new: the PR's build; old: the live site, i.e. main) and lists what changed in
-// the run's summary, with the pictures as an artifact. It reports; it doesn't fail, because most changes are meant. A
-// person looks at the list and says whether each one was.
+// Screenshot comparison: every page of the new build next to the old one, pixel by pixel (README, "Site checks"). It
+// reports and doesn't fail, because most changes are meant: a person looks at the list and says whether each one was.
 // usage: npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]
-//   --strict fails if anything changed; --wide adds 1280 x 720 and 2560 x 1440 (the smallest and a big one-screen-per-
-//   section desktop) for a layout change
 // Drawings, photos and the footer map are masked (painted over in both shots): their animation frames differ run to
 // run. Reduce Motion is on, so the page itself holds still. Writes out/visual/report.md and, for each page and size
 // that changed, old, new and diff pictures (the diff shows changed pixels in red over a faded new shot).

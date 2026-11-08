@@ -1,5 +1,11 @@
 // The SVGO settings for every drawing the site ships: scripts/svgo.mjs runs them on dist/assets/img/ after the
-// build, and Grow.astro on the world it inlines into Home (inlined drawings never reach dist/assets/img/).
+// build, and Grow.astro on the world it inlines into Home (README, "How the repository is organized"). Why each
+// default is off, why shape tags can't be styled, and shipped(): beside the code below.
+import { createHash } from 'node:crypto';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { VERSION, optimize } from 'svgo';
+
 // What must survive, so a few SVGO defaults are off:
 //   ids and classes        home.js, the hero CSS and the footer find parts by them (cleanupIds, collapseGroups)
 //   <style> as written     the embedded fonts, and rules for classes the scripts add later, like .is-on
@@ -10,17 +16,6 @@
 //   role="img"             with the aria-label, so screen readers read a drawing as one picture (removeUnknownsAndDefaults)
 //   empty groups           ones a script fills, like the Grow dome's <g class="dome-orbit"> (removeEmptyContainers)
 // (SVGO 4 keeps the viewBox on its own.)
-// What doesn't survive: shape tags. SVGO writes <polygon>, <rect>, <line> and the like as <path>, so a drawing's CSS
-// (its own <style>, or the site's: footer.css for the campus map) styles parts by class, never by tag. shrink()
-// refuses a drawing whose own <style> names a tag the output no longer has (review B9: the hero's tiles lost their
-// edges and fades that way).
-// shipped(): a drawing as the site serves it, for the ?v= on the drawings the pages insert (src/lib/site.ts), so a
-// change in SVGO's output is a new address too (review B10).
-import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { VERSION, optimize } from 'svgo';
-
 /** @type {import('svgo').Config} */
 export const SVGO = {
   multipass: true,
@@ -43,6 +38,10 @@ export const SVGO = {
   ],
 };
 
+// What doesn't survive: shape tags. SVGO writes <polygon>, <rect>, <line> and the like as <path>, so a drawing's CSS
+// (its own <style>, or the site's: footer.css for the campus map) styles parts by class, never by tag. shrink()
+// refuses a drawing whose own <style> names a tag the output no longer has (review B9: the hero's tiles lost their
+// edges and fades that way).
 const SHAPES = [
   'path',
   'rect',
@@ -105,6 +104,8 @@ export function shrink(svg, name = 'drawing') {
   return out;
 }
 
+// shipped(): a drawing as the site serves it, for the ?v= on the drawings the pages insert (src/lib/site.ts), so a
+// change in SVGO's output is a new address too (review B10).
 // the bytes the site serves for a file in public/ (a drawing after shrink(), anything else as it is)
 export const shipped = (/** @type {string} */ path) => {
   const text = readFileSync(`public${path}`, 'utf-8');

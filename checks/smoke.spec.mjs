@@ -1,41 +1,14 @@
-// Smoke test: the live site answers the way it should. A few seconds, plain HTTP, no browser. Run it straight after a
-// deploy, and on launch day after the domain switch (docs/launch-runbook.md).
+// Smoke check: a deployed site answers the way it should, over plain HTTP with no browser. Run it after a deploy and
+// on launch day (docs/launch-runbook.md). What it checks and each flag: README, "Live-site checks".
 //   npm run smoke -- https://uplink-site.johnoreilly.workers.dev        today: noindex expected
 //   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable, sitemap named
 //   npm run smoke -- https://uplinkit.ca --launch --old https://uplink-site.johnoreilly.workers.dev
-//                                                                       and the old address redirects here
-//   npm run smoke -- http://localhost:8787                              the local build (npm run serve): CI runs this.
-//                                                                       Its sitemap names the live host and http stays
-//                                                                       http, so those two checks are left out
-//   npm run smoke -- https://ab12cd34-uplink-site.johnoreilly.workers.dev --preview
-//                                                                       a version that takes no traffic yet, at its own
-//                                                                       preview address (scripts/deploy.mjs runs this
-//                                                                       before it deploys): the sitemap, robots.txt and
-//                                                                       canonicals name the live address, and the
-//                                                                       http:// check waits for the live run
-// Checks:
-//   every page in sitemap.xml answers 200, as text/html, with the security headers, and without the ones the site
-//                    dropped (X-Permitted-Cross-Domain-Policies, review H9)
-//   plain http:// redirects (301/308) to the same https:// address (not on localhost): an address the Worker
-//                    answers, always; with --launch a page too (the zone's Always Use HTTPS). On workers.dev the
-//                    pages aren't redirected: browsers never ask a .dev host over http (README, "The Worker")
-//   a made-up address answers 404 with the site's 404 page; /404 itself answers 404, also when asked again with
-//                    If-None-Match / If-Modified-Since (not an empty page), and refuses a POST (405)
-//   a missing .md, .txt, /_astro/ file, font or drawing answers the same 404 page with the pages' headers: HTML,
-//                    the pages' CSP, not cached for a year
-//   the Worker's own answers (/api/report, other /api/ addresses) are nosniff and no-store, with a CSP of their own
-//   /index, /index.html, /services/, /services.html, /services/index.html and /services/index: 308 to the page
-//   pages name their speculation rules (Speculation-Rules), served as application/speculationrules+json
-//   /api/report refuses a GET (405); robots.txt, llms.txt and a .md copy answer
-//   the .md copies of /services and home: noindex (with --launch too) and a canonical Link to the page (review M4)
-//   sitemap.xml names this address (not another host; not on localhost; with --preview, the live address)
-//   noindex: present while it's a test build; with --launch, gone, and robots.txt names the sitemap
-//   --old: the old address redirects to the same path here
-// Fails on any of them. Cloudflare refuses a client with no user agent of its own (403), so requests name one.
+//   npm run smoke -- http://localhost:8787                              the local build (npm run serve): CI runs this
+//   npm run smoke -- https://ab12cd34-uplink-site.johnoreilly.workers.dev --preview   (scripts/deploy.mjs, pre-deploy)
 import { test } from '@playwright/test';
 import { flag, option, positional } from './lib.mjs';
 
-const UA = { 'User-Agent': 'uplink-smoke-test' };
+const UA = { 'User-Agent': 'uplink-smoke-test' }; // Cloudflare refuses a client with no user agent of its own (403)
 const HEADERS = [
   'strict-transport-security',
   'content-security-policy',

@@ -1,6 +1,6 @@
 # Security, privacy, and accessibility on the Uplink site
 
-*Last updated: November 7, 2026*
+*Last updated: November 8, 2026*
 
 This page explains how the Uplink Technology website protects its visitors and who it's built to serve. For each protection, you'll find:
 - what it guards against
@@ -8,13 +8,13 @@ This page explains how the Uplink Technology website protects its visitors and w
 - how you can check it yourself with public tools
 - how to apply the same idea to your own site
 
-The site is a static site: pages are built ahead of time and served from Cloudflare's network. One small server function sees each request first: it redirects plain `http://` to `https://` and handles error reports from browsers. Because there are no accounts, no database, and no third-party scripts beyond privacy-friendly analytics, there is very little that an attacker can reach. The sections below build on that small footprint.
+The site is a static site: pages are built ahead of time and served from Cloudflare's network. One small server function runs only for error reports from browsers, the 404 page, and addresses with no file; every other request is a static file. Because there are no accounts, no database, and no third-party scripts beyond privacy-friendly analytics, there is very little that an attacker can reach. The sections below build on that small footprint.
 
 ## Standards this site meets
 
 | Area | Standard | What the site does |
 | --- | --- | --- |
-| Accessibility | [WCAG 2.0](https://www.w3.org/TR/WCAG20/) Level AA, the level set by Ontario's [Integrated Accessibility Standards](https://www.ontario.ca/laws/regulation/110191) | Built to Level AA and checked by machine on every page. The review by hand is still open. Also built to the WCAG 2.1 and 2.2 criteria listed in [Accessibility](#accessibility). |
+| Accessibility | [WCAG 2.2](https://www.w3.org/TR/WCAG22/) Level AA, which includes the WCAG 2.0 AA that Ontario's [Integrated Accessibility Standards](https://www.ontario.ca/laws/regulation/110191) set. Why: [Standards we meet](sop.md#standards-we-meet) in `sop.md`. | Checked by machine on every page. The hand check on real phones and with a screen reader is still open (`notes.md`). |
 | Privacy | [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/) | Publishes what it collects, who processes it, where, and for how long. Sets no cookies. |
 | Response headers | [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/) | Sends the headers listed in [Set protective response headers](#set-protective-response-headers). Scores A+ on [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). |
 | Vulnerability disclosure | [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) | Publishes a `security.txt` file with a contact address. |
@@ -79,7 +79,7 @@ Content-Security-Policy:
 
 What the directives do:
 - `default-src 'self'`: anything not named elsewhere may come only from the site itself.
-- `script-src`: scripts come from the site, plus Cloudflare's analytics script. The one inline script, which marks the page as script-enabled, is allowed by its hash.
+- `script-src`: scripts come from the site, plus Cloudflare's analytics script. The one inline script, which marks the page as script-enabled and applies the saved theme and motion choice before the page paints, is allowed by its hash.
 - `style-src`: styles come from the site. Each inline `<style>` block is allowed by its hash.
 - `object-src 'none'`, `base-uri 'self'`, and `form-action 'self'` close three common ways around a CSP: plugins, a rewritten base URL, and forms that post somewhere else.
 - `frame-ancestors 'none'`: no other site can show these pages in a frame. This prevents clickjacking.
@@ -209,7 +209,7 @@ For any endpoint that accepts input:
 ### Keep secrets and dependencies under control
 
 **How the site does it**
-- Passwords, API keys, and tokens are never stored in the code. They live in the hosting and build services' secret stores. A private list records each secret's name, purpose, and location, without its value.
+- Passwords, API keys, and tokens are never stored in the code. They live in the hosting and build services' secret stores. A list records each secret's name, purpose, and location, without its value ([`secrets.md`](secrets.md)).
 - Every build step from GitHub Actions is pinned to an exact commit, so a changed release can't slip into the build.
 - Automated update requests arrive weekly for every dependency, and each is tested like any other change.
 - The pages load no third-party code except the analytics script. Fonts are hosted on the site itself.
@@ -237,7 +237,7 @@ The site follows Canada's Personal Information Protection and Electronic Documen
 
 The site sets no cookies. Visit counts come from Cloudflare Web Analytics, which doesn't use cookies or follow visitors across sites. Its script loads after the page has finished loading, so it never slows the page down. Because there's nothing to consent to, the site shows no cookie banner.
 
-If you change a setting, such as pausing animations or turning keyboard shortcuts off, the site remembers it in your browser's own storage. That setting never leaves your device, and you can clear it by clearing the site's data in your browser.
+If you change a setting, such as the theme, Reduce motion, pausing animations, or turning keyboard shortcuts off, the site remembers it in your browser's own storage. That setting never leaves your device, and you can clear it by clearing the site's data in your browser.
 
 **Verify it**
 
@@ -261,9 +261,7 @@ The site has a working rule: any change that starts collecting new information, 
 
 ## Accessibility
 
-The site is built to WCAG 2.0 Level AA and checked by machine on every page. A review by hand, on real phones and with a screen reader, is still to be done. The site is also built to these later success criteria:
-- from WCAG 2.1: 1.3.5, 1.4.10, 1.4.11, 1.4.12, 2.1.4, 2.5.3 and 4.1.3
-- from WCAG 2.2: 2.5.8
+The site is built to WCAG 2.2 Level AA and checked by machine on every page. A review by hand, on real phones and with a screen reader, is still to be done. Which check covers each criterion: [What CI proves](sop.md#what-ci-proves) and the [release checklist](sop.md#release-checklist) in `sop.md`.
 
 The [accessibility statement](/accessibility) describes the site's support and how to send feedback or ask for another format.
 
@@ -280,14 +278,14 @@ The [accessibility statement](/accessibility) describes the site's support and h
 | Keyboard shortcuts | Single-key shortcuts can be turned off. They never fire while you type or while a pop-up is open. | 2.1.4 |
 | Contrast | Text has at least 4.5:1 contrast, and the edges of controls have at least 3:1 | 1.4.3, 1.4.11 |
 | Colour | Colour is never the only signal. Errors also have words and an icon. | 1.4.1 |
-| Text size | Browser zoom to 200% enlarges text without breaking the layout (on very wide desktop screens zoom does less until the layout plan's phase 4; see the accessibility page's known limits) | 1.4.4 |
+| Text size | Browser zoom to 200%, or a bigger font in the browser's settings, enlarges text on every screen without breaking the layout | 1.4.4 |
 | Text spacing | The page holds up when you increase line, letter, word, and paragraph spacing | 1.4.12 |
 | Reflow | Every page works at 320 pixels wide without scrolling sideways | 1.4.10 |
 | Target size | Touch targets are at least 44 pixels, and never smaller than 24 | 2.5.8 |
 | Motion | If your system asks for reduced motion, nothing animates. Otherwise, every looping animation has a pause button, and nothing flashes more than three times a second. | 2.2.2, 2.3.1 |
 | Forms | Every field has a visible label. Optional fields say so. Common fields support autofill. Errors are written out, tied to their field, and focus moves to the first one. | 1.3.5, 3.3.1, 3.3.2 |
 | Status messages | Updates such as the number of projects shown after you filter are announced by screen readers without moving focus | 4.1.3 |
-| Valid code | The home page goes through the W3C validator at each release, and every page does when a release changes their markup. One error is open on the home page today: an attribute on the Grow play button's ring (`notes.md`). | 4.1.1 |
+| Valid code | The home page goes through the W3C validator at each release, and every page does when a release changes their markup | 4.1.1 |
 
 ### Works the way you browse
 
@@ -317,24 +315,7 @@ You can check most of these yourself:
 
 ## How changes reach the live site
 
-Every change goes through the same path before visitors see it:
-1. **Automated checks.** Each change runs:
-   - type checks and code linting
-   - tests for the build and the server endpoint
-   - a headless browser over every page, which fails on any script error, blocked resource, sideways scroll, or serious accessibility problem
-   - a check that every link and file answers
-2. **Preview.** Each proposed change gets its own preview address, plus a screenshot comparison against the live site.
-3. **Release.** CI deploys only changes that pass every check.
-4. **Smoke test.** After a release, a smoke test requests every page and checks its status code, its security headers, and the redirects.
-5. **Rollback.** If something goes wrong, the previous version can be restored in seconds.
-
-Larger releases also get a full audit:
-- three browser engines and emulated phones
-- a keyboard walkthrough of every page
-- a screen-reader transcript of every page
-- motion and form checks
-- HTML validation
-- a hands-on pass with real phones and a screen reader
+Every change passes automated checks, a preview, and a smoke test before visitors see it, and a bad deploy rolls back in seconds. Larger releases also get a full audit and a pass by hand. The steps are in [`sop.md`](sop.md#how-a-change-reaches-the-live-site).
 
 ## Review checklist
 

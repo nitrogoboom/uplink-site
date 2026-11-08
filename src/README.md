@@ -1,6 +1,6 @@
 # Source code map
 
-*Last updated: November 5, 2026*
+*Last updated: November 8, 2026*
 
 This page maps the `src/` folder: where each page, component, content file, stylesheet, and script lives, and how they fit together. For how to run and build the site, see the [project README](../README.md).
 
@@ -57,7 +57,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | Component | What it is |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
-| `Footer.astro` | The footer: one `<nav aria-label="Footer">` of six `<details name="footer">` sections (the summary is the tile, the rest its panel), the campus map, and the base bar, from `data/footer.json` (through `lib/footer.ts`) and the services collection. CSS lays it out (`styles/footer.css`). |
+| `Footer.astro` | The footer. See [The footer](#the-footer). |
 | `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the theme (System, Light or Dark: radios in a fieldset, `.seg` in `forms.css`), the Reduce motion switch and the keyboard-shortcuts switch. Text size is the browser's own zoom. |
 | `Drawing.astro` | A drawing shown as a picture, in both themes: the dark `NAME.svg` and the light `NAME-light.svg`, one hidden by `theme-light.css`. Takes `src`, optional `sources` (a `<picture>`'s cuts), and the `<img>`'s own attributes. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
@@ -74,6 +74,22 @@ Section components live in `components/PAGE/`. Each section's CSS sits beside it
 A card in a list of cards (the services on `/services`, `work/ProjectCard.astro`, Contact's help cards) is a `<div class="card">` whose title is a heading holding the link: `<h2 class="card-title {fit(title)}"><a class="card-link" href="…">`. Use `h2` when the cards sit right under the page's `h1` and `h3` under a section's `h2` (`ProjectCard`'s `level` prop). The link's `::after` covers the card, so a click anywhere opens it and the focus ring goes round the card (`styles/surfaces.css`); the rest of the card, chip included, is read as plain text, with no `<Pause />`. The Markdown copy makes each one line, "[Title](address): text". A chip is never `aria-hidden`: it tells which group a card is in (review M3, M10).
 
 `components/home/hero-flows.svg` and `components/home/grow-world.svg` are drawings, inlined as components. `tools/gen_office.py` and `tools/gen_grow.py` write them. Don't edit them by hand.
+
+### The footer
+
+Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). The footer is one `<nav aria-label="Footer">` holding six `<details name="footer">` sections: Contact, Services, Company, Support, Resources, and Follow. Each section's `<summary>` is its tile, and the rest is its panel. The browser opens one section at a time, so the footer works the same with or without script. Tab reaches each tile, and Enter or Space opens it.
+
+On desktop, the footer is at least one screen tall. It has three parts:
+
+- **Stage:** the open section's panel on the left, and a live campus map on the right. One section is always open on tablet and desktop: `footer.js` opens Contact at load and again when a visitor shuts the one they picked. Without script, CSS shows Contact's panel while nothing is open.
+- **Tile row:** the six summaries.
+- **Base bar:** the brand, legal links, and status. Keyboard shortcuts live in the Settings dialog, which the header's gear opens.
+
+On a tablet, the tile row comes first, then the map, then the panel. Below 700 px wide, the sections are six rows that open in place, with no map. A row grows open and shrinks shut where the browser can animate to `auto` (`interpolate-size`), and opens at once elsewhere and with reduced motion. The browser's own scroll anchoring keeps a tapped row in place while the one above it shuts.
+
+The lists come from `data/footer.json`, checked by its schema in `lib/footer.ts`, and the Services panel comes from the services collection. The layout is `styles/footer.css`: the summaries and panels are items of one grid (`.fc-deck`), so CSS alone places the tile row and the open panel. Each section has a `data-map` value that names a spot on the map. The map's label holds all six spots' words, and CSS shows the open section's. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. For what `footer.js` does, see [Scripts](#scripts).
+
+> **Note:** A browser that can't place a `<details>` panel (no `::details-content`: Firefox before 143, Safari before 18.4) shows the six rows on every screen, with no map. Without `<details name>` (Firefox before 130, Safari before 17.2), more than one row can be open at once. Firefox ESR 140 gets the rows; Safari and Chrome get the tiles. Only Chromium is tested here: check the footer on a real iPhone and in Firefox before a release.
 
 ## Content
 
@@ -112,9 +128,9 @@ Text sizes are in `rem`, and `html` has no font size of its own, so 1rem is the 
 
 Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), var(--fit))` and `min(var(--fs-7), var(--fit))`, where `cqi` is 1% of the nearest container's width. A heading whose longest word has 10 letters or more ("Cybersecurity", "Everything") carries the class `fit`, which components add at build time with `fit(text)` from `lib/fit.js` (`TextPage.astro` adds it to the Markdown's `h2`s): its `--fit` is `--fit-long` (14cqi), so a 13-letter word fits on one line. Every other heading gets `--fit-short` (21cqi), which keeps its size step except with big text in a narrow column; `fit(text)` gives a heading whose words all have 6 letters or fewer the class `fit-loose` (30cqi). `h3` follows the same rule. A heading's container must be its own column: the project page's title has a box of its own (`.case-title`), and Contact's form heading measures `.form-head`. Home's service tile titles (`.svc-title`, not headings) follow the same rule against their text box (`.svc-text`). A process step puts its title under the number when the step is narrower than 12rem. The columns are marked `container-type: inline-size` in `styles/layout.css` (stat tiles and Contact's queue ring mark themselves). Mark only a box that takes its width from its parent: a box sized by its content collapses to nothing. No heading may get smaller on screen as zoom goes up (the zoom check measures it). Zoom narrows the window in CSS pixels, so a size that is a share of the window or of a column stays the same on screen at best: keep any `vw` part of a size with a rem part that isn't negative (`--fs-7` and `--fs-8` grow only between 27rem and 45rem wide, so 200% zoom on a 1440 window still doubles them), never let a narrower layout use a smaller size than the wider one before it, and give a heading's column a rem floor. So the service and project pages' title column is at least 30rem, stat numbers are `--fs-7` (38cqi only stops them outgrowing a tile; About's tiles go from four in a row to two when they can't hold 44px), and the Home headline is `--fs-hero-phone` below its two-column layout (40px on phones, a share of the window up to `--fs-8` wider) and 16.5cqi of its column in it, so it keeps two lines.
 
-### Breakpoints
-
 Reduced motion: write plain `@media (prefers-reduced-motion: reduce)` (or `no-preference`) rules. A build step in `postcss.config.mjs` (`motion-choice`) scopes each one to `html[data-motion]` and gives it a copy, so the visitor's choice in Settings (Reduce motion: `reduce` or `full`) wins over the device's. `Base.astro`'s head script and `core.js` set the attribute. Scripts ask `reduceMotion` from `core.js` (`.matches`, and a `change` event), never `matchMedia` directly. See `docs/motion-setting-2026-11-08.md`.
+
+### Breakpoints
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
 
@@ -137,7 +153,7 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | Script | Where it runs | What it does |
 | --- | --- | --- |
 | `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the theme (`theme.ev` says when it changes), the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
-| `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
+| `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one; phones start with every row shut. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. On desktop it rounds any Home section whose words make it taller than its one-screen floor up to the next 100px wheel step, so every section still starts on the wheel grid. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `contact.js` | Contact | The copy buttons and the queue card. |
