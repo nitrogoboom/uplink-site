@@ -123,7 +123,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
     <meta name="theme-color" content="#0E1A27" />
     <!-- Before the page paints: html.js, and the theme (Settings: System, Light or Dark; core.js keeps it up to date).
          uplink.theme holds the visitor's choice; anything else, or no storage, follows the device. The light colours
-         are in theme-light.css; #EBF0F5 is the light page colour, for the browser's own bar. -->
+         are in theme-light.css; #E8EFF7 is the light page colour, for the browser's own bar. -->
     <script is:inline>
       (function (r) {
         r.classList.add('js');
@@ -135,7 +135,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
         }
         if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         r.dataset.theme = t;
-        if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#EBF0F5');
+        if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#E8EFF7');
       })(document.documentElement);
     </script>
     {fonts.map((f) => (

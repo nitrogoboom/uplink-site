@@ -1855,9 +1855,9 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
     await q.route('**/_astro/*.js', (r) => r.abort());
     await q.goto(url('index'));
     const s = await state(q);
-    if (s.theme !== 'light' || s.bar !== '#EBF0F5')
-      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #EBF0F5`);
-    if ((await page_bg(q)) !== 'rgb(235, 240, 245)') fails.push(`light page ground: ${await page_bg(q)}`);
+    if (s.theme !== 'light' || s.bar !== '#E8EFF7')
+      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #E8EFF7`);
+    if ((await page_bg(q)) !== 'rgb(232, 239, 247)') fails.push(`light page ground: ${await page_bg(q)}`);
     await ctx.close();
   }
 
@@ -1874,7 +1874,7 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
   await q.locator('input[name="theme"][value="system"]').focus();
   await q.keyboard.press('ArrowRight'); // System -> Light
   s = await state(q);
-  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#EBF0F5')
+  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#E8EFF7')
     fails.push(`Light by the arrow key: ${JSON.stringify(s)}`);
   const results = await axe(q).include('#settings-dialog').analyze();
   for (const v of axeFails(results.violations)) fails.push(`axe, Settings open in light: ${v.id} (${v.nodes.length})`);

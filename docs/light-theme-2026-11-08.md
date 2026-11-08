@@ -41,10 +41,7 @@ The palette's light values (`docs/palette.md`, light columns) are used as writte
 
 | Token or drawing colour | Palette | Used | Why |
 | --- | --- | --- | --- |
-| `--c-bg` (page), `--c-glass` | `#F2F7FC` | `#EBF0F5` | The light page read over-bright, and white cards didn't lift off it. One step greyer (applied November 8, 2026, after the contrast reviews). |
-| `--c-bg-band` | `#E6ECF2` | `#DFE5EB` | The same step, so the bands keep their place. |
-| `--c-surface` (cards) | `rgb(255 255 255 / 0.72)` | `#FFFFFF` | Solid, so a card stands clear of the ground: 1.15–1.27:1, was 1.06–1.13. |
-| `--c-line` | `rgb(34 46 58 / 0.12)` | `/ 0.16` | Card edges faded out on white: 1.35:1, was 1.25. |
+| Grounds and cards ("velvet", November 8, 2026) | page `#F2F7FC`, band `#E6ECF2`, card `rgb(255 255 255 / 0.72)`, line 0.12 | page `#E8EFF7`, band `#DCE5EE`, card `#F8FBFF`, line 0.13 | The light page read over-bright, and white boxes on grey had no depth. Now every neutral is navy, a card is the ground lifted, and a soft layered navy shadow with a top highlight (`--shadow-card`) and light from above (`--card-light`) separate cards, as light and glow do in dark. The palette now holds these values (`docs/palette.md` 4.3, 5.1). |
 | Marks that carry meaning (the current dot, Grow's steps, the chosen theme, the chosen `/work` filter) | `--c-accent` (`#FFAD51`) | `--c-accent-text` (`#88520A`); Grow's open step `#C37600` | Bright amber on white is under 3:1 (WCAG 1.4.11). Amber can fill; a mark is drawn in amber ink, as the open footer tile already was. |
 | Amber buttons' edge | none (transparent) | 1px amber 500 `#C37600` | Bright amber on white had no edge (1.6–1.8:1) and read as a glow; 3.3:1 now. Not in forced colours. |
 | Grow's faded "Watch for" row | `opacity: 0.45` | `0.65` | A fade costs more on a light page; 0.65 matches dark (3:1). |
@@ -64,7 +61,7 @@ The palette's light values (`docs/palette.md`, light columns) are used as writte
 ## Accessibility
 
 - axe (WCAG 2.2 AA tags), every page, light and dark, at 1440×900 and 390×844: clean, apart from one finding Home has in both themes: Grow's last step fades its "Watch for" row (`opacity: 0.45`) on purpose, as the step moves from risks to fixes.
-- Drawing labels on the light page (then `#F2F7FC`; now `#EBF0F5`, about 0.3 lower): link blue `#005D8A` 6.6:1, amber ink `#88520A` 6.0:1, grey sublines `#4D5863` 6.7:1, green `#004F2E` 9.0:1.
+- Drawing labels on the light page (then `#F2F7FC`; now `#E8EFF7`, about 0.4 lower): link blue `#005D8A` 6.6:1, amber ink `#88520A` 6.0:1, grey sublines `#4D5863` 6.7:1, green `#004F2E` 9.0:1.
 - The site check runs on a dark device (`checks/playwright.config.mjs`), the site's own look; its theme test runs axe on every page in light.
 
 ## Still open

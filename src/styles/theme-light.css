@@ -6,6 +6,9 @@
    (tokens.css). Where the palette's light value didn't hold up, the change and the reason are noted beside it
    (docs/light-theme-2026-11-08.md). The drawings: theme-drawings.css (inside the page) and .th-dark / .th-light
    (pictures, Drawing.astro), at the end.
+   The look follows the dark theme's: every neutral is navy (hue 250), never a plain grey; a card is the ground's own
+   colour lifted, not a different one; depth comes from soft, layered, navy-tinted shadows and light from above, not
+   from outlines (docs/palette.md, "Light mode").
    ========================================================================== */
 
 @media screen {
@@ -13,19 +16,19 @@
     color-scheme: light;
 
     /* grounds, text and lines (5.1) */
-    --c-bg: #ebf0f5; /* palette #f2f7fc, one step greyer: the page read over-bright and white cards didn't lift off it */
-    --c-bg-band: #dfe5eb; /* palette #e6ecf2, the same step */
-    --c-solid: #fff;
-    --c-surface: #fff; /* palette rgb(255 255 255 / 0.72): solid, so a card stands clear of the ground (1.15-1.27, was 1.06-1.13) */
-    --c-surface-2: rgb(34 46 58 / 0.06); /* palette 0.045: too faint to see an icon tile on a white card */
-    --c-well: rgb(34 46 58 / 0.05);
-    --c-line: rgb(34 46 58 / 0.16); /* palette 0.12: card edges faded out on white (1.35:1, was 1.25) */
+    --c-bg: #e8eff7; /* navy, OKLCH 0.95 / 0.013: tinted enough to read as the brand's navy, not grey */
+    --c-bg-band: #dce5ee; /* the same navy one step down (0.92 / 0.016) */
+    --c-solid: #fff; /* the top layer only: dialogs, toasts, menus */
+    --c-surface: #f8fbff; /* a card: the ground's navy lifted to 0.99 / 0.006, never plain white (1.12:1 on the page) */
+    --c-surface-2: rgb(34 46 58 / 0.06); /* palette 0.045: too faint to see an icon tile on a card */
+    --c-well: rgb(34 46 58 / 0.045);
+    --c-line: rgb(34 46 58 / 0.13); /* a soft edge: the card's shadow does the separating, as light does in dark */
     --c-line-2: rgb(34 46 58 / 0.24);
     --c-edge: rgb(34 46 58 / 0.58);
     --c-text: #0e1a27;
     --c-muted: #4d5863;
-    --c-glass: #ebf0f5; /* the page colour, solid, as the dark header: no blur cost on scroll */
-    --c-glass-2: #fff;
+    --c-glass: #e8eff7; /* the page colour, solid, as the dark header: no blur cost on scroll */
+    --c-glass-2: #f8fbff; /* phone tab bar: a card */
     --c-backdrop: rgb(34 46 58 / 0.4);
 
     /* action, links and status (5.2) */
@@ -74,6 +77,14 @@
     --shadow-1: 0 12px 32px -12px rgb(14 26 39 / 0.18);
     --shadow-2: 0 32px 64px -24px rgb(14 26 39 / 0.22);
     --shadow-ink: 212deg 40% 20%;
+    /* a card at rest: lit from above (a 1px highlight on its top edge), then three soft layers of navy shadow, each
+       about twice the last (the dark theme's --shadow-front method, at a card's height) */
+    --shadow-card:
+      inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215deg 40% 30% / 0.05), 0 2px 4px hsl(215deg 40% 30% / 0.05),
+      0 6px 14px -4px hsl(215deg 40% 30% / 0.08);
+    /* and its light: a little brighter at the top, a hair darker at the foot. See-through, so a hover or chosen
+       colour under it still shows */
+    --card-light: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 55%, rgb(14 26 39 / 0.015));
   }
 }
 
@@ -87,6 +98,21 @@
 
 /* ---- fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
 @media screen {
+  /* Cards and panels: lit from above, on a soft navy shadow (--card-light, --shadow-card). A rule that gives one a
+     shadow of its own (the Services row's middle card, a hover) still wins: it comes later in the cascade */
+  :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-wall-item, .fc-soc, .svc-tile, .fc-tile, .feat) {
+    background-image: var(--card-light);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* the phone Services row paints its cards solid with a gradient layer over the band (services.css); the light above
+     replaces that layer, so the card takes its colour here (a light card is solid already) */
+  @media (--phone) {
+    :root[data-theme='light'] .svc-tile {
+      background-color: var(--c-surface);
+    }
+  }
+
   /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
      (#fff on #b24438 5.6:1, on #004f2e 9.7:1; the dark label was 3.2:1 on red) */
   :root[data-theme='light'] .grow-tag {

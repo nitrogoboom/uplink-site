@@ -57,7 +57,7 @@ SWAP = {
     # ground, grid, unlit window, drop shadow
     '#15212E': '#E6ECF2', '#2B3743': '#C5CCD3', '#182431': '#A1A9B1', '#05111D': '#BBC2C9',
     # page colour (halos, dot rims) and label ink
-    '#0E1A27': '#EBF0F5', '#F2F7FC': '#0E1A27', '#BBC2C9': '#4D5863',   # EBF0F5: the light --c-bg
+    '#0E1A27': '#E8EFF7', '#F2F7FC': '#0E1A27', '#BBC2C9': '#4D5863',   # E8EFF7: the light --c-bg
     # blue boxes: palette light column
     '#B7DDF8': '#97C8EA', '#73AFD9': '#005D8A',
     # amber box edge, lit window

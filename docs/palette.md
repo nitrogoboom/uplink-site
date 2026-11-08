@@ -6,7 +6,7 @@ A portable colour spec. Hand this file to an agent to recolour a site, a documen
 
 It does not belong to one project. Each project maps its own names onto the roles below. See "Name maps" at the end.
 
-- Version: 1.1 (2026-10-28). 1.1 adds two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
+- Version: 1.2 (November 8, 2026). 1.2 rewrites the light column of the grounds (5.1) and adds light mode's own rules (4.3), two light-only roles (`card-shadow`, `card-light`) and rule 13. 1.1 added two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
 - Colour values: approved by an independent colour-theory and accessibility review. All 12 checks pass. Measured by `editing-room/palette/final/build.py` on the `archive/editing-room` branch.
 
 > **Note:** This file was `editing-room/palette/DESIGN.md` until November 8, 2026 (review C9). The proposals, the review and the build scripts behind it stay on the `archive/editing-room` branch.
@@ -83,6 +83,27 @@ Raw sources. Components use roles (section 5), not ramp steps.
 
 ---
 
+### 4.3 Light mode
+
+Light mode keeps the dark mode's feel: soft, deep and calm, like velvet, not a white page with grey boxes. Dark mode gets that from four habits. Light mode follows the same four.
+
+1. **Every neutral is navy.** No plain grey and no plain white, except the top layer. Grounds sit at hue 250 with OKLCH chroma 0.013–0.016. Light greys need more tint than mid greys to keep from looking flat or dirty.
+2. **A card is the ground, lifted.** Its fill is the ground's own navy at a higher lightness (`#F8FBFF`, L 0.99), not a different colour. Pure `#FFFFFF` is only for the top layer: dialogs, toasts and menus.
+3. **Depth comes from light, not outlines.** A card's edge is a soft line (`line`, 13%). What separates it is `card-shadow`: three soft layers of navy shadow, each about twice the last, plus a 1px highlight along its top edge. Shadows are tinted navy (hue 215), never black.
+4. **Light comes from above.** `card-light` makes a card a little brighter at the top and a hair darker at its foot, as the drawings light their boxes (top lightest, 5.4). It is see-through, so a hover or a chosen colour under it still shows.
+
+Two more rules hold in light mode only:
+
+- **Amber can fill, but a mark is amber ink.** Bright amber on white is under 3:1. Anything that says "chosen" or "you are here" (a current dot, an open step, a chosen option) is drawn in `action-ink`. An amber button keeps its fill and takes a 1px amber 500 (`#C37600`) edge.
+- **Fades cost more on a light ground.** Grey text faded to the same opacity loses more contrast on a light page than on a dark one. Fade less: about 0.65 where dark uses 0.45.
+
+| Layer | Light | OKLCH (L / C, hue 250) |
+|---|---|---|
+| `band` | `#DCE5EE` | 0.92 / 0.016 |
+| `page` | `#E8EFF7` | 0.95 / 0.013 |
+| `surface` (card) | `#F8FBFF` | 0.99 / 0.006 |
+| `raised` (top layer) | `#FFFFFF` | 1.00 / 0 |
+
 ## 5. Roles
 
 Every colour has one job. If you need a second job, you need a second role.
@@ -91,20 +112,22 @@ Every colour has one job. If you need a second job, you need a second role.
 
 | Role | Dark | Light | Job |
 |---|---|---|---|
-| `page` | `#0E1A27` | `#F2F7FC` | page ground (the 60%) |
-| `band` | `#14202D` | `#E6ECF2` | alternate section band |
+| `page` | `#0E1A27` | `#E8EFF7` | page ground (the 60%) |
+| `band` | `#14202D` | `#DCE5EE` | alternate section band |
 | `raised` | `#222E3A` | `#FFFFFF` | opaque ground: dialogs, toasts, menus |
-| `surface` | `rgb(242 247 252 / 0.05)` | `rgb(255 255 255 / 0.72)` | card and panel fill |
-| `surface-hover` | `rgb(242 247 252 / 0.09)` | `rgb(34 46 58 / 0.045)` | hover, selected, icon tile |
-| `well` | `rgb(0 0 0 / 0.18)` | `rgb(34 46 58 / 0.05)` | input fill, image well |
-| `line` | `rgb(242 247 252 / 0.1)` | `rgb(34 46 58 / 0.12)` | decorative divider, card border |
+| `surface` | `rgb(242 247 252 / 0.05)` | `#F8FBFF` | card and panel fill |
+| `surface-hover` | `rgb(242 247 252 / 0.09)` | `rgb(34 46 58 / 0.06)` | hover, selected, icon tile |
+| `well` | `rgb(0 0 0 / 0.18)` | `rgb(34 46 58 / 0.045)` | input fill, image well |
+| `line` | `rgb(242 247 252 / 0.1)` | `rgb(34 46 58 / 0.13)` | decorative divider, card border |
 | `line-strong` | `rgb(242 247 252 / 0.18)` | `rgb(34 46 58 / 0.24)` | soft divider, hover border, link underline |
 | `edge` | `rgb(242 247 252 / 0.46)` | `rgb(34 46 58 / 0.58)` | border of anything you can click or type in (3:1) |
 | `text` | `#F2F7FC` | `#0E1A27` | body text, headings |
 | `text-muted` | `#BBC2C9` | `#4D5863` | secondary text |
-| `glass` | `#0E1A27` | `rgb(242 247 252 / 0.86)` | sticky header (dark: solid, no blur since 2 Nov 2026) |
-| `glass-raised` | `#202C38` | `rgb(255 255 255 / 0.92)` | phone bottom bar (dark: solid, no blur) |
+| `glass` | `#0E1A27` | `#E8EFF7` | sticky header (solid in both modes: no blur cost on scroll) |
+| `glass-raised` | `#202C38` | `#F8FBFF` | phone bottom bar (solid, no blur) |
 | `backdrop` | `rgb(14 26 39 / 0.62)` | `rgb(34 46 58 / 0.4)` | scrim behind pop-ups |
+| `card-shadow` | none (light and glows do this) | `inset 0 1px 0 rgb(255 255 255 / 0.9)`, then `0 1px 1px`, `0 2px 4px` (both `hsl(215 40% 30% / 0.05)`) and `0 6px 14px -4px hsl(215 40% 30% / 0.08)` | a card at rest: its top highlight and soft lift (4.3) |
+| `card-light` | none | `linear-gradient(rgb(255 255 255 / 0.55), transparent 55%, rgb(14 26 39 / 0.015))` | a card lit from above (4.3) |
 
 ### 5.2 Action, links and status
 
@@ -206,6 +229,7 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
 10. **Headline accent.** One word in a headline may take `action-ink`. One word, no glow, no underline.
 11. **Cards.** Border `line`, fill `surface`. No coloured left-edge accents. At most one selected card, shown with `action-tint` plus a label.
 12. **Grounds stay calm.** Grounds and text stay under OKLCH chroma 0.04. Saturation belongs to the action, status and illustration roles.
+13. **Light mode is its own mode** (4.3). Navy-tinted neutrals only; pure white only on the top layer; cards separate by `card-shadow` and `card-light`, not by darker borders; marks that carry meaning in `action-ink`.
 
 ---
 
@@ -251,18 +275,22 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
 }
 :root[data-theme="light"] {
   color-scheme: light;
-  --page: #F2F7FC; --band: #E6ECF2; --raised: #FFFFFF;
-  --surface: rgb(255 255 255 / 0.72); --surface-hover: rgb(34 46 58 / 0.045); --well: rgb(34 46 58 / 0.05);
-  --line: rgb(34 46 58 / 0.12); --line-strong: rgb(34 46 58 / 0.24); --edge: rgb(34 46 58 / 0.58);
+  --page: #E8EFF7; --band: #DCE5EE; --raised: #FFFFFF;
+  --surface: #F8FBFF; --surface-hover: rgb(34 46 58 / 0.06); --well: rgb(34 46 58 / 0.045);
+  --line: rgb(34 46 58 / 0.13); --line-strong: rgb(34 46 58 / 0.24); --edge: rgb(34 46 58 / 0.58);
   --text: #0E1A27; --text-muted: #4D5863;
   --action: #FFAD51; --on-action: #0E1A27; --action-ink: #88520A;
   --action-tint: rgb(255 173 81 / 0.18); --action-ring: rgb(136 82 10 / 0.3);
   --link: #005D8A; --link-tint: rgb(0 93 138 / 0.07);
   --success: #004F2E; --success-tint: rgb(0 79 46 / 0.1);
   --error: #B24438;
-  --glass: rgb(242 247 252 / 0.86); --backdrop: rgb(34 46 58 / 0.4);
+  --glass: #E8EFF7; --backdrop: rgb(34 46 58 / 0.4);
+  --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215 40% 30% / 0.05),
+    0 2px 4px hsl(215 40% 30% / 0.05), 0 6px 14px -4px hsl(215 40% 30% / 0.08);
+  --card-light: linear-gradient(rgb(255 255 255 / 0.55), transparent 55%, rgb(14 26 39 / 0.015));
 }
 body { background: var(--page); color: var(--text); }
+:root[data-theme="light"] .card { background-image: var(--card-light); box-shadow: var(--card-shadow); }
 :focus-visible { outline: 2px solid var(--action-ink); outline-offset: 3px; }
 ```
 
@@ -309,6 +337,7 @@ A project lists its own names here so an agent can apply the roles without guess
 | success / success-tint / error | `--c-ok` / `--c-ok-tint` / `--c-alert` |
 | glass / glass-raised / backdrop | `--c-glass` / `--c-glass-2` / `--c-backdrop` |
 | glow-warm / glow-cool / glow-cool-2 | `--c-glow-accent` / `--c-glow-sky` / `--c-glow-sky-2` |
+| card-shadow / card-light (light only) | `--shadow-card` / `--card-light` (`src/styles/theme-light.css`) |
 | cool-surface / -hover / cool-text-muted | `--c-cool-surface` / `--c-cool-surface-2` / `--c-cool-muted` |
 | box-top / left / right / edge | `--iso-top` / `--iso-left` / `--iso-right` / `--iso-edge` |
 | box-hi-* | `--iso-hi-top` / `--iso-hi-left` / `--iso-hi-right` / `--iso-hi-edge` |

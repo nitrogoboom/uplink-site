@@ -127,17 +127,17 @@
 <polygon points="77.9,65.0 90.9,72.5 90.9,70.0 77.9,62.5" fill="#D2D8DE" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="103.9,65.0 90.9,72.5 90.9,70.0 103.9,62.5" fill="#BBC2C9" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="90.9,55.0 103.9,62.5 90.9,70.0 77.9,62.5" fill="#FFFFFF" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
-<g class="lbl" data-t="FIREWALL" data-s="managed and patched"><g class="co lt"><polyline points="0.0,-120.0 -35.0,-150.0 -59.7,-150.0" fill="none" stroke="#C37600" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="0.0" cy="-120.0" r="5.28" fill="#FFAD51" stroke="#EBF0F5" stroke-width="2.64"/></g>
+<g class="lbl" data-t="FIREWALL" data-s="managed and patched"><g class="co lt"><polyline points="0.0,-120.0 -35.0,-150.0 -59.7,-150.0" fill="none" stroke="#C37600" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="0.0" cy="-120.0" r="5.28" fill="#FFAD51" stroke="#E8EFF7" stroke-width="2.64"/></g>
 <text class="lt" x="-72.0" y="-142.1" font-size="22.9" font-weight="600" letter-spacing="1.37" fill="#88520A" text-anchor="end">FIREWALL</text>
 <text class="lt" x="-72.0" y="-115.7" font-size="19.4" font-weight="400" fill="#4D5863" text-anchor="end">managed</text>
 <text class="lt" x="-72.0" y="-92.8" font-size="19.4" font-weight="400" fill="#4D5863" text-anchor="end">and patched</text>
 </g>
-<g class="lbl" data-t="VOIP PHONES" data-s="calls over your network"><g class="co lt"><polyline points="93.1,26.2 70.0,-60.0 137.7,-60.0" fill="none" stroke="#1F75A6" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="93.1" cy="26.2" r="5.28" fill="#4A93C1" stroke="#EBF0F5" stroke-width="2.64"/></g>
+<g class="lbl" data-t="VOIP PHONES" data-s="calls over your network"><g class="co lt"><polyline points="93.1,26.2 70.0,-60.0 137.7,-60.0" fill="none" stroke="#1F75A6" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="93.1" cy="26.2" r="5.28" fill="#4A93C1" stroke="#E8EFF7" stroke-width="2.64"/></g>
 <text class="lt" x="150.0" y="-52.1" font-size="22.9" font-weight="600" letter-spacing="1.37" fill="#005D8A" text-anchor="start">VOIP PHONES</text>
 <text class="lt" x="150.0" y="-25.7" font-size="19.4" font-weight="400" fill="#4D5863" text-anchor="start">calls over</text>
 <text class="lt" x="150.0" y="-2.8" font-size="19.4" font-weight="400" fill="#4D5863" text-anchor="start">your network</text>
 </g>
-<g class="lbl" data-t="ACCESS POINT" data-s="coverage-planned Wi-Fi"><g class="co lt"><polyline points="77.9,120.0 66.0,202.0 51.3,202.0" fill="none" stroke="#C37600" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="77.9" cy="120.0" r="5.28" fill="#FFAD51" stroke="#EBF0F5" stroke-width="2.64"/></g>
+<g class="lbl" data-t="ACCESS POINT" data-s="coverage-planned Wi-Fi"><g class="co lt"><polyline points="77.9,120.0 66.0,202.0 51.3,202.0" fill="none" stroke="#C37600" stroke-width="2.11" stroke-opacity="0.55"/><circle cx="77.9" cy="120.0" r="5.28" fill="#FFAD51" stroke="#E8EFF7" stroke-width="2.64"/></g>
 <text class="lt" x="39.0" y="209.9" font-size="22.9" font-weight="600" letter-spacing="1.37" fill="#88520A" text-anchor="end">ACCESS POINT</text>
 <text class="lt" x="39.0" y="236.3" font-size="19.4" font-weight="400" fill="#4D5863" text-anchor="end">coverage-planned Wi-Fi</text>
 </g>

@@ -337,7 +337,7 @@ const applyTheme = () => {
   if (root.dataset.theme === t) return;
   root.dataset.theme = t;
   // the page colour, for the browser's own bar (as Base.astro's head script)
-  $('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#EBF0F5' : '#0E1A27');
+  $('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#E8EFF7' : '#0E1A27');
   theme.ev.dispatchEvent(new Event('change'));
 };
 themeInputs.forEach((i) =>
