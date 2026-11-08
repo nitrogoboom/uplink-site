@@ -676,6 +676,70 @@ test('Grow: a held or hidden step resumes where it was; your own pause wins (B17
 });
 
 // B15: reduced motion switched on mid-visit pauses Grow: no more steps, no frames
+// Paused (the site's pause, saved), the hero drawing still shows built: on a reload, and when a resize brings a new
+// cut. Held on their first frame, the build animations left an empty stage (owner, live, November 8, 2026). The loops
+// stay held; on phones the captions draw too.
+test('hero: paused, the drawing shows built on load and after a resize', async ({ browser }) => {
+  const fails = [];
+  const built = async (q, name, phone) => {
+    const cut = phone ? 'svg[data-items]' : 'svg.ob .ob-cloud';
+    const ok = await q
+      .waitForFunction((c) => document.querySelector('.stage[data-hero] ' + c), cut, { timeout: 8000 })
+      .then(
+        () => true,
+        () => false,
+      );
+    if (!ok) return fails.push(`${name}: the ${phone ? 'phone' : 'wide'} cut never arrived`);
+    if (phone) {
+      const caps = await q
+        .waitForFunction(() => document.querySelectorAll('.stage[data-hero] .ob-cap-lead.is-draw').length === 2, null, {
+          timeout: 6000,
+        })
+        .then(
+          () => true,
+          () => false,
+        );
+      if (!caps) fails.push(`${name}: the two captions never drew`);
+    }
+    await q.waitForTimeout(200);
+    const r = await q.evaluate(() => {
+      // CSS animations only: a short transition (a tile's colour, a caption's words) is not held by the pause
+      const all = document
+        .querySelector('.stage[data-hero]')
+        .getAnimations({ subtree: true })
+        .filter((a) => 'animationName' in a);
+      const ends = all.filter((a) => a.effect.getComputedTiming().iterations !== Infinity);
+      const loops = all.filter((a) => a.effect.getComputedTiming().iterations === Infinity);
+      return {
+        ends: ends.length,
+        unfinished: ends.filter((a) => a.playState !== 'finished').length,
+        running: loops.filter((a) => a.playState === 'running').length,
+      };
+    });
+    if (!r.ends) fails.push(`${name}: no build animations found (the check no longer sees the drawing)`);
+    if (r.unfinished)
+      fails.push(`${name}: ${r.unfinished} of ${r.ends} build animations not at their end (empty stage)`);
+    if (r.running) fails.push(`${name}: ${r.running} loops running while paused`);
+  };
+  for (const [w, h] of [
+    [1440, 900],
+    [900, 1000],
+    [390, 844],
+  ]) {
+    const { ctx, q, errs } = await home(browser, { w, h, held: true });
+    await built(q, `paused, loaded at ${w}`, w < 500);
+    if (w === 1440) {
+      await q.setViewportSize({ width: 390, height: 844 });
+      await built(q, 'paused, resized 1440 to 390', true);
+      await q.setViewportSize({ width: 1440, height: 900 });
+      await built(q, 'paused, resized 390 to 1440', false);
+    }
+    fails.push(...errs);
+    await ctx.close();
+  }
+  verdict(fails);
+});
+
 test('Grow: reduced motion switched on mid-visit pauses it (B15)', async ({ browser }) => {
   const fails = [];
   const { ctx, q, errs } = await home(browser);

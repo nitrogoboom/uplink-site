@@ -18,15 +18,11 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 
 Quick, visible:
 - [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
-- [ ] Hero with pause on: the build freezes on its first frame, and on desktop that frame is an empty stage (on phones the furnished room with no network or cloud, and the caption lines don't draw). Seen by the owner on the live site, November 8, 2026: pause the hero, then resize the window across a cut (full, tablet, phone) or reload, and the drawing never shows. `home.js` (`load()`) fetches the new cut and inserts it, and `.is-held svg *` in `base.css` holds every animation at frame 0. Fix: when the drawing goes in while `held.on`, finish its build animations (`getAnimations()`, `finish()` on the ones that don't loop), leaving the loops held.
 - [ ] Backup for the hero (later): if the drawing still ends up blank or never builds, show the still office (`template.hero-still`, already used when the fetch fails) instead of an empty stage.
 
 Design, nice to have:
 - [ ] Desktop: the small secondary text under hero items and footer lines is low-contrast (it passes AA). Raise its size a step or its colour toward `--c-text`.
 - [ ] Home services row mixes three tall cards with four short tiles; the tall ones are mostly empty. Even out the row, or give the tall cards their drawing.
-
-Rule from now on:
-- [ ] Freeze the tooling: no new checks or docs until real content arrives. Spend the time on content, forms (PR #38) and launch steps.
 
 ## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)

@@ -4,7 +4,7 @@
    phones, and Proof's wheel-grid height. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, held, html, reduceMotion, replay, theme, whenOnScreen } from './core.js';
+import { $, $$, held, html, reduceMotion, replay, settle, theme, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
@@ -569,6 +569,8 @@ if (stage) {
         const before = stage.children.length;
         stage.insertAdjacentHTML('afterbegin', html(texts.join('')));
         added = Array.from(stage.children).slice(0, stage.children.length - before);
+        // paused: the drawing shows built, not its empty first frame (a reload, or a new cut after a resize)
+        settle(stage);
         // looping animations pause off screen: the drawing, and the dashes' layer (the cut's own on phones)
         const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
         observers = layers.map((el) => whenOnScreen(el));
@@ -588,6 +590,8 @@ if (stage) {
   };
   load();
   [phone, tablet].forEach((m) => m.addEventListener('change', load));
+  // paused mid-build: the drawing finishes building at once and its loops hold
+  held.ev.addEventListener('change', () => settle(stage));
 }
 
 /* ======================================================================
