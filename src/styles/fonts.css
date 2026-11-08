@@ -1,6 +1,6 @@
 /*--- Fonts: Barlow and Barlow Condensed, served from public/assets/fonts/ (Latin set, which covers French).
-   SIL Open Font License, copy in public/assets/fonts/OFL.txt. The four faces every first screen uses are
-   preloaded in each page's <head> (and sent as Early Hints); the nav tabs' face only from 700px wide.
+   SIL Open Font License, copy in public/assets/fonts/OFL.txt. The two faces that carry every first screen
+   (Condensed 700 italic titles, 400 body) are preloaded in each page's <head> and sent as Early Hints (Base.astro).
    Condensed 700 italic is for page and section titles and big numbers; 700 upright for buttons, card titles and
    sub-headings; 600 upright for tabs, links and small labels. The "Fallback" faces are a system font resized to Barlow's
    width and line height, so text set in the fallback takes the same room and nothing moves when Barlow arrives: Arial,

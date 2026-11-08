@@ -40,7 +40,7 @@
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
 # first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
-# @early-hints (written by scripts/headers.mjs; edit FIRST_FONTS there, not these lines)
+# @early-hints (written by scripts/headers.mjs; it copies the font preloads in Base.astro; edit those, not these lines)
 # @end early-hints
 
 # Cloudflare sends .md and .txt as text/markdown and text/plain with no charset, and browsers then read them as

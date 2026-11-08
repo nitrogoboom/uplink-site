@@ -27,7 +27,6 @@ import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
 import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
-import { MEDIA } from '../lib/media.js';
 import { footer as contact } from '../lib/footer';
 
 export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -60,9 +59,11 @@ const jsonld = type && canonical && {
     ...ldGraph,
   ],
 };
-// Every first screen uses these four faces, phone and desktop (titles 700 italic, buttons and card titles 700,
-// body 400 and 600). The nav tabs' Condensed 600 shows from 700px wide, so it is preloaded with that media query.
-const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-400', 'barlow-600'];
+// Preload only the two faces that carry the first screen: the page title (Condensed 700 italic) and body text
+// (Barlow 400, the most letters on every first screen). The other faces start at the first layout, since the CSS is
+// inline, and their fallbacks take the same room, so nothing moves when they arrive. Preloading all of them split
+// the bandwidth and made the title and body faces arrive later (review L2, November 7, 2026).
+const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
 ---
 <!doctype html>
 <html lang="en-CA">
@@ -95,7 +96,6 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-condensed-700', 'barlow-40
 <meta name="theme-color" content="#0E1A27">
 <script is:inline>document.documentElement.classList.add('js')</script>
 {fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
-<link rel="preload" href="/assets/fonts/barlow-condensed-600.woff2" as="font" type="font/woff2" crossorigin media={MEDIA.tabletUp}>
 <slot name="head" />
 {jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
 </head>
