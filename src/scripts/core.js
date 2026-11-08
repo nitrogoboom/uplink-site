@@ -38,12 +38,14 @@ const $ = (sel, ctx = document) => /** @type {E | null} */ (ctx.querySelector(se
  * @returns {E[]}
  */
 const $$ = (sel, ctx = document) => /** @type {E[]} */ (Array.from(ctx.querySelectorAll(sel)));
-// Less motion: the device's setting (prefers-reduced-motion) or the visitor's own (Settings, Reduce motion; below).
+// Less motion: the visitor's own choice (Settings, Reduce motion; below) if they made one, else the device's setting
+// (prefers-reduced-motion).
 // Shaped like the MediaQueryList it replaced, so every script asks it the same way: .matches, and 'change' events.
 const deviceReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 class MotionChoice extends EventTarget {
   get matches() {
-    return deviceReduce.matches || store.get(MOTION_KEY) === 'reduce';
+    const choice = store.get(MOTION_KEY);
+    return choice === 'reduce' || (choice !== 'full' && deviceReduce.matches);
   }
 }
 const MOTION_KEY = 'uplink.motion';
@@ -365,21 +367,22 @@ window.addEventListener('pageshow', (e) => {
 applyTheme();
 
 /* ---------- Reduce motion (Settings) --------------------------------------- */
-// html[data-motion="reduce"] when the visitor turns it on (saved as uplink.motion) or the device asks for less motion.
-// Base.astro's head script sets it before the page paints; this keeps it right after that, as the theme does: the
-// switch, the device's setting changing, another tab (storage) and the back/forward cache (pageshow). The CSS keys off
-// the attribute (postcss.config.mjs writes a copy of every prefers-reduced-motion rule for it), and the scripts ask
-// reduceMotion (top), which says 'change' when the answer changes. With the device asking for less motion, the switch
-// shows on and can't be turned off here: the device's setting comes first.
+// html[data-motion]: "reduce" when the visitor turns it on, or their device asks for less motion and they haven't turned
+// it off; "full" when they turned it off (saved as uplink.motion: reduce or full). The visitor's choice wins over the
+// device's, for this site only. Base.astro's head script sets it before the page paints; this keeps it right after
+// that, as the theme does: the switch, the device's setting changing, another tab (storage) and the back/forward cache
+// (pageshow). The CSS keys off the attribute (postcss.config.mjs follows every prefers-reduced-motion rule to it), and
+// the scripts ask reduceMotion (top), which says 'change' when the answer changes. With the device asking for less
+// motion, the hint says so, and turning the switch off is the visitor's own choice to see the animations here.
 const moToggle = /** @type {HTMLInputElement | null} */ (document.getElementById('mo-toggle'));
 let motionWas = reduceMotion.matches;
 const applyMotion = () => {
   const on = reduceMotion.matches;
   if (on) root.dataset.motion = 'reduce';
+  else if (store.get(MOTION_KEY) === 'full') root.dataset.motion = 'full';
   else delete root.dataset.motion;
   if (moToggle) {
     moToggle.checked = on;
-    moToggle.disabled = deviceReduce.matches;
     const dev = document.getElementById('mo-device');
     if (dev) dev.hidden = !deviceReduce.matches;
   }

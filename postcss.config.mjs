@@ -13,15 +13,21 @@ const names = {
   },
 };
 
-// Settings, Reduce motion (core.js): html[data-motion="reduce"] when the visitor turns it on or the device asks for less
-// motion. The CSS keeps writing plain prefers-reduced-motion queries, and this follows them to the attribute, the way
+// Settings, Reduce motion (core.js): html[data-motion] is "reduce" (the visitor turned it on, or their device asks for
+// less motion and they haven't turned it off) or "full" (they turned it off, the device's setting notwithstanding).
+// The CSS keeps writing plain prefers-reduced-motion queries, and this follows them to the attribute, the way
 // postcss-dark-theme-class does for prefers-color-scheme:
-//   @media (prefers-reduced-motion: reduce) { A }   stays (without script it's all there is), and A is copied after
-//                                                   it with :root[data-motion='reduce'] on each selector
-//   @media (... prefers-reduced-motion: no-preference) { B }   B's selectors take :root:not([data-motion='reduce'])
-// A rule with no selector (@view-transition) can't follow an attribute: page-transitions.css says what it does instead.
-const ON = "[data-motion='reduce']";
-const OFF = ":not([data-motion='reduce'])";
+//   @media (prefers-reduced-motion: reduce) { A }   A's selectors take :root:not([data-motion='full']), and A is
+//                                                   copied after it with :root[data-motion='reduce']
+//   @media (... prefers-reduced-motion: no-preference) { B }   B's selectors take :root:not([data-motion='reduce']),
+//                                                   and B is copied with :root[data-motion='full'] under the rest of
+//                                                   the query (or none)
+// Without script there's no attribute, so the queries alone decide. A rule with no selector (@view-transition) can't
+// follow an attribute: page-transitions.css says what it does instead.
+const REDUCE = "[data-motion='reduce']";
+const NOT_REDUCE = ":not([data-motion='reduce'])";
+const FULL = "[data-motion='full']";
+const NOT_FULL = ":not([data-motion='full'])";
 const scope = (sel, attr) =>
   sel
     .split(',')
@@ -31,29 +37,44 @@ const scope = (sel, attr) =>
       return m ? m[1] + attr + t.slice(m[1].length) : `:root${attr} ${t}`;
     })
     .join(', ');
+const inKeyframes = (r) => r.parent?.type === 'atrule' && /keyframes/.test(r.parent.name);
+const scoped = (node, attr) => {
+  node.walkRules((r) => {
+    if (!inKeyframes(r)) r.selector = scope(r.selector, attr);
+  });
+  return node;
+};
+const selectorless = (node) => {
+  node.walkAtRules((a) => {
+    if (!a.nodes?.some((n) => n.type === 'rule' || n.type === 'atrule')) a.remove(); // @view-transition {…}
+  });
+  return node;
+};
 const motion = {
   postcssPlugin: 'motion-choice',
-  Once(root) {
+  Once(root, { AtRule }) {
     root.walkAtRules('media', (at) => {
-      if (!at.params.includes('prefers-reduced-motion')) return;
+      if (!at.params.includes('prefers-reduced-motion') || at.motionDone) return;
       if (at.params.includes('prefers-reduced-motion: no-preference')) {
-        at.walkRules((r) => {
-          if (r.parent?.type !== 'atrule' || !/keyframes/.test(r.parent.name)) r.selector = scope(r.selector, OFF);
-        });
+        const rest = at.params.replace(/(\s*and\s*)?\(prefers-reduced-motion: no-preference\)(\s*and\s*)?/, ' ').trim();
+        const copy = scoped(at.clone(), FULL);
+        selectorless(copy);
+        scoped(at, NOT_REDUCE);
+        if (rest) {
+          const wrap = new AtRule({ name: 'media', params: rest });
+          wrap.append(copy.nodes);
+          at.after(wrap);
+        } else at.after(copy.nodes);
       } else if (at.params.trim() === '(prefers-reduced-motion: reduce)') {
-        const copy = at.clone();
-        copy.walkRules((r) => {
-          if (r.parent?.type !== 'atrule' || !/keyframes/.test(r.parent.name)) r.selector = scope(r.selector, ON);
-        });
-        copy.walkAtRules((a) => {
-          if (!a.nodes?.some((n) => n.type === 'rule' || n.type === 'atrule')) a.remove(); // @view-transition {…}
-        });
+        const copy = selectorless(scoped(at.clone(), REDUCE));
+        scoped(at, NOT_FULL);
         at.after(copy.nodes);
       } else {
         throw at.error(
           `motion-choice: write "${at.params}" as (prefers-reduced-motion: reduce) alone, or teach this plugin`,
         );
       }
+      at.motionDone = true;
     });
   },
 };

@@ -3,7 +3,8 @@
 // invoker commands (commandfor) and a click on the backdrop closes it (closedby="any"), so it works in browsers that
 // have them before core.js runs, or if it never loads; core.js takes over when it runs. With script off the gear
 // hides (header.css): the one setting needs script.
-// Motion: Reduce motion, a switch (core.js; on and fixed when the device asks for less motion).
+// Motion: Reduce motion, a switch (core.js). It starts as the device's setting; the visitor's choice wins, for this
+// site only.
 // Theme: System (the default: follows the device's light or dark setting), Light or Dark, each with its icon
 // (screen, sun, moon in icons.ts) beside the word. Native radios in a
 // fieldset, so the arrow keys move between them and a screen reader reads the group and each option. Base.astro's head
@@ -54,7 +55,8 @@ const THEMES = [
           ><strong id="mo-name">Reduce motion</strong
           ><span class="small muted" id="mo-hint"
             >Stops the moving drawings and the slide and fade effects on every
-            page.<span id="mo-device" hidden> On: your device is set to reduce motion.</span></span
+            page.<span id="mo-device" hidden>
+              Your device asks for less motion; turn this off to see them on this site only.</span></span
           ></span
         >
         <input id="mo-toggle" type="checkbox" role="switch" aria-labelledby="mo-name" aria-describedby="mo-hint" />

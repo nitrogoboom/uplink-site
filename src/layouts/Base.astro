@@ -136,14 +136,17 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
         }
         if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         r.dataset.theme = t;
-        // Settings, Reduce motion: on if the visitor turned it on (uplink.motion) or their device asks for less motion
+        // Settings, Reduce motion: "reduce" if the visitor turned it on (uplink.motion), or their device asks for less
+        // motion and they haven't turned it off; "full" if they turned it off
         let m = null;
         try {
           m = localStorage.getItem('uplink.motion');
         } catch {
           /* no storage: follow the device */
         }
-        if (m === 'reduce' || matchMedia('(prefers-reduced-motion: reduce)').matches) r.dataset.motion = 'reduce';
+        if (m === 'reduce' || (m !== 'full' && matchMedia('(prefers-reduced-motion: reduce)').matches))
+          r.dataset.motion = 'reduce';
+        else if (m === 'full') r.dataset.motion = 'full';
         if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#E8EFF7');
       })(document.documentElement);
     </script>

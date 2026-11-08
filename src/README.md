@@ -114,7 +114,7 @@ Headings and big numbers fit their column. `h1` and `h2` are `min(var(--fs-8), v
 
 ### Breakpoints
 
-Reduced motion: write plain `@media (prefers-reduced-motion: reduce)` (or `no-preference`) rules. A build step in `postcss.config.mjs` (`motion-choice`) gives each one a copy that follows `html[data-motion="reduce"]`, which `Base.astro`'s head script and `core.js` set when the visitor turns on Reduce motion in Settings or the device asks for less motion. Scripts ask `reduceMotion` from `core.js` (`.matches`, and a `change` event), never `matchMedia` directly. See `docs/motion-setting-2026-11-08.md`.
+Reduced motion: write plain `@media (prefers-reduced-motion: reduce)` (or `no-preference`) rules. A build step in `postcss.config.mjs` (`motion-choice`) scopes each one to `html[data-motion]` and gives it a copy, so the visitor's choice in Settings (Reduce motion: `reduce` or `full`) wins over the device's. `Base.astro`'s head script and `core.js` set the attribute. Scripts ask `reduceMotion` from `core.js` (`.matches`, and a `change` event), never `matchMedia` directly. See `docs/motion-setting-2026-11-08.md`.
 
 The screen sizes are named once, in `lib/media.js`. CSS uses the names, such as `@media (--desktop)`, and the build writes the real query back in (`postcss-custom-media`). Page scripts import `MEDIA` from the same file for `matchMedia`.
 

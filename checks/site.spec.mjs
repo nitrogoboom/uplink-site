@@ -1922,11 +1922,12 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
 });
 
 // Settings: Reduce motion. On a device that doesn't ask for less motion, the switch is off and the drawings run; turned
-// on, html[data-motion] is set, the choice is saved, and nothing on the page animates (no running animation once the
-// footer map has come in, and transitions are instant); it survives a reload. On a device that asks for less motion
-// the switch shows on and can't be turned off. Without script, that device still gets no animation (the CSS keeps its
-// prefers-reduced-motion queries; postcss.config.mjs only adds the attribute's copy).
-test('motion: Reduce motion in Settings stops every animation, is saved, and the device setting wins', async ({
+// on, html[data-motion] is "reduce", the choice is saved, and nothing on the page animates (no running animation once
+// the footer map has come in, and transitions are instant); it survives a reload. On a device that asks for less motion
+// the switch starts on and nothing moves; turned off, html[data-motion] is "full" and the site animates, for this site
+// only, after a reload too. Without script, that device still gets no animation (the CSS keeps its
+// prefers-reduced-motion queries; postcss.config.mjs only scopes them and adds the attribute's copies).
+test('motion: Reduce motion in Settings stops every animation, is saved, and wins over the device', async ({
   browser,
 }) => {
   const fails = [];
@@ -1977,8 +1978,18 @@ test('motion: Reduce motion in Settings stops every animation, is saved, and the
   await d.goto(url('index'));
   await d.waitForLoadState('networkidle');
   s = await state(d);
-  if (s.motion !== 'reduce' || !s.on || !s.locked)
-    fails.push(`device asks for less motion: ${JSON.stringify(s)}, want on and locked`);
+  if (s.motion !== 'reduce' || !s.on || s.locked)
+    fails.push(`device asks for less motion: ${JSON.stringify(s)}, want on`);
+  if (await running(d)) fails.push('device asks for less motion: something animates');
+  await d.evaluate(() => window.scrollTo(0, 0));
+  await d.locator('[data-open="settings-dialog"]:visible').first().click();
+  await d.locator('label[for="mo-toggle"]').click();
+  await d.reload();
+  await d.waitForLoadState('networkidle');
+  s = await state(d);
+  if (s.motion !== 'full' || s.saved !== 'full' || s.on)
+    fails.push(`device asks for less, visitor turned it off: ${JSON.stringify(s)}, want full`);
+  if ((await running(d)) === 0) fails.push('device asks for less, visitor turned it off: nothing animates');
   await dev.close();
 
   const nojs = await browser.newContext({

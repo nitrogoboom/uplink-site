@@ -58,7 +58,7 @@ If you change a setting, the site remembers it in your browser, so it's the same
 | Saved as | What it remembers |
 | --- | --- |
 | uplink.theme | the theme you picked: system, light or dark |
-| uplink.motion | whether you turned on Reduce motion |
+| uplink.motion | whether you turned Reduce motion on or off |
 | uplink.shortcuts | whether keyboard shortcuts are on or off |
 | uplink-held | whether you paused the animations |
 
