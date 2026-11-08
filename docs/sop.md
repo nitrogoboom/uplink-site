@@ -86,13 +86,14 @@ Don't repeat these by hand. CI fails the build if any of them break:
 - No script errors and no CSP blocks on any page: watched until the network is idle and while the page's timers run a few seconds on, while the screen turns, and while each of the page's own buttons is pressed.
 - No sideways scroll on any page at 320, 390, 600, 768, 1024, and 1280 px wide. The header fits at every width from 320 px to 1440 px in 10 px steps, and at 1600, 1920, 2560, and 3440 px.
 - Exactly one `h1` on every page, and every JSON-LD block parses.
+- Every card in a list of cards (services, projects, help cards) has its title as a heading holding its link, the link covers the card, no heading in `<main>` skips a level, and no chip or other words a link shows are hidden from screen readers (review M3, M10).
 - Every pop-up a page opens shows, passes axe while open, closes on Esc, and gives focus back; a toast leaves on its own; the phone services row follows a swipe. All of it with the site's pause on too, when nothing on Home may loop.
 - The sitemap lists exactly the pages the build wrote, and every check covers all of them.
 - The security headers and `noindex` on every page, the 404 status, and the report endpoint (`npm run smoke` against the local build).
 - The workflows pass zizmor's high-severity audits.
 - The hero, the Grow section, and the footer work. The footer is one screen tall at 1440×900.
 - Every link, picture, script, and preload on every page answers, and every `#section` link finds its id (`npm run verify:links`).
-- **axe-core finds nothing serious or critical on any page.** Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop (1440×900), every other page on phone. At release, `npm run verify -- --all` adds desktop for every page.
+- **axe-core finds nothing serious or critical on any page, and nothing moderate that isn't on its allow-list (`AXE_ALLOW` in `checks/site.spec.mjs`).** It runs the WCAG 2.0, 2.1 and 2.2 A and AA rules (2.2 adds target size, 2.5.8) and axe's best practices. Among its checks: a way to skip the menus (2.4.1) and the page's language (3.1.1). Home on phone and desktop (1440×900), every other page on phone. At release, `npm run verify -- --all` adds desktop for every page.
 
 On a pull request, CI also compares every page with the live site at three sizes (`npm run visual-diff`). That check reports and never fails: a person decides whether each change was meant.
 
@@ -124,7 +125,7 @@ A clean run ticks every box here. A failure names the page and the problem.
 - [ ] **Browsers:** every page in Chromium, Firefox, and WebKit (Safari's engine) at 1440 px, and on an emulated iPhone and Android phone. No script errors, no CSP blocks, no sideways scroll. Screenshots are in `out/audit/shots/`.
 - [ ] **Keyboard (2.1.1, 2.1.2, 2.4.3, 2.4.7):** Tab through every page. Focus is visible on every stop, never off screen, and never stuck. Each dialog opens from the keyboard, Esc closes it, and focus returns. The stops per page are in `out/audit/keyboard/`.
 - [ ] **Screen reader (1.1.1, 1.3.1, 2.4.4, 4.1.2):** every page read top to bottom with a virtual screen reader. It fails on a link whose parts run together with no pause, or one link name that goes to two pages. Transcripts are in `out/audit/reader/`.
-- [ ] **axe on every page, on phone and desktop (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical.
+- [ ] **axe on every page, on phone and desktop (1.4.3 contrast and the rest):** `npm run verify -- --all` finds nothing serious or critical, and nothing moderate off the allow-list.
 - [ ] **200% text (1.4.4) and reflow (1.4.10):** `npm run verify:zoom -- --all` passes: at 200% and 400% zoom and at a 24 px and 32 px default font, no text is cut off or overlapped, nothing is out of reach, and nothing scrolls sideways. It runs Chromium only: zoom to 200% by hand once in Firefox and Safari, in a phone-size and a desktop window.
 - [ ] **Motion (2.2.2, 2.3.1):** with Reduce Motion on, nothing moves. With it off, the pause button stops every loop, and nothing flashes more than three times a second.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email address. Every problem field has its message in words, tied to the field, and focus goes to the first one.

@@ -1,21 +1,24 @@
 ---
 // One project as a card linking to its case study: Home's "Our work", the Work grid and a service page's
-// "Where we've done this". The link reads "Office move in a weekend. Professional services firm, 40 staff": the
-// tag chip is for the eye only, a pause follows the name, " · " is a short pause (Sep). The chip follows the picture
-// rather than sitting in it, so phones can put it beside the picture (a row) and wider screens over it, as before;
-// each part of the client line after the first ("40 staff") keeps its words together. Styles: .card and
-// .card--project in src/styles/surfaces.css.
+// "Where we've done this". The name is a heading holding the link (h2 on /work, h3 under a section's h2), and the
+// link covers the whole card (.card-link in surfaces.css), so heading navigation lands on each project and the link
+// is named by the name alone (review M3). The client line and the tag chip are read after it as plain text (M10);
+// " · " is a short pause (Sep). The chip comes last in the markup but shows first: on phones the grid puts it above
+// the name, wider screens over the picture's corner. Each part of the client line after the first ("40 staff") keeps
+// its words together. Styles: .card and .card--project in src/styles/surfaces.css.
 //   project   the collection entry
+//   level     the heading level: 2 where the cards sit right under the page's h1, else 3
 //   first     the picture loads eagerly (the first card on screen)
 import type { CollectionEntry } from 'astro:content';
-import Pause from '../Pause.astro';
 import Sep from '../Sep.astro';
 import { cardSize } from '../../lib/site';
-interface Props { project: CollectionEntry<'projects'>; first?: boolean }
-const { project: { id, data: p }, first = false } = Astro.props;
+import { fit } from '../../lib/fit';
+interface Props { project: CollectionEntry<'projects'>; level?: 2 | 3; first?: boolean }
+const { project: { id, data: p }, level = 3, first = false } = Astro.props;
+const H = level === 2 ? 'h2' : 'h3';
 ---
-<a class="card card--project" href={`/work/${id}`}>
+<div class="card card--project">
   <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'}></span>
-  <span class="chip" aria-hidden="true">{p.tag}</span>
-  <span class="card-body"><span class="card-title">{p.name}</span><Pause /><span class="card-meta muted small">{p.clientShort.split(' · ').map((part, i) => <Fragment>{i > 0 ? <Fragment><Sep /><span class="keep">{part}</span></Fragment> : part}</Fragment>)}</span></span>
-</a>
+  <span class="card-body"><H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H><span class="card-meta muted small">{p.clientShort.split(' · ').map((part, i) => <Fragment>{i > 0 ? <Fragment><Sep /><span class="keep">{part}</span></Fragment> : part}</Fragment>)}</span></span>
+  <span class="chip">{p.tag}</span>
+</div>

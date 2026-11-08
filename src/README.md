@@ -69,6 +69,8 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 
 Section components live in `components/PAGE/`. Each section's CSS sits beside it and is imported at the top of the component, for example `hero.css` next to `Hero.astro`. `services/ServiceCard.astro` and `work/ProjectCase.astro` render one service or project in full on its own page.
 
+A card in a list of cards (the services on `/services`, `work/ProjectCard.astro`, Contact's help cards) is a `<div class="card">` whose title is a heading holding the link: `<h2 class="card-title {fit(title)}"><a class="card-link" href="…">`. Use `h2` when the cards sit right under the page's `h1` and `h3` under a section's `h2` (`ProjectCard`'s `level` prop). The link's `::after` covers the card, so a click anywhere opens it and the focus ring goes round the card (`styles/surfaces.css`); the rest of the card, chip included, is read as plain text, with no `<Pause />`. The Markdown copy makes each one line, "[Title](address): text". A chip is never `aria-hidden`: it tells which group a card is in (review M3, M10).
+
 `components/home/hero-flows.svg` and `components/home/grow-world.svg` are drawings, inlined as components. `tools/gen_office.py` and `tools/gen_grow.py` write them. Don't edit them by hand.
 
 ## Content

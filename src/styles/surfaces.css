@@ -6,6 +6,7 @@
 @media (--tablet-up) { .pad { padding: var(--sp-6); } }
 
 .card {
+  position: relative;   /* holds its link's cover (.card-link::after) */
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
@@ -23,12 +24,25 @@
 .card-media img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-3); }
 .card-media .chip { position: absolute; top: var(--sp-3); left: var(--sp-3); }
 .card-body { display: flex; flex-direction: column; gap: var(--sp-2); padding: 0 var(--sp-3) var(--sp-3); }
-.card-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); letter-spacing: var(--tracking-1); text-transform: uppercase; line-height: var(--lh-title); }
+/* phones: the body is the title's column (container-type, as in layout.css), so its --fit measures the words' width,
+   not the card's, which the card's and the body's padding make 3rem wider: with a big default font a long word
+   ("Cybersecurity") would split. Wider screens measure the card, as before: a narrow desktop column at zoom would
+   otherwise shrink the title on screen (review C1) */
+@media (--phone) { .card-body { container-type: inline-size; } }
+.card-title { font-family: var(--font-display); font-weight: 700; font-size: min(var(--fs-5), var(--fit, var(--fs-5))); letter-spacing: var(--tracking-1); text-transform: uppercase; line-height: var(--lh-title); }
+/* a card that is one link (review M3): its title is a heading holding the link, and the link's ::after covers the
+   whole card, border included, so a click anywhere opens it and the focus ring goes round the card as before. The
+   heading looks like the old title: upright, no balancing or hyphens (base.css gives headings those) */
+:is(h2, h3).card-title { font-style: normal; text-wrap: wrap; hyphens: manual; }
+.card-link { color: inherit; text-decoration: none; }
+.card-link::after { content: ""; position: absolute; inset: -1px; z-index: 1; border-radius: var(--r-3); }
+.card-link:focus-visible { outline: none; }
+.card-link:focus-visible::after { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }
 .card .link-arrow { margin-top: auto; }
 .card.pad { padding: var(--sp-5); }
 @media (--tablet-up) { .card.pad { padding: var(--sp-6); } }
 
-/* project card (ProjectCard.astro): picture, tag chip, words. The chip comes after the picture in the markup; from
+/* project card (ProjectCard.astro): picture, tag chip, words. The chip comes last in the markup (read after the name); from
    700px it sits over the picture's corner, where .card-media .chip puts other cards' chips (one card padding plus one
    inset in from the card's edge). */
 .card--project { position: relative; }
@@ -36,16 +50,20 @@
 .card-meta .keep { white-space: nowrap; }   /* "40 staff" on one line: the client line breaks at its dot */
 /* phones: a row, so more projects fit on a screen. The drawing on the left at a fixed width, as tall as the row; the
    chip, name and client beside it as one block, centred on the drawing (the empty rows above and below share what
-   is left). Chip, name and client share one left edge; the client sits close under the name (docs/spacing.md R4). */
-@media (--phone) {
+   is left). Chip, name and client share one left edge; the client sits close under the name (docs/spacing.md R4).
+   Under 20em (a phone with a big default font or zoom) a row leaves the words no room: the card stacks as on wider
+   screens. The name is a step smaller only under 30em: wider (a desktop window at 200% zoom) it keeps the tablet's
+   size, so zooming in never makes it smaller on screen (review C1) */
+@media (--phone) and (width >= 20em) {
   .card--project { display: grid; grid-template: "media ." 1fr "media chip" auto "media body" auto "media ." 1fr / var(--card-thumb) minmax(0, 1fr); gap: 0 var(--sp-4); }
   .card--project > .card-media { grid-area: media; aspect-ratio: auto; min-height: calc(var(--card-thumb) * 3 / 4); }
   .card--project > .card-media img { padding: var(--sp-2); }
   .card--project > .chip { position: static; grid-area: chip; justify-self: start; margin-bottom: var(--sp-2); }
   .card--project > .card-body { grid-area: body; gap: var(--sp-1); padding: 0; overflow-wrap: break-word; }
-  .card--project .card-title { font-size: var(--fs-4); text-wrap: balance; }   /* "Office move / in a weekend", not "…in a / weekend" */
+  .card--project .card-title { text-wrap: balance; }   /* "Office move / in a weekend", not "…in a / weekend" */
   .card--project .card-meta { line-height: var(--lh-snug); }
 }
+@media (20em <= width < 30em) { .card--project .card-title { font-size: min(var(--fs-4), var(--fit, var(--fs-4))); } }
 
 .icon-tile {
   display: grid; place-items: center; flex: none;

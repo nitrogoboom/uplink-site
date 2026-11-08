@@ -17,7 +17,7 @@
 // 1440x900 that isn't one screen tall, whose panel overflows or whose map spot doesn't show, keys that don't reach and
 // open the footer's sections, a header whose tabs come within 8px of the logo or
 // buttons (or scroll) at any width from 320 to 1440 in 10px steps and on wider screens,
-// anything serious or critical from axe, or a sitemap that doesn't list exactly the built pages.
+// anything serious or critical from axe (or moderate, off its allow-list; WCAG 2.2 AA rules), or a sitemap that doesn't list exactly the built pages.
 // Known failures are marked test.fail with the review item that fixes them (KNOWN, below): such a test fails the run
 // once the bug is fixed, as a reminder to drop the mark.
 // At the end, one test for each bug the November 7, 2026 review found and batch 2b fixed, named by its item (B2 …), so
@@ -292,6 +292,12 @@ for (const page of PAGES) {
 // toasts and footer panels stayed at their first, invisible animation frame, and the phone services row stopped
 // following a swipe). axe gets the whole page at load (pause off), and then each open dialog, which a pass over the page
 // can't see (a closed <dialog> isn't rendered). With the pause on, every looping animation must be paused once the drawings have loaded.
+// axe runs the WCAG 2.2 AA rules and axe's best practices (review L10). Serious and critical findings fail, and so
+// does a moderate one unless AXE_ALLOW names its rule with the reason it's accepted; minor ones are only printed.
+const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
+const AXE_ALLOW = {};
+const axe = (q) => new AxeBuilder({ page: q }).withTags(AXE_TAGS);
+const axeFails = (v) => v.filter((x) => x.impact === 'serious' || x.impact === 'critical' || (x.impact === 'moderate' && !AXE_ALLOW[x.id]));
 // wait until an element's own animations have stopped running (finished, or held by a pause), up to 5 s, so a busy
 // runner can't catch a 250ms fade-in half way; a fade held by the pause stays at its first frame and still fails
 const settled = (q, sel) =>
@@ -333,11 +339,11 @@ for (const page of PAGES) {
         if (isHeld !== held) fails.push(`${name}: html.is-held is ${isHeld}, expected ${held}`);
         // axe on the whole page as it loads (once, with the pause off); each open dialog gets its own pass below
         if (!held) {
-          const v = (await new AxeBuilder({ page: q }).analyze()).violations;
-          const serious = v.filter((x) => x.impact === 'serious' || x.impact === 'critical');
+          const v = (await axe(q).analyze()).violations;
+          const serious = axeFails(v);
           console.log(
             [
-              `axe ${pad(page, 22)} ${pad(n, 6)} ${v.length} violation(s), ${serious.length} serious/critical`,
+              `axe ${pad(page, 22)} ${pad(n, 6)} ${v.length} violation(s), ${serious.length} failing`,
               ...v.map(
                 (x) =>
                   `    [${x.impact}] ${x.id}: ${x.help}\n      ` +
@@ -365,8 +371,8 @@ for (const page of PAGES) {
           const st = await q.evaluate(shownStyle, `#${id}`);
           rep.push(`${id}: ${JSON.stringify(st)}`);
           if (!st || st.opacity < 0.99 || st.w < 100 || st.h < 100) fails.push(`${name}: #${id} isn't shown once open: ${JSON.stringify(st)}`);
-          const v = (await new AxeBuilder({ page: q }).include(`#${id}`).analyze()).violations;
-          for (const x of v.filter((x) => x.impact === 'serious' || x.impact === 'critical')) fails.push(`${name}: axe in #${id}: [${x.impact}] ${x.id}`);
+          const v = (await axe(q).include(`#${id}`).analyze()).violations;
+          for (const x of axeFails(v)) fails.push(`${name}: axe in #${id}: [${x.impact}] ${x.id}`);
           // a toast in the dialog: Settings' shortcuts switch says what it did, then leaves on its own (3 s)
           if (id === 'settings-dialog' && (await q.locator('#sc-toggle').count())) {
             await q.locator('#sc-toggle').click();
@@ -1236,8 +1242,8 @@ test('work filters: a radio group that works without script, keys, forced colour
   await q.goto(url('work'));
   await q.locator('.filters .filter').nth(1).click();
   await q.waitForTimeout(300);
-  const v = (await new AxeBuilder({ page: q }).analyze()).violations;
-  for (const x of v.filter((x) => x.impact === 'serious' || x.impact === 'critical')) fails.push(`axe, a filter chosen: [${x.impact}] ${x.id}`);
+  const v = (await axe(q).analyze()).violations;
+  for (const x of axeFails(v)) fails.push(`axe, a filter chosen: [${x.impact}] ${x.id}`);
   rep.push(`axe with a filter chosen: ${v.length} violation(s)`);
   await ctx.close();
   console.log(`work filters:\n  ${rep.join('\n  ')}`);
@@ -1417,6 +1423,46 @@ test('Markdown copies: team, facts links, hours heading, Home contact (C15)', as
   if (!home.includes('- Languages: English, French')) fails.push('/index.md: not "Languages: English, French"');
   if (!tel || !home.includes(`](${tel})`)) fails.push(`/index.md: phone link is not ${tel}, the one /contact shows`);
   if (/\{[a-z]+\}/i.test(home)) fails.push(`/index.md: placeholder left: ${home.match(/\{[a-z]+\}/i)[0]}`);
+  verdict(fails);
+});
+
+// M3: a card in a list of cards (services, projects, help cards) has its title as a heading holding its link, so
+// heading navigation lands on each one, and the link still covers the card (a click near its corner opens it). No
+// heading in <main> skips a level. M10: what a link shows is in its name (nothing with words aria-hidden inside a
+// link), and no chip is hidden from screen readers.
+test('cards: titles are headings, chips are heard (M3, M10)', async ({ browser }) => {
+  const fails = [];
+  const q = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  for (const page of ['index', 'services', 'work', 'contact', 'services/security']) {
+    await q.goto(url(page));
+    const r = await q.evaluate(() => {
+      const out = [];
+      let prev = 1;
+      for (const h of document.querySelectorAll('main :is(h1, h2, h3, h4, h5, h6)')) {
+        const n = Number(h.tagName[1]);
+        if (n > prev + 1) out.push(`${h.tagName.toLowerCase()} "${h.textContent.trim()}" follows an h${prev}`);
+        prev = n;
+      }
+      const cards = [...document.querySelectorAll('main :is(.svc-grid, .work-grid, .card-row, .svc-cards) > li > .card')];
+      for (const card of cards) {
+        const name = card.querySelector('.card-title')?.textContent.trim() || card.textContent.trim().slice(0, 30);
+        const link = card.querySelector(':is(h2, h3) > a[href]');
+        if (!link) { out.push(`card "${name}": its title is not a heading holding its link`); continue; }
+        card.scrollIntoView({ block: 'center', behavior: 'instant' });
+        const b = card.getBoundingClientRect();
+        const at = document.elementFromPoint(b.right - 6, b.bottom - 6);
+        if (at?.closest('a') !== link) out.push(`card "${name}": a click near its corner reaches ${at?.outerHTML.slice(0, 60)}, not its link`);
+      }
+      for (const a of document.querySelectorAll('main a[href]')) {
+        for (const x of a.querySelectorAll('[aria-hidden="true"]')) if (/\p{L}/u.test(x.textContent)) out.push(`link "${a.textContent.trim().slice(0, 40)}": "${x.textContent.trim()}" is shown but aria-hidden`);
+      }
+      for (const c of document.querySelectorAll('main .chip')) if (c.closest('[aria-hidden="true"]')) out.push(`chip "${c.textContent.trim()}" is aria-hidden`);
+      return { out, cards: cards.length };
+    });
+    if (!r.cards) fails.push(`${page}: no cards found`);
+    fails.push(...r.out.map((x) => `${page}: ${x}`));
+  }
+  await q.close();
   verdict(fails);
 });
 

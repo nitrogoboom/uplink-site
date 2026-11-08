@@ -23,7 +23,7 @@ const filters = await workFilters();
     </div>
     <div class="work-main">
     <ul class="work-grid">
-      {projects.map((project, i) => <li data-tags={project.data.tag.toLowerCase()}><ProjectCard project={project} first={i === 0} /></li>)}
+      {projects.map((project, i) => <li data-tags={project.data.tag.toLowerCase()}><ProjectCard project={project} level={2} first={i === 0} /></li>)}
     </ul>
     </div>
   </div>

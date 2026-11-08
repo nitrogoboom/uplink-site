@@ -67,11 +67,12 @@
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up. Its shadow is a layer on the li
    that only fades and scales with it, so the big blur is drawn once, not on every frame of the lift. */
 @media (hover: hover) and (--tablet-up) {
-  /* hidden as well as moved out: no sliver of it shows at the tile's foot, whatever the rounding (200% zoom) */
-  .svc-go { position: absolute; inset: auto 0 0; visibility: hidden; transform: translateY(100%); transition: transform var(--dur-2) var(--ease), visibility var(--dur-2); }
+  /* clipped as well as moved out: no sliver of it shows at the tile's foot, whatever the rounding (200% zoom). A clip,
+     not visibility: hidden, so "View service" stays in the link's name for a screen reader (M10) */
+  .svc-go { position: absolute; inset: auto 0 0; clip-path: inset(0 0 100% 0); transform: translateY(100%); transition: transform var(--dur-2) var(--ease), clip-path var(--dur-2) var(--ease); }
   .svc-big .svc-text { padding-bottom: calc(var(--control-h) + var(--sp-4)); }
   .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); }
-  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { visibility: visible; transform: none; }
+  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { clip-path: inset(0); transform: none; }
   .svc-menu > li { position: relative; }
   .svc-menu > li::after {
     content: "";

@@ -1,9 +1,15 @@
 ---
-// CONTACT · 2. Already a client: quick links for existing clients. Styles: support.css.
+// CONTACT · 2. Already a client: quick links for existing clients. Each card's title is an h3 holding its link, the
+// link covering the card (.card-link in src/styles/surfaces.css; review M3). Styles: support.css.
 import './support.css';
 import { phone } from '../../lib/footer';
 import Icon from '../Icon.astro';
-import Pause from '../Pause.astro';
+import { fit } from '../../lib/fit';
+const cards = [
+  { icon: 'headset', title: 'Call the help desk', href: phone.href, text: `${phone.display}, then press 1. After hours this rings our on-call technician.` },
+  { icon: 'ticket', title: 'Open a ticket', href: '/soon#client-portal', text: 'Log in to the client portal to open a ticket and follow its progress.' },
+  { icon: 'screen', title: 'Start a remote session', href: '/soon#remote-support', text: 'A technician will give you a six-digit code to share your screen.' },
+] as const;
 ---
 <section class="section section--band fold fold-always" id="support" aria-labelledby="support-title">
   <div class="container">
@@ -13,21 +19,13 @@ import Pause from '../Pause.astro';
       <p class="lead">Clients skip the queue. Pick whichever is fastest for you.</p>
     </div>
     <ul class="svc-cards help-cards">
-      <li><a class="card pad" href={phone.href}>
-        <span class="icon-tile" aria-hidden="true"><Icon name="headset" /></span>
-        <span class="card-title">Call the help desk</span><Pause />
-        <span class="muted">{phone.display}, then press 1. After hours this rings our on-call technician.</span>
-      </a></li>
-      <li><a class="card pad" href="/soon#client-portal">
-        <span class="icon-tile" aria-hidden="true"><Icon name="ticket" /></span>
-        <span class="card-title">Open a ticket</span><Pause />
-        <span class="muted">Log in to the client portal to open a ticket and follow its progress.</span>
-      </a></li>
-      <li><a class="card pad" href="/soon#remote-support">
-        <span class="icon-tile" aria-hidden="true"><Icon name="screen" /></span>
-        <span class="card-title">Start a remote session</span><Pause />
-        <span class="muted">A technician will give you a six-digit code to share your screen.</span>
-      </a></li>
+      {cards.map((c) => (
+        <li><div class="card pad">
+          <span class="icon-tile" aria-hidden="true"><Icon name={c.icon} /></span>
+          <h3 class:list={['card-title', fit(c.title)]}><a class="card-link" href={c.href}>{c.title}</a></h3>
+          <span class="muted">{c.text}</span>
+        </div></li>
+      ))}
     </ul>
   </div>
 </section>

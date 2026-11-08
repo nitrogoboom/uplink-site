@@ -44,7 +44,16 @@ const md = (site, page) => {
       || (cls(node, 'sr-only') && !!node.previousElementSibling && cls(node.previousElementSibling, 'label', 'chan-title', 'card-title')),
     replacement: () => '',
   });
-  td.addRule('feature', { filter: (node) => cls(node, 'feat-d'), replacement: (content) => `: ${content.trim()}` });
+  // a card that is one link (its title a heading holding .card-link, review M3): one line, "[Title](address): text",
+  // not a heading inside a list item
+  td.addRule('card', {
+    filter: (node) => cls(node, 'card') && all(node, 'a').some((a) => cls(a, 'card-link')),
+    replacement: (content) => {
+      const m = content.trim().match(/^#+ +(.+)\n([\s\S]*)$/);
+      return m ? `${m[1].trim()}: ${m[2].replace(/\s+/g, ' ').trim()}` : content;
+    },
+  });
+  td.addRule('feature',{ filter: (node) => cls(node, 'feat-d'), replacement: (content) => `: ${content.trim()}` });
   // a small label beside its value ("Clients supported" 120+, "Call" 1-855-…): one "Label: value" line; a label
   // over a block (a list) becomes a bold line of its own
   td.addRule('label', {
