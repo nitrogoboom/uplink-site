@@ -1930,12 +1930,14 @@ test('motion: Reduce motion in Settings stops every animation, is saved, and the
   browser,
 }) => {
   const fails = [];
-  const running = (q) =>
-    q.evaluate(async () => {
-      window.scrollTo(0, document.body.scrollHeight);
-      await new Promise((r) => setTimeout(r, 2500));
-      return document.getAnimations().filter((a) => a.playState === 'running').length;
-    });
+  // scroll to the footer and wait for its map (footer.js fetches it when it comes near, and its loops start once it's
+  // on screen), so both counts see the map: on a busy runner a fixed wait could count before it arrived
+  const running = async (q) => {
+    await q.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await q.waitForSelector('[data-fc-map] svg', { state: 'attached', timeout: 15000 });
+    await q.waitForTimeout(1500);
+    return q.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
+  };
   const state = (q) =>
     q.evaluate(() => {
       const sw = /** @type {HTMLInputElement} */ (document.getElementById('mo-toggle'));
