@@ -97,3 +97,4 @@ Domain and hosting:
 - [ ] Web Analytics: the site in Cloudflare was set up for the old `pages.dev` host, but data already arrives from `uplink-site.johnoreilly.workers.dev` under the token in `core.js` (checked 6 Nov 2026). At launch, add the real domain to that site (or make a new site and swap the token), and drop the "old pages.dev host" remarks in `core.js` and `docs/secrets.md`.
 - [ ] Search Console: verify the domain, submit the sitemap.
 - [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).
+- [ ] Smoke from a cloud session (November 8, 2026): the environment must allow the site's host, and Node needs `NODE_USE_ENV_PROXY=1` to use the proxy. The `http://` redirect check can't run there (the proxy carries HTTPS only); it passes from a normal machine.
