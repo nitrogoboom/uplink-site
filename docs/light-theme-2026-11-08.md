@@ -46,6 +46,7 @@ The palette's light values (`docs/palette.md`, light columns) are used as writte
 | `--c-surface` (cards) | `rgb(255 255 255 / 0.72)` | `#FFFFFF` | Solid, so a card stands clear of the ground: 1.15–1.27:1, was 1.06–1.13. |
 | `--c-line` | `rgb(34 46 58 / 0.12)` | `/ 0.16` | Card edges faded out on white: 1.35:1, was 1.25. |
 | Marks that carry meaning (the current dot, Grow's steps, the chosen theme, the chosen `/work` filter) | `--c-accent` (`#FFAD51`) | `--c-accent-text` (`#88520A`); Grow's open step `#C37600` | Bright amber on white is under 3:1 (WCAG 1.4.11). Amber can fill; a mark is drawn in amber ink, as the open footer tile already was. |
+| Amber buttons' edge | none (transparent) | 1px amber 500 `#C37600` | Bright amber on white had no edge (1.6–1.8:1) and read as a glow; 3.3:1 now. Not in forced colours. |
 | Grow's faded "Watch for" row | `opacity: 0.45` | `0.65` | A fade costs more on a light page; 0.65 matches dark (3:1). |
 | Home's news cards' border | `--c-cool-surface-2` | `--c-line` | The border was the fill's own colour (1:1). |
 | `--c-surface-2` | `rgb(34 46 58 / 0.045)` | `/ 0.06` | Icon tiles on white cards didn't show. |

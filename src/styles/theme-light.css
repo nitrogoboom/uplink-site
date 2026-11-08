@@ -145,3 +145,12 @@
 :root[data-theme='light'] .th-dark {
   display: none;
 }
+
+/* Amber buttons: bright amber on white has no edge of its own (1.6-1.8:1), so it read as a glow. A 1px amber 500
+   border (palette 4.2; 3.3:1 on the page) gives it one; the fill and its label (9.5:1) stay. Not in forced colours,
+   where the system draws the button's border. (docs/light-theme-home-review-2026-11-08.md item 7) */
+@media screen and (forced-colors: none) {
+  :root[data-theme='light'] .btn--primary {
+    border-color: #c37600;
+  }
+}
