@@ -1,6 +1,7 @@
 /*--- Page transitions: a soft crossfade between pages (cross-document view transitions). Chrome, Edge and
    Safari 18.2+; other browsers just load the next page as before. The header and the phone tab bar hold
-   still while the page under them fades. Off when the system asks for less motion. ---*/
+   still while the page under them fades. Off when the system asks for less motion. Last, the site-wide reduced-motion
+   switch: every animation and transition near-instant. ---*/
 @view-transition {
   navigation: auto;
 }
@@ -40,4 +41,16 @@
 ::view-transition-group(site-header),
 ::view-transition-group(botnav) {
   animation-duration: var(--dur-2);
+}
+
+/* ---------- motion preferences -------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
