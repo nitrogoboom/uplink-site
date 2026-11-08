@@ -344,7 +344,10 @@ a.fc-cl:hover { color: var(--c-accent-text); }
     }
     /* the stage's two columns, 5 : 7 with --sp-8 between, in the one grid cell they share */
     .fc-sec::details-content { grid-row: stage; justify-self: start; width: calc((100% - var(--sp-8)) * 5 / 12); margin-bottom: var(--sp-5); }
-    .fc-map { grid-row: stage; justify-self: end; width: calc((100% - var(--sp-8)) * 7 / 12); aspect-ratio: auto; min-height: 26rem; margin-bottom: var(--sp-5); }
+    .fc-map { grid-row: stage; justify-self: end; width: calc((100% - var(--sp-8)) * 7 / 12); aspect-ratio: auto; min-height: 26rem; margin-bottom: var(--sp-5); container-type: size; }
+    /* the label on the drawing's base: the drawing (1071 x 768, its camera's shape) is centred in the box, so a box
+       taller than that shape leaves a band under it, and the label rises by that band */
+    .fc-hud { bottom: max(0px, (100cqh - 100cqw * 768 / 1071) / 2); }
     .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
   }
 }

@@ -22,7 +22,7 @@
 // wide enough for the one-screen layout at that font). Each case keeps at least 20em (320px at 16px) of width, the
 // narrowest the site checks: a phone at 200% zoom or with a 24px font is narrower than that (notes.md).
 // One test per page and case; each fails on any finding. Known failures are marked test.fail with the review item
-// that fixes them (KNOWN, below).
+// that fixes them (KNOWN, below). Then one test per page and desktop screen for headings at zoom steps (end of file).
 // usage: npm run build && npm run serve   then   npm run verify:zoom [-- --all] [--base URL]
 //   (npm run verify runs it too, after the site check)
 import { test } from '@playwright/test';
@@ -176,6 +176,53 @@ for (const path of PATHS) {
       }
       console.log(lines.join('\n'));
       if (found.length) throw new Error(lines.join('\n'));
+    });
+  }
+}
+
+// Headings and big numbers on screen as zoom goes up (review C1: "at 150% the Home h1 is smaller than at 100%"). Every
+// h1, h2, stat number and footer heading, at 110, 125, 150, 175 and 200% on four desktop screens: on screen (CSS px x
+// zoom) it is at least as big as at the step before, so no step of zoom makes it smaller, and at 200% it is at least
+// FLOOR times its size at 100%. A heading may size to its column (cqi) or the screen's width (the vw slope of --fs-7
+// and --fs-8), but a narrower column at zoom must never undo the zoom. Each run prints the least and most growth at
+// 200% (200% where the heading is at its rem cap at half the width).
+const STEPS = [1, 1.1, 1.25, 1.5, 1.75, 2];
+const FLOOR = 1.5;
+const HEADS = () => {
+  const out = {};
+  for (const e of document.querySelectorAll('main h1, main h2, main .stat-val, .fc-head h3')) {
+    if (!e.checkVisibility({ opacityProperty: true, visibilityProperty: true }) || e.closest('svg, .sr-only')) continue;
+    const k = `${e.tagName.toLowerCase()} "${e.textContent.trim().replace(/\s+/g, ' ').slice(0, 30)}"`;
+    if (!(k in out)) out[k] = parseFloat(getComputedStyle(e).fontSize);
+  }
+  return out;
+};
+for (const path of PATHS) {
+  for (const [w, h] of [[1280, 720], [1440, 900], [1920, 1080], [2560, 1440]]) {
+    test(`headings grow with zoom ${path} ${w}x${h}`, async ({ browser }) => {
+      const at = [];
+      for (const z of STEPS) {
+        const { ctx, pg } = await open(browser, path, { w, h, zoom: z });
+        at.push(await pg.evaluate(HEADS));
+        await ctx.close();
+      }
+      const px = (i, k) => Math.round(at[i][k] * STEPS[i] * 10) / 10; // on screen
+      const found = [], two = [];
+      for (const [k, one] of Object.entries(at[0])) {
+        let last = 0; // the step it was last seen at
+        STEPS.forEach((z, i) => {
+          if (!i || !(k in at[i])) return;
+          if (px(i, k) < px(last, k) * 0.99) found.push(`${k}: ${px(last, k)}px on screen at ${Math.round(STEPS[last] * 100)}%, ${px(i, k)}px at ${Math.round(z * 100)}%`);
+          last = i;
+        });
+        if (k in at[5]) {
+          two.push(Math.round((px(5, k) / one) * 100));
+          if (px(5, k) < one * FLOOR * 0.99) found.push(`${k}: ${one}px at 100%, ${px(5, k)}px on screen at 200% (under ${FLOOR * 100}%)`);
+        }
+      }
+      const line = `${pad(path, 20)} ${w}x${h}  at 200%: ${two.length ? `${Math.min(...two)}% to ${Math.max(...two)}%` : '-'}`;
+      console.log(line);
+      if (found.length) throw new Error(`${line}\n    ${found.join('\n    ')}`);
     });
   }
 }

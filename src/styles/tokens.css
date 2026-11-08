@@ -80,8 +80,11 @@
   --fs-4: 1.125rem;   /* 18  lead, buttons */
   --fs-5: 1.375rem;   /* 22  card titles */
   --fs-6: 1.75rem;    /* 28  sub-headings, dialog titles, big buttons */
-  --fs-7: clamp(2rem, 1.35rem + 2.2vw, 2.75rem);   /* 32-44  section headings */
-  --fs-8: clamp(2.75rem, 1.6rem + 4.4vw, 4.5rem);  /* 44-72  page headings */
+  /* the two heading sizes grow with the window only between a big phone (27rem, 432px) and 45rem (720px), and are at
+     their cap from there: so 200% zoom on a 1440 window (720 CSS px) still doubles them, and a 1280 one gives about
+     180% (review C1). Phones keep their size. */
+  --fs-7: clamp(2rem, 0.875rem + 4.17vw, 2.75rem);    /* 32-44  section headings */
+  --fs-8: clamp(2.75rem, 0.125rem + 9.72vw, 4.5rem);  /* 44-72  page headings */
   --fit-long:  14cqi;   /* the most a heading with a long word may be (class fit, lib/fit.js): a 13-letter word
                           ("Cybersecurity") fits its column. cqi: 1% of the nearest container's width (layout.css) */
   --fit-loose: 30cqi;   /* a heading whose words are all 6 letters or fewer (class fit-loose) */
@@ -188,7 +191,10 @@
   --loop-grow-rim: 2.4s;
 
   /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
-  --fs-hero-phone: 2.5rem;    /* 40: the home headline on phones, a step under --fs-8 so the hero fits one screen */
+  /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
+     under --fs-8 so the hero fits one screen; wider, a share of the window up to --fs-8. All vw, no negative rem part,
+     so a narrower window at zoom never makes it smaller on screen (review C1) */
+  --fs-hero-phone: clamp(2.5rem, 9.26vw, var(--fs-8));
   --cap-title: var(--fs-4);
   --cap-sub: var(--fs-2);
   --cap-edge: var(--sp-3);    /* words to the drawing's edge */
@@ -245,8 +251,8 @@
     --fold-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
     /* the tallest the Home hero (home/hero.css) and the Grow picture (home/grow.css) get: shares of the screen, not
        rem, so the pictures fill big screens whatever the text size. 62vw: the hero stops growing taller only on a
-       near-square window */
-    --hero-max: 62vw;
+       near-square window; never under 50rem, the room its menu needs */
+    --hero-max: max(62vw, 50rem);
     --grow-stage-max: min(49vw, 78svh);
     --fold-pad: var(--sp-7);   /* top and bottom of a one-screen section (fold.css): a step of the scale that grows
                                   with the screen's height, so big screens keep their air */

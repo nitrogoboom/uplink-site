@@ -13,6 +13,7 @@
 .menu-label { display: block; margin: 0 0 var(--sp-2); }
 .hero-cta .small { text-align: center; }
 @media (--tablet-up) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
+.hero-menu h1 { font-size: min(var(--fs-hero-phone), var(--fit)); }
 .hero-menu h1 .line { display: block; }
 .hero-menu h1 em { font-style: italic; color: var(--c-accent-text); }
 .hero-top .lead { text-wrap: pretty; }
@@ -88,7 +89,6 @@
   .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
   .hero-menu, .hero-art { display: contents; }
   .hero-top { grid-area: top; gap: var(--sp-3); }
-  .hero-menu h1 { font-size: min(var(--fs-hero-phone), var(--fit)); }
   .hero-top .eyebrow, .lead-long { display: none; }
   .lead-short { display: inline; }
   .hero-art .stage { grid-area: stage; }
@@ -139,14 +139,13 @@
     row-gap: var(--sp-6);
   }
   .hero-menu { grid-area: menu; justify-content: center; gap: var(--sp-6); }
+  /* the headline keeps its two lines in its column: "Always online", the longer, is about 5.7em wide. A share of the
+     column, not of the screen, so zoom (a narrower column, then the tablet layout) never shrinks it on screen */
+  .hero-menu h1 { font-size: min(var(--fs-8), 16.5cqi, var(--fit)); }
   .hero-cta { flex-wrap: wrap; }
   .hero-art { display: contents; }
   .hero-art .stage { grid-area: stage; aspect-ratio: auto; min-height: 0; }
   .hero-dock { grid-area: dock; }
-}
-/* tablets: the headline steps down so it stays on two lines in its column */
-@media (56.25em <= width < 68.75em) and (height >= 35em) and (orientation: landscape) {
-  .hero-menu h1 { font-size: min(var(--fs-8), 4.6vw, var(--fit)); }
 }
 
 /* ---- desktop, tall enough for the menu ----------------------------------
@@ -173,6 +172,15 @@
   .hero-menu .hero-services { display: block; margin-top: var(--sp-6); }
   /* icons and text line up with the headline; the highlight hangs outside */
   .hero-menu .menu { margin-inline: calc(-1 * var(--sp-3)); }
+  /* a window under 884px tall (1280 x 800, 1536 x 864): the menu drops its sublines and its gaps step down, so the
+     menu and the news cards stay on the first screen (the full menu needs 770px of the 688 a 800px window leaves) */
+  @media (height < 55.25em) {
+    .hero-menu { gap: var(--sp-5); }
+    .hero-menu .hero-services { margin-top: var(--sp-4); }
+    .hero-menu .mi-sub { display: none; }
+  }
+  /* narrow desktops: the office column is too narrow for two news cards side by side, so they stack */
+  @media (width < 77.5em) { .hero-dock { grid-template-columns: minmax(0, 1fr); } }
 
   /* very wide screens (21:9 and wider): news in a column beside the office.
      A maximised 16:9 browser is about 2:1, so this starts well past that. */

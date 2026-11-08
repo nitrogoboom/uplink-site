@@ -502,23 +502,28 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
 /* ------------------------------------------------------------------
    Wheel grid (fold.css, tokens.css): on desktop every fold is a whole
    number of wheel steps tall, so the wheel's stops land on fold edges.
-   Proof is as tall as its words, which CSS can't round, so it rounds
-   its own height up to the next step here; the footer after it then
+   CSS makes each fold at least one screen, rounded up to a step; a fold
+   whose words need more room than that (Proof always: it is as tall as
+   its words; Services and Grow on a narrow or short desktop, 1100 x 700
+   to 1200 x 800) grows by its content, which CSS can't round, so each
+   rounds its own height up to the next step here, and the next fold
    starts on a stop too. Off below desktop, where sections take their
    own height.
    ------------------------------------------------------------------ */
-const proof = $('#proof');
-if (proof?.firstElementChild && 'ResizeObserver' in window) {
+const folds = $$('main > .fold, #proof').filter((f) => f.firstElementChild);
+if (folds.length && 'ResizeObserver' in window) {
   const fold = window.matchMedia(MEDIA.fold);
-  const inner = proof.firstElementChild;
-  const fit = () => {
-    if (!fold.matches) { proof.style.minHeight = ''; return; }
+  const fit = (/** @type {HTMLElement} */ f) => {
+    f.style.minHeight = '';
+    if (!fold.matches) return;
     const step = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wheel-step'));
-    const pad = getComputedStyle(proof);
-    const h = inner.getBoundingClientRect().height + parseFloat(pad.paddingTop) + parseFloat(pad.paddingBottom);
-    proof.style.minHeight = step > 0 ? `${Math.ceil(h / step - 0.001) * step}px` : '';
+    const h = f.getBoundingClientRect().height;   // its own height: the CSS floor, or its words if they need more
+    const up = Math.ceil(h / step - 0.001) * step;
+    if (step > 0 && up - h > 0.5) f.style.minHeight = `${up}px`;
   };
-  // the inner box keeps its height when Proof grows (its words only rewrap with the width), so this never loops
-  new ResizeObserver(fit).observe(inner);
-  fold.addEventListener('change', fit);
+  // a fold's inner box keeps its height when the fold grows (centred in its row, not stretched; its words only rewrap
+  // with the width), so this never loops
+  const seen = new ResizeObserver((list) => list.forEach((e) => fit(/** @type {HTMLElement} */ (e.target.parentElement))));
+  folds.forEach((f) => seen.observe(/** @type {Element} */ (f.firstElementChild)));
+  fold.addEventListener('change', () => folds.forEach(fit));
 }

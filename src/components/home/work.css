@@ -8,4 +8,7 @@
   .work-wrap { display: flex; flex-direction: column; min-height: var(--fold-inner); }
   .work-wrap .card-row { flex: 1; min-height: 0; }
   .work-wrap .card-media { flex: 1; min-height: 12rem; aspect-ratio: auto; }
+  /* the picture asks for no room of its own (absolute): on a wide, short window (3440 x 1080) a card is wide, and a
+     picture in the flow would take its height from that width and make the fold taller than the screen */
+  .work-wrap .card-media img { position: absolute; inset: 0; }
 }

@@ -52,7 +52,7 @@
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(min(100%, 8rem), 34%), 1fr)); gap: var(--sp-4); list-style: none; }
 @media (--desktop) { .stats { gap: var(--sp-5); } }
 .stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-5); }
-.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: clamp(min(var(--fs-7), 38cqi), 30cqi, var(--fs-8)); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; white-space: nowrap; }   /* big, but never wider than its tile, and never split ("3,40 / 0", B20). At least --fs-7 where that fits: the widest, "12 min", is 2.5em, so up to 38cqi */
+.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: min(var(--fs-7), 38cqi); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; white-space: nowrap; }   /* --fs-7, but never wider than its tile, and never split ("3,40 / 0", B20): the widest, "12 min", is 2.5em, so up to 38cqi. No bigger share of the tile: a tile narrows at zoom, and the number must still grow on screen (review C1) */
 
 /* FAQ */
 .faq { display: flex; flex-direction: column; gap: var(--sp-3); max-width: 55rem; }
