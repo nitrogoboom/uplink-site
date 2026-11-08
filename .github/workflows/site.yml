@@ -1,8 +1,10 @@
-# Build and check on every push and pull request (types, the build scripts' tests, lint, build, then the built site
-# in a browser: the site check, the link check and the header check, Playwright Test in checks/; on a pull request
-# also a screenshot comparison with the live site); beside it, the drawings job regenerates every drawing from its
-# Python script and checks it; deploy to the Cloudflare Worker on main only if all of that passed, and then only a
-# version that passes the smoke check at its own address first (scripts/deploy.mjs).
+# Build and check on every push and pull request: the build once (dist), beside it types, the build scripts' tests and
+# lint (static), then the built site in a browser, split across three runners (verify: the site check, plus the link
+# check and the header check, Playwright Test in checks/; on a pull request also a screenshot comparison with the live
+# site, visual-diff). The build job is the gate over all of them, the required check on main. Beside it, the drawings
+# job regenerates every drawing from its Python script and checks it; deploy to the Cloudflare Worker on main only if
+# all of that passed, and then only a version that passes the smoke check at its own address first
+# (scripts/deploy.mjs).
 # The workflows themselves are linted (zizmor); a pull request's new dependencies are reviewed where GitHub offers it.
 # Actions are pinned to a commit (the # vX.Y.Z beside each says which release), so a moved tag can't change what
 # runs here; Dependabot (.github/dependabot.yml) proposes the updates.
@@ -38,9 +40,10 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build:
+  # the build, once: its dist/ is what every check below opens, what the preview uploads and what deploy puts live
+  dist:
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # about 6 minutes on a good day
+    timeout-minutes: 15 # about 2 minutes
     environment: cloudflare # so the step below can see whether the deploy secrets exist
     outputs:
       cloudflare: ${{ steps.cf.outputs.ready }}
@@ -58,15 +61,58 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+        with:
+          name: dist
+          path: dist
+          include-hidden-files: true # dist/.well-known/security.txt: upload-artifact skips dot folders by default
+          retention-days: 7
+
+  # beside the build: types, the build scripts' tests, lint
+  static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # about 2 minutes
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
       - run: npm run check
       - run: npm test
       - run: npm run lint
-      - run: npm run build
-      # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
-      # deploys: the site check (checks/site.spec.mjs) fails on a script error, a CSP block, a dead hero or Grow section,
-      # sideways scroll, a pop-up that doesn't show, or a serious axe finding; the smoke check on the headers
-      # Playwright's Chromium is kept between runs, for as long as package-lock.json names the same @playwright/test
-      # (the browser build goes with that version); the system libraries it needs are installed each time
+
+  # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
+  # deploys: the site check (checks/site.spec.mjs) fails on a script error, a CSP block, a dead hero or Grow section,
+  # sideways scroll, a pop-up that doesn't show, or a serious axe finding. It's split in three (Playwright's --shard),
+  # each part on its own runner; the first part also runs the link check and the smoke check on the headers.
+  # Playwright's Chromium is kept between runs, for as long as package-lock.json names the same @playwright/test
+  # (the browser build goes with that version); the system libraries it needs are installed each time
+  verify:
+    needs: dist
+    runs-on: ubuntu-latest
+    timeout-minutes: 20 # about 3 minutes
+    strategy:
+      fail-fast: false # every shard reports, so one run shows every failure
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: dist
+          path: dist
       - id: pw
         run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
       - id: pw-cache
@@ -83,41 +129,97 @@ jobs:
           npx wrangler dev --port 8787 > wrangler.log 2>&1 &
           for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
           curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
-          npm run verify
-          npm run verify:links
-          npm run smoke -- http://localhost:8787
-          # a pull request: each page next to the live site (main) at three sizes. It reports, it never fails: a
-          # person reads the list in the run's summary and says whether each change was meant
-          if [ "$EVENT" = pull_request ]; then
-            npm run visual-diff -- https://uplink-site.johnoreilly.workers.dev http://localhost:8787 || true
-            cat out/visual/report.md >> "$GITHUB_STEP_SUMMARY" || true
+          npm run verify -- -- --shard="$SHARD/3"
+          if [ "$SHARD" = 1 ]; then
+            npm run verify:links
+            npm run smoke -- http://localhost:8787
           fi
         env:
           WRANGLER_SEND_METRICS: 'false'
-          EVENT: ${{ github.event_name }}
+          SHARD: ${{ matrix.shard }}
       - if: failure()
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
-          name: site-check
+          name: site-check-${{ matrix.shard }}
           path: |
             out/*.png
             out/test-results
             wrangler.log
           retention-days: 7
-      - if: github.event_name == 'pull_request' && hashFiles('out/visual/*.png') != ''
+
+  # a pull request: each page next to the live site (main) at three sizes. It reports, it never fails: a person reads
+  # the list in the run's summary and says whether each change was meant
+  visual-diff:
+    needs: dist
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # about 2 minutes
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: dist
+          path: dist
+      - id: pw
+        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
+      - id: pw-cache
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Compare each page with the live site
+        run: |
+          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
+          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
+          npm run visual-diff -- https://uplink-site.johnoreilly.workers.dev http://localhost:8787 || true
+          cat out/visual/report.md >> "$GITHUB_STEP_SUMMARY" || true
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - if: hashFiles('out/visual/*.png') != ''
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: visual-diff
           path: out/visual
           retention-days: 14
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-        with:
-          name: dist
-          path: dist
-          include-hidden-files: true # dist/.well-known/security.txt: upload-artifact skips dot folders by default
-          retention-days: 7
+
+  # the gate, under the name the ruleset on main requires (`build`), and what deploy and preview wait for. It passes
+  # only when the build, the static checks, every verify shard and, on a pull request, the screenshot comparison
+  # passed; a failed, cancelled or skipped one fails it. always(), so it reports even when one of them failed (a
+  # skipped required check would count as passed)
+  build:
+    needs: [dist, static, verify, visual-diff]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      cloudflare: ${{ needs.dist.outputs.cloudflare }}
+    steps:
+      - name: Every check passed
+        run: |
+          for r in "dist=$DIST" "static=$STATIC" "verify=$VERIFY"; do
+            [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
+          done
+          if [ "$EVENT" = pull_request ] && [ "$VISUAL" != success ]; then echo "::error::visual-diff: $VISUAL"; exit 1; fi
+        env:
+          EVENT: ${{ github.event_name }}
+          DIST: ${{ needs.dist.result }}
+          STATIC: ${{ needs.static.result }}
+          VERIFY: ${{ needs.verify.result }}
+          VISUAL: ${{ needs.visual-diff.result }}
       # a push to main that can't deploy fails, after the checks above have had their say
-      - if: github.event_name == 'push' && steps.cf.outputs.ready != 'true'
+      - if: github.event_name == 'push' && needs.dist.outputs.cloudflare != 'true'
         run: |
           echo "::error::CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID is missing from the cloudflare environment, so this push to main can't deploy"
           echo "**Not deployed:** the cloudflare environment is missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID." >> "$GITHUB_STEP_SUMMARY"
@@ -125,7 +227,11 @@ jobs:
 
   deploy:
     needs: [build, workflows, drawings] # a high zizmor finding, or a drawing out of step with its script, stops the deploy too
-    if: github.event_name == 'push' && needs.build.outputs.cloudflare == 'true'
+    # each result named: the build gate runs always(), and a job skipped further up (visual-diff, on a push) would
+    # otherwise skip this one too. The gate itself passes only when every check before it passed
+    if: >-
+      !cancelled() && github.event_name == 'push' && needs.build.outputs.cloudflare == 'true' &&
+      needs.build.result == 'success' && needs.workflows.result == 'success' && needs.drawings.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30 # about 2 minutes; at worst about 25: each smoke run may take up to 5 and the live one can run twice, and the wait for the live build up to 2
     environment: cloudflare
@@ -162,7 +268,9 @@ jobs:
   # a pull request gets a preview address (wrangler prints it) without touching the live Worker
   preview:
     needs: build
-    if: github.event_name == 'pull_request' && needs.build.outputs.cloudflare == 'true'
+    if: >- # the result named, as in deploy
+      !cancelled() && github.event_name == 'pull_request' && needs.build.outputs.cloudflare == 'true' &&
+      needs.build.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
