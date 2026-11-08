@@ -193,7 +193,8 @@ test('extra arguments go to both smoke runs (--launch); --old only to the live o
   const { code, calls, out, live, preview } = await deploy({ args: ['--launch', '--old', 'https://old.example.test'] });
   assert.equal(code, 0, out);
   assert.ok(smokes(calls, preview)[0].includes('--launch') && smokes(calls, live)[0].includes('--launch'));
-  assert.ok(!smokes(calls, preview)[0].includes('--old') && !smokes(calls, preview)[0].includes('https://old.example.test'), 'no --old at the preview');
+  const atPreview = new Set(smokes(calls, preview)[0]);
+  assert.ok(!atPreview.has('--old') && !atPreview.has('https://old.example.test'), 'no --old at the preview');
   assert.deepEqual(smokes(calls, live)[0].slice(2, 5), ['--launch', '--old', 'https://old.example.test']);
 });
 
