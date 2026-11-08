@@ -488,8 +488,8 @@
 }
 
 /* desktop with a pointer: the room kept for the bar (above) comes out of the icon, so a short tile still fits its
-   quarter of the screen (1280x800, 1366x768) */
-@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+   quarter of the screen (1280x800, 1366x768). From 60em tall (1920x1080 and up) there is room for the full icon. */
+@media (hover: hover) and (width >= 68.75em) and (43.75em <= height < 60em) and (aspect-ratio >= 3 / 2) {
   .svc-small .svc-icon svg {
     width: var(--sp-6);
     height: var(--sp-6);

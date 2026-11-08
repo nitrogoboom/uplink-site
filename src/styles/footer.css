@@ -1079,7 +1079,7 @@ a.fc-cl:hover {
       padding-top: var(--sp-2);
     }
     .fc-head h3 {
-      font-size: min(var(--fs-8), 8.2svh, var(--fit));
+      font-size: min(var(--fs-8), var(--fit));
     }
     .fc-map {
       min-height: 16rem;
