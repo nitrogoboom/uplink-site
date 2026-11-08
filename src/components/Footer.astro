@@ -24,65 +24,157 @@ const services = await getServices();
 type Spot = keyof typeof f.spots;
 const spot = (k: Spot) => f.spots[k];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
-const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : p.links ?? [] }));
+const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : (p.links ?? []) }));
 // the six sections in reading order: Contact, the link panels, Follow. footer.css places the tiles by this order.
-const sections: { id: string; map: Spot; icon: IconName; name: string; count: string; panel?: (typeof panels)[number] }[] = [
+const sections: {
+  id: string;
+  map: Spot;
+  icon: IconName;
+  name: string;
+  count: string;
+  panel?: (typeof panels)[number];
+}[] = [
   { id: 'contact', map: 'hq', icon: 'bubble', name: 'Contact', count: 'Start here' },
-  ...panels.map((p) => ({ id: p.id, map: p.map, icon: p.icon, name: p.tile, count: `${p.links.length} links`, panel: p })),
-  { id: 'follow', map: 'follow', icon: f.follow.icon, name: f.follow.tile, count: `${f.follow.socials.length} channels` },
+  ...panels.map((p) => ({
+    id: p.id,
+    map: p.map,
+    icon: p.icon,
+    name: p.tile,
+    count: `${p.links.length} links`,
+    panel: p,
+  })),
+  {
+    id: 'follow',
+    map: 'follow',
+    icon: f.follow.icon,
+    name: f.follow.tile,
+    count: `${f.follow.socials.length} channels`,
+  },
 ];
 ---
+
 <footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
   <h2 class="sr-only" id="fc-title">Site footer</h2>
   <nav class="fc-nav" aria-label="Footer">
-  <div class="container fc-deck">
-{sections.map((s) => (
-<details class="fc-sec" name="footer" id={`fc-${s.id}`} data-map={s.map}>
-  <summary class="fc-tile"><span class="icon-tile"><Icon name={s.icon} /></span><span class="fc-tile-n">{s.name}</span><Pause /><span class="fc-tile-c">{s.count}</span><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span></summary>
-  <div class="fc-panel">
-  {s.id === 'contact' && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{f.contact.eyebrow}</p><h3 class={fit(`${f.contact.title} ${f.contact.accent}`)}>{f.contact.title} <em>{f.contact.accent}</em></h3></div><p class="fc-lead">{f.contact.lead}</p><div class="fc-body">
-  <div class="fc-facts">
-    <div><p class="label">Call or email</p>
-      <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
-      <a class="fc-cl" href={`mailto:${f.email}`}><Icon name="mail" /><span>{f.email}</span></a></div>
-    <div><p class="label">Office</p>
-      <p class="fc-cl fc-cl--two"><Icon name="pin" /><span>{f.office.city}<small>{f.office.street}</small></span></p>
-      <p class="fc-cl fc-cl--two"><Icon name="clock" /><span>{f.hours.line}<small>{f.hours.days}</small></span></p></div>
-  </div>
-  <div class="fc-follow"><span class="label">Follow</span><ul class="fc-socials">{f.follow.socials.map((x) => (
-    <li><a class="fc-soc" href={x.href} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a></li>))}</ul></div>
-</div>
-  </Fragment>)}
-  {s.panel && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(s.panel.title)}>{s.panel.title}</h3></div><p class="fc-lead">{s.panel.lead}</p><div class="fc-body"><ul class="fc-rows fc-rows--two">{s.panel.links.map((l) => (
-  <li><a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a></li>))}</ul><a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a></div>
-  </Fragment>)}
-  {s.id === 'follow' && (<Fragment>
-<div class="fc-head"><p class="eyebrow">{s.count}</p><h3 class={fit(`${f.follow.title} ${f.follow.accent}`)}>{f.follow.title} <em>{f.follow.accent}</em></h3></div><p class="fc-lead">{f.follow.lead}</p><div class="fc-body">
-  <ul class="fc-wall">{f.follow.socials.map((x) => (
-    <li><a class="fc-wall-item" href={x.href}><span class="icon-tile"><Icon name={x.icon} /></span><b>{x.name}</b></a></li>))}</ul>
-  <form class="fc-nl" action="/soon" data-fc-nl novalidate>
-    <label class="label" for="fc-nl-email"><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label>
-    <div class="fc-nl-row"><input class="input" id="fc-nl-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="An email address like name@company.com" placeholder="you@company.com" autocomplete="email" required aria-describedby="fc-nl-msg"><button class="btn btn--secondary" type="submit">Subscribe</button></div>
-    <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
-  </form>
-</div>
-  </Fragment>)}
-  </div>
-</details>
-))}
-    <div class="fc-map" data-fc-map={CAMPUS}>
-      <div class="fc-hud" aria-hidden="true"><Icon name="spot" />{sections.map((s) => <span class="fc-hud-l"><b>{spot(s.map).name}</b><small>{spot(s.map).sub}</small></span>)}</div>
-      <HoldButton class="fc-hold" />
+    <div class="container fc-deck">
+      {sections.map((s) => <details class="fc-sec" name="footer" id={`fc-${s.id}`} data-map={s.map}>
+        <summary class="fc-tile">
+          <span class="icon-tile"><Icon name={s.icon} /></span><span class="fc-tile-n">{s.name}</span
+          ><Pause /><span class="fc-tile-c">{s.count}</span
+          ><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span>
+        </summary>
+        <div class="fc-panel">
+          {s.id === 'contact' && <Fragment>
+            <div class="fc-head">
+              <p class="eyebrow">{f.contact.eyebrow}</p>
+              <h3 class={fit(`${f.contact.title} ${f.contact.accent}`)}>
+                {f.contact.title} <em>{f.contact.accent}</em>
+              </h3>
+            </div>
+            <p class="fc-lead">{f.contact.lead}</p>
+            <div class="fc-body">
+              <div class="fc-facts">
+                <div>
+                  <p class="label">Call or email</p>
+                  <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
+                  <a class="fc-cl" href={`mailto:${f.email}`}><Icon name="mail" /><span>{f.email}</span></a>
+                </div>
+                <div>
+                  <p class="label">Office</p>
+                  <p class="fc-cl fc-cl--two">
+                    <Icon name="pin" /><span>{f.office.city}<small>{f.office.street}</small></span>
+                  </p>
+                  <p class="fc-cl fc-cl--two">
+                    <Icon name="clock" /><span>{f.hours.line}<small>{f.hours.days}</small></span>
+                  </p>
+                </div>
+              </div>
+              <div class="fc-follow">
+                <span class="label">Follow</span>
+                <ul class="fc-socials">
+                  {f.follow.socials.map((x) => <li>
+                    <a class="fc-soc" href={x.href} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a>
+                  </li>)}
+                </ul>
+              </div>
+            </div>
+          </Fragment>}
+          {s.panel && <Fragment>
+            <div class="fc-head">
+              <p class="eyebrow">{s.count}</p>
+              <h3 class={fit(s.panel.title)}>{s.panel.title}</h3>
+            </div>
+            <p class="fc-lead">{s.panel.lead}</p>
+            <div class="fc-body">
+              <ul class="fc-rows fc-rows--two">
+                {s.panel.links.map((l) => <li>
+                  <a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a>
+                </li>)}
+              </ul>
+              <a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a>
+            </div>
+          </Fragment>}
+          {s.id === 'follow' && <Fragment>
+            <div class="fc-head">
+              <p class="eyebrow">{s.count}</p>
+              <h3 class={fit(`${f.follow.title} ${f.follow.accent}`)}>{f.follow.title} <em>{f.follow.accent}</em></h3>
+            </div>
+            <p class="fc-lead">{f.follow.lead}</p>
+            <div class="fc-body">
+              <ul class="fc-wall">
+                {f.follow.socials.map((x) => <li>
+                  <a class="fc-wall-item" href={x.href}
+                    ><span class="icon-tile"><Icon name={x.icon} /></span><b>{x.name}</b></a
+                  >
+                </li>)}
+              </ul>
+              <form class="fc-nl" action="/soon" data-fc-nl novalidate>
+                <label class="label" for="fc-nl-email"
+                  ><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label
+                >
+                <div class="fc-nl-row">
+                  <input
+                    class="input"
+                    id="fc-nl-email"
+                    type="email"
+                    pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                    title="An email address like name@company.com"
+                    placeholder="you@company.com"
+                    autocomplete="email"
+                    required
+                    aria-describedby="fc-nl-msg"
+                  /><button class="btn btn--secondary" type="submit">Subscribe</button>
+                </div>
+                <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
+              </form>
+            </div>
+          </Fragment>}
+        </div>
+      </details>)}
+      <div class="fc-map" data-fc-map={CAMPUS}>
+        <div class="fc-hud" aria-hidden="true">
+          <Icon name="spot" />{sections.map((s) => <span class="fc-hud-l"
+            ><b>{spot(s.map).name}</b><small>{spot(s.map).sub}</small></span
+          >)}
+        </div>
+        <HoldButton class="fc-hold" />
+      </div>
     </div>
-  </div>
-  <div class="fc-base"><div class="container">
-    <span class="fc-brand"><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b><span>{f.copyright}</span></span>
-    <ul class="fc-legal" aria-label="Legal">{f.legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}</ul>
-    <span class="fc-base-end">
-      <span class="status"><span>{f.status.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span>
-    </span>
-  </div></div>
+    <div class="fc-base">
+      <div class="container">
+        <span class="fc-brand"
+          ><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b
+          ><span>{f.copyright}</span></span
+        >
+        <ul class="fc-legal" aria-label="Legal">
+          {f.legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        </ul>
+        <span class="fc-base-end">
+          <span class="status"
+            ><span>{f.status.split(' · ').map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span></span
+          >
+        </span>
+      </div>
+    </div>
   </nav>
 </footer>

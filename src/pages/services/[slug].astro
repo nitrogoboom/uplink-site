@@ -14,8 +14,15 @@ import { fit } from '../../lib/fit';
 export async function getStaticPaths() {
   const services = await getServices();
   const projects = await getProjects();
-  return services.map((service, i) => ({ params: { slug: service.id }, props: { service, n: i + 1, total: services.length,
-    projects: projects.filter((p) => p.data.services.some((r) => r.id === service.id)).slice(0, 3) } }));
+  return services.map((service, i) => ({
+    params: { slug: service.id },
+    props: {
+      service,
+      n: i + 1,
+      total: services.length,
+      projects: projects.filter((p) => p.data.services.some((r) => r.id === service.id)).slice(0, 3),
+    },
+  }));
 }
 const { service, n, total, projects } = Astro.props;
 const { id, data: s } = service;
@@ -24,27 +31,52 @@ const business = { '@id': `${Astro.site!.href}#business` };
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
-    { '@type': 'Service', '@id': url, url, name: s.title, description: s.lead, provider: business, areaServed: 'Ontario',
-      subjectOf: { '@id': `${url}#questions` } },
-    { '@type': 'FAQPage', '@id': `${url}#questions`, url, inLanguage: 'en-CA',
-      mainEntity: s.page.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) },
-    breadcrumbs([[PAGES.home.name, Astro.site!.href], [PAGES.services.name, new URL(PAGES.services.path, Astro.site).href], [s.title, url]]),
+    {
+      '@type': 'Service',
+      '@id': url,
+      url,
+      name: s.title,
+      description: s.lead,
+      provider: business,
+      areaServed: 'Ontario',
+      subjectOf: { '@id': `${url}#questions` },
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${url}#questions`,
+      url,
+      inLanguage: 'en-CA',
+      mainEntity: s.page.faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+    breadcrumbs([
+      [PAGES.home.name, Astro.site!.href],
+      [PAGES.services.name, new URL(PAGES.services.path, Astro.site).href],
+      [s.title, url],
+    ]),
     businessNode(Astro.site!),
   ],
 };
 ---
+
 <Base title={`${s.title} · Uplink Technology`} description={s.lead} page="services" path={`/services/${id}`}>
-  <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={jsonLd(ld)} />
-  </Fragment>
+  <Fragment slot="head"> <script is:inline type="application/ld+json" set:html={jsonLd(ld)} /></Fragment>
   <section class="hero svc-page" aria-labelledby={`svc-${id}`}>
     <div class="container svc-page-grid">
       <nav class="crumbs" aria-label="Breadcrumb">
-        <ol><li><a href="/services">Services</a></li><li aria-current="page">{s.title}</li></ol>
+        <ol>
+          <li><a href="/services">Services</a></li>
+          <li aria-current="page">{s.title}</li>
+        </ol>
       </nav>
       <ServiceCard service={service} n={n} total={total} on first heading="h1" />
       <div class="svc-page-cta row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}>Talk to us about this</a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}
+          >Talk to us about this</a
+        >
       </div>
     </div>
   </section>
@@ -66,17 +98,14 @@ const ld = {
         <h2 id="questions-title" class={fit(`Questions about ${s.title}`)}>Questions about {s.title}</h2>
       </div>
       <div class="faq">
-        {s.page.faq.map((f) => (
-          <details>
-            <summary>{f.q}<Icon name="plus" /></summary>
-            <div><p>{f.a}</p></div>
-          </details>
-        ))}
+        {s.page.faq.map((f) => <details>
+          <summary>{f.q}<Icon name="plus" /></summary>
+          <div><p>{f.a}</p></div>
+        </details>)}
       </div>
     </div>
   </section>
-  {projects.length > 0 && (
-  <section class="section section--band" id="projects" aria-labelledby="projects-title">
+  {projects.length > 0 && <section class="section section--band" id="projects" aria-labelledby="projects-title">
     <div class="container stack-5">
       <div class="section-head">
         <p class="eyebrow">Our work</p>
@@ -86,6 +115,5 @@ const ld = {
         {projects.map((project) => <li><ProjectCard project={project} /></li>)}
       </ul>
     </div>
-  </section>
-  )}
+  </section>}
 </Base>

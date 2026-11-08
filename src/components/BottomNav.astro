@@ -4,14 +4,19 @@
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, tabCurrent } from '../lib/site';
-interface Props { current: Page }
+interface Props {
+  current: Page;
+}
 const { current } = Astro.props;
 const here = Astro.url.pathname;
 ---
+
 <nav class="botnav" aria-label="Main (bottom bar)">
   <ul>
-    {NAV.map(({ page, icon, short }) => (
-      <li><a class="bn" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}><Icon name={icon} /><span class="bn-t">{short ?? PAGES[page].name}</span></a></li>
-    ))}
+    {NAV.map(({ page, icon, short }) => <li>
+      <a class="bn" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
+        ><Icon name={icon} /><span class="bn-t">{short ?? PAGES[page].name}</span></a
+      >
+    </li>)}
   </ul>
 </nav>

@@ -3,40 +3,60 @@
 // (src/content.config.ts, src/lib/footer.ts) take an icon name only from ICON_NAMES, so a misspelt one stops the build.
 export type Def = { d: string; box?: string; sw?: number; cap?: boolean; join?: boolean };
 export const ICONS = {
-  arrow:    { d: '<path d="M5 12h14M13 6l6 6-6 6"/>', sw: 2 },
+  arrow: { d: '<path d="M5 12h14M13 6l6 6-6 6"/>', sw: 2 },
   chevronL: { d: '<path d="M15 6l-6 6 6 6"/>', sw: 2.2 },
   chevronR: { d: '<path d="M9 6l6 6-6 6"/>', sw: 2.2 },
-  check:    { d: '<path d="M5 12l5 5 9-10"/>', sw: 3 },
-  minus:    { d: '<path d="M6 12h12"/>', sw: 2, join: false },
-  plus:     { d: '<path d="M12 5v14M5 12h14"/>', sw: 2, join: false },
-  close:    { d: '<path d="M3 3l10 10M13 3L3 13"/>', box: '0 0 16 16', sw: 2, join: false },
-  mark:     { d: '<path d="M5 14l7-7 7 7"/><path d="M8.5 19l3.5-3.5 3.5 3.5"/>', sw: 2.6 },
-  spot:     { d: '<path d="M12 3l4 9-4 9-4-9z"/>', sw: 2, cap: false },   // the footer map's marker, in its label
-  gear:     { d: '<path d="M10 4.7l.6-2.6h2.8l.6 2.6 1.8.7 2.2-1.4 2 2-1.4 2.2.7 1.8 2.6.6v2.8l-2.6.6-.7 1.8 1.4 2.2-2 2-2.2-1.4-1.8.7-.6 2.6h-2.8l-.6-2.6-1.8-.7-2.2 1.4-2-2 1.4-2.2-.7-1.8-2.6-.6v-2.8l2.6-.6.7-1.8-1.4-2.2 2-2 2.2 1.4z"/><circle cx="12" cy="12" r="3"/>' },
-  phone:    { d: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>' },
-  mail:     { d: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>' },
-  pin:      { d: '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' },
-  clock:    { d: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
-  home:     { d: '<path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/>' },
-  bubble:   { d: '<path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/>' },
-  grid:     { d: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>' },
-  building: { d: '<path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18M8.5 8h3M8.5 12h3M8.5 16h3"/>' },
-  headset:  { d: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>' },
-  book:     { d: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 7h7"/>' },
-  signal:   { d: '<path d="M5 13a7 7 0 0 1 14 0M8.5 13a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="17" r="1.5"/>' },
-  person:   { d: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>' },
-  play:     { d: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/>' },
-  people:   { d: '<circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c1-3.5 3.5-5 6-5s5 1.5 6 5M15 15.5c2.5 0 4.5 1.2 5.5 4"/>' },
-  camera:   { d: '<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/>' },
-  cloud:    { d: '<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>' },
-  shield:   { d: '<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/>' },
-  stack:    { d: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>' },
-  chart:    { d: '<path d="M4 20h16M7 16v-4M12 16V8M17 16V5"/>' },
-  chat:     { d: '<path d="M4 5h16v11H10l-6 4z"/><path d="M8 9h8M8 12h5"/>' },
+  check: { d: '<path d="M5 12l5 5 9-10"/>', sw: 3 },
+  minus: { d: '<path d="M6 12h12"/>', sw: 2, join: false },
+  plus: { d: '<path d="M12 5v14M5 12h14"/>', sw: 2, join: false },
+  close: { d: '<path d="M3 3l10 10M13 3L3 13"/>', box: '0 0 16 16', sw: 2, join: false },
+  mark: { d: '<path d="M5 14l7-7 7 7"/><path d="M8.5 19l3.5-3.5 3.5 3.5"/>', sw: 2.6 },
+  spot: { d: '<path d="M12 3l4 9-4 9-4-9z"/>', sw: 2, cap: false }, // the footer map's marker, in its label
+  gear: {
+    d: '<path d="M10 4.7l.6-2.6h2.8l.6 2.6 1.8.7 2.2-1.4 2 2-1.4 2.2.7 1.8 2.6.6v2.8l-2.6.6-.7 1.8 1.4 2.2-2 2-2.2-1.4-1.8.7-.6 2.6h-2.8l-.6-2.6-1.8-.7-2.2 1.4-2-2 1.4-2.2-.7-1.8-2.6-.6v-2.8l2.6-.6.7-1.8-1.4-2.2 2-2 2.2 1.4z"/><circle cx="12" cy="12" r="3"/>',
+  },
+  phone: {
+    d: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/>',
+  },
+  mail: { d: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>' },
+  pin: { d: '<path d="M12 21s-7-6-7-11a7 7 0 0 1 14 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/>' },
+  clock: { d: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>' },
+  home: { d: '<path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/>' },
+  bubble: { d: '<path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-5 4z"/>' },
+  grid: {
+    d: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+  },
+  building: {
+    d: '<path d="M5 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M15 9h3a1 1 0 0 1 1 1v11M3 21h18M8.5 8h3M8.5 12h3M8.5 16h3"/>',
+  },
+  headset: {
+    d: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+  },
+  book: { d: '<path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h13"/><path d="M8 7h7"/>' },
+  signal: { d: '<path d="M5 13a7 7 0 0 1 14 0M8.5 13a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="17" r="1.5"/>' },
+  person: { d: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>' },
+  play: { d: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/>' },
+  people: {
+    d: '<circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c1-3.5 3.5-5 6-5s5 1.5 6 5M15 15.5c2.5 0 4.5 1.2 5.5 4"/>',
+  },
+  camera: {
+    d: '<rect x="3" y="6" width="18" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/>',
+  },
+  cloud: { d: '<path d="M7 18a4.5 4.5 0 0 1-.6-8.96A6 6 0 0 1 18 9.5a4 4 0 0 1-.5 8.5z"/>' },
+  shield: { d: '<path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6z"/>' },
+  stack: {
+    d: '<ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/>',
+  },
+  chart: { d: '<path d="M4 20h16M7 16v-4M12 16V8M17 16V5"/>' },
+  chat: { d: '<path d="M4 5h16v11H10l-6 4z"/><path d="M8 9h8M8 12h5"/>' },
   calendar: { d: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>' },
-  copy:     { d: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>' },
-  ticket:   { d: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>' },
-  screen:   { d: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>' },
+  copy: {
+    d: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  },
+  ticket: {
+    d: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/>',
+  },
+  screen: { d: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>' },
 } satisfies Record<string, Def>;
 export type IconName = keyof typeof ICONS;
 export const ICON_NAMES = Object.keys(ICONS) as [IconName, ...IconName[]];

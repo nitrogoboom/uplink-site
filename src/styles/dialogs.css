@@ -1,7 +1,7 @@
 /*--- Pop-ups (native <dialog>). ---*/
 /* ---------- dialogs (native <dialog>) -------------------------------- */
 .dialog {
-  overscroll-behavior: contain;   /* scrolling past the dialog's end doesn't scroll the page behind (iOS) */
+  overscroll-behavior: contain; /* scrolling past the dialog's end doesn't scroll the page behind (iOS) */
   width: min(100% - 2 * var(--sp-4), 37.5rem);
   max-height: calc(100dvh - 2 * var(--sp-6));
   padding: 0;
@@ -12,20 +12,49 @@
   box-shadow: var(--shadow-2);
   overflow: auto;
 }
-.dialog::backdrop { background: var(--c-backdrop); -webkit-backdrop-filter: blur(var(--blur-backdrop)); backdrop-filter: blur(var(--blur-backdrop)); }
-.dialog[open] { animation: dlg-in var(--dur-2) var(--ease); }
-@keyframes dlg-in { from { opacity: 0; transform: translateY(var(--sp-3)); } }
+.dialog::backdrop {
+  background: var(--c-backdrop);
+  -webkit-backdrop-filter: blur(var(--blur-backdrop));
+  backdrop-filter: blur(var(--blur-backdrop));
+}
+.dialog[open] {
+  animation: dlg-in var(--dur-2) var(--ease);
+}
+@keyframes dlg-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sp-3));
+  }
+}
 
 .dlg-head {
-  position: sticky; top: 0; z-index: 1;
-  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-3) var(--sp-4) var(--sp-6);
   background: var(--c-solid);
   border-bottom: 1px solid var(--c-line);
 }
-.dlg-head h2 { font-size: var(--fs-6); }
-.dlg-body { display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-5) var(--sp-6); }
-.dlg-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--sp-3); padding: 0 var(--sp-6) var(--sp-6); }
+.dlg-head h2 {
+  font-size: var(--fs-6);
+}
+.dlg-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-5) var(--sp-6);
+}
+.dlg-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-6) var(--sp-6);
+}
 
 @media (--phone) {
   .dialog {
@@ -37,17 +66,48 @@
     border-bottom: 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-  .dlg-head { padding-left: var(--sp-5); }
-  .dlg-body { padding: var(--sp-5); }
-  .dlg-actions { padding: 0 var(--sp-5) var(--sp-5); }
-  .dlg-actions .btn { flex: 1 1 0; }
+  .dlg-head {
+    padding-left: var(--sp-5);
+  }
+  .dlg-body {
+    padding: var(--sp-5);
+  }
+  .dlg-actions {
+    padding: 0 var(--sp-5) var(--sp-5);
+  }
+  .dlg-actions .btn {
+    flex: 1 1 0;
+  }
 }
 
 /* keyboard shortcuts (Settings): the switch, the keys, the note */
-.keys-group { display: flex; flex-direction: column; gap: var(--sp-3); }
-.keys-list { display: flex; flex-direction: column; list-style: none; }
-.keys-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); padding-block: var(--sp-3); border-bottom: 1px solid var(--c-line); }
-.keys-list li:last-child { border-bottom: 0; }
-.keys-list .kbd { font-size: var(--fs-2); }
-.keys-list .keys { display: flex; align-items: center; gap: var(--sp-1); flex: none; }
-
+.keys-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.keys-list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+.keys-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-block: var(--sp-3);
+  border-bottom: 1px solid var(--c-line);
+}
+.keys-list li:last-child {
+  border-bottom: 0;
+}
+.keys-list .kbd {
+  font-size: var(--fs-2);
+}
+.keys-list .keys {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex: none;
+}

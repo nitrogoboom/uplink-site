@@ -46,10 +46,13 @@ async function main() {
   }
   // the delete lives only under the newer /workers/workers/ path: the /workers/scripts/ one answers 405 (error 10405)
   const api = async (method, path, base = 'scripts') => {
-    const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/workers/${base}/${WORKER}${path}`, {
-      method,
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${account}/workers/${base}/${WORKER}${path}`,
+      {
+        method,
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
     return { status: res.status, body: await res.json().catch(() => ({})) };
   };
 
@@ -64,7 +67,9 @@ async function main() {
   const dep = await api('GET', '/deployments');
   if (dep.status !== 200) throw new Error(`listing deployments: ${dep.status} ${JSON.stringify(dep.body.errors)}`);
   const deployed = new Set(dep.body.result.deployments.flatMap((d) => d.versions.map((v) => v.version_id)));
-  const branches = process.env.OPEN_BRANCHES ? readFileSync(process.env.OPEN_BRANCHES, 'utf8').split('\n').filter(Boolean) : [];
+  const branches = process.env.OPEN_BRANCHES
+    ? readFileSync(process.env.OPEN_BRANCHES, 'utf8').split('\n').filter(Boolean)
+    : [];
   const open = new Set(branches.map(aliasOf));
   const gone = pick(versions, deployed, open, Date.now() - keepDays * 86400000, only);
 

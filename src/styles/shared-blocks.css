@@ -1,10 +1,23 @@
 /*--- Blocks used on more than one page: page intro, call-to-action band, steps, stats, FAQ. ---*/
 /* ---------- shared page blocks -------------------------------------- */
 /* page intro (non-home pages) */
-.page-intro { padding-block: var(--sp-7) var(--sp-6); }
-@media (--desktop) { .page-intro { padding-block: var(--sp-8) var(--sp-7); } }
-.page-intro .container { display: flex; flex-direction: column; gap: var(--sp-4); }
-.page-intro .container + .container { display: block; margin-top: var(--sp-6); }
+.page-intro {
+  padding-block: var(--sp-7) var(--sp-6);
+}
+@media (--desktop) {
+  .page-intro {
+    padding-block: var(--sp-8) var(--sp-7);
+  }
+}
+.page-intro .container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.page-intro .container + .container {
+  display: block;
+  margin-top: var(--sp-6);
+}
 
 /* call-to-action band */
 .cta-band {
@@ -14,57 +27,195 @@
   gap: var(--sp-5);
   padding: var(--sp-6);
 }
-@media (--desktop) { .cta-band { grid-template-columns: minmax(0, 1fr) auto; padding: var(--sp-7); } }
-.cta-band .row > .btn { flex: 1 1 12rem; }   /* stacked on phones: same width; side by side: same height, shared evenly */
-@media (--desktop) { .cta-band .row > .btn { flex: 0 0 auto; } }
+@media (--desktop) {
+  .cta-band {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--sp-7);
+  }
+}
+.cta-band .row > .btn {
+  flex: 1 1 12rem;
+} /* stacked on phones: same width; side by side: same height, shared evenly */
+@media (--desktop) {
+  .cta-band .row > .btn {
+    flex: 0 0 auto;
+  }
+}
 
 /* numbered steps (real sequence) */
-.steps { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; counter-reset: step; }
-@media (--tablet-up) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (--desktop) { .steps { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); } }
+.steps {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+  counter-reset: step;
+}
+@media (--tablet-up) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (--desktop) {
+  .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+}
 /* number and title on one line, text under both */
-.step { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--sp-3) var(--sp-4); padding: var(--sp-5); }
-.step > :not(.step-n) { grid-column: 1 / -1; }
-.step > .step-n + * { grid-column: 2; }
-@container (width < 12rem) { .step > .step-n + * { grid-column: 1 / -1; } }   /* too narrow beside the number (big text): the title goes under it */
-.step-n { display: grid; place-items: center; width: var(--tap); height: var(--tap); border-radius: var(--r-2); background: var(--c-surface-2); font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-5); color: var(--c-accent-text); }
-.step:first-child .step-n { background: var(--c-accent); color: var(--c-on-accent); }
+.step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--sp-3) var(--sp-4);
+  padding: var(--sp-5);
+}
+.step > :not(.step-n) {
+  grid-column: 1 / -1;
+}
+.step > .step-n + * {
+  grid-column: 2;
+}
+@container (width < 12rem) {
+  .step > .step-n + * {
+    grid-column: 1 / -1;
+  }
+} /* too narrow beside the number (big text): the title goes under it */
+.step-n {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--r-2);
+  background: var(--c-surface-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: var(--fs-5);
+  color: var(--c-accent-text);
+}
+.step:first-child .step-n {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
 
 /* a row of up to three project cards: a service's page and Home */
-.card-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
-.card-row > li { display: flex; }
-.card-row .card { flex: 1; width: 100%; }
-@media (--tablet-up) { .card-row { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+}
+.card-row > li {
+  display: flex;
+}
+.card-row .card {
+  flex: 1;
+  width: 100%;
+}
+@media (--tablet-up) {
+  .card-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 /* phones: the project cards are rows (surfaces.css); each as tall as the tallest, so the drawings and words sit at
    the same place in every card */
-@media (--phone) { .card-row { grid-auto-rows: 1fr; } }
-@media (--desktop) { .card-row { gap: var(--sp-5); } }   /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
+@media (--phone) {
+  .card-row {
+    grid-auto-rows: 1fr;
+  }
+}
+@media (--desktop) {
+  .card-row {
+    gap: var(--sp-5);
+  }
+} /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the
    current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current). */
-.pip { display: block; width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); transition: width var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease); }
-.pip.on, [aria-current="step"] > .pip { width: var(--sp-5); background: var(--c-accent); opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .pip { transition: none; } }
+.pip {
+  display: block;
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--c-surface-2);
+  transition:
+    width var(--dur-2) var(--ease),
+    background-color var(--dur-2) var(--ease),
+    opacity var(--dur-2) var(--ease);
+}
+.pip.on,
+[aria-current='step'] > .pip {
+  width: var(--sp-5);
+  background: var(--c-accent);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pip {
+    transition: none;
+  }
+}
 /* forced colours (Windows contrast themes) paint the fills away and the dots vanish (B4): they opt out and take the
    theme's colours, the current one long in Highlight, the rest GrayText */
 @media (forced-colors: active) {
-  .pip { forced-color-adjust: none; background: GrayText; }
-  .pip.on, [aria-current="step"] > .pip { background: Highlight; }
+  .pip {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+  .pip.on,
+  [aria-current='step'] > .pip {
+    background: Highlight;
+  }
 }
 
 /* stat tiles */
 /* as many tiles a row as fit at 8rem each, but never three (four tiles would leave one alone): zoom and a bigger font
    give fewer, wider tiles, and the number grows with its tile */
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(min(100%, 8rem), 34%), 1fr)); gap: var(--sp-4); list-style: none; }
-@media (--desktop) { .stats { gap: var(--sp-5); } }
-.stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-5); }
-.stat-val { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: min(var(--fs-7), 38cqi); line-height: var(--lh-tight); font-variant-numeric: tabular-nums; white-space: nowrap; }   /* --fs-7, but never wider than its tile, and never split ("3,40 / 0", B20): the widest, "12 min", is 2.5em, so up to 38cqi. No bigger share of the tile: a tile narrows at zoom, and the number must still grow on screen (review C1) */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, 8rem), 34%), 1fr));
+  gap: var(--sp-4);
+  list-style: none;
+}
+@media (--desktop) {
+  .stats {
+    gap: var(--sp-5);
+  }
+}
+.stat {
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+.stat-val {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: min(var(--fs-7), 38cqi);
+  line-height: var(--lh-tight);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+} /* --fs-7, but never wider than its tile, and never split ("3,40 / 0", B20): the widest, "12 min", is 2.5em, so up to 38cqi. No bigger share of the tile: a tile narrows at zoom, and the number must still grow on screen (review C1) */
 
 /* FAQ */
-.faq { display: flex; flex-direction: column; gap: var(--sp-3); max-width: 55rem; }
-.faq details { border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); }
+.faq {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 55rem;
+}
+.faq details {
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-3);
+  background: var(--c-surface);
+}
 .faq summary {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
   min-height: calc(var(--control-lg) + var(--sp-1));
   padding: var(--sp-4) var(--sp-5);
   font-weight: 600;
@@ -73,13 +224,34 @@
   list-style: none;
   cursor: pointer;
 }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
-.faq details[open] summary svg { transform: rotate(45deg); color: var(--c-accent-text); }
-.faq details > div { padding: 0 var(--sp-5) var(--sp-5); max-width: var(--measure-lead); color: var(--c-muted); }
+.faq summary::-webkit-details-marker {
+  display: none;
+}
+.faq summary svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  color: var(--c-muted);
+  transition: transform var(--dur-2) var(--ease);
+}
+.faq details[open] summary svg {
+  transform: rotate(45deg);
+  color: var(--c-accent-text);
+}
+.faq details > div {
+  padding: 0 var(--sp-5) var(--sp-5);
+  max-width: var(--measure-lead);
+  color: var(--c-muted);
+}
 
 /* desktop (>= 1100 wide and >= 700 tall): FAQ beside its heading */
 @media (--fold) {
-  .split .faq { max-width: none; }   /* lines up with the blocks above and below; answers keep their reading width */
-  @media (height <= 47.5em) { .faq { gap: var(--sp-2); } }
+  .split .faq {
+    max-width: none;
+  } /* lines up with the blocks above and below; answers keep their reading width */
+  @media (height <= 47.5em) {
+    .faq {
+      gap: var(--sp-2);
+    }
+  }
 }

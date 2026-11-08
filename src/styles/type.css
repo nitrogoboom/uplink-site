@@ -11,16 +11,30 @@
   color: var(--c-muted);
 }
 .eyebrow::before {
-  content: "";
+  content: '';
   width: var(--sp-2);
   height: var(--sp-2);
   border-radius: 50%;
   background: var(--c-accent);
 }
-h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line-height: var(--lh-snug); }
-.lead { max-width: var(--measure-lead); font-size: var(--fs-4); color: var(--c-muted); }
-.prose { max-width: var(--measure); color: var(--c-muted); }
-.prose > * + * { margin-top: var(--sp-4); }
+h1.eyebrow,
+h2.eyebrow {
+  font-family: var(--font-body);
+  font-style: normal;
+  line-height: var(--lh-snug);
+}
+.lead {
+  max-width: var(--measure-lead);
+  font-size: var(--fs-4);
+  color: var(--c-muted);
+}
+.prose {
+  max-width: var(--measure);
+  color: var(--c-muted);
+}
+.prose > * + * {
+  margin-top: var(--sp-4);
+}
 .label {
   font-size: var(--fs-1);
   font-weight: 600;
@@ -28,8 +42,19 @@ h1.eyebrow, h2.eyebrow { font-family: var(--font-body); font-style: normal; line
   text-transform: uppercase;
   color: var(--c-muted);
 }
-h2.label, h3.label { font-family: var(--font-body); font-style: normal; line-height: var(--lh-body); text-wrap: wrap; }   /* a label that is also a heading */
-.muted { color: var(--c-muted); }
-.small { font-size: var(--fs-2); }
-.accent { color: var(--c-accent-text); }
-
+h2.label,
+h3.label {
+  font-family: var(--font-body);
+  font-style: normal;
+  line-height: var(--lh-body);
+  text-wrap: wrap;
+} /* a label that is also a heading */
+.muted {
+  color: var(--c-muted);
+}
+.small {
+  font-size: var(--fs-2);
+}
+.accent {
+  color: var(--c-accent-text);
+}

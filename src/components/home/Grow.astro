@@ -19,11 +19,14 @@ import Icon from '../Icon.astro';
 import { getGrow } from '../../lib/site';
 import './grow.css';
 
-const steps = await getGrow();   // src/data/grow.json, typed in content.config.ts
+const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
 
-const world = optimize(raw, SVGO).data.replace(/<style>[\s\S]*?<\/style>/g, '').replace(' id="plain"', '');
+const world = optimize(raw, SVGO)
+  .data.replace(/<style>[\s\S]*?<\/style>/g, '')
+  .replace(' id="plain"', '');
 const last = steps.length - 1;
 ---
+
 <section class="section fold grow-section" id="grow" aria-labelledby="grow-title">
   <div class="container">
     <div class="grow" data-steps={steps.length}>
@@ -33,43 +36,68 @@ const last = steps.length - 1;
         <p class="lead">As your team spreads out, here's what to watch, and what we take care of.</p>
       </div>
       <ol class="grow-list" aria-label="Where your people work" data-md-skip>
-        {steps.map((s, i) => (
-          <li><button type="button" class="grow-item" data-i={i}><span class="grow-item-n">{i + 1}</span><span class="grow-item-t">{s.place}</span><span class="grow-item-m">Team of {s.team}</span></button></li>
-        ))}
+        {steps.map((s, i) => <li>
+          <button type="button" class="grow-item" data-i={i}>
+            <span class="grow-item-n">{i + 1}</span><span class="grow-item-t">{s.place}</span
+            ><span class="grow-item-m">Team of {s.team}</span>
+          </button>
+        </li>)}
       </ol>
       <div class="grow-player">
         <div class="grow-stage" data-md-skip>
           <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
           <span class="grow-team" aria-hidden="true">Team of {steps[last].team}</span>
           <Fragment set:html={world} />
-          {steps.map((s, i) => s.tags.map((t, k) => (
-            <span class="grow-tag" aria-hidden="true" data-step={i} data-k={k} data-at={t.at} data-risk={t.risk} data-fix={t.fix}><span class="grow-tag-i">!</span><span class="grow-tag-t">{t.risk}</span></span>
-          )))}
+          {steps.map((s, i) =>
+            s.tags.map((t, k) => <span
+              class="grow-tag"
+              aria-hidden="true"
+              data-step={i}
+              data-k={k}
+              data-at={t.at}
+              data-risk={t.risk}
+              data-fix={t.fix}
+              ><span class="grow-tag-i">!</span><span class="grow-tag-t">{t.risk}</span></span
+            >),
+          )}
           <button type="button" class="grow-play" aria-label="Pause">
             <svg class="grow-play-i" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 1h3v10H2zM7 1h3v10H7z" /></svg>
             <svg class="grow-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" /></svg>
           </button>
         </div>
         <div class="grow-nav" role="group" aria-label="Where your people work" data-md-skip>
-          <button type="button" class="iconbtn grow-step-btn" data-dir="-1" aria-label="Previous place"><Icon name="chevronL" /></button>
+          <button type="button" class="iconbtn grow-step-btn" data-dir="-1" aria-label="Previous place">
+            <Icon name="chevronL" />
+          </button>
           <span class="grow-dots">
-            {steps.map((s, i) => (
-              <button type="button" class="grow-dot" data-i={i} aria-label={`${i + 1} of ${steps.length}: ${s.place}`}><i class="pip"></i></button>
-            ))}
+            {steps.map((s, i) => <button
+              type="button"
+              class="grow-dot"
+              data-i={i}
+              aria-label={`${i + 1} of ${steps.length}: ${s.place}`}
+            >
+              <i class="pip"></i>
+            </button>)}
           </span>
-          <button type="button" class="iconbtn grow-step-btn" data-dir="1" aria-label="Next place"><Icon name="chevronR" /></button>
+          <button type="button" class="iconbtn grow-step-btn" data-dir="1" aria-label="Next place">
+            <Icon name="chevronR" />
+          </button>
         </div>
       </div>
       <ol class="grow-cards">
-        {steps.map((s, i) => (
-          <li class="grow-card" data-i={i} data-place={s.place} data-team={s.team}>
-            <h3>{s.title}</h3>
-            <div class="grow-rows">
-              <div class="grow-row grow-watch"><span class="grow-lbl"><i></i>Watch for</span><p>{s.watch}</p></div>
-              <div class="grow-row grow-handle"><span class="grow-lbl"><i></i>We handle</span><p>{s.handle}</p></div>
+        {steps.map((s, i) => <li class="grow-card" data-i={i} data-place={s.place} data-team={s.team}>
+          <h3>{s.title}</h3>
+          <div class="grow-rows">
+            <div class="grow-row grow-watch">
+              <span class="grow-lbl"><i></i>Watch for</span>
+              <p>{s.watch}</p>
             </div>
-          </li>
-        ))}
+            <div class="grow-row grow-handle">
+              <span class="grow-lbl"><i></i>We handle</span>
+              <p>{s.handle}</p>
+            </div>
+          </div>
+        </li>)}
       </ol>
     </div>
   </div>

@@ -8,7 +8,8 @@ const kebab = (name) => name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
 const names = {
   postcssPlugin: 'media-names',
   Once(root, { AtRule }) {
-    for (const [name, query] of Object.entries(MEDIA)) root.prepend(new AtRule({ name: 'custom-media', params: `--${kebab(name)} ${query}` }));
+    for (const [name, query] of Object.entries(MEDIA))
+      root.prepend(new AtRule({ name: 'custom-media', params: `--${kebab(name)} ${query}` }));
   },
 };
 

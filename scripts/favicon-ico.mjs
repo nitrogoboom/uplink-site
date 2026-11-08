@@ -13,7 +13,9 @@ const browser = await chromium.launch();
 const pngs = [];
 for (const size of SIZES) {
   const page = await browser.newPage({ viewport: { width: size, height: size } });
-  await page.setContent(`<style>html,body{margin:0;background:transparent}svg{display:block;width:${size}px;height:${size}px}</style>${SVG}`);
+  await page.setContent(
+    `<style>html,body{margin:0;background:transparent}svg{display:block;width:${size}px;height:${size}px}</style>${SVG}`,
+  );
   pngs.push(await page.screenshot({ omitBackground: true }));
   await page.close();
 }

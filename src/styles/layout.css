@@ -8,21 +8,51 @@
   padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
 }
 
-.section { padding-block: var(--section-y); }
+.section {
+  padding-block: var(--section-y);
+}
 /* the band's top and bottom lines are drawn inside it (inset shadows, not borders), so they take no room:
    a band that is one screen (.fold, with a --fold-inner child) fits it exactly instead of running 2px over */
-.section--band { background: var(--c-bg-band); box-shadow: inset 0 1px var(--c-line), inset 0 -1px var(--c-line); }
+.section--band {
+  background: var(--c-bg-band);
+  box-shadow:
+    inset 0 1px var(--c-line),
+    inset 0 -1px var(--c-line);
+}
 /* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size.
    safe: content too tall for the screen (zoom) overflows downward only, never off the top where nothing scrolls to it */
-.fold { display: flex; flex-direction: column; justify-content: safe center; }
-.fold-always { min-height: var(--fold-h); }
-.fold > .container { width: 100%; }
+.fold {
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+}
+.fold-always {
+  min-height: var(--fold-h);
+}
+.fold > .container {
+  width: 100%;
+}
 
 /* a heading's column: headings and big numbers inside size to its width (--fit, cqi). Only boxes that take their width
    from their parent: on a box sized by its content (a centred, shrink-to-fit one) the containment shrinks it to nothing.
    Stat tiles and the queue ring mark themselves (shared-blocks.css, message.css) */
-.section-head, .page-intro > .container, .hero-menu, .profile-text, .work-side, .picker-head, .svc-overview-head,
-.lobby > *, .form-head, .case-title, .step, .cta-band > :first-child, .fc-panel, .card, .svc-text { container-type: inline-size; }
+.section-head,
+.page-intro > .container,
+.hero-menu,
+.profile-text,
+.work-side,
+.picker-head,
+.svc-overview-head,
+.lobby > *,
+.form-head,
+.case-title,
+.step,
+.cta-band > :first-child,
+.fc-panel,
+.card,
+.svc-text {
+  container-type: inline-size;
+}
 
 .section-head {
   display: flex;
@@ -37,9 +67,30 @@
   justify-content: space-between;
   gap: var(--sp-4) var(--sp-6);
 }
-.section-head--split > :first-child { display: flex; flex-direction: column; gap: var(--sp-4); }
+.section-head--split > :first-child {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
 
-.stack   { display: flex; flex-direction: column; gap: var(--sp-4); }
-.stack-2 { display: flex; flex-direction: column; gap: var(--sp-2); }
-.stack-5 { display: flex; flex-direction: column; gap: var(--sp-5); }
-.row     { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3); }
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.stack-2 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.stack-5 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3);
+}

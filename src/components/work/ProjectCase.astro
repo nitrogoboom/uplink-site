@@ -4,26 +4,47 @@ import { getEntries, type CollectionEntry } from 'astro:content';
 import { svgSize } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import './project-case.css';
-interface Props { project: CollectionEntry<'projects'> }
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
 const { project } = Astro.props;
 const { id, data: p } = project;
-const services = await getEntries(p.services);   // each links to the service's own page
+const services = await getEntries(p.services); // each links to the service's own page
 const size = svgSize(`${p.image}.svg`);
 ---
+
 <article class="case-src" id={`case-${id}`} aria-labelledby={`case-${id}-t`}>
   <div class="case-title"><h1 id={`case-${id}-t`} class={fit(p.name)} data-case-field="name">{p.name}</h1></div>
   <div class="case">
     <div class="case-fig">
-      <div class="case-img well"><img src={`/assets/img/${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy"></div>
+      <div class="case-img well">
+        <img src={`/assets/img/${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy" />
+      </div>
     </div>
     <div class="stack">
       <span class="chip chip--sky" data-case-field="tag">{p.tag}</span>
       <p class="muted" data-case-field="story">{p.story}</p>
       <dl class="facts">
-        <div><dt>Client</dt><dd data-case-field="client">{p.client}</dd></div>
-        <div><dt>Services</dt><dd data-case-field="services">{services.map(({ id: sid, data: s }, i) => <>{i > 0 && ', '}<a href={`/services/${sid}`}>{s.title}</a></>)}</dd></div>
-        <div><dt>Timeline</dt><dd data-case-field="timeline">{p.page.timeline}</dd></div>
-        <div><dt>Result</dt><dd class="accent" data-case-field="result">{p.result}</dd></div>
+        <div>
+          <dt>Client</dt>
+          <dd data-case-field="client">{p.client}</dd>
+        </div>
+        <div>
+          <dt>Services</dt>
+          <dd data-case-field="services">
+            {services.map(({ id: sid, data: s }, i) => (
+              <>{i > 0 && ', '}<a href={`/services/${sid}`}>{s.title}</a></>
+            ))}
+          </dd>
+        </div>
+        <div>
+          <dt>Timeline</dt>
+          <dd data-case-field="timeline">{p.page.timeline}</dd>
+        </div>
+        <div>
+          <dt>Result</dt>
+          <dd class="accent" data-case-field="result">{p.result}</dd>
+        </div>
       </dl>
     </div>
   </div>

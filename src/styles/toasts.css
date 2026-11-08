@@ -23,18 +23,62 @@
   box-shadow: var(--shadow-1);
   animation: toast-in var(--dur-2) var(--ease);
 }
-.toast[data-leaving] { animation: toast-out var(--dur-2) var(--ease) forwards; }
-@keyframes toast-in { from { opacity: 0; transform: translateY(calc(-1 * var(--sp-2))); } }
-@keyframes toast-out { to { opacity: 0; transform: translateY(calc(-1 * var(--sp-2))); } }
-.toast-ic { display: grid; place-items: center; flex: none; width: var(--sp-6); height: var(--sp-6); border-radius: 50%; background: var(--c-accent); color: var(--c-on-accent); }
-.toast-ic svg { width: var(--sp-4); height: var(--sp-4); }
-.toast--info .toast-ic { background: var(--c-sky); }
+.toast[data-leaving] {
+  animation: toast-out var(--dur-2) var(--ease) forwards;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--sp-2)));
+  }
+}
+@keyframes toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--sp-2)));
+  }
+}
+.toast-ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--sp-6);
+  height: var(--sp-6);
+  border-radius: 50%;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.toast-ic svg {
+  width: var(--sp-4);
+  height: var(--sp-4);
+}
+.toast--info .toast-ic {
+  background: var(--c-sky);
+}
 /* Icon, title and close button share one centre line: the title's line is as tall as the icon (--sp-6), and the
    close button (--tap tall) hangs above and below it by the same amount. A second line of text runs under the title. */
-.toast-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); font-size: var(--fs-2); }
-.toast-text strong { display: flex; align-items: center; min-height: var(--sp-6); font-size: var(--fs-3); line-height: var(--lh-snug); }
-.toast > .iconbtn { flex: none; margin-block: calc((var(--sp-6) - var(--tap)) / 2); }
-@media (--phone) {
-  .toasts { left: max(var(--sp-4), env(safe-area-inset-left, 0px)); width: auto; }
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  font-size: var(--fs-2);
 }
-
+.toast-text strong {
+  display: flex;
+  align-items: center;
+  min-height: var(--sp-6);
+  font-size: var(--fs-3);
+  line-height: var(--lh-snug);
+}
+.toast > .iconbtn {
+  flex: none;
+  margin-block: calc((var(--sp-6) - var(--tap)) / 2);
+}
+@media (--phone) {
+  .toasts {
+    left: max(var(--sp-4), env(safe-area-inset-left, 0px));
+    width: auto;
+  }
+}

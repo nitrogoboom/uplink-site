@@ -12,7 +12,13 @@ export const SHORT = 6;
 /** The letter count of the longest word in a heading's text (or HTML): hyphens and slashes split words.
  * @param {unknown} text */
 export const longest = (text) =>
-  Math.max(0, ...String(text).replace(/<[^>]*>/g, ' ').split(/[\s\-‐–—/]+/).map((w) => w.replace(/[^\p{L}\p{N}]/gu, '').length));
+  Math.max(
+    0,
+    ...String(text)
+      .replace(/<[^>]*>/g, ' ')
+      .split(/[\s\-‐–—/]+/)
+      .map((w) => w.replace(/[^\p{L}\p{N}]/gu, '').length),
+  );
 
 /** 'fit' for a heading with a long word, 'fit-loose' for one of short words only, else undefined (no class).
  * @param {unknown} text */

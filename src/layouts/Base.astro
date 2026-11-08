@@ -29,7 +29,8 @@ import SettingsDialog from '../components/SettingsDialog.astro';
 import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
 
-export type Page = 'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
+export type Page =
+  'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
 interface Props {
   title: string;
   description: string;
@@ -38,90 +39,121 @@ interface Props {
   robots?: string;
   ogType?: 'website' | 'article';
   type?: 'FAQPage' | 'CollectionPage' | 'AboutPage' | 'ContactPage';
-  ldPage?: Record<string, unknown>;   // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
-  ldGraph?: object[];                 // more nodes for the page's JSON-LD graph (e.g. the Services listed)
-  footer?: boolean;                   // false: no footer (the 404)
+  ldPage?: Record<string, unknown>; // more fields for the page's JSON-LD node (e.g. a FAQPage's mainEntity)
+  ldGraph?: object[]; // more nodes for the page's JSON-LD graph (e.g. the Services listed)
+  footer?: boolean; // false: no footer (the 404)
 }
-const { title, description, page, path, robots, ogType = 'website', type, ldPage = {}, ldGraph = [], footer = true } = Astro.props;
+const {
+  title,
+  description,
+  page,
+  path,
+  robots,
+  ogType = 'website',
+  type,
+  ldPage = {},
+  ldGraph = [],
+  footer = true,
+} = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
 // the page's Markdown copy, for AI agents (scripts/markdown.mjs writes it; Home's is src/data/index.md)
 const markdown = path === undefined ? null : new URL(path === '/' ? '/index.md' : `${path}.md`, Astro.site).href;
 const ogImage = new URL('/assets/img/og.png', Astro.site).href;
 const business = { '@id': `${Astro.site!.href}#business` };
 const name = title.split(' · ')[0];
-const jsonld = type && canonical && {
-  '@context': 'https://schema.org',
-  '@graph': [
-    { '@type': type, '@id': canonical, url: canonical, name, description, inLanguage: 'en-CA', publisher: business,
-      ...(type === 'AboutPage' ? { about: business } : {}), ...ldPage },
-    breadcrumbs([[PAGES.home.name, Astro.site!.href], [name, canonical]]),
-    businessNode(Astro.site!),
-    ...ldGraph,
-  ],
-};
+const jsonld = type &&
+  canonical && {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': type,
+        '@id': canonical,
+        url: canonical,
+        name,
+        description,
+        inLanguage: 'en-CA',
+        publisher: business,
+        ...(type === 'AboutPage' ? { about: business } : {}),
+        ...ldPage,
+      },
+      breadcrumbs([
+        [PAGES.home.name, Astro.site!.href],
+        [name, canonical],
+      ]),
+      businessNode(Astro.site!),
+      ...ldGraph,
+    ],
+  };
 // Preload only the two faces that carry the first screen: the page title (Condensed 700 italic) and body text
 // (Barlow 400, the most letters on every first screen). The other faces start at the first layout, since the CSS is
 // inline, and their fallbacks take the same room, so nothing moves when they arrive. Preloading all of them split
 // the bandwidth and made the title and body faces arrive later (review L2, November 7, 2026).
 const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
 ---
+
 <!doctype html>
 <html lang="en-CA">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>{title}</title>
-<meta name="description" content={description}>
-{robots && <meta name="robots" content={robots}>}
-{canonical && <link rel="canonical" href={canonical}>}
-{markdown && <link rel="alternate" type="text/markdown" href={markdown}>}
-<link rel="icon" href="/favicon.ico" sizes="32x32">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-{canonical && (
-  <Fragment>
-    <meta property="og:type" content={ogType}>
-    <meta property="og:site_name" content="Uplink Technology">
-    <meta property="og:title" content={title}>
-    <meta property="og:description" content={description}>
-    <meta property="og:url" content={canonical}>
-    <meta property="og:locale" content="en_CA">
-    <meta property="og:image" content={ogImage}>
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack.">
-    <meta name="twitter:card" content="summary_large_image">
-  </Fragment>
-)}
-<meta name="theme-color" content="#0E1A27">
-<script is:inline>document.documentElement.classList.add('js')</script>
-{fonts.map((f) => <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin>)}
-<slot name="head" />
-{jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
-</head>
-<body data-page={page} class={footer ? undefined : 'no-footer'}>
-<a class="skip-link" href="#main">Skip to content</a>
-<Header current={page} />
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {robots && <meta name="robots" content={robots} />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    {canonical && <Fragment>
+      <meta property="og:type" content={ogType} />
+      <meta property="og:site_name" content="Uplink Technology" />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:locale" content="en_CA" />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta
+        property="og:image:alt"
+        content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack."
+      />
+      <meta name="twitter:card" content="summary_large_image" />
+    </Fragment>}
+    <meta name="theme-color" content="#0E1A27" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    {fonts.map((f) => (
+      <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin />
+    ))}
+    <slot name="head" />
+    {jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
+  </head>
+  <body data-page={page} class={footer ? undefined : 'no-footer'}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header current={page} />
 
-<main id="main" tabindex="-1">
-<slot />
-</main>
-{footer && <Footer />}
-{footer && <p class="print-contact">Uplink Technology · {contact.phone.display} · {contact.email} · {contact.office.street}, {contact.office.city}</p>}
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    {footer && <Footer />}
+    {footer && <p class="print-contact">
+      Uplink Technology · {contact.phone.display} · {contact.email} · {contact.office.street}, {contact.office.city}
+    </p>}
 
-<BottomNav current={page} />
+    <BottomNav current={page} />
 
-<BookDialog />
+    <BookDialog />
 
+    <SettingsDialog />
 
-<SettingsDialog />
+    <div class="toasts" aria-live="polite"></div>
 
-<div class="toasts" aria-live="polite"></div>
-
-<script>
-  import '../scripts/core.js';
-  import '../scripts/footer.js';
-</script>
-<slot name="scripts" />
-</body>
+    <script>
+      import '../scripts/core.js';
+      import '../scripts/footer.js';
+    </script>
+    <slot name="scripts" />
+  </body>
 </html>

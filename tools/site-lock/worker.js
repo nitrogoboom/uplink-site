@@ -5,7 +5,7 @@ const REALM = 'Uplink mockup';
 
 /** The 401 that makes the browser ask for the password, or null when the request carries the right one. */
 export async function lock(request, env) {
-  if (env.SITE_PASSWORD && await passwordOk(request, env.SITE_PASSWORD)) return null;
+  if (env.SITE_PASSWORD && (await passwordOk(request, env.SITE_PASSWORD))) return null;
   return new Response('Password required.', {
     status: 401,
     headers: {

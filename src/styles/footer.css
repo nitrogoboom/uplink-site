@@ -20,14 +20,18 @@
   flex-direction: column;
   background: var(--c-bg);
 }
-.fc-nav { display: flex; flex: 1; flex-direction: column; }
+.fc-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
 .fc::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  overflow-anchor: none;   /* never the scroll anchor: it doesn't move, so a row anchored to it wouldn't hold (below) */
+  overflow-anchor: none; /* never the scroll anchor: it doesn't move, so a row anchored to it wouldn't hold (below) */
   background:
     radial-gradient(48% 58% at 70% 46%, var(--c-glow-sky-2), transparent 70%),
     radial-gradient(30% 40% at 4% 18%, var(--c-accent-faint), transparent 70%);
@@ -40,38 +44,120 @@
    (display: contents), since a details running off the top of the screen would be picked whole. Anchored to any of
    those, it would hold nothing still, and the tapped row would jump up by the shut panel's height, off the top of the
    screen if that panel was tall. */
-.fc-deck { flex: 1; padding-block: var(--sp-4) var(--sp-6); }
+.fc-deck {
+  flex: 1;
+  padding-block: var(--sp-4) var(--sp-6);
+}
 /* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile, so it never widens the page */
 .fc-tile {
   position: relative;
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: "icon name chev" "icon count chev";
-  align-items: center; column-gap: var(--sp-3); row-gap: var(--sp-1);
-  min-height: calc(var(--sp-8) - var(--sp-1)); padding: var(--sp-2) 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'icon name chev' 'icon count chev';
+  align-items: center;
+  column-gap: var(--sp-3);
+  row-gap: var(--sp-1);
+  min-height: calc(var(--sp-8) - var(--sp-1));
+  padding: var(--sp-2) 0;
   border-bottom: 1px solid var(--c-line);
-  list-style: none; color: var(--c-text); text-align: left; cursor: pointer;
+  list-style: none;
+  color: var(--c-text);
+  text-align: left;
+  cursor: pointer;
 }
-.fc-tile::-webkit-details-marker { display: none; }   /* Safari's own triangle */
-.fc-tile .icon-tile { grid-area: icon; width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
-.fc-tile-n { grid-area: name; align-self: end; font-family: var(--font-display); font-weight: 700; font-size: var(--fs-5); line-height: var(--lh-tight); text-transform: uppercase; }
-.fc-tile-c { grid-area: count; align-self: start; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-3); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-muted); }
-.fc-tile-chev { grid-area: chev; display: grid; color: var(--c-muted); transition: transform var(--dur-2) var(--ease); }
-.fc-tile-chev svg { width: var(--sp-4); height: var(--sp-4); }
+.fc-tile::-webkit-details-marker {
+  display: none;
+} /* Safari's own triangle */
+.fc-tile .icon-tile {
+  grid-area: icon;
+  width: calc(var(--sp-6) + var(--sp-1));
+  height: calc(var(--sp-6) + var(--sp-1));
+}
+.fc-tile-n {
+  grid-area: name;
+  align-self: end;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-5);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+.fc-tile-c {
+  grid-area: count;
+  align-self: start;
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-3);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.fc-tile-chev {
+  grid-area: chev;
+  display: grid;
+  color: var(--c-muted);
+  transition: transform var(--dur-2) var(--ease);
+}
+.fc-tile-chev svg {
+  width: var(--sp-4);
+  height: var(--sp-4);
+}
 /* the open row. Forced colours (B4, phase 9) keep only the chevron's turn: the icon's and name's colours go */
-.fc-sec[open] > .fc-tile .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-.fc-sec[open] > .fc-tile .fc-tile-n { color: var(--c-accent-text); }
-.fc-sec[open] > .fc-tile .fc-tile-chev { transform: rotate(90deg); color: var(--c-accent-text); }
+.fc-sec[open] > .fc-tile .icon-tile {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.fc-sec[open] > .fc-tile .fc-tile-n {
+  color: var(--c-accent-text);
+}
+.fc-sec[open] > .fc-tile .fc-tile-chev {
+  transform: rotate(90deg);
+  color: var(--c-accent-text);
+}
 /* :where(): as weak as .fc-tile, so the tiles' own border (below) wins */
-:where(.fc-sec:last-of-type:not([open])) > .fc-tile, .fc-sec:last-of-type .fc-panel { border-bottom: 0; }
-.fc-panel { display: flex; flex-direction: column; min-width: 0; padding-block: var(--sp-3) var(--sp-6); border-bottom: 1px solid var(--c-line); }
-.fc-head { display: none; flex-direction: column; gap: var(--sp-3); }   /* rows: the row above already names it */
+:where(.fc-sec:last-of-type:not([open])) > .fc-tile,
+.fc-sec:last-of-type .fc-panel {
+  border-bottom: 0;
+}
+.fc-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding-block: var(--sp-3) var(--sp-6);
+  border-bottom: 1px solid var(--c-line);
+}
+.fc-head {
+  display: none;
+  flex-direction: column;
+  gap: var(--sp-3);
+} /* rows: the row above already names it */
 /* each panel's title is an h3 under the footer's own (screen-reader) h2, styled as the section title it looks like */
-.fc-head h3 { font-size: min(var(--fs-8), var(--fit)); font-style: italic; line-height: var(--lh-display); }
-.fc-head h3 em { color: var(--c-accent-text); }
-.fc-lead { max-width: 46ch; font-size: var(--fs-3); color: var(--c-muted); }
-.fc-body { display: flex; flex-direction: column; gap: var(--sp-5); margin-top: var(--sp-4); }
+.fc-head h3 {
+  font-size: min(var(--fs-8), var(--fit));
+  font-style: italic;
+  line-height: var(--lh-display);
+}
+.fc-head h3 em {
+  color: var(--c-accent-text);
+}
+.fc-lead {
+  max-width: 46ch;
+  font-size: var(--fs-3);
+  color: var(--c-muted);
+}
+.fc-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  margin-top: var(--sp-4);
+}
 @supports selector(::details-content) {
-  .fc-sec { display: contents; }
-  .fc-sec::details-content { overflow-anchor: none; }
+  .fc-sec {
+    display: contents;
+  }
+  .fc-sec::details-content {
+    overflow-anchor: none;
+  }
 }
 /* a row's panel grows open and shrinks shut: the details' content box animates its height to and from auto
    (interpolate-size: Chrome; elsewhere it opens at once), as the links fade and settle in; shutting is a little
@@ -80,193 +166,701 @@
    the same box in the stage. */
 @media (--phone) and (prefers-reduced-motion: no-preference) {
   @supports selector(::details-content) {
-    .fc { interpolate-size: allow-keywords; }
-    .fc-sec::details-content {
-      height: 0; overflow-y: clip;
-      transition: height var(--dur-fc-row-shut) var(--ease-soft), content-visibility var(--dur-fc-row-shut) allow-discrete;
+    .fc {
+      interpolate-size: allow-keywords;
     }
-    .fc-sec[open]::details-content { height: auto; transition-duration: var(--dur-fc-row-open); }
-    .fc-panel { opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); transition: opacity var(--dur-fc-row-shut) var(--ease-soft), transform var(--dur-fc-row-shut) var(--ease-soft); }
-    .fc-sec[open] .fc-panel { opacity: 1; transform: none; transition-duration: var(--dur-fc-row-open); }
-    @starting-style { .fc-sec[open] .fc-panel { opacity: 0; transform: translateY(calc(var(--sp-2) * -1)); } }
+    .fc-sec::details-content {
+      height: 0;
+      overflow-y: clip;
+      transition:
+        height var(--dur-fc-row-shut) var(--ease-soft),
+        content-visibility var(--dur-fc-row-shut) allow-discrete;
+    }
+    .fc-sec[open]::details-content {
+      height: auto;
+      transition-duration: var(--dur-fc-row-open);
+    }
+    .fc-panel {
+      opacity: 0;
+      transform: translateY(calc(var(--sp-2) * -1));
+      transition:
+        opacity var(--dur-fc-row-shut) var(--ease-soft),
+        transform var(--dur-fc-row-shut) var(--ease-soft);
+    }
+    .fc-sec[open] .fc-panel {
+      opacity: 1;
+      transform: none;
+      transition-duration: var(--dur-fc-row-open);
+    }
+    @starting-style {
+      .fc-sec[open] .fc-panel {
+        opacity: 0;
+        transform: translateY(calc(var(--sp-2) * -1));
+      }
+    }
   }
 }
 
 /* link rows: hairline rows, two columns (one on phones) */
-.fc-rows { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--sp-6); list-style: none; }
-.fc-rows--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fc-rows {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--sp-6);
+  list-style: none;
+}
+.fc-rows--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
 .fc-link {
-  display: flex; align-items: center; gap: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
   min-height: var(--tap);
   padding-inline: var(--sp-2);
   margin-inline: calc(var(--sp-2) * -1);
   border-bottom: 1px solid var(--c-line);
   border-radius: var(--r-1) var(--r-1) 0 0;
-  font-family: var(--font-display); font-weight: 600; text-transform: uppercase;
-  font-size: var(--fs-5); letter-spacing: 0.01em; line-height: var(--lh-title);
-  color: var(--c-text); text-decoration: none;
-  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: var(--fs-5);
+  letter-spacing: 0.01em;
+  line-height: var(--lh-title);
+  color: var(--c-text);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
 }
-.fc-link svg { flex: none; margin-left: auto; width: var(--sp-4); height: var(--sp-4); color: var(--c-accent-text); opacity: 0; transform: translateX(calc(var(--sp-1) * -1)); transition: opacity var(--dur-1) var(--ease), transform var(--dur-1) var(--ease); }
-.fc-link:hover, .fc-link:focus-visible { background: var(--c-surface); color: var(--c-accent-text); }
-.fc-link:hover svg, .fc-link:focus-visible svg { opacity: 1; transform: none; }
+.fc-link svg {
+  flex: none;
+  margin-left: auto;
+  width: var(--sp-4);
+  height: var(--sp-4);
+  color: var(--c-accent-text);
+  opacity: 0;
+  transform: translateX(calc(var(--sp-1) * -1));
+  transition:
+    opacity var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+.fc-link:hover,
+.fc-link:focus-visible {
+  background: var(--c-surface);
+  color: var(--c-accent-text);
+}
+.fc-link:hover svg,
+.fc-link:focus-visible svg {
+  opacity: 1;
+  transform: none;
+}
 
 /* contact */
-.fc-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5); }
-.fc-facts > div { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
-.fc-facts .label { margin-bottom: var(--sp-1); }
-.fc-cl { display: flex; align-items: center; gap: var(--sp-3); align-self: flex-start; min-height: var(--tap); color: var(--c-text); text-decoration: none; }
-a.fc-cl:hover { color: var(--c-accent-text); }
-.fc-cl svg { flex: none; width: var(--sp-4); height: var(--sp-4); color: var(--c-accent-text); }
-.fc-cl span { overflow-wrap: anywhere; line-height: var(--lh-snug); }
-.fc-cl small { display: block; font-size: var(--fs-2); color: var(--c-muted); }
-.fc-cl--two { align-items: flex-start; padding-block: var(--sp-1); }
-/* stylelint-disable-next-line declaration-property-value-disallowed-list -- optical nudge: icon onto the first text line */
-.fc-cl--two svg { margin-top: 0.15rem; }
-.fc-follow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-4); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
-.fc-socials { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
-.fc-soc {
-  display: grid; place-items: center; width: var(--tap); height: var(--tap);
-  border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface); color: var(--c-text);
-  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease), transform var(--dur-1) var(--ease);
+.fc-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
 }
-@media (hover: hover) { .fc-soc:hover { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); transform: translateY(-2px); } }
-.fc-soc svg { width: var(--icon); height: var(--icon); }
+.fc-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.fc-facts .label {
+  margin-bottom: var(--sp-1);
+}
+.fc-cl {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  align-self: flex-start;
+  min-height: var(--tap);
+  color: var(--c-text);
+  text-decoration: none;
+}
+a.fc-cl:hover {
+  color: var(--c-accent-text);
+}
+.fc-cl svg {
+  flex: none;
+  width: var(--sp-4);
+  height: var(--sp-4);
+  color: var(--c-accent-text);
+}
+.fc-cl span {
+  overflow-wrap: anywhere;
+  line-height: var(--lh-snug);
+}
+.fc-cl small {
+  display: block;
+  font-size: var(--fs-2);
+  color: var(--c-muted);
+}
+.fc-cl--two {
+  align-items: flex-start;
+  padding-block: var(--sp-1);
+}
+.fc-cl--two svg {
+  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- optical nudge: icon onto the first text line */
+  margin-top: 0.15rem;
+}
+.fc-follow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--c-line);
+}
+.fc-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+}
+.fc-soc {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-2);
+  background: var(--c-surface);
+  color: var(--c-text);
+  transition:
+    background-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+@media (hover: hover) {
+  .fc-soc:hover {
+    background: var(--c-accent);
+    border-color: transparent;
+    color: var(--c-on-accent);
+    transform: translateY(-2px);
+  }
+}
+.fc-soc svg {
+  width: var(--icon);
+  height: var(--icon);
+}
 
 /* follow */
-.fc-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: var(--sp-2); list-style: none; }
-.fc-wall-item {
-  position: relative;   /* keeps its screen-reader pause inside (see .fc-tile) */
-  display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-2);
-  border: 1px solid var(--c-line); border-radius: var(--r-2); background: var(--c-surface);
-  color: var(--c-text); text-decoration: none;
-  transition: background-color var(--dur-1) var(--ease), border-color var(--dur-1) var(--ease);
+.fc-wall {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--sp-2);
+  list-style: none;
 }
-.fc-wall-item:hover { background: var(--c-surface-2); border-color: var(--c-line-2); }
-.fc-wall-item:hover .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-.fc-wall-item .icon-tile { width: calc(var(--sp-6) + var(--sp-1)); height: calc(var(--sp-6) + var(--sp-1)); }
-.fc-wall-item b { display: block; font-weight: 600; line-height: var(--lh-snug); }
-.fc-nl { display: flex; flex-direction: column; gap: var(--sp-2); max-width: 30rem; }
-.fc-nl-row { display: flex; gap: var(--sp-2); }
-.fc-nl-row .input { flex: 1; min-width: 0; }
-.fc-nl-row .btn { flex: none; }
+.fc-wall-item {
+  position: relative; /* keeps its screen-reader pause inside (see .fc-tile) */
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-2);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-2);
+  background: var(--c-surface);
+  color: var(--c-text);
+  text-decoration: none;
+  transition:
+    background-color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease);
+}
+.fc-wall-item:hover {
+  background: var(--c-surface-2);
+  border-color: var(--c-line-2);
+}
+.fc-wall-item:hover .icon-tile {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.fc-wall-item .icon-tile {
+  width: calc(var(--sp-6) + var(--sp-1));
+  height: calc(var(--sp-6) + var(--sp-1));
+}
+.fc-wall-item b {
+  display: block;
+  font-weight: 600;
+  line-height: var(--lh-snug);
+}
+.fc-nl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-width: 30rem;
+}
+.fc-nl-row {
+  display: flex;
+  gap: var(--sp-2);
+}
+.fc-nl-row .input {
+  flex: 1;
+  min-width: 0;
+}
+.fc-nl-row .btn {
+  flex: none;
+}
 
 /* map: tiles only (below); rows have none, and a box that never shows never fetches it (footer.js) */
-.fc-map { position: relative; display: none; min-height: 18rem; aspect-ratio: 16 / 11; max-width: 100%; }
+.fc-map {
+  position: relative;
+  display: none;
+  min-height: 18rem;
+  aspect-ratio: 16 / 11;
+  max-width: 100%;
+}
 .fc-map > svg {
-  position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none;
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
   -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-image:
+    linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
   mask-composite: intersect;
 }
 .fc-hud {
-  position: absolute; left: 0; bottom: 0;
-  display: flex; align-items: center; gap: var(--sp-3);
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
   padding: var(--sp-3) var(--sp-4) var(--sp-3) var(--sp-3);
-  border: 1px solid var(--c-line-2); border-radius: var(--r-2);
-  background: var(--c-glass-2);   /* solid, like the phone bar */
+  border: 1px solid var(--c-line-2);
+  border-radius: var(--r-2);
+  background: var(--c-glass-2); /* solid, like the phone bar */
   box-shadow: var(--shadow-1);
 }
-:root:not(.js) .fc-hud { display: none; }   /* the map's label: no map without script */
-.fc-hud svg { flex: none; width: var(--icon); height: var(--icon); color: var(--c-accent-text); }
-.fc-hud b { display: block; font-size: var(--fs-2); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; color: var(--c-accent-text); }
-.fc-hud small { display: block; font-size: var(--fs-2); line-height: var(--lh-snug); color: var(--c-muted); }
+:root:not(.js) .fc-hud {
+  display: none;
+} /* the map's label: no map without script */
+.fc-hud svg {
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  color: var(--c-accent-text);
+}
+.fc-hud b {
+  display: block;
+  font-size: var(--fs-2);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: var(--lh-snug);
+  text-transform: uppercase;
+  color: var(--c-accent-text);
+}
+.fc-hud small {
+  display: block;
+  font-size: var(--fs-2);
+  line-height: var(--lh-snug);
+  color: var(--c-muted);
+}
 /* the label names the shown section's spot: all six are in the markup, in section order, and one shows */
-.fc-hud-l { display: none; }
+.fc-hud-l {
+  display: none;
+}
 .fc-deck:not(:has(> .fc-sec[open])) .fc-hud-l:nth-of-type(1),
 .fc-deck:has(> .fc-sec:nth-of-type(1)[open]) .fc-hud-l:nth-of-type(1),
 .fc-deck:has(> .fc-sec:nth-of-type(2)[open]) .fc-hud-l:nth-of-type(2),
 .fc-deck:has(> .fc-sec:nth-of-type(3)[open]) .fc-hud-l:nth-of-type(3),
 .fc-deck:has(> .fc-sec:nth-of-type(4)[open]) .fc-hud-l:nth-of-type(4),
 .fc-deck:has(> .fc-sec:nth-of-type(5)[open]) .fc-hud-l:nth-of-type(5),
-.fc-deck:has(> .fc-sec:nth-of-type(6)[open]) .fc-hud-l:nth-of-type(6) { display: block; }
+.fc-deck:has(> .fc-sec:nth-of-type(6)[open]) .fc-hud-l:nth-of-type(6) {
+  display: block;
+}
 /* pause button (HoldButton.astro, look in buttons.css), top right, clear of the label; only once the map is in */
-.fc-hold { position: absolute; top: 0; right: 0; }
-.fc-map:not(:has(> svg.fc-w)) .fc-hold { display: none; }
+.fc-hold {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+.fc-map:not(:has(> svg.fc-w)) .fc-hold {
+  display: none;
+}
 
 /* base bar */
-.fc-base { background: var(--c-bg-band); }
+.fc-base {
+  background: var(--c-bg-band);
+}
 .fc-base .container {
   max-width: none;
-  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-6);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-6);
   padding-block: var(--sp-2) var(--sp-3);
   border-top: 1px solid var(--c-line);
-  font-size: var(--fs-2); color: var(--c-muted);
+  font-size: var(--fs-2);
+  color: var(--c-muted);
 }
-.fc-brand { display: flex; align-items: center; gap: var(--sp-3); }
-.fc-mark { display: grid; place-items: center; flex: none; width: var(--sp-6); height: var(--sp-6); border-radius: var(--r-1); background: var(--c-accent); color: var(--c-on-accent); }
-.fc-mark svg { width: var(--sp-4); height: var(--sp-4); }
-.fc-brand b { font-family: var(--font-display); font-weight: 700; font-style: italic; font-size: var(--fs-4); line-height: var(--lh-tight); text-transform: uppercase; color: var(--c-text); }
-.fc-legal { display: flex; flex-wrap: wrap; gap: 0 var(--sp-5); list-style: none; }
-.fc-legal a { display: inline-flex; align-items: center; min-height: var(--tap); color: var(--c-muted); text-decoration: none; }
-.fc-legal a:hover { color: var(--c-text); }
-.fc-base-end { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-5); margin-left: auto; }
-.status { display: inline-flex; align-items: center; gap: var(--sp-2); }
-.status::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: var(--c-ok); box-shadow: 0 0 0 var(--sp-1) var(--c-ok-tint); }
+.fc-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.fc-mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--sp-6);
+  height: var(--sp-6);
+  border-radius: var(--r-1);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.fc-mark svg {
+  width: var(--sp-4);
+  height: var(--sp-4);
+}
+.fc-brand b {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: var(--fs-4);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+.fc-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--sp-5);
+  list-style: none;
+}
+.fc-legal a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  color: var(--c-muted);
+  text-decoration: none;
+}
+.fc-legal a:hover {
+  color: var(--c-text);
+}
+.fc-base-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-5);
+  margin-left: auto;
+}
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.status::before {
+  content: '';
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  background: var(--c-ok);
+  box-shadow: 0 0 0 var(--sp-1) var(--c-ok-tint);
+}
 
 /* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot). Its parts
    are styled by class, never by tag: SVGO (scripts/svgo-config.mjs) writes its polygons and lines as paths. The
    faces are .f-t, .f-l, .f-r, the windows .win, the marker .mk-d, .mk-i (every polygon gen_campus.py draws: a test in
    scripts/test/ holds the list to the drawing); :where() keeps this base rule as weak as the tag rule it replaces. */
-.fc-w :where(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke: var(--iso-edge); stroke-opacity: 0.3; stroke-width: 1; stroke-linejoin: round; transition: fill var(--dur-fc-fill) ease, stroke var(--dur-fc-fill) ease, stroke-opacity var(--dur-fc-fill) ease; }
-.fc-w .f-t { fill: var(--iso-top); } .fc-w .f-l { fill: var(--iso-left); } .fc-w .f-r { fill: var(--iso-right); }
-.fc-w .on .b .f-t { fill: var(--iso-hi-top); } .fc-w .on .b .f-l { fill: var(--iso-hi-left); } .fc-w .on .b .f-r { fill: var(--iso-hi-right); }
-.fc-w .on .b :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke: var(--iso-hi-edge); stroke-opacity: 0.55; }
-.fc-w .tree :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) { stroke-opacity: 0.22; } .fc-w .tree .f-t { fill: var(--iso-green-top); } .fc-w .tree .f-l { fill: var(--iso-green-mid); } .fc-w .tree .f-r { fill: var(--iso-green-dark); }
-.fc-w .plat .f-t { fill: var(--iso-ground); }
-.fc-w .grid > * { stroke: var(--iso-grid); stroke-width: 0.8; stroke-opacity: 0.6; }
-.fc-w .edge { fill: none; stroke: var(--c-sky); stroke-width: 1.4; stroke-opacity: 0.6; }
-.fc-w .win { fill: var(--iso-window); fill-opacity: 0.6; stroke: var(--c-sky); stroke-width: 0.9; stroke-opacity: 0.5; }
-.fc-w .win.lit { fill: var(--iso-sky-left); fill-opacity: 0.38; }   /* cool lit window (docs/palette.md 5.4) */
-.fc-w .on .win { fill: var(--c-on-accent); fill-opacity: 0.35; stroke: var(--iso-light); stroke-opacity: 0.55; }
-.fc-w .on .win.lit { fill: var(--iso-light); fill-opacity: 0.75; }
-.fc-w .tk-1 .f-t { fill: var(--iso-sky-top); } .fc-w .tk-1 .f-l { fill: var(--iso-sky-left); } .fc-w .tk-1 .f-r { fill: var(--iso-sky-right); }
-.fc-w .tk-2 .f-t { fill: var(--iso-hi-top); } .fc-w .tk-2 .f-l { fill: var(--iso-hi-left); } .fc-w .tk-2 .f-r { fill: var(--iso-hi-right); }
-.fc-w .tk-3 .f-t { fill: var(--iso-green-top); } .fc-w .tk-3 .f-l { fill: var(--iso-green-mid); } .fc-w .tk-3 .f-r { fill: var(--iso-green-dark); }
-.fc-w .led { fill: var(--iso-led); } .fc-w .led.w2 { fill: var(--iso-light); }
-.fc-w .route { fill: none; stroke: var(--c-sky); stroke-width: 1.3; stroke-opacity: 0.22; stroke-dasharray: 3 6; stroke-linecap: round; stroke-linejoin: round; transition: stroke var(--dur-fc-route) ease, stroke-opacity var(--dur-fc-route) ease; }
-.fc-w .route.on { stroke: var(--iso-hi-left); stroke-opacity: 0.55; stroke-dasharray: none; }
-.fc-w .flow { fill: none; stroke: var(--iso-hi-left); stroke-width: 2.4; stroke-dasharray: 2 10; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transition: opacity var(--dur-fc-route) ease; }
-.fc-w .flow.on { opacity: 1; }
-.fc-w .ring { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-opacity: 0.8; }
-.fc-w .ring:not(.on) { display: none; }   /* one ring per spot; the picked spot's shows */
-.fc-w .ring2 { fill: none; stroke: var(--iso-hi-left); stroke-width: 1; stroke-opacity: 0.35; stroke-dasharray: 4 5; }
-.fc-w .sig { fill: none; stroke: var(--c-sky); stroke-width: 1.2; }
-.fc-w .beacon { fill: none; stroke: var(--iso-hi-left); stroke-width: 1.2; }
-.fc-w .shadow { fill: url("#fc-shade"); opacity: 0.35; }   /* a soft gradient (gen_campus.py), not a blur filter redrawn as the camera flies */
-.fc-w .shade { stop-color: var(--iso-shadow); }
-.fc-w .mk-line { stroke: var(--iso-hi-left); stroke-width: 1.4; stroke-dasharray: 2 4; }
-.fc-w .mk-d { fill: var(--iso-hi-left); stroke: var(--c-bg); stroke-width: 3; }
-.fc-w .mk-i { fill: var(--c-on-accent); }
-.fc-w .dot { fill: var(--iso-hi-left); }
-.fc-w .mast { stroke: var(--iso-hi-left); stroke-width: 1.6; }
+.fc-w :where(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) {
+  stroke: var(--iso-edge);
+  stroke-opacity: 0.3;
+  stroke-width: 1;
+  stroke-linejoin: round;
+  transition:
+    fill var(--dur-fc-fill) ease,
+    stroke var(--dur-fc-fill) ease,
+    stroke-opacity var(--dur-fc-fill) ease;
+}
+.fc-w .f-t {
+  fill: var(--iso-top);
+}
+.fc-w .f-l {
+  fill: var(--iso-left);
+}
+.fc-w .f-r {
+  fill: var(--iso-right);
+}
+.fc-w .on .b .f-t {
+  fill: var(--iso-hi-top);
+}
+.fc-w .on .b .f-l {
+  fill: var(--iso-hi-left);
+}
+.fc-w .on .b .f-r {
+  fill: var(--iso-hi-right);
+}
+.fc-w .on .b :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) {
+  stroke: var(--iso-hi-edge);
+  stroke-opacity: 0.55;
+}
+.fc-w .tree :is(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) {
+  stroke-opacity: 0.22;
+}
+.fc-w .tree .f-t {
+  fill: var(--iso-green-top);
+}
+.fc-w .tree .f-l {
+  fill: var(--iso-green-mid);
+}
+.fc-w .tree .f-r {
+  fill: var(--iso-green-dark);
+}
+.fc-w .plat .f-t {
+  fill: var(--iso-ground);
+}
+.fc-w .grid > * {
+  stroke: var(--iso-grid);
+  stroke-width: 0.8;
+  stroke-opacity: 0.6;
+}
+.fc-w .edge {
+  fill: none;
+  stroke: var(--c-sky);
+  stroke-width: 1.4;
+  stroke-opacity: 0.6;
+}
+.fc-w .win {
+  fill: var(--iso-window);
+  fill-opacity: 0.6;
+  stroke: var(--c-sky);
+  stroke-width: 0.9;
+  stroke-opacity: 0.5;
+}
+.fc-w .win.lit {
+  fill: var(--iso-sky-left);
+  fill-opacity: 0.38;
+} /* cool lit window (docs/palette.md 5.4) */
+.fc-w .on .win {
+  fill: var(--c-on-accent);
+  fill-opacity: 0.35;
+  stroke: var(--iso-light);
+  stroke-opacity: 0.55;
+}
+.fc-w .on .win.lit {
+  fill: var(--iso-light);
+  fill-opacity: 0.75;
+}
+.fc-w .tk-1 .f-t {
+  fill: var(--iso-sky-top);
+}
+.fc-w .tk-1 .f-l {
+  fill: var(--iso-sky-left);
+}
+.fc-w .tk-1 .f-r {
+  fill: var(--iso-sky-right);
+}
+.fc-w .tk-2 .f-t {
+  fill: var(--iso-hi-top);
+}
+.fc-w .tk-2 .f-l {
+  fill: var(--iso-hi-left);
+}
+.fc-w .tk-2 .f-r {
+  fill: var(--iso-hi-right);
+}
+.fc-w .tk-3 .f-t {
+  fill: var(--iso-green-top);
+}
+.fc-w .tk-3 .f-l {
+  fill: var(--iso-green-mid);
+}
+.fc-w .tk-3 .f-r {
+  fill: var(--iso-green-dark);
+}
+.fc-w .led {
+  fill: var(--iso-led);
+}
+.fc-w .led.w2 {
+  fill: var(--iso-light);
+}
+.fc-w .route {
+  fill: none;
+  stroke: var(--c-sky);
+  stroke-width: 1.3;
+  stroke-opacity: 0.22;
+  stroke-dasharray: 3 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    stroke var(--dur-fc-route) ease,
+    stroke-opacity var(--dur-fc-route) ease;
+}
+.fc-w .route.on {
+  stroke: var(--iso-hi-left);
+  stroke-opacity: 0.55;
+  stroke-dasharray: none;
+}
+.fc-w .flow {
+  fill: none;
+  stroke: var(--iso-hi-left);
+  stroke-width: 2.4;
+  stroke-dasharray: 2 10;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity var(--dur-fc-route) ease;
+}
+.fc-w .flow.on {
+  opacity: 1;
+}
+.fc-w .ring {
+  fill: none;
+  stroke: var(--iso-hi-left);
+  stroke-width: 1.4;
+  stroke-opacity: 0.8;
+}
+.fc-w .ring:not(.on) {
+  display: none;
+} /* one ring per spot; the picked spot's shows */
+.fc-w .ring2 {
+  fill: none;
+  stroke: var(--iso-hi-left);
+  stroke-width: 1;
+  stroke-opacity: 0.35;
+  stroke-dasharray: 4 5;
+}
+.fc-w .sig {
+  fill: none;
+  stroke: var(--c-sky);
+  stroke-width: 1.2;
+}
+.fc-w .beacon {
+  fill: none;
+  stroke: var(--iso-hi-left);
+  stroke-width: 1.2;
+}
+.fc-w .shadow {
+  fill: url('#fc-shade');
+  opacity: 0.35;
+} /* a soft gradient (gen_campus.py), not a blur filter redrawn as the camera flies */
+.fc-w .shade {
+  stop-color: var(--iso-shadow);
+}
+.fc-w .mk-line {
+  stroke: var(--iso-hi-left);
+  stroke-width: 1.4;
+  stroke-dasharray: 2 4;
+}
+.fc-w .mk-d {
+  fill: var(--iso-hi-left);
+  stroke: var(--c-bg);
+  stroke-width: 3;
+}
+.fc-w .mk-i {
+  fill: var(--c-on-accent);
+}
+.fc-w .dot {
+  fill: var(--iso-hi-left);
+}
+.fc-w .mast {
+  stroke: var(--iso-hi-left);
+  stroke-width: 1.6;
+}
 @media (prefers-reduced-motion: no-preference) {
   /* SVG parts animate on the main thread and repaint the map, so every loop steps at about 12 frames a second
      (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen.
      --d: each shape's own delay (gen_campus.py), so the windows, lights and pulses run out of step */
-  .fc-w.is-seen .flow { animation: fc-flow var(--loop-fc-flow) steps(14) infinite; }
-  .fc-w .lit.blink, .fc-w .led { animation: fc-blink var(--loop-fc-blink) step-end var(--d, 0s) infinite; }
-  .fc-w .bob { animation: fc-bob var(--loop-fc-bob) steps(18) var(--d, 0s) infinite; }
-  .fc-w .mk-bob { animation: fc-bob var(--loop-fc-mk-bob) steps(13) infinite; }
-  .fc-w .ring, .fc-w .beacon, .fc-w .sig { transform-box: fill-box; transform-origin: 50% 50%; }
-  .fc-w .ring { animation: fc-ring var(--loop-fc-ring) steps(29) infinite; }
-  .fc-w .beacon { animation: fc-ping var(--loop-fc-ring) steps(29) var(--d, 0s) infinite; }
-  .fc-w .sig { animation: fc-ping var(--loop-fc-sig) steps(34) var(--d, 0s) infinite; }
+  .fc-w.is-seen .flow {
+    animation: fc-flow var(--loop-fc-flow) steps(14) infinite;
+  }
+  .fc-w .lit.blink,
+  .fc-w .led {
+    animation: fc-blink var(--loop-fc-blink) step-end var(--d, 0s) infinite;
+  }
+  .fc-w .bob {
+    animation: fc-bob var(--loop-fc-bob) steps(18) var(--d, 0s) infinite;
+  }
+  .fc-w .mk-bob {
+    animation: fc-bob var(--loop-fc-mk-bob) steps(13) infinite;
+  }
+  .fc-w .ring,
+  .fc-w .beacon,
+  .fc-w .sig {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+  }
+  .fc-w .ring {
+    animation: fc-ring var(--loop-fc-ring) steps(29) infinite;
+  }
+  .fc-w .beacon {
+    animation: fc-ping var(--loop-fc-ring) steps(29) var(--d, 0s) infinite;
+  }
+  .fc-w .sig {
+    animation: fc-ping var(--loop-fc-sig) steps(34) var(--d, 0s) infinite;
+  }
 }
-@keyframes fc-flow { to { stroke-dashoffset: -24; } }
-@keyframes fc-blink { 0%, 62% { opacity: 1; } 70%, 82% { opacity: 0.25; } 88%, 100% { opacity: 1; } }
-@keyframes fc-bob { 50% { transform: translateY(-5px); } }
-@keyframes fc-ring { from { transform: scale(0.75); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
-@keyframes fc-ping { from { transform: scale(0.3); opacity: 0.9; } to { transform: scale(1.5); opacity: 0; } }
+@keyframes fc-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes fc-blink {
+  0%,
+  62% {
+    opacity: 1;
+  }
+  70%,
+  82% {
+    opacity: 0.25;
+  }
+  88%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fc-bob {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes fc-ring {
+  from {
+    transform: scale(0.75);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+@keyframes fc-ping {
+  from {
+    transform: scale(0.3);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
 
 /* phones: one column of links and facts */
 @media (--phone) {
-  .fc-rows--two, .fc-facts { grid-template-columns: minmax(0, 1fr); }
-  .fc-base-end { margin-left: 0; }
+  .fc-rows--two,
+  .fc-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .fc-base-end {
+    margin-left: 0;
+  }
   /* base bar: the logo sat 8px under its line, against about 21px between the bar's other lines; one step more */
-  .fc-base .container { padding-top: var(--sp-4); }
-  .fc-wall-item b { min-width: 0; overflow-wrap: anywhere; }
+  .fc-base .container {
+    padding-top: var(--sp-4);
+  }
+  .fc-wall-item b {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
 }
 
 /* ---------- tiles: tablet and desktop, where the browser can place a details' panel ----------
@@ -278,59 +872,162 @@ a.fc-cl:hover { color: var(--c-accent-text); }
    .fc clips the scrollbar's width they add). */
 @media (--tablet-up) {
   @supports selector(::details-content) {
-    .fc { overflow-x: clip; border-top: 1px solid var(--c-line); }
-    .fc-deck { display: grid; column-gap: var(--sp-3); padding-block: 0; }
-    .fc-deck::before, .fc-deck::after { content: ""; grid-column: 1 / -1; margin-inline: calc(50% - 50vw); }
-    .fc-deck::before { grid-row: dock; background: var(--c-bg-band); }
-    .fc-deck::after { grid-row: line; height: 1px; background: var(--c-line); }
-    .fc-sec:nth-of-type(1) > .fc-tile { grid-column: t1; }
-    .fc-sec:nth-of-type(2) > .fc-tile { grid-column: t2; }
-    .fc-sec:nth-of-type(3) > .fc-tile { grid-column: t3; }
-    .fc-sec:nth-of-type(4) > .fc-tile { grid-column: t4; }
-    .fc-sec:nth-of-type(5) > .fc-tile { grid-column: t5; }
-    .fc-sec:nth-of-type(6) > .fc-tile { grid-column: t6; }
-    .fc-sec::details-content { grid-column: 1 / -1; min-width: 0; }
-    .fc-sec:not([open])::details-content { display: none; }
-    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type::details-content { display: block; content-visibility: visible; }
+    .fc {
+      overflow-x: clip;
+      border-top: 1px solid var(--c-line);
+    }
+    .fc-deck {
+      display: grid;
+      column-gap: var(--sp-3);
+      padding-block: 0;
+    }
+    .fc-deck::before,
+    .fc-deck::after {
+      content: '';
+      grid-column: 1 / -1;
+      margin-inline: calc(50% - 50vw);
+    }
+    .fc-deck::before {
+      grid-row: dock;
+      background: var(--c-bg-band);
+    }
+    .fc-deck::after {
+      grid-row: line;
+      height: 1px;
+      background: var(--c-line);
+    }
+    .fc-sec:nth-of-type(1) > .fc-tile {
+      grid-column: t1;
+    }
+    .fc-sec:nth-of-type(2) > .fc-tile {
+      grid-column: t2;
+    }
+    .fc-sec:nth-of-type(3) > .fc-tile {
+      grid-column: t3;
+    }
+    .fc-sec:nth-of-type(4) > .fc-tile {
+      grid-column: t4;
+    }
+    .fc-sec:nth-of-type(5) > .fc-tile {
+      grid-column: t5;
+    }
+    .fc-sec:nth-of-type(6) > .fc-tile {
+      grid-column: t6;
+    }
+    .fc-sec::details-content {
+      grid-column: 1 / -1;
+      min-width: 0;
+    }
+    .fc-sec:not([open])::details-content {
+      display: none;
+    }
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type::details-content {
+      display: block;
+      content-visibility: visible;
+    }
     .fc-tile {
       grid-row: dock;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
-      min-width: calc(var(--sp-9) + var(--sp-6)); min-height: calc(var(--sp-9) - var(--sp-1));   /* the least it takes: it grows to fit its name and count */
-      margin-block: var(--sp-5); padding: var(--sp-2);
-      border: 1px solid var(--c-line); border-radius: var(--r-3); background: var(--c-surface); text-align: center;
-      transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-1);
+      min-width: calc(var(--sp-9) + var(--sp-6));
+      min-height: calc(var(--sp-9) - var(--sp-1)); /* the least it takes: it grows to fit its name and count */
+      margin-block: var(--sp-5);
+      padding: var(--sp-2);
+      border: 1px solid var(--c-line);
+      border-radius: var(--r-3);
+      background: var(--c-surface);
+      text-align: center;
+      transition:
+        transform var(--dur-2) var(--ease),
+        border-color var(--dur-2) var(--ease),
+        background-color var(--dur-2) var(--ease);
     }
-    .fc-tile-n { font-size: var(--fs-4); }
-    .fc-tile-n, .fc-tile-c { align-self: auto; }
-    .fc-tile-chev { display: none; }
+    .fc-tile-n {
+      font-size: var(--fs-4);
+    }
+    .fc-tile-n,
+    .fc-tile-c {
+      align-self: auto;
+    }
+    .fc-tile-chev {
+      display: none;
+    }
     /* the picked tile. Forced colours (B4, phase 9) lose its border colour and fills: it needs a cue of its own */
     .fc-sec[open] > .fc-tile,
-    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile { border: 2px solid var(--c-accent-text); background: var(--c-accent-tint); transform: translateY(-4px); }
-    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-    .fc-sec[open] > .fc-tile .fc-tile-n { color: inherit; }
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile {
+      border: 2px solid var(--c-accent-text);
+      background: var(--c-accent-tint);
+      transform: translateY(-4px);
+    }
+    .fc-deck:not(:has(> .fc-sec[open])) > .fc-sec:first-of-type > .fc-tile .icon-tile {
+      background: var(--c-accent);
+      color: var(--c-on-accent);
+    }
+    .fc-sec[open] > .fc-tile .fc-tile-n {
+      color: inherit;
+    }
     /* real pointers only: on touch a tap leaves :hover stuck */
-    @media (hover: hover) { .fc-sec:not([open]) > .fc-tile:hover { transform: translateY(-3px); border-color: var(--c-line-2); background: var(--c-surface-2); } }
-    .fc-panel { padding-block: 0; border-bottom: 0; }
-    .fc-sec[open] .fc-panel { animation: fc-in var(--dur-fc-panel) var(--ease); }   /* the picked panel slides in */
-    .fc-head { display: flex; }
-    .fc-lead { margin-top: var(--sp-4); font-size: var(--fs-4); }
-    .fc-body { margin-top: var(--sp-6); }
-    .fc-map { display: block; grid-column: 1 / -1; }
+    @media (hover: hover) {
+      .fc-sec:not([open]) > .fc-tile:hover {
+        transform: translateY(-3px);
+        border-color: var(--c-line-2);
+        background: var(--c-surface-2);
+      }
+    }
+    .fc-panel {
+      padding-block: 0;
+      border-bottom: 0;
+    }
+    .fc-sec[open] .fc-panel {
+      animation: fc-in var(--dur-fc-panel) var(--ease);
+    } /* the picked panel slides in */
+    .fc-head {
+      display: flex;
+    }
+    .fc-lead {
+      margin-top: var(--sp-4);
+      font-size: var(--fs-4);
+    }
+    .fc-body {
+      margin-top: var(--sp-6);
+    }
+    .fc-map {
+      display: block;
+      grid-column: 1 / -1;
+    }
   }
 }
-@keyframes fc-in { from { opacity: 0; transform: translateY(var(--sp-2)); } }
+@keyframes fc-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sp-2));
+  }
+}
 
 /* tablet: the tile row on top (six even columns, no sideways scroll), then the map, then the panel */
 @media (--tablet) {
   @supports selector(::details-content) {
     .fc-deck {
-      grid-template-columns: [t1] minmax(0, 1fr) [t2] minmax(0, 1fr) [t3] minmax(0, 1fr) [t4] minmax(0, 1fr) [t5] minmax(0, 1fr) [t6] minmax(0, 1fr);
+      grid-template-columns:
+        [t1] minmax(0, 1fr) [t2] minmax(0, 1fr) [t3] minmax(0, 1fr) [t4] minmax(0, 1fr)
+        [t5] minmax(0, 1fr) [t6] minmax(0, 1fr);
       grid-template-rows: [dock] auto [line] auto [map] auto [panel] auto;
       padding-bottom: var(--sp-5);
     }
-    .fc-tile { min-width: 0; }
-    .fc-map { grid-row: map; margin-top: var(--sp-6); }
-    .fc-sec::details-content { grid-row: panel; margin-top: var(--sp-5); }
+    .fc-tile {
+      min-width: 0;
+    }
+    .fc-map {
+      grid-row: map;
+      margin-top: var(--sp-6);
+    }
+    .fc-sec::details-content {
+      grid-row: panel;
+      margin-top: var(--sp-5);
+    }
   }
 }
 
@@ -343,27 +1040,57 @@ a.fc-cl:hover { color: var(--c-accent-text); }
       padding-top: var(--sp-6);
     }
     /* the stage's two columns, 5 : 7 with --sp-8 between, in the one grid cell they share */
-    .fc-sec::details-content { grid-row: stage; justify-self: start; width: calc((100% - var(--sp-8)) * 5 / 12); margin-bottom: var(--sp-5); }
-    .fc-map { grid-row: stage; justify-self: end; width: calc((100% - var(--sp-8)) * 7 / 12); aspect-ratio: auto; min-height: 26rem; margin-bottom: var(--sp-5); container-type: size; }
+    .fc-sec::details-content {
+      grid-row: stage;
+      justify-self: start;
+      width: calc((100% - var(--sp-8)) * 5 / 12);
+      margin-bottom: var(--sp-5);
+    }
+    .fc-map {
+      grid-row: stage;
+      justify-self: end;
+      width: calc((100% - var(--sp-8)) * 7 / 12);
+      aspect-ratio: auto;
+      min-height: 26rem;
+      margin-bottom: var(--sp-5);
+      container-type: size;
+    }
     /* the label on the drawing's base: the drawing (1071 x 768, its camera's shape) is centred in the box, so a box
        taller than that shape leaves a band under it, and the label rises by that band */
-    .fc-hud { bottom: max(0px, (100cqh - 100cqw * 768 / 1071) / 2); }
-    .fc-rows .fc-link { min-height: calc(var(--sp-7) - var(--sp-2)); }
+    .fc-hud {
+      bottom: max(0px, (100cqh - 100cqw * 768 / 1071) / 2);
+    }
+    .fc-rows .fc-link {
+      min-height: calc(var(--sp-7) - var(--sp-2));
+    }
   }
 }
 
 /* one screen as a floor: a panel whose words need more grows it */
 @media (--fold) {
   @supports selector(::details-content) {
-    .fc { min-height: max(var(--fold-h), 40rem); }
-    .fc-deck { padding-top: var(--sp-7); }
-    .fc-sec::details-content { padding-top: var(--sp-2); }
-    .fc-head h3 { font-size: min(var(--fs-8), 8.2svh, var(--fit)); }
-    .fc-map { min-height: 16rem; }
+    .fc {
+      min-height: max(var(--fold-h), 40rem);
+    }
+    .fc-deck {
+      padding-top: var(--sp-7);
+    }
+    .fc-sec::details-content {
+      padding-top: var(--sp-2);
+    }
+    .fc-head h3 {
+      font-size: min(var(--fs-8), 8.2svh, var(--fit));
+    }
+    .fc-map {
+      min-height: 16rem;
+    }
     @media (height <= 51.25em) {
-      .fc-deck { padding-top: var(--sp-6); }
-      .fc-body { margin-top: var(--sp-5); }
+      .fc-deck {
+        padding-top: var(--sp-6);
+      }
+      .fc-body {
+        margin-top: var(--sp-5);
+      }
     }
   }
 }
-

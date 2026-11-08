@@ -2,10 +2,18 @@
    Phone layout first, then tablet, then desktop at the end. ---*/
 /* one source per gap: the heading's own margin (.section-head, --sp-6) sets heading to content, as on every section;
    the card's margin-top sets picture to card */
-.grow { display: grid; grid-template-columns: minmax(0, 1fr); }
+.grow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
 
 /* the player: the picture and its controls, one unit */
-.grow-player { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); min-width: 0; }   /* one column no wider than the player: the dots row can't widen the page (B13) */
+.grow-player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-2);
+  min-width: 0;
+} /* one column no wider than the player: the dots row can't widen the page (B13) */
 .grow-stage {
   position: relative;
   width: 100%;
@@ -15,11 +23,34 @@
   border-radius: var(--r-3);
   background: radial-gradient(60% 55% at 50% 58%, var(--c-glow-sky), transparent 72%), var(--c-bg-band);
 }
-.grow-stage > svg { position: absolute; inset: 2% 2% 3%; display: block; width: 96%; height: 95%; }   /* the drawing only, not the button's icons */
+.grow-stage > svg {
+  position: absolute;
+  inset: 2% 2% 3%;
+  display: block;
+  width: 96%;
+  height: 95%;
+} /* the drawing only, not the button's icons */
 /* the picture's corner labels, the tags and the card's row labels: the site's label and chip type (.label, .chip) */
-.grow-place, .grow-team { position: absolute; top: var(--sp-3); z-index: 1; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-tight); text-transform: uppercase; }
-.grow-place { left: var(--sp-4); color: var(--c-sky); }
-.grow-team { right: var(--sp-4); color: var(--c-muted); font-variant-numeric: tabular-nums; }
+.grow-place,
+.grow-team {
+  position: absolute;
+  top: var(--sp-3);
+  z-index: 1;
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: var(--lh-tight);
+  text-transform: uppercase;
+}
+.grow-place {
+  left: var(--sp-4);
+  color: var(--c-sky);
+}
+.grow-team {
+  right: var(--sp-4);
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+}
 
 /* tags: a step's risks in red, then its fixes in green, pinned to the drawing's anchors (grow.js places them) */
 .grow-tag {
@@ -42,12 +73,31 @@
   pointer-events: none;
   opacity: 0;
   transform: translate(-50%, -100%) scale(0.85);
-  transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+  transition:
+    opacity var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease),
+    background-color var(--dur-2) var(--ease);
 }
-.grow-tag-i { flex: none; display: grid; place-items: center; width: 1.4em; height: 1.4em; border-radius: 50%; background: var(--c-ink-tint); font-weight: 700; }   /* em: grows with the text */
-.grow-tag.is-fixed { background: var(--c-ok); }
-.grow-tag.is-on { opacity: 1; transform: translate(-50%, -100%) scale(1); }
-.grow-tag.is-flip { transform: translate(-50%, -100%) scale(1.12); }
+.grow-tag-i {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: var(--c-ink-tint);
+  font-weight: 700;
+} /* em: grows with the text */
+.grow-tag.is-fixed {
+  background: var(--c-ok);
+}
+.grow-tag.is-on {
+  opacity: 1;
+  transform: translate(-50%, -100%) scale(1);
+}
+.grow-tag.is-flip {
+  transform: translate(-50%, -100%) scale(1.12);
+}
 
 /* play / pause, with the story's timer running round its edge */
 .grow-play {
@@ -65,87 +115,251 @@
   background: var(--c-solid);
   color: var(--c-text);
 }
-.grow-play-i { width: var(--sp-4); height: var(--sp-4); fill: currentColor; }
-.grow-ring { position: absolute; inset: -1px; width: calc(100% + 2px); height: calc(100% + 2px); overflow: visible; transform: rotate(-90deg); pointer-events: none; }
+.grow-play-i {
+  width: var(--sp-4);
+  height: var(--sp-4);
+  fill: currentColor;
+}
+.grow-ring {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  overflow: visible;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
 /* the ring's dash is its whole length in its own units (2π × 49.5 = 311.02; grow.js fills it by that), so it fills
    once over the six steps at any size. Its line is in those units too: 4.55 is 2px on the 44px ring (the button's
    42px inside its border, plus 1px each side). (A non-scaling stroke would measure the dash in screen pixels: on a
    44px ring, full by step 3.) */
-.grow-ring circle { fill: none; stroke: var(--c-accent); stroke-width: 4.55; stroke-linecap: round; stroke-dasharray: 311.02; stroke-dashoffset: 311.02; }
+.grow-ring circle {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-width: 4.55;
+  stroke-linecap: round;
+  stroke-dasharray: 311.02;
+  stroke-dashoffset: 311.02;
+}
 
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
    the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */
-.grow-nav { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); }
-.grow-step-btn[aria-disabled="true"] { opacity: 0.4; cursor: default; }   /* at an end; not disabled, so focus stays on it */
-.grow-step-btn[aria-disabled="true"]:hover { background: transparent; color: var(--c-muted); }
-.grow-dots { display: flex; align-items: center; }
-.grow-dot { display: grid; place-items: center; height: var(--tap); padding: 0 var(--sp-3); border: 0; border-radius: var(--r-2); background: none; }
+.grow-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+.grow-step-btn[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: default;
+} /* at an end; not disabled, so focus stays on it */
+.grow-step-btn[aria-disabled='true']:hover {
+  background: transparent;
+  color: var(--c-muted);
+}
+.grow-dots {
+  display: flex;
+  align-items: center;
+}
+.grow-dot {
+  display: grid;
+  place-items: center;
+  height: var(--tap);
+  padding: 0 var(--sp-3);
+  border: 0;
+  border-radius: var(--r-2);
+  background: none;
+}
 /* under 360px the arrows and six dots (312px) are wider than the player: dots 24px wide, still a 24px target (B13) */
-@media (width < 22.5em) { .grow-dot { padding-inline: var(--sp-2); } }
+@media (width < 22.5em) {
+  .grow-dot {
+    padding-inline: var(--sp-2);
+  }
+}
 /* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
    amber, dimmed */
-.grow-dot.is-done .pip { background: var(--c-accent); opacity: 0.45; }
-@media (hover: hover) { .grow-dot:not([aria-current="step"]):hover .pip { opacity: 1; } }
+.grow-dot.is-done .pip {
+  background: var(--c-accent);
+  opacity: 0.45;
+}
+@media (hover: hover) {
+  .grow-dot:not([aria-current='step']):hover .pip {
+    opacity: 1;
+  }
+}
 /* forced colours (Windows contrast themes) paint the pips' fills away (B4): the shared rule (shared-blocks.css) draws
    the open one long in Highlight and the rest in GrayText; the ones already built in CanvasText */
-@media (forced-colors: active) { .grow-dot.is-done .pip { background: CanvasText; opacity: 1; } }
+@media (forced-colors: active) {
+  .grow-dot.is-done .pip {
+    background: CanvasText;
+    opacity: 1;
+  }
+}
 
 /* the cards: every step's card in a list without script; with it (.is-live) only the open one */
-.grow-cards { display: grid; gap: var(--sp-5); margin-top: var(--sp-5); list-style: none; }
-.grow-card { display: grid; gap: var(--sp-2); }
-.grow-rows { display: grid; gap: var(--sp-3); }
-.grow-row { display: grid; gap: var(--sp-1); transition: opacity var(--dur-2) var(--ease); }
-.grow-lbl { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
-.grow-lbl i { width: var(--sp-2); height: var(--sp-2); border-radius: var(--r-1); background: currentColor; }
-.grow-watch .grow-lbl { color: var(--c-alert); }
-.grow-handle .grow-lbl { color: var(--c-ok); }
-.grow-row p { color: var(--c-muted); }
-.grow-handle p { color: var(--c-text); }
-.grow.is-live .grow-card:not(.is-on) { display: none; }
-.grow-card[data-beat="build"] .grow-row { opacity: 0.35; }
-.grow-card[data-beat="risk"] .grow-handle { opacity: 0.3; }
-.grow-card[data-beat="fix"] .grow-watch { opacity: 0.45; }
+.grow-cards {
+  display: grid;
+  gap: var(--sp-5);
+  margin-top: var(--sp-5);
+  list-style: none;
+}
+.grow-card {
+  display: grid;
+  gap: var(--sp-2);
+}
+.grow-rows {
+  display: grid;
+  gap: var(--sp-3);
+}
+.grow-row {
+  display: grid;
+  gap: var(--sp-1);
+  transition: opacity var(--dur-2) var(--ease);
+}
+.grow-lbl {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+.grow-lbl i {
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: var(--r-1);
+  background: currentColor;
+}
+.grow-watch .grow-lbl {
+  color: var(--c-alert);
+}
+.grow-handle .grow-lbl {
+  color: var(--c-ok);
+}
+.grow-row p {
+  color: var(--c-muted);
+}
+.grow-handle p {
+  color: var(--c-text);
+}
+.grow.is-live .grow-card:not(.is-on) {
+  display: none;
+}
+.grow-card[data-beat='build'] .grow-row {
+  opacity: 0.35;
+}
+.grow-card[data-beat='risk'] .grow-handle {
+  opacity: 0.3;
+}
+.grow-card[data-beat='fix'] .grow-watch {
+  opacity: 0.45;
+}
 /* the step list: desktop only, in place of the dots (its look is in the desktop block at the end) */
-.grow-list { display: none; }
-:root:not(.js) :is(.grow-nav, .grow-play, .grow-tag, .grow-list) { display: none; }
+.grow-list {
+  display: none;
+}
+:root:not(.js) :is(.grow-nav, .grow-play, .grow-tag, .grow-list) {
+  display: none;
+}
 
 /* the drawing's parts: a step's parts drop in and glow; .pre places them at once (first draw, pause) */
-.grow-stage .pc { transition: opacity var(--dur-grow-fade) var(--ease), transform var(--dur-grow-drop) var(--ease); }
-.grow-stage .pc.hide { opacity: 0; transform: translateY(calc(-1 * var(--sp-4))); }
-.grow-stage .pc.pre { transition: none; }
-.grow-stage .pc.glow { filter: url("#grow-glow"); }
+.grow-stage .pc {
+  transition:
+    opacity var(--dur-grow-fade) var(--ease),
+    transform var(--dur-grow-drop) var(--ease);
+}
+.grow-stage .pc.hide {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--sp-4)));
+}
+.grow-stage .pc.pre {
+  transition: none;
+}
+.grow-stage .pc.glow {
+  filter: url('#grow-glow');
+}
 /* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes (one dash period a loop) */
-@keyframes grow-flow8 { to { stroke-dashoffset: -16; } }
-@keyframes grow-flow10 { to { stroke-dashoffset: -20; } }
-@keyframes grow-flow12 { to { stroke-dashoffset: -24; } }
-@keyframes grow-rim { 50% { stroke-opacity: 0.35; } }
-.grow-stage [stroke-dasharray="5 5"] { animation: grow-flow10 var(--loop-grow-link) linear infinite; }
-.grow-stage [stroke-dasharray="4 4"] { animation: grow-flow8 var(--loop-grow-cable) linear infinite; }
-.grow-stage [stroke-dasharray="6 6"] { animation: grow-flow12 var(--loop-grow-ring) linear infinite; }
-.grow-stage .dome-rim { animation: grow-rim var(--loop-grow-rim) ease-in-out infinite; }
-.grow-stage.is-paused * { animation-play-state: paused; }   /* as specific as the rules above and after them, so it wins */
+@keyframes grow-flow8 {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+@keyframes grow-flow10 {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+@keyframes grow-flow12 {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes grow-rim {
+  50% {
+    stroke-opacity: 0.35;
+  }
+}
+.grow-stage [stroke-dasharray='5 5'] {
+  animation: grow-flow10 var(--loop-grow-link) linear infinite;
+}
+.grow-stage [stroke-dasharray='4 4'] {
+  animation: grow-flow8 var(--loop-grow-cable) linear infinite;
+}
+.grow-stage [stroke-dasharray='6 6'] {
+  animation: grow-flow12 var(--loop-grow-ring) linear infinite;
+}
+.grow-stage .dome-rim {
+  animation: grow-rim var(--loop-grow-rim) ease-in-out infinite;
+}
+.grow-stage.is-paused * {
+  animation-play-state: paused;
+} /* as specific as the rules above and after them, so it wins */
 @media (prefers-reduced-motion: reduce) {
-  .grow-stage .pc, .grow-tag, .grow-row { transition: none; }
-  .grow-stage [stroke-dasharray], .grow-stage .dome-rim { animation: none; }
+  .grow-stage .pc,
+  .grow-tag,
+  .grow-row {
+    transition: none;
+  }
+  .grow-stage [stroke-dasharray],
+  .grow-stage .dome-rim {
+    animation: none;
+  }
 }
 
 /* phones: the player scrolls with the page and the card sits under it. Text keeps the site's sizes, so it grows
    with the visitor's zoom. */
 @media (--phone) {
-  .grow-cards { margin-top: var(--sp-3); }
+  .grow-cards {
+    margin-top: var(--sp-3);
+  }
   /* a tag wider than the picture wraps instead of running past its edge (grow.js keeps it inside by its real size) */
-  .grow-tag { width: max-content; max-width: calc(100% - var(--sp-3)); white-space: normal; }
+  .grow-tag {
+    width: max-content;
+    max-width: calc(100% - var(--sp-3));
+    white-space: normal;
+  }
 }
 
 /* tablet: the player a little narrower and centred, the card in two columns under it */
 @media (--tablet) {
-  .grow-player { justify-self: center; width: min(80%, 36rem); }
-  .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
+  .grow-player {
+    justify-self: center;
+    width: min(80%, 36rem);
+  }
+  .grow-rows {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--sp-5);
+  }
 }
 /* phones and tablets: the square picture no taller than the screen under the header (a phone on its side: 390px tall,
    L9), centred; never under --grow-stage-min, so big zoom keeps a picture to read */
 @media (--below-desktop) {
-  .grow-stage { justify-self: center; width: min(100%, max(var(--grow-stage-min), var(--fold-h))); }
+  .grow-stage {
+    justify-self: center;
+    width: min(100%, max(var(--grow-stage-min), var(--fold-h)));
+  }
 }
 
 /* desktop: one screen; on the left the heading, the step list and the card, on the right the picture as tall as the
@@ -153,14 +367,46 @@
    so the dots and arrows go and the picture takes their row. */
 @media (--desktop) {
   /* the heading at the picture's top, the list in the middle, the card level with the picture's bottom */
-  .grow { grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--sp-8); align-items: start; }
-  .grow-head { grid-row: 1; grid-column: 1; }
-  .grow-list { grid-row: 2; grid-column: 1; align-self: center; display: grid; gap: var(--sp-1); margin-bottom: var(--sp-6); list-style: none; }
-  .grow-cards { grid-row: 3; grid-column: 1; align-self: end; margin-block: 0; }
-  .grow-rows { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
-  .grow-player { grid-row: 1 / 4; grid-column: 2; }
-  .grow-nav { display: none; }
-  .grow-stage { width: auto; height: min(var(--fold-inner, var(--fold-h)), var(--grow-stage-max)); }   /* under 700 tall (no fold): the screen */
+  .grow {
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--sp-8);
+    align-items: start;
+  }
+  .grow-head {
+    grid-row: 1;
+    grid-column: 1;
+  }
+  .grow-list {
+    grid-row: 2;
+    grid-column: 1;
+    align-self: center;
+    display: grid;
+    gap: var(--sp-1);
+    margin-bottom: var(--sp-6);
+    list-style: none;
+  }
+  .grow-cards {
+    grid-row: 3;
+    grid-column: 1;
+    align-self: end;
+    margin-block: 0;
+  }
+  .grow-rows {
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--sp-5);
+  }
+  .grow-player {
+    grid-row: 1 / 4;
+    grid-column: 2;
+  }
+  .grow-nav {
+    display: none;
+  }
+  .grow-stage {
+    width: auto;
+    height: min(var(--fold-inner, var(--fold-h)), var(--grow-stage-max));
+  } /* under 700 tall (no fold): the screen */
 
   /* a row: the step's number in a tile, the place, the team size; a button at least --tap tall. The same three
      states as the dots: the open step lit, the ones already built a dimmer amber, the ones to come grey. */
@@ -172,14 +418,17 @@
     gap: var(--sp-4);
     width: 100%;
     min-height: var(--tap);
-    padding: var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-1);   /* the tile sits close to the edge, as a tag's icon */
+    padding: var(--sp-1) var(--sp-4) var(--sp-1) var(--sp-1); /* the tile sits close to the edge, as a tag's icon */
     overflow: hidden;
     border: 1px solid transparent;
     border-radius: var(--r-2);
     background: none;
     color: var(--c-muted);
     text-align: left;
-    transition: background-color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+    transition:
+      background-color var(--dur-2) var(--ease),
+      border-color var(--dur-2) var(--ease),
+      color var(--dur-2) var(--ease);
   }
   .grow-item-n {
     display: grid;
@@ -193,34 +442,105 @@
     font-style: italic;
     font-weight: 700;
     line-height: var(--lh-tight);
-    transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+    transition:
+      background-color var(--dur-2) var(--ease),
+      color var(--dur-2) var(--ease);
   }
-  .grow-item-t { font-family: var(--font-display); font-size: var(--fs-5); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
-  .grow-item-m { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-tight); text-transform: uppercase; font-variant-numeric: tabular-nums; }
+  .grow-item-t {
+    font-family: var(--font-display);
+    font-size: var(--fs-5);
+    font-weight: 700;
+    letter-spacing: var(--tracking-1);
+    line-height: var(--lh-title);
+    text-transform: uppercase;
+  }
+  .grow-item-m {
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    line-height: var(--lh-tight);
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums;
+  }
   /* built already: dimmed amber. 0.7, not lower: the small team text keeps 4.5:1 */
-  .grow-item.is-done { color: var(--c-accent-text); }
-  .grow-item.is-done .grow-item-n { background: var(--c-accent-tint); }
-  .grow-item.is-done :is(.grow-item-t, .grow-item-m) { opacity: 0.7; }
+  .grow-item.is-done {
+    color: var(--c-accent-text);
+  }
+  .grow-item.is-done .grow-item-n {
+    background: var(--c-accent-tint);
+  }
+  .grow-item.is-done :is(.grow-item-t, .grow-item-m) {
+    opacity: 0.7;
+  }
   /* the open step: an even amber border and a filled tile */
-  .grow-item[aria-current="step"] { border-color: var(--c-accent); background: var(--c-accent-faint); color: var(--c-text); }
-  .grow-item[aria-current="step"] .grow-item-n { background: var(--c-accent); color: var(--c-on-accent); }
-  .grow-item[aria-current="step"] .grow-item-m { color: var(--c-accent-text); }
-  @media (hover: hover) { .grow-item:not([aria-current="step"]):hover { background: var(--c-surface); color: var(--c-text); } }
+  .grow-item[aria-current='step'] {
+    border-color: var(--c-accent);
+    background: var(--c-accent-faint);
+    color: var(--c-text);
+  }
+  .grow-item[aria-current='step'] .grow-item-n {
+    background: var(--c-accent);
+    color: var(--c-on-accent);
+  }
+  .grow-item[aria-current='step'] .grow-item-m {
+    color: var(--c-accent-text);
+  }
+  @media (hover: hover) {
+    .grow-item:not([aria-current='step']):hover {
+      background: var(--c-surface);
+      color: var(--c-text);
+    }
+  }
   /* forced colours (B4): every row gets the theme's border, so the open one is filled with Highlight and its number
      tile cut out of it. It opts out of the forcing, or the theme's backplate blocks out the words (as projects.css) */
   @media (forced-colors: active) {
-    .grow-item { transition: none; }
-    .grow-item[aria-current="step"] { forced-color-adjust: none; border-color: Highlight; background: Highlight; color: HighlightText; }
-    .grow-item[aria-current="step"] .grow-item-n { background: HighlightText; color: Highlight; }
-    .grow-item[aria-current="step"] .grow-item-m { color: HighlightText; }
+    .grow-item {
+      transition: none;
+    }
+    .grow-item[aria-current='step'] {
+      forced-color-adjust: none;
+      border-color: Highlight;
+      background: Highlight;
+      color: HighlightText;
+    }
+    .grow-item[aria-current='step'] .grow-item-n {
+      background: HighlightText;
+      color: Highlight;
+    }
+    .grow-item[aria-current='step'] .grow-item-m {
+      color: HighlightText;
+    }
   }
   /* while the story plays, the open row's foot fills over the step's time (grow.js sets --grow-dwell and .is-timing) */
-  .grow-item::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--c-accent); transform: scaleX(0); transform-origin: left; }
-  .grow-item.is-timing::after { animation: grow-item-fill var(--grow-dwell) linear var(--grow-at, 0ms) forwards; }   /* --grow-at: the time the step has played */
-  .is-idle .grow-item.is-timing::after, .grow-item.is-timing.is-waiting::after { animation-play-state: paused; }   /* off screen or paused, as the step's clock holds */
-  @media (prefers-reduced-motion: reduce) {   /* after the rules above, so it wins */
-    .grow-item, .grow-item-n { transition: none; }
-    .grow-item.is-timing::after { animation: none; }
+  .grow-item::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 2px;
+    background: var(--c-accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .grow-item.is-timing::after {
+    animation: grow-item-fill var(--grow-dwell) linear var(--grow-at, 0ms) forwards;
+  } /* --grow-at: the time the step has played */
+  .is-idle .grow-item.is-timing::after,
+  .grow-item.is-timing.is-waiting::after {
+    animation-play-state: paused;
+  } /* off screen or paused, as the step's clock holds */
+  @media (prefers-reduced-motion: reduce) {
+    /* after the rules above, so it wins */
+    .grow-item,
+    .grow-item-n {
+      transition: none;
+    }
+    .grow-item.is-timing::after {
+      animation: none;
+    }
   }
 }
-@keyframes grow-item-fill { to { transform: scaleX(1); } }
+@keyframes grow-item-fill {
+  to {
+    transform: scaleX(1);
+  }
+}

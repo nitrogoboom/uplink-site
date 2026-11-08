@@ -12,8 +12,14 @@ import './grow.js';
 // in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
 // spot (a forced layout). Old browsers: after the next paint, which is clean unless something else ran between.
 const afterLayout = (/** @type {() => void} */ fn) => {
-  if (!('ResizeObserver' in window)) { requestAnimationFrame(() => setTimeout(fn, 0)); return; }   // window is "never" here to the type check
-  const ro = new ResizeObserver(() => { ro.disconnect(); fn(); });
+  if (!('ResizeObserver' in window)) {
+    requestAnimationFrame(() => setTimeout(fn, 0));
+    return;
+  } // window is "never" here to the type check
+  const ro = new ResizeObserver(() => {
+    ro.disconnect();
+    fn();
+  });
   ro.observe(document.documentElement);
 };
 
@@ -35,20 +41,24 @@ const afterLayout = (/** @type {() => void} */ fn) => {
 const stage = $('.hero-art .stage[data-hero]');
 // Pause buttons (HoldButton.astro, wired in core.js): while held, the cloud and the phone captions stop their timers.
 const APPS = [
-  { id: 'mail',   name: 'Email',    state: 'Online',  detail: 'Spam and phishing filtered' },
-  { id: 'files',  name: 'Files',    state: 'Synced',  detail: 'OneDrive and Drive backed up' },
-  { id: 'meet',   name: 'Meetings', state: 'Ready',   detail: 'Teams and Meet, one-click join' },
-  { id: 'chat',   name: 'Chat',     state: 'Online',  detail: 'Every channel watched' },
-  { id: 'cal',    name: 'Calendar', state: 'Synced',  detail: 'Shared calendars in step' },
-  { id: 'secure', name: 'Sign-in',  state: 'Secured', detail: 'MFA on for every user' }
+  { id: 'mail', name: 'Email', state: 'Online', detail: 'Spam and phishing filtered' },
+  { id: 'files', name: 'Files', state: 'Synced', detail: 'OneDrive and Drive backed up' },
+  { id: 'meet', name: 'Meetings', state: 'Ready', detail: 'Teams and Meet, one-click join' },
+  { id: 'chat', name: 'Chat', state: 'Online', detail: 'Every channel watched' },
+  { id: 'cal', name: 'Calendar', state: 'Synced', detail: 'Shared calendars in step' },
+  { id: 'secure', name: 'Sign-in', state: 'Secured', detail: 'MFA on for every user' },
 ];
 // A timer that runs tick every `every` ms only while it may: el on screen, the tab showing, motion allowed, the
 // pause button off, and ready() (default: always). It stops and starts itself as those change. start() restarts
 // the count (after a hover or a tap); off() lets go of the timer and every listener, when the cut is swapped out.
 /** @param {Element} el @param {() => void} tick @param {number} every @param {() => boolean} [ready] */
 const loopWhileSeen = (el, tick, every, ready = () => true) => {
-  let timer = 0, onScreen = true;
-  const stop = () => { window.clearInterval(timer); timer = 0; };
+  let timer = 0,
+    onScreen = true;
+  const stop = () => {
+    window.clearInterval(timer);
+    timer = 0;
+  };
   const start = () => {
     stop();
     if (!ready() || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
@@ -59,7 +69,11 @@ const loopWhileSeen = (el, tick, every, ready = () => true) => {
   reduceMotion.addEventListener('change', start);
   held.ev.addEventListener('change', start);
   // off screen: no timer, and the looping animations pause
-  const seen = whenOnScreen(el, (on) => { onScreen = on; if (on) start(); else stop(); });
+  const seen = whenOnScreen(el, (on) => {
+    onScreen = on;
+    if (on) start();
+    else stop();
+  });
   const off = () => {
     stop();
     document.removeEventListener('visibilitychange', onVisible);
@@ -69,8 +83,8 @@ const loopWhileSeen = (el, tick, every, ready = () => true) => {
   };
   return { start, stop, off };
 };
-const CLOUD_EVERY = 3200;   // ms each app shows before the next
-const WORDS_SWAP = 180;     // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
+const CLOUD_EVERY = 3200; // ms each app shows before the next
+const WORDS_SWAP = 180; // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
 // the hero drawing's parts (tools/gen_office.py) are all there
 const startCloud = (/** @type {SVGGElement} */ cloud) => {
   const svg = /** @type {SVGSVGElement} */ (cloud.ownerSVGElement);
@@ -85,7 +99,10 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
   const LINK = cloud.dataset.link || 'curve';
   const tile = (/** @type {string} */ id) => svg.querySelector('.ob-tile[data-tile="' + id + '"]');
   const topCentre = (/** @type {Element} */ t) => {
-    const pts = /** @type {string} */ (/** @type {Element} */ (t.querySelector('.f-t')).getAttribute('points')).trim().split(/\s+/).map((p) => p.split(',').map(Number));
+    const pts = /** @type {string} */ (/** @type {Element} */ (t.querySelector('.f-t')).getAttribute('points'))
+      .trim()
+      .split(/\s+/)
+      .map((p) => p.split(',').map(Number));
     return { x: pts.reduce((a, p) => a + p[0], 0) / pts.length, y: pts.reduce((a, p) => a + p[1], 0) / pts.length };
   };
   // The state word is right-aligned, so the dot before it moves with the word's width.
@@ -109,12 +126,34 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
     const first = index < 0;
     index = i;
     const app = APPS[i];
-    /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
-    /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg, .ob-pip')).forEach((s) => s.classList.toggle('is-on', s.dataset.app === app.id));
+    /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) =>
+      t.classList.toggle('is-on', t.dataset.tile === app.id),
+    );
+    /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg, .ob-pip')).forEach((s) =>
+      s.classList.toggle('is-on', s.dataset.app === app.id),
+    );
     const t = tile(app.id);
     if (t && LINK !== 'none') {
       const p = topCentre(t);
-      const dPath = LINK === 'elbow' ? 'M' + START.x + ',' + START.y + ' H' + p.x + ' V' + p.y : 'M' + START.x + ',' + START.y + ' C' + (START.x + 70) + ',' + START.y + ' ' + p.x + ',' + (p.y - 110) + ' ' + p.x + ',' + p.y;
+      const dPath =
+        LINK === 'elbow'
+          ? 'M' + START.x + ',' + START.y + ' H' + p.x + ' V' + p.y
+          : 'M' +
+            START.x +
+            ',' +
+            START.y +
+            ' C' +
+            (START.x + 70) +
+            ',' +
+            START.y +
+            ' ' +
+            p.x +
+            ',' +
+            (p.y - 110) +
+            ' ' +
+            p.x +
+            ',' +
+            p.y;
       base.setAttribute('d', dPath);
       flow.setAttribute('d', dPath);
       end.setAttribute('cx', String(p.x));
@@ -131,12 +170,18 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
       focus.classList.remove('is-out');
     };
     window.clearTimeout(swap);
-    if (first || reduceMotion.matches) { write(); return; }
+    if (first || reduceMotion.matches) {
+      write();
+      return;
+    }
     focus.classList.add('is-out');
     swap = window.setTimeout(write, WORDS_SWAP);
   };
   const loop = loopWhileSeen(svg, () => show(index + 1), CLOUD_EVERY);
-  const pick = (/** @type {string | undefined} */ id) => { loop.stop(); show(APPS.findIndex((a) => a.id === id)); };
+  const pick = (/** @type {string | undefined} */ id) => {
+    loop.stop();
+    show(APPS.findIndex((a) => a.id === id));
+  };
   /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => {
     t.addEventListener('pointerenter', () => pick(t.dataset.tile));
     t.addEventListener('pointerleave', loop.start);
@@ -147,7 +192,8 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
   });
   show(0);
   loop.start();
-  return () => {   // the cut is swapped out: let go of the timers and listeners
+  return () => {
+    // the cut is swapped out: let go of the timers and listeners
     loop.off();
     window.clearTimeout(swap);
     if (dotSized) dotSized.disconnect();
@@ -168,9 +214,9 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
    width, all together in a hidden group, after layout (measure()).
    ------------------------------------------------------------------ */
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const CAP_EVERY = 2200;     // ms between caption changes, the two captions taking turns (each one every 4.4s)
-const CAP_SWAP = 170;       // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
-const CAP_SECOND = 1100;    // ms from the first caption to the second
+const CAP_EVERY = 2200; // ms between caption changes, the two captions taking turns (each one every 4.4s)
+const CAP_SWAP = 170; // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
+const CAP_SECOND = 1100; // ms from the first caption to the second
 const CLOUD_TITLE = 'Cloud workspace';
 /** @param {string} tag @param {string} cls @param {Element} parent */
 const make = (tag, cls, parent) => {
@@ -182,7 +228,10 @@ const make = (tag, cls, parent) => {
 // a caption line's words; the cloud's names its app first, in a tspan
 /** @param {Element} el @param {string} text @param {string} [app] */
 const fill = (el, text, app) => {
-  if (!app) { el.textContent = text; return; }
+  if (!app) {
+    el.textContent = text;
+    return;
+  }
   const name = document.createElementNS(SVG_NS, 'tspan');
   name.setAttribute('class', 'ob-cap-app');
   name.textContent = app;
@@ -193,17 +242,31 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   const [cloudX, cloudY] = /** @type {string} */ (svg.dataset.cloud).split(',').map(Number);
   // the drawing's own list (tools/gen_office.py); lint can't see a JSDoc cast, so it would call this an any
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const items = /** @type {{ t: string, s: string, c: string, x: number, y: number }[]} */ (JSON.parse(/** @type {string} */ (svg.dataset.items)));
+  const items = /** @type {{ t: string, s: string, c: string, x: number, y: number }[]} */ (
+    JSON.parse(/** @type {string} */ (svg.dataset.items))
+  );
   /** @type {ReturnType<typeof readSizes>} */
-  let size;   // read once, at the first measure()
-  let width = 0, cloudFill = '';
+  let size; // read once, at the first measure()
+  let width = 0,
+    cloudFill = '';
   /** @type {Map<string, number>} */
-  const lengths = new Map();   // each caption text's length in drawing units, at the current width
+  const lengths = new Map(); // each caption text's length in drawing units, at the current width
   const readSizes = () => {
     const css = window.getComputedStyle(svg);
     const rootPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize);
-    const px = (/** @type {string} */ name) => { const v = css.getPropertyValue(name).trim(); return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1); };
-    return { t: px('--cap-title'), s: px('--cap-sub'), edge: px('--cap-edge'), gap: px('--cap-gap'), line: px('--cap-line'), dot: px('--cap-dot'), halo: px('--cap-halo') };
+    const px = (/** @type {string} */ name) => {
+      const v = css.getPropertyValue(name).trim();
+      return parseFloat(v) * (v.endsWith('rem') ? rootPx : 1);
+    };
+    return {
+      t: px('--cap-title'),
+      s: px('--cap-sub'),
+      edge: px('--cap-edge'),
+      gap: px('--cap-gap'),
+      line: px('--cap-line'),
+      dot: px('--cap-dot'),
+      halo: px('--cap-halo'),
+    };
   };
   const spot = (/** @type {string} */ name) => {
     const g = make('g', 'ob-cap ob-cap-' + name, svg);
@@ -211,7 +274,14 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     const ring = make('circle', 'ob-cap-ring', g);
     const end = make('circle', 'ob-cap-end', g);
     const words = make('g', 'ob-cap-words', g);
-    return { g, lead, ring, end, t: /** @type {SVGTextElement} */ (make('text', 'ob-cap-t', words)), s: /** @type {SVGTextElement} */ (make('text', 'ob-cap-s', words)) };
+    return {
+      g,
+      lead,
+      ring,
+      end,
+      t: /** @type {SVGTextElement} */ (make('text', 'ob-cap-t', words)),
+      s: /** @type {SVGTextElement} */ (make('text', 'ob-cap-s', words)),
+    };
   };
   const spots = { cloud: spot('cloud'), office: spot('office') };
   const at = { cloud: -1, office: -1 };
@@ -219,20 +289,37 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   /** @typedef {ReturnType<typeof spot>} Spot */
   /** @param {Spot} sp @param {boolean} top @param {string} tKey @param {string} sKey */
   const place = (sp, top, tKey, sKey) => {
-    if (!width || !lengths.has(tKey)) return null;   // not measured yet (hidden, or mid-swap): measure() places it
-    const k = vb.width / width;   // drawing units per screen px
-    const tf = size.t * k, sf = size.s * k, x = vb.x + size.edge * k;
-    /** @type {[SVGTextElement, number][]} */ ([[sp.t, tf], [sp.s, sf]]).forEach(([el, f]) => {
+    if (!width || !lengths.has(tKey)) return null; // not measured yet (hidden, or mid-swap): measure() places it
+    const k = vb.width / width; // drawing units per screen px
+    const tf = size.t * k,
+      sf = size.s * k,
+      x = vb.x + size.edge * k;
+    /** @type {[SVGTextElement, number][]} */ ([
+      [sp.t, tf],
+      [sp.s, sf],
+    ]).forEach(([el, f]) => {
       el.setAttribute('font-size', f.toFixed(1));
       el.setAttribute('x', x.toFixed(1));
       el.style.strokeWidth = (size.halo * k).toFixed(1) + 'px';
     });
     let ty, sy;
-    if (top) { ty = vb.y + size.edge * k + tf * 0.76; sy = ty + size.gap * k + sf * 1.05; }
-    else { sy = vb.y + vb.height - size.edge * k - sf * 0.28; ty = sy - size.gap * k - sf * 1.05; }
+    if (top) {
+      ty = vb.y + size.edge * k + tf * 0.76;
+      sy = ty + size.gap * k + sf * 1.05;
+    } else {
+      sy = vb.y + vb.height - size.edge * k - sf * 0.28;
+      ty = sy - size.gap * k - sf * 1.05;
+    }
     sp.t.setAttribute('y', ty.toFixed(1));
     sp.s.setAttribute('y', sy.toFixed(1));
-    return { k, x, ty, tf, tw: /** @type {number} */ (lengths.get(tKey)), sw: /** @type {number} */ (lengths.get(sKey)) };   // measured together
+    return {
+      k,
+      x,
+      ty,
+      tf,
+      tw: /** @type {number} */ (lengths.get(tKey)),
+      sw: /** @type {number} */ (lengths.get(sKey)),
+    }; // measured together
   };
   /** @param {Spot} sp @param {string} d @param {string} colour @param {number} x @param {number} y @param {number} k */
   const draw = (sp, d, colour, x, y, k) => {
@@ -242,7 +329,11 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     const len = sp.lead.getTotalLength();
     sp.lead.style.strokeDasharray = String(len);
     sp.lead.style.setProperty('--len', String(len));
-    [sp.end, sp.ring].forEach((c) => { c.setAttribute('cx', String(x)); c.setAttribute('cy', String(y)); c.setAttribute('r', (size.dot * k).toFixed(1)); });
+    [sp.end, sp.ring].forEach((c) => {
+      c.setAttribute('cx', String(x));
+      c.setAttribute('cy', String(y));
+      c.setAttribute('r', (size.dot * k).toFixed(1));
+    });
     sp.end.setAttribute('fill', colour);
     sp.end.setAttribute('stroke-width', (size.dot * 0.6 * k).toFixed(1));
     sp.ring.setAttribute('stroke', colour);
@@ -253,47 +344,80 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   const write = {
     cloud: () => {
-      const sp = spots.cloud, app = APPS[at.cloud];
+      const sp = spots.cloud,
+        app = APPS[at.cloud];
       fill(sp.t, CLOUD_TITLE);
       fill(sp.s, ' · ' + app.detail, app.name);
       const L = place(sp, true, 't:' + CLOUD_TITLE, 'app:' + app.id);
       if (!L) return;
-      const x0 = L.x + L.tw + size.gap * 2 * L.k, y0 = L.ty - L.tf * 0.32;   // a level tail from the title, then to the cloud
-      draw(sp, `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`, cloudFill, cloudX, cloudY, L.k);
-      /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => t.classList.toggle('is-on', t.dataset.tile === app.id));
+      const x0 = L.x + L.tw + size.gap * 2 * L.k,
+        y0 = L.ty - L.tf * 0.32; // a level tail from the title, then to the cloud
+      draw(
+        sp,
+        `M${x0.toFixed(1)},${y0.toFixed(1)} H${cloudX - 50} L${cloudX},${cloudY}`,
+        cloudFill,
+        cloudX,
+        cloudY,
+        L.k,
+      );
+      /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) =>
+        t.classList.toggle('is-on', t.dataset.tile === app.id),
+      );
     },
     office: () => {
-      const sp = spots.office, it = items[at.office];
+      const sp = spots.office,
+        it = items[at.office];
       fill(sp.t, it.t);
       sp.t.setAttribute('fill', it.c);
       fill(sp.s, it.s);
       const L = place(sp, false, 't:' + it.t, 's:' + it.s);
       if (!L) return;
-      const top = L.ty - L.tf * 0.76 - size.gap * 2 * L.k;   // the line rises from just above the words to the item
+      const top = L.ty - L.tf * 0.76 - size.gap * 2 * L.k; // the line rises from just above the words to the item
       const x0 = Math.min(Math.max(it.x, L.x + size.gap * L.k), L.x + Math.max(L.tw, L.sw) - size.gap * L.k);
       draw(sp, `M${x0.toFixed(1)},${top.toFixed(1)} L${it.x},${it.y}`, it.c, it.x, it.y, L.k);
-    }
+    },
   };
   // each caption's pending swap: its timeout, then its frame (a new step on the same caption cancels both first)
   const swaps = { cloud: { t: 0, f: 0 }, office: { t: 0, f: 0 } };
-  const cancel = (/** @type {{ t: number, f: number }} */ sw) => { window.clearTimeout(sw.t); window.cancelAnimationFrame(sw.f); };
+  const cancel = (/** @type {{ t: number, f: number }} */ sw) => {
+    window.clearTimeout(sw.t);
+    window.cancelAnimationFrame(sw.f);
+  };
   const step = (/** @type {'cloud' | 'office'} */ name, /** @type {boolean} */ animate) => {
     at[name] = (at[name] + 1) % (name === 'cloud' ? APPS.length : items.length);
-    const sp = spots[name], sw = swaps[name];
+    const sp = spots[name],
+      sw = swaps[name];
     cancel(sw);
     sp.g.classList.remove('is-pre');
-    if (!animate || reduceMotion.matches) { sp.g.classList.remove('is-out'); write[name](); return; }
+    if (!animate || reduceMotion.matches) {
+      sp.g.classList.remove('is-out');
+      write[name]();
+      return;
+    }
     sp.g.classList.add('is-out');
     sw.t = window.setTimeout(() => {
       sp.g.classList.add('is-pre');
       sp.g.classList.remove('is-out');
-      write[name]();   // drawn once below their place (is-pre), the words rise in from the frame after
-      sw.f = window.requestAnimationFrame(() => { sw.f = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre')); });
+      write[name](); // drawn once below their place (is-pre), the words rise in from the frame after
+      sw.f = window.requestAnimationFrame(() => {
+        sw.f = window.requestAnimationFrame(() => sp.g.classList.remove('is-pre'));
+      });
     }, CAP_SWAP);
   };
-  let turn = 0, begun = false;
-  const loop = loopWhileSeen(svg, () => step(turn++ % 2 ? 'office' : 'cloud', true), CAP_EVERY, () => begun);
-  const tap = () => { if (!begun) return; step('office', true); turn = 0; loop.start(); };
+  let turn = 0,
+    begun = false;
+  const loop = loopWhileSeen(
+    svg,
+    () => step(turn++ % 2 ? 'office' : 'cloud', true),
+    CAP_EVERY,
+    () => begun,
+  );
+  const tap = () => {
+    if (!begun) return;
+    step('office', true);
+    turn = 0;
+    loop.start();
+  };
   svg.addEventListener('click', tap);
   // Every caption text, set at this width's sizes in a hidden group and read together after a layout pass: one layout
   // the browser makes anyway, instead of a forced one for each caption as it changes.
@@ -314,7 +438,10 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     const probes = [
       probe('t:' + CLOUD_TITLE, 'ob-cap-t', size.t, CLOUD_TITLE),
       ...APPS.map((a) => probe('app:' + a.id, 'ob-cap-s', size.s, ' · ' + a.detail, a.name)),
-      ...items.flatMap((it) => [probe('t:' + it.t, 'ob-cap-t', size.t, it.t), probe('s:' + it.s, 'ob-cap-s', size.s, it.s)])
+      ...items.flatMap((it) => [
+        probe('t:' + it.t, 'ob-cap-t', size.t, it.t),
+        probe('s:' + it.s, 'ob-cap-s', size.s, it.s),
+      ]),
     ];
     afterLayout(() => {
       if (mine === job) {
@@ -340,36 +467,51 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   const onResize = () => relayout(svg.getBoundingClientRect().width);
   const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
-  if (sized) sized.observe(svg); else { window.addEventListener('resize', onResize); afterLayout(onResize); }
+  if (sized) sized.observe(svg);
+  else {
+    window.addEventListener('resize', onResize);
+    afterLayout(onResize);
+  }
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
   const capFirst = Number(svg.dataset.words) || 0;
   let second = 0;
-  const first = window.setTimeout(() => {
-    begun = true;
-    step('cloud', !quick);
-    second = window.setTimeout(() => { step('office', !quick); loop.start(); }, quick ? 0 : CAP_SECOND);
-  }, quick ? 0 : capFirst);
-  return () => {   // the cut is swapped out: let go of the timers and listeners
+  const first = window.setTimeout(
+    () => {
+      begun = true;
+      step('cloud', !quick);
+      second = window.setTimeout(
+        () => {
+          step('office', !quick);
+          loop.start();
+        },
+        quick ? 0 : CAP_SECOND,
+      );
+    },
+    quick ? 0 : capFirst,
+  );
+  return () => {
+    // the cut is swapped out: let go of the timers and listeners
     loop.off();
     window.clearTimeout(first);
     window.clearTimeout(second);
     cancel(swaps.cloud);
     cancel(swaps.office);
-    job++;   // a measure still waiting for its paint drops its results
+    job++; // a measure still waiting for its paint drops its results
     svg.removeEventListener('click', tap);
-    if (sized) sized.disconnect(); else window.removeEventListener('resize', onResize);
+    if (sized) sized.disconnect();
+    else window.removeEventListener('resize', onResize);
   };
 };
 if (stage) {
-  const phone = window.matchMedia(MEDIA.smallPhone);   // HERO.media.phone
+  const phone = window.matchMedia(MEDIA.smallPhone); // HERO.media.phone
   // Hero.astro writes every one of these data- attributes
   const tablet = window.matchMedia(/** @type {string} */ (stage.dataset.tablet));
   const files = /** @type {Record<'full' | 'tablet' | 'phone', string[]>} */ ({
     full: [stage.dataset.hero],
     tablet: [stage.dataset.heroTablet],
-    phone: [stage.dataset.heroPhone, stage.dataset.heroPhoneFlows]
+    phone: [stage.dataset.heroPhone, stage.dataset.heroPhoneFlows],
   });
   /** @type {string | null} */
   let shown = null;
@@ -379,7 +521,7 @@ if (stage) {
   let observers = [];
   /** @type {(() => void) | null} */
   let stopCloud = null;
-  let ticket = 0;   // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
+  let ticket = 0; // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
   const clear = () => {
     if (stopCloud) stopCloud();
     stopCloud = null;
@@ -394,20 +536,32 @@ if (stage) {
   /** @type {HTMLTemplateElement | null} */
   const still = $('template.hero-still', stage);
   const failed = (/** @type {boolean} */ on) => {
-    $$('svg.ob-over', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
-    $$('.hero-pause', stage).forEach((el) => { el.style.display = on ? 'none' : ''; });
-    if (on && still) { const pic = /** @type {Element} */ (/** @type {Element} */ (still.content.firstElementChild).cloneNode(true)); stage.prepend(pic); added = [pic]; }
+    $$('svg.ob-over', stage).forEach((el) => {
+      el.style.display = on ? 'none' : '';
+    });
+    $$('.hero-pause', stage).forEach((el) => {
+      el.style.display = on ? 'none' : '';
+    });
+    if (on && still) {
+      const pic = /** @type {Element} */ (/** @type {Element} */ (still.content.firstElementChild).cloneNode(true));
+      stage.prepend(pic);
+      added = [pic];
+    }
   };
   const load = () => {
-    const cut = phone.matches ? 'phone' : (tablet.matches ? 'tablet' : 'full');
+    const cut = phone.matches ? 'phone' : tablet.matches ? 'tablet' : 'full';
     if (cut === shown) return;
     shown = cut;
     const mine = ++ticket;
     clear();
     failed(false);
-    Promise.all(files[cut].map((url) => window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))))
+    Promise.all(
+      files[cut].map((url) =>
+        window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status))))),
+      ),
+    )
       .then((texts) => {
-        if (mine !== ticket) return;   // the screen changed while it loaded (even if it has changed back since)
+        if (mine !== ticket) return; // the screen changed while it loaded (even if it has changed back since)
         const before = stage.children.length;
         stage.insertAdjacentHTML('afterbegin', html(texts.join('')));
         added = Array.from(stage.children).slice(0, stage.children.length - before);
@@ -417,10 +571,16 @@ if (stage) {
         /** @type {SVGGElement | null} */
         const cloud = $('svg.ob .ob-cloud', stage);
         const first = /** @type {SVGSVGElement} */ (added[0]);
-        if (cut === 'phone') { if (first.dataset.items) stopCloud = startCaptions(first); }
-        else if (cloud) stopCloud = startCloud(cloud);
+        if (cut === 'phone') {
+          if (first.dataset.items) stopCloud = startCaptions(first);
+        } else if (cloud) stopCloud = startCloud(cloud);
       })
-      .catch(() => { if (mine === ticket) { shown = null; failed(true); } });
+      .catch(() => {
+        if (mine === ticket) {
+          shown = null;
+          failed(true);
+        }
+      });
   };
   load();
   [phone, tablet].forEach((m) => m.addEventListener('change', load));
@@ -446,53 +606,97 @@ const svcDots = $$('.svc-dots .pip');
 const svcHint = $('.svc-hint');
 if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
   const cards = Array.from(svcRow.children);
-  const hint = /** @type {HTMLElement} */ (svcHint);   // Services.astro has it with the dots
+  const hint = /** @type {HTMLElement} */ (svcHint); // Services.astro has it with the dots
   const steps = $$('.svc-step', hint);
   const row = window.matchMedia(MEDIA.phone);
   let current = 0;
   /** @type {number | null} */
-  let aim = null;   // the card a step is sliding to, so a quick second click steps on from there
+  let aim = null; // the card a step is sliding to, so a quick second click steps on from there
   const centre = (/** @type {number} */ best) => {
     current = best;
     if (best === aim) aim = null;
     cards.forEach((li, i) => li.classList.toggle('is-centre', i === best));
     svcDots.forEach((dot, i) => dot.classList.toggle('on', i === best));
-    steps.forEach((b) => b.setAttribute('aria-disabled', String(current + +(/** @type {string} */ (b.dataset.step)) < 0 || current + +(/** @type {string} */ (b.dataset.step)) >= cards.length)));
+    steps.forEach((b) =>
+      b.setAttribute(
+        'aria-disabled',
+        String(
+          current + +(/** @type {string} */ (b.dataset.step)) < 0 ||
+            current + +(/** @type {string} */ (b.dataset.step)) >= cards.length,
+        ),
+      ),
+    );
     if (best > 0) svcHint?.classList.add('is-swiped');
   };
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach((en) => { if (en.isIntersecting) centre(cards.indexOf(en.target)); });
-  }, { root: svcRow, rootMargin: '0px -49% 0px -49%' });
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((en) => {
+        if (en.isIntersecting) centre(cards.indexOf(en.target));
+      });
+    },
+    { root: svcRow, rootMargin: '0px -49% 0px -49%' },
+  );
   cards.forEach((li) => io.observe(li));
   centre(0);
   // scrolls the row only (scrollIntoView would also move the page); the li itself never transforms, so its box is true
   const go = (/** @type {number} */ i) => {
     aim = Math.max(0, Math.min(cards.length - 1, i));
     const li = cards[aim];
-    const r = li.getBoundingClientRect(), box = svcRow.getBoundingClientRect();
-    svcRow.scrollBy({ left: r.left + r.width / 2 - (box.left + box.width / 2), behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+    const r = li.getBoundingClientRect(),
+      box = svcRow.getBoundingClientRect();
+    svcRow.scrollBy({
+      left: r.left + r.width / 2 - (box.left + box.width / 2),
+      behavior: reduceMotion.matches ? 'auto' : 'smooth',
+    });
     if (aim === current) aim = null;
   };
   // a slide that ends (or a swipe that cuts it short) forgets its aim. Safari before 26.2 has no scrollend: there a
   // scroll that has been still for 150ms has ended (review J15)
-  const settle = () => { aim = null; };
+  const settle = () => {
+    aim = null;
+  };
   if ('onscrollend' in window) svcRow.addEventListener('scrollend', settle);
   else {
     /** @type {ReturnType<typeof setTimeout> | undefined} */
-    let quiet;   // (window is "never" here to the type check, which knows only browsers with scrollend)
-    svcRow.addEventListener('scroll', () => { clearTimeout(quiet); quiet = setTimeout(settle, 150); }, { passive: true });
+    let quiet; // (window is "never" here to the type check, which knows only browsers with scrollend)
+    svcRow.addEventListener(
+      'scroll',
+      () => {
+        clearTimeout(quiet);
+        quiet = setTimeout(settle, 150);
+      },
+      { passive: true },
+    );
   }
-  steps.forEach((b) => b.addEventListener('click', () => go((aim ?? current) + +(/** @type {string} */ (b.dataset.step)))));
+  steps.forEach((b) =>
+    b.addEventListener('click', () => go((aim ?? current) + +(/** @type {string} */ (b.dataset.step)))),
+  );
   $('.svc-dots', hint)?.addEventListener('click', (e) => {
-    const near = svcDots.map((dot) => { const r = dot.getBoundingClientRect(); return Math.abs(e.clientX - (r.left + r.width / 2)); });
+    const near = svcDots.map((dot) => {
+      const r = dot.getBoundingClientRect();
+      return Math.abs(e.clientX - (r.left + r.width / 2));
+    });
     go(near.indexOf(Math.min(...near)));
   });
   // keyboard focus only (above); a browser without :focus-visible slides on any focus, as before
-  const byKeyboard = (/** @type {Element} */ el) => { try { return el.matches(':focus-visible'); } catch { return true; } };
-  svcRow.addEventListener('focusin', (e) => { if (row.matches && byKeyboard(/** @type {Element} */ (e.target))) go(cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li')))); });
+  const byKeyboard = (/** @type {Element} */ el) => {
+    try {
+      return el.matches(':focus-visible');
+    } catch {
+      return true;
+    }
+  };
+  svcRow.addEventListener('focusin', (e) => {
+    if (row.matches && byKeyboard(/** @type {Element} */ (e.target)))
+      go(cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li'))));
+  });
   svcRow.addEventListener('keydown', (e) => {
     if (!row.matches || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || e.altKey || e.ctrlKey || e.metaKey) return;
-    const next = cards[cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li'))) + (e.key === 'ArrowLeft' ? -1 : 1)];
+    const next =
+      cards[
+        cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li'))) +
+          (e.key === 'ArrowLeft' ? -1 : 1)
+      ];
     if (!next) return;
     e.preventDefault();
     /** @type {HTMLElement} */ ($('a', next)).focus({ preventScroll: true });
@@ -517,13 +721,15 @@ if (folds.length && 'ResizeObserver' in window) {
     f.style.minHeight = '';
     if (!fold.matches) return;
     const step = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wheel-step'));
-    const h = f.getBoundingClientRect().height;   // its own height: the CSS floor, or its words if they need more
+    const h = f.getBoundingClientRect().height; // its own height: the CSS floor, or its words if they need more
     const up = Math.ceil(h / step - 0.001) * step;
     if (step > 0 && up - h > 0.5) f.style.minHeight = `${up}px`;
   };
   // a fold's inner box keeps its height when the fold grows (centred in its row, not stretched; its words only rewrap
   // with the width), so this never loops
-  const seen = new ResizeObserver((list) => list.forEach((e) => fit(/** @type {HTMLElement} */ (e.target.parentElement))));
+  const seen = new ResizeObserver((list) =>
+    list.forEach((e) => fit(/** @type {HTMLElement} */ (e.target.parentElement))),
+  );
   folds.forEach((f) => seen.observe(/** @type {Element} */ (f.firstElementChild)));
   fold.addEventListener('change', () => folds.forEach(fit));
 }

@@ -9,7 +9,9 @@ const DAY = 86400000;
 const now = Date.parse('2026-11-10T00:00:00Z');
 const v = (id, alias, daysAgo) => ({
   id,
-  annotations: alias ? { 'workers/alias': alias, 'workers/triggered_by': 'version_upload' } : { 'workers/triggered_by': 'version_upload' },
+  annotations: alias
+    ? { 'workers/alias': alias, 'workers/triggered_by': 'version_upload' }
+    : { 'workers/triggered_by': 'version_upload' },
   metadata: { created_on: new Date(now - daysAgo * DAY).toISOString() },
 });
 // newest first, as Cloudflare lists them
@@ -25,7 +27,10 @@ const versions = [
 test('aliasOf matches the alias site.yml gives a branch', () => {
   assert.equal(aliasOf('claude/wizardly-curran-beef14'), 'claude-wizardly-curran-beef14');
   assert.equal(aliasOf('Feature/__Big  Change__'), 'feature-big-change');
-  assert.equal(aliasOf('claude/a-very-long-branch-name-that-goes-on'), previewAlias('claude/a-very-long-branch-name-that-goes-on'));
+  assert.equal(
+    aliasOf('claude/a-very-long-branch-name-that-goes-on'),
+    previewAlias('claude/a-very-long-branch-name-that-goes-on'),
+  );
   assert.ok(aliasOf('claude/a-very-long-branch-name-that-goes-on').length <= 30);
 });
 

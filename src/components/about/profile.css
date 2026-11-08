@@ -1,25 +1,85 @@
 /*--- ABOUT · 1. Who we are. Desktop layout at the end. ---*/
 /* ---------- ABOUT ---------------------------------------------------- */
-.profile { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "text" "card"; gap: var(--sp-5); }
-@media (--tablet-up) { .profile { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "card text"; gap: var(--sp-6); } }
-.profile-card { grid-area: card; display: flex; flex-direction: column; gap: var(--sp-5); padding: var(--sp-4); }
-.profile-card > :not(.profile-art) { margin-inline: var(--sp-2); }
-.profile-art { position: relative; aspect-ratio: 4 / 3; max-width: 100%; }
-.profile-art img { width: 100%; height: 100%; object-fit: contain; padding: var(--sp-3); }
-.profile-art .chip { position: absolute; left: var(--sp-3); bottom: var(--sp-3); }
-.profile-text { grid-area: text; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.profile-text .stats { margin-top: var(--sp-4); }
+.profile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'text' 'card';
+  gap: var(--sp-5);
+}
+@media (--tablet-up) {
+  .profile {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas: 'card text';
+    gap: var(--sp-6);
+  }
+}
+.profile-card {
+  grid-area: card;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-4);
+}
+.profile-card > :not(.profile-art) {
+  margin-inline: var(--sp-2);
+}
+.profile-art {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+}
+.profile-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--sp-3);
+}
+.profile-art .chip {
+  position: absolute;
+  left: var(--sp-3);
+  bottom: var(--sp-3);
+}
+.profile-text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.profile-text .stats {
+  margin-top: var(--sp-4);
+}
 
 /* desktop (>= 1100 wide and >= 700 tall): one screen tall, as a floor: words that need more room make it taller.
    The picture takes what the words leave, down to its own floor, and asks for no room of its own (absolute) */
 @media (--fold) {
-  .profile { min-height: var(--fold-inner); align-items: stretch; }
-  .profile-card { min-height: 0; }
-  .profile-art { aspect-ratio: auto; flex: 1; min-height: 12rem; }
-  .profile-art img { position: absolute; inset: 0; }
-  .profile-text { justify-content: center; }
+  .profile {
+    min-height: var(--fold-inner);
+    align-items: stretch;
+  }
+  .profile-card {
+    min-height: 0;
+  }
+  .profile-art {
+    aspect-ratio: auto;
+    flex: 1;
+    min-height: 12rem;
+  }
+  .profile-art img {
+    position: absolute;
+    inset: 0;
+  }
+  .profile-text {
+    justify-content: center;
+  }
   /* four in a row while each tile holds its number at --fs-7 (44px, shared-blocks.css); in a narrower column (1280
      wide, or zoomed), two rows of two, so the number keeps its size and zoom makes it bigger on screen (review C1) */
-  .profile-text .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  @container (width < 46rem) { .profile-text .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .profile-text .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  @container (width < 46rem) {
+    .profile-text .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }

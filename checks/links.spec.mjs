@@ -14,16 +14,28 @@ const NO_FRAGMENTS = ['/soon']; // pages that read the #address themselves
 // every address a page points at and every id it has (template contents too)
 const PARSE = (html) => {
   const doc = new DOMParser().parseFromString(html, 'text/html');
-  const refs = [], ids = [];
+  const refs = [],
+    ids = [];
   const visit = (root) => {
     for (const e of root.querySelectorAll('*')) {
       if (e.id) ids.push(e.id);
       for (const key of ['href', 'src', 'data-hero', 'data-hero-tablet', 'data-hero-phone', 'data-fc-map']) {
         const v = e.getAttribute(key);
-        if (v && !(e.tagName === 'LINK' && ['canonical', 'alternate'].includes(e.getAttribute('rel')) && key === 'href')) refs.push(v);
+        if (
+          v &&
+          !(e.tagName === 'LINK' && ['canonical', 'alternate'].includes(e.getAttribute('rel')) && key === 'href')
+        )
+          refs.push(v);
       }
       const set = e.getAttribute('srcset');
-      if (set && !set.startsWith('data:')) refs.push(...set.split(',').map((p) => p.trim()).filter(Boolean).map((p) => p.split(' ')[0])); // a data: address has commas of its own
+      if (set && !set.startsWith('data:'))
+        refs.push(
+          ...set
+            .split(',')
+            .map((p) => p.trim())
+            .filter(Boolean)
+            .map((p) => p.split(' ')[0]),
+        ); // a data: address has commas of its own
       if (e.tagName === 'TEMPLATE') visit(e.content);
     }
   };
@@ -42,7 +54,11 @@ async function fetchPage(url, missing = false) {
   }
 }
 
-const strip = (u) => { const x = new URL(u); x.hash = ''; return x.href; };
+const strip = (u) => {
+  const x = new URL(u);
+  x.hash = '';
+  return x.href;
+};
 
 test('links answer', async ({ page }) => {
   test.setTimeout(600_000);
@@ -54,7 +70,9 @@ test('links answer', async ({ page }) => {
   for (const path of await pages(BASE)) {
     const [status, body] = await fetchPage(BASE + path, path.endsWith(MISSING));
     if (body === null) {
-      fails.push(`${path}: the page itself answered ${status}${path.endsWith(MISSING) ? ' (the 404 page should answer 404, as HTML)' : ''}`);
+      fails.push(
+        `${path}: the page itself answered ${status}${path.endsWith(MISSING) ? ' (the 404 page should answer 404, as HTML)' : ''}`,
+      );
       continue;
     }
     const p = await page.evaluate(PARSE, body);
@@ -84,15 +102,21 @@ test('links answer', async ({ page }) => {
     }
     const [status, body] = await fetchPage(url);
     if (status !== 200) fails.push(`${url} answered ${status} (on ${where.slice(0, 3).join(', ')})`);
-    else if (body !== null && !ids.has(new URL(url).pathname)) ids.set(new URL(url).pathname, new Set((await page.evaluate(PARSE, body)).ids));
+    else if (body !== null && !ids.has(new URL(url).pathname))
+      ids.set(new URL(url).pathname, new Set((await page.evaluate(PARSE, body)).ids));
   }
   for (const k of [...frags.keys()].sort()) {
     const [url, frag, where] = frags.get(k);
     const path = new URL(url).pathname;
     if (NO_FRAGMENTS.includes(path.replace(/\/$/, '')) || !ids.has(path)) continue;
-    if (!ids.get(path).has(frag)) fails.push(`${path}#${frag}: no id "${frag}" on that page (linked from ${[...where].sort().slice(0, 3).join(', ')})`);
+    if (!ids.get(path).has(frag))
+      fails.push(
+        `${path}#${frag}: no id "${frag}" on that page (linked from ${[...where].sort().slice(0, 3).join(', ')})`,
+      );
   }
-  console.log(`${found.size} addresses (${outside} outside the site${EXTERNAL ? '' : ', not asked'}), ${frags.size} #section links`);
+  console.log(
+    `${found.size} addresses (${outside} outside the site${EXTERNAL ? '' : ', not asked'}), ${frags.size} #section links`,
+  );
   console.log(fails.length ? `links: ${fails.length} broken` : 'links: all good');
   if (fails.length) throw new Error(fails.map((f) => 'FAIL ' + f).join('\n'));
 });
@@ -110,31 +134,44 @@ test('a link rested on is prefetched, and the click uses it; /api/ and .md links
     if (purpose.includes('prefetch')) prefetched.push(new URL(e.request.url).pathname);
   });
   const blocked = [];
-  page.on('console', (m) => { if (/Content.Security.Policy|speculation/i.test(m.text())) blocked.push(m.text()); });
+  page.on('console', (m) => {
+    if (/Content.Security.Policy|speculation/i.test(m.text())) blocked.push(m.text());
+  });
   await page.goto(`${BASE}/`, { waitUntil: 'load' });
   // links of our own, above everything, so each can be hovered where it is
-  await page.evaluate((hrefs) => {
-    const box = document.createElement('div');
-    Object.assign(box.style, { position: 'fixed', top: '0', left: '0', zIndex: '2147483647', background: 'white' });
-    for (const href of hrefs) {
-      const a = document.createElement('a');
-      a.href = href;
-      a.textContent = href;
-      a.dataset.check = href;
-      Object.assign(a.style, { display: 'block', padding: '12px' });
-      box.append(a);
-    }
-    document.body.append(box);
-  }, ['/api/report', '/services.md', '/about']);
+  await page.evaluate(
+    (hrefs) => {
+      const box = document.createElement('div');
+      Object.assign(box.style, { position: 'fixed', top: '0', left: '0', zIndex: '2147483647', background: 'white' });
+      for (const href of hrefs) {
+        const a = document.createElement('a');
+        a.href = href;
+        a.textContent = href;
+        a.dataset.check = href;
+        Object.assign(a.style, { display: 'block', padding: '12px' });
+        box.append(a);
+      }
+      document.body.append(box);
+    },
+    ['/api/report', '/services.md', '/about'],
+  );
   for (const href of ['/api/report', '/services.md']) {
     await page.hover(`[data-check="${href}"]`);
-    await page.waitForTimeout(600);   // moderate: 200 ms of rest starts a prefetch
+    await page.waitForTimeout(600); // moderate: 200 ms of rest starts a prefetch
   }
   await page.hover('[data-check="/about"]');
-  await expect.poll(() => prefetched, { timeout: 10_000, message: 'resting on /about prefetches it' }).toContain('/about');
-  expect(prefetched.filter((p) => p.startsWith('/api/') || p.endsWith('.md')), '/api/ and .md links are not prefetched').toEqual([]);
+  await expect
+    .poll(() => prefetched, { timeout: 10_000, message: 'resting on /about prefetches it' })
+    .toContain('/about');
+  expect(
+    prefetched.filter((p) => p.startsWith('/api/') || p.endsWith('.md')),
+    '/api/ and .md links are not prefetched',
+  ).toEqual([]);
   expect(blocked, 'no CSP or speculation rules complaint').toEqual([]);
   await page.click('[data-check="/about"]');
   await page.waitForURL(`${BASE}/about`);
-  expect(await page.evaluate(() => performance.getEntriesByType('navigation')[0].deliveryType), 'the click is served from the prefetch').toBe('navigational-prefetch');
+  expect(
+    await page.evaluate(() => performance.getEntriesByType('navigation')[0].deliveryType),
+    'the click is served from the prefetch',
+  ).toBe('navigational-prefetch');
 });

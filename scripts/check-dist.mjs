@@ -6,7 +6,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DIST = process.env.DIST || 'dist';   // another folder only for the tests (scripts/test/)
+const DIST = process.env.DIST || 'dist'; // another folder only for the tests (scripts/test/)
 const headers = join(DIST, '_headers');
 const problems = [];
 if (!existsSync(headers)) problems.push(`${headers} is missing`);
@@ -18,6 +18,8 @@ else {
 }
 if (!existsSync(join(DIST, '_redirects'))) problems.push(`${join(DIST, '_redirects')} is missing`);
 if (problems.length) {
-  console.error(`${DIST}/ isn't a finished build (${problems.join('; ')}). Build with npm run build, not astro build alone: its last step, scripts/headers.mjs, fills in the CSP hashes.`);
+  console.error(
+    `${DIST}/ isn't a finished build (${problems.join('; ')}). Build with npm run build, not astro build alone: its last step, scripts/headers.mjs, fills in the CSP hashes.`,
+  );
   process.exit(1);
 }

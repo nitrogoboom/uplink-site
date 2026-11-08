@@ -11,29 +11,60 @@ import { phone, email } from '../../lib/footer';
 import { fit } from '../../lib/fit';
 const TITLE = 'Talk to a real person';
 ---
+
 <section class="page-intro fold fold-always" id="message" aria-labelledby="contact-title">
   <div class="container">
     <div class="lobby">
       <div class="lobby-intro">
         <p class="eyebrow">Lobby</p>
         <h1 id="contact-title" class={fit(TITLE)}>{TITLE}</h1>
-        <p class="lead">No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk options further down.</p>
+        <p class="lead">
+          No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk
+          options further down.
+        </p>
       </div>
       <div class="lobby-chan">
         <span class="label">Reach us directly</span>
         <div class="chan panel">
           <span class="icon-tile" aria-hidden="true"><Icon name="phone" /></span>
-          <span class="chan-text"><span class="chan-title">Call</span><a class="chan-value" id="tel-val" href={phone.href}>{phone.display}</a></span>
-          <button class="iconbtn copy-btn" type="button" data-copy={phone.display} data-copy-target="tel-val" aria-label="Copy phone number"><Icon name="copy" /></button>
+          <span class="chan-text"
+            ><span class="chan-title">Call</span
+            ><a class="chan-value" id="tel-val" href={phone.href}>{phone.display}</a></span
+          >
+          <button
+            class="iconbtn copy-btn"
+            type="button"
+            data-copy={phone.display}
+            data-copy-target="tel-val"
+            aria-label="Copy phone number"
+          >
+            <Icon name="copy" />
+          </button>
         </div>
         <div class="chan panel">
           <span class="icon-tile" aria-hidden="true"><Icon name="mail" /></span>
-          <span class="chan-text"><span class="chan-title">Email</span><a class="chan-value" id="mail-val" href={`mailto:${email}`}>{email.split('@')[0]}@<wbr />{email.split('@')[1]}</a></span>
-          <button class="iconbtn copy-btn" type="button" data-copy={email} data-copy-target="mail-val" aria-label="Copy email address"><Icon name="copy" /></button>
+          <span class="chan-text"
+            ><span class="chan-title">Email</span
+            ><a class="chan-value" id="mail-val" href={`mailto:${email}`}
+              >{email.split('@')[0]}@<wbr />{email.split('@')[1]}</a
+            ></span
+          >
+          <button
+            class="iconbtn copy-btn"
+            type="button"
+            data-copy={email}
+            data-copy-target="mail-val"
+            aria-label="Copy email address"
+          >
+            <Icon name="copy" />
+          </button>
         </div>
         <a class="chan panel card" href="/contact#message" data-open="book-dialog">
           <span class="icon-tile" aria-hidden="true"><Icon name="calendar" /></span>
-          <span class="chan-text"><span class="chan-title">Book a check-up</span><Pause /><span class="chan-value">Free, 30 minutes</span></span>
+          <span class="chan-text"
+            ><span class="chan-title">Book a check-up</span
+            ><Pause /><span class="chan-value">Free, 30 minutes</span></span
+          >
         </a>
       </div>
 
@@ -47,17 +78,34 @@ const TITLE = 'Talk to a real person';
             <div class="form-grid">
               <div class="field">
                 <label for="c-name">Name</label>
-                <input class="input" id="c-name" type="text" autocomplete="name" required pattern=".*\S.*" title="Your name (more than spaces)">
+                <input
+                  class="input"
+                  id="c-name"
+                  type="text"
+                  autocomplete="name"
+                  required
+                  pattern=".*\S.*"
+                  title="Your name (more than spaces)"
+                />
                 <span class="field-error" id="c-name-err">Add your name so we know who to reply to.</span>
               </div>
               <div class="field">
                 <label for="c-email">Work email</label>
-                <input class="input" id="c-email" type="email" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="An email address like name@company.com" autocomplete="email" placeholder="you@company.com" required>
+                <input
+                  class="input"
+                  id="c-email"
+                  type="email"
+                  pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
+                  title="An email address like name@company.com"
+                  autocomplete="email"
+                  placeholder="you@company.com"
+                  required
+                />
                 <span class="field-error" id="c-email-err">Enter an email like name@company.com.</span>
               </div>
               <div class="field">
                 <label for="c-company">Company <span class="opt">(optional)</span></label>
-                <input class="input" id="c-company" type="text" autocomplete="organization">
+                <input class="input" id="c-company" type="text" autocomplete="organization" />
               </div>
               <div class="field">
                 <label for="c-topic">What do you need?</label>
@@ -71,7 +119,13 @@ const TITLE = 'Talk to a real person';
               </div>
               <div class="field span-2">
                 <label for="c-msg">Message</label>
-                <textarea class="input" id="c-msg" required minlength="10" placeholder="Tell us a little about your team and what is going on."></textarea>
+                <textarea
+                  class="input"
+                  id="c-msg"
+                  required
+                  minlength="10"
+                  placeholder="Tell us a little about your team and what is going on."
+                ></textarea>
                 <span class="field-error" id="c-msg-err">Write at least a sentence so we can help.</span>
               </div>
             </div>
@@ -89,15 +143,43 @@ const TITLE = 'Talk to a real person';
           <span class="chip chip--ok chip--dot" data-queue-text="You're in the queue">Open now</span>
         </div>
         <div class="queue-ring" data-md-skip>
-          <svg viewBox="0 0 168 168" aria-hidden="true"><circle class="queue-ring-track" cx="84" cy="84" r="70" fill="none" stroke-width="12"/><circle class="queue-ring-arc" data-queue-arc cx="84" cy="84" r="70" fill="none" stroke-width="12" stroke-linecap="round" stroke-dasharray="120 440" transform="rotate(-90 84 84)"/></svg>
-          <div class="queue-ring-label"><span class="label">Reply to new messages</span><Pause /><span class="stat-val">1 day</span></div>
+          <svg viewBox="0 0 168 168" aria-hidden="true">
+            <circle class="queue-ring-track" cx="84" cy="84" r="70" fill="none" stroke-width="12" />
+            <circle
+              class="queue-ring-arc"
+              data-queue-arc
+              cx="84"
+              cy="84"
+              r="70"
+              fill="none"
+              stroke-width="12"
+              stroke-linecap="round"
+              stroke-dasharray="120 440"
+              transform="rotate(-90 84 84)"
+            />
+          </svg>
+          <div class="queue-ring-label">
+            <span class="label">Reply to new messages</span><Pause /><span class="stat-val">1 day</span>
+          </div>
         </div>
         <h2 class="sr-only">Hours and office</h2>
         <dl class="facts">
-          <div><dt>Monday to Friday</dt><dd>7 am to 7 pm ET</dd></div>
-          <div><dt>Weekends</dt><dd>Emergency line</dd></div>
-          <div><dt>Monitoring</dt><dd>24/7 for clients</dd></div>
-          <div><dt>Office</dt><dd>Toronto, ON</dd></div>
+          <div>
+            <dt>Monday to Friday</dt>
+            <dd>7 am to 7 pm ET</dd>
+          </div>
+          <div>
+            <dt>Weekends</dt>
+            <dd>Emergency line</dd>
+          </div>
+          <div>
+            <dt>Monitoring</dt>
+            <dd>24/7 for clients</dd>
+          </div>
+          <div>
+            <dt>Office</dt>
+            <dd>Toronto, ON</dd>
+          </div>
         </dl>
       </div>
     </div>

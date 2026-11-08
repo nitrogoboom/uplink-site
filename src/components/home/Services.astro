@@ -16,12 +16,19 @@ const services = await getServices();
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
 const featured = services.filter((s) => s.data.featured);
-if (featured.length !== 3) throw new Error(`Home services: ${featured.length} services have "featured": true; the layout takes exactly 3 (src/content/services/*.json)`);
+if (featured.length !== 3)
+  throw new Error(
+    `Home services: ${featured.length} services have "featured": true; the layout takes exactly 3 (src/content/services/*.json)`,
+  );
 const tiles = [
   ...featured.map((s) => ({ ...s, size: 'big' })),
-  ...services.filter((s) => !s.data.featured).slice(0, SLOTS - 1).map((s) => ({ ...s, size: 'small' })),
+  ...services
+    .filter((s) => !s.data.featured)
+    .slice(0, SLOTS - 1)
+    .map((s) => ({ ...s, size: 'small' })),
 ];
 ---
+
 <section class="section section--band fold" id="services" aria-labelledby="services-title">
   <div class="container svc-wrap">
     <div class="section-head section-head--split">
@@ -32,24 +39,51 @@ const tiles = [
       <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
     </div>
     <ul class="svc-menu" id="services-row" aria-label="Services">
-      {tiles.map(({ id, size, data: s }) => (
-        <li class={`svc-${size}`}><a class="svc-tile" href={`/services/${id}`}>
-          <span class="svc-art"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"></span>
+      {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
+        <a class="svc-tile" href={`/services/${id}`}>
+          <span class="svc-art"
+            ><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
+          /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
-          <span class="svc-text"><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span><Pause /><span class="svc-line">{s.card}</span></span>
-          <span class="svc-go"><span class="sr-only"> </span>View service<Icon name="chevronR" /></span>
-        </a></li>
-      ))}
-      <li class="svc-small svc-more"><a class="svc-tile" href="/services">
-        <span class="svc-icon"><Icon name="grid" /></span>
-        <span class="svc-text"><span class:list={['svc-title', fit(MORE)]}>{MORE}</span></span>
-        <span class="svc-go"><Pause />View services<Icon name="chevronR" /></span>
-      </a></li>
+          <span class="svc-text"
+            ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
+            ><Pause /><span class="svc-line">{s.card}</span></span
+          >
+          <span class="svc-go"><span class="sr-only"></span>View service<Icon name="chevronR" /></span>
+        </a>
+      </li>)}
+      <li class="svc-small svc-more">
+        <a class="svc-tile" href="/services">
+          <span class="svc-icon"><Icon name="grid" /></span>
+          <span class="svc-text"><span class:list={['svc-title', fit(MORE)]}>{MORE}</span></span>
+          <span class="svc-go"><Pause />View services<Icon name="chevronR" /></span>
+        </a>
+      </li>
     </ul>
     <div class="svc-hint" data-md-skip>
-      <button class="iconbtn svc-step" type="button" data-step="-1" aria-controls="services-row" aria-label="Previous service"><Icon name="chevronL" /></button>
-      <span class="svc-dots" aria-hidden="true">{[...tiles, null].map(() => <i class="pip" />)}</span>
-      <button class="iconbtn svc-step" type="button" data-step="1" aria-controls="services-row" aria-label="Next service"><Icon name="chevronR" /></button>
+      <button
+        class="iconbtn svc-step"
+        type="button"
+        data-step="-1"
+        aria-controls="services-row"
+        aria-label="Previous service"
+      >
+        <Icon name="chevronL" />
+      </button>
+      <span class="svc-dots" aria-hidden="true"
+        >{[...tiles, null].map(() => (
+          <i class="pip" />
+        ))}</span
+      >
+      <button
+        class="iconbtn svc-step"
+        type="button"
+        data-step="1"
+        aria-controls="services-row"
+        aria-label="Next service"
+      >
+        <Icon name="chevronR" />
+      </button>
       <span class="svc-swipe" aria-hidden="true">Swipe<Icon name="arrow" /></span>
     </div>
   </div>

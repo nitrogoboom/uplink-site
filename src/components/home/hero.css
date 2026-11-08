@@ -3,124 +3,432 @@
    src/styles/hero.css, shared with the service pages and the case-study pages. ---*/
 /* ---------- HOME ----------------------------------------------------- */
 /* phone + portrait tablet: one column. */
-.hero-grid { max-width: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-7); }
-.hero-menu { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
-.hero-top { display: flex; flex-direction: column; gap: var(--sp-4); }
-.hero-cta { display: flex; flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+.hero-grid {
+  max-width: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-7);
+}
+.hero-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+.hero-top {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.hero-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--sp-2);
+}
 /* the top tabs (tablet, desktop) and bottom bar (phone) already hold these
    links, so the menu shows only on desktops tall enough for it (end of file) */
-.hero-menu .hero-services { display: none; }
-.menu-label { display: block; margin: 0 0 var(--sp-2); }
-.hero-cta .small { text-align: center; }
-@media (--tablet-up) { .hero-cta { flex-direction: row; align-items: center; gap: var(--sp-4); } .hero-cta .small { text-align: left; } }
-.hero-menu h1 { font-size: min(var(--fs-hero-phone), var(--fit)); }
-.hero-menu h1 .line { display: block; }
-.hero-menu h1 em { font-style: italic; color: var(--c-accent-text); }
-.hero-top .lead { text-wrap: pretty; }
+.hero-menu .hero-services {
+  display: none;
+}
+.menu-label {
+  display: block;
+  margin: 0 0 var(--sp-2);
+}
+.hero-cta .small {
+  text-align: center;
+}
+@media (--tablet-up) {
+  .hero-cta {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+  .hero-cta .small {
+    text-align: left;
+  }
+}
+.hero-menu h1 {
+  font-size: min(var(--fs-hero-phone), var(--fit));
+}
+.hero-menu h1 .line {
+  display: block;
+}
+.hero-menu h1 em {
+  font-style: italic;
+  color: var(--c-accent-text);
+}
+.hero-top .lead {
+  text-wrap: pretty;
+}
 
-.hero-art { position: relative; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.hero-art .stage { position: relative; aspect-ratio: 40 / 31; max-width: 100%; }
-.hero-art .stage svg, .hero-art .stage .hero-nojs { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-art .stage .hero-nojs { object-fit: contain; }
+.hero-art {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.hero-art .stage {
+  position: relative;
+  aspect-ratio: 40 / 31;
+  max-width: 100%;
+}
+.hero-art .stage svg,
+.hero-art .stage .hero-nojs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.hero-art .stage .hero-nojs {
+  object-fit: contain;
+}
 /* pause button (HoldButton.astro; its look is .hold in buttons.css), bottom right on the drawing. Its icon is
    drawn in CSS, so the stage's svg rules can't reach it. */
-.hero-pause { position: absolute; right: var(--sp-2); bottom: var(--sp-2); }
+.hero-pause {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: var(--sp-2);
+}
 
-.menu { display: flex; flex-direction: column; gap: var(--sp-1); list-style: none; }
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  list-style: none;
+}
 .mi {
-  display: flex; align-items: center; gap: var(--sp-4);
-  padding: var(--sp-3);   /* as much as the menu hangs out (desktop, below): icon and arrow line up with the column's edges */
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(
+    --sp-3
+  ); /* as much as the menu hangs out (desktop, below): icon and arrow line up with the column's edges */
   border-radius: var(--r-3);
   color: var(--c-text);
   text-decoration: none;
-  transition: background-color var(--dur-1) var(--ease), transform var(--dur-2) var(--ease);
+  transition:
+    background-color var(--dur-1) var(--ease),
+    transform var(--dur-2) var(--ease);
 }
-.mi:hover { background: var(--c-surface-2); }
-@media (hover: hover) { .mi:hover { transform: translateX(var(--sp-1)); } }
-.mi .icon-tile { transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease); }
-.mi:hover .icon-tile, .mi:focus-visible .icon-tile { background: var(--c-accent); color: var(--c-on-accent); }
-.mi:focus-visible { background: var(--c-surface-2); }
-.mi-text { display: flex; flex-direction: column; gap: var(--sp-1); min-width: 0; }
-.mi-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6); letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
-.mi-sub { font-size: var(--fs-2); color: var(--c-muted); }
-.mi-go { margin-left: auto; flex: none; width: var(--icon); height: var(--icon); color: var(--c-muted); opacity: 0; transition: opacity var(--dur-1) var(--ease); }
-.mi:hover .mi-go, .mi:focus-visible .mi-go { opacity: 1; }
+.mi:hover {
+  background: var(--c-surface-2);
+}
+@media (hover: hover) {
+  .mi:hover {
+    transform: translateX(var(--sp-1));
+  }
+}
+.mi .icon-tile {
+  transition:
+    background-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+.mi:hover .icon-tile,
+.mi:focus-visible .icon-tile {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.mi:focus-visible {
+  background: var(--c-surface-2);
+}
+.mi-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.mi-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-6);
+  letter-spacing: var(--tracking-1);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+}
+.mi-sub {
+  font-size: var(--fs-2);
+  color: var(--c-muted);
+}
+.mi-go {
+  margin-left: auto;
+  flex: none;
+  width: var(--icon);
+  height: var(--icon);
+  color: var(--c-muted);
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease);
+}
+.mi:hover .mi-go,
+.mi:focus-visible .mi-go {
+  opacity: 1;
+}
 
 /* the news cards: a card grid, so its gap is every card grid's (docs/spacing.md R6) */
-.hero-dock { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); min-width: 0; }
-@media (--tablet-up) { .hero-dock { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (--desktop) { .hero-dock { gap: var(--sp-5); } }
+.hero-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  min-width: 0;
+}
+@media (--tablet-up) {
+  .hero-dock {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (--desktop) {
+  .hero-dock {
+    gap: var(--sp-5);
+  }
+}
 /* a picture card with the picture as a panel: edge to edge on the left, a line, then the words with --sp-4 all
    round (R5, small card). The panel is as tall as the card and the words sit centred beside it as one block, so
    nothing leaves a gap under it; the two cards in a row stretch to one height (the dock is a grid). Picked from
    the news-cards mockups (round 2, C; archive/editing-room branch). */
-.news { flex-direction: row; align-items: stretch; gap: var(--sp-4); padding: 0; overflow: hidden; }
-.news-thumb { flex: none; display: grid; place-items: center; width: calc(var(--sp-9) + var(--sp-5)); padding: var(--sp-3); border-radius: 0; border-right: 1px solid var(--c-line); }
-.news-thumb img { width: 100%; height: auto; max-height: 100%; }
-.news-text { display: flex; flex-direction: column; justify-content: center; gap: var(--sp-1); min-width: 0; padding: var(--sp-4) var(--sp-4) var(--sp-4) 0; text-wrap: pretty; }
+.news {
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--sp-4);
+  padding: 0;
+  overflow: hidden;
+}
+.news-thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: calc(var(--sp-9) + var(--sp-5));
+  padding: var(--sp-3);
+  border-radius: 0;
+  border-right: 1px solid var(--c-line);
+}
+.news-thumb img {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+.news-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-1);
+  min-width: 0;
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) 0;
+  text-wrap: pretty;
+}
 /* the tag: a dot and a word in the card's colour, as the eyebrows. After the title in the markup (read second),
    on top on screen */
-.news-tag { order: -1; display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); line-height: var(--lh-snug); text-transform: uppercase; }
-.news-tag::before { content: ""; flex: none; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: currentColor; }
-.news-tag--accent { color: var(--c-accent-text); }
-.news-tag--sky { color: var(--c-sky); }
-.news-title { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; }
+.news-tag {
+  order: -1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  line-height: var(--lh-snug);
+  text-transform: uppercase;
+}
+.news-tag::before {
+  content: '';
+  flex: none;
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  background: currentColor;
+}
+.news-tag--accent {
+  color: var(--c-accent-text);
+}
+.news-tag--sky {
+  color: var(--c-sky);
+}
+.news-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-4);
+  letter-spacing: var(--tracking-1);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+}
 
 /* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
    news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
 @media (--tablet-up) and (orientation: portrait) {
-  .hero-art .stage { width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31))); margin-inline: auto; }
+  .hero-art .stage {
+    width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31)));
+    margin-inline: auto;
+  }
 }
 
 /* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP), which its still
    for no script (hero-office-phone.svg) shares */
 @media (--small-phone) {
-  .hero-art .stage { aspect-ratio: 962 / 900; }
-  .hero-art .stage svg.ob-phone { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+  .hero-art .stage {
+    aspect-ratio: 962 / 900;
+  }
+  .hero-art .stage svg.ob-phone {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 /* phones (under the bottom bar's 700px): headline and the short line, the button, then the office full width
    and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. The button sits
    above the office so it is on the first screen on every phone (under it, a 667px-tall screen put it half under
    the bottom bar). No eyebrow, and the short line. */
-.lead-short { display: none; }
+.lead-short {
+  display: none;
+}
 @media (--phone) {
-  .hero.fold { --hero-pad-top: var(--sp-5); }
-  .hero-grid { grid-template-areas: "top" "cta" "stage" "dock"; gap: var(--sp-3); }
-  .hero-menu, .hero-art { display: contents; }
-  .hero-top { grid-area: top; gap: var(--sp-3); }
-  .hero-top .eyebrow, .lead-long { display: none; }
-  .lead-short { display: inline; }
-  .hero-art .stage { grid-area: stage; }
-  .hero-cta { grid-area: cta; }
-  .hero-dock { grid-area: dock; }
+  .hero.fold {
+    --hero-pad-top: var(--sp-5);
+  }
+  .hero-grid {
+    grid-template-areas: 'top' 'cta' 'stage' 'dock';
+    gap: var(--sp-3);
+  }
+  .hero-menu,
+  .hero-art {
+    display: contents;
+  }
+  .hero-top {
+    grid-area: top;
+    gap: var(--sp-3);
+  }
+  .hero-top .eyebrow,
+  .lead-long {
+    display: none;
+  }
+  .lead-short {
+    display: inline;
+  }
+  .hero-art .stage {
+    grid-area: stage;
+  }
+  .hero-cta {
+    grid-area: cta;
+  }
+  .hero-dock {
+    grid-area: dock;
+  }
 }
 
 /* phone captions, written by home.js over the phone cut: the drawings' own label look (caps title in its colour,
    grey subline), at the sizes in tokens.css (--cap-*). Words fade out and up, then in from below; the line draws
    once they have settled, its dot pops in at the end and its ring pulses. */
-.ob-cap-t { font-family: var(--font-body); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
-.ob-cap-cloud .ob-cap-t { fill: var(--c-sky); }
-.ob-cap-s { font-family: var(--font-body); font-weight: 400; fill: var(--c-muted); }
-.ob-cap-app { fill: var(--c-text); font-weight: 600; letter-spacing: var(--cap-tracking); text-transform: uppercase; }
-.ob-cap-t, .ob-cap-s { paint-order: stroke; stroke: var(--c-bg); stroke-linejoin: round; }
-.ob-cap-words { transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease); }
-.ob-cap.is-out .ob-cap-words { opacity: 0; transform: translateY(calc(-1 * var(--sp-4))); transition-duration: var(--dur-1); }
-.ob-cap.is-pre .ob-cap-words { opacity: 0; transform: translateY(var(--sp-4)); transition: none; }
-.ob-cap-lead { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 0.6; }
-.ob-cap.is-out :is(.ob-cap-lead, .ob-cap-end, .ob-cap-ring) { opacity: 0; transition: opacity var(--dur-1) var(--ease); }
-.ob-cap-lead.is-draw { animation: cap-draw var(--dur-3) var(--ease) both; }
-@keyframes cap-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
-.ob-cap-end { stroke: var(--c-bg); opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
-.ob-cap-end.is-in { animation: cap-pop var(--dur-2) var(--ease) var(--dur-3) both; }
-@keyframes cap-pop { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
-.ob-cap-ring { fill: none; opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
-.ob-cap-ring.is-in { animation: cap-ring var(--dur-pulse) steps(20) calc(var(--dur-3) + var(--dur-2)) infinite; }
-@keyframes cap-ring { from { opacity: 0.8; transform: scale(1); } to { opacity: 0; transform: scale(2.8); } }
+.ob-cap-t {
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: var(--cap-tracking);
+  text-transform: uppercase;
+}
+.ob-cap-cloud .ob-cap-t {
+  fill: var(--c-sky);
+}
+.ob-cap-s {
+  font-family: var(--font-body);
+  font-weight: 400;
+  fill: var(--c-muted);
+}
+.ob-cap-app {
+  fill: var(--c-text);
+  font-weight: 600;
+  letter-spacing: var(--cap-tracking);
+  text-transform: uppercase;
+}
+.ob-cap-t,
+.ob-cap-s {
+  paint-order: stroke;
+  stroke: var(--c-bg);
+  stroke-linejoin: round;
+}
+.ob-cap-words {
+  transition:
+    opacity var(--dur-2) var(--ease),
+    transform var(--dur-2) var(--ease);
+}
+.ob-cap.is-out .ob-cap-words {
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--sp-4)));
+  transition-duration: var(--dur-1);
+}
+.ob-cap.is-pre .ob-cap-words {
+  opacity: 0;
+  transform: translateY(var(--sp-4));
+  transition: none;
+}
+.ob-cap-lead {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-opacity: 0.6;
+}
+.ob-cap.is-out :is(.ob-cap-lead, .ob-cap-end, .ob-cap-ring) {
+  opacity: 0;
+  transition: opacity var(--dur-1) var(--ease);
+}
+.ob-cap-lead.is-draw {
+  animation: cap-draw var(--dur-3) var(--ease) both;
+}
+@keyframes cap-draw {
+  from {
+    stroke-dashoffset: var(--len);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.ob-cap-end {
+  stroke: var(--c-bg);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.ob-cap-end.is-in {
+  animation: cap-pop var(--dur-2) var(--ease) var(--dur-3) both;
+}
+@keyframes cap-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.ob-cap-ring {
+  fill: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.ob-cap-ring.is-in {
+  animation: cap-ring var(--dur-pulse) steps(20) calc(var(--dur-3) + var(--dur-2)) infinite;
+}
+@keyframes cap-ring {
+  from {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.8);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .ob-cap-words { transition: none; }
-  .ob-cap-lead.is-draw, .ob-cap-end.is-in, .ob-cap-ring.is-in { animation: none; }
-  .ob-cap-end { opacity: 1; }
+  .ob-cap-words {
+    transition: none;
+  }
+  .ob-cap-lead.is-draw,
+  .ob-cap-end.is-in,
+  .ob-cap-ring.is-in {
+    animation: none;
+  }
+  .ob-cap-end {
+    opacity: 1;
+  }
 }
 
 /* ---- two columns: landscape tablets, short laptops and desktops ---------
@@ -134,18 +442,34 @@
        src/styles/hero.css), and grows past it only if the text needs more */
     min-height: calc(var(--hero-h) - var(--hero-pad-top) - var(--hero-pad-bottom));
     grid-template-rows: 1fr auto;
-    grid-template-areas: "menu stage" "dock dock";
+    grid-template-areas: 'menu stage' 'dock dock';
     column-gap: var(--sp-7);
     row-gap: var(--sp-6);
   }
-  .hero-menu { grid-area: menu; justify-content: center; gap: var(--sp-6); }
+  .hero-menu {
+    grid-area: menu;
+    justify-content: center;
+    gap: var(--sp-6);
+  }
   /* the headline keeps its two lines in its column: "Always online", the longer, is about 5.7em wide. A share of the
      column, not of the screen, so zoom (a narrower column, then the tablet layout) never shrinks it on screen */
-  .hero-menu h1 { font-size: min(var(--fs-8), 16.5cqi, var(--fit)); }
-  .hero-cta { flex-wrap: wrap; }
-  .hero-art { display: contents; }
-  .hero-art .stage { grid-area: stage; aspect-ratio: auto; min-height: 0; }
-  .hero-dock { grid-area: dock; }
+  .hero-menu h1 {
+    font-size: min(var(--fs-8), 16.5cqi, var(--fit));
+  }
+  .hero-cta {
+    flex-wrap: wrap;
+  }
+  .hero-art {
+    display: contents;
+  }
+  .hero-art .stage {
+    grid-area: stage;
+    aspect-ratio: auto;
+    min-height: 0;
+  }
+  .hero-dock {
+    grid-area: dock;
+  }
 }
 
 /* ---- desktop, tall enough for the menu ----------------------------------
@@ -159,7 +483,7 @@
     min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
     grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas: "menu stage" "menu dock";
+    grid-template-areas: 'menu stage' 'menu dock';
     column-gap: var(--sp-8);
     /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
     row-gap: var(--sp-6);
@@ -167,20 +491,38 @@
   /* wider letter and line spacing (WCAG 1.4.12, a reader's own style sheet): the text can outgrow one screen. The
      hero's height is a floor, not a cap, so it grows, and the menu centres only while it fits (safe), so its top
      never slides up under the header */
-  .hero-menu { min-height: 0; justify-content: safe center; }
+  .hero-menu {
+    min-height: 0;
+    justify-content: safe center;
+  }
   /* the menu is its own group: the column's --sp-6 gap plus this, --sp-8 under the button */
-  .hero-menu .hero-services { display: block; margin-top: var(--sp-6); }
+  .hero-menu .hero-services {
+    display: block;
+    margin-top: var(--sp-6);
+  }
   /* icons and text line up with the headline; the highlight hangs outside */
-  .hero-menu .menu { margin-inline: calc(-1 * var(--sp-3)); }
+  .hero-menu .menu {
+    margin-inline: calc(-1 * var(--sp-3));
+  }
   /* a window under 884px tall (1280 x 800, 1536 x 864): the menu drops its sublines and its gaps step down, so the
      menu and the news cards stay on the first screen (the full menu needs 770px of the 688 a 800px window leaves) */
   @media (height < 55.25em) {
-    .hero-menu { gap: var(--sp-5); }
-    .hero-menu .hero-services { margin-top: var(--sp-4); }
-    .hero-menu .mi-sub { display: none; }
+    .hero-menu {
+      gap: var(--sp-5);
+    }
+    .hero-menu .hero-services {
+      margin-top: var(--sp-4);
+    }
+    .hero-menu .mi-sub {
+      display: none;
+    }
   }
   /* narrow desktops: the office column is too narrow for two news cards side by side, so they stack */
-  @media (width < 77.5em) { .hero-dock { grid-template-columns: minmax(0, 1fr); } }
+  @media (width < 77.5em) {
+    .hero-dock {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
 
   /* very wide screens (21:9 and wider): news in a column beside the office.
      A maximised 16:9 browser is about 2:1, so this starts well past that. */
@@ -191,13 +533,21 @@
     .hero-grid {
       grid-template-columns: minmax(0, 34rem) auto 24rem;
       grid-template-rows: minmax(0, 1fr);
-      grid-template-areas: "menu stage dock";
+      grid-template-areas: 'menu stage dock';
       column-gap: var(--sp-6);
       justify-content: center;
     }
     /* the hero's own height, written out: the grid's height is only a floor, so 100% of it wouldn't resolve */
-    .hero-art .stage { aspect-ratio: 40 / 31; height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max)); }
-    .hero-menu { margin-right: var(--sp-6); }   /* menu to office: sp-6 + sp-6, as wide as the sp-8 gap above */
-    .hero-dock { grid-template-columns: minmax(0, 1fr); align-content: end; }
+    .hero-art .stage {
+      aspect-ratio: 40 / 31;
+      height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
+    }
+    .hero-menu {
+      margin-right: var(--sp-6);
+    } /* menu to office: sp-6 + sp-6, as wide as the sp-8 gap above */
+    .hero-dock {
+      grid-template-columns: minmax(0, 1fr);
+      align-content: end;
+    }
   }
 }

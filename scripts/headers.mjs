@@ -30,17 +30,20 @@ import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const DIST = process.env.DIST || 'dist';   // another folder only for the tests (scripts/test/)
+const DIST = process.env.DIST || 'dist'; // another folder only for the tests (scripts/test/)
 const ROOT = new URL('..', import.meta.url);
-const WORKER_DIR = process.env.WORKER_DIR || fileURLToPath(new URL('worker', ROOT));   // likewise
+const WORKER_DIR = process.env.WORKER_DIR || fileURLToPath(new URL('worker', ROOT)); // likewise
 // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
 // into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included), the one
 // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's preloads with
 // no media).
 const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
 const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
-const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)].filter((m) => !/\smedia=/.test(m[0])).map((m) => m[1]);
-if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !FIRST_FONTS.length) throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
+const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)]
+  .filter((m) => !/\smedia=/.test(m[0]))
+  .map((m) => m[1]);
+if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !FIRST_FONTS.length)
+  throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
 const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
 const pages = [];
@@ -61,7 +64,7 @@ const styles = new Set();
 const attrs = [];
 const styleBlocks = (file, text) => {
   for (const m of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) styles.add(sha(m[1]));
-  const n = [...text.matchAll(/<[a-zA-Z][^>]*\sstyle=["']/g)].length;   // inside a tag, not prose about one
+  const n = [...text.matchAll(/<[a-zA-Z][^>]*\sstyle=["']/g)].length; // inside a tag, not prose about one
   if (n) attrs.push(`${relative(DIST, file).split(sep).join('/')} (${n})`);
 };
 for (const file of pages) {
@@ -80,32 +83,58 @@ if (attrs.length) throw new Error(`style="" attributes the CSP would block: ${at
 // 404.html is served at any missing address, so no rule can name it; soon is noindex but still a page people see.
 const paths = pages
   .filter((f) => !f.endsWith(`${sep}404.html`))
-  .map((f) => '/' + relative(DIST, f).split(sep).join('/').replace(/index\.html$/, '').replace(/\.html$/, ''))
+  .map(
+    (f) =>
+      '/' +
+      relative(DIST, f)
+        .split(sep)
+        .join('/')
+        .replace(/index\.html$/, '')
+        .replace(/\.html$/, ''),
+  )
   .sort();
 const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
 // each Markdown copy: services.md names services.html's canonical, index.md names index.html's (home, /)
-const markdown = copies.map((f) => {
-  const md = relative(DIST, f).split(sep).join('/');
-  const page = md.replace(/\.md$/, '.html');
-  let canonical = null;   // no page beside it (agents.md): noindex only
-  try { canonical = readFileSync(join(DIST, page), 'utf-8').match(/<link rel="canonical" href="([^"]+)"/)?.[1]; }
-  catch { /* stays null */ }
-  if (canonical === undefined) throw new Error(`${md}: its page ${page} has no <link rel="canonical">, so the copy can't name it`);
-  return `/${md}\n  X-Robots-Tag: noindex\n${canonical ? `  Link: <${canonical}>; rel="canonical"\n` : ''}`;
-}).sort().join('');
+const markdown = copies
+  .map((f) => {
+    const md = relative(DIST, f).split(sep).join('/');
+    const page = md.replace(/\.md$/, '.html');
+    let canonical = null; // no page beside it (agents.md): noindex only
+    try {
+      canonical = readFileSync(join(DIST, page), 'utf-8').match(/<link rel="canonical" href="([^"]+)"/)?.[1];
+    } catch {
+      /* stays null */
+    }
+    if (canonical === undefined)
+      throw new Error(`${md}: its page ${page} has no <link rel="canonical">, so the copy can't name it`);
+    return `/${md}\n  X-Robots-Tag: noindex\n${canonical ? `  Link: <${canonical}>; rel="canonical"\n` : ''}`;
+  })
+  .sort()
+  .join('');
 
 // every page, plus /404 (served at its own name too, by the Worker): its trailing-slash, .html and index spellings
 // (Cloudflare would send /index and /services/index.html on as 307s)
-const redirects = [...paths, '/404'].flatMap((p) => (p === '/' ? ['/index.html / 308', '/index / 308']
-  : [`${p}/ ${p} 308`, `${p}.html ${p} 308`, `${p}/index.html ${p} 308`, `${p}/index ${p} 308`]));
+const redirects = [...paths, '/404'].flatMap((p) =>
+  p === '/'
+    ? ['/index.html / 308', '/index / 308']
+    : [`${p}/ ${p} 308`, `${p}.html ${p} 308`, `${p}/index.html ${p} 308`, `${p}/index ${p} 308`],
+);
 writeFileSync(join(DIST, '_redirects'), redirects.join('\n') + '\n');
 
 const src = readFileSync(join(DIST, '_headers'), 'utf-8');
 // a block the template marks with "# @NAME …" and "# @end NAME" lines; what's between them is written here
 const block = (name) => new RegExp(`(# @${name}[^\\n]*\\n)[\\s\\S]*?(# @end ${name}\\n)`);
-if (!src.includes('{script-hashes}') || !src.includes('{style-hashes}') || !src.includes('{build}') || !block('early-hints').test(src) || !block('markdown-copies').test(src)) {
-  throw new Error('public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} placeholder, and the @early-hints and @markdown-copies blocks');
+if (
+  !src.includes('{script-hashes}') ||
+  !src.includes('{style-hashes}') ||
+  !src.includes('{build}') ||
+  !block('early-hints').test(src) ||
+  !block('markdown-copies').test(src)
+) {
+  throw new Error(
+    'public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} placeholder, and the @early-hints and @markdown-copies blocks',
+  );
 }
 const filled = src
   .replaceAll('{script-hashes}', [...hashes].join(' '))
@@ -114,13 +143,17 @@ const filled = src
   .replace(block('markdown-copies'), (_, start, end) => start + markdown + end);
 
 // the build's ID (X-Build): every file in dist/ but _headers, the headers as they ship, and the Worker
-const files = (dir, skip = () => false) => readdirSync(dir).sort().flatMap((name) => {
-  const p = join(dir, name);
-  return statSync(p).isDirectory() ? files(p, skip) : skip(p) ? [] : [p];
-});
+const files = (dir, skip = () => false) =>
+  readdirSync(dir)
+    .sort()
+    .flatMap((name) => {
+      const p = join(dir, name);
+      return statSync(p).isDirectory() ? files(p, skip) : skip(p) ? [] : [p];
+    });
 const id = createHash('sha256');
 const add = (label, bytes) => id.update(`${label}\0${bytes.length}\0`).update(bytes);
-for (const f of files(DIST, (p) => relative(DIST, p) === '_headers')) add(`dist/${relative(DIST, f).split(sep).join('/')}`, readFileSync(f));
+for (const f of files(DIST, (p) => relative(DIST, p) === '_headers'))
+  add(`dist/${relative(DIST, f).split(sep).join('/')}`, readFileSync(f));
 add('_headers', Buffer.from(filled));
 for (const f of files(WORKER_DIR)) add(`worker/${relative(WORKER_DIR, f).split(sep).join('/')}`, readFileSync(f));
 add('wrangler.jsonc', readFileSync(new URL('wrangler.jsonc', ROOT)));
@@ -130,5 +163,8 @@ writeFileSync(join(DIST, '_headers'), out);
 
 const rules = out.split('\n').filter((l) => /^\S/.test(l) && !l.startsWith('#')).length;
 const longest = Math.max(...out.split('\n').map((l) => l.length));
-if (rules > 100 || longest > 2000) throw new Error(`_headers over Cloudflare's limits: ${rules} rules (max 100), longest line ${longest} (max 2000)`);
-console.log(`_headers: build ${build}, ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${copies.length} Markdown copies, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`);
+if (rules > 100 || longest > 2000)
+  throw new Error(`_headers over Cloudflare's limits: ${rules} rules (max 100), longest line ${longest} (max 2000)`);
+console.log(
+  `_headers: build ${build}, ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${copies.length} Markdown copies, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`,
+);

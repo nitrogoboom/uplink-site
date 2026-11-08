@@ -1,28 +1,64 @@
 /*--- SERVICES · a service's own page (/services/<slug>): breadcrumb, title and button beside the drawing, then
    what's included as three cards. The parts are ServiceCard's (service-card.css styles them); this places them.
    Desktop layout at the end. ---*/
-.svc-page { padding-block: var(--sp-6) var(--sp-7); }
+.svc-page {
+  padding-block: var(--sp-6) var(--sp-7);
+}
 .svc-page-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "crumbs" "head" "cta" "prev" "detail";
+  grid-template-areas: 'crumbs' 'head' 'cta' 'prev' 'detail';
   gap: var(--sp-5);
 }
-.svc-page .svc { display: contents; }
-.svc-page .crumbs { grid-area: crumbs; }
-.svc-page-cta { grid-area: cta; gap: var(--sp-5); }
-.svc-page .picker-head .lead { font-size: var(--fs-5); line-height: var(--lh-snug); }
-.svc-page .picker-art { aspect-ratio: 4 / 3; flex: none; }
+.svc-page .svc {
+  display: contents;
+}
+.svc-page .crumbs {
+  grid-area: crumbs;
+}
+.svc-page-cta {
+  grid-area: cta;
+  gap: var(--sp-5);
+}
+.svc-page .picker-head .lead {
+  font-size: var(--fs-5);
+  line-height: var(--lh-snug);
+}
+.svc-page .picker-art {
+  aspect-ratio: 4 / 3;
+  flex: none;
+}
 /* the drawing in flow, not absolute (service-card.css): same box, since the art is overflow: hidden and sized by its aspect
    ratio. Absolute, its late load made Chrome re-lay out the page grid by a shortcut that leaves getComputedStyle
    reporting the grid's auto side margins as 0 (the box itself never moved), so the styles check saw 0 or 440px. */
-.svc-page .picker-prev img { position: static; display: block; }
-.svc-page .picker-detail { gap: var(--sp-5); padding-top: var(--sp-5); border-top: 1px solid var(--c-line); }
-.svc-page .feat-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
-.svc-page .feat { align-items: flex-start; padding: var(--sp-4); background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-3); }
-.svc-page .feat-t { font-size: var(--fs-4); }
+.svc-page .picker-prev img {
+  position: static;
+  display: block;
+}
+.svc-page .picker-detail {
+  gap: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--c-line);
+}
+.svc-page .feat-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+}
+.svc-page .feat {
+  align-items: flex-start;
+  padding: var(--sp-4);
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-3);
+}
+.svc-page .feat-t {
+  font-size: var(--fs-4);
+}
 @media (--tablet-up) {
-  .svc-page .feat-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .svc-page .feat-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 /* the title's column is at least 30rem (or the whole width): a share of the window alone narrows at zoom, and the
    title, sized to its column (14cqi with a long word), would shrink on screen as zoom grows (review C1) */
@@ -30,15 +66,23 @@
   .svc-page-grid {
     grid-template-columns: minmax(min(30rem, 100%), 5fr) minmax(0, 7fr);
     grid-template-rows: auto auto 1fr auto;
-    grid-template-areas: "crumbs prev" "head prev" "cta prev" "detail detail";
+    grid-template-areas: 'crumbs prev' 'head prev' 'cta prev' 'detail detail';
     column-gap: var(--sp-7);
   }
-  .svc-page .picker-head { align-self: end; }
-  .svc-page-cta { align-self: start; }
+  .svc-page .picker-head {
+    align-self: end;
+  }
+  .svc-page-cta {
+    align-self: start;
+  }
 }
 
 /* desktop (>= 1100 wide and >= 700 tall): the drawing never taller than most of the screen */
 @media (--fold) {
-  .svc-page .picker-art { max-height: calc(var(--fold-h) * 0.68); }
-  .svc-page-grid { column-gap: var(--sp-8); }
+  .svc-page .picker-art {
+    max-height: calc(var(--fold-h) * 0.68);
+  }
+  .svc-page-grid {
+    column-gap: var(--sp-8);
+  }
 }

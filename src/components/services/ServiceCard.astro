@@ -9,12 +9,20 @@
 import type { CollectionEntry } from 'astro:content';
 import { fit } from '../../lib/fit';
 import './service-card.css';
-interface Props { service: CollectionEntry<'services'>; n: number; total: number; on?: boolean; first?: boolean; heading?: 'h1' | 'h2' }
+interface Props {
+  service: CollectionEntry<'services'>;
+  n: number;
+  total: number;
+  on?: boolean;
+  first?: boolean;
+  heading?: 'h1' | 'h2';
+}
 const { service, n, total, on = false, first = false, heading: Heading = 'h2' } = Astro.props;
 const Sub = Heading === 'h1' ? 'h2' : 'h3';
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
 ---
+
 <article class:list={['svc', { 'is-on': on }]} id={id} aria-labelledby={`svc-${id}`}>
   <div class="picker-head">
     <span class="chip chip--sky">{s.chip}</span>
@@ -23,20 +31,33 @@ const two = (k: number) => String(k).padStart(2, '0');
   </div>
   <div class="picker-prev panel">
     <div class="picker-art">
-      <div class="tags"><span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span></div>
+      <div class="tags">
+        <span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span>
+      </div>
       <picture>
-        <source media="(width < 75em)" srcset={`/assets/img/${s.image}-compact.svg`}>
-        <img src={`/assets/img/${s.image}.svg`} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'} alt={s.alt} width="640" height="480">
+        <source media="(width < 75em)" srcset={`/assets/img/${s.image}-compact.svg`} />
+        <img
+          src={`/assets/img/${s.image}.svg`}
+          fetchpriority={first ? 'high' : undefined}
+          loading={first ? undefined : 'lazy'}
+          alt={s.alt}
+          width="640"
+          height="480"
+        />
       </picture>
     </div>
   </div>
   <div class="picker-detail">
     <Sub class="label">What's included</Sub>
     <ul class="feat-list">
-      {s.features.map((f, i) => (
-        <li class="feat"><span class="icon-tile" aria-hidden="true">{i + 1}</span><span><span class="feat-t">{f.title}</span><span class="feat-d">{f.detail}</span></span></li>
-      ))}
+      {s.features.map((f, i) => <li class="feat">
+        <span class="icon-tile" aria-hidden="true">{i + 1}</span
+        ><span><span class="feat-t">{f.title}</span><span class="feat-d">{f.detail}</span></span>
+      </li>)}
     </ul>
-    <div class="row"><Sub class="label">Best for</Sub><p>{s.bestFor}</p></div>
+    <div class="row">
+      <Sub class="label">Best for</Sub>
+      <p>{s.bestFor}</p>
+    </div>
   </div>
 </article>

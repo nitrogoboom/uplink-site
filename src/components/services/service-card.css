@@ -1,25 +1,104 @@
 /*--- SERVICES · a service's own parts (ServiceCard: head, drawing, what's included), kept from the old picker;
    service-page.css places them. With script the article's parts drop into the page grid (display: contents);
    without it they stack. Desktop layout at the end. ---*/
-.js .svc { display: contents; }
-.js .svc:not(.is-on) { display: none; }
-html:not(.js) .svc { display: flex; flex-direction: column; gap: var(--sp-5); }
-html:not(.js) .picker-prev { height: auto; max-width: 40rem; }
-.picker-head { grid-area: head; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.picker-detail { grid-area: detail; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.picker-prev { grid-area: prev; min-width: 0; max-width: 100%; display: flex; flex-direction: column; }
-.picker-art { position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
-.picker-prev img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; padding: var(--sp-7) var(--sp-5) var(--sp-5); }
-.picker-prev .tags { position: absolute; top: var(--sp-4); left: var(--sp-4); right: var(--sp-4); display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sp-2); }   /* the two chips stack when they don't fit side by side */
-.feat-list { display: flex; flex-direction: column; gap: var(--sp-3); list-style: none; }
-.feat { display: flex; align-items: center; gap: var(--sp-4); }
-.feat .icon-tile { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-4); color: var(--c-accent-text); }
-.feat > :last-child { min-width: 0; }   /* the words beside the number tile wrap inside the card (B20) */
-.feat-t { display: block; font-weight: 600; }
-.feat-d { display: block; font-size: var(--fs-2); color: var(--c-muted); }
+.js .svc {
+  display: contents;
+}
+.js .svc:not(.is-on) {
+  display: none;
+}
+html:not(.js) .svc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+html:not(.js) .picker-prev {
+  height: auto;
+  max-width: 40rem;
+}
+.picker-head {
+  grid-area: head;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.picker-detail {
+  grid-area: detail;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.picker-prev {
+  grid-area: prev;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.picker-art {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+.picker-prev img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: var(--sp-7) var(--sp-5) var(--sp-5);
+}
+.picker-prev .tags {
+  position: absolute;
+  top: var(--sp-4);
+  left: var(--sp-4);
+  right: var(--sp-4);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--sp-2);
+} /* the two chips stack when they don't fit side by side */
+.feat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  list-style: none;
+}
+.feat {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.feat .icon-tile {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-4);
+  color: var(--c-accent-text);
+}
+.feat > :last-child {
+  min-width: 0;
+} /* the words beside the number tile wrap inside the card (B20) */
+.feat-t {
+  display: block;
+  font-weight: 600;
+}
+.feat-d {
+  display: block;
+  font-size: var(--fs-2);
+  color: var(--c-muted);
+}
 
 /* desktop (>= 1100 wide and >= 700 tall): the drawing takes the height it is given */
 @media (--fold) {
-  .picker-prev { min-height: 0; height: 100%; }
-  .picker-art { aspect-ratio: auto; flex: 1; min-height: 0; }
+  .picker-prev {
+    min-height: 0;
+    height: 100%;
+  }
+  .picker-art {
+    aspect-ratio: auto;
+    flex: 1;
+    min-height: 0;
+  }
 }

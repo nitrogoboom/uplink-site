@@ -9,20 +9,45 @@
 // uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.switch).
 import Icon from './Icon.astro';
 ---
+
 <dialog class="dialog" id="settings-dialog" aria-labelledby="st-title" closedby="any">
   <div class="dlg-head">
     <h2 id="st-title">Settings</h2>
-    <button class="hbtn" type="button" data-close commandfor="settings-dialog" command="close" aria-keyshortcuts="Escape"><span class="kbd kbd-hint" aria-hidden="true">Esc</span><Icon name="close" /><span class="sr-only">Close (Esc)</span></button>
+    <button
+      class="hbtn"
+      type="button"
+      data-close
+      commandfor="settings-dialog"
+      command="close"
+      aria-keyshortcuts="Escape"
+    >
+      <span class="kbd kbd-hint" aria-hidden="true">Esc</span
+      ><Icon name="close" /><span class="sr-only">Close (Esc)</span>
+    </button>
   </div>
   <div class="dlg-body">
     <section class="keys-group" aria-labelledby="st-keys">
       <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
       <label class="switch" for="sc-toggle">
-        <span class="stack-2"><strong id="sc-name">Single-key shortcuts</strong><span class="small muted" id="sc-hint">Turn off if they clash with a screen reader or voice control.</span></span>
-        <input id="sc-toggle" type="checkbox" role="switch" aria-labelledby="sc-name" aria-describedby="sc-hint" checked>
+        <span class="stack-2"
+          ><strong id="sc-name">Single-key shortcuts</strong
+          ><span class="small muted" id="sc-hint"
+            >Turn off if they clash with a screen reader or voice control.</span
+          ></span
+        >
+        <input
+          id="sc-toggle"
+          type="checkbox"
+          role="switch"
+          aria-labelledby="sc-name"
+          aria-describedby="sc-hint"
+          checked
+        />
       </label>
       <ul class="keys-list">
-        <li><span>Open these settings</span><span class="keys"><span class="kbd">?</span></span></li>
+        <li>
+          <span>Open these settings</span><span class="keys"><span class="kbd">?</span></span>
+        </li>
       </ul>
       <p class="small muted">Shortcuts pause while you type or while a pop-up is open.</p>
     </section>

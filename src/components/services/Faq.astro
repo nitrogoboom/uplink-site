@@ -7,6 +7,7 @@ import Icon from '../Icon.astro';
 import { phone } from '../../lib/footer';
 const faq = (await getCollection('faq')).sort(byOrder);
 ---
+
 <section class="section fold fold-always" id="faq" aria-labelledby="faq-title">
   <div class="container split">
     <div class="section-head">
@@ -14,12 +15,10 @@ const faq = (await getCollection('faq')).sort(byOrder);
       <h2 id="faq-title">Things people ask first</h2>
     </div>
     <div class="faq">
-      {faq.map(({ data: f }) => (
-        <details>
-          <summary>{f.q}<Icon name="plus" /></summary>
-          <div><p>{f.a}</p></div>
-        </details>
-      ))}
+      {faq.map(({ data: f }) => <details>
+        <summary>{f.q}<Icon name="plus" /></summary>
+        <div><p>{f.a}</p></div>
+      </details>)}
     </div>
     <div class="panel cta-band fold-foot" id="start">
       <div class="stack">

@@ -16,5 +16,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: [['list', { printSteps: false }]],
   use: { browserName: 'chromium', headless: true },
-  projects: CHECKS.map((name) => ({ name, testMatch: name === 'site' ? ['site.spec.mjs', 'zoom.spec.mjs'] : `${name}.spec.mjs` })),
+  projects: CHECKS.map((name) => ({
+    name,
+    testMatch: name === 'site' ? ['site.spec.mjs', 'zoom.spec.mjs'] : `${name}.spec.mjs`,
+  })),
 });

@@ -1,6 +1,13 @@
 /*--- Home services: a game-mode menu. Tall cards for the featured services, short tiles for the rest. ---*/
-.svc-menu { display: grid; gap: var(--sp-4); list-style: none; }
-.svc-menu > li { display: flex; min-width: 0; }
+.svc-menu {
+  display: grid;
+  gap: var(--sp-4);
+  list-style: none;
+}
+.svc-menu > li {
+  display: flex;
+  min-width: 0;
+}
 .svc-tile {
   position: relative;
   flex: 1;
@@ -14,26 +21,69 @@
   color: var(--c-text);
   text-align: center;
   text-decoration: none;
-  transition: transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+  transition:
+    transform var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease),
+    background-color var(--dur-2) var(--ease);
 }
-.svc-art { position: relative; flex: 1; width: 100%; min-height: 0; }
-.svc-art img { position: absolute; inset: var(--sp-5) var(--sp-5) 0; width: calc(100% - 2 * var(--sp-5)); height: calc(100% - var(--sp-5)); object-fit: contain; }
-.svc-icon { display: none; color: var(--c-accent-text); }
-.svc-icon svg { width: var(--sp-7); height: var(--sp-7); }
-.svc-text { display: flex; flex-direction: column; align-self: stretch; align-items: center; gap: var(--sp-2); padding: var(--sp-5); }   /* the tile's width: the title's column (container, layout.css) */
-.svc-text .chip { align-self: center; }
+.svc-art {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+.svc-art img {
+  position: absolute;
+  inset: var(--sp-5) var(--sp-5) 0;
+  width: calc(100% - 2 * var(--sp-5));
+  height: calc(100% - var(--sp-5));
+  object-fit: contain;
+}
+.svc-icon {
+  display: none;
+  color: var(--c-accent-text);
+}
+.svc-icon svg {
+  width: var(--sp-7);
+  height: var(--sp-7);
+}
+.svc-text {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5);
+} /* the tile's width: the title's column (container, layout.css) */
+.svc-text .chip {
+  align-self: center;
+}
 /* the title fits its column as a heading does (base.css): class fit (lib/fit.js) for a long word ("Cybersecurity" at
    200% zoom), --fit-short for the rest; :where() so the fit classes win. A word still too long breaks rather than being cut */
-:where(.svc-title) { --fit: var(--fit-short); }
-.svc-title { font-family: var(--font-display); font-size: min(var(--fs-6), var(--fit)); font-weight: 700; letter-spacing: var(--tracking-1); line-height: var(--lh-title); text-transform: uppercase; overflow-wrap: anywhere; hyphens: auto; }
-.svc-line { max-width: 32ch; color: var(--c-muted); }
+:where(.svc-title) {
+  --fit: var(--fit-short);
+}
+.svc-title {
+  font-family: var(--font-display);
+  font-size: min(var(--fs-6), var(--fit));
+  font-weight: 700;
+  letter-spacing: var(--tracking-1);
+  line-height: var(--lh-title);
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+.svc-line {
+  max-width: 32ch;
+  color: var(--c-muted);
+}
 /* the bar along the bottom of the card you point at */
 .svc-go {
   display: flex;
   align-items: center;
   align-self: stretch;
   gap: var(--sp-1);
-  min-height: var(--control-h);   /* a label that wraps (big zoom) grows the bar instead of being cut */
+  min-height: var(--control-h); /* a label that wraps (big zoom) grows the bar instead of being cut */
   margin-top: auto;
   padding-inline: var(--sp-5);
   background: var(--c-bg);
@@ -45,37 +95,95 @@
   line-height: var(--lh-tight);
   text-transform: uppercase;
 }
-.svc-go svg { width: var(--sp-4); height: var(--sp-4); }
-.svc-small .svc-art { display: none; }
-.svc-small .svc-icon { display: block; }
-.svc-hint { display: none; }
+.svc-go svg {
+  width: var(--sp-4);
+  height: var(--sp-4);
+}
+.svc-small .svc-art {
+  display: none;
+}
+.svc-small .svc-icon {
+  display: block;
+}
+.svc-hint {
+  display: none;
+}
 
 /* tablet and up: big cards three to a row, short tiles four to a row under them (12 columns); short tiles show their icon and name */
 @media (--tablet-up) {
-  .svc-menu { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  .svc-big { grid-column: span 4; }
-  .svc-small { grid-column: span 3; }
-  .svc-big .svc-art { flex: none; aspect-ratio: 4 / 3; }
-  .svc-small .svc-tile { justify-content: center; padding-top: var(--sp-5); }
-  .svc-small .svc-text { padding: var(--sp-3) var(--sp-5) var(--sp-5); }
-  .svc-small .svc-text .chip { display: none; }
-  .svc-small .svc-title { font-size: min(var(--fs-5), var(--fit)); }
-  .svc-small .svc-go { padding-inline: var(--sp-3); }   /* "View service" on one line in a narrow tile (200% zoom) */
+  .svc-menu {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+  .svc-big {
+    grid-column: span 4;
+  }
+  .svc-small {
+    grid-column: span 3;
+  }
+  .svc-big .svc-art {
+    flex: none;
+    aspect-ratio: 4 / 3;
+  }
+  .svc-small .svc-tile {
+    justify-content: center;
+    padding-top: var(--sp-5);
+  }
+  .svc-small .svc-text {
+    padding: var(--sp-3) var(--sp-5) var(--sp-5);
+  }
+  .svc-small .svc-text .chip {
+    display: none;
+  }
+  .svc-small .svc-title {
+    font-size: min(var(--fs-5), var(--fit));
+  }
+  .svc-small .svc-go {
+    padding-inline: var(--sp-3);
+  } /* "View service" on one line in a narrow tile (200% zoom) */
   /* the line stays for screen readers: the .sr-only clip (base.css), here only from tablet up */
-  .svc-small .svc-line { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .svc-small .svc-line {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }
 /* a pointer: the card under it lifts, outlines in amber and slides its bar up. Its shadow is a layer on the li
    that only fades and scales with it, so the big blur is drawn once, not on every frame of the lift. */
 @media (hover: hover) and (--tablet-up) {
   /* clipped as well as moved out: no sliver of it shows at the tile's foot, whatever the rounding (200% zoom). A clip,
      not visibility: hidden, so "View service" stays in the link's name for a screen reader (M10) */
-  .svc-go { position: absolute; inset: auto 0 0; clip-path: inset(0 0 100% 0); transform: translateY(100%); transition: transform var(--dur-2) var(--ease), clip-path var(--dur-2) var(--ease); }
-  .svc-big .svc-text { padding-bottom: calc(var(--control-h) + var(--sp-4)); }
-  .svc-tile:hover, .svc-tile:focus-visible { z-index: 1; transform: scale(1.03); background: var(--c-surface-2); border-color: var(--c-accent); }
-  .svc-tile:hover .svc-go, .svc-tile:focus-visible .svc-go { clip-path: inset(0); transform: none; }
-  .svc-menu > li { position: relative; }
+  .svc-go {
+    position: absolute;
+    inset: auto 0 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(100%);
+    transition:
+      transform var(--dur-2) var(--ease),
+      clip-path var(--dur-2) var(--ease);
+  }
+  .svc-big .svc-text {
+    padding-bottom: calc(var(--control-h) + var(--sp-4));
+  }
+  .svc-tile:hover,
+  .svc-tile:focus-visible {
+    z-index: 1;
+    transform: scale(1.03);
+    background: var(--c-surface-2);
+    border-color: var(--c-accent);
+  }
+  .svc-tile:hover .svc-go,
+  .svc-tile:focus-visible .svc-go {
+    clip-path: inset(0);
+    transform: none;
+  }
+  .svc-menu > li {
+    position: relative;
+  }
   .svc-menu > li::after {
-    content: "";
+    content: '';
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -83,9 +191,15 @@
     box-shadow: var(--shadow-2);
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
   }
-  .svc-menu > li:hover::after, .svc-menu > li:has(> .svc-tile:focus-visible)::after { opacity: 1; transform: scale(1.03); }
+  .svc-menu > li:hover::after,
+  .svc-menu > li:has(> .svc-tile:focus-visible)::after {
+    opacity: 1;
+    transform: scale(1.03);
+  }
 }
 
 /* phone: one swipe row. The middle card is full size and sits just over the edges of the two beside it,
@@ -105,34 +219,75 @@
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
   }
-  .svc-menu::-webkit-scrollbar { display: none; }
+  .svc-menu::-webkit-scrollbar {
+    display: none;
+  }
   /* the heading stays over the row's top edge, so "See all services" keeps its whole tap area */
-  .svc-wrap > .section-head { position: relative; z-index: 3; }
+  .svc-wrap > .section-head {
+    position: relative;
+    z-index: 3;
+  }
   /* spacers, so the first and last card can sit in the middle */
-  .svc-menu::before, .svc-menu::after { content: ""; flex: 0 0 calc(16vw - var(--sp-3)); }
+  .svc-menu::before,
+  .svc-menu::after {
+    content: '';
+    flex: 0 0 calc(16vw - var(--sp-3));
+  }
   /* no snap-stop: a hard flick can pass several cards and still lands one in the middle */
-  .svc-menu > li { flex: 0 0 68vw; scroll-snap-align: center; }
-  .svc-small .svc-art { display: block; }
-  .svc-small .svc-icon { display: none; }
-  .svc-more .svc-icon { display: block; margin-top: auto; }
-  .svc-art { flex: none; aspect-ratio: 16 / 11; }
-  .svc-text { flex: 1; padding: var(--sp-4) var(--sp-5); }
-  .svc-more .svc-text { flex: none; }
-  .svc-title { font-size: min(var(--fs-5), var(--fit)); }
-  .svc-line { font-size: var(--fs-2); }
+  .svc-menu > li {
+    flex: 0 0 68vw;
+    scroll-snap-align: center;
+  }
+  .svc-small .svc-art {
+    display: block;
+  }
+  .svc-small .svc-icon {
+    display: none;
+  }
+  .svc-more .svc-icon {
+    display: block;
+    margin-top: auto;
+  }
+  .svc-art {
+    flex: none;
+    aspect-ratio: 16 / 11;
+  }
+  .svc-text {
+    flex: 1;
+    padding: var(--sp-4) var(--sp-5);
+  }
+  .svc-more .svc-text {
+    flex: none;
+  }
+  .svc-title {
+    font-size: min(var(--fs-5), var(--fit));
+  }
+  .svc-line {
+    font-size: var(--fs-2);
+  }
   /* solid: the card surface is see-through, and the middle card sits over its neighbours' edges */
-  .svc-tile { background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band); transition: none; }
+  .svc-tile {
+    background: linear-gradient(var(--c-surface), var(--c-surface)), var(--c-bg-band);
+    transition: none;
+  }
   /* the timeline sits in its own rule: the minifier folds a longhand next to `animation` into the shorthand,
      which can't hold a timeline, and the browser then drops the whole declaration.
      Only transform and opacity move with the swipe, so Chrome keeps it off the main thread. The middle card's
      shadow and lighter border are a layer over the card (li::after) that moves with it and fades in.
      Which card sits on top is .is-centre (home.js), set as a card crosses the middle, not every frame. */
   @supports (animation-timeline: view()) {
-    .svc-menu > li { position: relative; view-timeline: --svc inline; }
-    .svc-menu > .is-centre { z-index: 2; }
+    .svc-menu > li {
+      position: relative;
+      view-timeline: --svc inline;
+    }
+    .svc-menu > .is-centre {
+      z-index: 2;
+    }
     .svc-menu > li::after {
-      content: "";
-      animation: svc-centre linear both, svc-lift linear both;
+      content: '';
+      animation:
+        svc-centre linear both,
+        svc-lift linear both;
       position: absolute;
       inset: 0;
       border: 1px solid var(--c-line-2);
@@ -141,55 +296,154 @@
       opacity: 0;
       pointer-events: none;
     }
-    .svc-tile { animation: svc-centre linear both; }
-    .svc-art, .svc-icon, .svc-go { animation: svc-dim linear both; }
-    .svc-menu > li::after, .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) { animation-timeline: --svc; }
+    .svc-tile {
+      animation: svc-centre linear both;
+    }
+    .svc-art,
+    .svc-icon,
+    .svc-go {
+      animation: svc-dim linear both;
+    }
+    .svc-menu > li::after,
+    .svc-menu :is(.svc-tile, .svc-art, .svc-icon, .svc-go) {
+      animation-timeline: --svc;
+    }
   }
   @supports not (animation-timeline: view()) {
-    .svc-tile { transform: scale(0.88); transition: transform var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease); }
-    .svc-art, .svc-icon, .svc-go { opacity: 0.4; transition: opacity var(--dur-2) var(--ease); }
-    .svc-menu > .is-centre .svc-tile { z-index: 1; transform: none; border-color: var(--c-line-2); box-shadow: var(--shadow-front); }
-    .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) { opacity: 1; }
+    .svc-tile {
+      transform: scale(0.88);
+      transition:
+        transform var(--dur-2) var(--ease),
+        box-shadow var(--dur-2) var(--ease);
+    }
+    .svc-art,
+    .svc-icon,
+    .svc-go {
+      opacity: 0.4;
+      transition: opacity var(--dur-2) var(--ease);
+    }
+    .svc-menu > .is-centre .svc-tile {
+      z-index: 1;
+      transform: none;
+      border-color: var(--c-line-2);
+      box-shadow: var(--shadow-front);
+    }
+    .svc-menu > .is-centre :is(.svc-art, .svc-icon, .svc-go) {
+      opacity: 1;
+    }
   }
   /* the hint sits up inside the row's bottom padding, and WebKit hit-tests the scrolling row over it (the arrows and
      dots got no clicks in Safari), so it is lifted over the row, as the heading is */
-  .svc-hint { position: relative; z-index: 3; display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: calc(-1 * (var(--sp-4) + var(--sp-8))); color: var(--c-muted); font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; }
+  .svc-hint {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-2);
+    margin-top: calc(-1 * (var(--sp-4) + var(--sp-8)));
+    color: var(--c-muted);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
   /* "Swipe" fades once they have swiped (home.js); the dots stay */
-  .svc-swipe { display: flex; align-items: center; gap: var(--sp-2); transition: opacity var(--dur-2) var(--ease); }
-  .svc-swipe svg { width: var(--sp-4); height: var(--sp-4); }
-  .svc-hint.is-swiped .svc-swipe { opacity: 0; }
-  .svc-dots { display: flex; gap: var(--sp-1); margin-right: var(--sp-2); }   /* the dots themselves: .pip (shared-blocks.css) */
-  .svc-hint .svc-step { display: none; }
+  .svc-swipe {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    transition: opacity var(--dur-2) var(--ease);
+  }
+  .svc-swipe svg {
+    width: var(--sp-4);
+    height: var(--sp-4);
+  }
+  .svc-hint.is-swiped .svc-swipe {
+    opacity: 0;
+  }
+  .svc-dots {
+    display: flex;
+    gap: var(--sp-1);
+    margin-right: var(--sp-2);
+  } /* the dots themselves: .pip (shared-blocks.css) */
+  .svc-hint .svc-step {
+    display: none;
+  }
 }
 /* phone width with a mouse (a narrow desktop window): no swipe, so arrows either side of the dots step a card,
    and a click on the dots jumps to the nearest one (home.js). The arrows dim at the ends (aria-disabled, so a
    focused arrow keeps its focus). */
 @media (--phone) and (hover: hover) and (pointer: fine) {
-  .svc-hint .svc-step { display: grid; }
-  .svc-step[aria-disabled="true"] { opacity: 0.4; cursor: default; }
-  .svc-step[aria-disabled="true"]:hover { background: transparent; color: var(--c-muted); }
-  .svc-swipe { display: none; }
-  .svc-dots { margin-right: 0; padding-block: var(--sp-2); cursor: pointer; }
+  .svc-hint .svc-step {
+    display: grid;
+  }
+  .svc-step[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .svc-step[aria-disabled='true']:hover {
+    background: transparent;
+    color: var(--c-muted);
+  }
+  .svc-swipe {
+    display: none;
+  }
+  .svc-dots {
+    margin-right: 0;
+    padding-block: var(--sp-2);
+    cursor: pointer;
+  }
 }
 /* a neighbour sits about 85% of the way to the edge keyframes, so 18% puts the middle card a few px over it */
 @keyframes svc-centre {
-  0% { transform: translateX(-18%) scale(0.88); }
-  50% { transform: none; }
-  100% { transform: translateX(18%) scale(0.88); }
+  0% {
+    transform: translateX(-18%) scale(0.88);
+  }
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: translateX(18%) scale(0.88);
+  }
 }
 @keyframes svc-lift {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 @keyframes svc-dim {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 /* reduced motion: a plain row, nothing scales or moves with the swipe */
 @media (prefers-reduced-motion: reduce) {
-  .svc-menu > li::after, .svc-tile, .svc-art, .svc-icon, .svc-go { animation: none !important; }
-  .svc-menu > li > .svc-tile, .svc-tile:hover, .svc-tile:focus-visible { transform: none; }
-  .svc-menu .svc-art, .svc-menu .svc-icon, .svc-menu .svc-go { opacity: 1; }
+  .svc-menu > li::after,
+  .svc-tile,
+  .svc-art,
+  .svc-icon,
+  .svc-go {
+    animation: none !important;
+  }
+  .svc-menu > li > .svc-tile,
+  .svc-tile:hover,
+  .svc-tile:focus-visible {
+    transform: none;
+  }
+  .svc-menu .svc-art,
+  .svc-menu .svc-icon,
+  .svc-menu .svc-go {
+    opacity: 1;
+  }
 }
 
 /* desktop (>= 1100 wide and >= 700 tall): one screen; tall cards beside a column of four short tiles (the last is All services).
@@ -198,14 +452,38 @@
 @media (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
   /* one screen, as a floor: a tile whose words outgrow its share (wider spacing, WCAG 1.4.12) makes its row taller
      and the section with it, instead of cutting its icon off */
-  .svc-wrap { display: flex; flex-direction: column; min-height: var(--fold-inner); }
-  .svc-menu { flex: 1; min-height: 0; gap: var(--sp-5); grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(4, minmax(auto, 1fr)); }
-  .svc-big { grid-column: auto; grid-row: 1 / -1; }
-  .svc-small { grid-column: 4; }
-  .svc-big .svc-art { flex: 1; aspect-ratio: auto; }
-  .svc-big .svc-line { font-size: var(--fs-4); }
-  .svc-small .svc-tile { padding-top: 0; }
+  .svc-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: var(--fold-inner);
+  }
+  .svc-menu {
+    flex: 1;
+    min-height: 0;
+    gap: var(--sp-5);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(auto, 1fr));
+  }
+  .svc-big {
+    grid-column: auto;
+    grid-row: 1 / -1;
+  }
+  .svc-small {
+    grid-column: 4;
+  }
+  .svc-big .svc-art {
+    flex: 1;
+    aspect-ratio: auto;
+  }
+  .svc-big .svc-line {
+    font-size: var(--fs-4);
+  }
+  .svc-small .svc-tile {
+    padding-top: 0;
+  }
 }
 
 /* without script the arrows and dots can't do anything (home.js drives them): the row still swipes and scrolls */
-:root:not(.js) .svc-hint :is(.svc-step, .svc-dots) { display: none; }
+:root:not(.js) .svc-hint :is(.svc-step, .svc-dots) {
+  display: none;
+}

@@ -4,4 +4,7 @@
 import { getServices } from '../lib/site';
 const services = await getServices();
 ---
-{services.map(({ data: s }) => s.optionLabel ? <option value={s.title}>{s.optionLabel}</option> : <option>{s.title}</option>)}
+
+{services.map(({ data: s }) =>
+  s.optionLabel ? <option value={s.title}>{s.optionLabel}</option> : <option>{s.title}</option>,
+)}

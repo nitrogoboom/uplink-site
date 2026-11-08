@@ -10,8 +10,14 @@ import { join } from 'node:path';
 import { test } from '@playwright/test';
 import { BASE, ROOT, SIZES, lanes, pages, positional } from './lib.mjs';
 
-const SCALE = [0, ...[...readFileSync(join(ROOT, 'src/styles/tokens.css'), 'utf8').matchAll(/--sp-\d:\s*([\d.]+)rem/g)].map((m) => Number(m[1]) * 16)];
-if (SCALE.length < 2) throw new Error('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern');
+const SCALE = [
+  0,
+  ...[...readFileSync(join(ROOT, 'src/styles/tokens.css'), 'utf8').matchAll(/--sp-\d:\s*([\d.]+)rem/g)].map(
+    (m) => Number(m[1]) * 16,
+  ),
+];
+if (SCALE.length < 2)
+  throw new Error('no --sp-* steps in rem found in src/styles/tokens.css: update the SCALE pattern');
 // selector -> why it may sit off the scale. Keep this short; fix the CSS instead where you can.
 const SKIP = {
   '.sr-only': 'the 1px clip',
@@ -21,11 +27,27 @@ const SKIP = {
   '.svc-hint': 'pulled up under the swiping cards by their bottom padding: -(--sp-4 + --sp-8) (home/services.css)',
   '.grow-cards': "desktop: level with the picture's bottom, above its controls: --tap + --sp-2 (home/grow.css)",
 };
-const PROPS = ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap'];
+const PROPS = [
+  'marginTop',
+  'marginRight',
+  'marginBottom',
+  'marginLeft',
+  'paddingTop',
+  'paddingRight',
+  'paddingBottom',
+  'paddingLeft',
+  'rowGap',
+  'columnGap',
+];
 // values above the biggest step are layout (auto margins, a scroll track sized in svh), not spacing
 const PROBE = ([scale, props, skip]) => {
-  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16, max = Math.max(...scale) * rem, out = [];
-  const name = (e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).join('.') : '');
+  const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) / 16,
+    max = Math.max(...scale) * rem,
+    out = [];
+  const name = (e) =>
+    e.tagName.toLowerCase() +
+    (e.id ? '#' + e.id : '') +
+    (typeof e.className === 'string' && e.className.trim() ? '.' + e.className.trim().split(/\s+/).join('.') : '');
   for (const e of document.body.querySelectorAll('*')) {
     if (e.closest('svg') && e.tagName.toLowerCase() !== 'svg') continue;
     if (skip.some((s) => e.matches(s))) continue;
@@ -35,7 +57,8 @@ const PROBE = ([scale, props, skip]) => {
     for (const p of props) {
       const v = Math.abs(parseFloat(cs[p]));
       if (!v || v > max * 1.01 || (centred && /margin(Left|Right)/.test(p))) continue;
-      if (!scale.some((s) => Math.abs(v - s * rem) < 0.05)) out.push([name(e), p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), Math.round((v / rem) * 100) / 100]);
+      if (!scale.some((s) => Math.abs(v - s * rem) < 0.05))
+        out.push([name(e), p.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), Math.round((v / rem) * 100) / 100]);
     }
   }
   return out;
@@ -63,11 +86,20 @@ test('spacing on scale', async ({ browser }) => {
     const [props, at] = found.get(el);
     const where = [...at].sort();
     lines.push(
-      el + ': ' + Object.keys(props).sort().map((p) => `${p} ${[...props[p]].sort((a, b) => a - b).join('/')}px`).join(', '),
+      el +
+        ': ' +
+        Object.keys(props)
+          .sort()
+          .map((p) => `${p} ${[...props[p]].sort((a, b) => a - b).join('/')}px`)
+          .join(', '),
       `    on ${where.length}: ${where.slice(0, 4).join(', ')}${where.length > 4 ? ' ...' : ''}`,
     );
   }
-  lines.push(found.size ? `${found.size} element(s) off scale on ${paths.length} pages x ${SIZES.length} sizes` : 'spacing: all on scale');
+  lines.push(
+    found.size
+      ? `${found.size} element(s) off scale on ${paths.length} pages x ${SIZES.length} sizes`
+      : 'spacing: all on scale',
+  );
   console.log(lines.join('\n'));
   if (found.size) throw new Error(lines.join('\n'));
 });

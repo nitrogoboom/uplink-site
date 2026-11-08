@@ -6,6 +6,7 @@ import { byOrder } from '../../content.config';
 import './team.css';
 const team = (await getCollection('team')).sort(byOrder);
 ---
+
 <section class="section fold" id="team" aria-labelledby="team-title">
   <div class="container">
     <div class="section-head">
@@ -13,9 +14,13 @@ const team = (await getCollection('team')).sort(byOrder);
       <h2 id="team-title">The people who pick up</h2>
     </div>
     <ul class="team">
-      {team.map(({ data: t }) => (
-        <li class="person panel"><span class="avatar" aria-hidden="true">{t.initials}</span><span class="stack-2"><span class="person-name">{t.name}</span><span class="sr-only">, </span><span class="small muted">{t.role}</span></span></li>
-      ))}
+      {team.map(({ data: t }) => <li class="person panel">
+        <span class="avatar" aria-hidden="true">{t.initials}</span
+        ><span class="stack-2"
+          ><span class="person-name">{t.name}</span><span class="sr-only">, </span
+          ><span class="small muted">{t.role}</span></span
+        >
+      </li>)}
     </ul>
     <div class="panel cta-band fold-foot" id="start">
       <div class="stack">

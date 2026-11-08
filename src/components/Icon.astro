@@ -3,10 +3,22 @@
 //   <Icon name="arrow" />   <Icon name="close" class="x" />
 import { ICONS, type Def, type IconName } from './icons';
 export type { IconName };
-interface Props { name: IconName; class?: string }
+interface Props {
+  name: IconName;
+  class?: string;
+}
 const { name, class: cls } = Astro.props;
 const i: Def = ICONS[name];
 ---
-<svg class={cls} viewBox={i.box ?? '0 0 24 24'} fill="none" stroke="currentColor" stroke-width={i.sw ?? 1.8}
-     stroke-linecap={i.cap === false ? undefined : 'round'} stroke-linejoin={i.join === false ? undefined : 'round'}
-     aria-hidden="true" set:html={i.d} />
+
+<svg
+  class={cls}
+  viewBox={i.box ?? '0 0 24 24'}
+  fill="none"
+  stroke="currentColor"
+  stroke-width={i.sw ?? 1.8}
+  stroke-linecap={i.cap === false ? undefined : 'round'}
+  stroke-linejoin={i.join === false ? undefined : 'round'}
+  aria-hidden="true"
+  set:html={i.d}
+/>

@@ -2,12 +2,27 @@
 /* ---------- WORK ----------------------------------------------------- */
 /* the filters: a radio group (Projects.astro). Each label is a chip; its radio is hidden but keeps focus and the arrow
    keys. The rules that hide the other cards come from the data (workFilterCss() in lib/site.ts, in the page's <head>) */
-.filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); position: relative; min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  position: relative;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 /* without :has() choosing one would change nothing (every project shows), so the filters go */
-@supports not selector(:has(*)) { .filters { display: none; } }
+@supports not selector(:has(*)) {
+  .filters {
+    display: none;
+  }
+}
 .filter {
-  position: relative;   /* holds the hidden radio and the ", " pause (both absolute) inside the chip */
-  display: inline-flex; align-items: center; gap: var(--sp-3);
+  position: relative; /* holds the hidden radio and the ", " pause (both absolute) inside the chip */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
   min-height: var(--tap);
   padding-inline: var(--sp-4) var(--sp-3);
   border: 1px solid var(--c-line);
@@ -18,48 +33,158 @@
   cursor: pointer;
   transition: background-color var(--dur-1) var(--ease);
 }
-.filter:hover { background: var(--c-surface-2); }
-.filter:has(:checked) { background: var(--c-accent); border-color: transparent; color: var(--c-on-accent); }
-.filter:has(:focus-visible) { outline: 2px solid var(--c-accent-text); outline-offset: 2px; }   /* the site's ring (base.css), on the chip */
-.filter .count { display: inline-grid; place-items: center; min-width: var(--sp-5); height: var(--sp-5); padding-inline: var(--sp-2); border-radius: var(--r-pill); background: var(--c-surface-2); font-size: var(--fs-1); }
-.filter:has(:checked) .count { background: var(--c-ink-tint); }
+.filter:hover {
+  background: var(--c-surface-2);
+}
+.filter:has(:checked) {
+  background: var(--c-accent);
+  border-color: transparent;
+  color: var(--c-on-accent);
+}
+.filter:has(:focus-visible) {
+  outline: 2px solid var(--c-accent-text);
+  outline-offset: 2px;
+} /* the site's ring (base.css), on the chip */
+.filter .count {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--sp-5);
+  height: var(--sp-5);
+  padding-inline: var(--sp-2);
+  border-radius: var(--r-pill);
+  background: var(--c-surface-2);
+  font-size: var(--fs-1);
+}
+.filter:has(:checked) .count {
+  background: var(--c-ink-tint);
+}
 /* forced colours (Windows contrast themes) paint every chip alike: the checked one takes the theme's Highlight. It
    opts out of the forcing (forced-color-adjust: none, as in header.css and buttons.css), or the theme's backplate
    puts Canvas behind its HighlightText words and they turn into a solid block. The focus ring is CanvasText: with
    radios the focused chip is the checked one, and the forced ring (currentColor, HighlightText) would match the page.
    Each forced-colours fix sits beside the rule it fixes (src/README.md, Styles) */
 @media (forced-colors: active) {
-  .filter { transition: none; }   /* the words change at once: a fading background would leave them unreadable a moment */
-  .filter:has(:checked) { forced-color-adjust: none; background: Highlight; border-color: Highlight; color: HighlightText; }
-  .filter:has(:checked) .count { background: Canvas; color: CanvasText; }
-  .filter:has(:focus-visible) { outline-color: CanvasText; }
+  .filter {
+    transition: none;
+  } /* the words change at once: a fading background would leave them unreadable a moment */
+  .filter:has(:checked) {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+    color: HighlightText;
+  }
+  .filter:has(:checked) .count {
+    background: Canvas;
+    color: CanvasText;
+  }
+  .filter:has(:focus-visible) {
+    outline-color: CanvasText;
+  }
 }
 @media (--phone) {
-  .filters { flex-wrap: nowrap; overflow-x: auto; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); padding-block: var(--sp-1); scrollbar-width: none; }
-  .filters > .filter { flex: none; }
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    padding-block: var(--sp-1);
+    scrollbar-width: none;
+  }
+  .filters > .filter {
+    flex: none;
+  }
 }
-.work-layout { display: flex; flex-direction: column; gap: var(--sp-6); }
-.work-side { display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-.work-side .filters { margin-top: var(--sp-2); }
-.work-main { min-width: 0; }
-.work-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
+.work-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.work-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+.work-side .filters {
+  margin-top: var(--sp-2);
+}
+.work-main {
+  min-width: 0;
+}
+.work-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+}
 /* phones: the project cards are rows (surfaces.css); each as tall as the tallest, as on Home (.card-row) */
-@media (--phone) { .work-grid { grid-auto-rows: 1fr; } }
-@media (--tablet-up) { .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (--desktop) { .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--sp-5); } }
-.work-grid > li { display: flex; }
-.work-grid .card { flex: 1; width: 100%; font: inherit; }
+@media (--phone) {
+  .work-grid {
+    grid-auto-rows: 1fr;
+  }
+}
+@media (--tablet-up) {
+  .work-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (--desktop) {
+  .work-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+}
+.work-grid > li {
+  display: flex;
+}
+.work-grid .card {
+  flex: 1;
+  width: 100%;
+  font: inherit;
+}
 
 /* desktop (>= 1100 wide and >= 700 tall): intro and filters in a side column, projects fill the rest. One screen is a
    floor: cards whose words need more room make the grid taller; the pictures take what is left, down to a floor */
 @media (--fold) {
-  .work-layout { min-height: var(--fold-inner); }
-  .work-main { height: 100%; min-height: 0; }
-  .work-grid { height: 100%; grid-template-rows: repeat(2, minmax(0, 1fr)); }
-  .work-grid > li, .work-grid .card { min-height: 0; }
-  .work-grid .card-media img { position: absolute; inset: 0; }
-  .work-grid .card-media { aspect-ratio: auto; flex: 1; min-height: 8rem; }
-  .page-intro .work-layout { display: grid; grid-template-rows: minmax(0, 1fr); grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); column-gap: var(--sp-8); align-items: center; }
-  .work-side .filters { flex-direction: column; gap: var(--sp-2); margin-top: var(--sp-4); }
-  .work-side .filter { width: 100%; justify-content: space-between; border-radius: var(--r-2); }
+  .work-layout {
+    min-height: var(--fold-inner);
+  }
+  .work-main {
+    height: 100%;
+    min-height: 0;
+  }
+  .work-grid {
+    height: 100%;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  .work-grid > li,
+  .work-grid .card {
+    min-height: 0;
+  }
+  .work-grid .card-media img {
+    position: absolute;
+    inset: 0;
+  }
+  .work-grid .card-media {
+    aspect-ratio: auto;
+    flex: 1;
+    min-height: 8rem;
+  }
+  .page-intro .work-layout {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+    column-gap: var(--sp-8);
+    align-items: center;
+  }
+  .work-side .filters {
+    flex-direction: column;
+    gap: var(--sp-2);
+    margin-top: var(--sp-4);
+  }
+  .work-side .filter {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: var(--r-2);
+  }
 }

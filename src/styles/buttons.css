@@ -17,28 +17,69 @@
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
-  transition: transform var(--dur-1) var(--ease), filter var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+  transition:
+    transform var(--dur-1) var(--ease),
+    filter var(--dur-1) var(--ease),
+    background-color var(--dur-1) var(--ease);
 }
-@media (hover: hover) { .btn:hover { transform: translateY(-1px); } }   /* real pointers only: on touch a tap leaves :hover stuck */
-.btn:active { transform: none; }
-.btn svg { width: var(--icon); height: var(--icon); flex: none; }
-.btn--primary { background: var(--c-accent); color: var(--c-on-accent); box-shadow: var(--shadow-1); }
-.btn--primary:hover { filter: brightness(1.06); }
-.btn--secondary { background: var(--c-surface-2); border-color: var(--c-line); color: var(--c-text); }
-.btn--secondary:hover { background: var(--c-line-2); }
-.btn--lg { min-height: var(--control-lg); padding-inline: var(--sp-6); font-size: var(--fs-6); }
-.btn--primary .kbd { background: var(--c-ink-tint); border-color: var(--c-ink-tint); color: var(--c-on-accent); }
+@media (hover: hover) {
+  .btn:hover {
+    transform: translateY(-1px);
+  }
+} /* real pointers only: on touch a tap leaves :hover stuck */
+.btn:active {
+  transform: none;
+}
+.btn svg {
+  width: var(--icon);
+  height: var(--icon);
+  flex: none;
+}
+.btn--primary {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  box-shadow: var(--shadow-1);
+}
+.btn--primary:hover {
+  filter: brightness(1.06);
+}
+.btn--secondary {
+  background: var(--c-surface-2);
+  border-color: var(--c-line);
+  color: var(--c-text);
+}
+.btn--secondary:hover {
+  background: var(--c-line-2);
+}
+.btn--lg {
+  min-height: var(--control-lg);
+  padding-inline: var(--sp-6);
+  font-size: var(--fs-6);
+}
+.btn--primary .kbd {
+  background: var(--c-ink-tint);
+  border-color: var(--c-ink-tint);
+  color: var(--c-on-accent);
+}
 
 .iconbtn {
-  display: grid; place-items: center;
-  width: var(--tap); height: var(--tap);
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
   border: 0;
   border-radius: var(--r-2);
   background: transparent;
   color: var(--c-muted);
 }
-.iconbtn:hover { background: var(--c-surface-2); color: var(--c-text); }
-.iconbtn svg { width: var(--icon); height: var(--icon); }
+.iconbtn:hover {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+.iconbtn svg {
+  width: var(--icon);
+  height: var(--icon);
+}
 
 .chip {
   display: inline-flex;
@@ -55,12 +96,32 @@
   letter-spacing: var(--tracking-3);
   line-height: var(--lh-tight);
   text-transform: uppercase;
-}   /* a long chip wraps on a narrow screen instead of running off it */
-.chip--accent { background: var(--c-accent); color: var(--c-on-accent); }
-.chip--sky { background: var(--c-sky-tint); color: var(--c-sky); }
-.chip--ok { background: var(--c-ok-tint); color: var(--c-ok); }
-.chip--dot::before { content: ""; width: var(--sp-2); height: var(--sp-2); border-radius: 50%; background: currentColor; }
-@media (forced-colors: active) { .chip--dot::before { forced-color-adjust: none; background: CanvasText; } }   /* contrast themes paint backgrounds over */
+} /* a long chip wraps on a narrow screen instead of running off it */
+.chip--accent {
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+.chip--sky {
+  background: var(--c-sky-tint);
+  color: var(--c-sky);
+}
+.chip--ok {
+  background: var(--c-ok-tint);
+  color: var(--c-ok);
+}
+.chip--dot::before {
+  content: '';
+  width: var(--sp-2);
+  height: var(--sp-2);
+  border-radius: 50%;
+  background: currentColor;
+}
+@media (forced-colors: active) {
+  .chip--dot::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+} /* contrast themes paint backgrounds over */
 
 .link-arrow {
   display: inline-flex;
@@ -72,9 +133,14 @@
   color: var(--c-accent-text);
   text-decoration: none;
 }
-.link-arrow svg { width: var(--sp-4); height: var(--sp-4); transition: transform var(--dur-1) var(--ease); }
-.link-arrow:hover svg { transform: translateX(var(--sp-1)); }
-
+.link-arrow svg {
+  width: var(--sp-4);
+  height: var(--sp-4);
+  transition: transform var(--dur-1) var(--ease);
+}
+.link-arrow:hover svg {
+  transform: translateX(var(--sp-1));
+}
 
 /* pause button (HoldButton.astro): a round key with two bars, or a play triangle while held. core.js shows it with
    script and motion; the caller places it (.hero-pause, .fc-hold). */
@@ -89,10 +155,27 @@
   color: var(--c-text);
   transition: background-color var(--dur-1) var(--ease);
 }
-.hold[hidden] { display: none; }
-.hold:hover { background: var(--c-surface-2); }
-.hold-icon { width: calc(var(--icon) * 0.6); height: calc(var(--icon) * 0.7); border-inline: calc(var(--icon) * 0.2) solid currentColor; }
-.hold[aria-pressed="true"] .hold-icon { border: 0; background: currentColor; clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
+.hold[hidden] {
+  display: none;
+}
+.hold:hover {
+  background: var(--c-surface-2);
+}
+.hold-icon {
+  width: calc(var(--icon) * 0.6);
+  height: calc(var(--icon) * 0.7);
+  border-inline: calc(var(--icon) * 0.2) solid currentColor;
+}
+.hold[aria-pressed='true'] .hold-icon {
+  border: 0;
+  background: currentColor;
+  clip-path: polygon(15% 0, 100% 50%, 15% 100%);
+}
 /* forced colours paint the play triangle's fill away, leaving an empty button (B4): it keeps the button's text colour,
    ButtonText outside the drawings and its own colour inside one (.stage keeps its colours: surfaces.css) */
-@media (forced-colors: active) { .hold[aria-pressed="true"] .hold-icon { forced-color-adjust: none; background: currentColor; } }
+@media (forced-colors: active) {
+  .hold[aria-pressed='true'] .hold-icon {
+    forced-color-adjust: none;
+    background: currentColor;
+  }
+}
