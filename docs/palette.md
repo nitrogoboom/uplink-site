@@ -90,7 +90,7 @@ Light mode keeps the dark mode's feel: soft, deep and calm, like velvet, not a w
 1. **Every neutral is navy.** No plain grey and no plain white, except the top layer. Grounds sit at hue 250 with OKLCH chroma 0.013–0.016. Light greys need more tint than mid greys to keep from looking flat or dirty.
 2. **A card is the ground, lifted.** Its fill is the ground's own navy at a higher lightness (`#F8FBFF`, L 0.99), not a different colour. Pure `#FFFFFF` is only for the top layer: dialogs, toasts and menus.
 3. **Depth comes from light, not outlines.** A card's edge is a soft line (`line`, 13%). What separates it is `card-shadow`: three soft layers of navy shadow, each about twice the last, plus a 1px highlight along its top edge. Shadows are tinted navy (hue 215), never black.
-4. **Light comes from above.** `card-light` makes a card a little brighter at the top and a hair darker at its foot, as the drawings light their boxes (top lightest, 5.4). It is see-through, so a hover or a chosen colour under it still shows.
+4. **Light comes from above.** `card-light` makes a card a touch brighter along its top, fading out a third of the way down, as the drawings light their boxes (top lightest, 5.4). Keep it that faint: a fuller fade, or a darker foot, reads as a cheap gradient. It is see-through, so a hover or a chosen colour under it still shows.
 
 Two more rules hold in light mode only:
 
@@ -127,7 +127,7 @@ Every colour has one job. If you need a second job, you need a second role.
 | `glass-raised` | `#202C38` | `#F8FBFF` | phone bottom bar (solid, no blur) |
 | `backdrop` | `rgb(14 26 39 / 0.62)` | `rgb(34 46 58 / 0.4)` | scrim behind pop-ups |
 | `card-shadow` | none (light and glows do this) | `inset 0 1px 0 rgb(255 255 255 / 0.9)`, then `0 1px 1px`, `0 2px 4px` (both `hsl(215 40% 30% / 0.05)`) and `0 6px 14px -4px hsl(215 40% 30% / 0.08)` | a card at rest: its top highlight and soft lift (4.3) |
-| `card-light` | none | `linear-gradient(rgb(255 255 255 / 0.55), transparent 55%, rgb(14 26 39 / 0.015))` | a card lit from above (4.3) |
+| `card-light` | none | `linear-gradient(rgb(255 255 255 / 0.3), transparent 30%)` | a card lit from above (4.3) |
 
 ### 5.2 Action, links and status
 
@@ -287,7 +287,7 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
   --glass: #E8EFF7; --backdrop: rgb(34 46 58 / 0.4);
   --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215 40% 30% / 0.05),
     0 2px 4px hsl(215 40% 30% / 0.05), 0 6px 14px -4px hsl(215 40% 30% / 0.08);
-  --card-light: linear-gradient(rgb(255 255 255 / 0.55), transparent 55%, rgb(14 26 39 / 0.015));
+  --card-light: linear-gradient(rgb(255 255 255 / 0.3), transparent 30%);
 }
 body { background: var(--page); color: var(--text); }
 :root[data-theme="light"] .card { background-image: var(--card-light); box-shadow: var(--card-shadow); }

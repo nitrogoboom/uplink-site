@@ -82,9 +82,10 @@
     --shadow-card:
       inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215deg 40% 30% / 0.05), 0 2px 4px hsl(215deg 40% 30% / 0.05),
       0 6px 14px -4px hsl(215deg 40% 30% / 0.08);
-    /* and its light: a little brighter at the top, a hair darker at the foot. See-through, so a hover or chosen
+    /* and its light: a touch brighter along the top, gone by a third of the way down, nothing at the foot (a fuller
+       fade, with a darker foot, read as a cheap gradient on the short tiles). See-through, so a hover or chosen
        colour under it still shows */
-    --card-light: linear-gradient(rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 55%, rgb(14 26 39 / 0.015));
+    --card-light: linear-gradient(rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 30%);
   }
 }
 
