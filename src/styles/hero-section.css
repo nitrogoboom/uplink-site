@@ -13,7 +13,7 @@
   isolation: isolate;
   /* its padding, set here once: the screen sizes below (and the home hero's phone rule) change only the two
      values. Named so the home hero can take it off its own height (components/home/hero.css). It wins over
-     .fold's (fold.css) only by coming later in global.css: keep hero.css after fold.css. */
+     .fold's (fold.css) only by coming later in global.css: keep hero-section.css after fold.css. */
   --hero-pad-top: var(--sp-6);
   --hero-pad-bottom: var(--sp-7);
   padding-block: var(--hero-pad-top) var(--hero-pad-bottom);

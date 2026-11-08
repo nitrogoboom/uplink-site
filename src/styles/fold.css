@@ -1,5 +1,6 @@
 /*--- Desktop: one section per screen, on every page. After shared-blocks.css on purpose: .fold's padding wins a
-   tie against .page-intro's, as it always has. Each section's own desktop layout sits at the end of its CSS. ---*/
+   tie against .page-intro's, as it always has. Each section's own desktop layout sits at the end of its CSS.
+   At the end, .fold-foot: content after a section's main block. ---*/
 /* desktop (>= 1100 wide and >= 700 tall): one section per screen. Text keeps the visitor's size (tokens.css); the space
    round each section (--fold-pad) and the pictures follow the screen, so a 1280 x 720 laptop and a 3440 x 1440
    ultrawide both show one section a screen. A section whose words need more room grows past one screen. */
@@ -46,5 +47,20 @@
   }
   .split > .section-head {
     margin-bottom: 0;
+  }
+}
+
+/* ---------- shared: content after a section's main block ------------- */
+.fold-foot {
+  margin-top: var(--sp-7);
+}
+
+/* desktop (>= 1100 wide and >= 700 tall) */
+@media (--fold) {
+  .split > .fold-foot {
+    grid-column: 1 / -1;
+  }
+  .fold-foot {
+    margin-top: var(--sp-6);
   }
 }

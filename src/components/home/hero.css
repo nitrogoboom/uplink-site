@@ -1,6 +1,6 @@
 /*--- HOME · 1. Hero, every screen size. Phone and portrait tablet first, then
    the two-column layouts at the end of this file. The .hero section itself (colour, glow, padding) is
-   src/styles/hero.css, shared with the service pages and the case-study pages. ---*/
+   src/styles/hero-section.css, shared with the service pages and the case-study pages. ---*/
 /* ---------- HOME ----------------------------------------------------- */
 /* phone + portrait tablet: one column. */
 .hero-grid {
@@ -439,7 +439,7 @@
   .hero-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     /* one screen with the news cards in it: the office row takes what the cards leave (less the hero's padding,
-       src/styles/hero.css), and grows past it only if the text needs more */
+       src/styles/hero-section.css), and grows past it only if the text needs more */
     min-height: calc(var(--hero-h) - var(--hero-pad-top) - var(--hero-pad-bottom));
     grid-template-rows: 1fr auto;
     grid-template-areas: 'menu stage' 'dock dock';
