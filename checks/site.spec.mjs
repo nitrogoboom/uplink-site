@@ -1698,6 +1698,134 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
   verdict(fails);
 });
 
+// WCAG 1.4.11 (non-text contrast): on a phone each dot in Grow's step row and the services row is the only visible
+// part of its control, so every state (Grow: done, current, not reached; services: current, off) is at least 3:1
+// against what is behind it. The dot's colour is its fill at its alpha times its own and its ancestors' opacity; the
+// backdrop is the pixel under its centre, read from a screenshot with the dots hidden.
+test('non-text contrast: Grow and services dots, every state, 3:1 (WCAG 1.4.11)', async ({ browser }) => {
+  const fails = [];
+  const rep = [];
+  const q = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await q.goto(url('index'));
+  await q.waitForLoadState('networkidle');
+  const lum = (c) => {
+    const [r, g, b] = c.map((v) => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const ratio = (a, b) => {
+    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+    return (x + 0.05) / (y + 0.05);
+  };
+  const look = async (name, sel, state) => {
+    await q.locator(sel).first().scrollIntoViewIfNeeded();
+    await q.mouse.move(0, 0);
+    await q.waitForTimeout(400); // the dots' colour and opacity transitions
+    const dots = await q.$$eval(sel, (els) =>
+      els.map((e) => {
+        const m = getComputedStyle(e)
+          .backgroundColor.match(/[\d.]+/g)
+          .map(Number);
+        let a = m[3] ?? 1;
+        for (let n = e; n; n = n.parentElement) a *= Number(getComputedStyle(n).opacity);
+        const r = e.getBoundingClientRect();
+        return { state: e.dataset.state, fill: m.slice(0, 3), a, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+      }),
+    );
+    const hide = (v) =>
+      q.$$eval(sel, (els, v) => els.forEach((e) => e.style.setProperty('visibility', v, 'important')), v);
+    await hide('hidden');
+    const png = PNG.sync.read(await q.screenshot());
+    await hide('');
+    const seen = new Set();
+    for (const d of dots) {
+      const k = state(d);
+      if (seen.has(k)) continue;
+      seen.add(k);
+      const i = (Math.round(d.y) * png.width + Math.round(d.x)) * 4;
+      const back = [png.data[i], png.data[i + 1], png.data[i + 2]];
+      const ink = d.fill.map((v, j) => v * d.a + back[j] * (1 - d.a));
+      const r = ratio(ink, back);
+      rep.push(`${name} ${k}: ${r.toFixed(2)}:1 (rgb ${ink.map(Math.round)} on rgb ${back})`);
+      if (r < 3) fails.push(`${name} ${k} dot ${r.toFixed(2)}:1 against rgb ${back}, under 3:1`);
+    }
+  };
+  // Grow: pick the third step, so two are done, one is current and three are not reached
+  await q.locator('#grow').scrollIntoViewIfNeeded();
+  await q.locator('#grow .grow-dot:visible').nth(2).click();
+  await q.$$eval('#grow .grow-dot', (bs) =>
+    bs.forEach((b) => {
+      const pip = /** @type {HTMLElement} */ (b.querySelector('.pip'));
+      pip.dataset.state = b.matches('[aria-current="step"]')
+        ? 'current'
+        : b.classList.contains('is-done')
+          ? 'done'
+          : 'not reached';
+    }),
+  );
+  await look('Grow', '#grow .grow-dot .pip', (d) => d.state);
+  await q.$$eval('.svc-dots .pip', (ps) =>
+    ps.forEach((p) => (p.dataset.state = p.classList.contains('on') ? 'current' : 'off')),
+  );
+  await look('services', '.svc-dots .pip', (d) => d.state);
+  for (const want of ['Grow done', 'Grow current', 'Grow not reached', 'services current', 'services off'])
+    if (!rep.some((r) => r.startsWith(want + ':'))) fails.push(`${want}: no such dot on the page`);
+  await q.close();
+  console.log(`dot contrast:\n  ${rep.join('\n  ')}`);
+  verdict(fails);
+});
+
+// WCAG 1.4.13 (content on hover or focus): the "View service" bar a Home service tile slides up on hover or keyboard
+// focus covers none of the tile's words (its title, line or tag), at 1440x900 and at 200% zoom on it.
+test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.13)', async ({ browser }) => {
+  const fails = [];
+  for (const zoom of [1, 2]) {
+    const ctx = await browser.newContext({
+      viewport: { width: 1440 / zoom, height: 900 / zoom },
+      deviceScaleFactor: zoom,
+    });
+    const q = await ctx.newPage();
+    await q.goto(url('index'));
+    await q.evaluate(() => document.fonts.ready);
+    const tiles = q.locator('#services .svc-tile');
+    for (let i = 0; i < (await tiles.count()); i++) {
+      const tile = tiles.nth(i);
+      for (const how of ['hover', 'focus']) {
+        await tile.scrollIntoViewIfNeeded();
+        if (how === 'hover') await tile.hover();
+        else {
+          await q.mouse.move(0, 0);
+          await q.keyboard.press('Shift'); // a key, so the focus that follows is a keyboard one (:focus-visible)
+          await tile.focus();
+        }
+        await q.waitForTimeout(400); // the bar's slide and the lift
+        const out = await tile.evaluate((t, how) => {
+          const go = /** @type {Element} */ (t.querySelector('.svc-go')).getBoundingClientRect();
+          if (how === 'focus' && !t.matches(':focus-visible')) return ['not :focus-visible'];
+          if (getComputedStyle(/** @type {Element} */ (t.querySelector('.svc-go'))).clipPath.includes('100%'))
+            return ['bar not shown'];
+          const hit = [];
+          for (const w of t.querySelectorAll('.svc-title, .svc-line, .chip')) {
+            const r = w.getBoundingClientRect();
+            if (r.width <= 1 || r.height <= 1 || !w.checkVisibility()) continue; // the small tiles' line is for screen readers only
+            const over = Math.min(r.bottom, go.bottom) - Math.max(r.top, go.top);
+            if (over > 0.5 && Math.min(r.right, go.right) > Math.max(r.left, go.left))
+              hit.push(`covers ${over.toFixed(1)}px of "${w.textContent.trim().slice(0, 24)}"`);
+          }
+          return hit;
+        }, how);
+        if (how === 'focus') await tile.blur();
+        const name = (await tile.locator('.svc-title').textContent()).trim();
+        for (const h of out) fails.push(`${zoom * 100}% zoom, ${how}, ${name}: ${h}`);
+      }
+    }
+    await ctx.close();
+  }
+  verdict(fails);
+});
+
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
 test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
