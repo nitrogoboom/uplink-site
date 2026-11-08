@@ -164,8 +164,12 @@
       transform var(--dur-2) var(--ease),
       clip-path var(--dur-2) var(--ease);
   }
+  /* room for the bar under the words, so it covers none of them (WCAG 1.4.13) */
   .svc-big .svc-text {
     padding-bottom: calc(var(--control-h) + var(--sp-4));
+  }
+  .svc-small .svc-text {
+    padding-bottom: calc(var(--control-h) + var(--sp-2));
   }
   .svc-tile:hover,
   .svc-tile:focus-visible {
@@ -480,6 +484,18 @@
   }
   .svc-small .svc-tile {
     padding-top: 0;
+  }
+}
+
+/* desktop with a pointer: the room kept for the bar (above) comes out of the icon, so a short tile still fits its
+   quarter of the screen (1280x800, 1366x768) */
+@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-small .svc-icon svg {
+    width: var(--sp-6);
+    height: var(--sp-6);
+  }
+  .svc-small .svc-text {
+    padding-top: var(--sp-2);
   }
 }
 

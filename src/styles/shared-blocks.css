@@ -131,13 +131,14 @@
 } /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the
-   current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current). */
+   current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current).
+   The rest are --c-edge, 3:1 against the page: a dot is all there is of its control (WCAG 1.4.11) */
 .pip {
   display: block;
   width: var(--sp-2);
   height: var(--sp-2);
   border-radius: var(--r-pill);
-  background: var(--c-surface-2);
+  background: var(--c-edge);
   transition:
     width var(--dur-2) var(--ease),
     background-color var(--dur-2) var(--ease),

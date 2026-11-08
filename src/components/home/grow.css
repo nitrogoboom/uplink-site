@@ -178,10 +178,10 @@
   }
 }
 /* the dots themselves: .pip (shared-blocks.css); the current one is the pressed button's. Steps already shown stay
-   amber, dimmed */
+   amber, dimmed but still 3:1 against the page (0.6: about 4:1; WCAG 1.4.11) */
 .grow-dot.is-done .pip {
   background: var(--c-accent);
-  opacity: 0.45;
+  opacity: 0.6;
 }
 @media (hover: hover) {
   .grow-dot:not([aria-current='step']):hover .pip {
