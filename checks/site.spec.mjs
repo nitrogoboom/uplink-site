@@ -1406,29 +1406,30 @@ const WORDS = () => {
   }
   return [out, plain];
 };
-test('headings and numbers: no word split across lines (B18, B20)', async ({ browser }) => {
-  test.setTimeout(300_000);
-  const jobs = [
-    ...[320, 768, 1060, 1440, 2560].flatMap((w) => PAGES.map((page) => [page, w, 0])),
-    ...[1024, 1040, 1080, 1099].map((w) => ['services/security', w, 0]),
-    ...[320, 390].flatMap((w) => PAGES.map((page) => [page, w, 32])),
-  ];
-  const fails = (
-    await lanes(jobs, 4, async ([page, w, font]) => {
-      const ctx = await browser.newContext({ viewport: { width: w, height: w > 1000 ? 900 : 800 } });
-      const q = await ctx.newPage();
-      if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
-      await q.goto(url(page));
-      await q.evaluate(() => document.fonts.ready);
-      const [split, plain] = await q.evaluate(WORDS);
-      for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
-      await ctx.close();
-      return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
-    })
-  ).filter(Boolean);
-  console.log(`headings: ${jobs.length} page sizes, ${fails.length} with a split word`);
-  verdict(fails);
-});
+// one test per page, so the shards (README, "CI") share the work evenly
+for (const page of PAGES) {
+  test(`headings and numbers: no word split across lines, ${page} (B18, B20)`, async ({ browser }) => {
+    const jobs = [
+      ...[320, 768, 1060, 1440, 2560].map((w) => [w, 0]),
+      ...(page === 'services/security' ? [1024, 1040, 1080, 1099].map((w) => [w, 0]) : []),
+      ...[320, 390].map((w) => [w, 32]),
+    ];
+    const fails = (
+      await lanes(jobs, 4, async ([w, font]) => {
+        const ctx = await browser.newContext({ viewport: { width: w, height: w > 1000 ? 900 : 800 } });
+        const q = await ctx.newPage();
+        if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
+        await q.goto(url(page));
+        await q.evaluate(() => document.fonts.ready);
+        const [split, plain] = await q.evaluate(WORDS);
+        for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
+        await ctx.close();
+        return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}: ${split.join(', ')}` : null;
+      })
+    ).filter(Boolean);
+    verdict(fails);
+  });
+}
 
 // C1 (layout phase 4: text in rem, the room round it from the screen). Home on desktop windows people use: the hero is
 // one wheel step tall and its menu and news cards are on the first screen; every Home section starts on the 100px
