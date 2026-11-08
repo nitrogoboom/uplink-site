@@ -6,7 +6,7 @@ A portable colour spec. Hand this file to an agent to recolour a site, a documen
 
 It does not belong to one project. Each project maps its own names onto the roles below. See "Name maps" at the end.
 
-- Version: 1.2 (November 8, 2026). 1.2 rewrites the light column of the grounds (5.1) and adds light mode's own rules (4.3), two light-only roles (`card-shadow`, `card-light`) and rule 13. 1.1 added two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
+- Version: 1.2 (November 8, 2026). 1.2 rewrites the light column of the grounds (5.1) and adds light mode's own rules (4.3), a light-only role (`card-shadow`) and rule 13. 1.1 added two drawing roles (`led`, `window-lit-cool`) and the derived drawing shades (5.5).
 - Colour values: approved by an independent colour-theory and accessibility review. All 12 checks pass. Measured by `editing-room/palette/final/build.py` on the `archive/editing-room` branch.
 
 > **Note:** This file was `editing-room/palette/DESIGN.md` until November 8, 2026 (review C9). The proposals, the review and the build scripts behind it stay on the `archive/editing-room` branch.
@@ -90,7 +90,7 @@ Light mode keeps the dark mode's feel: soft, deep and calm, like velvet, not a w
 1. **Every neutral is navy.** No plain grey and no plain white, except the top layer. Grounds sit at hue 250 with OKLCH chroma 0.013–0.016. Light greys need more tint than mid greys to keep from looking flat or dirty.
 2. **A card is the ground, lifted.** Its fill is the ground's own navy at a higher lightness (`#F8FBFF`, L 0.99), not a different colour. Pure `#FFFFFF` is only for the top layer: dialogs, toasts and menus.
 3. **Depth comes from light, not outlines.** A card's edge is a soft line (`line`, 13%). What separates it is `card-shadow`: three soft layers of navy shadow, each about twice the last, plus a 1px highlight along its top edge. Shadows are tinted navy (hue 215), never black.
-4. **Light comes from above.** `card-light` makes a card a touch brighter along its top, fading out a third of the way down, as the drawings light their boxes (top lightest, 5.4). Keep it that faint: a fuller fade, or a darker foot, reads as a cheap gradient. It is see-through, so a hover or a chosen colour under it still shows.
+4. **Light comes from above, and cards stay flat.** The 1px highlight along a card's top edge (in `card-shadow`) is all the light a card gets, as the drawings light their boxes from the top (5.4). No gradient on a card: even a faint fade down it read as cheap.
 
 Two more rules hold in light mode only:
 
@@ -127,7 +127,6 @@ Every colour has one job. If you need a second job, you need a second role.
 | `glass-raised` | `#202C38` | `#F8FBFF` | phone bottom bar (solid, no blur) |
 | `backdrop` | `rgb(14 26 39 / 0.62)` | `rgb(34 46 58 / 0.4)` | scrim behind pop-ups |
 | `card-shadow` | none (light and glows do this) | `inset 0 1px 0 rgb(255 255 255 / 0.9)`, then `0 1px 1px`, `0 2px 4px` (both `hsl(215 40% 30% / 0.05)`) and `0 6px 14px -4px hsl(215 40% 30% / 0.08)` | a card at rest: its top highlight and soft lift (4.3) |
-| `card-light` | none | `linear-gradient(rgb(255 255 255 / 0.3), transparent 30%)` | a card lit from above (4.3) |
 
 ### 5.2 Action, links and status
 
@@ -229,7 +228,7 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
 10. **Headline accent.** One word in a headline may take `action-ink`. One word, no glow, no underline.
 11. **Cards.** Border `line`, fill `surface`. No coloured left-edge accents. At most one selected card, shown with `action-tint` plus a label.
 12. **Grounds stay calm.** Grounds and text stay under OKLCH chroma 0.04. Saturation belongs to the action, status and illustration roles.
-13. **Light mode is its own mode** (4.3). Navy-tinted neutrals only; pure white only on the top layer; cards separate by `card-shadow` and `card-light`, not by darker borders; marks that carry meaning in `action-ink`.
+13. **Light mode is its own mode** (4.3). Navy-tinted neutrals only; pure white only on the top layer; cards are flat and separate by `card-shadow`, not by darker borders or gradients; marks that carry meaning in `action-ink`.
 
 ---
 
@@ -287,10 +286,9 @@ L and C are the shade's old lightness and chroma, so each part keeps its weight 
   --glass: #E8EFF7; --backdrop: rgb(34 46 58 / 0.4);
   --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215 40% 30% / 0.05),
     0 2px 4px hsl(215 40% 30% / 0.05), 0 6px 14px -4px hsl(215 40% 30% / 0.08);
-  --card-light: linear-gradient(rgb(255 255 255 / 0.3), transparent 30%);
 }
 body { background: var(--page); color: var(--text); }
-:root[data-theme="light"] .card { background-image: var(--card-light); box-shadow: var(--card-shadow); }
+:root[data-theme="light"] .card { box-shadow: var(--card-shadow); }
 :focus-visible { outline: 2px solid var(--action-ink); outline-offset: 3px; }
 ```
 
@@ -337,7 +335,7 @@ A project lists its own names here so an agent can apply the roles without guess
 | success / success-tint / error | `--c-ok` / `--c-ok-tint` / `--c-alert` |
 | glass / glass-raised / backdrop | `--c-glass` / `--c-glass-2` / `--c-backdrop` |
 | glow-warm / glow-cool / glow-cool-2 | `--c-glow-accent` / `--c-glow-sky` / `--c-glow-sky-2` |
-| card-shadow / card-light (light only) | `--shadow-card` / `--card-light` (`src/styles/theme-light.css`) |
+| card-shadow (light only) | `--shadow-card` (`src/styles/theme-light.css`) |
 | cool-surface / -hover / cool-text-muted | `--c-cool-surface` / `--c-cool-surface-2` / `--c-cool-muted` |
 | box-top / left / right / edge | `--iso-top` / `--iso-left` / `--iso-right` / `--iso-edge` |
 | box-hi-* | `--iso-hi-top` / `--iso-hi-left` / `--iso-hi-right` / `--iso-hi-edge` |

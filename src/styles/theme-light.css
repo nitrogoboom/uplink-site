@@ -82,10 +82,6 @@
     --shadow-card:
       inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215deg 40% 30% / 0.05), 0 2px 4px hsl(215deg 40% 30% / 0.05),
       0 6px 14px -4px hsl(215deg 40% 30% / 0.08);
-    /* and its light: a touch brighter along the top, gone by a third of the way down, nothing at the foot (a fuller
-       fade, with a darker foot, read as a cheap gradient on the short tiles). See-through, so a hover or chosen
-       colour under it still shows */
-    --card-light: linear-gradient(rgb(255 255 255 / 0.3), rgb(255 255 255 / 0) 30%);
   }
 }
 
@@ -99,19 +95,11 @@
 
 /* ---- fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
 @media screen {
-  /* Cards and panels: lit from above, on a soft navy shadow (--card-light, --shadow-card). A rule that gives one a
-     shadow of its own (the Services row's middle card, a hover) still wins: it comes later in the cascade */
+  /* Cards and panels: a flat fill on a soft navy shadow with a top highlight (--shadow-card); no gradient (a fade
+     down the card read as cheap). A rule that gives one a shadow of its own (the Services row's middle card, a hover)
+     still wins: it comes later in the cascade */
   :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-wall-item, .fc-soc, .svc-tile, .fc-tile, .feat) {
-    background-image: var(--card-light);
     box-shadow: var(--shadow-card);
-  }
-
-  /* the phone Services row paints its cards solid with a gradient layer over the band (services.css); the light above
-     replaces that layer, so the card takes its colour here (a light card is solid already) */
-  @media (--phone) {
-    :root[data-theme='light'] .svc-tile {
-      background-color: var(--c-surface);
-    }
   }
 
   /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
