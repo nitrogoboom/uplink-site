@@ -1,6 +1,6 @@
 # Go-live checklist
 
-*Started November 5, 2026. Last updated: November 6, 2026.*
+*Started November 5, 2026. Last updated: November 8, 2026.*
 
 This checklist covers what to check before the site moves to its real domain, beyond what CI and the release audit already prove. For those, see [What CI proves](sop.md#what-ci-proves) and the [release checklist](sop.md#release-checklist). For the launch-day steps, see [`launch-runbook.md`](launch-runbook.md).
 
@@ -26,13 +26,10 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [x] **Response headers, outside scan** (November 5, 2026). Mozilla Observatory on the live `workers.dev` address: **A+, 130, 12/12 tests passed**. Rerun on the real domain.
 - [ ] **(domain)** SSL Labs (ssllabs.com/ssltest) on the real domain: aim for A or A+. Also run securityheaders.com once.
 - [x] **Dependencies** (November 5, 2026). `npm audit --omit=dev`: 0 vulnerabilities in anything the site ships. The full tree shows 11 moderate, all one advisory in `minimatch` under ESLint (dev only, never deployed). Dependabot will bring the fix; nothing to do by hand.
-- [x] GitHub code scanning (CodeQL): skipped on purpose (November 5, 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public. **It went public on November 7, 2026: CodeQL is now free; see `notes.md`.**
-- [ ] **(you)** Protect `main`, 2FA on Cloudflare, a scoped API token, secret owners and rotation dates (`notes.md`, "Production readiness").
-- [ ] **(domain)** Domain hardening at the registrar and in DNS:
-  - registrar lock, auto-renew, 2FA on the registrar account
-  - DNSSEC on (one switch on Cloudflare, then the DS record at the registrar)
-  - CAA records naming only the CAs Cloudflare uses
-  - SPF `v=spf1 -all`, DMARC `p=reject` and a null MX until the domain sends mail, so nobody can fake mail from it. Replace these with the real records when Cloudflare Email Service goes on.
+- [x] GitHub code scanning (CodeQL): skipped on purpose (November 5, 2026). The repo is private, where CodeQL needs GitHub Advanced Security, a paid add-on. The site's own code is a few small scripts that ESLint already checks, so the cost doesn't pay for itself. Revisit if the repo goes public. **It went public on November 7, 2026, and CodeQL (default setup) is now on** (README, "Repository rules").
+- [x] Protect `main`: two rulesets (README, "Repository rules").
+- [ ] **(you)** 2FA on Cloudflare, a scoped API token, secret owners and rotation dates (`notes.md`, "Production readiness").
+- [ ] **(domain)** Domain hardening: registrar lock, auto-renew, and 2FA on the registrar account. DNSSEC, CAA, and the no-mail records (SPF, DMARC, null MX) are steps 2 and 8 of "Launch" in [`launch-runbook.md`](launch-runbook.md#launch).
 
 ## 2. Licences and legal
 
@@ -61,7 +58,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 - [ ] Known, waits on forms: the contact and newsletter fields have no `name`, so a real submit would send nothing ("Before going live" in `notes.md`).
 - [ ] Optional, a design call:
   - On service pages "What's included" and "Best for" are h2s beside the real sections. They could be h3s, or "Best for" a plain label (`src/components/services/ServiceCard.astro`; its comment says h2 is on purpose).
-  - Card titles on `/work` and `/services` are not headings, so the h1 is the only heading on `/work`. Each card is one well-named link, so it passes; headings would let screen-reader users jump card to card.
+- [x] Card titles on `/work` and `/services` are headings holding the card's link (review M3, M10). See "Section components" in [`src/README.md`](../src/README.md#section-components).
 - [x] Fixed: project pages now say `og:type` "article", to match their `Article` JSON-LD (the new `ogType` prop on `Base.astro`). `/privacy` and `/accessibility` have no JSON-LD and don't need any.
 
 ## 4. Display modes
@@ -84,7 +81,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
   - since November 7, 2026 (review B22, M7): every Grow step's card prints, no section keeps a screen's height (a page printed scaled down is laid out at a desktop width), forms, copy buttons and the buttons that open a pop-up drop out (a card that opens one still prints its words), and a one-line contact block stands in for the footer
 - [x] **No JavaScript**: every page shows its content, links and footer.
 - [x] Fixed: without script, Home's "Previous / Next service" arrows and the dots under the phone service row are hidden, since they can't do anything; the row still swipes (`src/components/home/services.css`).
-- [x] **Text spacing (WCAG 1.4.12, a 2.1 rule, beyond our 2.0 target)**. Fixed November 5, 2026; every other page already passed.
+- [x] **Text spacing (WCAG 1.4.12)**. Fixed November 5, 2026; every other page already passed.
   - The hero's height is now a floor, not a cap, and its text centres only while it fits (`safe center`). With the WCAG spacing, the h1 stays below the header at 1280, 1440 and 3440.
   - The desktop service tiles' rows grow when their words do, so no icon is cut off (`src/components/home/hero.css`, `src/components/home/services.css`).
   - The styles check (then `tools/verify_styles.py`, now `npm run verify:styles`): nothing else on any page moved, at all four sizes.
@@ -109,14 +106,7 @@ Wording and keyword SEO aren't in this list on purpose. The copy is placeholder 
 
 - [x] Cutover runbook written (November 5, 2026): `docs/launch-runbook.md`. It covers the day before, launch, straight after, a back-out table, and how to practise the rollback.
 - [ ] **(you)** Practise one rollback on a quiet day (steps at the end of the runbook). It briefly puts the previous version live.
-- [x] Smoke test written (November 5, 2026), moved to Node on November 6, 2026: `npm run smoke -- ADDRESS [--launch] [--old OLD_ADDRESS]`. It checks:
-  - every sitemap page: 200, html, security headers
-  - noindex present today, gone with `--launch`
-  - `http://` and the old address redirect
-  - made-up addresses and `/404` give 404
-  - the report endpoint, `robots.txt`, `llms.txt` and one `.md` copy (`/services.md`) answer
-  - the sitemap names this host
-  - It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since the smoke test can't see it.
+- [x] Smoke test written (November 5, 2026), moved to Node on November 6, 2026: `npm run smoke -- ADDRESS`. What it checks: README, "Live-site checks". It passes on the live `workers.dev` site (20 pages). The Early Hints 103 still needs a hand check (`curl -I --http2`), since the smoke test can't see it.
 - [ ] **(you)** Alerts, not just logs. Workers logs keep 3 days and ping nobody. Add a notification for errors (Cloudflare Notifications, or a small daily summary of `/api/report` lines to email), plus the outside uptime check (`notes.md`).
 
 ## 8. People

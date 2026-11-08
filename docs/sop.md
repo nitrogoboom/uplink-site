@@ -1,6 +1,6 @@
 # How we build, check, and release the site
 
-*Last updated: November 6, 2026*
+*Last updated: November 8, 2026*
 
 This page describes how the Uplink site is built, the standards it meets, and the checks that prove it before a release. It's for anyone who changes the site. When a tool, rule, or standard changes, update this page in the same pull request.
 
@@ -20,8 +20,8 @@ A *release* is the first production launch, and any later change to layout, navi
 | Content | Typed JSON and Markdown: services, projects, FAQ, team, footer, Grow | `src/content/`, `src/data/`, `src/content.config.ts` |
 | Styles | One token file. Lint enforces the spacing scale. | `src/styles/tokens.css`, `docs/spacing.md` |
 | Drawings | Python generators write every SVG. The build never runs them; CI's drawings job regenerates them, fails on any difference, and checks them. | `tools/gen_*.py`, `tools/regen.py`, Python 3.12, `requirements.txt` (locked from `requirements.in`) |
-| Hosting | Cloudflare Workers: static files, plus one small Worker. The Worker runs only for `/api/*`, `/404` and addresses with no file: it answers `/api/report` (error and CSP reports) and sends the 404 page with a 404 status and the pages' headers. | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
-| CI/CD | GitHub Actions: check, tests, lint, build, site check (split across three runners), link check, deploy (a new version is smoke checked at its own address before it takes traffic, and rolled back if the live site then fails the smoke check). Beside them, the drawings job (Python). On a pull request, also a preview and a screenshot comparison. Actions are pinned to commits. | `.github/workflows/site.yml` |
+| Hosting | Cloudflare Workers: static files, plus one small Worker for `/api/*`, `/404` and addresses with no file. See "The Worker" in the [README](../README.md#the-worker). | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
+| CI/CD | GitHub Actions, with every action pinned to a commit. The jobs and the checked deploy: "Deploys" in the [README](../README.md#deploys). | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
 | Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
 | Code checks | TypeScript (`astro check`, the page scripts and `src/lib` included through `checkJs`), ESLint (with type-aware rules on `src/scripts` and `src/lib`), Stylelint, Prettier (code, JSON and YAML) | `tsconfig.json`, `eslint.config.js`, `.stylelintrc.json`, `.prettierrc.json` |

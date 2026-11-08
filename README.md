@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-*Last updated: November 6, 2026*
+*Last updated: November 8, 2026*
 
 This repository holds the website for Uplink Technology, a made-up IT company. The content is placeholder text, and the look is inspired by the Overwatch 2 menus. This page explains how to run the site, how it's organized, and how to use the tools that build and check it.
 
@@ -15,7 +15,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 | --- | --- |
 | [`notes.md`](notes.md) | Open items: bugs, polish, and decisions still to make. Start here. |
 | [`docs/sop.md`](docs/sop.md) | How a change reaches the live site, the standards the site meets, and the release checklist. |
-| [`src/README.md`](src/README.md) | A map of the source code: pages, components, content, styles, and scripts. |
+| [`src/README.md`](src/README.md) | A map of the source code: pages, components (the footer included), content, styles, and scripts. |
 | [`docs/spacing.md`](docs/spacing.md) | Spacing and line-height rules. |
 | [`docs/security-and-compliance.md`](docs/security-and-compliance.md) | Security, privacy, and accessibility controls, and how to check each one. |
 | [`docs/secrets.md`](docs/secrets.md) | Every secret and key the site uses, and where it's kept. Names only, never values. |
@@ -149,22 +149,6 @@ A project works the same way. Its file is `src/content/projects/SLUG.json`, and 
 
 The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/data/*.json`.
 
-## Footer
-
-Every page has the same footer, except the 404 page, which is one screen with nothing under it (`footer={false}` on `Base`). The footer is one `<nav aria-label="Footer">` holding six `<details name="footer">` sections: Contact, Services, Company, Support, Resources, and Follow. Each section's `<summary>` is its tile, and the rest is its panel. The browser opens one section at a time, so the footer works the same with or without script. Tab reaches each tile, and Enter or Space opens it.
-
-On desktop, the footer is at least one screen tall. It has three parts:
-
-- **Stage:** the open section's panel on the left, and a live campus map on the right. One section is always open on tablet and desktop: `footer.js` opens Contact at load and again when a visitor shuts the one they picked. Without script, CSS shows Contact's panel while nothing is open.
-- **Tile row:** the six summaries.
-- **Base bar:** the brand, legal links, and status. Keyboard shortcuts live in the Settings dialog, which the header's gear opens.
-
-On a tablet, the tile row comes first, then the map, then the panel. Below 700 px wide, the sections are six rows that open in place, with no map. A row grows open and shrinks shut where the browser can animate to `auto` (`interpolate-size`), and opens at once elsewhere and with reduced motion. The browser's own scroll anchoring keeps a tapped row in place while the one above it shuts.
-
-The lists come from `src/data/footer.json`, checked by its schema in `src/lib/footer.ts`, and the Services panel comes from the services collection. The markup is `src/components/Footer.astro`, and the layout is `src/styles/footer.css`: the summaries and panels are items of one grid (`.fc-deck`), so CSS alone places the tile row and the open panel. Each section has a `data-map` value that names a spot on the map. The map's label holds all six spots' words, and CSS shows the open section's. `tools/gen_campus.py` draws the map: `SPOTS` lists the spots and `ORDER` sets the back-to-front draw order. `src/scripts/footer.js` only fetches the map when the footer scrolls near, and flies its camera to the open section's spot on each `toggle` event. On tablet and desktop it keeps one section open (Contact unless another is picked); phones start with every row shut. It also checks the newsletter mockup.
-
-> **Note:** A browser that can't place a `<details>` panel (no `::details-content`: Firefox before 143, Safari before 18.4) shows the six rows on every screen, with no map. Without `<details name>` (Firefox before 130, Safari before 17.2), more than one row can be open at once. Firefox ESR 140 gets the rows; Safari and Chrome get the tiles. Only Chromium is tested here: check the footer on a real iPhone and in Firefox before a release.
-
 ## Drawing rules
 
 Every drawing follows these rules. The values are measured in the files.
@@ -282,7 +266,7 @@ These checks ask a deployed site over plain HTTP. They need no local server.
 
 The site runs on Cloudflare Workers with static assets.
 
-- **Code:** the private GitHub repository `nitrogoboom/uplink-site`.
+- **Code:** the GitHub repository `nitrogoboom/uplink-site`, public since November 7, 2026.
 - **Site:** a Worker named `uplink-site` serves `dist/` as static assets (`wrangler.jsonc`). Until the site has its own domain, it's at https://uplink-site.johnoreilly.workers.dev. The old Cloudflare Pages project was deleted on October 28, 2026.
 
 ### The Worker
