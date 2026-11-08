@@ -3,8 +3,8 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Light theme
-- [ ] Home, light: decide on the contrast fixes in `docs/light-theme-home-review-2026-11-08.md` (1–3 fail WCAG in light only; 4–5 faint edges; 6–8 optional), and on the other pages' two (S1 Settings theme choice, S2 chosen /work filter) in `docs/light-theme-site-review-2026-11-08.md`.
 - [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
+- [ ] Light theme, optional: a thin amber-500 edge on amber buttons, and a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
 ## Review of November 7, 2026

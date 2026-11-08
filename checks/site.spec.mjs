@@ -1702,77 +1702,80 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
 // part of its control, so every state (Grow: done, current, not reached; services: current, off) is at least 3:1
 // against what is behind it. The dot's colour is its fill at its alpha times its own and its ancestors' opacity; the
 // backdrop is the pixel under its centre, read from a screenshot with the dots hidden.
-test('non-text contrast: Grow and services dots, every state, 3:1 (WCAG 1.4.11)', async ({ browser }) => {
+test('non-text contrast: Grow and services dots, every state, 3:1, both themes (WCAG 1.4.11)', async ({ browser }) => {
   const fails = [];
   const rep = [];
-  const q = await browser.newPage({ viewport: { width: 390, height: 844 } });
-  await q.goto(url('index'));
-  await q.waitForLoadState('networkidle');
-  const lum = (c) => {
-    const [r, g, b] = c.map((v) => {
-      const s = v / 255;
-      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    });
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  };
-  const ratio = (a, b) => {
-    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
-    return (x + 0.05) / (y + 0.05);
-  };
-  const look = async (name, sel, state) => {
-    await q.locator(sel).first().scrollIntoViewIfNeeded();
-    await q.mouse.move(0, 0);
-    await q.waitForTimeout(400); // the dots' colour and opacity transitions
-    const dots = await q.$$eval(sel, (els) =>
-      els.map((e) => {
-        const m = getComputedStyle(e)
-          .backgroundColor.match(/[\d.]+/g)
-          .map(Number);
-        let a = m[3] ?? 1;
-        for (let n = e; n; n = n.parentElement) a *= Number(getComputedStyle(n).opacity);
-        const r = e.getBoundingClientRect();
-        return { state: e.dataset.state, fill: m.slice(0, 3), a, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+  for (const scheme of ['dark', 'light']) {
+    const q = await browser.newPage({ viewport: { width: 390, height: 844 }, colorScheme: scheme });
+    await q.goto(url('index'));
+    await q.waitForLoadState('networkidle');
+    const lum = (c) => {
+      const [r, g, b] = c.map((v) => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    const ratio = (a, b) => {
+      const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+      return (x + 0.05) / (y + 0.05);
+    };
+    const look = async (name, sel, state) => {
+      await q.locator(sel).first().scrollIntoViewIfNeeded();
+      await q.mouse.move(0, 0);
+      await q.waitForTimeout(400); // the dots' colour and opacity transitions
+      const dots = await q.$$eval(sel, (els) =>
+        els.map((e) => {
+          const m = getComputedStyle(e)
+            .backgroundColor.match(/[\d.]+/g)
+            .map(Number);
+          let a = m[3] ?? 1;
+          for (let n = e; n; n = n.parentElement) a *= Number(getComputedStyle(n).opacity);
+          const r = e.getBoundingClientRect();
+          return { state: e.dataset.state, fill: m.slice(0, 3), a, x: r.x + r.width / 2, y: r.y + r.height / 2 };
+        }),
+      );
+      const hide = (v) =>
+        q.$$eval(sel, (els, v) => els.forEach((e) => e.style.setProperty('visibility', v, 'important')), v);
+      await hide('hidden');
+      const png = PNG.sync.read(await q.screenshot());
+      await hide('');
+      const seen = new Set();
+      for (const d of dots) {
+        const k = state(d);
+        if (seen.has(k)) continue;
+        seen.add(k);
+        const i = (Math.round(d.y) * png.width + Math.round(d.x)) * 4;
+        const back = [png.data[i], png.data[i + 1], png.data[i + 2]];
+        const ink = d.fill.map((v, j) => v * d.a + back[j] * (1 - d.a));
+        const r = ratio(ink, back);
+        rep.push(`${name} ${k}: ${r.toFixed(2)}:1 (rgb ${ink.map(Math.round)} on rgb ${back})`);
+        if (r < 3) fails.push(`${name} ${k} dot ${r.toFixed(2)}:1 against rgb ${back}, under 3:1`);
+      }
+    };
+    // Grow: pick the third step, so two are done, one is current and three are not reached
+    await q.locator('#grow').scrollIntoViewIfNeeded();
+    await q.locator('#grow .grow-dot:visible').nth(2).click();
+    await q.$$eval('#grow .grow-dot', (bs) =>
+      bs.forEach((b) => {
+        const pip = /** @type {HTMLElement} */ (b.querySelector('.pip'));
+        pip.dataset.state = b.matches('[aria-current="step"]')
+          ? 'current'
+          : b.classList.contains('is-done')
+            ? 'done'
+            : 'not reached';
       }),
     );
-    const hide = (v) =>
-      q.$$eval(sel, (els, v) => els.forEach((e) => e.style.setProperty('visibility', v, 'important')), v);
-    await hide('hidden');
-    const png = PNG.sync.read(await q.screenshot());
-    await hide('');
-    const seen = new Set();
-    for (const d of dots) {
-      const k = state(d);
-      if (seen.has(k)) continue;
-      seen.add(k);
-      const i = (Math.round(d.y) * png.width + Math.round(d.x)) * 4;
-      const back = [png.data[i], png.data[i + 1], png.data[i + 2]];
-      const ink = d.fill.map((v, j) => v * d.a + back[j] * (1 - d.a));
-      const r = ratio(ink, back);
-      rep.push(`${name} ${k}: ${r.toFixed(2)}:1 (rgb ${ink.map(Math.round)} on rgb ${back})`);
-      if (r < 3) fails.push(`${name} ${k} dot ${r.toFixed(2)}:1 against rgb ${back}, under 3:1`);
-    }
-  };
-  // Grow: pick the third step, so two are done, one is current and three are not reached
-  await q.locator('#grow').scrollIntoViewIfNeeded();
-  await q.locator('#grow .grow-dot:visible').nth(2).click();
-  await q.$$eval('#grow .grow-dot', (bs) =>
-    bs.forEach((b) => {
-      const pip = /** @type {HTMLElement} */ (b.querySelector('.pip'));
-      pip.dataset.state = b.matches('[aria-current="step"]')
-        ? 'current'
-        : b.classList.contains('is-done')
-          ? 'done'
-          : 'not reached';
-    }),
-  );
-  await look('Grow', '#grow .grow-dot .pip', (d) => d.state);
-  await q.$$eval('.svc-dots .pip', (ps) =>
-    ps.forEach((p) => (p.dataset.state = p.classList.contains('on') ? 'current' : 'off')),
-  );
-  await look('services', '.svc-dots .pip', (d) => d.state);
-  for (const want of ['Grow done', 'Grow current', 'Grow not reached', 'services current', 'services off'])
-    if (!rep.some((r) => r.startsWith(want + ':'))) fails.push(`${want}: no such dot on the page`);
-  await q.close();
+    await look(`${scheme} Grow`, '#grow .grow-dot .pip', (d) => d.state);
+    await q.$$eval('.svc-dots .pip', (ps) =>
+      ps.forEach((p) => (p.dataset.state = p.classList.contains('on') ? 'current' : 'off')),
+    );
+    await look(`${scheme} services`, '.svc-dots .pip', (d) => d.state);
+    for (const want of ['Grow done', 'Grow current', 'Grow not reached', 'services current', 'services off'])
+      if (!rep.some((r) => r.startsWith(`${scheme} ${want}:`)))
+        fails.push(`${scheme} ${want}: no such dot on the page`);
+    await q.close();
+  }
   console.log(`dot contrast:\n  ${rep.join('\n  ')}`);
   verdict(fails);
 });
@@ -1852,9 +1855,9 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
     await q.route('**/_astro/*.js', (r) => r.abort());
     await q.goto(url('index'));
     const s = await state(q);
-    if (s.theme !== 'light' || s.bar !== '#F2F7FC')
-      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #F2F7FC`);
-    if ((await page_bg(q)) !== 'rgb(242, 247, 252)') fails.push(`light page ground: ${await page_bg(q)}`);
+    if (s.theme !== 'light' || s.bar !== '#EBF0F5')
+      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #EBF0F5`);
+    if ((await page_bg(q)) !== 'rgb(235, 240, 245)') fails.push(`light page ground: ${await page_bg(q)}`);
     await ctx.close();
   }
 
@@ -1871,7 +1874,7 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
   await q.locator('input[name="theme"][value="system"]').focus();
   await q.keyboard.press('ArrowRight'); // System -> Light
   s = await state(q);
-  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#F2F7FC')
+  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#EBF0F5')
     fails.push(`Light by the arrow key: ${JSON.stringify(s)}`);
   const results = await axe(q).include('#settings-dialog').analyze();
   for (const v of axeFails(results.violations)) fails.push(`axe, Settings open in light: ${v.id} (${v.nodes.length})`);

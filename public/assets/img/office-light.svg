@@ -553,7 +553,7 @@
 <polygon points="973.9,195.5 1015.3,219.5 1015.3,213.8 973.9,189.9" fill="#FFAD51" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="1056.7,195.5 1015.3,219.5 1015.3,213.8 1056.7,189.9" fill="#C37600" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon points="1015.3,166.0 1056.7,189.9 1015.3,213.8 973.9,189.9" fill="#FFCD9B" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<g transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 172.3)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/></g>
+<g transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 172.3)" fill="none" stroke="#EBF0F5" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/></g>
 </g>
 <g>
 <polygon points="1023.8,224.4 1065.2,248.3 1065.2,242.7 1023.8,218.8" fill="#D2D8DE" stroke="#37424E" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -596,28 +596,28 @@
 </g>
 <g class="co lbl" data-t="FIREWALL RACK" data-s="core switch + backups">
 <polyline class="lt" points="1022.0,523.9 944.0,712.0 984.0,712.0" fill="none" stroke="#C37600" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle class="lt" cx="1022.0" cy="523.9" r="6" fill="#FFAD51" stroke="#F2F7FC" stroke-width="3"/>
+<circle class="lt" cx="1022.0" cy="523.9" r="6" fill="#FFAD51" stroke="#EBF0F5" stroke-width="3"/>
 <text class="lt" x="996.0" y="720.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#88520A" text-anchor="start">FIREWALL RACK</text>
 <text class="lt" x="996.0" y="748.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#4D5863" text-anchor="start">core switch + backups</text>
 
 </g>
 <g class="co lbl" data-t="WI-FI ACCESS POINT" data-s="Wi-Fi 6E, no dead spots">
 <polyline class="lt" points="381.9,333.4 361.1,208.7 321.1,208.7" fill="none" stroke="#C37600" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle class="lt" cx="381.9" cy="333.4" r="6" fill="#FFAD51" stroke="#F2F7FC" stroke-width="3"/>
+<circle class="lt" cx="381.9" cy="333.4" r="6" fill="#FFAD51" stroke="#EBF0F5" stroke-width="3"/>
 <text class="lt" x="309.1" y="216.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#88520A" text-anchor="end">WI-FI ACCESS POINT</text>
 <text class="lt" x="309.1" y="244.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#4D5863" text-anchor="end">Wi-Fi 6E, no dead spots</text>
 
 </g>
 <g class="co lbl" data-t="WORKSTATIONS" data-s="managed + patched">
 <polyline class="lt" points="713.8,521.5 634.1,695.7 594.1,695.7" fill="none" stroke="#1F75A6" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle class="lt" cx="713.8" cy="521.5" r="6" fill="#4A93C1" stroke="#F2F7FC" stroke-width="3"/>
+<circle class="lt" cx="713.8" cy="521.5" r="6" fill="#4A93C1" stroke="#EBF0F5" stroke-width="3"/>
 <text class="lt" x="582.1" y="703.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#005D8A" text-anchor="end">WORKSTATIONS</text>
 <text class="lt" x="582.1" y="731.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#4D5863" text-anchor="end">managed + patched</text>
 
 </g>
 <g class="co lbl" data-t="TEAMS ROOM" data-s="one-touch meeting join">
 <polyline class="lt" points="311.9,359.7 290.0,523.7 250.0,523.7" fill="none" stroke="#1F75A6" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle class="lt" cx="311.9" cy="359.7" r="6" fill="#4A93C1" stroke="#F2F7FC" stroke-width="3"/>
+<circle class="lt" cx="311.9" cy="359.7" r="6" fill="#4A93C1" stroke="#EBF0F5" stroke-width="3"/>
 <text class="lt" x="238.0" y="531.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#005D8A" text-anchor="end">TEAMS ROOM</text>
 <text class="lt" x="238.0" y="559.7" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" letter-spacing="0" fill="#4D5863" text-anchor="end">one-touch meeting join</text>
 

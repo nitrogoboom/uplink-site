@@ -36,7 +36,7 @@
 <polygon points="-17.6,-165.1 10.6,-148.8 10.6,-152.9 -17.6,-169.2" fill="#FFAD51" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="38.9,-165.1 10.6,-148.8 10.6,-152.9 38.9,-169.2" fill="#C37600" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="10.6,-185.5 38.9,-169.2 10.6,-152.9 -17.6,-169.2" fill="#FFCD9B" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
-<g transform="matrix(0.9 0.5 -0.9 0.5 10.6 -181.4)" fill="none" stroke="#F2F7FC" stroke-width="1.6" vector-effect="non-scaling-stroke"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></g>
+<g transform="matrix(0.9 0.5 -0.9 0.5 10.6 -181.4)" fill="none" stroke="#EBF0F5" stroke-width="1.6" vector-effect="non-scaling-stroke"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/></g>
 <polygon points="17.7,-144.7 45.9,-128.4 45.9,-132.5 17.7,-148.8" fill="#D2D8DE" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="74.2,-144.7 45.9,-128.4 45.9,-132.5 74.2,-148.8" fill="#BBC2C9" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
 <polygon points="45.9,-165.1 74.2,-148.8 45.9,-132.5 17.7,-148.8" fill="#FFFFFF" stroke="#37424E" stroke-width="1" stroke-opacity="0.3"/>
@@ -64,11 +64,11 @@
 <g class="lt"><circle cx="-56.7" cy="-249.6" r="3.6" fill="#198152"/><text x="-48.7" y="-244.5" font-size="14" font-weight="600" letter-spacing="0.06em" fill="#0E1A27">MICROSOFT 365</text></g>
 <g class="lt"><circle cx="-56.7" cy="-230.0" r="3.6" fill="#198152"/><text x="-48.7" y="-224.9" font-size="14" font-weight="600" letter-spacing="0.06em" fill="#0E1A27">GOOGLE WORKSPACE</text></g>
 </g>
-<g class="lbl" data-t="OLD SERVER" data-s="migrated, then retired"><g class="co lt"><polyline points="-70.6,-57.1 -100.0,-80.0 -120.0,-80.0" fill="none" stroke="#1F75A6" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="-70.6" cy="-57.1" r="3" fill="#4A93C1" stroke="#F2F7FC" stroke-width="1.5"/></g>
+<g class="lbl" data-t="OLD SERVER" data-s="migrated, then retired"><g class="co lt"><polyline points="-70.6,-57.1 -100.0,-80.0 -120.0,-80.0" fill="none" stroke="#1F75A6" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="-70.6" cy="-57.1" r="3" fill="#4A93C1" stroke="#EBF0F5" stroke-width="1.5"/></g>
 <text class="lt" x="-127.0" y="-75.5" font-size="13" font-weight="600" letter-spacing="0.78" fill="#005D8A" text-anchor="end">OLD SERVER</text>
 <text class="lt" x="-127.0" y="-60.5" font-size="11" font-weight="400" fill="#4D5863" text-anchor="end">migrated, then retired</text>
 </g>
-<g class="lbl" data-t="ANY DEVICE" data-s="same files everywhere"><g class="co lt"><polyline points="91.8,44.9 130.0,86.0 150.0,86.0" fill="none" stroke="#1F75A6" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="91.8" cy="44.9" r="3" fill="#4A93C1" stroke="#F2F7FC" stroke-width="1.5"/></g>
+<g class="lbl" data-t="ANY DEVICE" data-s="same files everywhere"><g class="co lt"><polyline points="91.8,44.9 130.0,86.0 150.0,86.0" fill="none" stroke="#1F75A6" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="91.8" cy="44.9" r="3" fill="#4A93C1" stroke="#EBF0F5" stroke-width="1.5"/></g>
 <text class="lt" x="157.0" y="90.5" font-size="13" font-weight="600" letter-spacing="0.78" fill="#005D8A" text-anchor="start">ANY DEVICE</text>
 <text class="lt" x="157.0" y="105.5" font-size="11" font-weight="400" fill="#4D5863" text-anchor="start">same files everywhere</text>
 </g>

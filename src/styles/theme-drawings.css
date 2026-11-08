@@ -4,7 +4,7 @@
 
 /* .hero-art: hero-office.svg, hero-office-tablet.svg, office-compact-build.svg, office-compact-flows.svg, hero-flows.svg */
 :where(:root[data-theme='light'] .hero-art) [fill='#0e1a27' i] {
-  fill: #f2f7fc;
+  fill: #ebf0f5;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#182430' i] {
   fill: #222e3a;
@@ -148,7 +148,7 @@
   stop-color: #e3e9ef;
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#0e1a27' i] {
-  stroke: #f2f7fc;
+  stroke: #ebf0f5;
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#28333f' i] {
   stroke: #c3cad1;
@@ -299,7 +299,7 @@
   stroke: #7c4900;
 }
 :root[data-theme='light'] .hero-art .ob-tile.is-on .f-ic {
-  stroke: #f2f7fc;
+  stroke: #ebf0f5;
 }
 :root[data-theme='light'] .hero-art .ob-seg {
   fill: #198152;
@@ -307,7 +307,7 @@
 
 /* .grow-stage: grow-world.svg */
 :where(:root[data-theme='light'] .grow-stage) [fill='#0e1a27' i] {
-  fill: #f2f7fc;
+  fill: #ebf0f5;
 }
 :where(:root[data-theme='light'] .grow-stage) [fill='#182430' i] {
   fill: #222e3a;
@@ -358,7 +358,7 @@
   stop-color: #4a93c1;
 }
 :where(:root[data-theme='light'] .grow-stage) [stroke='#0e1a27' i] {
-  stroke: #f2f7fc;
+  stroke: #ebf0f5;
 }
 :where(:root[data-theme='light'] .grow-stage) [stroke='#2b3743' i] {
   stroke: #c5ccd3;

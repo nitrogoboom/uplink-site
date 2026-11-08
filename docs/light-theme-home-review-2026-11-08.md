@@ -1,6 +1,8 @@
 # Light theme, Home: contrast review (November 8, 2026)
 
-A WCAG 2.2 colour-contrast review of Home in the light theme, with the dark theme measured the same way for comparison. **Nothing here is applied yet.** Each item has a small, measured fix to accept or skip. Once Home is settled, the same fixes apply to the rest of the site.
+A WCAG 2.2 colour-contrast review of Home in the light theme, with the dark theme measured the same way for comparison. > **Note:** Applied on November 8, 2026: the WCAG fixes and the faint edges (items 1–5 on Home, S1–S2 on the other pages), with one more found by the site check's dot test in light: Grow's dots for steps already shown (1.35:1, now amber ink at 0.8, 3.8:1). The page and band went one step greyer and cards solid white (`docs/light-theme-2026-11-08.md`). The optional items are still open.
+
+At the time of writing, nothing here was applied. Each item has a small, measured fix to accept or skip. Once Home is settled, the same fixes apply to the rest of the site.
 
 ## How it was measured
 

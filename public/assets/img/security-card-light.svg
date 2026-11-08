@@ -64,7 +64,7 @@
 <path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -22.759 -227.76)" fill="#C37600"/>
 <path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -23.602 -227.27)" fill="#C37600"/>
 <path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" transform="matrix(16.859 9.7333 0 19.467 -24.445 -226.79)" fill="#C37600"/>
-<g transform="matrix(16.859 9.7333 0 19.467 -25.288 -226.3)"><path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" fill="#FFFFFF" stroke="#C37600" stroke-width="2.5" vector-effect="non-scaling-stroke"/><rect x="1.18" y="1.522" width="0.64" height="0.6" rx="0.1" fill="#FFAD51"/><path d="M1.3,1.522 v-0.3 a0.2,0.2 0 0 1 0.4,0 v0.3" fill="none" stroke="#C37600" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="1.5" cy="1.823" r="0.08" fill="#F2F7FC"/></g>
+<g transform="matrix(16.859 9.7333 0 19.467 -25.288 -226.3)"><path d="M1.5,0 L3,0.58 L3,1.958 C3,2.972 2.07,3.371 1.5,3.625 C0.93,3.371 0,2.972 0,1.958 L0,0.58 Z" fill="#FFFFFF" stroke="#C37600" stroke-width="2.5" vector-effect="non-scaling-stroke"/><rect x="1.18" y="1.522" width="0.64" height="0.6" rx="0.1" fill="#FFAD51"/><path d="M1.3,1.522 v-0.3 a0.2,0.2 0 0 1 0.4,0 v0.3" fill="none" stroke="#C37600" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cx="1.5" cy="1.823" r="0.08" fill="#EBF0F5"/></g>
 
 
 </g>

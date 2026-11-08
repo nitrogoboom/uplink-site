@@ -1,6 +1,8 @@
 # Light theme, every other page: contrast review (November 8, 2026)
 
-The same review as Home (`docs/light-theme-home-review-2026-11-08.md`), run on the other 19 pages and on the states you only see after a click. **Nothing here is applied yet.** It doesn't repeat Home's findings; where one of them also shows on other pages, it says so.
+The same review as Home (`docs/light-theme-home-review-2026-11-08.md`), run on the other 19 pages and on the states you only see after a click. > **Note:** Applied on November 8, 2026: the WCAG fixes and the faint edges (items 1–5 on Home, S1–S2 on the other pages), with one more found by the site check's dot test in light: Grow's dots for steps already shown (1.35:1, now amber ink at 0.8, 3.8:1). The page and band went one step greyer and cards solid white (`docs/light-theme-2026-11-08.md`). The optional items are still open.
+
+At the time of writing, nothing here was applied. It doesn't repeat Home's findings; where one of them also shows on other pages, it says so.
 
 ## What was measured
 

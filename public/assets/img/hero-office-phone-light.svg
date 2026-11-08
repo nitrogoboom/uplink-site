@@ -575,7 +575,7 @@
 <polygon class="f-l" points="973.9,195.5 1015.3,219.5 1015.3,213.8 973.9,189.9" fill="#FFAD51" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon class="f-r" points="1056.7,195.5 1015.3,219.5 1015.3,213.8 1056.7,189.9" fill="#C37600" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
 <polygon class="f-t" points="1015.3,166.0 1056.7,189.9 1015.3,213.8 973.9,189.9" fill="#FFCD9B" stroke="#7C4900" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 172.3)" fill="none" stroke="#F2F7FC" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/></g>
+<g class="f-ic" transform="matrix(1.2687 0.7325 -1.2687 0.7325 1015.3 172.3)" fill="none" stroke="#EBF0F5" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/></g>
 </g>
 <g class="ob-i ob-tile" data-tile="files">
 <polygon class="f-l" points="1023.8,224.4 1065.2,248.3 1065.2,242.7 1023.8,218.8" fill="#D2D8DE" stroke="#37424E" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>

@@ -26,7 +26,7 @@
 <g class="lbl" data-t="Q2 UPGRADE" data-s=""><text class="lt" x="-26.0" y="140.0" font-size="11" font-weight="600" letter-spacing="0.66" fill="#0E1A27" text-anchor="middle">Q2 UPGRADE</text></g>
 <g class="lbl" data-t="Q3 SECURE" data-s=""><text class="lt" x="77.9" y="160.0" font-size="11" font-weight="600" letter-spacing="0.66" fill="#0E1A27" text-anchor="middle">Q3 SECURE</text></g>
 <g class="lbl" data-t="Q4 REVIEW" data-s=""><text class="lt" x="181.9" y="180.0" font-size="11" font-weight="600" letter-spacing="0.66" fill="#0E1A27" text-anchor="middle">Q4 REVIEW</text></g>
-<g class="lbl" data-t="IT BUDGET" data-s="planned, not surprised"><g class="co lt"><polyline points="108.3,-52.5 140.0,-66.0 160.0,-66.0" fill="none" stroke="#C37600" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="108.3" cy="-52.5" r="3" fill="#FFAD51" stroke="#F2F7FC" stroke-width="1.5"/></g>
+<g class="lbl" data-t="IT BUDGET" data-s="planned, not surprised"><g class="co lt"><polyline points="108.3,-52.5 140.0,-66.0 160.0,-66.0" fill="none" stroke="#C37600" stroke-width="1.2" stroke-opacity="0.55"/><circle cx="108.3" cy="-52.5" r="3" fill="#FFAD51" stroke="#EBF0F5" stroke-width="1.5"/></g>
 <text class="lt" x="167.0" y="-61.5" font-size="13" font-weight="600" letter-spacing="0.78" fill="#88520A" text-anchor="start">IT BUDGET</text>
 <text class="lt" x="167.0" y="-46.5" font-size="11" font-weight="400" fill="#4D5863" text-anchor="start">planned, not surprised</text>
 </g>
