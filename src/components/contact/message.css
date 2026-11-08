@@ -1,41 +1,169 @@
 /*--- CONTACT · 1. Contact: channels, form, queue ring. Desktop layout at the end. ---*/
 /* ---------- CONTACT -------------------------------------------------- */
-.lobby { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "chan" "form" "queue"; gap: var(--sp-5); }
-.lobby-intro { grid-area: intro; display: flex; flex-direction: column; gap: var(--sp-4); min-width: 0; }
-@media (--tablet-up) { .lobby { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "intro intro" "chan queue" "form form"; } }
-.lobby-chan { grid-area: chan; display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
-.lobby-form { grid-area: form; min-width: 0; }
-.lobby-queue { grid-area: queue; display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
-.chan { display: flex; flex-direction: row; align-items: center; gap: var(--sp-4); padding: var(--sp-4); }
-.chan-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
-.chan-title { font-weight: 600; }
-.chan-value { font-size: var(--fs-2); color: var(--c-muted); user-select: all; overflow-wrap: anywhere; }
-.chan a.chan-value { display: inline-flex; align-items: center; align-self: flex-start; min-height: var(--sp-5); color: var(--c-muted); text-decoration: none; }
-.chan a.chan-value:hover { color: var(--c-text); }
-.copy-btn { flex: none; }
-:root:not(.js) .copy-btn { display: none; }   /* contact.js does the copying: without it the button would do nothing */
-.form-panel { display: flex; flex-direction: column; }
-.form-head { display: flex; flex-direction: column; gap: var(--sp-2); padding: var(--sp-5) var(--sp-5) 0; }
-.form-body { display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); }
-.form-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); padding: 0 var(--sp-5) var(--sp-5); }
-@media (--tablet-up) {
-  .form-head { padding: var(--sp-6) var(--sp-6) 0; }
-  .form-body { padding: var(--sp-5) var(--sp-6); }
-  .form-foot { padding: 0 var(--sp-6) var(--sp-6); }
+.lobby {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'intro' 'chan' 'form' 'queue';
+  gap: var(--sp-5);
 }
-.queue-ring { container-type: inline-size; position: relative; align-self: center; width: min(100%, 11rem); aspect-ratio: 1; }
-.queue-ring svg { width: 100%; height: 100%; }
+.lobby-intro {
+  grid-area: intro;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  min-width: 0;
+}
+@media (--tablet-up) {
+  .lobby {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: 'intro intro' 'chan queue' 'form form';
+  }
+}
+.lobby-chan {
+  grid-area: chan;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  min-width: 0;
+}
+.lobby-form {
+  grid-area: form;
+  min-width: 0;
+}
+.lobby-queue {
+  grid-area: queue;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  min-width: 0;
+}
+.chan {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+.chan-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.chan-title {
+  font-weight: 600;
+}
+.chan-value {
+  font-size: var(--fs-2);
+  color: var(--c-muted);
+  user-select: all;
+  overflow-wrap: anywhere;
+}
+.chan a.chan-value {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: var(--sp-5);
+  color: var(--c-muted);
+  text-decoration: none;
+}
+.chan a.chan-value:hover {
+  color: var(--c-text);
+}
+.copy-btn {
+  flex: none;
+}
+:root:not(.js) .copy-btn {
+  display: none;
+} /* contact.js does the copying: without it the button would do nothing */
+.form-panel {
+  display: flex;
+  flex-direction: column;
+}
+.form-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-5) 0;
+}
+.form-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
+.form-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-5) var(--sp-5);
+}
+@media (--tablet-up) {
+  .form-head {
+    padding: var(--sp-6) var(--sp-6) 0;
+  }
+  .form-body {
+    padding: var(--sp-5) var(--sp-6);
+  }
+  .form-foot {
+    padding: 0 var(--sp-6) var(--sp-6);
+  }
+}
+.queue-ring {
+  container-type: inline-size;
+  position: relative;
+  align-self: center;
+  width: min(100%, 11rem);
+  aspect-ratio: 1;
+}
+.queue-ring svg {
+  width: 100%;
+  height: 100%;
+}
 /* the label comes first in the HTML, so it is heard before the number; column-reverse shows the number on top */
-.queue-ring-label { position: absolute; inset: 0; display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: var(--sp-1); text-align: center; }
-.queue-ring-label .label { max-width: 10em; }   /* wraps under the number, inside the ring */
+.queue-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  text-align: center;
+}
+.queue-ring-label .label {
+  max-width: 10em;
+} /* wraps under the number, inside the ring */
 /* the number sized to the ring, on one line: inside the stroke at any width and with wider text spacing (B19, B7) */
-.queue-ring .stat-val { font-size: min(var(--fs-7), 22cqi); white-space: nowrap; }
-.queue-ring-track { stroke: var(--c-line); }
-.queue-ring-arc { stroke: var(--c-accent-text); transition: stroke-dasharray var(--dur-3) var(--ease); }
+.queue-ring .stat-val {
+  font-size: min(var(--fs-7), 22cqi);
+  white-space: nowrap;
+}
+.queue-ring-track {
+  stroke: var(--c-line);
+}
+.queue-ring-arc {
+  stroke: var(--c-accent-text);
+  transition: stroke-dasharray var(--dur-3) var(--ease);
+}
 
 /* desktop (>= 1100 wide and >= 700 tall): three columns */
 @media (--fold) {
-  .lobby { grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr); grid-template-rows: auto 1fr; grid-template-areas: "intro form queue" "chan form queue"; column-gap: var(--sp-6); row-gap: var(--sp-6); align-items: start; }
-  .lobby-intro .lead { font-size: var(--fs-3); }
-  .lobby textarea.input { min-height: var(--sp-9); }
+  .lobby {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'intro form queue' 'chan form queue';
+    column-gap: var(--sp-6);
+    row-gap: var(--sp-6);
+    align-items: start;
+  }
+  .lobby-intro .lead {
+    font-size: var(--fs-3);
+  }
+  .lobby textarea.input {
+    min-height: var(--sp-9);
+  }
 }

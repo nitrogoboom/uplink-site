@@ -16,13 +16,18 @@
   line-height: var(--lh-tight);
   color: var(--c-text);
 }
-.kbd-hint { display: none; }
+.kbd-hint {
+  display: none;
+}
 /* any-: a touchscreen PC with a mouse or trackpad still gets the key hints */
 /* Esc beside a pop-up's close button: any width, shortcuts on or off (Esc is the browser's own close, not ours) */
 @media (any-hover: hover) and (any-pointer: fine) {
-  .dlg-head .kbd-hint { display: inline-grid; }
+  .dlg-head .kbd-hint {
+    display: inline-grid;
+  }
 }
 @media (any-hover: hover) and (any-pointer: fine) and (--desktop) {
-  :root:not([data-shortcuts="off"]) .kbd-hint { display: inline-grid; }
+  :root:not([data-shortcuts='off']) .kbd-hint {
+    display: inline-grid;
+  }
 }
-

@@ -36,10 +36,14 @@
 const MAX_BODY = 8 * 1024;
 // what every response this script writes itself carries: never sniffed, never stored, and if one were ever opened as
 // a page it could load nothing and be framed nowhere
-const OWN = { 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'" };
+const OWN = {
+  'X-Content-Type-Options': 'nosniff',
+  'Cache-Control': 'no-store',
+  'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
+};
 const reply = (status, body = null, headers = {}) => new Response(body, { status, headers: { ...OWN, ...headers } });
 const MAX_REPORTS = 20;
-const EXTENSION = /^(chrome|moz|safari-web)-extension$/;   // an extension's address, as bare() leaves it
+const EXTENSION = /^(chrome|moz|safari-web)-extension$/; // an extension's address, as bare() leaves it
 // a field as text: only a string or a number counts (a report is the sender's word; an object's toString can throw)
 const cut = (v, n = 300) => (typeof v === 'string' || typeof v === 'number' ? String(v).slice(0, n) : undefined);
 // a line or column number, or nothing (a report is the sender's word: never log what it sends as is)
@@ -49,10 +53,10 @@ const bare = (u) => {
   if (!u || (typeof u !== 'string' && typeof u !== 'number')) return undefined;
   try {
     const url = new URL(String(u));
-    if (url.origin === 'null') return cut(url.protocol.slice(0, -1));   // data:, an extension's own address: the scheme only
+    if (url.origin === 'null') return cut(url.protocol.slice(0, -1)); // data:, an extension's own address: the scheme only
     return cut(url.origin + url.pathname);
   } catch {
-    return cut(String(u).split(/[?#]/)[0]);   // 'inline', 'eval' and the like
+    return cut(String(u).split(/[?#]/)[0]); // 'inline', 'eval' and the like
   }
 };
 
@@ -68,18 +72,37 @@ const fromReport = (r) => ({
 });
 // the shapes a report arrives in, as one flat record
 function records(type, body) {
-  if (type.includes('application/reports+json')) {   // Reporting API: an array of { type, url, body }
+  if (type.includes('application/reports+json')) {
+    // Reporting API: an array of { type, url, body }
     return (Array.isArray(body) ? body : []).slice(0, MAX_REPORTS).filter(isObject).map(fromReport);
   }
-  if (type.includes('application/csp-report')) {     // report-uri: { "csp-report": { … } }
-    if (!body?.['csp-report'] && body?.body) return [fromReport(body)];   // WebKit: one Reporting API report under this type
+  if (type.includes('application/csp-report')) {
+    // report-uri: { "csp-report": { … } }
+    if (!body?.['csp-report'] && body?.body) return [fromReport(body)]; // WebKit: one Reporting API report under this type
     const r = body?.['csp-report'] || {};
-    return [{ kind: 'csp-violation', page: bare(r['document-uri']), blocked: bare(r['blocked-uri']),
-      directive: cut(r['effective-directive'] || r['violated-directive'], 60), source: bare(r['source-file']), line: num(r['line-number']) }];
+    return [
+      {
+        kind: 'csp-violation',
+        page: bare(r['document-uri']),
+        blocked: bare(r['blocked-uri']),
+        directive: cut(r['effective-directive'] || r['violated-directive'], 60),
+        source: bare(r['source-file']),
+        line: num(r['line-number']),
+      },
+    ];
   }
-  if (body?.kind === 'error') {                       // core.js
-    return [{ kind: 'script-error', page: bare(body.page), message: cut(body.message), source: bare(body.source),
-      line: num(body.line), column: num(body.column) }];
+  if (body?.kind === 'error') {
+    // core.js
+    return [
+      {
+        kind: 'script-error',
+        page: bare(body.page),
+        message: cut(body.message),
+        source: bare(body.source),
+        line: num(body.line),
+        column: num(body.column),
+      },
+    ];
   }
   return [];
 }
@@ -95,12 +118,18 @@ async function capped(request) {
     const { done, value } = await reader.read();
     if (done) break;
     size += value.byteLength;
-    if (size > MAX_BODY) { await reader.cancel(); return null; }
+    if (size > MAX_BODY) {
+      await reader.cancel();
+      return null;
+    }
     chunks.push(value);
   }
   const all = new Uint8Array(size);
   let at = 0;
-  for (const c of chunks) { all.set(c, at); at += c.byteLength; }
+  for (const c of chunks) {
+    all.set(c, at);
+    at += c.byteLength;
+  }
   return new TextDecoder().decode(all);
 }
 
@@ -108,17 +137,26 @@ async function report(request, env) {
   if (request.method !== 'POST') return reply(405, 'Method not allowed', { Allow: 'POST' });
   const site = new URL(request.url).origin;
   const origin = request.headers.get('Origin');
-  if (origin && origin !== 'null' && origin !== site) return reply(403);   // null: WebKit's CSP reports (above)
+  if (origin && origin !== 'null' && origin !== site) return reply(403); // null: WebKit's CSP reports (above)
   const text = await capped(request);
   if (text == null) return reply(413);
   let body;
-  try { body = JSON.parse(text); } catch { return reply(400); }
-  const ours = (r) => (r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`));
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return reply(400);
+  }
+  const ours = (r) =>
+    r.kind === 'script-error' ? origin === site : r.page === site || !!r.page?.startsWith(`${site}/`);
   const extension = (r) => EXTENSION.test(r.source || '') || EXTENSION.test(r.blocked || '');
-  const webkitSelect = (r) => r.directive === 'style-src-attr' && r.blocked === 'inline' && !r.source && r.line === undefined;
+  const webkitSelect = (r) =>
+    r.directive === 'style-src-attr' && r.blocked === 'inline' && !r.source && r.line === undefined;
   let keep;
-  try {   // the type checks above should leave nothing to throw; if a shape still does, it's a bad report, not a crash
-    keep = records((request.headers.get('Content-Type') || '').toLowerCase(), body).filter((r) => ours(r) && !extension(r) && !webkitSelect(r));
+  try {
+    // the type checks above should leave nothing to throw; if a shape still does, it's a bad report, not a crash
+    keep = records((request.headers.get('Content-Type') || '').toLowerCase(), body).filter(
+      (r) => ours(r) && !extension(r) && !webkitSelect(r),
+    );
   } catch {
     return reply(400);
   }
@@ -137,7 +175,9 @@ async function report(request, env) {
 // and with none of the visitor's If-None-Match / If-Modified-Since: the file would answer those 304, and a 304 turned
 // into a 404 is an empty page (review B3). Its ETag and Last-Modified are dropped so a browser has nothing to send back.
 async function notFound(request, env) {
-  const page = await env.ASSETS.fetch(new Request(new URL('/404', request.url), { method: request.method === 'HEAD' ? 'HEAD' : 'GET' }));
+  const page = await env.ASSETS.fetch(
+    new Request(new URL('/404', request.url), { method: request.method === 'HEAD' ? 'HEAD' : 'GET' }),
+  );
   const headers = new Headers(page.headers);
   headers.delete('ETag');
   headers.delete('Last-Modified');
@@ -147,9 +187,16 @@ async function notFound(request, env) {
 // http:// to https://, the same address. 308 keeps a POST a POST. A server on this machine or the local network
 // (npm run serve, or wrangler dev --ip 0.0.0.0 for a phone on the same Wi-Fi) stays on http: it has no certificate.
 const local = (host) =>
-  host === 'localhost' || host.endsWith('.localhost') || host.endsWith('.local') || host === '0.0.0.0' || host === '[::1]' ||
-  /^(127|10)\.\d+\.\d+\.\d+$/.test(host) || /^192\.168\.\d+\.\d+$/.test(host) || /^172\.(1[6-9]|2\d|3[01])\.\d+\.\d+$/.test(host) ||
-  /^169\.254\.\d+\.\d+$/.test(host) || /^\[(f[cd]|fe[89ab])[0-9a-f]*:/i.test(host);   // IPv6: unique local, link-local
+  host === 'localhost' ||
+  host.endsWith('.localhost') ||
+  host.endsWith('.local') ||
+  host === '0.0.0.0' ||
+  host === '[::1]' ||
+  /^(127|10)\.\d+\.\d+\.\d+$/.test(host) ||
+  /^192\.168\.\d+\.\d+$/.test(host) ||
+  /^172\.(1[6-9]|2\d|3[01])\.\d+\.\d+$/.test(host) ||
+  /^169\.254\.\d+\.\d+$/.test(host) ||
+  /^\[(f[cd]|fe[89ab])[0-9a-f]*:/i.test(host); // IPv6: unique local, link-local
 
 async function route(request, env) {
   const url = new URL(request.url);
@@ -160,7 +207,8 @@ async function route(request, env) {
   if (url.pathname === '/api/report') return report(request, env);
   if (url.pathname.startsWith('/api/')) return reply(404, 'Not found', { 'Content-Type': 'text/plain; charset=utf-8' });
   // the assets answer any other method with a bare 405 (a POST to /services): the same here, with the list
-  if (request.method !== 'GET' && request.method !== 'HEAD') return reply(405, 'Method not allowed', { Allow: 'GET, HEAD' });
+  if (request.method !== 'GET' && request.method !== 'HEAD')
+    return reply(405, 'Method not allowed', { Allow: 'GET, HEAD' });
   if (url.pathname === '/404') return notFound(request, env);
   // a miss (or, with run_worker_first true, any address): the file if there is one, else the 404 page
   const res = await env.ASSETS.fetch(request);

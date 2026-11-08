@@ -1,0 +1,3 @@
+# Commits that only reformat code. GitHub blame skips them; locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# Prettier reformat of the code (npm run format), November 8, 2026
+f54b94f383d3396b9785f8ecd13e5553b1ce0da3

@@ -10,21 +10,32 @@ import { WORK_FILTER, getProjects, workFilters } from '../../lib/site';
 const projects = await getProjects();
 const filters = await workFilters();
 ---
+
 <section class="page-intro fold fold-always" id="projects" aria-labelledby="work-title">
   <div class="container work-layout">
     <div class="work-side">
       <p class="eyebrow">Our work</p>
       <h1 id="work-title">Setups we built and still run</h1>
-      <p class="lead">Every project here is a client we still look after today. Open one to see what we found, what we did and how it turned out.</p>
+      <p class="lead">
+        Every project here is a client we still look after today. Open one to see what we found, what we did and how it
+        turned out.
+      </p>
       <fieldset class="filters" data-md-skip>
         <legend class="sr-only">Filter projects</legend>
-        {filters.map((f) => <label class="filter"><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'}>{f.label}<span class="sr-only">, </span><span class="count">{f.count}</span></label>)}
+        {filters.map((f) => <label class="filter"
+          ><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'} />{
+            f.label
+          }<span class="sr-only">, </span
+          ><span class="count">{f.count}</span></label
+        >)}
       </fieldset>
     </div>
     <div class="work-main">
-    <ul class="work-grid">
-      {projects.map((project, i) => <li data-tags={project.data.tag.toLowerCase()}><ProjectCard project={project} level={2} first={i === 0} /></li>)}
-    </ul>
+      <ul class="work-grid">
+        {projects.map((project, i) => <li data-tags={project.data.tag.toLowerCase()}>
+          <ProjectCard project={project} level={2} first={i === 0} />
+        </li>)}
+      </ul>
     </div>
   </div>
 </section>

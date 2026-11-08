@@ -1,5 +1,6 @@
 // ESLint (flat config): the recommended JS, TypeScript and Astro rules, for the page scripts, the build scripts and
-// the Astro components. Formatting is left alone (the code is hand-formatted; see .prettierignore).
+// the Astro components. Formatting is Prettier's (npm run format); none of these
+// configs turns on a formatting rule, so the two don't fight.
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
@@ -14,7 +15,10 @@ export default defineConfig(
   { languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } } },
   ...astro.configs.recommended,
   { files: ['src/scripts/**/*.js', 'tools/**/*.js'], languageOptions: { globals: globals.browser } },
-  { files: ['scripts/**/*.mjs', '*.{js,mjs}', 'src/**/*.ts', 'src/lib/*.mjs'], languageOptions: { globals: globals.node } },
+  {
+    files: ['scripts/**/*.mjs', '*.{js,mjs}', 'src/**/*.ts', 'src/lib/*.mjs'],
+    languageOptions: { globals: globals.node },
+  },
   // the site checks run in Node and hand functions to the page, so both sets of globals apply
   { files: ['checks/**/*.mjs'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   // the Worker runs on Cloudflare: the web platform's globals (fetch, Request, Response, URL), no DOM

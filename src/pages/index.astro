@@ -17,23 +17,37 @@ const business = {
   '@id': `${site}#business`,
   name: 'Uplink Technology',
   url: site,
-  description: 'Managed IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.',
+  description:
+    'Managed IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.',
   telephone: `+${phone.display}`,
   email,
-  address: { '@type': 'PostalAddress', streetAddress: office.street, addressLocality: office.city, addressRegion: 'ON', addressCountry: 'CA' },
-  openingHoursSpecification: [{ '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'], opens: '07:00', closes: '19:00' }],
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: office.street,
+    addressLocality: office.city,
+    addressRegion: 'ON',
+    addressCountry: 'CA',
+  },
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '07:00',
+      closes: '19:00',
+    },
+  ],
   areaServed: 'Ontario',
   knowsLanguage: ['en', 'fr'],
 };
 ---
-<Base title={PAGES.home.title} description={PAGES.home.description}
-      page="home" path="/">
+
+<Base title={PAGES.home.title} description={PAGES.home.description} page="home" path="/">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={jsonLd(business)} />
-    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone}>
-    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={HERO.media.phone}>
-    <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet}>
-    <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full}>
+    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone} />
+    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={HERO.media.phone} />
+    <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet} />
+    <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full} />
   </Fragment>
   <Hero />
   <Services />

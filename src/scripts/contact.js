@@ -10,7 +10,7 @@ import { $, $$, toast } from './core.js';
    ====================================================================== */
 $$('[data-copy]').forEach((btn) => {
   btn.addEventListener('click', () => {
-    const value = /** @type {string} */ (btn.dataset.copy);   // every copy button has one
+    const value = /** @type {string} */ (btn.dataset.copy); // every copy button has one
     const target = document.getElementById(btn.dataset.copyTarget || '');
     const fallback = () => {
       if (target) {
@@ -23,10 +23,7 @@ $$('[data-copy]').forEach((btn) => {
       toast({ title: 'Selected', text: 'Copy it with Ctrl+C, or long-press on a phone.', tone: 'info', timeout: 4000 });
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(value).then(
-        () => toast({ title: 'Copied', text: value, timeout: 3000 }),
-        fallback
-      );
+      navigator.clipboard.writeText(value).then(() => toast({ title: 'Copied', text: value, timeout: 3000 }), fallback);
     } else {
       fallback();
     }
@@ -44,6 +41,8 @@ if (contactForm) {
     if (q) q.dataset.state = 'queued';
     const arc = $('[data-queue-arc]');
     if (arc) arc.setAttribute('stroke-dasharray', '330 440');
-    $$('[data-queue-text]').forEach((el) => { el.textContent = /** @type {string} */ (el.dataset.queueText); });
+    $$('[data-queue-text]').forEach((el) => {
+      el.textContent = /** @type {string} */ (el.dataset.queueText);
+    });
   });
 }

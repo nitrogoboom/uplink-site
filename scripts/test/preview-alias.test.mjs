@@ -6,8 +6,20 @@ import { execFileSync } from 'node:child_process';
 import { MAX, WRANGLER, previewAlias } from '../preview-alias.mjs';
 
 const NAMES = [
-  'main', 'claude/uplink-site-best-practices-ppzgw3', 'Feature/ÉTÉ_2026', '123-fix', '2026-11-07', '-x-', '___', '',
-  'dependabot/npm_and_yarn/minor-and-patch-6f1e2d', 'UPPER', 'a', 'x'.repeat(80), 'z/' + '9'.repeat(40), 'fix--double..dots',
+  'main',
+  'claude/uplink-site-best-practices-ppzgw3',
+  'Feature/ÉTÉ_2026',
+  '123-fix',
+  '2026-11-07',
+  '-x-',
+  '___',
+  '',
+  'dependabot/npm_and_yarn/minor-and-patch-6f1e2d',
+  'UPPER',
+  'a',
+  'x'.repeat(80),
+  'z/' + '9'.repeat(40),
+  'fix--double..dots',
 ];
 
 test('every alias is one wrangler accepts, and at most 30 characters', () => {

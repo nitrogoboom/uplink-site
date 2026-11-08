@@ -4,7 +4,12 @@
 // shows them only with script and motion. The icon is drawn in CSS (.hold in src/styles/buttons.css): two bars, or
 // a play triangle while held. The caller places it with its own class.
 //   <HoldButton class="fc-hold" />
-interface Props { class?: string }
+interface Props {
+  class?: string;
+}
 const { class: cls } = Astro.props;
 ---
-<button class:list={['hold', cls]} type="button" hidden data-hold aria-pressed="false" aria-label="Pause animations"><span class="hold-icon" aria-hidden="true"></span></button>
+
+<button class:list={['hold', cls]} type="button" hidden data-hold aria-pressed="false" aria-label="Pause animations">
+  <span class="hold-icon" aria-hidden="true"></span>
+</button>

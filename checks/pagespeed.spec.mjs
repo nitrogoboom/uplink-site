@@ -33,7 +33,13 @@ function apiKey() {
   let key = process.env.PSI_API_KEY;
   const vars = join(ROOT, '.dev.vars');
   if (!key && existsSync(vars))
-    key = readFileSync(vars, 'utf8').split(/\r?\n/).find((l) => l.startsWith('PSI_API_KEY='))?.split('=').slice(1).join('=').trim();
+    key = readFileSync(vars, 'utf8')
+      .split(/\r?\n/)
+      .find((l) => l.startsWith('PSI_API_KEY='))
+      ?.split('=')
+      .slice(1)
+      .join('=')
+      .trim();
   if (!key) throw new Error('No PageSpeed API key: put PSI_API_KEY=... in .dev.vars (see the note at the top).');
   return key;
 }
@@ -48,16 +54,27 @@ async function sitePages(base) {
 async function warm(url) {
   const get = async (u) => (await fetch(u, { headers: UA, signal: AbortSignal.timeout(30_000) })).text();
   const base = url.match(/^https?:\/\/[^/]+/)[0];
-  const refs = new Set([...(await get(url)).matchAll(/(?:href|src|srcset|data-hero)="\/?(assets\/[^"#]+)/g)].map((m) => m[1]));
+  const refs = new Set(
+    [...(await get(url)).matchAll(/(?:href|src|srcset|data-hero)="\/?(assets\/[^"#]+)/g)].map((m) => m[1]),
+  );
   for (const ref of refs) await get(`${base}/${ref}`);
 }
 
 // one PageSpeed test; returns its Lighthouse report
 async function run(url, strategy, key) {
-  const q = new URLSearchParams([['url', url], ['strategy', strategy], ['key', key], ...CATS.map((c) => ['category', c])]);
+  const q = new URLSearchParams([
+    ['url', url],
+    ['strategy', strategy],
+    ['key', key],
+    ...CATS.map((c) => ['category', c]),
+  ]);
   const r = await fetch(`${API}?${q}`, { signal: AbortSignal.timeout(180_000) });
   // never print the request: the key is in it
-  if (!r.ok) throw new Error(`PageSpeed API ${r.status} for ${url} (${strategy}): ` + ((await r.json().catch(() => ({}))).error?.message || '').slice(0, 200));
+  if (!r.ok)
+    throw new Error(
+      `PageSpeed API ${r.status} for ${url} (${strategy}): ` +
+        ((await r.json().catch(() => ({}))).error?.message || '').slice(0, 200),
+    );
   return (await r.json()).lighthouseResult;
 }
 
@@ -78,7 +95,8 @@ const lowest = (s) => Math.min(...Object.values(s));
 // the best single run over up to RUNS tests (highest lowest score), stopping once one reaches the bar
 async function measure(base, path, strategy, key, bar) {
   const name = path.replace(/^\/|\/$/g, '') || 'home';
-  let best = null, n = 0;
+  let best = null,
+    n = 0;
   while (n < RUNS) {
     n++;
     const report = await run(base + path, strategy, key);
@@ -110,12 +128,19 @@ test('pagespeed', async () => {
   const jobs = paths.flatMap((p) => STRATEGIES.map((s) => [p, s]));
   const results = await Promise.all(jobs.map(([p, s]) => measure(base, p, s, key, bar)));
   const failed = [];
-  const lines = [`${pad('page', 10)} ${pad('device', 8)} ` + CATS.map((c) => c.slice(0, 6).padStart(6)).join(' ') + '  runs'];
+  const lines = [
+    `${pad('page', 10)} ${pad('device', 8)} ` + CATS.map((c) => c.slice(0, 6).padStart(6)).join(' ') + '  runs',
+  ];
   jobs.forEach(([path], i) => {
     const { name, strategy, best, n } = results[i];
     const mark = gated.includes(path) ? '' : '  (not gated)';
-    lines.push(`${pad(name, 10)} ${pad(strategy, 8)} ` + CATS.map((c) => String(best[c]).padStart(6)).join(' ') + `  ${n}${mark}`);
-    if (gated.includes(path)) failed.push(...CATS.filter((c) => best[c] < bar).map((c) => `${name} ${strategy} ${c} ${best[c]}`));
+    lines.push(
+      `${pad(name, 10)} ${pad(strategy, 8)} ` +
+        CATS.map((c) => String(best[c]).padStart(6)).join(' ') +
+        `  ${n}${mark}`,
+    );
+    if (gated.includes(path))
+      failed.push(...CATS.filter((c) => best[c] < bar).map((c) => `${name} ${strategy} ${c} ${best[c]}`));
   });
   console.log(lines.join('\n'));
   if (failed.length) throw new Error(`Under ${bar}: ` + failed.join(', '));

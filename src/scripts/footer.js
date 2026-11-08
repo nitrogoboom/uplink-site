@@ -21,7 +21,7 @@ import { MEDIA } from '../lib/media.js';
    (data-vb, a viewBox) and the marker's point (data-mk), and the spot's
    group, route and ring share its data-k.
    ====================================================================== */
-const MAP_MOVE = 700;   // ms the map's camera takes to fly to a section's spot
+const MAP_MOVE = 700; // ms the map's camera takes to fly to a section's spot
 const fc = $('.fc');
 if (fc) {
   const mapBox = /** @type {HTMLElement} */ ($('[data-fc-map]', fc));
@@ -37,39 +37,58 @@ if (fc) {
   let marker = null;
   /** @type {number[]} */
   let vb = [];
-  let mk = [0, 0], raf = 0;
-  const build = () => window.fetch(/** @type {string} */ (mapBox.dataset.fcMap))
-    .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
-    .then((text) => {
-      mapBox.insertAdjacentHTML('afterbegin', html(text));
-      // the drawing's markup (tools/gen_campus.py) has these
-      const map = /** @type {SVGSVGElement} */ ($('svg.fc-w', mapBox));
-      svg = map; marker = $('.mk', map);
-      vb = nums(/** @type {string} */ (map.getAttribute('viewBox')));
-      focusMap(true);
-      // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
-      whenOnScreen(map, (on) => { if (on) map.classList.add('is-seen'); });
-    })
-    .catch(() => { /* no map: the sections and the label still work */ });
+  let mk = [0, 0],
+    raf = 0;
+  const build = () =>
+    window
+      .fetch(/** @type {string} */ (mapBox.dataset.fcMap))
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
+      .then((text) => {
+        mapBox.insertAdjacentHTML('afterbegin', html(text));
+        // the drawing's markup (tools/gen_campus.py) has these
+        const map = /** @type {SVGSVGElement} */ ($('svg.fc-w', mapBox));
+        svg = map;
+        marker = $('.mk', map);
+        vb = nums(/** @type {string} */ (map.getAttribute('viewBox')));
+        focusMap(true);
+        // the map's looping animations pause while it is off screen; the moving dashes start the first time it shows
+        whenOnScreen(map, (on) => {
+          if (on) map.classList.add('is-seen');
+        });
+      })
+      .catch(() => {
+        /* no map: the sections and the label still work */
+      });
 
-  const paint = () => {   // only once the map is in
+  const paint = () => {
+    // only once the map is in
     /** @type {SVGSVGElement} */ (svg).setAttribute('viewBox', vb.map((n) => n.toFixed(1)).join(' '));
     /** @type {SVGElement} */ (marker).setAttribute('transform', `translate(${mk[0].toFixed(1)} ${mk[1].toFixed(1)})`);
   };
   // the shown section's spot lights up and the camera flies there
   const focusMap = (/** @type {boolean} */ instant) => {
-    if (!svg) return;   // not in yet: build() shows the spot when it is
+    if (!svg) return; // not in yet: build() shows the spot when it is
     const k = shown().dataset.map;
     /** @type {SVGElement} */
     const spot = $(`.dist[data-k="${k}"]`, svg) || /** @type {SVGElement} */ ($('.dist[data-k="hq"]', svg));
     $$('[data-k]', svg).forEach((el) => el.classList.toggle('on', el.dataset.k === spot.dataset.k));
-    const to = nums(/** @type {string} */ (spot.dataset.vb)), toMk = nums(/** @type {string} */ (spot.dataset.mk));
+    const to = nums(/** @type {string} */ (spot.dataset.vb)),
+      toMk = nums(/** @type {string} */ (spot.dataset.mk));
     window.cancelAnimationFrame(raf);
-    if (instant || reduceMotion.matches) { vb = to; mk = toMk; paint(); return; }
-    const v0 = vb.slice(), m0 = mk.slice(), t0 = performance.now(), dur = MAP_MOVE;
+    if (instant || reduceMotion.matches) {
+      vb = to;
+      mk = toMk;
+      paint();
+      return;
+    }
+    const v0 = vb.slice(),
+      m0 = mk.slice(),
+      t0 = performance.now(),
+      dur = MAP_MOVE;
     const ease = (/** @type {number} */ p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
     const step = (/** @type {number} */ now) => {
-      const p = Math.min(1, (now - t0) / dur), e = ease(p);
+      const p = Math.min(1, (now - t0) / dur),
+        e = ease(p);
       vb = v0.map((a, i) => a + (to[i] - a) * e);
       mk = m0.map((a, i) => a + (toMk[i] - a) * e);
       paint();
@@ -82,16 +101,22 @@ if (fc) {
   // anyway (its summary then says closed). Phones and the fallback rows start with every row shut.
   const tiles = window.matchMedia(MEDIA.tabletUp);
   const placed = window.CSS?.supports?.('selector(::details-content)');
-  const keepOne = () => { if (placed && tiles.matches && !sections.some((d) => d.open)) sections[0].open = true; };
+  const keepOne = () => {
+    if (placed && tiles.matches && !sections.some((d) => d.open)) sections[0].open = true;
+  };
   keepOne();
   tiles.addEventListener('change', keepOne);
   // toggle doesn't bubble: listen on the way down. Opening one section shuts the open one, so two events can come
   // in a row; both see the new one open. Shutting the open one leaves none: Contact opens again.
-  fc.addEventListener('toggle', (e) => {
-    if (!(/** @type {Element} */ (e.target).matches('.fc-sec'))) return;
-    keepOne();
-    focusMap(false);
-  }, true);
+  fc.addEventListener(
+    'toggle',
+    (e) => {
+      if (!(/** @type {Element} */ (e.target).matches('.fc-sec'))) return;
+      keepOne();
+      focusMap(false);
+    },
+    true,
+  );
 
   // newsletter (prototype: nothing is sent)
   // the form's input and message are in its markup (Footer.astro)
@@ -99,32 +124,43 @@ if (fc) {
   const nl = $('[data-fc-nl]', fc);
   const note = nl ? /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl)).textContent : '';
   // once marked wrong, the address clears its error as soon as it reads right, not on the next submit
-  if (nl) /** @type {HTMLInputElement} */ ($('input', nl)).addEventListener('input', (e) => {
-    const t = /** @type {HTMLInputElement} */ (e.target);
-    if (t.getAttribute('aria-invalid') && t.checkValidity()) {
-      t.removeAttribute('aria-invalid');
-      /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl)).textContent = note;
-    }
-  });
-  if (nl) nl.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const input = /** @type {HTMLInputElement} */ ($('input', nl)), msg = /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl));
-    if (!input.checkValidity()) {
-      input.setAttribute('aria-invalid', 'true');
-      msg.textContent = 'Enter an email like name@company.com.';
-      input.focus();
-      return;
-    }
-    input.removeAttribute('aria-invalid');
-    msg.textContent = 'One email a month. Threats to watch and fixes that matter.';
-    nl.reset();
-    toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
-  });
+  if (nl)
+    /** @type {HTMLInputElement} */ ($('input', nl)).addEventListener('input', (e) => {
+      const t = /** @type {HTMLInputElement} */ (e.target);
+      if (t.getAttribute('aria-invalid') && t.checkValidity()) {
+        t.removeAttribute('aria-invalid');
+        /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl)).textContent = note;
+      }
+    });
+  if (nl)
+    nl.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = /** @type {HTMLInputElement} */ ($('input', nl)),
+        msg = /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl));
+      if (!input.checkValidity()) {
+        input.setAttribute('aria-invalid', 'true');
+        msg.textContent = 'Enter an email like name@company.com.';
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      msg.textContent = 'One email a month. Threats to watch and fixes that matter.';
+      nl.reset();
+      toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
+    });
 
   // the map is fetched when its box comes within a screen of view; phones hide the box (footer.css), so they never
   // fetch it, and a phone turned past 700 px fetches it then
   if ('IntersectionObserver' in window) {
-    const near = new IntersectionObserver(([en]) => { if (en.isIntersecting) { near.disconnect(); void build(); } }, { rootMargin: '100% 0px' });
+    const near = new IntersectionObserver(
+      ([en]) => {
+        if (en.isIntersecting) {
+          near.disconnect();
+          void build();
+        }
+      },
+      { rootMargin: '100% 0px' },
+    );
     near.observe(mapBox);
-  } else if (!matchMedia(MEDIA.phone).matches) void build();   // window is "never" here to the type check
+  } else if (!matchMedia(MEDIA.phone).matches) void build(); // window is "never" here to the type check
 }

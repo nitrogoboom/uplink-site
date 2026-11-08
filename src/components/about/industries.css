@@ -1,4 +1,14 @@
 /*--- ABOUT · industry chips (Profile). ---*/
-.industries { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; }
-.industries .chip { height: var(--sp-6); padding-inline: var(--sp-4); font-size: var(--fs-2); letter-spacing: var(--tracking-1); text-transform: none; }
-
+.industries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+}
+.industries .chip {
+  height: var(--sp-6);
+  padding-inline: var(--sp-4);
+  font-size: var(--fs-2);
+  letter-spacing: var(--tracking-1);
+  text-transform: none;
+}

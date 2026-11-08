@@ -8,29 +8,75 @@
   border-bottom: 1px solid var(--c-line);
 }
 .site-header .container {
-  max-width: none;   /* pinned to the screen edges, even on ultrawide */
+  max-width: none; /* pinned to the screen edges, even on ultrawide */
   display: flex;
   align-items: center;
   gap: var(--sp-5);
-  height: calc(var(--header-h) - 1px);   /* plus the 1px bottom line: the header is --header-h tall, so one-screen sections fit exactly */
+  height: calc(
+    var(--header-h) - 1px
+  ); /* plus the 1px bottom line: the header is --header-h tall, so one-screen sections fit exactly */
 }
 
-.brand { display: flex; align-items: center; gap: var(--sp-3); flex: none; min-height: var(--tap); text-decoration: none; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex: none;
+  min-height: var(--tap);
+  text-decoration: none;
+}
 .brand-mark {
-  display: grid; place-items: center;
-  width: var(--sp-6); height: var(--sp-6);
+  display: grid;
+  place-items: center;
+  width: var(--sp-6);
+  height: var(--sp-6);
   border-radius: var(--r-2);
   background: var(--c-accent);
   color: var(--c-on-accent);
 }
-.brand-mark svg { width: var(--icon); height: var(--icon); }
-.brand-text { display: flex; flex-direction: column; gap: var(--sp-1); }
-.brand-name { font-family: var(--font-display); font-weight: 700; font-style: italic; text-transform: uppercase; font-size: var(--fs-5); line-height: var(--lh-tight); }
-.brand-sub { font-size: var(--fs-1); line-height: var(--lh-tight); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
+.brand-mark svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+.brand-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: italic;
+  text-transform: uppercase;
+  font-size: var(--fs-5);
+  line-height: var(--lh-tight);
+}
+.brand-sub {
+  font-size: var(--fs-1);
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
 
-.tabs { flex: 1; align-self: stretch; min-width: 0; display: flex; align-items: stretch; justify-content: center; gap: var(--sp-1); }
-.tabs ul { display: flex; align-items: stretch; gap: var(--sp-1); list-style: none; }
-.tabs li { display: flex; }
+.tabs {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--sp-1);
+}
+.tabs ul {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-1);
+  list-style: none;
+}
+.tabs li {
+  display: flex;
+}
 .tab {
   position: relative;
   display: flex;
@@ -45,20 +91,40 @@
   text-decoration: none;
   white-space: nowrap;
   color: var(--c-muted);
-  transition: background-color var(--dur-1) var(--ease), color var(--dur-1) var(--ease);
+  transition:
+    background-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
 }
-.tab:hover { color: var(--c-text); background: var(--c-surface); }
-.tab[aria-current] { color: var(--c-text); background: var(--c-surface-2); }
+.tab:hover {
+  color: var(--c-text);
+  background: var(--c-surface);
+}
+.tab[aria-current] {
+  color: var(--c-text);
+  background: var(--c-surface-2);
+}
 .tab[aria-current]::after {
-  content: "";
+  content: '';
   position: absolute;
-  left: 0; right: 0; bottom: -1px;   /* on the header's bottom line */
+  left: 0;
+  right: 0;
+  bottom: -1px; /* on the header's bottom line */
   height: var(--sp-1);
   background: var(--c-accent);
 }
-@media (forced-colors: active) { .tab[aria-current]::after { forced-color-adjust: none; background: Highlight; } }
+@media (forced-colors: active) {
+  .tab[aria-current]::after {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+}
 
-.hdr-actions { flex: none; display: flex; align-items: center; gap: var(--sp-2); }
+.hdr-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
 
 /* small header buttons */
 .hbtn {
@@ -78,7 +144,14 @@
   white-space: nowrap;
   transition: background-color var(--dur-1) var(--ease);
 }
-.hbtn:hover { background: var(--c-surface-2); }
-.hbtn svg { width: var(--icon); height: var(--icon); flex: none; }
-:root:not(.js) .hbtn-settings { display: none; }   /* the settings need script; without it there is nothing to open */
-
+.hbtn:hover {
+  background: var(--c-surface-2);
+}
+.hbtn svg {
+  width: var(--icon);
+  height: var(--icon);
+  flex: none;
+}
+:root:not(.js) .hbtn-settings {
+  display: none;
+} /* the settings need script; without it there is nothing to open */

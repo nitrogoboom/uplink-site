@@ -5,8 +5,14 @@ import { PAGES } from '../lib/site';
 import Message from '../components/contact/Message.astro';
 import Support from '../components/contact/Support.astro';
 ---
-<Base title={PAGES.contact.title} description={PAGES.contact.description}
-      page="contact" path="/contact" type="ContactPage">
+
+<Base
+  title={PAGES.contact.title}
+  description={PAGES.contact.description}
+  page="contact"
+  path="/contact"
+  type="ContactPage"
+>
   <Message />
   <Support />
   <Fragment slot="scripts">

@@ -1,18 +1,62 @@
 /*--- Breadcrumb and write-up: a service's page and a project's page. ---*/
-.crumbs ol { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
-.crumbs li + li::before { content: "/" / ""; margin-right: var(--sp-2); color: var(--c-line-2); }
-.crumbs a { color: var(--c-accent-text); text-decoration: none; }
-.crumbs a:hover { text-decoration: underline; }
-.crumbs [aria-current] { color: var(--c-text); }
+.crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.crumbs li + li::before {
+  content: '/' / '';
+  margin-right: var(--sp-2);
+  color: var(--c-line-2);
+}
+.crumbs a {
+  color: var(--c-accent-text);
+  text-decoration: none;
+}
+.crumbs a:hover {
+  text-decoration: underline;
+}
+.crumbs [aria-current] {
+  color: var(--c-text);
+}
 
 /* the full write-up under a service or project: paragraphs, sub-headings and lists at reading width */
-.detail-body .prose { font-size: var(--fs-4); }
-.detail-body .prose h3 { color: var(--c-text); }
-.detail-body .prose > * + h3 { margin-top: var(--sp-6); }
-.detail-body .prose > h3 + * { margin-top: var(--sp-3); }   /* closer below than above: a heading sits with its text */
-.detail-body .prose :is(ol, ul) { display: flex; flex-direction: column; gap: var(--sp-3); padding-left: var(--sp-5); }
-.detail-body .prose li { padding-left: var(--sp-1); }
-.detail-body .prose li::marker { color: var(--c-accent-text); font-weight: 600; }
-.detail-body .prose strong { color: var(--c-text); font-weight: 600; }
-.detail-body .facts { max-width: var(--measure); font-size: var(--fs-3); }
-
+.detail-body .prose {
+  font-size: var(--fs-4);
+}
+.detail-body .prose h3 {
+  color: var(--c-text);
+}
+.detail-body .prose > * + h3 {
+  margin-top: var(--sp-6);
+}
+.detail-body .prose > h3 + * {
+  margin-top: var(--sp-3);
+} /* closer below than above: a heading sits with its text */
+.detail-body .prose :is(ol, ul) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding-left: var(--sp-5);
+}
+.detail-body .prose li {
+  padding-left: var(--sp-1);
+}
+.detail-body .prose li::marker {
+  color: var(--c-accent-text);
+  font-weight: 600;
+}
+.detail-body .prose strong {
+  color: var(--c-text);
+  font-weight: 600;
+}
+.detail-body .facts {
+  max-width: var(--measure);
+  font-size: var(--fs-3);
+}

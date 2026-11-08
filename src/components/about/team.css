@@ -1,16 +1,44 @@
 /*--- ABOUT · 3. Team cards. ---*/
-.team { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
-@media (--tablet-up) { .team { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (--desktop) { .team { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); } }
-.person { display: flex; flex-direction: column; gap: var(--sp-4); padding: var(--sp-5); }
+.team {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+}
+@media (--tablet-up) {
+  .team {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (--desktop) {
+  .team {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+}
+.person {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+}
 .avatar {
-  display: grid; place-items: center;
-  width: var(--control-lg); height: var(--control-lg);
+  display: grid;
+  place-items: center;
+  width: var(--control-lg);
+  height: var(--control-lg);
   border-radius: var(--r-3);
   background: var(--c-surface-2);
-  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-6);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-6);
   color: var(--c-accent-text);
 }
-.person .stack-2 { gap: var(--sp-1); line-height: var(--lh-snug); }
-.person-name { font-weight: 600; font-size: var(--fs-4); }
-
+.person .stack-2 {
+  gap: var(--sp-1);
+  line-height: var(--lh-snug);
+}
+.person-name {
+  font-weight: 600;
+  font-size: var(--fs-4);
+}

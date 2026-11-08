@@ -1,8 +1,23 @@
 /*--- Forms and the toggle switch. ---*/
 /* ---------- forms ----------------------------------------------------- */
-.field { display: flex; flex-direction: column; gap: var(--sp-2); min-width: 0; }
-.field label { font-size: var(--fs-1); font-weight: 600; letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--c-muted); }
-.field .opt { font-weight: 400; letter-spacing: 0; text-transform: none; }
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+.field label {
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.field .opt {
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
 .input {
   width: 100%;
   min-height: var(--control-h);
@@ -13,12 +28,26 @@
   color: var(--c-text);
   font-size: var(--fs-3);
   line-height: var(--lh-snug);
-  transition: border-color var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+  transition:
+    border-color var(--dur-1) var(--ease),
+    box-shadow var(--dur-1) var(--ease);
 }
-textarea.input { min-height: calc(var(--sp-9) + var(--sp-7)); resize: vertical; }
-.input::placeholder { color: var(--c-muted); opacity: 0.7; }
-.input:focus { outline: none; border-color: var(--c-accent-text); box-shadow: 0 0 0 3px var(--c-accent-ring); }
-.input[aria-invalid="true"] { border-color: var(--c-alert); }
+textarea.input {
+  min-height: calc(var(--sp-9) + var(--sp-7));
+  resize: vertical;
+}
+.input::placeholder {
+  color: var(--c-muted);
+  opacity: 0.7;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--c-accent-text);
+  box-shadow: 0 0 0 3px var(--c-accent-ring);
+}
+.input[aria-invalid='true'] {
+  border-color: var(--c-alert);
+}
 
 /* selects: our own arrow, text lined up with the inputs. Browsers with customizable selects (base-select) also get a
    dark list styled like a menu; the others get dark options in their own list. */
@@ -28,12 +57,25 @@ select.input {
   background: var(--c-well) var(--chevron-down) no-repeat right var(--sp-3) center / var(--icon);
   cursor: pointer;
 }
-select.input option { background-color: var(--c-solid); color: var(--c-text); }
-select.input:hover { border-color: var(--c-text); }
+select.input option {
+  background-color: var(--c-solid);
+  color: var(--c-text);
+}
+select.input:hover {
+  border-color: var(--c-text);
+}
 @supports (appearance: base-select) {
-  select.input, select.input::picker(select) { appearance: base-select; }
-  select.input::picker-icon { display: none; }
-  select.input:open { background-image: var(--chevron-up); border-color: var(--c-accent-text); }
+  select.input,
+  select.input::picker(select) {
+    appearance: base-select;
+  }
+  select.input::picker-icon {
+    display: none;
+  }
+  select.input:open {
+    background-image: var(--chevron-up);
+    border-color: var(--c-accent-text);
+  }
   select.input::picker(select) {
     margin-block: var(--sp-1);
     padding: var(--sp-1);
@@ -50,19 +92,53 @@ select.input:hover { border-color: var(--c-text); }
     background: none;
     font-size: var(--fs-3);
   }
-  select.input option:hover, select.input option:focus-visible { background: var(--c-surface-2); outline: none; }
-  select.input option:checked { color: var(--c-accent-text); }
-  select.input option::checkmark { order: 1; margin-inline-start: auto; color: var(--c-accent-text); }
+  select.input option:hover,
+  select.input option:focus-visible {
+    background: var(--c-surface-2);
+    outline: none;
+  }
+  select.input option:checked {
+    color: var(--c-accent-text);
+  }
+  select.input option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--c-accent-text);
+  }
 }
-.field-error { display: none; font-size: var(--fs-2); color: var(--c-alert); }
-.input[aria-invalid="true"] ~ .field-error { display: block; }
-.form-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
-@media (--tablet-up) { .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .form-grid .span-2 { grid-column: 1 / -1; } }
+.field-error {
+  display: none;
+  font-size: var(--fs-2);
+  color: var(--c-alert);
+}
+.input[aria-invalid='true'] ~ .field-error {
+  display: block;
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+}
+@media (--tablet-up) {
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .form-grid .span-2 {
+    grid-column: 1 / -1;
+  }
+}
 
 /* toggle switch */
 /* The knob is centred in the track and sits the same 3px in from each end, off or on. The track is 48 wide:
    3 + knob 20 + travel 20 + knob's other side + 3, inside a 1px border. */
-.switch { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-4); min-height: var(--tap); cursor: pointer; }
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  min-height: var(--tap);
+  cursor: pointer;
+}
 .switch input {
   appearance: none;
   position: relative;
@@ -75,10 +151,12 @@ select.input:hover { border-color: var(--c-text); }
   border-radius: var(--r-pill);
   background: var(--c-surface-2);
   cursor: pointer;
-  transition: background-color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+  transition:
+    background-color var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease);
 }
 .switch input::after {
-  content: "";
+  content: '';
   position: absolute;
   inset-block: 0;
   left: 3px;
@@ -88,15 +166,37 @@ select.input:hover { border-color: var(--c-text); }
   border-radius: 50%;
   background: var(--c-muted);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
-  transition: transform var(--dur-2) var(--ease), background-color var(--dur-2) var(--ease);
+  transition:
+    transform var(--dur-2) var(--ease),
+    background-color var(--dur-2) var(--ease);
 }
-.switch:hover input:not(:checked) { border-color: var(--c-text); }
-.switch:hover input:not(:checked)::after { background: var(--c-text); }
-.switch input:checked { background: var(--c-accent); border-color: var(--c-accent); }
-.switch input:checked::after { transform: translateX(calc(var(--sp-5) - var(--sp-1))); background: var(--c-on-accent); box-shadow: none; }
-.switch input:focus-visible { border-radius: var(--r-pill); }   /* the site's focus ring squares corners (base.css); keep the pill */
+.switch:hover input:not(:checked) {
+  border-color: var(--c-text);
+}
+.switch:hover input:not(:checked)::after {
+  background: var(--c-text);
+}
+.switch input:checked {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+}
+.switch input:checked::after {
+  transform: translateX(calc(var(--sp-5) - var(--sp-1)));
+  background: var(--c-on-accent);
+  box-shadow: none;
+}
+.switch input:focus-visible {
+  border-radius: var(--r-pill);
+} /* the site's focus ring squares corners (base.css); keep the pill */
 @media (forced-colors: active) {
-  .switch input::after { background: CanvasText; }
-  .switch input:checked { background: Highlight; border-color: Highlight; }
-  .switch input:checked::after { background: HighlightText; }
+  .switch input::after {
+    background: CanvasText;
+  }
+  .switch input:checked {
+    background: Highlight;
+    border-color: Highlight;
+  }
+  .switch input:checked::after {
+    background: HighlightText;
+  }
 }

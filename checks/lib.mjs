@@ -37,12 +37,21 @@ const NOT_IN_SITEMAP = ['/soon', '/404']; // soon is noindex; the 404 page is se
 
 // the built pages' addresses: dist/index.html -> '/', dist/services/backup.html -> '/services/backup'
 export function builtPages(dir = DIST) {
-  if (!existsSync(join(dir, 'index.html'))) throw new Error(`no built site in ${dir}: run npm run build first (or pass --dist DIR)`);
+  if (!existsSync(join(dir, 'index.html')))
+    throw new Error(`no built site in ${dir}: run npm run build first (or pass --dist DIR)`);
   const out = [];
   const walk = (d) => {
     for (const e of readdirSync(d, { withFileTypes: true })) {
       if (e.isDirectory()) walk(join(d, e.name));
-      else if (e.name.endsWith('.html')) out.push('/' + relative(dir, join(d, e.name)).split(sep).join('/').replace(/(^|\/)index\.html$/, '').replace(/\.html$/, ''));
+      else if (e.name.endsWith('.html'))
+        out.push(
+          '/' +
+            relative(dir, join(d, e.name))
+              .split(sep)
+              .join('/')
+              .replace(/(^|\/)index\.html$/, '')
+              .replace(/\.html$/, ''),
+        );
     }
   };
   walk(dir);
@@ -57,7 +66,9 @@ export async function pages(base) {
   const missing = want.filter((p) => !listed.includes(p));
   const extra = listed.filter((p) => !want.includes(p));
   if (missing.length || extra.length)
-    throw new Error(`sitemap.xml at ${base} doesn't match the build (${DIST}): ${[...missing.map((p) => `${p} not listed`), ...extra.map((p) => `${p} listed but not built`)].join(', ')}`);
+    throw new Error(
+      `sitemap.xml at ${base} doesn't match the build (${DIST}): ${[...missing.map((p) => `${p} not listed`), ...extra.map((p) => `${p} listed but not built`)].join(', ')}`,
+    );
   return [...listed, ...NOT_IN_SITEMAP.filter((p) => built.includes(p)).map((p) => (p === '/404' ? '/' + MISSING : p))];
 }
 
@@ -66,7 +77,12 @@ export function watch(page, where, errs) {
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
     // the 404 page's own status is the point of that page, not an error
-    if (where.startsWith(MISSING) && m.location().url.replace(/\/$/, '').endsWith(MISSING) && m.text().includes('status of 404')) return;
+    if (
+      where.startsWith(MISSING) &&
+      m.location().url.replace(/\/$/, '').endsWith(MISSING) &&
+      m.text().includes('status of 404')
+    )
+      return;
     errs.push(`${where}: console: ${m.text()}`);
   });
   page.on('pageerror', (e) => errs.push(`${where}: page error: ${e}`));

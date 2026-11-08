@@ -36,12 +36,26 @@ import { test } from '@playwright/test';
 import { flag, option, positional } from './lib.mjs';
 
 const UA = { 'User-Agent': 'uplink-smoke-test' };
-const HEADERS = ['strict-transport-security', 'content-security-policy', 'x-content-type-options', 'referrer-policy', 'x-frame-options', 'permissions-policy', 'cross-origin-opener-policy', 'cross-origin-resource-policy'];
+const HEADERS = [
+  'strict-transport-security',
+  'content-security-policy',
+  'x-content-type-options',
+  'referrer-policy',
+  'x-frame-options',
+  'permissions-policy',
+  'cross-origin-opener-policy',
+  'cross-origin-resource-policy',
+];
 const DROPPED = ['x-permitted-cross-domain-policies']; // Flash and Acrobat were all that read it (review H9)
 
 // [status, headers, body] without following redirects
 async function get(url, method = 'GET', headers = {}) {
-  const r = await fetch(url, { method, headers: { ...UA, ...headers }, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
+  const r = await fetch(url, {
+    method,
+    headers: { ...UA, ...headers },
+    redirect: 'manual',
+    signal: AbortSignal.timeout(30_000),
+  });
   return [r.status, r.headers, await r.text()];
 }
 
@@ -84,12 +98,15 @@ test('smoke', async () => {
   }
   console.log(`${urls.length} pages checked`);
 
-  const pageCsp = h.get('content-security-policy');   // the last page's
+  const pageCsp = h.get('content-security-policy'); // the last page's
   const speculation = h.get('speculation-rules');
   if (!local && !preview) {
     for (const path of launch ? ['/api/report', '/services'] : ['/api/report']) {
       [status, h] = await get(`http://${host}${path}`);
-      ok([301, 308].includes(status) && h.get('location') === `https://${host}${path}`, `http://${host}${path} redirect: ${status} to ${h.get('location')}`);
+      ok(
+        [301, 308].includes(status) && h.get('location') === `https://${host}${path}`,
+        `http://${host}${path} redirect: ${status} to ${h.get('location')}`,
+      );
     }
   }
   const page404 = (b) => b.includes('404') || b.toLowerCase().includes('not found');
@@ -99,23 +116,40 @@ test('smoke', async () => {
   [status, h] = await get(`${base}/404`);
   ok(status === 404, '/404 does not answer 404');
   // asked again the way a browser revalidates (review B3): with the validators it was given, or made-up ones
-  const again = { 'If-None-Match': h.get('etag') || '"smoke"', 'If-Modified-Since': h.get('last-modified') || new Date().toUTCString() };
+  const again = {
+    'If-None-Match': h.get('etag') || '"smoke"',
+    'If-Modified-Since': h.get('last-modified') || new Date().toUTCString(),
+  };
   for (const path of ['/404', '/no-such-page-smoke-test']) {
     [status, , body] = await get(base + path, 'GET', again);
-    ok(status === 404 && page404(body), `${path} asked again (If-None-Match): ${status}, ${body.length} bytes, not the 404 page`);
+    ok(
+      status === 404 && page404(body),
+      `${path} asked again (If-None-Match): ${status}, ${body.length} bytes, not the 404 page`,
+    );
   }
   ok((await get(`${base}/404`, 'POST'))[0] === 405, '/404 POST is not 405');
   // a missing file under a _headers path rule (review B8): the 404 page, as a page
-  for (const path of ['/no-such.md', '/no-such.txt', '/_astro/no-such.js', '/assets/fonts/no-such.woff2', '/assets/img/no-such.svg']) {
+  for (const path of [
+    '/no-such.md',
+    '/no-such.txt',
+    '/_astro/no-such.js',
+    '/assets/fonts/no-such.woff2',
+    '/assets/img/no-such.svg',
+  ]) {
     [status, h, body] = await get(base + path);
-    const type = h.get('content-type') || '', cache = h.get('cache-control') || '', csp = h.get('content-security-policy');
+    const type = h.get('content-type') || '',
+      cache = h.get('cache-control') || '',
+      csp = h.get('content-security-policy');
     ok(status === 404 && page404(body), `${path}: ${status}, not the 404 page`);
     ok(type.startsWith('text/html'), `${path}: 404 page sent as ${type}`);
     ok(!/immutable|max-age=[1-9]/.test(cache), `${path}: 404 cached (${cache})`);
     ok(csp === pageCsp, `${path}: 404 page under another CSP (${(csp || 'none').slice(0, 40)}…)`);
   }
   // the Worker's own answers (review H7)
-  for (const [path, want] of [['/api/report', 405], ['/api/no-such', 404]]) {
+  for (const [path, want] of [
+    ['/api/report', 405],
+    ['/api/no-such', 404],
+  ]) {
     [status, h] = await get(base + path);
     ok(status === want, `${path}: ${status}, not ${want}`);
     const missing = ['x-content-type-options', 'content-security-policy'].filter((n) => !h.get(n));
@@ -123,8 +157,14 @@ test('smoke', async () => {
     ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
   }
   // the other spellings of an address (review H13)
-  for (const [from, to] of [['/index', '/'], ['/index.html', '/'], ['/services/', '/services'], ['/services.html', '/services'],
-    ['/services/index.html', '/services'], ['/services/index', '/services']]) {
+  for (const [from, to] of [
+    ['/index', '/'],
+    ['/index.html', '/'],
+    ['/services/', '/services'],
+    ['/services.html', '/services'],
+    ['/services/index.html', '/services'],
+    ['/services/index', '/services'],
+  ]) {
     [status, h] = await get(base + from);
     ok(status === 308 && h.get('location') === to, `${from}: ${status} to ${h.get('location')}, not 308 to ${to}`);
   }
@@ -133,21 +173,39 @@ test('smoke', async () => {
   ok(rulesPath, `pages: Speculation-Rules header ${speculation ?? 'missing'}, not a quoted address`);
   if (rulesPath) {
     [status, h, body] = await get(new URL(rulesPath, base).href);
-    ok(status === 200 && h.get('content-type') === 'application/speculationrules+json', `${rulesPath}: ${status} as ${h.get('content-type')}`);
+    ok(
+      status === 200 && h.get('content-type') === 'application/speculationrules+json',
+      `${rulesPath}: ${status} as ${h.get('content-type')}`,
+    );
     let rules;
-    try { rules = JSON.parse(body); } catch { ok(false, `${rulesPath}: not JSON`); }
+    try {
+      rules = JSON.parse(body);
+    } catch {
+      ok(false, `${rulesPath}: not JSON`);
+    }
     const text = JSON.stringify(rules?.prefetch || []);
-    ok(rules?.prefetch?.length && rules.prefetch.every((r) => r.eagerness === 'moderate'), `${rulesPath}: no moderate prefetch rules`);
-    for (const left of ['/api/*', '/*.md']) ok(text.includes(`{"not":{"href_matches":"${left}"}}`), `${rulesPath}: ${left} not left out`);
+    ok(
+      rules?.prefetch?.length && rules.prefetch.every((r) => r.eagerness === 'moderate'),
+      `${rulesPath}: no moderate prefetch rules`,
+    );
+    for (const left of ['/api/*', '/*.md'])
+      ok(text.includes(`{"not":{"href_matches":"${left}"}}`), `${rulesPath}: ${left} not left out`);
   }
   ok((await get(`${base}/api/report`))[0] === 405, '/api/report GET is not 405');
-  for (const path of ['/robots.txt', '/llms.txt', '/services.md']) ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
+  for (const path of ['/robots.txt', '/llms.txt', '/services.md'])
+    ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
   // the Markdown copies (review M4): out of search results for good, not only while it's a test build, and each
   // names its page. The canonical is the build's address (site), as in the page's own <link rel="canonical">
-  for (const [copy, page] of [['/services.md', '/services'], ['/index.md', '/']]) {
+  for (const [copy, page] of [
+    ['/services.md', '/services'],
+    ['/index.md', '/'],
+  ]) {
     [status, h] = await get(base + copy);
     ok(status === 200, `${copy}: ${status}`);
-    ok((h.get('x-robots-tag') || '').includes('noindex'), `${copy}: no X-Robots-Tag: noindex (${h.get('x-robots-tag')})`);
+    ok(
+      (h.get('x-robots-tag') || '').includes('noindex'),
+      `${copy}: no X-Robots-Tag: noindex (${h.get('x-robots-tag')})`,
+    );
     const want = `<${site}${page}>; rel="canonical"`;
     ok((h.get('link') || '').split(/,\s*(?=<)/).includes(want), `${copy}: Link ${h.get('link')}, not ${want}`);
   }
@@ -156,7 +214,10 @@ test('smoke', async () => {
 
   if (old) {
     [status, h] = await get(`${old}/services`);
-    ok([301, 308].includes(status) && h.get('location') === `${base}/services`, `old address: ${status} to ${h.get('location')}, not ${base}/services`);
+    ok(
+      [301, 308].includes(status) && h.get('location') === `${base}/services`,
+      `old address: ${status} to ${h.get('location')}, not ${base}/services`,
+    );
   }
 
   console.log(fails.length ? `${fails.length} failure(s)` : 'smoke test passed');

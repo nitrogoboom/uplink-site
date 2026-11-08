@@ -3,13 +3,20 @@
    Each drawing has a closer cut with bigger labels (NAME-compact.svg, from its
    tools/gen_*.py). Pages swap it in with <picture> wherever the drawing shows
    small; picture takes no box of its own, so the img keeps its usual sizing. */
-picture { display: contents; }
+picture {
+  display: contents;
+}
 /* Home hero: phones show the phone cut (svg.ob-phone, from home.js; it stands still with reduced motion) and hide
    the wider cuts' dash layer. Wider screens never show the phone cut, even for the moment after a turn to landscape
    before home.js swaps it out. */
-.hero-art .stage svg.ob-phone { display: none; }
-@media (--small-phone) {
-  .hero-art .stage svg:not(.ob-phone) { display: none; }
-  .hero-art .stage svg.ob-phone { display: block; }
+.hero-art .stage svg.ob-phone {
+  display: none;
 }
-
+@media (--small-phone) {
+  .hero-art .stage svg:not(.ob-phone) {
+    display: none;
+  }
+  .hero-art .stage svg.ob-phone {
+    display: block;
+  }
+}

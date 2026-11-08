@@ -7,21 +7,37 @@ import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
 const services = await getServices();
 ---
+
 <section class="page-intro" id="overview" aria-labelledby="svc-page-title">
   <div class="container svc-overview">
     <div class="svc-overview-head">
       <p class="eyebrow">Services</p>
       <h1 id="svc-page-title">Managed IT, one team</h1>
-      <p class="lead">We run the technology behind your office: help desk, security, cloud, network and phones. We look first, then quote.</p>
-      <div class="row"><a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a></div>
+      <p class="lead">
+        We run the technology behind your office: help desk, security, cloud, network and phones. We look first, then
+        quote.
+      </p>
+      <div class="row">
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+      </div>
     </div>
     <ul class="svc-grid" aria-label="Services">
-      {services.map(({ id, data: s }) => (
-        <li><div class="card">
-          <span class="card-media well"><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"><span class="chip">{s.chip}</span></span>
-          <span class="card-body"><h2 class:list={['card-title', fit(s.title)]}><a class="card-link" href={`/services/${id}`}>{s.title}</a></h2><span class="muted small">{s.card}</span></span>
-        </div></li>
-      ))}
+      {services.map(({ id, data: s }) => <li>
+        <div class="card">
+          <span class="card-media well"
+            ><img src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy" /><span
+              class="chip"
+              >{s.chip}</span
+            ></span
+          >
+          <span class="card-body"
+            ><h2 class:list={['card-title', fit(s.title)]}>
+              <a class="card-link" href={`/services/${id}`}>{s.title}</a>
+            </h2>
+            <span class="muted small">{s.card}</span></span
+          >
+        </div>
+      </li>)}
     </ul>
   </div>
 </section>

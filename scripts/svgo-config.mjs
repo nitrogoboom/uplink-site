@@ -43,19 +43,37 @@ export const SVGO = {
   ],
 };
 
-const SHAPES = ['path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'use', 'image', 'g', 'stop'];
+const SHAPES = [
+  'path',
+  'rect',
+  'circle',
+  'ellipse',
+  'line',
+  'polyline',
+  'polygon',
+  'text',
+  'tspan',
+  'use',
+  'image',
+  'g',
+  'stop',
+];
 const has = (/** @type {string} */ svg, /** @type {string} */ tag) => new RegExp(`<${tag}[\\s/>]`).test(svg);
 
 // the shape tags a drawing's own <style> names in a selector (".ob-tile polygon" -> polygon), not in a declaration
 /** @param {string} svg */
 export function styledTags(svg) {
-  const css = [...svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('').replace(/\/\*[\s\S]*?\*\//g, '');
+  const css = [...svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)]
+    .map((m) => m[1])
+    .join('')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
   const tags = new Set();
   let prelude = '';
   for (const ch of css) {
     if (ch === '{') {
       if (!prelude.trim().startsWith('@'))
-        for (const t of SHAPES) if (new RegExp(`(^|[\\s>+~,(])${t}(?=$|[\\s.#:\\[>+~,)])`).test(prelude.trim())) tags.add(t);
+        for (const t of SHAPES)
+          if (new RegExp(`(^|[\\s>+~,(])${t}(?=$|[\\s.#:\\[>+~,)])`).test(prelude.trim())) tags.add(t);
       prelude = '';
     } else if (ch === '}' || ch === ';') prelude = '';
     else prelude += ch;
@@ -75,7 +93,9 @@ export function shrink(svg, name = 'drawing') {
   const out = optimize(svg, SVGO).data;
   const lost = styledTags(svg).filter((t) => has(svg, t) && !has(out, t));
   if (lost.length)
-    throw new Error(`${name}: its <style> styles <${lost.join('>, <')}>, but SVGO turns every one into something else (style it by class)`);
+    throw new Error(
+      `${name}: its <style> styles <${lost.join('>, <')}>, but SVGO turns every one into something else (style it by class)`,
+    );
   try {
     mkdirSync(CACHE, { recursive: true });
     writeFileSync(file, out);

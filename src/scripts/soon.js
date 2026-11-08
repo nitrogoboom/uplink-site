@@ -12,10 +12,16 @@ const soonName = $('[data-soon-name]');
 if (soonName) {
   /** @type {Record<string, string>} */
   const names = {
-    'client-portal': 'The client portal', 'remote-support': 'Remote support', 'system-status': 'System status',
-    'careers': 'Careers', 'blog': 'The blog', 'terms': 'The terms of service',
+    'client-portal': 'The client portal',
+    'remote-support': 'Remote support',
+    'system-status': 'System status',
+    careers: 'Careers',
+    blog: 'The blog',
+    terms: 'The terms of service',
     'windows-10-guide': 'The Windows 10 upgrade guide',
-    'security-checklist': 'The security checklist', 'social': 'Our social channels', 'francais': 'The French site'
+    'security-checklist': 'The security checklist',
+    social: 'Our social channels',
+    francais: 'The French site',
   };
   const baseTitle = document.title;
   const showName = () => {

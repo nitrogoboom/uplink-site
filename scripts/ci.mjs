@@ -23,7 +23,11 @@ const run = (cmd, live = false) =>
     const t = Date.now();
     let out = '';
     if (live) console.log(`\n> ${cmd}`);
-    const c = spawn(cmd, { shell: true, stdio: live ? 'inherit' : 'pipe', env: { ...process.env, FORCE_COLOR: process.stdout.isTTY ? '1' : '0' } });
+    const c = spawn(cmd, {
+      shell: true,
+      stdio: live ? 'inherit' : 'pipe',
+      env: { ...process.env, FORCE_COLOR: process.stdout.isTTY ? '1' : '0' },
+    });
     c.stdout?.on('data', (d) => (out += d));
     c.stderr?.on('data', (d) => (out += d));
     c.on('exit', (code) => {

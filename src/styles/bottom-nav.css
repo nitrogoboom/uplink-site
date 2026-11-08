@@ -8,16 +8,28 @@
   right: 0;
   bottom: 0;
   display: none;
-  padding: var(--sp-1) max(var(--sp-1), env(safe-area-inset-right, 0px)) calc(var(--sp-1) + env(safe-area-inset-bottom, 0px)) max(var(--sp-1), env(safe-area-inset-left, 0px));
+  padding: var(--sp-1) max(var(--sp-1), env(safe-area-inset-right, 0px))
+    calc(var(--sp-1) + env(safe-area-inset-bottom, 0px)) max(var(--sp-1), env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--c-line-2);
   background: var(--c-glass-2);
   transition: transform var(--dur-2) var(--ease);
 }
 /* scrolling down (core.js): slides off the bottom; motion.css makes it instant for reduced motion */
-.botnav.is-hidden { transform: translateY(100%); }
-.botnav ul { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--sp-1); list-style: none; }
+.botnav.is-hidden {
+  transform: translateY(100%);
+}
+.botnav ul {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-1);
+  list-style: none;
+}
 .bn {
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
   min-height: calc(var(--botnav-h) - var(--sp-2));
   border-radius: var(--r-2);
   font-size: var(--fs-1);
@@ -27,36 +39,77 @@
   text-decoration: none;
   color: var(--c-muted);
 }
-.bn svg { width: var(--icon); height: var(--icon); }
-.bn[aria-current] { background: var(--c-surface-2); color: var(--c-text); }
-.bn[aria-current] svg { color: var(--c-accent-text); }
+.bn svg {
+  width: var(--icon);
+  height: var(--icon);
+}
+.bn[aria-current] {
+  background: var(--c-surface-2);
+  color: var(--c-text);
+}
+.bn[aria-current] svg {
+  color: var(--c-accent-text);
+}
 /* forced colours paint its fill away and leave an amber icon that ignores the theme (B4): the current tab is filled
    with Highlight, as the header tab's bar (header.css) */
 @media (forced-colors: active) {
-  .bn[aria-current] { forced-color-adjust: none; background: Highlight; color: HighlightText; }
-  .bn[aria-current] svg { color: HighlightText; }
+  .bn[aria-current] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+  .bn[aria-current] svg {
+    color: HighlightText;
+  }
 }
 
 @media (--phone) {
-  .tabs, .hdr-actions .hbtn-text { display: none; }
-  .site-header .container { justify-content: space-between; gap: var(--sp-3); }
-  .brand-sub { display: none; }
-  .botnav { display: block; }
+  .tabs,
+  .hdr-actions .hbtn-text {
+    display: none;
+  }
+  .site-header .container {
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+  .brand-sub {
+    display: none;
+  }
+  .botnav {
+    display: block;
+  }
   /* room for the bar under the page: kept in the footer's base bar (the last thing on every page), so its band colour
      runs down behind the bar instead of a strip of page background */
-  .fc-base { padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }   /* 96px: on the scale (docs/spacing.md R0) */
+  .fc-base {
+    padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px));
+  } /* 96px: on the scale (docs/spacing.md R0) */
   /* a page with no footer (Base.astro footer={false}: the 404) keeps that room under <main>: its one-screen section
      (--fold-h, already short of the bar) ends where the bar starts, and the page is exactly one screen */
-  .no-footer main { padding-bottom: calc(var(--botnav-h) + env(safe-area-inset-bottom, 0px)); }   /* 64px */
-  html { scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px)); }
-  .btn { white-space: normal; text-align: center; line-height: var(--lh-snug); padding-block: var(--sp-2); }
+  .no-footer main {
+    padding-bottom: calc(var(--botnav-h) + env(safe-area-inset-bottom, 0px));
+  } /* 64px */
+  html {
+    scroll-padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px));
+  }
+  .btn {
+    white-space: normal;
+    text-align: center;
+    line-height: var(--lh-snug);
+    padding-block: var(--sp-2);
+  }
 }
 /* tablets and narrow desktops: the desktop header (tagline, 24px tab padding) needs 1230px at a 16px root, so it
    starts at 1240px (77.5em); under that it keeps this one. The header-fit check (checks/site.spec.mjs) holds it */
 @media (43.75em <= width < 77.5em) {
-  .brand-sub { display: none; }
-  .site-header .container { gap: var(--sp-3); }
-  .tab { padding-inline: var(--sp-3); }
+  .brand-sub {
+    display: none;
+  }
+  .site-header .container {
+    gap: var(--sp-3);
+  }
+  .tab {
+    padding-inline: var(--sp-3);
+  }
 }
 /* Tablet header, measured (16px root): logo 99px, five tabs 419px at 12px padding, three icon buttons 154px (318px
    with their words), gutters and gaps 48px. The room each side of the tabs is (width - 720) / 2 with icon buttons and
@@ -64,9 +117,17 @@
    Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
    padding would overlap). */
 @media (43.75em <= width < 48.75em) {
-  .tab { padding-inline: var(--sp-2); }
-  .site-header .container { gap: var(--sp-2); }
+  .tab {
+    padding-inline: var(--sp-2);
+  }
+  .site-header .container {
+    gap: var(--sp-2);
+  }
 }
 /* the buttons' words come back where they fit with 24px a side: 884 + 2 x 24 = 932, so from 940px (each button keeps
    its name in aria-label, Header.astro) */
-@media (43.75em <= width < 58.75em) { .hdr-actions .hbtn-text { display: none; } }
+@media (43.75em <= width < 58.75em) {
+  .hdr-actions .hbtn-text {
+    display: none;
+  }
+}

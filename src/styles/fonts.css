@@ -6,24 +6,96 @@
    width and line height, so text set in the fallback takes the same room and nothing moves when Barlow arrives: Arial,
    or Liberation Sans where Arial isn't installed (Linux; the same metrics as Arial, so the same numbers), and Roboto
    on Android, which has neither (its own numbers, in the "Fallback Roboto" faces, listed next in tokens.css). ---*/
-@font-face { font-family: 'Barlow'; font-style: normal; font-weight: 400; font-display: swap; src: url('/assets/fonts/barlow-400.woff2') format('woff2'); }
-@font-face { font-family: 'Barlow'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/fonts/barlow-600.woff2') format('woff2'); }
-@font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 600; font-display: swap; src: url('/assets/fonts/barlow-condensed-600.woff2') format('woff2'); }
-@font-face { font-family: 'Barlow Condensed'; font-style: normal; font-weight: 700; font-display: swap; src: url('/assets/fonts/barlow-condensed-700.woff2') format('woff2'); }
-@font-face { font-family: 'Barlow Condensed'; font-style: italic; font-weight: 700; font-display: swap; src: url('/assets/fonts/barlow-condensed-700-italic.woff2') format('woff2'); }
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/assets/fonts/barlow-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/fonts/barlow-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/assets/fonts/barlow-condensed-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/barlow-condensed-700.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Barlow Condensed';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/assets/fonts/barlow-condensed-700-italic.woff2') format('woff2');
+}
 
 /* sizes measured with fontTools on a line of the site's own copy (Arial regular and bold, Windows) */
-@font-face { font-family: 'Barlow Fallback'; font-weight: 400 500; src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans');
-  size-adjust: 95.14%; ascent-override: 105.11%; descent-override: 21.02%; line-gap-override: 0%; }
-@font-face { font-family: 'Barlow Fallback'; font-weight: 600 700; src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold');
-  size-adjust: 90.61%; ascent-override: 110.36%; descent-override: 22.07%; line-gap-override: 0%; }
-@font-face { font-family: 'Barlow Condensed Fallback'; font-weight: 600 700; src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold');
-  size-adjust: 66.5%; ascent-override: 150.38%; descent-override: 30.08%; line-gap-override: 0%; }
+@font-face {
+  font-family: 'Barlow Fallback';
+  font-weight: 400 500;
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans');
+  size-adjust: 95.14%;
+  ascent-override: 105.11%;
+  descent-override: 21.02%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Barlow Fallback';
+  font-weight: 600 700;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold');
+  size-adjust: 90.61%;
+  ascent-override: 110.36%;
+  descent-override: 22.07%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Barlow Condensed Fallback';
+  font-weight: 600 700;
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold');
+  size-adjust: 66.5%;
+  ascent-override: 150.38%;
+  descent-override: 30.08%;
+  line-gap-override: 0%;
+}
 /* Roboto (Android), measured the same way (fontTools, Roboto 400 and 700 from Google Fonts, November 7, 2026) and
    checked in Chromium: the site's copy wraps to the same lines and runs within 0.3% of Barlow's width */
-@font-face { font-family: 'Barlow Fallback Roboto'; font-weight: 400 500; src: local('Roboto'), local('Roboto-Regular');
-  size-adjust: 97.19%; ascent-override: 102.89%; descent-override: 20.58%; line-gap-override: 0%; }
-@font-face { font-family: 'Barlow Fallback Roboto'; font-weight: 600 700; src: local('Roboto Bold'), local('Roboto-Bold');
-  size-adjust: 96.93%; ascent-override: 103.17%; descent-override: 20.63%; line-gap-override: 0%; }
-@font-face { font-family: 'Barlow Condensed Fallback Roboto'; font-weight: 600 700; src: local('Roboto Bold'), local('Roboto-Bold');
-  size-adjust: 74.52%; ascent-override: 134.19%; descent-override: 26.84%; line-gap-override: 0%; }
+@font-face {
+  font-family: 'Barlow Fallback Roboto';
+  font-weight: 400 500;
+  src: local('Roboto'), local('Roboto-Regular');
+  size-adjust: 97.19%;
+  ascent-override: 102.89%;
+  descent-override: 20.58%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Barlow Fallback Roboto';
+  font-weight: 600 700;
+  src: local('Roboto Bold'), local('Roboto-Bold');
+  size-adjust: 96.93%;
+  ascent-override: 103.17%;
+  descent-override: 20.63%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Barlow Condensed Fallback Roboto';
+  font-weight: 600 700;
+  src: local('Roboto Bold'), local('Roboto-Bold');
+  size-adjust: 74.52%;
+  ascent-override: 134.19%;
+  descent-override: 26.84%;
+  line-gap-override: 0%;
+}

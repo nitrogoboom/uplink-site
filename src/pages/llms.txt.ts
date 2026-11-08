@@ -10,16 +10,29 @@ export const GET: APIRoute = async ({ site }) => {
   const services = await getServices();
   const projects = await getProjects();
   const lines = [
-    '# Uplink Technology', '', `> ${PAGES.home.description}`, '',
-    'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.', '',
-    'Every link below is the page as Markdown. Drop the .md for the web page.', '',
-    '## Pages', '',
+    '# Uplink Technology',
+    '',
+    `> ${PAGES.home.description}`,
+    '',
+    'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.',
+    '',
+    'Every link below is the page as Markdown. Drop the .md for the web page.',
+    '',
+    '## Pages',
+    '',
     ...Object.values(PAGES).map((p) => `- [${p.name}](${md(p.path)}): ${p.description}`),
-    '', '## Services', '',
+    '',
+    '## Services',
+    '',
     ...services.map(({ id, data: s }) => `- [${s.title}](${md(`/services/${id}`)}): ${s.card}`),
-    '', '## Projects', '',
+    '',
+    '## Projects',
+    '',
     ...projects.map(({ id, data: p }) => `- [${p.name}](${md(`/work/${id}`)}): ${p.client}. ${p.result}.`),
-    '', '## For agents', '', `- [Notes for AI agents](${url('/agents.md')})`,
+    '',
+    '## For agents',
+    '',
+    `- [Notes for AI agents](${url('/agents.md')})`,
   ];
   return new Response(lines.join('\n') + '\n', { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
 };

@@ -51,22 +51,38 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let reportsLeft = 5;
 /** @type {(message: string, source?: string, line?: number, column?: number) => void} */
 const reportError = (message, source, line, column) => {
-  if (!message || message === 'Script error.' || /ResizeObserver loop|^Transition was (aborted|skipped)/.test(message)) return;
+  if (!message || message === 'Script error.' || /ResizeObserver loop|^Transition was (aborted|skipped)/.test(message))
+    return;
   if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
   const body = { kind: 'error', page: location.pathname, message: String(message).slice(0, 300), source, line, column };
   navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
 };
 window.addEventListener('error', (e) => reportError(e.message, e.filename, e.lineno, e.colno));
 // a rejection's reason is whatever was thrown (typed any), and lint can't see a JSDoc cast, so its any-rules are off here
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-window.addEventListener('unhandledrejection', (e) => reportError(e.reason?.message || String(e.reason), e.reason?.stack?.split('\n')[1]?.trim()));
+/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+window.addEventListener('unhandledrejection', (e) =>
+  reportError(e.reason?.message || String(e.reason), e.reason?.stack?.split('\n')[1]?.trim()),
+);
+/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 
 /* ---------- storage (can be unavailable) ------------------------------ */
 const store = {
   /** @param {string} key */
-  get(key) { try { return window.localStorage.getItem(key); } catch { return null; } },
+  get(key) {
+    try {
+      return window.localStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
   /** @param {string} key @param {string} value */
-  set(key, value) { try { window.localStorage.setItem(key, value); } catch { /* ignore */ } }
+  set(key, value) {
+    try {
+      window.localStorage.setItem(key, value);
+    } catch {
+      /* ignore */
+    }
+  },
 };
 
 /* ---------- Trusted Types ---------------------------------------------- */
@@ -74,18 +90,25 @@ const store = {
 // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
 // The one script it may load from elsewhere is the analytics beacon (BEACON, below).
 const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
-const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', {
-  createHTML: (/** @type {string} */ s) => s,
-  createScriptURL: (/** @type {string} */ u) => { if (u === BEACON) return u; throw new TypeError('script not allowed: ' + u); }
-}) : null;
+const ttPolicy = window.trustedTypes
+  ? window.trustedTypes.createPolicy('uplink', {
+      createHTML: (/** @type {string} */ s) => s,
+      createScriptURL: (/** @type {string} */ u) => {
+        if (u === BEACON) return u;
+        throw new TypeError('script not allowed: ' + u);
+      },
+    })
+  : null;
 /** @type {(s: string) => string} */
 const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
 
 /* ---------- icons used by script-built UI ------------------------------ */
 const ICON = {
-  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
+  check:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>',
   info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M12 8h.01M12 11v6"/></svg>',
-  close: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>'
+  close:
+    '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>',
 };
 
 /* ======================================================================
@@ -146,17 +169,27 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
     el.dataset.leaving = '';
     if (el.contains(document.activeElement)) {
       const dlg = region.closest('dialog');
-      const to = /** @type {(HTMLElement | null)[]} */ ([from, dlg && $('[data-close]', dlg), $('#main')]).find((x) => x && document.contains(x) && !el.contains(x) && typeof x.focus === 'function');
+      const to = /** @type {(HTMLElement | null)[]} */ ([from, dlg && $('[data-close]', dlg), $('#main')]).find(
+        (x) => x && document.contains(x) && !el.contains(x) && typeof x.focus === 'function',
+      );
       if (to) to.focus({ preventScroll: true });
     }
     const done = () => el.remove();
-    if (reduceMotion.matches) done(); else el.addEventListener('animationend', done, { once: true });
+    if (reduceMotion.matches) done();
+    else el.addEventListener('animationend', done, { once: true });
   };
-  const arm = () => { clearTimeout(timer); timer = setTimeout(leave, timeout); };
+  const arm = () => {
+    clearTimeout(timer);
+    timer = setTimeout(leave, timeout);
+  };
   btn.addEventListener('click', leave);
   el.addEventListener('mouseenter', () => clearTimeout(timer));
   el.addEventListener('mouseleave', arm);
-  el.addEventListener('focusin', (e) => { clearTimeout(timer); const r = /** @type {HTMLElement | null} */ (e.relatedTarget); if (r && !el.contains(r)) from = r; });
+  el.addEventListener('focusin', (e) => {
+    clearTimeout(timer);
+    const r = /** @type {HTMLElement | null} */ (e.relatedTarget);
+    if (r && !el.contains(r)) from = r;
+  });
   el.addEventListener('focusout', arm);
   arm();
 }
@@ -173,9 +206,9 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
 // starts on the close button (a screen reader still reads the dialog's title) and a tap on a field brings the keyboard.
 const coarse = window.matchMedia('(pointer: coarse)');
 /** @type {WeakMap<HTMLDialogElement, number>} */
-const openedAt = new WeakMap();   // dialog -> when it opened
+const openedAt = new WeakMap(); // dialog -> when it opened
 /** @type {WeakMap<HTMLDialogElement, HTMLElement | null>} */
-const openers = new WeakMap();    // dialog -> what opened it, which gets focus back when it closes
+const openers = new WeakMap(); // dialog -> what opened it, which gets focus back when it closes
 /** @param {string} id @param {HTMLElement | null} [opener] */
 function openDialog(id, opener) {
   const dlg = /** @type {HTMLDialogElement | null} */ (document.getElementById(id));
@@ -184,7 +217,11 @@ function openDialog(id, opener) {
   dlg.showModal();
   openedAt.set(dlg, performance.now());
   // a group of options (radios) is entered at its chosen one, as Tab does
-  const first = (coarse.matches ? null : $('[autofocus]', dlg) || $('input:not([type="radio"]), input[type="radio"]:checked, select, textarea', dlg)) || $('[data-close]', dlg);
+  const first =
+    (coarse.matches
+      ? null
+      : $('[autofocus]', dlg) || $('input:not([type="radio"]), input[type="radio"]:checked, select, textarea', dlg)) ||
+    $('[data-close]', dlg);
   if (first) first.focus({ preventScroll: true });
   dlg.scrollTop = 0;
   return true;
@@ -196,7 +233,9 @@ function openDialog(id, opener) {
   // dismiss (closedby="any") can't tell the two apart, so it's off once this script runs.
   dlg.setAttribute('closedby', 'closerequest');
   let downOnBackdrop = false;
-  dlg.addEventListener('pointerdown', (e) => { downOnBackdrop = e.target === dlg; });
+  dlg.addEventListener('pointerdown', (e) => {
+    downOnBackdrop = e.target === dlg;
+  });
   dlg.addEventListener('click', (e) => {
     const settled = e.detail < 2 && performance.now() - (openedAt.get(dlg) || 0) > 400;
     if (e.target === dlg && downOnBackdrop && settled) dlg.close();
@@ -230,7 +269,10 @@ document.addEventListener('click', (e) => {
   if (closer) {
     const dlg = closer.closest('dialog');
     // closed here, so the button's own command="close" is cancelled (it would find the pop-up shut, and say so)
-    if (dlg) { dlg.close(); e.preventDefault(); }
+    if (dlg) {
+      dlg.close();
+      e.preventDefault();
+    }
   }
 });
 
@@ -257,8 +299,16 @@ const setHeld = (/** @type {boolean} */ on) => {
   held.ev.dispatchEvent(new Event('change'));
 };
 if (store.get(HOLD_KEY) === '1') setHeld(true);
-const showHold = () => holdBtns.forEach((b) => { b.hidden = reduceMotion.matches; });
-holdBtns.forEach((b) => b.addEventListener('click', () => { setHeld(!held.on); store.set(HOLD_KEY, held.on ? '1' : '0'); }));
+const showHold = () =>
+  holdBtns.forEach((b) => {
+    b.hidden = reduceMotion.matches;
+  });
+holdBtns.forEach((b) =>
+  b.addEventListener('click', () => {
+    setHeld(!held.on);
+    store.set(HOLD_KEY, held.on ? '1' : '0');
+  }),
+);
 showHold();
 reduceMotion.addEventListener('change', showHold);
 
@@ -273,8 +323,13 @@ const scToggle = /** @type {HTMLInputElement | null} */ (document.getElementById
 if (scToggle) {
   scToggle.checked = shortcutsOn();
   scToggle.addEventListener('change', () => {
-    if (scToggle.checked) { delete root.dataset.shortcuts; store.set(SC_KEY, 'on'); }
-    else { root.dataset.shortcuts = 'off'; store.set(SC_KEY, 'off'); }
+    if (scToggle.checked) {
+      delete root.dataset.shortcuts;
+      store.set(SC_KEY, 'on');
+    } else {
+      root.dataset.shortcuts = 'off';
+      store.set(SC_KEY, 'off');
+    }
     toast({ title: scToggle.checked ? 'Shortcuts on' : 'Shortcuts off', tone: 'info', timeout: 3000 });
   });
 }
@@ -297,7 +352,10 @@ document.addEventListener('keydown', (e) => {
   if (isTyping(/** @type {HTMLElement} */ (e.target))) return;
   if (document.querySelector('dialog[open]')) return;
 
-  if (e.key === '?') { e.preventDefault(); openDialog('settings-dialog'); }
+  if (e.key === '?') {
+    e.preventDefault();
+    openDialog('settings-dialog');
+  }
 });
 
 /* ======================================================================
@@ -329,19 +387,33 @@ document.addEventListener('keydown', (e) => {
     linkError(el, !ok);
     return ok;
   };
-  fields.forEach((el) => el.addEventListener('input', () => { if (el.getAttribute('aria-invalid')) check(el); }));
-  fields.forEach((el) => el.addEventListener('blur', () => { if (el.value) check(el); }));
+  fields.forEach((el) =>
+    el.addEventListener('input', () => {
+      if (el.getAttribute('aria-invalid')) check(el);
+    }),
+  );
+  fields.forEach((el) =>
+    el.addEventListener('blur', () => {
+      if (el.value) check(el);
+    }),
+  );
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const bad = fields.filter((el) => !check(el));
-    if (bad.length) { bad[0].focus(); return; }
+    if (bad.length) {
+      bad[0].focus();
+      return;
+    }
 
     const kind = form.dataset.validate;
     const dlg = form.closest('dialog');
     if (dlg) dlg.close();
     form.reset();
-    fields.forEach((el) => { el.removeAttribute('aria-invalid'); linkError(el, false); });
+    fields.forEach((el) => {
+      el.removeAttribute('aria-invalid');
+      linkError(el, false);
+    });
 
     if (kind === 'book') {
       toast({ title: 'Check-up requested', text: 'We will email you within one business day to pick a time.' });
@@ -358,26 +430,45 @@ document.addEventListener('keydown', (e) => {
 // nothing there.
 const botnav = $('.botnav');
 if (botnav) {
-  const STEP = 12;   // px of travel before the bar reacts, so small jitters don't flicker it
+  const STEP = 12; // px of travel before the bar reacts, so small jitters don't flicker it
   const phone = window.matchMedia(MEDIA.phone);
   const barOn = () => phone.matches;
   /** @type {number | null} */
-  let lastY = null;   // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
+  let lastY = null; // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
   let queued = false;
   const show = (/** @type {boolean} */ on) => botnav.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
-    if (!barOn()) { show(true); return; }
+    if (!barOn()) {
+      show(true);
+      return;
+    }
     const y = window.scrollY;
     if (lastY === null) lastY = y;
     const end = root.scrollHeight - window.innerHeight - STEP;
-    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) { show(true); lastY = y; return; }
+    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) {
+      show(true);
+      lastY = y;
+      return;
+    }
     if (Math.abs(y - lastY) < STEP) return;
     show(y < lastY);
     lastY = y;
   };
-  window.addEventListener('scroll', () => { if (!queued && barOn()) { queued = true; window.requestAnimationFrame(update); } }, { passive: true });
-  phone.addEventListener('change', () => { lastY = window.scrollY; show(true); });
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!queued && barOn()) {
+        queued = true;
+        window.requestAnimationFrame(update);
+      }
+    },
+    { passive: true },
+  );
+  phone.addEventListener('change', () => {
+    lastY = window.scrollY;
+    show(true);
+  });
   botnav.addEventListener('focusin', () => show(true));
 }
 
@@ -385,7 +476,11 @@ if (botnav) {
 // Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
 // read, so it costs no forced layout (offsetWidth would).
 const replay = (/** @type {Element} */ el, /** @type {string} */ cls) => {
-  if (el.classList.contains(cls)) el.getAnimations().forEach((a) => { a.cancel(); a.play(); });
+  if (el.classList.contains(cls))
+    el.getAnimations().forEach((a) => {
+      a.cancel();
+      a.play();
+    });
   else el.classList.add(cls);
 };
 
@@ -408,8 +503,16 @@ function whenOnScreen(el, onChange) {
 // text still reaches screen readers). An error doesn't bubble, so it's caught on the way down; one that came before
 // this script ran is found by decode(), which fails only for a picture that can't be shown.
 const broken = (/** @type {HTMLImageElement} */ img) => img.classList.add('is-broken');
-document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageElement) broken(e.target); }, true);
-/** @type {HTMLImageElement[]} */ ($$('img')).forEach((img) => { if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img)); });
+document.addEventListener(
+  'error',
+  (e) => {
+    if (e.target instanceof HTMLImageElement) broken(e.target);
+  },
+  true,
+);
+/** @type {HTMLImageElement[]} */ ($$('img')).forEach((img) => {
+  if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img));
+});
 
 /* ---------- Cloudflare Web Analytics ----------------------------------- */
 // Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and
@@ -419,7 +522,7 @@ document.addEventListener('error', (e) => { if (e.target instanceof HTMLImageEle
 // canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
 // Not in a browser driven by a test (navigator.webdriver): our own checks after each deploy were about 140 of a
 // page's visits a week in Web Analytics.
-const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053';   // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; see notes.md)
+const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053'; // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; see notes.md)
 const startBeacon = () => {
   if (navigator.webdriver) return;
   const canon = /** @type {HTMLLinkElement | null} */ ($('link[rel="canonical"]'));
@@ -430,7 +533,8 @@ const startBeacon = () => {
   s.src = ttPolicy ? ttPolicy.createScriptURL(BEACON) : BEACON;
   document.body.append(s);
 };
-const whenIdle = (/** @type {() => void} */ fn) => ('requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1500));
+const whenIdle = (/** @type {() => void} */ fn) =>
+  'requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1500);
 if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 

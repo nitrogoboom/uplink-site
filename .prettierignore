@@ -1,14 +1,12 @@
-# Prettier checks the data and config files (JSON, YAML). The code (JS, TS, Astro, CSS) and Markdown are
-# hand-formatted: packed one-line rules and statements that Prettier would rewrite in every file. ESLint and
-# Stylelint check those instead. The Astro plugin stays configured for `npx prettier --write` on a file by hand.
-*.js
-*.mjs
-*.ts
-*.astro
-*.css
+# Prettier formats the code (JS, TS, Astro, CSS) and the data and config files (JSON, YAML): `npm run format`
+# writes it, `npm run lint` checks it. ESLint and Stylelint check everything else (neither has a formatting rule
+# switched on). Markdown, HTML and SVG stay out: the Markdown is hand-wrapped prose, the HTML and SVG are written by
+# scripts (tools/gen_*.py, the build). tools/office_parts/ is a generator's input: a {{pal:NAME}} template pasted into
+# the drawings as it is, so its bytes are the drawing's (python tools/regen.py --check).
 *.md
 *.html
 *.svg
+tools/office_parts/
 dist/
 out/
 site/

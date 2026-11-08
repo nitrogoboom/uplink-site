@@ -1,22 +1,62 @@
 /*--- SERVICES · 1. Overview: intro, then a grid of service cards. Desktop layout at the end. ---*/
-.svc-overview { display: flex; flex-direction: column; gap: var(--sp-6); }
-.svc-overview-head { display: flex; flex-direction: column; gap: var(--sp-4); max-width: 44rem; }
-.svc-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); list-style: none; }
-.svc-grid > li { display: flex; }
-.svc-grid .card { flex: 1; width: 100%; }
-@media (--tablet-up) { .svc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.svc-overview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+.svc-overview-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  max-width: 44rem;
+}
+.svc-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+}
+.svc-grid > li {
+  display: flex;
+}
+.svc-grid .card {
+  flex: 1;
+  width: 100%;
+}
+@media (--tablet-up) {
+  .svc-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 /* a last card that would sit alone (tablet) or leave a hole (desktop) spans two columns as a wide card: the
    drawing beside the words. Seven services today: the seventh, IT strategy. */
 @media (--tablet) {
-  .svc-grid > li:last-child:nth-child(odd) { grid-column: span 2; }
-  .svc-grid > li:last-child:nth-child(odd) .card { flex-direction: row; align-items: center; }
-  .svc-grid > li:last-child:nth-child(odd) .card-media { flex: 0 0 calc(50% - var(--sp-4)); }
+  .svc-grid > li:last-child:nth-child(odd) {
+    grid-column: span 2;
+  }
+  .svc-grid > li:last-child:nth-child(odd) .card {
+    flex-direction: row;
+    align-items: center;
+  }
+  .svc-grid > li:last-child:nth-child(odd) .card-media {
+    flex: 0 0 calc(50% - var(--sp-4));
+  }
 }
 
 /* desktop: four across */
 @media (--desktop) {
-  .svc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sp-5); }
-  .svc-grid > li:last-child:nth-child(4n+3) { grid-column: span 2; }
-  .svc-grid > li:last-child:nth-child(4n+3) .card { flex-direction: row; align-items: center; }
-  .svc-grid > li:last-child:nth-child(4n+3) .card-media { flex: 0 0 calc(50% - var(--sp-4)); }
+  .svc-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--sp-5);
+  }
+  .svc-grid > li:last-child:nth-child(4n + 3) {
+    grid-column: span 2;
+  }
+  .svc-grid > li:last-child:nth-child(4n + 3) .card {
+    flex-direction: row;
+    align-items: center;
+  }
+  .svc-grid > li:last-child:nth-child(4n + 3) .card-media {
+    flex: 0 0 calc(50% - var(--sp-4));
+  }
 }

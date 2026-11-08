@@ -47,44 +47,95 @@ process.exit(process.env.FAKE_SMOKE_FAIL === where ? 1 : 0);
 // a site that serves one build: its home page names a hashed /_astro/ file, its CSP, sitemap and X-Build are its own.
 // 'new:old' serves the new build's files under the old build's X-Build (a change the files alone can't show)
 const build = (name) => ({
-  '/': [`<!doctype html><link rel="stylesheet" href="/_astro/index.${name}.css"><script src="/_astro/page.${name}.js"></script>`, 'text/html'],
-  '/sitemap.xml': [`<urlset><url><loc>https://example.test/</loc><lastmod>${name}</lastmod></url></urlset>`, 'application/xml'],
+  '/': [
+    `<!doctype html><link rel="stylesheet" href="/_astro/index.${name}.css"><script src="/_astro/page.${name}.js"></script>`,
+    'text/html',
+  ],
+  '/sitemap.xml': [
+    `<urlset><url><loc>https://example.test/</loc><lastmod>${name}</lastmod></url></urlset>`,
+    'application/xml',
+  ],
 });
-const serve = (pick) => new Promise((resolve) => {
-  const server = createServer((req, res) => {
-    const [name, id = name] = pick().split(':');
-    const [body, type] = build(name)[req.url] || ['not found', 'text/plain'];
-    res.writeHead(build(name)[req.url] ? 200 : 404, { 'Content-Type': type, 'Content-Security-Policy': `style-src 'self' 'sha256-${name}'`, 'X-Build': id });
-    res.end(body);
+const serve = (pick) =>
+  new Promise((resolve) => {
+    const server = createServer((req, res) => {
+      const [name, id = name] = pick().split(':');
+      const [body, type] = build(name)[req.url] || ['not found', 'text/plain'];
+      res.writeHead(build(name)[req.url] ? 200 : 404, {
+        'Content-Type': type,
+        'Content-Security-Policy': `style-src 'self' 'sha256-${name}'`,
+        'X-Build': id,
+      });
+      res.end(body);
+    });
+    server.listen(0, '127.0.0.1', () => resolve(server));
   });
-  server.listen(0, '127.0.0.1', () => resolve(server));
-});
 const address = (server) => `http://127.0.0.1:${server.address().port}`;
 
 // opts: smoke (where it fails), args (after the live address), deployExit, deployLands ('no': status never shows the
 // new version), liveBuild (a function of the state file's last line: which build the live server serves)
 const deploy = async ({ smoke = 'none', args = [], deployExit = 0, deployLands = 'yes', liveBuild, env = {} } = {}) => {
   const dir = mkdtempSync(join(tmpdir(), 'uplink-deploy-test-'));
-  const tool = (name, text) => { const p = join(dir, name); writeFileSync(p, text); chmodSync(p, 0o755); return p; };
-  const log = join(dir, 'calls.log'), summary = join(dir, 'summary.md'), state = join(dir, 'state');
+  const tool = (name, text) => {
+    const p = join(dir, name);
+    writeFileSync(p, text);
+    chmodSync(p, 0o755);
+    return p;
+  };
+  const log = join(dir, 'calls.log'),
+    summary = join(dir, 'summary.md'),
+    state = join(dir, 'state');
   const now = () => (existsSync(state) ? readFileSync(state, 'utf-8').trim().split('\n').pop() : '');
   const preview = await serve(() => 'new');
   const live = await serve(() => (liveBuild || ((s) => (s === 'deployed' ? 'new' : 'old')))(now()));
   try {
     const child = spawn(process.execPath, ['scripts/deploy.mjs', address(live), ...args], {
-      env: { ...process.env, DEPLOY_WRANGLER: tool('wrangler.cjs', WRANGLER), DEPLOY_SMOKE: tool('smoke.cjs', SMOKE), DEPLOY_POLL: '0',
-        DEPLOY_WAIT: '1', DEPLOY_SETTLE: '0', DEPLOY_RETRY: '0', ...env, FAKE_LOG: log, FAKE_STATE: state, FAKE_SMOKE_FAIL: smoke, FAKE_PREVIEW: address(preview),
-        FAKE_DEPLOY_EXIT: String(deployExit), FAKE_DEPLOY_LANDS: deployLands, GITHUB_STEP_SUMMARY: summary, GITHUB_SHA: 'abc123def4567890',
-        CLOUDFLARE_API_TOKEN: 'fake-token', CLOUDFLARE_ACCOUNT_ID: 'fake-account' },
+      env: {
+        ...process.env,
+        DEPLOY_WRANGLER: tool('wrangler.cjs', WRANGLER),
+        DEPLOY_SMOKE: tool('smoke.cjs', SMOKE),
+        DEPLOY_POLL: '0',
+        DEPLOY_WAIT: '1',
+        DEPLOY_SETTLE: '0',
+        DEPLOY_RETRY: '0',
+        ...env,
+        FAKE_LOG: log,
+        FAKE_STATE: state,
+        FAKE_SMOKE_FAIL: smoke,
+        FAKE_PREVIEW: address(preview),
+        FAKE_DEPLOY_EXIT: String(deployExit),
+        FAKE_DEPLOY_LANDS: deployLands,
+        GITHUB_STEP_SUMMARY: summary,
+        GITHUB_SHA: 'abc123def4567890',
+        CLOUDFLARE_API_TOKEN: 'fake-token',
+        CLOUDFLARE_ACCOUNT_ID: 'fake-account',
+      },
     });
     let out = '';
-    child.stdout.on('data', (d) => { out += d; });
-    child.stderr.on('data', (d) => { out += d; });
+    child.stdout.on('data', (d) => {
+      out += d;
+    });
+    child.stderr.on('data', (d) => {
+      out += d;
+    });
     const code = await new Promise((resolve) => child.on('exit', resolve));
-    const calls = existsSync(log) ? readFileSync(log, 'utf-8').trim().split('\n').map((l) => JSON.parse(l)) : [];
-    return { code, calls, out, summary: existsSync(summary) ? readFileSync(summary, 'utf-8') : '', live: address(live), preview: address(preview) };
+    const calls = existsSync(log)
+      ? readFileSync(log, 'utf-8')
+          .trim()
+          .split('\n')
+          .map((l) => JSON.parse(l))
+      : [];
+    return {
+      code,
+      calls,
+      out,
+      summary: existsSync(summary) ? readFileSync(summary, 'utf-8') : '',
+      live: address(live),
+      preview: address(preview),
+    };
   } finally {
-    preview.close(); live.close();
+    preview.close();
+    live.close();
     rmSync(dir, { recursive: true });
   }
 };
@@ -94,9 +145,15 @@ const smokes = (calls, at) => calls.filter((c) => c[0] === 'smoke' && c[1] === a
 test('all good: uploads, smokes the version, deploys it at 100%, smokes the live address, no rollback', async () => {
   const { code, calls, out, summary, live, preview } = await deploy();
   assert.equal(code, 0, out);
-  assert.deepEqual(calls.map((c) => c.slice(0, 2).join(' ')), ['wrangler deployments', 'wrangler versions', 'smoke ' + preview, 'wrangler versions', 'smoke ' + live]);
+  assert.deepEqual(
+    calls.map((c) => c.slice(0, 2).join(' ')),
+    ['wrangler deployments', 'wrangler versions', 'smoke ' + preview, 'wrangler versions', 'smoke ' + live],
+  );
   assert.ok(did(calls, 'smoke', preview, '--preview'), 'the preview smoke is told it is a preview');
-  assert.ok(did(calls, 'wrangler', 'versions', 'deploy', 'new-version@100%', '--yes'), 'deploys exactly the version it smoked');
+  assert.ok(
+    did(calls, 'wrangler', 'versions', 'deploy', 'new-version@100%', '--yes'),
+    'deploys exactly the version it smoked',
+  );
   assert.ok(!did(calls, 'wrangler', 'rollback'), 'no rollback');
   assert.ok(!did(calls, 'wrangler', 'deploy'), 'never the old one-step wrangler deploy');
   assert.match(summary, /new-version/);
@@ -118,14 +175,22 @@ test('deployed, then the live address fails (twice): rolls back to the version t
   assert.equal(smokes(calls, live).length, 2, 'the live smoke is tried twice before a rollback');
   const back = calls.findIndex((c) => c[0] === 'wrangler' && c[1] === 'rollback');
   assert.ok(back > 0, 'rollback called');
-  assert.deepEqual(calls[back].slice(0, 4), ['wrangler', 'rollback', 'old-version', '--yes'], 'to the version from before');
+  assert.deepEqual(
+    calls[back].slice(0, 4),
+    ['wrangler', 'rollback', 'old-version', '--yes'],
+    'to the version from before',
+  );
   assert.match(summary, /[Rr]olled back to old-version/);
 });
 
 test('versions deploy exits 1 but the new version is live (at any percentage): still checked, rolled back on failure', async () => {
   const good = await deploy({ deployExit: 1 });
   assert.equal(good.code, 0, good.out);
-  assert.equal(good.calls.filter((c) => c[0] === 'wrangler' && c[1] === 'deployments').length, 2, 'status read again after the error');
+  assert.equal(
+    good.calls.filter((c) => c[0] === 'wrangler' && c[1] === 'deployments').length,
+    2,
+    'status read again after the error',
+  );
   assert.equal(smokes(good.calls, good.live).length, 1, 'the live address is checked');
   assert.match(good.summary, /new-version/);
   const bad = await deploy({ deployExit: 1, smoke: 'live' });
@@ -151,7 +216,9 @@ test('the live address still serves the old build: never matched, so no live smo
 
 test('the live address serves the new build only after a while: waits for it, then checks', async () => {
   let asks = 0;
-  const { code, calls, out, live } = await deploy({ liveBuild: (s) => (s === 'deployed' && ++asks > 4 ? 'new' : 'old') });
+  const { code, calls, out, live } = await deploy({
+    liveBuild: (s) => (s === 'deployed' && ++asks > 4 ? 'new' : 'old'),
+  });
   assert.equal(code, 0, out);
   assert.equal(smokes(calls, live).length, 1);
 });

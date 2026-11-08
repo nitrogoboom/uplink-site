@@ -8,10 +8,13 @@
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, tabCurrent } from '../lib/site';
-interface Props { current: Page }
+interface Props {
+  current: Page;
+}
 const { current } = Astro.props;
 const here = Astro.url.pathname;
 ---
+
 <header class="site-header">
   <div class="container">
     <a class="brand" href="/" aria-label="Uplink Technology management, home page">
@@ -24,9 +27,11 @@ const here = Astro.url.pathname;
 
     <nav class="tabs" aria-label="Main">
       <ul>
-        {NAV.map(({ page }) => (
-          <li><a class="tab" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}>{PAGES[page].name}</a></li>
-        ))}
+        {NAV.map(({ page }) => <li>
+          <a class="tab" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
+            >{PAGES[page].name}</a
+          >
+        </li>)}
       </ul>
     </nav>
 
@@ -37,7 +42,14 @@ const here = Astro.url.pathname;
       <a class="hbtn" href="/soon#client-portal" aria-label="Client portal, sign in">
         <Icon name="person" /><span class="hbtn-text">Client portal</span>
       </a>
-      <button class="hbtn hbtn-settings" type="button" data-open="settings-dialog" commandfor="settings-dialog" command="show-modal" aria-label="Accessibility settings">
+      <button
+        class="hbtn hbtn-settings"
+        type="button"
+        data-open="settings-dialog"
+        commandfor="settings-dialog"
+        command="show-modal"
+        aria-label="Accessibility settings"
+      >
         <Icon name="gear" />
       </button>
     </div>

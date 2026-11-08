@@ -11,10 +11,11 @@
 import { execFileSync } from 'node:child_process';
 
 /** @type {(args: string[], cwd?: string) => string} */
-const git = (args, cwd) => execFileSync('git', args, { cwd, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+const git = (args, cwd) =>
+  execFileSync('git', args, { cwd, encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
 
 /** @type {Map<string, boolean>} */
-const verdicts = new Map();   // cwd → true (dates can be trusted) or false (left out), checked once per folder
+const verdicts = new Map(); // cwd → true (dates can be trusted) or false (left out), checked once per folder
 
 /**
  * Whether the folder's git history is whole. Throws in CI when it isn't; warns once otherwise.
@@ -24,15 +25,21 @@ export function fullHistory({ cwd = process.cwd(), env = process.env, warn = con
   if (verdicts.has(cwd)) return verdicts.get(cwd);
   let problem = '';
   try {
-    if (git(['rev-parse', '--is-shallow-repository'], cwd) === 'true') problem = 'the git history is shallow (a --depth clone)';
+    if (git(['rev-parse', '--is-shallow-repository'], cwd) === 'true')
+      problem = 'the git history is shallow (a --depth clone)';
   } catch {
     problem = 'this is not a git checkout';
   }
   if (problem && env.CI) {
-    throw new Error(`dates: ${problem}, so every sitemap <lastmod> and case-study date would be wrong. `
-      + 'Build from a full clone: actions/checkout with fetch-depth: 0, or git fetch --unshallow (src/lib/git-dates.mjs).');
+    throw new Error(
+      `dates: ${problem}, so every sitemap <lastmod> and case-study date would be wrong. ` +
+        'Build from a full clone: actions/checkout with fetch-depth: 0, or git fetch --unshallow (src/lib/git-dates.mjs).',
+    );
   }
-  if (problem) warn(`dates: ${problem}; the build leaves out the sitemap's <lastmod> and the case studies' dates. git fetch --unshallow puts them back.`);
+  if (problem)
+    warn(
+      `dates: ${problem}; the build leaves out the sitemap's <lastmod> and the case studies' dates. git fetch --unshallow puts them back.`,
+    );
   verdicts.set(cwd, !problem);
   return !problem;
 }

@@ -12,7 +12,10 @@ export const MAX = 30;
 export const WRANGLER = /^[a-z](?:[a-z0-9-]*[a-z0-9])?$/;
 
 export function previewAlias(branch) {
-  let a = String(branch).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  let a = String(branch)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
   if (!/^[a-z]/.test(a)) a = `b-${a}`.replace(/-+$/, '');
   if (a.length > MAX) {
     const hash = createHash('sha256').update(String(branch)).digest('hex').slice(0, 6);

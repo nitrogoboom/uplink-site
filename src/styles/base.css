@@ -1,13 +1,21 @@
 /*--- Base: reset, page background, focus rings, the phone status-bar band. ---*/
 /* ---------- base ------------------------------------------------------ */
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 html {
   -webkit-text-size-adjust: 100%;
-  scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-5));   /* the header sits below the notch */
+  scroll-padding-top: calc(
+    env(safe-area-inset-top, 0px) + var(--header-h) + var(--sp-5)
+  ); /* the header sits below the notch */
 }
 @media (prefers-reduced-motion: no-preference) {
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -17,13 +25,13 @@ body {
   font-family: var(--font-body);
   font-size: var(--fs-3);
   line-height: var(--lh-body);
-  overflow-wrap: break-word;   /* long emails and links wrap instead of pushing the page sideways */
+  overflow-wrap: break-word; /* long emails and links wrap instead of pushing the page sideways */
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 /* paints the phone status-bar band above the sticky header */
 body::before {
-  content: "";
+  content: '';
   position: fixed;
   inset: 0 0 auto;
   height: env(safe-area-inset-top, 0px);
@@ -31,10 +39,19 @@ body::before {
   background: var(--c-bg);
 }
 
-img, svg { display: block; max-width: 100%; }
-img { height: auto; }
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+img {
+  height: auto;
+}
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
@@ -48,23 +65,68 @@ h1, h2, h3, h4 {
    by lib/fit.js) shrinks to fit its column instead of splitting; the rest keep their size step unless the text is big
    and the column narrow. Hyphens are the backup for a word longer than that allows for: only words of 14 letters or
    more, since browsers hyphenate any word that ends a line, needed or not */
-:is(h1, h2, h3) { --fit: var(--fit-short); }
-.fit { --fit: var(--fit-long); }
-.fit-loose { --fit: var(--fit-loose); }
-h1 { font-size: min(var(--fs-8), var(--fit)); }
-h2 { font-size: min(var(--fs-7), var(--fit)); }
-h1, h2 { hyphens: auto; hyphenate-limit-chars: 14 6 6; }
-h3 { font-size: min(var(--fs-5), var(--fit)); line-height: var(--lh-title); }
-h4 { font-size: var(--fs-4); line-height: var(--lh-title); }
-h3, h4 { font-style: normal; }   /* italic is for page and section titles (h1, h2); sub-headings stand upright */
+:is(h1, h2, h3) {
+  --fit: var(--fit-short);
+}
+.fit {
+  --fit: var(--fit-long);
+}
+.fit-loose {
+  --fit: var(--fit-loose);
+}
+h1 {
+  font-size: min(var(--fs-8), var(--fit));
+}
+h2 {
+  font-size: min(var(--fs-7), var(--fit));
+}
+h1,
+h2 {
+  hyphens: auto;
+  hyphenate-limit-chars: 14 6 6;
+}
+h3 {
+  font-size: min(var(--fs-5), var(--fit));
+  line-height: var(--lh-title);
+}
+h4 {
+  font-size: var(--fs-4);
+  line-height: var(--lh-title);
+}
+h3,
+h4 {
+  font-style: normal;
+} /* italic is for page and section titles (h1, h2); sub-headings stand upright */
 
-p { margin: 0; text-wrap: pretty; }
-ul, ol { margin: 0; padding: 0; }
-button, input, select, textarea { font: inherit; color: inherit; }
-button { padding: 0; cursor: pointer; }
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  padding: 0;
+  cursor: pointer;
+}
 
-a { color: var(--c-text); text-decoration-color: var(--c-line-2); text-underline-offset: 0.2em; }
-a:hover { text-decoration-color: currentColor; }
+a {
+  color: var(--c-text);
+  text-decoration-color: var(--c-line-2);
+  text-underline-offset: 0.2em;
+}
+a:hover {
+  text-decoration-color: currentColor;
+}
 
 :focus-visible {
   outline: 2px solid var(--c-accent-text);
@@ -78,13 +140,25 @@ a:hover { text-decoration-color: currentColor; }
    animates is the page answering the visitor (a dialog, a toast or a footer panel coming in, the phone services row
    following a swipe) and keeps running: held on its first frame, a pop-up would stay invisible and a toast would never
    leave (review B1). A new decorative loop outside an SVG must be added here.
-   !important because the inline drawings' own <style> comes later. */
-.is-idle, .is-idle *, .is-held svg, .is-held svg * { animation-play-state: paused !important; }
+   !important because the inline drawings' own \3c style> comes later. */
+.is-idle,
+.is-idle *,
+.is-held svg,
+.is-held svg * {
+  animation-play-state: paused !important;
+}
 
 .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
   /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the standard 1px clip, not spacing */
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .skip-link {
@@ -100,10 +174,15 @@ a:hover { text-decoration-color: currentColor; }
   text-decoration: none;
   transform: translateY(-200%);
 }
-.skip-link:focus { transform: none; }
+.skip-link:focus {
+  transform: none;
+}
 /* the skip link's target takes focus (tabindex="-1" in Base.astro), so the next Tab goes on from the content;
    a ring round the whole of <main> would only get in the way */
-main:focus { outline: none; }
+main:focus {
+  outline: none;
+}
 /* a picture that couldn't load (core.js): no broken-image box */
-img.is-broken { opacity: 0; }
-
+img.is-broken {
+  opacity: 0;
+}

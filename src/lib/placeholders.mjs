@@ -16,13 +16,18 @@ export const PLACEHOLDER = /\{([a-z]+)\}|%7B([a-z]+)%7D/gi;
  * @param {string} where  the file, for the error
  */
 export function fill(text, values, where) {
-  return text.replace(PLACEHOLDER, (/** @type {string} */ _, /** @type {string | undefined} */ plain, /** @type {string | undefined} */ encoded) => {
-    const name = /** @type {string} */ (plain ?? encoded);   // one of the two always matches
-    if (!Object.hasOwn(values, name)) {
-      throw new Error(`${where}: no value for the placeholder {${name}} (known: ${Object.keys(values).join(', ')}; src/lib/placeholders.mjs)`);
-    }
-    return values[name];
-  });
+  return text.replace(
+    PLACEHOLDER,
+    (/** @type {string} */ _, /** @type {string | undefined} */ plain, /** @type {string | undefined} */ encoded) => {
+      const name = /** @type {string} */ (plain ?? encoded); // one of the two always matches
+      if (!Object.hasOwn(values, name)) {
+        throw new Error(
+          `${where}: no value for the placeholder {${name}} (known: ${Object.keys(values).join(', ')}; src/lib/placeholders.mjs)`,
+        );
+      }
+      return values[name];
+    },
+  );
 }
 
 /** @param {Record<string, string>} values */

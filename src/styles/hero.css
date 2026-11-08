@@ -5,10 +5,10 @@
    other on the colour wheel, so the two glows balance instead of fighting.
    Surfaces inside the hero pick up a slight blue tint to match the page. */
 .hero {
-  --c-surface:   var(--c-cool-surface);
+  --c-surface: var(--c-cool-surface);
   --c-surface-2: var(--c-cool-surface-2);
-  --c-line:      var(--c-cool-surface-2);
-  --c-muted:     var(--c-cool-muted);
+  --c-line: var(--c-cool-surface-2);
+  --c-muted: var(--c-cool-muted);
   position: relative;
   isolation: isolate;
   /* its padding, set here once: the screen sizes below (and the home hero's phone rule) change only the two
@@ -18,9 +18,13 @@
   --hero-pad-bottom: var(--sp-7);
   padding-block: var(--hero-pad-top) var(--hero-pad-bottom);
 }
-@media (prefers-contrast: more) { .hero { --c-line: var(--c-edge); } }   /* its lines as everywhere else (tokens.css, L8) */
+@media (prefers-contrast: more) {
+  .hero {
+    --c-line: var(--c-edge);
+  }
+} /* its lines as everywhere else (tokens.css, L8) */
 .hero::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -31,9 +35,14 @@
 }
 /* two columns (landscape tablets and up): the hero is one screen tall */
 @media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
-  .hero { --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px)); --hero-pad-top: var(--sp-5); }
+  .hero {
+    --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
+    --hero-pad-top: var(--sp-5);
+  }
 }
 /* the home hero on a tall desktop: the news cards sit closer to the bottom edge */
 @media (width >= 68.75em) and (height >= 50em) and (orientation: landscape) {
-  .hero.fold { --hero-pad-bottom: var(--sp-5); }
+  .hero.fold {
+    --hero-pad-bottom: var(--sp-5);
+  }
 }

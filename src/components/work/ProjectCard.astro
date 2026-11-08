@@ -13,12 +13,37 @@ import type { CollectionEntry } from 'astro:content';
 import Sep from '../Sep.astro';
 import { cardSize } from '../../lib/site';
 import { fit } from '../../lib/fit';
-interface Props { project: CollectionEntry<'projects'>; level?: 2 | 3; first?: boolean }
-const { project: { id, data: p }, level = 3, first = false } = Astro.props;
+interface Props {
+  project: CollectionEntry<'projects'>;
+  level?: 2 | 3;
+  first?: boolean;
+}
+const {
+  project: { id, data: p },
+  level = 3,
+  first = false,
+} = Astro.props;
 const H = level === 2 ? 'h2' : 'h3';
 ---
+
 <div class="card card--project">
-  <span class="card-media well"><img src={`/assets/img/${p.image}-card.svg`} alt="" {...cardSize(p.image)} fetchpriority={first ? 'high' : undefined} loading={first ? undefined : 'lazy'}></span>
-  <span class="card-body"><H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H><span class="card-meta muted small">{p.clientShort.split(' · ').map((part, i) => <Fragment>{i > 0 ? <Fragment><Sep /><span class="keep">{part}</span></Fragment> : part}</Fragment>)}</span></span>
+  <span class="card-media well"
+    ><img
+      src={`/assets/img/${p.image}-card.svg`}
+      alt=""
+      {...cardSize(p.image)}
+      fetchpriority={first ? 'high' : undefined}
+      loading={first ? undefined : 'lazy'}
+  /></span>
+  <span class="card-body"
+    ><H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H
+    ><span class="card-meta muted small"
+      >{p.clientShort
+        .split(' · ')
+        .map((part, i) => <Fragment
+          >{i > 0 ? <Fragment><Sep /><span class="keep">{part}</span></Fragment> : part}</Fragment
+        >)}</span
+    ></span
+  >
   <span class="chip"><span class="sr-only">, </span>{p.tag}</span>
 </div>

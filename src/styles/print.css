@@ -14,21 +14,76 @@
      contact   the footer goes, so a one-line contact block (.print-contact, Base.astro) takes its place
    --------------------------------------------------------------------------- */
 @media not print {
-  .print-contact { display: none; }
+  .print-contact {
+    display: none;
+  }
 }
 @media print {
-  .skip-link, .site-header .hdr-actions, .botnav, dialog, .toasts, .site-footer, .svc-step, .grow-dots,
-  .hero-art .stage, .grow-stage, form, .copy-btn, .btn[data-open], button[data-open],
-  [data-md-skip] { display: none !important; }
-  :root { --fold-h: initial !important; --fold-inner: initial !important; --fold-pitch: initial !important; }
-  .site-header { position: static; }
-  .fold, .fold-always, .hero, .hero-grid { min-height: 0 !important; height: auto !important; }
-  .grow.is-live .grow-card { display: grid !important; }
-  .grow-row { opacity: 1 !important; }
-  .work-grid > li { display: flex !important; }   /* the /work filters don't print, so a chosen one doesn't filter */
-  h1, h2, h3 { break-after: avoid; }
-  article, figure, li, .card, .grow-card { break-inside: avoid; }
-  img, svg { max-height: 60vh; }
-  .prose a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 0.85em; }
-  .print-contact { margin-top: var(--sp-6); padding-top: var(--sp-3); border-top: 1px solid var(--c-line-2); font-size: var(--fs-2); }
+  .skip-link,
+  .site-header .hdr-actions,
+  .botnav,
+  dialog,
+  .toasts,
+  .site-footer,
+  .svc-step,
+  .grow-dots,
+  .hero-art .stage,
+  .grow-stage,
+  form,
+  .copy-btn,
+  .btn[data-open],
+  button[data-open],
+  [data-md-skip] {
+    display: none !important;
+  }
+  :root {
+    --fold-h: initial !important;
+    --fold-inner: initial !important;
+    --fold-pitch: initial !important;
+  }
+  .site-header {
+    position: static;
+  }
+  .fold,
+  .fold-always,
+  .hero,
+  .hero-grid {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .grow.is-live .grow-card {
+    display: grid !important;
+  }
+  .grow-row {
+    opacity: 1 !important;
+  }
+  .work-grid > li {
+    display: flex !important;
+  } /* the /work filters don't print, so a chosen one doesn't filter */
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  article,
+  figure,
+  li,
+  .card,
+  .grow-card {
+    break-inside: avoid;
+  }
+  img,
+  svg {
+    max-height: 60vh;
+  }
+  .prose a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+  }
+  .print-contact {
+    margin-top: var(--sp-6);
+    padding-top: var(--sp-3);
+    border-top: 1px solid var(--c-line-2);
+    font-size: var(--fs-2);
+  }
 }

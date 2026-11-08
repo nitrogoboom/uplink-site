@@ -8,12 +8,14 @@ import { join } from 'node:path';
 import { shrink } from './svgo-config.mjs';
 
 const DIR = join(process.env.DIST || 'dist', 'assets/img');
-let before = 0, after = 0;
+let before = 0,
+  after = 0;
 for (const name of readdirSync(DIR).filter((f) => f.endsWith('.svg'))) {
   const file = join(DIR, name);
   const src = readFileSync(file, 'utf-8');
   const out = shrink(src, `assets/img/${name}`);
-  before += src.length; after += out.length;
+  before += src.length;
+  after += out.length;
   writeFileSync(file, out);
 }
 console.log(`svgo: drawings ${(before / 1024).toFixed(0)} KB -> ${(after / 1024).toFixed(0)} KB`);

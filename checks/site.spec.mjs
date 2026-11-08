@@ -56,7 +56,10 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   await pg.waitForTimeout(5500);
   // hover a tile three along from the one showing, so the cloud's own timer can't have got there first
   const tiles = await pg.$$eval('.ob-tile', (t) => t.map((x) => [x.dataset.tile, x.classList.contains('is-on')]));
-  const on = Math.max(0, tiles.findIndex(([, o]) => o));
+  const on = Math.max(
+    0,
+    tiles.findIndex(([, o]) => o),
+  );
   const want = tiles[(on + 3) % tiles.length][0];
   const before = await pg.$eval('.ob-app', (e) => e.textContent);
   await pg.locator(`.ob-tile[data-tile="${want}"]`).first().hover({ force: true });
@@ -72,7 +75,11 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   const probe = () => {
     const pcs = [...document.querySelectorAll('#grow .pc')];
     const on = document.querySelector('#grow .grow-dot[aria-current="step"]');
-    return { built: pcs.filter((p) => !p.classList.contains('hide')).length, total: pcs.length, step: on ? Number(on.dataset.i) : -1 };
+    return {
+      built: pcs.filter((p) => !p.classList.contains('hide')).length,
+      total: pcs.length,
+      step: on ? Number(on.dataset.i) : -1,
+    };
   };
   let g = await pg.evaluate(probe);
   rep.push(`grow playing: step ${g.step + 1}, ${g.built} of ${g.total} parts built`);
@@ -87,13 +94,22 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   await pg.$eval('#footer', (e) => e.scrollIntoView());
   await pg.waitForTimeout(400);
   // the map is fetched as the footer comes near (footer.js): wait for it, as a slow CI machine can take over a second
-  await pg.waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 }).catch(() => fails.push('footer: the campus map never loaded'));
+  await pg
+    .waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 })
+    .catch(() => fails.push('footer: the campus map never loaded'));
   // review M6: the map is decoration (the footer's own words say what it shows), so the inserted map stays out of the
   // accessibility tree: aria-hidden, no role or name, and nothing of it in the map box's tree but the hold button
-  const mapA11y = await pg.$eval('svg.fc-w', (s) => ['aria-hidden', 'role', 'aria-label'].map((a) => `${a}=${s.getAttribute(a)}`).join(' ')).catch(() => '');
-  const mapTree = await pg.locator('.fc-map').ariaSnapshot().catch(() => '');
+  const mapA11y = await pg
+    .$eval('svg.fc-w', (s) => ['aria-hidden', 'role', 'aria-label'].map((a) => `${a}=${s.getAttribute(a)}`).join(' '))
+    .catch(() => '');
+  const mapTree = await pg
+    .locator('.fc-map')
+    .ariaSnapshot()
+    .catch(() => '');
   if (mapA11y && (mapA11y !== 'aria-hidden=true role=null aria-label=null' || /\bimg\b/.test(mapTree)))
-    fails.push(`footer: the campus map is in the accessibility tree (${mapA11y}; tree: ${mapTree.replace(/\s+/g, ' ')}) (review M6)`);
+    fails.push(
+      `footer: the campus map is in the accessibility tree (${mapA11y}; tree: ${mapTree.replace(/\s+/g, ' ')}) (review M6)`,
+    );
   // each tile (a <details>' summary, Footer.astro) opens its section: one screen tall, its panel above the tile row
   // and not cut off, and the map's label and camera move to its spot
   const fcTiles = pg.locator('.fc-tile');
@@ -115,13 +131,19 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
         open: open.map((d) => d.id),
         map: open[0]?.dataset.map,
         panelH: r ? Math.round(r.height) : 0,
-        over: p ? Math.max(p.scrollHeight - p.clientHeight, Math.ceil(r.bottom - document.querySelector('.fc-tile').getBoundingClientRect().top)) : 0,
+        over: p
+          ? Math.max(
+              p.scrollHeight - p.clientHeight,
+              Math.ceil(r.bottom - document.querySelector('.fc-tile').getBoundingClientRect().top),
+            )
+          : 0,
         hud: hud.map((e) => e.querySelector('b').textContent).join(' | '),
         vb: document.querySelector('svg.fc-w')?.getAttribute('viewBox'),
       };
     });
     rep.push(`tile ${i}: ${JSON.stringify(info)}`);
-    if (info.open.length !== 1 || info.panelH < 50) fails.push(`footer tile ${i} at 1440: open ${JSON.stringify(info.open)}, panel ${info.panelH}px tall`);
+    if (info.open.length !== 1 || info.panelH < 50)
+      fails.push(`footer tile ${i} at 1440: open ${JSON.stringify(info.open)}, panel ${info.panelH}px tall`);
     if (Math.abs(info.h - info.fold) > 1)
       fails.push(`footer tile ${i} at 1440: ${info.h}px tall, the screen below the header is ${info.fold}px`);
     if (info.over > 0) fails.push(`footer tile ${i} at 1440: panel overflows by ${info.over}px`);
@@ -129,17 +151,24 @@ test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
     seen.vb.add(info.vb);
     await pg.screenshot({ path: join(OUT, `f-1440-${i}.png`) });
   }
-  if (seen.hud.size !== n || [...seen.hud].some((h) => !h || h.includes('|'))) fails.push(`footer: the map's label didn't name one spot per section: ${[...seen.hud].join(' / ')}`);
-  if (seen.vb.size !== n) fails.push(`footer: the map's camera didn't move to each section's spot (${seen.vb.size} views for ${n} sections)`);
+  if (seen.hud.size !== n || [...seen.hud].some((h) => !h || h.includes('|')))
+    fails.push(`footer: the map's label didn't name one spot per section: ${[...seen.hud].join(' / ')}`);
+  if (seen.vb.size !== n)
+    fails.push(`footer: the map's camera didn't move to each section's spot (${seen.vb.size} views for ${n} sections)`);
   // shut the open one: Contact opens again (footer.js), shows, and its tile looks picked
   await fcTiles.nth(n - 1).click();
   await pg.waitForTimeout(500);
   const none = await pg.evaluate(() => {
     const p = document.querySelector('.fc-sec:first-of-type .fc-panel');
-    return { open: [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id), contact: p.getBoundingClientRect().height, tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth };
+    return {
+      open: [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id),
+      contact: p.getBoundingClientRect().height,
+      tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth,
+    };
   });
   rep.push(`after shutting the open section: ${JSON.stringify(none)}`);
-  if (none.open.join() !== 'fc-contact' || none.contact < 50 || none.tile !== '2px') fails.push(`footer after shutting the open section doesn't show Contact, open and picked: ${JSON.stringify(none)}`);
+  if (none.open.join() !== 'fc-contact' || none.contact < 50 || none.tile !== '2px')
+    fails.push(`footer after shutting the open section doesn't show Contact, open and picked: ${JSON.stringify(none)}`);
   await pg.close();
   console.log(rep.join('\n'));
   verdict([...fails, ...errs]);
@@ -170,7 +199,8 @@ test('header fit', async ({ browser }) => {
       };
     });
     if (worst === null || r.room < worst[1]) worst = [w, r.room];
-    if (r.room < 8 || r.cut > 0 || r.side > 0) fails.push(`header at ${w}px: ${r.room}px room, tabs cut ${r.cut}px, sideways ${r.side}px`);
+    if (r.room < 8 || r.cut > 0 || r.side > 0)
+      fails.push(`header at ${w}px: ${r.room}px room, tabs cut ${r.cut}px, sideways ${r.side}px`);
   }
   console.log(`header fit: tightest ${worst[1]}px at ${worst[0]}px wide`);
   await q.close();
@@ -213,7 +243,12 @@ for (const page of PAGES) {
         const f = document.getElementById('footer');
         if (!f) return [document.documentElement.scrollWidth - innerWidth, 'none', '-', '-'];
         const s = [...f.querySelectorAll('.fc-panel')].find((p) => p.getClientRects().length);
-        return [document.documentElement.scrollWidth - innerWidth, f.offsetHeight, s ? s.scrollHeight - s.clientHeight : '-', f.querySelectorAll('.fc-sec[open]').length];
+        return [
+          document.documentElement.scrollWidth - innerWidth,
+          f.offsetHeight,
+          s ? s.scrollHeight - s.clientHeight : '-',
+          f.querySelectorAll('.fc-sec[open]').length,
+        ];
       });
       if (page === 'soon' || page === 'index') await q.screenshot({ path: join(OUT, `f-${page}-${n}.png`) });
       if (r[0] > 0) fails.push(`${page} ${n}: ${r[0]}px sideways scroll`);
@@ -226,18 +261,25 @@ for (const page of PAGES) {
       await q.clock.runFor(600);
       const controls = await q.evaluate(() => {
         const shown = (e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden';
-        const all = [...document.querySelectorAll('button:not([data-open]):not([type="submit"]):not(:disabled), summary')].filter((b) => !b.closest('dialog, form') && shown(b));
+        const all = [
+          ...document.querySelectorAll('button:not([data-open]):not([type="submit"]):not(:disabled), summary'),
+        ].filter((b) => !b.closest('dialog, form') && shown(b));
         all.forEach((b, i) => b.setAttribute('data-check-ctl', String(i)));
         return all.length;
       });
       for (let i = 0; i < controls; i++) {
-        await q.locator(`[data-check-ctl="${i}"]`).click({ timeout: 2000 }).catch(() => {}); // covered or gone: not this check's business
+        await q
+          .locator(`[data-check-ctl="${i}"]`)
+          .click({ timeout: 2000 })
+          .catch(() => {}); // covered or gone: not this check's business
         await q.clock.runFor(150);
       }
       await q.keyboard.press('Escape');
       await q.clock.runFor(1000);
       await q.close();
-      console.log(`${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} open ${r[3]} h1 ${m.h1} ld ${m.ld.length} controls ${controls}`);
+      console.log(
+        `${pad(page, 22)} ${pad(n, 6)} overflowX ${r[0]} footer h ${r[1]} panel overflow ${r[2]} open ${r[3]} h1 ${m.h1} ld ${m.ld.length} controls ${controls}`,
+      );
       verdict([...fails, ...errs]);
     });
   }
@@ -249,7 +291,9 @@ for (const page of PAGES) {
 const WIDTHS = [320, 390, 600, 768, 1024, 1280];
 // in the page: two frames on, how far the page is wider than the screen
 const WIDE = () =>
-  new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done(document.documentElement.scrollWidth - innerWidth))));
+  new Promise((done) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => done(document.documentElement.scrollWidth - innerWidth))),
+  );
 /** @type {Record<string, string>} */
 const KNOWN = {};
 for (const page of PAGES) {
@@ -297,15 +341,20 @@ for (const page of PAGES) {
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const AXE_ALLOW = {};
 const axe = (q) => new AxeBuilder({ page: q }).withTags(AXE_TAGS);
-const axeFails = (v) => v.filter((x) => x.impact === 'serious' || x.impact === 'critical' || (x.impact === 'moderate' && !AXE_ALLOW[x.id]));
+const axeFails = (v) =>
+  v.filter((x) => x.impact === 'serious' || x.impact === 'critical' || (x.impact === 'moderate' && !AXE_ALLOW[x.id]));
 // wait until an element's own animations have stopped running (finished, or held by a pause), up to 5 s, so a busy
 // runner can't catch a 250ms fade-in half way; a fade held by the pause stays at its first frame and still fails
 const settled = (q, sel) =>
   q
-    .waitForFunction((s) => {
-      const e = document.querySelector(s);
-      return !!e && e.getAnimations().every((a) => a.playState !== 'running');
-    }, sel, { timeout: 5000 })
+    .waitForFunction(
+      (s) => {
+        const e = document.querySelector(s);
+        return !!e && e.getAnimations().every((a) => a.playState !== 'running');
+      },
+      sel,
+      { timeout: 5000 },
+    )
     .catch(() => {});
 const shownStyle = (sel) => {
   const e = document.querySelector(sel);
@@ -356,7 +405,11 @@ for (const page of PAGES) {
           );
           for (const x of serious) fails.push(`axe ${page} ${n}: [${x.impact}] ${x.id}`);
         }
-        const ids = await q.evaluate(() => [...new Set([...document.querySelectorAll('[data-open]')].map((e) => e.dataset.open))].filter((id) => document.getElementById(id)));
+        const ids = await q.evaluate(() =>
+          [...new Set([...document.querySelectorAll('[data-open]')].map((e) => e.dataset.open))].filter((id) =>
+            document.getElementById(id),
+          ),
+        );
         if (!ids.length) fails.push(`${name}: nothing opens a dialog (the header's Settings button should)`);
         for (const id of ids) {
           const opener = q.locator(`[data-open="${id}"]:visible`).first();
@@ -370,7 +423,8 @@ for (const page of PAGES) {
           await settled(q, `#${id}`); // the opening animation is 250ms (--dur-2)
           const st = await q.evaluate(shownStyle, `#${id}`);
           rep.push(`${id}: ${JSON.stringify(st)}`);
-          if (!st || st.opacity < 0.99 || st.w < 100 || st.h < 100) fails.push(`${name}: #${id} isn't shown once open: ${JSON.stringify(st)}`);
+          if (!st || st.opacity < 0.99 || st.w < 100 || st.h < 100)
+            fails.push(`${name}: #${id} isn't shown once open: ${JSON.stringify(st)}`);
           const v = (await axe(q).include(`#${id}`).analyze()).violations;
           for (const x of axeFails(v)) fails.push(`${name}: axe in #${id}: [${x.impact}] ${x.id}`);
           // a toast in the dialog: Settings' shortcuts switch says what it did, then leaves on its own (3 s)
@@ -381,12 +435,20 @@ for (const page of PAGES) {
             const t = await q.evaluate(shownStyle, `#${id} .toast`);
             if (!t || t.opacity < 0.99) fails.push(`${name}: the shortcuts toast isn't shown: ${JSON.stringify(t)}`);
             await q.clock.runFor(3000); // its time on screen; then it fades out (a CSS animation, in real time)
-            const gone = await q.waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 }).then(() => true, () => false);
+            const gone = await q
+              .waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 })
+              .then(
+                () => true,
+                () => false,
+              );
             if (!gone) fails.push(`${name}: the shortcuts toast never left`);
           }
           await q.keyboard.press('Escape');
           await q.waitForFunction((d) => !document.getElementById(d).open, id, { timeout: 2000 }).catch(() => {});
-          const after = await q.evaluate((d) => ({ open: document.getElementById(d).open, back: document.activeElement?.dataset?.open === d }), id);
+          const after = await q.evaluate(
+            (d) => ({ open: document.getElementById(d).open, back: document.activeElement?.dataset?.open === d }),
+            id,
+          );
           if (after.open) fails.push(`${name}: Esc didn't close #${id}`);
           else if (!after.back) fails.push(`${name}: focus didn't go back to what opened #${id}`);
         }
@@ -397,20 +459,31 @@ for (const page of PAGES) {
           await row.scrollIntoViewIfNeeded();
           await row.evaluate((e) => e.scrollBy({ left: e.querySelector('li').offsetWidth * 2, behavior: 'instant' }));
           // read until the middle card is the big one, or 3 s have gone
-          const middle = () => row.evaluate((e) => {
-            const mid = e.getBoundingClientRect().left + e.clientWidth / 2;
-            const li = [...e.children].reduce((a, b) => {
-              const d = (x) => Math.abs(x.getBoundingClientRect().left + x.getBoundingClientRect().width / 2 - mid);
-              return d(b) < d(a) ? b : a;
+          const middle = () =>
+            row.evaluate((e) => {
+              const mid = e.getBoundingClientRect().left + e.clientWidth / 2;
+              const li = [...e.children].reduce((a, b) => {
+                const d = (x) => Math.abs(x.getBoundingClientRect().left + x.getBoundingClientRect().width / 2 - mid);
+                return d(b) < d(a) ? b : a;
+              });
+              const scale = new DOMMatrix(getComputedStyle(li.querySelector('.svc-tile')).transform).a;
+              const art = li.querySelector('.svc-art, .svc-icon');
+              return {
+                i: [...e.children].indexOf(li),
+                scale: Math.round(scale * 100) / 100,
+                art: art ? Number(getComputedStyle(art).opacity) : 1,
+              };
             });
-            const scale = new DOMMatrix(getComputedStyle(li.querySelector('.svc-tile')).transform).a;
-            const art = li.querySelector('.svc-art, .svc-icon');
-            return { i: [...e.children].indexOf(li), scale: Math.round(scale * 100) / 100, art: art ? Number(getComputedStyle(art).opacity) : 1 };
-          });
           let c = await middle();
-          for (const end = Date.now() + 3000; (c.i < 1 || c.scale < 0.98 || c.art < 0.95) && Date.now() < end; c = await middle()) await q.waitForTimeout(100);
+          for (
+            const end = Date.now() + 3000;
+            (c.i < 1 || c.scale < 0.98 || c.art < 0.95) && Date.now() < end;
+            c = await middle()
+          )
+            await q.waitForTimeout(100);
           rep.push(`services row after a swipe: ${JSON.stringify(c)}`);
-          if (c.i < 1 || c.scale < 0.98 || c.art < 0.95) fails.push(`${name}: the services row didn't follow the swipe (the middle card: ${JSON.stringify(c)})`);
+          if (c.i < 1 || c.scale < 0.98 || c.art < 0.95)
+            fails.push(`${name}: the services row didn't follow the swipe (the middle card: ${JSON.stringify(c)})`);
         }
         // with the pause on, nothing loops: the hero, Grow and the footer map each counted while on screen (off screen
         // they idle anyway, so counting only at the end would miss a broken pause)
@@ -419,9 +492,15 @@ for (const page of PAGES) {
             await q.$eval(sel, (e) => e.scrollIntoView());
             await q.waitForTimeout(800);
             const running = await q.evaluate(() =>
-              document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity).map((a) => a.animationName || 'animation'),
+              document
+                .getAnimations()
+                .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity)
+                .map((a) => a.animationName || 'animation'),
             );
-            if (running.length) fails.push(`${name}: ${running.length} loop(s) still running with the pause on at ${sel}: ${[...new Set(running)].join(', ')}`);
+            if (running.length)
+              fails.push(
+                `${name}: ${running.length} loop(s) still running with the pause on at ${sel}: ${[...new Set(running)].join(', ')}`,
+              );
           }
         }
         // desktop footer tiles: the panel a tile opens shows (the 404 page has no footer)
@@ -431,7 +510,8 @@ for (const page of PAGES) {
           await settled(q, '.fc-sec[open] .fc-panel'); // its animation is 360ms (--dur-fc-panel)
           const p = await q.evaluate(shownStyle, '.fc-sec[open] .fc-panel');
           rep.push(`footer panel: ${JSON.stringify(p)}`);
-          if (!p || p.opacity < 0.99 || p.h < 50) fails.push(`${name}: the footer tile's panel isn't shown: ${JSON.stringify(p)}`);
+          if (!p || p.opacity < 0.99 || p.h < 50)
+            fails.push(`${name}: the footer tile's panel isn't shown: ${JSON.stringify(p)}`);
         }
         await ctx.close();
         console.log(`${name}: ${rep.join('; ')}`);
@@ -458,7 +538,8 @@ const framesIn = (q, ms = 1000) =>
     await new Promise((r) => setTimeout(r, ms));
     return window.__frames - a;
   }, ms);
-const growStep = (q) => q.evaluate(() => [...document.querySelectorAll('#grow .grow-card')].findIndex((c) => c.classList.contains('is-on')));
+const growStep = (q) =>
+  q.evaluate(() => [...document.querySelectorAll('#grow .grow-card')].findIndex((c) => c.classList.contains('is-on')));
 const growLabel = (q) => q.$eval('#grow .grow-play', (b) => b.getAttribute('aria-label'));
 const ringAt = (q) => q.$eval('#grow .grow-ring circle', (c) => getComputedStyle(c).strokeDashoffset);
 const loopsIn = (q, sel) =>
@@ -466,14 +547,27 @@ const loopsIn = (q, sel) =>
     (sel) =>
       document
         .getAnimations()
-        .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.(sel))
+        .filter(
+          (a) =>
+            a.playState === 'running' &&
+            a.effect?.getComputedTiming().iterations === Infinity &&
+            a.effect.target?.closest?.(sel),
+        )
         .map((a) => a.animationName || 'animation'),
     sel,
   );
 // waits for Grow to open step `i` and says how long that took (ms), or Infinity
 const until = async (q, i, timeout = 9000) => {
   const t0 = Date.now();
-  const ok = await q.waitForFunction((i) => document.querySelectorAll('#grow .grow-card')[i]?.classList.contains('is-on'), i, { timeout, polling: 50 }).then(() => true, () => false);
+  const ok = await q
+    .waitForFunction((i) => document.querySelectorAll('#grow .grow-card')[i]?.classList.contains('is-on'), i, {
+      timeout,
+      polling: 50,
+    })
+    .then(
+      () => true,
+      () => false,
+    );
   return ok ? Date.now() - t0 : Infinity;
 };
 const home = async (browser, { w = 1440, h = 900, held = false, init } = {}) => {
@@ -511,7 +605,16 @@ test('Grow: no frames and no loops once the story ends, or off screen (B2, B21)'
   await toGrow(q);
   await q.locator('#grow .grow-item').nth(4).click();
   await q.locator('#grow .grow-play').click();
-  const ended = await q.waitForFunction(() => document.querySelector('#grow .grow-play').getAttribute('aria-label') === 'Play again', null, { timeout: 15000 }).then(() => true, () => false);
+  const ended = await q
+    .waitForFunction(
+      () => document.querySelector('#grow .grow-play').getAttribute('aria-label') === 'Play again',
+      null,
+      { timeout: 15000 },
+    )
+    .then(
+      () => true,
+      () => false,
+    );
   if (!ended) fails.push(`Grow didn't reach the end of its story (button: ${await growLabel(q)})`);
   await q.waitForTimeout(500);
   const end = await framesIn(q);
@@ -541,7 +644,8 @@ test('Grow: a held or hidden step resumes where it was; your own pause wins (B17
   const r2 = await ringAt(q);
   if (r1 === r2) fails.push(`held and released: the ring stood still (${r1}) after the release`);
   const rest = 400 + (await until(q, 1));
-  if (rest > DWELL - 800) fails.push(`held at 1.5 s into a step, released: the step ran ${rest} ms more (about ${DWELL - 1500} left)`);
+  if (rest > DWELL - 800)
+    fails.push(`held at 1.5 s into a step, released: the step ran ${rest} ms more (about ${DWELL - 1500} left)`);
   // your own pause, under the site's: releasing the site's pause doesn't play it
   await q.evaluate(() => document.querySelector('[data-hold]').click());
   await q.locator('#grow .grow-play').click(); // play
@@ -549,7 +653,8 @@ test('Grow: a held or hidden step resumes where it was; your own pause wins (B17
   await q.evaluate(() => document.querySelector('[data-hold]').click());
   await q.waitForTimeout(600);
   const label = await growLabel(q);
-  if (label !== 'Play') fails.push(`paused by hand under the site's pause, then the site's pause released: Grow plays (button "${label}")`);
+  if (label !== 'Play')
+    fails.push(`paused by hand under the site's pause, then the site's pause released: Grow plays (button "${label}")`);
   // off screen for 2.5 s at 1.5 s into step 3
   await q.locator('#grow .grow-play').click();
   const at = await growStep(q);
@@ -561,8 +666,11 @@ test('Grow: a held or hidden step resumes where it was; your own pause wins (B17
   await q.waitForTimeout(2500);
   await toGrow(q);
   const more = await until(q, at + 2);
-  if (more > DWELL - 700 || shown + more < DWELL - 800) fails.push(`a step scrolled off screen ${shown} ms in, and back: it ran ${more} ms more (${DWELL} ms a step)`);
-  console.log(`grow resume: ${rest} ms after release (ring ${r1} -> ${r2}); own pause kept: ${label}; on screen ${shown}+${more} ms`);
+  if (more > DWELL - 700 || shown + more < DWELL - 800)
+    fails.push(`a step scrolled off screen ${shown} ms in, and back: it ran ${more} ms more (${DWELL} ms a step)`);
+  console.log(
+    `grow resume: ${rest} ms after release (ring ${r1} -> ${r2}); own pause kept: ${label}; on screen ${shown}+${more} ms`,
+  );
   await ctx.close();
   verdict([...fails, ...errs]);
 });
@@ -622,7 +730,9 @@ test('Grow phone: Next keeps focus at the last step; steps are aria-current (B14
 // B6, M11: each pop-up has its own empty live region from the start (one made with its first toast isn't announced),
 // and its close button's name holds the "Esc" it shows. M11: the skip link's target takes focus. B14: a toast
 // dismissed from the keyboard gives focus back, not to <body>.
-test('pop-ups: double-click, live regions, Esc in the name, skip link, toast focus (B12, B6, M11, B14)', async ({ browser }) => {
+test('pop-ups: double-click, live regions, Esc in the name, skip link, toast focus (B12, B6, M11, B14)', async ({
+  browser,
+}) => {
   const fails = [];
   const { ctx, q, errs } = await home(browser);
   for (const id of ['settings-dialog', 'book-dialog']) {
@@ -634,17 +744,24 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
       const r = document.querySelector(`#${id} > .toasts`);
       return r ? { live: r.getAttribute('aria-live'), kids: r.children.length } : null;
     }, id);
-    if (!region || region.live !== 'polite') fails.push(`#${id}: no aria-live="polite" .toasts of its own: ${JSON.stringify(region)}`);
+    if (!region || region.live !== 'polite')
+      fails.push(`#${id}: no aria-live="polite" .toasts of its own: ${JSON.stringify(region)}`);
     const tree = await q.locator(`#${id}`).ariaSnapshot();
     const close = tree.match(/button "([^"]*Close[^"]*)"/);
-    if (!close || !close[1].includes('Esc')) fails.push(`#${id}: its close button is named ${close ? `"${close[1]}"` : '(not found)'}, without the "Esc" it shows`);
+    if (!close || !close[1].includes('Esc'))
+      fails.push(
+        `#${id}: its close button is named ${close ? `"${close[1]}"` : '(not found)'}, without the "Esc" it shows`,
+      );
     await q.keyboard.press('Escape');
     await q.waitForTimeout(300);
   }
   // fresh page: the regions are in the markup, not made later
   await q.reload();
-  const marked = await q.evaluate(() => [...document.querySelectorAll('dialog')].map((d) => !!d.querySelector(':scope > .toasts[aria-live]')));
-  if (marked.includes(false)) fails.push(`a dialog has no live region before its first toast: ${JSON.stringify(marked)}`);
+  const marked = await q.evaluate(() =>
+    [...document.querySelectorAll('dialog')].map((d) => !!d.querySelector(':scope > .toasts[aria-live]')),
+  );
+  if (marked.includes(false))
+    fails.push(`a dialog has no live region before its first toast: ${JSON.stringify(marked)}`);
   // the skip link
   await q.keyboard.press('Tab');
   await q.keyboard.press('Enter');
@@ -657,12 +774,16 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   await q.waitForTimeout(400);
   await q.keyboard.press('Tab');
   const inToast = await q.evaluate(() => !!document.activeElement?.closest('.toast'));
-  if (!inToast) fails.push('Tab from the shortcuts switch didn\'t reach the toast it showed');
+  if (!inToast) fails.push("Tab from the shortcuts switch didn't reach the toast it showed");
   await q.keyboard.press('Enter');
   await q.waitForTimeout(500);
   const after = await q.evaluate(() => {
     const a = document.activeElement;
-    return { body: a === document.body, inDialog: !!a.closest('#settings-dialog'), what: `${a.tagName.toLowerCase()}#${a.id}` };
+    return {
+      body: a === document.body,
+      inDialog: !!a.closest('#settings-dialog'),
+      what: `${a.tagName.toLowerCase()}#${a.id}`,
+    };
   });
   if (after.body || !after.inDialog) fails.push(`toast dismissed with Enter: focus went to ${after.what}`);
   console.log(`pop-ups: regions ${JSON.stringify(marked)}, skip -> ${skip}, toast dismissed -> ${after.what}`);
@@ -682,7 +803,10 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
   const fails = [];
   const rep = [];
   const openIds = (q) => q.evaluate(() => [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id));
-  for (const [w, h] of [[390, 844], [1440, 900]]) {
+  for (const [w, h] of [
+    [390, 844],
+    [1440, 900],
+  ]) {
     const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h } });
     const q = await ctx.newPage();
     await q.goto(url('about'));
@@ -692,12 +816,16 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
     for (let i = 0; i < n; i++) {
       await tiles.nth(i).click();
       await q.waitForTimeout(500);
-      const s = await q.evaluate((i) => ({
-        id: document.querySelectorAll('.fc-sec')[i].id,
-        h: Math.round(document.querySelectorAll('.fc-sec .fc-panel')[i].getBoundingClientRect().height),
-      }), i);
+      const s = await q.evaluate(
+        (i) => ({
+          id: document.querySelectorAll('.fc-sec')[i].id,
+          h: Math.round(document.querySelectorAll('.fc-sec .fc-panel')[i].getBoundingClientRect().height),
+        }),
+        i,
+      );
       const open = await openIds(q);
-      if (open.length !== 1 || open[0] !== s.id || s.h < 50) fails.push(`no script, ${w}: section ${s.id} clicked: open ${JSON.stringify(open)}, its panel ${s.h}px tall`);
+      if (open.length !== 1 || open[0] !== s.id || s.h < 50)
+        fails.push(`no script, ${w}: section ${s.id} clicked: open ${JSON.stringify(open)}, its panel ${s.h}px tall`);
     }
     rep.push(`no script ${w}: ${n} sections opened one at a time`);
     await ctx.close();
@@ -724,10 +852,13 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
   // at load (nothing picked), and after a visitor shuts the section they opened
   const shownState = async (when) => {
     const s = await q.evaluate(() =>
-      [...document.querySelectorAll('.fc-sec')].filter((d) => d.querySelector('.fc-panel').getClientRects().length).map((d) => ({ id: d.id, open: d.open })),
+      [...document.querySelectorAll('.fc-sec')]
+        .filter((d) => d.querySelector('.fc-panel').getClientRects().length)
+        .map((d) => ({ id: d.id, open: d.open })),
     );
     rep.push(`1440 ${when}, panel shown: ${JSON.stringify(s)}`);
-    if (s.length !== 1 || !s[0].open) fails.push(`1440 ${when}: the panel on screen isn't its open section's: ${JSON.stringify(s)}`);
+    if (s.length !== 1 || !s[0].open)
+      fails.push(`1440 ${when}: the panel on screen isn't its open section's: ${JSON.stringify(s)}`);
   };
   await shownState('at load');
   await q.locator('.fc-tile').nth(1).click();
@@ -748,9 +879,13 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
     await q.keyboard.press('Tab');
   }
   rep.push(`Tab reached ${reached.join(', ')}`);
-  if (new Set(reached).size !== 6) fails.push(`Tab reached ${new Set(reached).size} of the 6 footer summaries: ${reached.join(', ')}`);
+  if (new Set(reached).size !== 6)
+    fails.push(`Tab reached ${new Set(reached).size} of the 6 footer summaries: ${reached.join(', ')}`);
   // Enter and Space open a section; Tab then goes into its links
-  for (const [key, i] of [['Enter', 2], ['Space', 3]]) {
+  for (const [key, i] of [
+    ['Enter', 2],
+    ['Space', 3],
+  ]) {
     await q.locator('.fc-tile').nth(i).focus();
     await q.keyboard.press(key);
     await q.waitForTimeout(500);
@@ -760,9 +895,16 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
   }
   await q.keyboard.press('Tab');
   const into = await q.evaluate(() => !!document.activeElement.closest('.fc-sec[open] .fc-panel'));
-  if (!into) fails.push(`Tab from the open summary went to ${await q.evaluate(() => document.activeElement.outerHTML.slice(0, 80))}, not into its panel`);
+  if (!into)
+    fails.push(
+      `Tab from the open summary went to ${await q.evaluate(() => document.activeElement.outerHTML.slice(0, 80))}, not into its panel`,
+    );
   // focus on a link in the open panel, then desktop -> phone -> phone turned -> desktop: focus never leaves it
-  const sizes = [[390, 844], [844, 390], [1280, 800]];
+  const sizes = [
+    [390, 844],
+    [844, 390],
+    [1280, 800],
+  ];
   for (const target of ['.fc-sec[open] .fc-panel a', '.fc-sec[open] > .fc-tile']) {
     await q.setViewportSize({ width: 1280, height: 800 });
     await q.waitForTimeout(300);
@@ -772,19 +914,27 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
       await q.waitForTimeout(400);
       const f = await q.evaluate((sel) => {
         const a = document.activeElement;
-        return { same: a === document.querySelector(sel), body: a === document.body, shown: a.getClientRects().length > 0 };
+        return {
+          same: a === document.querySelector(sel),
+          body: a === document.body,
+          shown: a.getClientRects().length > 0,
+        };
       }, target);
-      if (!f.same || !f.shown) fails.push(`focus on ${target} after the screen went to ${w}x${h}: ${JSON.stringify(f)}`);
+      if (!f.same || !f.shown)
+        fails.push(`focus on ${target} after the screen went to ${w}x${h}: ${JSON.stringify(f)}`);
     }
   }
   // landmarks: one navigation landmark in the footer, named Footer, with the legal links inside it
   const lm = await q.evaluate(() => ({
     all: [...document.querySelectorAll('nav, [role=navigation]')].map((n) => n.getAttribute('aria-label')),
-    footer: [...document.querySelectorAll('footer :is(nav, [role=navigation])')].map((n) => n.getAttribute('aria-label')),
+    footer: [...document.querySelectorAll('footer :is(nav, [role=navigation])')].map((n) =>
+      n.getAttribute('aria-label'),
+    ),
     legal: !!document.querySelector('footer nav .fc-legal a'),
   }));
   rep.push(`navigation landmarks: ${lm.all.join(', ')}`);
-  if (lm.footer.length !== 1 || lm.footer[0] !== 'Footer' || !lm.legal) fails.push(`footer landmarks: ${JSON.stringify(lm)}`);
+  if (lm.footer.length !== 1 || lm.footer[0] !== 'Footer' || !lm.legal)
+    fails.push(`footer landmarks: ${JSON.stringify(lm)}`);
   // what a screen reader gets: each summary a disclosure with its open state, named by its tile
   const cdp = await ctx.newCDPSession(q);
   const { nodes } = await cdp.send('Accessibility.getFullAXTree');
@@ -792,7 +942,11 @@ test('footer: no script, keys, resize and turn, landmarks, open state (J7, B14, 
     .filter((x) => /^DisclosureTriangle/.test(x.role?.value ?? '') && !x.ignored)
     .map((x) => ({ name: x.name?.value, expanded: x.properties?.find((p) => p.name === 'expanded')?.value.value }));
   rep.push(`summaries: ${JSON.stringify(sums)}`);
-  if (sums.length !== 6 || sums.filter((x) => x.expanded === true).length !== 1 || sums.some((x) => typeof x.expanded !== 'boolean' || !/\. /.test(x.name ?? '')))
+  if (
+    sums.length !== 6 ||
+    sums.filter((x) => x.expanded === true).length !== 1 ||
+    sums.some((x) => typeof x.expanded !== 'boolean' || !/\. /.test(x.name ?? ''))
+  )
     fails.push(`the footer's summaries in the accessibility tree: ${JSON.stringify(sums)}`);
   console.log(rep.join('\n'));
   await ctx.close();
@@ -813,21 +967,31 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
       .waitForFunction(
         (text) =>
           [...document.querySelectorAll('.toast')].some(
-            (t) => t.textContent.includes(text) && t.parentElement.parentElement === document.body && Number(getComputedStyle(t).opacity) > 0.99 && t.getClientRects().length > 0,
+            (t) =>
+              t.textContent.includes(text) &&
+              t.parentElement.parentElement === document.body &&
+              Number(getComputedStyle(t).opacity) > 0.99 &&
+              t.getClientRects().length > 0,
           ),
         text,
         { timeout: 3000 },
       )
-      .then(() => true, () => false);
+      .then(
+        () => true,
+        () => false,
+      );
   const where = (text) =>
     q.evaluate((text) => {
       const t = [...document.querySelectorAll('.toast')].find((x) => x.textContent.includes(text));
-      return t ? `${t.parentElement.parentElement.tagName.toLowerCase()}#${t.parentElement.parentElement.id}, opacity ${getComputedStyle(t).opacity}` : 'none';
+      return t
+        ? `${t.parentElement.parentElement.tagName.toLowerCase()}#${t.parentElement.parentElement.id}, opacity ${getComputedStyle(t).opacity}`
+        : 'none';
     }, text);
   await q.goto(url('contact'));
   await q.waitForLoadState('networkidle');
   await q.locator('.copy-btn').first().click(); // copied, or selected where the clipboard is refused: a toast either way
-  if (!(await toastShown(''))) fails.push(`contact: the copy button's toast isn't shown on the page (${await where('')})`);
+  if (!(await toastShown('')))
+    fails.push(`contact: the copy button's toast isn't shown on the page (${await where('')})`);
   await q.goto(url('index'));
   await q.waitForLoadState('networkidle');
   await q.locator('[data-open="book-dialog"]:visible').first().click();
@@ -835,7 +999,8 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
   await q.fill('#book-email', 'test@example.com');
   await q.selectOption('#book-size', { index: 1 });
   await q.locator('#book-dialog [type="submit"]').click();
-  if (!(await toastShown('Check-up requested'))) fails.push(`the Book form's confirmation isn't shown on the page (${await where('Check-up requested')})`);
+  if (!(await toastShown('Check-up requested')))
+    fails.push(`the Book form's confirmation isn't shown on the page (${await where('Check-up requested')})`);
   await ctx.close();
   verdict([...fails, ...errs]);
 });
@@ -846,7 +1011,9 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
 // focus goes back to the gear. With script off altogether the gear stays hidden (header.css: the one setting needs
 // script), and the Book links stay links that go to the form on /contact. With script, the close buttons give focus
 // back to whatever opened the pop-up (core.js keeps the opener in a WeakMap).
-test('pop-ups before or without script: Settings opens and closes, focus goes back; Book links reach the form (J8)', async ({ browser }) => {
+test('pop-ups before or without script: Settings opens and closes, focus goes back; Book links reach the form (J8)', async ({
+  browser,
+}) => {
   const fails = [];
   const rep = [];
   const blocked = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -857,7 +1024,11 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
   for (const how of ['Esc', 'its close button', 'the backdrop']) {
     await gear.click();
     await b.waitForTimeout(500); // the opening animation is 250ms (--dur-2)
-    const st = await b.evaluate(() => document.getElementById('settings-dialog').open && document.getElementById('settings-dialog').getBoundingClientRect().height);
+    const st = await b.evaluate(
+      () =>
+        document.getElementById('settings-dialog').open &&
+        document.getElementById('settings-dialog').getBoundingClientRect().height,
+    );
     if (!st) {
       fails.push(`page scripts blocked: the gear didn't open Settings (to shut it with ${how})`);
       continue;
@@ -866,7 +1037,10 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
     else if (how === 'its close button') await b.locator('#settings-dialog .dlg-head .hbtn').click();
     else await b.mouse.click(8, 450);
     await b.waitForTimeout(300);
-    const after = await b.evaluate(() => ({ open: document.getElementById('settings-dialog').open, back: !!document.activeElement?.classList.contains('hbtn-settings') }));
+    const after = await b.evaluate(() => ({
+      open: document.getElementById('settings-dialog').open,
+      back: !!document.activeElement?.classList.contains('hbtn-settings'),
+    }));
     rep.push(`page scripts blocked, ${how}: ${JSON.stringify(after)}`);
     if (after.open) fails.push(`page scripts blocked: ${how} didn't shut Settings`);
     else if (!after.back) fails.push(`page scripts blocked: focus didn't go back to the gear after ${how}`);
@@ -876,13 +1050,18 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
   const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 1440, height: 900 } });
   const q = await ctx.newPage();
   await q.goto(url('index'));
-  if (await q.locator('.hbtn-settings').isVisible()) fails.push('no script: the gear shows, with nothing in Settings that works without script');
+  if (await q.locator('.hbtn-settings').isVisible())
+    fails.push('no script: the gear shows, with nothing in Settings that works without script');
   const book = q.locator('[data-open="book-dialog"]:visible').first();
   await book.click();
   await q.waitForLoadState();
-  const there = await q.evaluate(() => ({ path: location.pathname + location.hash, form: !!document.querySelector('#message form[data-validate]') }));
+  const there = await q.evaluate(() => ({
+    path: location.pathname + location.hash,
+    form: !!document.querySelector('#message form[data-validate]'),
+  }));
   rep.push(`no script, Book: ${JSON.stringify(there)}`);
-  if (there.path !== '/contact#message' || !there.form) fails.push(`no script: a Book link went to ${there.path}, not the form at /contact#message`);
+  if (there.path !== '/contact#message' || !there.form)
+    fails.push(`no script: a Book link went to ${there.path}, not the form at /contact#message`);
   await ctx.close();
 
   // with script: each close button gives focus back to what opened the pop-up
@@ -895,7 +1074,13 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
     await p.waitForTimeout(500);
     await p.locator(close).click();
     await p.waitForTimeout(300);
-    const after = await p.evaluate(([id, sel]) => ({ open: document.getElementById(id).open, back: document.activeElement === document.querySelector(sel) }), [id, opener]);
+    const after = await p.evaluate(
+      ([id, sel]) => ({
+        open: document.getElementById(id).open,
+        back: document.activeElement === document.querySelector(sel),
+      }),
+      [id, opener],
+    );
     rep.push(`script, ${id}: ${JSON.stringify(after)}`);
     if (after.open) fails.push(`script: the close button didn't shut #${id}`);
     else if (!after.back) fails.push(`script: focus didn't go back to ${opener} after #${id} closed`);
@@ -912,7 +1097,9 @@ test('pop-ups: a close button closes once, with nothing in the console (J8)', as
   const fails = [];
   const { ctx, q, errs } = await home(browser);
   const said = [];
-  q.on('console', (m) => { if (m.type() === 'warning' || m.type() === 'error') said.push(`${m.type()}: ${m.text()}`); });
+  q.on('console', (m) => {
+    if (m.type() === 'warning' || m.type() === 'error') said.push(`${m.type()}: ${m.text()}`);
+  });
   for (const [opener, close] of [
     ['.hbtn-settings', '#settings-dialog .dlg-head .hbtn'],
     ['.hero [data-open="book-dialog"]', '#book-dialog .dlg-head .hbtn'],
@@ -922,7 +1109,9 @@ test('pop-ups: a close button closes once, with nothing in the console (J8)', as
     await q.waitForTimeout(500);
     await q.locator(close).click();
     await q.waitForTimeout(300);
-    const open = await q.evaluate(() => [...document.querySelectorAll('dialog')].filter((d) => d.open).map((d) => d.id));
+    const open = await q.evaluate(() =>
+      [...document.querySelectorAll('dialog')].filter((d) => d.open).map((d) => d.id),
+    );
     if (open.length) fails.push(`${close} left ${open.join(', ')} open`);
   }
   for (const s of said) fails.push(`console ${s}`);
@@ -933,7 +1122,7 @@ test('pop-ups: a close button closes once, with nothing in the console (J8)', as
 
 // J9: a form error adds its id to the field's aria-describedby and takes only that id away again, so a field's own
 // hint stays linked. No validated field has a hint today, so the check gives Book's email one.
-test('form errors keep a field\'s own hint in aria-describedby (J9)', async ({ browser }) => {
+test("form errors keep a field's own hint in aria-describedby (J9)", async ({ browser }) => {
   const fails = [];
   const { ctx, q, errs } = await home(browser);
   await q.locator('[data-open="book-dialog"]:visible').first().click();
@@ -945,7 +1134,10 @@ test('form errors keep a field\'s own hint in aria-describedby (J9)', async ({ b
     i.before(s);
     i.setAttribute('aria-describedby', 'book-email-hint');
   });
-  const ids = () => q.evaluate(() => ['book-email', 'book-name'].map((id) => document.getElementById(id).getAttribute('aria-describedby')));
+  const ids = () =>
+    q.evaluate(() =>
+      ['book-email', 'book-name'].map((id) => document.getElementById(id).getAttribute('aria-describedby')),
+    );
   const seen = [];
   await q.fill('#book-email', 'nope');
   await q.locator('#book-name').focus(); // blur: the email is checked
@@ -970,7 +1162,10 @@ test('form errors keep a field\'s own hint in aria-describedby (J9)', async ({ b
   ];
   const step = ['email wrong', 'email fixed', 'sent with no name', 'sent'];
   want.forEach((w, i) => {
-    if (JSON.stringify(seen[i]) !== JSON.stringify(w)) fails.push(`${step[i]}: aria-describedby of email, name is ${JSON.stringify(seen[i])}, expected ${JSON.stringify(w)}`);
+    if (JSON.stringify(seen[i]) !== JSON.stringify(w))
+      fails.push(
+        `${step[i]}: aria-describedby of email, name is ${JSON.stringify(seen[i])}, expected ${JSON.stringify(w)}`,
+      );
   });
   console.log(`form errors (J9): ${JSON.stringify(seen)}`);
   await ctx.close();
@@ -1016,7 +1211,8 @@ test('services row without scrollend: Next steps from the card showing (J15)', a
   await q.waitForTimeout(1200);
   const next = await middle();
   console.log(`services row without scrollend (J15): start ${start}, after the swipe ${swiped}, after Next ${next}`);
-  if (start !== 2 || swiped !== 0) fails.push(`setup: the row showed card ${start}, then ${swiped} after the swipe (expected 2, then 0)`);
+  if (start !== 2 || swiped !== 0)
+    fails.push(`setup: the row showed card ${start}, then ${swiped} after the swipe (expected 2, then 0)`);
   else if (next !== 1) fails.push(`Next after a swipe to card 0 went to card ${next}, not 1`);
   await ctx.close();
   verdict([...fails, ...errs]);
@@ -1034,16 +1230,25 @@ test('hero and pictures when drawings fail to load (J13)', async ({ browser }) =
   const s = await q.evaluate(() => {
     const stage = document.querySelector('.hero-art .stage');
     const img = stage.querySelector('img');
-    const shownEl = (e) => !!e && e.getClientRects().length > 0 && getComputedStyle(e).display !== 'none' && Number(getComputedStyle(e).opacity) > 0;
-    const broken = [...document.images].filter((i) => i.complete && !i.naturalWidth && i.getClientRects().length && Number(getComputedStyle(i).opacity) > 0);
+    const shownEl = (e) =>
+      !!e &&
+      e.getClientRects().length > 0 &&
+      getComputedStyle(e).display !== 'none' &&
+      Number(getComputedStyle(e).opacity) > 0;
+    const broken = [...document.images].filter(
+      (i) => i.complete && !i.naturalWidth && i.getClientRects().length && Number(getComputedStyle(i).opacity) > 0,
+    );
     return {
-      still: img ? { src: img.getAttribute('src'), loaded: img.complete && img.naturalWidth > 0, shown: shownEl(img) } : null,
+      still: img
+        ? { src: img.getAttribute('src'), loaded: img.complete && img.naturalWidth > 0, shown: shownEl(img) }
+        : null,
       beams: [...stage.querySelectorAll('svg.ob-over')].filter(shownEl).length,
       pause: shownEl(stage.querySelector('.hero-pause')),
       broken: broken.map((i) => i.getAttribute('src')),
     };
   });
-  if (!s.still?.loaded || !s.still.shown) fails.push(`hero: no still office in place of the drawing: ${JSON.stringify(s.still)}`);
+  if (!s.still?.loaded || !s.still.shown)
+    fails.push(`hero: no still office in place of the drawing: ${JSON.stringify(s.still)}`);
   if (s.beams) fails.push(`hero: ${s.beams} dashes layer(s) shown over a stage with no drawing`);
   if (s.pause) fails.push('hero: the pause button shows with nothing to pause');
   if (s.broken.length) fails.push(`${s.broken.length} broken-image box(es): ${s.broken.join(', ')}`);
@@ -1054,7 +1259,10 @@ test('hero and pictures when drawings fail to load (J13)', async ({ browser }) =
 
 // B5: text in the fallback font takes the same room as Barlow, so nothing moves when the fonts arrive late. Linux has
 // no Arial, so the fallback faces need Liberation Sans (CI's runner has it: Playwright installs it with Chromium).
-for (const [page, w, h] of [['index', 1440, 900], [MISSING, 390, 844]]) {
+for (const [page, w, h] of [
+  ['index', 1440, 900],
+  [MISSING, 390, 844],
+]) {
   test(`font swap: no layout shift, ${page} ${w} (B5)`, async ({ browser }) => {
     const ctx = await browser.newContext({ viewport: { width: w, height: h } });
     await ctx.route('**/assets/fonts/*.woff2', async (r) => {
@@ -1063,11 +1271,21 @@ for (const [page, w, h] of [['index', 1440, 900], [MISSING, 390, 844]]) {
     });
     await ctx.addInitScript(() => {
       window.__cls = 0;
-      new PerformanceObserver((l) => l.getEntries().forEach((e) => { if (!e.hadRecentInput) window.__cls += e.value; })).observe({ type: 'layout-shift', buffered: true });
+      new PerformanceObserver((l) =>
+        l.getEntries().forEach((e) => {
+          if (!e.hadRecentInput) window.__cls += e.value;
+        }),
+      ).observe({ type: 'layout-shift', buffered: true });
     });
     const q = await ctx.newPage();
     await q.goto(url(page));
-    await q.waitForFunction(() => document.fonts.status === 'loaded' && [...document.fonts].some((f) => f.family.includes('Barlow') && f.status === 'loaded'), null, { timeout: 15000 });
+    await q.waitForFunction(
+      () =>
+        document.fonts.status === 'loaded' &&
+        [...document.fonts].some((f) => f.family.includes('Barlow') && f.status === 'loaded'),
+      null,
+      { timeout: 15000 },
+    );
     await q.waitForTimeout(1000);
     const cls = await q.evaluate(() => window.__cls);
     await ctx.close();
@@ -1098,15 +1316,25 @@ for (const page of ['index', 'contact']) {
       return q.evaluate(() => Math.round(document.querySelector('main').getBoundingClientRect().height));
     };
     const [a, b] = [await tall(1010), await tall(1060)];
-    if (a !== b) fails.push(`${page} on paper is ${a}px long on a 1010px-tall screen and ${b}px on a 1060px one: sections keep a screen's height`);
+    if (a !== b)
+      fails.push(
+        `${page} on paper is ${a}px long on a 1010px-tall screen and ${b}px on a 1060px one: sections keep a screen's height`,
+      );
     const s = await q.evaluate(() => {
       const shown = (e) => e.getClientRects().length > 0;
       return {
         cards: [...document.querySelectorAll('.grow-card')].filter(shown).length,
         of: document.querySelectorAll('.grow-card').length,
-        gone: [...document.querySelectorAll('form, .copy-btn, .btn[data-open], button[data-open]')].filter(shown).map((e) => e.className || e.tagName),
-        cardsOpen: [...document.querySelectorAll('main .card[data-open]')].map((e) => (shown(e) ? '' : e.textContent.trim())).filter(Boolean),
-        contact: [...document.querySelectorAll('.print-contact')].filter(shown).map((e) => e.textContent).join(),
+        gone: [...document.querySelectorAll('form, .copy-btn, .btn[data-open], button[data-open]')]
+          .filter(shown)
+          .map((e) => e.className || e.tagName),
+        cardsOpen: [...document.querySelectorAll('main .card[data-open]')]
+          .map((e) => (shown(e) ? '' : e.textContent.trim()))
+          .filter(Boolean),
+        contact: [...document.querySelectorAll('.print-contact')]
+          .filter(shown)
+          .map((e) => e.textContent)
+          .join(),
         footer: [...document.querySelectorAll('.site-footer')].filter(shown).length,
       };
     });
@@ -1114,7 +1342,8 @@ for (const page of ['index', 'contact']) {
     if (s.cards !== s.of) fails.push(`${page} on paper: ${s.cards} of ${s.of} Grow steps`);
     if (s.gone.length) fails.push(`${page} on paper still shows: ${s.gone.join(', ')}`);
     if (s.cardsOpen.length) fails.push(`${page} on paper drops a card's words: ${s.cardsOpen.join(' | ')}`);
-    if (!/\d.*@/.test(s.contact)) fails.push(`${page} on paper: no contact line (phone, email) in place of the footer: "${s.contact}"`);
+    if (!/\d.*@/.test(s.contact))
+      fails.push(`${page} on paper: no contact line (phone, email) in place of the footer: "${s.contact}"`);
     console.log(`print ${page}: ${a}px / ${b}px, ${JSON.stringify(s)}`);
     await ctx.close();
     verdict(fails);
@@ -1141,8 +1370,10 @@ test('forms: copy buttons without script, pattern titles, blank required choices
   }));
   if (s.copy) fails.push(`contact without script: ${s.copy} copy button(s) shown that can't copy`);
   if (s.untitled.length) fails.push(`input(s) with a pattern and no title: ${s.untitled.join(', ')}`);
-  for (const c of s.choose) if (!c.required || c.first !== '' || c.picked !== '') fails.push(`#${c.id} doesn't start on a blank, required choice: ${JSON.stringify(c)}`);
-  if (!s.note) fails.push('the Book pop-up doesn\'t say fields are required unless marked optional');
+  for (const c of s.choose)
+    if (!c.required || c.first !== '' || c.picked !== '')
+      fails.push(`#${c.id} doesn't start on a blank, required choice: ${JSON.stringify(c)}`);
+  if (!s.note) fails.push("the Book pop-up doesn't say fields are required unless marked optional");
   console.log(`forms: ${JSON.stringify(s)}`);
   await ctx.close();
   verdict(fails);
@@ -1153,11 +1384,17 @@ test('forms: copy buttons without script, pattern titles, blank required choices
 // "All" brings them back; the arrow keys move the choice, and Tab leaves the group in one step. In forced colours the
 // checked chip still looks different from the rest (a colour change that isn't only transparency). axe passes with
 // a filter chosen. They used to be aria-pressed buttons that needed work.js and were hidden without it.
-test('work filters: a radio group that works without script, keys, forced colours, axe (M11, B4)', async ({ browser }) => {
+test('work filters: a radio group that works without script, keys, forced colours, axe (M11, B4)', async ({
+  browser,
+}) => {
   const fails = [];
   const rep = [];
-  const shown = (q) => q.$$eval('.work-grid > li', (ls) => ls.filter((l) => l.getClientRects().length).map((l) => l.dataset.tags));
-  for (const [w, h] of [[390, 844], [1440, 900]]) {
+  const shown = (q) =>
+    q.$$eval('.work-grid > li', (ls) => ls.filter((l) => l.getClientRects().length).map((l) => l.dataset.tags));
+  for (const [w, h] of [
+    [390, 844],
+    [1440, 900],
+  ]) {
     const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h } });
     const q = await ctx.newPage();
     await q.goto(url('work'));
@@ -1190,8 +1427,12 @@ test('work filters: a radio group that works without script, keys, forced colour
       const off = chips.find((c) => c !== on);
       return { on: on && look(on), off: off && look(off) };
     });
-    if (!fc.on || JSON.stringify(fc.on) === JSON.stringify(fc.off)) fails.push(`forced colours, ${w}: the checked filter looks like the others: ${JSON.stringify(fc)}`);
-    else if (fc.on.color === fc.on.bg) fails.push(`forced colours, ${w}: the checked filter's words are the colour of its background: ${JSON.stringify(fc.on)}`);
+    if (!fc.on || JSON.stringify(fc.on) === JSON.stringify(fc.off))
+      fails.push(`forced colours, ${w}: the checked filter looks like the others: ${JSON.stringify(fc)}`);
+    else if (fc.on.color === fc.on.bg)
+      fails.push(
+        `forced colours, ${w}: the checked filter's words are the colour of its background: ${JSON.stringify(fc.on)}`,
+      );
     rep.push(`forced colours ${w}: ${JSON.stringify(fc)}`);
     await q.emulateMedia({ forcedColors: 'none' });
     if (s.n < 2) {
@@ -1199,26 +1440,33 @@ test('work filters: a radio group that works without script, keys, forced colour
       await ctx.close();
       continue;
     }
-    if (s.names.length !== 1 || !s.names[0]) fails.push(`no script, ${w}: the radios aren't one named group: names ${JSON.stringify(s.names)}`);
-    if (!s.grouped || !s.legend) fails.push(`no script, ${w}: the radios aren't in one fieldset with a legend (${JSON.stringify(s.legend)})`);
+    if (s.names.length !== 1 || !s.names[0])
+      fails.push(`no script, ${w}: the radios aren't one named group: names ${JSON.stringify(s.names)}`);
+    if (!s.grouped || !s.legend)
+      fails.push(`no script, ${w}: the radios aren't in one fieldset with a legend (${JSON.stringify(s.legend)})`);
     if (!s.onScreen) fails.push(`no script, ${w}: the filters don't show`);
-    if (JSON.stringify(s.checked) !== '["all"]') fails.push(`no script, ${w}: checked at load ${JSON.stringify(s.checked)}, not "all"`);
+    if (JSON.stringify(s.checked) !== '["all"]')
+      fails.push(`no script, ${w}: checked at load ${JSON.stringify(s.checked)}, not "all"`);
     // each radio's accessible name ends in its count, and the count is the cards it shows
     const tree = await q.getByRole('group', { name: s.legend }).ariaSnapshot();
     const named = [...tree.matchAll(/- radio "([^"]+)"/g)].map((m) => m[1]);
-    if (named.length !== s.n) fails.push(`no script, ${w}: ${named.length} radio(s) in the group "${s.legend}", not ${s.n}`);
+    if (named.length !== s.n)
+      fails.push(`no script, ${w}: ${named.length} radio(s) in the group "${s.legend}", not ${s.n}`);
     const labels = q.locator('.filters label');
     for (let i = 0; i < s.n; i++) {
       await labels.nth(i).click();
       const on = await shown(q);
       const key = s.values[i];
       const want = all.filter((t) => key === 'all' || t.split(' ').includes(key));
-      if (JSON.stringify(on) !== JSON.stringify(want)) fails.push(`no script, ${w}: "${key}" chosen shows ${JSON.stringify(on)}, not ${JSON.stringify(want)}`);
+      if (JSON.stringify(on) !== JSON.stringify(want))
+        fails.push(`no script, ${w}: "${key}" chosen shows ${JSON.stringify(on)}, not ${JSON.stringify(want)}`);
       const count = Number((named[i] || '').match(/,\s*(\d+)$/)?.[1]);
-      if (count !== want.length) fails.push(`no script, ${w}: radio "${named[i]}" doesn't end in its count, ${want.length}`);
+      if (count !== want.length)
+        fails.push(`no script, ${w}: radio "${named[i]}" doesn't end in its count, ${want.length}`);
     }
     await labels.first().click();
-    if ((await shown(q)).length !== all.length) fails.push(`no script, ${w}: "All" chosen again doesn't show every project`);
+    if ((await shown(q)).length !== all.length)
+      fails.push(`no script, ${w}: "All" chosen again doesn't show every project`);
     // keys: the arrow moves the choice (and the cards follow); the chip shows the focus ring; Tab leaves the group
     await q.locator('.filters input:checked').focus();
     await q.keyboard.press('ArrowRight');
@@ -1227,13 +1475,19 @@ test('work filters: a radio group that works without script, keys, forced colour
       return { value: a.value, checked: a.checked, ring: getComputedStyle(a.closest('label')).outlineStyle };
     });
     const afterKey = await shown(q);
-    if (k.value !== s.values[1] || !k.checked) fails.push(`no script, ${w}: ArrowRight from "All" left ${JSON.stringify(k)} focused, not "${s.values[1]}" checked`);
-    if (afterKey.length === all.length) fails.push(`no script, ${w}: ArrowRight to "${s.values[1]}" didn't filter the cards`);
+    if (k.value !== s.values[1] || !k.checked)
+      fails.push(
+        `no script, ${w}: ArrowRight from "All" left ${JSON.stringify(k)} focused, not "${s.values[1]}" checked`,
+      );
+    if (afterKey.length === all.length)
+      fails.push(`no script, ${w}: ArrowRight to "${s.values[1]}" didn't filter the cards`);
     if (k.ring === 'none') fails.push(`no script, ${w}: the focused chip shows no focus ring`);
     await q.keyboard.press('Tab');
     const out = await q.evaluate(() => !document.activeElement.closest('.filters'));
     if (!out) fails.push(`no script, ${w}: Tab from the checked radio stayed in the group`);
-    rep.push(`no script ${w}: ${s.n} radios "${s.names[0]}" in "${s.legend}", names ${JSON.stringify(named)}, ArrowRight -> ${k.value} (${afterKey.length} shown)`);
+    rep.push(
+      `no script ${w}: ${s.n} radios "${s.names[0]}" in "${s.legend}", names ${JSON.stringify(named)}, ArrowRight -> ${k.value} (${afterKey.length} shown)`,
+    );
     await ctx.close();
   }
   // axe, with a filter chosen (axe needs script)
@@ -1255,7 +1509,9 @@ test('work filters: a radio group that works without script, keys, forced colour
 // holds two clearly different colours, not one solid block), and the focus ring round the focused chip (with radios,
 // always the checked one) isn't the page's Canvas colour. On paper a chosen filter doesn't filter: the filters don't
 // print, so every project does.
-test('work filters: forced colours legible as pixels, focus ring, print shows every project (B4)', async ({ browser }) => {
+test('work filters: forced colours legible as pixels, focus ring, print shows every project (B4)', async ({
+  browser,
+}) => {
   const fails = [];
   const rep = [];
   const far = (a, b) => Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1]), Math.abs(a[2] - b[2])) > 96;
@@ -1266,8 +1522,15 @@ test('work filters: forced colours legible as pixels, focus ring, print shows ev
     return { w: png.width, h: png.height, px: out };
   };
   for (const scheme of ['dark', 'light']) {
-    for (const [w, h] of [[390, 844], [1440, 900]]) {
-      const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: w, height: h }, deviceScaleFactor: 2 });
+    for (const [w, h] of [
+      [390, 844],
+      [1440, 900],
+    ]) {
+      const ctx = await browser.newContext({
+        javaScriptEnabled: false,
+        viewport: { width: w, height: h },
+        deviceScaleFactor: 2,
+      });
       const q = await ctx.newPage();
       await q.emulateMedia({ forcedColors: 'active', colorScheme: scheme });
       await q.goto(url('work'));
@@ -1287,12 +1550,20 @@ test('work filters: forced colours legible as pixels, focus ring, print shows ev
         const b = r.getBoundingClientRect();
         return { text: t.textContent.trim(), x: b.x, y: b.y, width: b.width, height: b.height };
       });
-      const shot = pixels(await q.screenshot({ clip: { x: word.x, y: word.y, width: word.width, height: word.height } }));
+      const shot = pixels(
+        await q.screenshot({ clip: { x: word.x, y: word.y, width: word.width, height: word.height } }),
+      );
       const tally = new Map();
       for (const p of shot.px) tally.set(p.join(), (tally.get(p.join()) || 0) + 1);
-      const main = [...tally].sort((a, b) => b[1] - a[1])[0][0].split(',').map(Number);
+      const main = [...tally]
+        .sort((a, b) => b[1] - a[1])[0][0]
+        .split(',')
+        .map(Number);
       const ink = shot.px.filter((p) => far(p, main)).length / shot.px.length;
-      if (ink < 0.08) fails.push(`forced colours ${scheme} ${w}: the checked chip's "${word.text}" is one block of rgb(${main}) (${(ink * 100).toFixed(1)}% of it another colour)`);
+      if (ink < 0.08)
+        fails.push(
+          `forced colours ${scheme} ${w}: the checked chip's "${word.text}" is one block of rgb(${main}) (${(ink * 100).toFixed(1)}% of it another colour)`,
+        );
       // the focus ring: Tab into the group from just before it lands on the checked radio
       await chip.locator('input').focus();
       await q.keyboard.press('Shift+Tab');
@@ -1306,19 +1577,40 @@ test('work filters: forced colours legible as pixels, focus ring, print shows ev
         probe.remove();
         const s = getComputedStyle(c);
         const b = c.getBoundingClientRect();
-        return { focused: c.contains(document.activeElement), style: s.outlineStyle, color: s.outlineColor, width: parseFloat(s.outlineWidth), offset: parseFloat(s.outlineOffset), canvas, x: b.x, y: b.y, w: b.width, h: b.height };
+        return {
+          focused: c.contains(document.activeElement),
+          style: s.outlineStyle,
+          color: s.outlineColor,
+          width: parseFloat(s.outlineWidth),
+          offset: parseFloat(s.outlineOffset),
+          canvas,
+          x: b.x,
+          y: b.y,
+          w: b.width,
+          h: b.height,
+        };
       });
       const rgb = (c) => (c.match(/[\d.]+/g) || []).slice(0, 3).map(Number);
       if (!ring.focused) fails.push(`forced colours ${scheme} ${w}: Tab into the filters didn't focus the checked one`);
-      else if (ring.style === 'none' || !far(rgb(ring.color), rgb(ring.canvas))) fails.push(`forced colours ${scheme} ${w}: the focus ring is ${ring.style} ${ring.color}, on a Canvas of ${ring.canvas}`);
+      else if (ring.style === 'none' || !far(rgb(ring.color), rgb(ring.canvas)))
+        fails.push(
+          `forced colours ${scheme} ${w}: the focus ring is ${ring.style} ${ring.color}, on a Canvas of ${ring.canvas}`,
+        );
       else {
         // and as pixels: a line across the chip's middle, just outside its left edge, in the ring's band
         const at = ring.x - ring.offset - ring.width / 2;
-        const band = pixels(await q.screenshot({ clip: { x: at - 0.5, y: ring.y + ring.h / 2 - 2, width: 1, height: 4 } }));
+        const band = pixels(
+          await q.screenshot({ clip: { x: at - 0.5, y: ring.y + ring.h / 2 - 2, width: 1, height: 4 } }),
+        );
         const seen = band.px.filter((p) => far(p, rgb(ring.canvas))).length / band.px.length;
-        if (seen < 0.5) fails.push(`forced colours ${scheme} ${w}: no focus ring to be seen beside the chip (${(seen * 100).toFixed(0)}% off Canvas ${ring.canvas})`);
+        if (seen < 0.5)
+          fails.push(
+            `forced colours ${scheme} ${w}: no focus ring to be seen beside the chip (${(seen * 100).toFixed(0)}% off Canvas ${ring.canvas})`,
+          );
       }
-      rep.push(`forced colours ${scheme} ${w}: "${word.text}" ${(ink * 100).toFixed(1)}% ink on rgb(${main}); ring ${ring.style} ${ring.color} on ${ring.canvas}`);
+      rep.push(
+        `forced colours ${scheme} ${w}: "${word.text}" ${(ink * 100).toFixed(1)}% ink on rgb(${main}); ring ${ring.style} ${ring.color} on ${ring.canvas}`,
+      );
       await ctx.close();
     }
   }
@@ -1329,7 +1621,10 @@ test('work filters: forced colours legible as pixels, focus ring, print shows ev
   const labels = q.locator('.filters label');
   if (await labels.count()) await labels.nth(1).click();
   await q.emulateMedia({ media: 'print' });
-  const p = await q.$$eval('.work-grid > li', (ls) => ({ all: ls.length, shown: ls.filter((l) => l.getClientRects().length).length }));
+  const p = await q.$$eval('.work-grid > li', (ls) => ({
+    all: ls.length,
+    shown: ls.filter((l) => l.getClientRects().length).length,
+  }));
   if (p.shown !== p.all) fails.push(`print with a filter chosen: ${p.shown} of ${p.all} projects print`);
   rep.push(`print with a filter chosen: ${p.shown} of ${p.all} projects`);
   await ctx.close();
@@ -1346,9 +1641,16 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
   const fails = [];
   const rep = [];
   for (const scheme of ['dark', 'light']) {
-    for (const [w, h] of [[390, 844], [1440, 900]]) {
+    for (const [w, h] of [
+      [390, 844],
+      [1440, 900],
+    ]) {
       // motion on: the pause buttons show only then
-      const ctx = await browser.newContext({ viewport: { width: w, height: h }, forcedColors: 'active', colorScheme: scheme });
+      const ctx = await browser.newContext({
+        viewport: { width: w, height: h },
+        forcedColors: 'active',
+        colorScheme: scheme,
+      });
       const q = await ctx.newPage();
       await q.goto(url('index'));
       await q.waitForLoadState('networkidle');
@@ -1373,7 +1675,11 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
             'Grow dot': pair('#grow .grow-dot[aria-current] .pip', '#grow .grow-dot:not([aria-current]) .pip'),
             'Grow row': pair('#grow .grow-item[aria-current]', '#grow .grow-item:not([aria-current])'),
             'services dot': pair('.svc-dots .pip.on', '.svc-dots .pip:not(.on)'),
-            'pause icon': { on: bg(vis('.hold[aria-pressed="true"] .hold-icon')[0]), off: canvas, shown: vis('.hold[aria-pressed="true"] .hold-icon').length > 0 },
+            'pause icon': {
+              on: bg(vis('.hold[aria-pressed="true"] .hold-icon')[0]),
+              off: canvas,
+              shown: vis('.hold[aria-pressed="true"] .hold-icon').length > 0,
+            },
             'current tab': pair('.botnav .bn[aria-current]', '.botnav .bn:not([aria-current])'),
           },
         };
@@ -1381,7 +1687,8 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
       for (const [k, v] of Object.entries(s.states)) {
         if (!v.shown) continue; // not at this width (the dots on phones, the rows on desktop)
         const alpha = Number((v.on.match(/rgba\([^)]*,\s*([\d.]+)\)/) || [0, 1])[1]); // the theme keeps a fill's alpha
-        if (v.on === v.off || v.on === s.canvas || alpha < 0.5) fails.push(`forced colours ${scheme} ${w}: ${k} on ${v.on}, off ${v.off}, page ${s.canvas}`);
+        if (v.on === v.off || v.on === s.canvas || alpha < 0.5)
+          fails.push(`forced colours ${scheme} ${w}: ${k} on ${v.on}, off ${v.off}, page ${s.canvas}`);
         rep.push(`${scheme} ${w} ${k}: on ${v.on}, off ${v.off}`);
       }
       await ctx.close();
@@ -1393,10 +1700,17 @@ test('forced colours: Grow step, dots, pause icon, current tab (B4)', async ({ b
 
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
-test('drawing addresses: ?v= is the served file\'s hash (B10)', async () => {
+test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
   const html = await (await fetch(BASE + '/')).text();
-  const urls = [...new Set([...html.matchAll(/data-[a-z-]+="(\/assets\/img\/[^"?]+\.svg)\?v=([0-9a-f]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`))];
-  const fails = urls.length < 4 ? [`Home inserts ${urls.length} drawing(s) with a ?v= (expected the hero cuts and the campus map)`] : [];
+  const urls = [
+    ...new Set(
+      [...html.matchAll(/data-[a-z-]+="(\/assets\/img\/[^"?]+\.svg)\?v=([0-9a-f]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`),
+    ),
+  ];
+  const fails =
+    urls.length < 4
+      ? [`Home inserts ${urls.length} drawing(s) with a ?v= (expected the hero cuts and the campus map)`]
+      : [];
   for (const u of urls) {
     const [path, v] = u.split('?v=');
     const body = Buffer.from(await (await fetch(BASE + path)).arrayBuffer());
@@ -1414,9 +1728,12 @@ test('Markdown copies: team, facts links, hours heading, Home contact (C15)', as
   const fails = [];
   const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith('The people who pick up')) || '';
   const people = team.split('\n').filter((l) => l.startsWith('- '));
-  if (!people.length || people.some((l) => !/^- [^,]+, \S/.test(l))) fails.push(`/about.md team lines run names into roles: ${people.join(' | ')}`);
-  if (!/^- Services: \[[^\]]+\]\(https?:\/\/[^)]+\/services\/[a-z-]+\)/m.test(await md('/work/office-move.md'))) fails.push('/work/office-move.md: Services are not links');
-  if (!/^## Hours and office\n\n- Monday to Friday: /m.test(await md('/contact.md'))) fails.push('/contact.md: the hours have no heading');
+  if (!people.length || people.some((l) => !/^- [^,]+, \S/.test(l)))
+    fails.push(`/about.md team lines run names into roles: ${people.join(' | ')}`);
+  if (!/^- Services: \[[^\]]+\]\(https?:\/\/[^)]+\/services\/[a-z-]+\)/m.test(await md('/work/office-move.md')))
+    fails.push('/work/office-move.md: Services are not links');
+  if (!/^## Hours and office\n\n- Monday to Friday: /m.test(await md('/contact.md')))
+    fails.push('/contact.md: the hours have no heading');
   const home = await md('/index.md');
   const html = await (await fetch(BASE + '/contact')).text();
   const tel = html.match(/href="(tel:\+\d+)"/)?.[1];
@@ -1443,20 +1760,29 @@ test('cards: titles are headings, chips are heard (M3, M10)', async ({ browser }
         if (n > prev + 1) out.push(`${h.tagName.toLowerCase()} "${h.textContent.trim()}" follows an h${prev}`);
         prev = n;
       }
-      const cards = [...document.querySelectorAll('main :is(.svc-grid, .work-grid, .card-row, .svc-cards) > li > .card')];
+      const cards = [
+        ...document.querySelectorAll('main :is(.svc-grid, .work-grid, .card-row, .svc-cards) > li > .card'),
+      ];
       for (const card of cards) {
         const name = card.querySelector('.card-title')?.textContent.trim() || card.textContent.trim().slice(0, 30);
         const link = card.querySelector(':is(h2, h3) > a[href]');
-        if (!link) { out.push(`card "${name}": its title is not a heading holding its link`); continue; }
+        if (!link) {
+          out.push(`card "${name}": its title is not a heading holding its link`);
+          continue;
+        }
         card.scrollIntoView({ block: 'center', behavior: 'instant' });
         const b = card.getBoundingClientRect();
         const at = document.elementFromPoint(b.right - 6, b.bottom - 6);
-        if (at?.closest('a') !== link) out.push(`card "${name}": a click near its corner reaches ${at?.outerHTML.slice(0, 60)}, not its link`);
+        if (at?.closest('a') !== link)
+          out.push(`card "${name}": a click near its corner reaches ${at?.outerHTML.slice(0, 60)}, not its link`);
       }
       for (const a of document.querySelectorAll('main a[href]')) {
-        for (const x of a.querySelectorAll('[aria-hidden="true"]')) if (/\p{L}/u.test(x.textContent)) out.push(`link "${a.textContent.trim().slice(0, 40)}": "${x.textContent.trim()}" is shown but aria-hidden`);
+        for (const x of a.querySelectorAll('[aria-hidden="true"]'))
+          if (/\p{L}/u.test(x.textContent))
+            out.push(`link "${a.textContent.trim().slice(0, 40)}": "${x.textContent.trim()}" is shown but aria-hidden`);
       }
-      for (const c of document.querySelectorAll('main .chip')) if (c.closest('[aria-hidden="true"]')) out.push(`chip "${c.textContent.trim()}" is aria-hidden`);
+      for (const c of document.querySelectorAll('main .chip'))
+        if (c.closest('[aria-hidden="true"]')) out.push(`chip "${c.textContent.trim()}" is aria-hidden`);
       return { out, cards: cards.length };
     });
     if (!r.cards) fails.push(`${page}: no cards found`);
@@ -1471,12 +1797,15 @@ test('favicons: .ico and .svg linked and served (M9)', async () => {
   const fails = [];
   for (const path of ['/', '/about', '/services/help-desk']) {
     const html = await (await fetch(BASE + path)).text();
-    if (!html.includes('<link rel="icon" href="/favicon.ico" sizes="32x32">')) fails.push(`${path}: no <link rel="icon"> for /favicon.ico`);
-    if (!html.includes('<link rel="icon" href="/favicon.svg" type="image/svg+xml">')) fails.push(`${path}: no <link rel="icon"> for /favicon.svg`);
+    if (!html.includes('<link rel="icon" href="/favicon.ico" sizes="32x32">'))
+      fails.push(`${path}: no <link rel="icon"> for /favicon.ico`);
+    if (!html.includes('<link rel="icon" href="/favicon.svg" type="image/svg+xml">'))
+      fails.push(`${path}: no <link rel="icon"> for /favicon.svg`);
   }
   for (const icon of ['/favicon.ico', '/favicon.svg']) {
     const r = await fetch(BASE + icon);
-    if (!r.ok || !/^image\//.test(r.headers.get('content-type') || '')) fails.push(`${icon}: ${r.status} ${r.headers.get('content-type')}`);
+    if (!r.ok || !/^image\//.test(r.headers.get('content-type') || ''))
+      fails.push(`${icon}: ${r.status} ${r.headers.get('content-type')}`);
   }
   verdict(fails);
 });
@@ -1491,16 +1820,23 @@ test('favicons: .ico and .svg linked and served (M9)', async () => {
 const WORDS = () => {
   const out = [];
   // headings without the class fit, for the long-word test in Node
-  const plain = [...document.querySelectorAll('h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit), .svc-title:not(.fit)')].filter((h) => !h.closest('dialog')).map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
+  const plain = [
+    ...document.querySelectorAll(
+      'h1:not(.fit), h2:not(.fit), main h3:not(.fit), .fc-head h3:not(.fit), .svc-title:not(.fit)',
+    ),
+  ]
+    .filter((h) => !h.closest('dialog'))
+    .map((h) => `${h.tagName.toLowerCase()} "${h.textContent.trim()}"`);
   for (const h of document.querySelectorAll('h1, h2, main h3, .fc-panel.is-on h3, .stat-val, .svc-title')) {
     if (!h.getClientRects().length || h.closest('.sr-only, dialog:not([open])')) continue;
     const tw = document.createTreeWalker(h, NodeFilter.SHOW_TEXT);
-    for (let t; (t = tw.nextNode()); ) {
+    for (let t; (t = tw.nextNode());) {
       for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
         const r = document.createRange();
         r.setStart(t, m.index);
         r.setEnd(t, m.index + m[0].length);
-        if (new Set([...r.getClientRects()].filter((x) => x.width).map((x) => Math.round(x.top))).size > 1) out.push(`${h.tagName.toLowerCase()} "${m[0]}"`);
+        if (new Set([...r.getClientRects()].filter((x) => x.width).map((x) => Math.round(x.top))).size > 1)
+          out.push(`${h.tagName.toLowerCase()} "${m[0]}"`);
       }
     }
   }
@@ -1518,15 +1854,22 @@ for (const page of PAGES) {
     const fails = (
       await lanes(jobs, 4, async ([w, font, zoom = 1]) => {
         const h = w > 1000 ? 900 : 800;
-        const ctx = await browser.newContext({ viewport: { width: w / zoom, height: h / zoom }, deviceScaleFactor: zoom });
+        const ctx = await browser.newContext({
+          viewport: { width: w / zoom, height: h / zoom },
+          deviceScaleFactor: zoom,
+        });
         const q = await ctx.newPage();
-        if (font) await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
+        if (font)
+          await (await ctx.newCDPSession(q)).send('Page.setFontSizes', { fontSizes: { standard: font, fixed: font } });
         await q.goto(url(page));
         await q.evaluate(() => document.fonts.ready);
         const [split, plain] = await q.evaluate(WORDS);
-        for (const h of plain) if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
+        for (const h of plain)
+          if (longest(h) >= LONG) split.push(`${h} has a word of ${LONG} letters or more but no class fit`);
         await ctx.close();
-        return split.length ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}${zoom > 1 ? ` (${zoom * 100}% zoom)` : ''}: ${split.join(', ')}` : null;
+        return split.length
+          ? `${page} at ${w}${font ? ` (${font}px default font)` : ''}${zoom > 1 ? ` (${zoom * 100}% zoom)` : ''}: ${split.join(', ')}`
+          : null;
       })
     ).filter(Boolean);
     verdict(fails);
@@ -1538,7 +1881,23 @@ for (const page of PAGES) {
 // wheel grid (its top under the header a multiple of 100). The hero's news cards at 1100 to 1240 wide (where the
 // office column is narrowest): no word in a card split across lines, and the words and tag inside the card. The footer
 // map's label sits on the drawing's base, not in empty space under it.
-const FIRST = [[1100, 700], [1100, 800], [1165, 800], [1280, 720], [1280, 800], [1366, 768], [1440, 900], [1470, 956], [1536, 864], [1920, 1080], [2560, 1440], [3440, 720], [3440, 900], [3440, 1080], [3440, 1440]];
+const FIRST = [
+  [1100, 700],
+  [1100, 800],
+  [1165, 800],
+  [1280, 720],
+  [1280, 800],
+  [1366, 768],
+  [1440, 900],
+  [1470, 956],
+  [1536, 864],
+  [1920, 1080],
+  [2560, 1440],
+  [3440, 720],
+  [3440, 900],
+  [3440, 1080],
+  [3440, 1440],
+];
 test('Home: hero on the first screen, sections on the wheel grid (C1)', async ({ browser }) => {
   const fails = (
     await lanes(FIRST, 4, async ([w, h]) => {
@@ -1555,16 +1914,19 @@ test('Home: hero on the first screen, sections on the wheel grid (C1)', async ({
         const pitch = probe.getBoundingClientRect().height;
         probe.remove();
         const hero = document.querySelector('#top').getBoundingClientRect();
-        if (hero.height > pitch + 1) out.push(`hero ${Math.round(hero.height)}px tall, more than one wheel step (${Math.round(pitch)}px)`);
+        if (hero.height > pitch + 1)
+          out.push(`hero ${Math.round(hero.height)}px tall, more than one wheel step (${Math.round(pitch)}px)`);
         for (const sel of ['.hero-menu .menu li:last-child', '.hero-cta', '.hero-dock']) {
           const e = document.querySelector(sel);
           if (!e || !e.getClientRects().length) continue;
           const b = e.getBoundingClientRect().bottom;
-          if (b > innerHeight + 1) out.push(`${sel} ends at ${Math.round(b)}px, below the first screen (${innerHeight}px)`);
+          if (b > innerHeight + 1)
+            out.push(`${sel} ends at ${Math.round(b)}px, below the first screen (${innerHeight}px)`);
         }
         for (const s of document.querySelectorAll('main > section.fold')) {
           const t = s.getBoundingClientRect().top + scrollY - head;
-          if (Math.abs(t - Math.round(t / 100) * 100) > 1) out.push(`#${s.id} starts ${Math.round(t)}px under the header, off the 100px wheel grid`);
+          if (Math.abs(t - Math.round(t / 100) * 100) > 1)
+            out.push(`#${s.id} starts ${Math.round(t)}px under the header, off the 100px wheel grid`);
         }
         return out;
       });
@@ -1587,14 +1949,15 @@ test('Home: hero news cards whole at 1100 to 1240 wide (C1)', async ({ browser }
           const c = card.getBoundingClientRect();
           for (const el of card.querySelectorAll('.news-title, .news-tag, .news-text p')) {
             const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-            for (let t; (t = tw.nextNode()); ) {
+            for (let t; (t = tw.nextNode());) {
               for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
                 const g = document.createRange();
                 g.setStart(t, m.index);
                 g.setEnd(t, m.index + m[0].length);
                 const rects = [...g.getClientRects()].filter((x) => x.width);
                 if (new Set(rects.map((x) => Math.round(x.top))).size > 1) out.push(`"${m[0]}" split across lines`);
-                for (const x of rects) if (x.right > c.right + 1 || x.left < c.left - 1) out.push(`"${m[0]}" cut by its card`);
+                for (const x of rects)
+                  if (x.right > c.right + 1 || x.left < c.left - 1) out.push(`"${m[0]}" cut by its card`);
               }
             }
           }
@@ -1609,19 +1972,29 @@ test('Home: hero news cards whole at 1100 to 1240 wide (C1)', async ({ browser }
 });
 test('footer map: its label on the drawing (C1)', async ({ browser }) => {
   const fails = [];
-  for (const [w, h] of [[1440, 900], [1920, 1080], [2560, 1440], [3440, 1440]]) {
+  for (const [w, h] of [
+    [1440, 900],
+    [1920, 1080],
+    [2560, 1440],
+    [3440, 1440],
+  ]) {
     const q = await browser.newPage({ viewport: { width: w, height: h } });
     await q.goto(url('contact'));
     await q.$eval('#footer', (e) => e.scrollIntoView());
     await q.waitForFunction(() => document.querySelector('.fc-map > svg'));
     await q.waitForTimeout(1500); // the camera settles on the open section's spot
     const r = await q.evaluate(() => {
-      const m = document.querySelector('.fc-map'), vb = m.querySelector(':scope > svg').viewBox.baseVal, b = m.getBoundingClientRect();
+      const m = document.querySelector('.fc-map'),
+        vb = m.querySelector(':scope > svg').viewBox.baseVal,
+        b = m.getBoundingClientRect();
       const drawn = vb.height * Math.min(b.width / vb.width, b.height / vb.height); // drawn centred, its whole shape shown
       return { gap: b.top + (b.height + drawn) / 2 - document.querySelector('.fc-hud').getBoundingClientRect().bottom };
     });
     await q.close();
-    if (Math.abs(r.gap) > 4) fails.push(`${w}x${h}: the map label sits ${Math.round(Math.abs(r.gap))}px ${r.gap > 0 ? 'above' : 'below'} the drawing's base`);
+    if (Math.abs(r.gap) > 4)
+      fails.push(
+        `${w}x${h}: the map label sits ${Math.round(Math.abs(r.gap))}px ${r.gap > 0 ? 'above' : 'below'} the drawing's base`,
+      );
   }
   verdict(fails);
 });
@@ -1629,7 +2002,8 @@ test('footer map: its label on the drawing (C1)', async ({ browser }) => {
 // B19, B7: Contact's queue ring holds its words. "1 day" stays on one line, and it and the label sit inside the
 // ring's stroke (the drawing's circle of radius 64 in 168: r 70, stroke 12; each line by its letters' height, 0.35em
 // either side of its middle), at the desktop widths where the review saw it break, and with WCAG 1.4.12 text spacing.
-const SPACING = '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
+const SPACING =
+  '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
 test('queue ring: its words inside the ring, with text spacing too (B19, B7)', async ({ browser }) => {
   const fails = [];
   for (const w of [1100, 1280, 1440, 1920]) {
@@ -1640,20 +2014,33 @@ test('queue ring: its words inside the ring, with text spacing too (B19, B7)', a
       if (spacing) await q.addStyleTag({ content: SPACING });
       await q.evaluate(() => document.fonts.ready);
       const r = await q.evaluate(() => {
-        const ring = document.querySelector('.queue-ring'), box = ring.getBoundingClientRect();
-        const cx = box.left + box.width / 2, cy = box.top + box.height / 2, rad = (box.width * 64) / 168;
-        const out = [], val = ring.querySelector('.stat-val');
+        const ring = document.querySelector('.queue-ring'),
+          box = ring.getBoundingClientRect();
+        const cx = box.left + box.width / 2,
+          cy = box.top + box.height / 2,
+          rad = (box.width * 64) / 168;
+        const out = [],
+          val = ring.querySelector('.stat-val');
         const lines = new Set([...val.getClientRects()].map((x) => Math.round(x.top))).size;
         if (lines > 1) out.push(`"${val.textContent}" on ${lines} lines`);
         for (const el of ring.querySelectorAll('.queue-ring-label > span:not(.sr-only)')) {
           const range = document.createRange();
           range.selectNodeContents(el);
           const half = parseFloat(getComputedStyle(el).fontSize) * 0.35;
-          const far = Math.max(...[...range.getClientRects()].filter((x) => x.width).flatMap((x) => {
-            const mid = (x.top + x.bottom) / 2;
-            return [x.left, x.right].flatMap((px) => [mid - half, mid + half].map((py) => Math.hypot(px - cx, py - cy)));
-          }));
-          if (far > rad + 0.5) out.push(`"${el.textContent.trim()}" reaches ${far.toFixed(1)}px from the centre, past the stroke at ${rad.toFixed(1)}px`);
+          const far = Math.max(
+            ...[...range.getClientRects()]
+              .filter((x) => x.width)
+              .flatMap((x) => {
+                const mid = (x.top + x.bottom) / 2;
+                return [x.left, x.right].flatMap((px) =>
+                  [mid - half, mid + half].map((py) => Math.hypot(px - cx, py - cy)),
+                );
+              }),
+          );
+          if (far > rad + 0.5)
+            out.push(
+              `"${el.textContent.trim()}" reaches ${far.toFixed(1)}px from the centre, past the stroke at ${rad.toFixed(1)}px`,
+            );
         }
         return out;
       });

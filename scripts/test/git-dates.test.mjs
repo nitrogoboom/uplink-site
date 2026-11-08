@@ -24,7 +24,10 @@ const repo = () => {
     }
     git('add', '-A');
     const at = `${day}T12:00:00+00:00`;
-    execFileSync('git', ['commit', '-q', '-m', day], { cwd: dir, env: { ...process.env, GIT_AUTHOR_DATE: at, GIT_COMMITTER_DATE: at } });
+    execFileSync('git', ['commit', '-q', '-m', day], {
+      cwd: dir,
+      env: { ...process.env, GIT_AUTHOR_DATE: at, GIT_COMMITTER_DATE: at },
+    });
   };
   return { dir, commit };
 };
@@ -49,7 +52,9 @@ test('git-dates: each entry dates from its own file; created is the oldest add',
     assert.equal(created([a], opts), '2026-01-10');
     assert.equal(created([b], opts), '2026-01-10');
     assert.equal(lastmod(['src/content/projects/new.json'], opts), undefined, 'a file never committed has no date');
-  } finally { rmSync(dir, { recursive: true }); }
+  } finally {
+    rmSync(dir, { recursive: true });
+  }
 });
 
 test('git-dates: a shallow clone stops the build in CI, and leaves the dates out (with one warning) elsewhere', () => {
@@ -58,7 +63,10 @@ test('git-dates: a shallow clone stops the build in CI, and leaves the dates out
   try {
     execFileSync('git', ['clone', '-q', '--depth', '1', `file://${dir}`, shallow], { stdio: 'pipe' });
     // without the check, the cut-off commit "adds" every file: both dates would be 2026-06-20
-    assert.equal(execFileSync('git', ['log', '-1', '--format=%cs', '--', a], { cwd: shallow }).toString().trim(), '2026-06-20');
+    assert.equal(
+      execFileSync('git', ['log', '-1', '--format=%cs', '--', a], { cwd: shallow }).toString().trim(),
+      '2026-06-20',
+    );
     assert.throws(() => lastmod([a], { cwd: shallow, env: { CI: 'true' } }), /git history is shallow.*fetch-depth: 0/s);
     const warnings = [];
     const opts = { cwd: shallow, env: {}, warn: (m) => warnings.push(m) };
@@ -67,7 +75,10 @@ test('git-dates: a shallow clone stops the build in CI, and leaves the dates out
     assert.equal(fullHistory(opts), false);
     assert.equal(warnings.length, 1, 'one warning per build, not one per page');
     assert.match(warnings[0], /shallow.*leaves out the sitemap's <lastmod>/);
-  } finally { rmSync(dir, { recursive: true }); rmSync(shallow, { recursive: true }); }
+  } finally {
+    rmSync(dir, { recursive: true });
+    rmSync(shallow, { recursive: true });
+  }
 });
 
 test('git-dates: outside a git checkout, the same: stop in CI, no dates elsewhere', () => {
@@ -75,5 +86,7 @@ test('git-dates: outside a git checkout, the same: stop in CI, no dates elsewher
   try {
     assert.throws(() => lastmod([a], { cwd: dir, env: { CI: '1' } }), /not a git checkout/);
     assert.equal(lastmod([a], { cwd: dir, env: {}, warn: () => {} }), undefined);
-  } finally { rmSync(dir, { recursive: true }); }
+  } finally {
+    rmSync(dir, { recursive: true });
+  }
 });

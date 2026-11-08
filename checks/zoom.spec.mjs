@@ -47,7 +47,11 @@ const KNOWN = {};
 // runs in the page: the findings, and the size of body text and the root
 const PROBE = () => {
   const out = { clip: [], over: [], away: [], sideways: document.documentElement.scrollWidth - innerWidth };
-  const name = (el) => el.tagName.toLowerCase() + (el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '');
+  const name = (el) =>
+    el.tagName.toLowerCase() +
+    (el.className && typeof el.className === 'string'
+      ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.')
+      : '');
   const fixed = (el) => {
     for (let a = el; a; a = a.parentElement) if (getComputedStyle(a).position === 'fixed') return true;
     return false;
@@ -65,27 +69,40 @@ const PROBE = () => {
     }
     return false;
   };
-  const sy = scrollY, sx = scrollX;
-  const off = (b, fx) => (fx ? b.top < -2 || b.left < -2 || b.right > innerWidth + 2 || b.bottom > innerHeight + 2 : b.top + sy < -2 || b.left + sx < -2);
+  const sy = scrollY,
+    sx = scrollX;
+  const off = (b, fx) =>
+    fx
+      ? b.top < -2 || b.left < -2 || b.right > innerWidth + 2 || b.bottom > innerHeight + 2
+      : b.top + sy < -2 || b.left + sx < -2;
   const boxes = [];
-  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.nodeValue.trim() ? 1 : 2) });
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => (n.nodeValue.trim() ? 1 : 2),
+  });
   for (let n, i = 0; (n = walk.nextNode()); i++) {
     const el = n.parentElement;
     if (!el || skip(el)) continue;
     const r = document.createRange();
     r.selectNodeContents(n);
-    const fx = fixed(el), ly = layer(el);
-    for (const b of r.getClientRects()) if (b.width > 2 && b.height > 2) boxes.push({ n: i, el, b, fx, ly, t: n.nodeValue.trim().slice(0, 28) });
+    const fx = fixed(el),
+      ly = layer(el);
+    for (const b of r.getClientRects())
+      if (b.width > 2 && b.height > 2) boxes.push({ n: i, el, b, fx, ly, t: n.nodeValue.trim().slice(0, 28) });
   }
   for (const x of boxes) {
-    if (off(x.b, x.fx)) out.away.push(`${name(x.el)} "${x.t}" at ${Math.round(x.b.left + sx)},${Math.round(x.b.top + sy)}`);
+    if (off(x.b, x.fx))
+      out.away.push(`${name(x.el)} "${x.t}" at ${Math.round(x.b.left + sx)},${Math.round(x.b.top + sy)}`);
     for (let a = x.el; a && a !== document.body; a = a.parentElement) {
       const cs = getComputedStyle(a);
-      const hx = /hidden|clip/.test(cs.overflowX), hy = /hidden|clip/.test(cs.overflowY);
+      const hx = /hidden|clip/.test(cs.overflowX),
+        hy = /hidden|clip/.test(cs.overflowY);
       if (!hx && !hy) continue;
       const c = a.getBoundingClientRect();
       if (x.b.right <= c.left || x.b.left >= c.right || x.b.bottom <= c.top || x.b.top >= c.bottom) break;
-      const past = Math.max(hx ? Math.max(c.left - x.b.left, x.b.right - c.right) : 0, hy ? Math.max(c.top - x.b.top, x.b.bottom - c.bottom) : 0);
+      const past = Math.max(
+        hx ? Math.max(c.left - x.b.left, x.b.right - c.right) : 0,
+        hy ? Math.max(c.top - x.b.top, x.b.bottom - c.bottom) : 0,
+      );
       if (past > 2) {
         out.clip.push(`${name(x.el)} "${x.t}" cut ${Math.round(past)}px by ${name(a)}`);
         break;
@@ -93,21 +110,26 @@ const PROBE = () => {
     }
   }
   // controls with no text of their own (icon buttons, fields) must be in reach too
-  for (const el of document.querySelectorAll('a[href], button, input:not([type="hidden"]), select, textarea, summary')) {
+  for (const el of document.querySelectorAll(
+    'a[href], button, input:not([type="hidden"]), select, textarea, summary',
+  )) {
     if (skip(el)) continue;
     const b = el.getBoundingClientRect();
-    if (b.width > 2 && b.height > 2 && off(b, fixed(el))) out.away.push(`${name(el)} (control) at ${Math.round(b.left + sx)},${Math.round(b.top + sy)}`);
+    if (b.width > 2 && b.height > 2 && off(b, fixed(el)))
+      out.away.push(`${name(el)} (control) at ${Math.round(b.left + sx)},${Math.round(b.top + sy)}`);
   }
   // the top and bottom quarter of each line are left out: glyph boxes are taller than tight line heights, so lines of
   // one heading touch there without the letters meeting
   const core = (b) => ({ l: b.left, r: b.right, t: b.top + b.height * 0.25, b: b.bottom - b.height * 0.25 });
   for (let i = 0; i < boxes.length; i++) {
-    const A = boxes[i], a = core(A.b);
+    const A = boxes[i],
+      a = core(A.b);
     for (let j = i + 1; j < boxes.length; j++) {
       const B = boxes[j];
       if (A.n === B.n || A.ly !== B.ly) continue; // a text's own lines; a bar and the page (it scrolls under the bars)
       const b = core(B.b);
-      const w = Math.min(a.r, b.r) - Math.max(a.l, b.l), h = Math.min(a.b, b.b) - Math.max(a.t, b.t);
+      const w = Math.min(a.r, b.r) - Math.max(a.l, b.l),
+        h = Math.min(a.b, b.b) - Math.max(a.t, b.t);
       if (w > 2 && h > 2) out.over.push(`${name(A.el)} "${A.t}" / ${name(B.el)} "${B.t}"`);
     }
   }
@@ -115,15 +137,24 @@ const PROBE = () => {
 };
 // body text: the first paragraph in <main> that isn't a small label
 const SIZE = () => {
-  const p = [...document.querySelectorAll('main p')].find((e) => !e.closest('.eyebrow, .small, svg') && e.checkVisibility());
-  return { root: parseFloat(getComputedStyle(document.documentElement).fontSize), body: p ? parseFloat(getComputedStyle(p).fontSize) : 0 };
+  const p = [...document.querySelectorAll('main p')].find(
+    (e) => !e.closest('.eyebrow, .small, svg') && e.checkVisibility(),
+  );
+  return {
+    root: parseFloat(getComputedStyle(document.documentElement).fontSize),
+    body: p ? parseFloat(getComputedStyle(p).fontSize) : 0,
+  };
 };
 
 // two frames on: what the page lays out from script (ResizeObserver, a picked step) is in place. Motion is reduced.
 const FRAMES = () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
 
 async function open(browser, path, { w, h, zoom = 1, font }) {
-  const ctx = await browser.newContext({ viewport: { width: Math.round(w / zoom), height: Math.round(h / zoom) }, deviceScaleFactor: zoom, reducedMotion: 'reduce' });
+  const ctx = await browser.newContext({
+    viewport: { width: Math.round(w / zoom), height: Math.round(h / zoom) },
+    deviceScaleFactor: zoom,
+    reducedMotion: 'reduce',
+  });
   const pg = await ctx.newPage();
   if (font) {
     const cdp = await ctx.newCDPSession(pg);
@@ -152,7 +183,10 @@ for (const path of PATHS) {
         await plain.ctx.close();
         // on screen, in device pixels: CSS px × zoom
         const ratio = (size.body * c.zoom) / at100.body;
-        if (ratio < c.zoom * 0.98) found.push(`body text ${at100.body}px at 100%, ${size.body}px at ${c.zoom * 100}%: ${Math.round(ratio * 100)}% on screen, not ${c.zoom * 100}%`);
+        if (ratio < c.zoom * 0.98)
+          found.push(
+            `body text ${at100.body}px at 100%, ${size.body}px at ${c.zoom * 100}%: ${Math.round(ratio * 100)}% on screen, not ${c.zoom * 100}%`,
+          );
       }
       const r = await pg.evaluate(PROBE);
       // Home's Grow section shows one step's card and tags at a time: open each with its dot and read it
@@ -165,13 +199,17 @@ for (const path of PATHS) {
         }, i);
         await pg.evaluate(FRAMES);
         const s = await pg.evaluate(PROBE);
-        for (const k of ['clip', 'over', 'away']) r[k].push(...s[k].filter((x) => !r[k].includes(x)).map((x) => `(Grow step ${i + 1}) ${x}`));
+        for (const k of ['clip', 'over', 'away'])
+          r[k].push(...s[k].filter((x) => !r[k].includes(x)).map((x) => `(Grow step ${i + 1}) ${x}`));
         r.sideways = Math.max(r.sideways, s.sideways);
       }
       await ctx.close();
       found.push(...['clip', 'over', 'away'].filter((k) => r[k].length).map((k) => `${r[k].length} ${k}`));
       if (r.sideways > 0) found.push(`${r.sideways}px sideways`);
-      const lines = [`${pad(where, 20)} ${pad(c.n, 20)} root ${size.root}px body ${size.body}px  ` + (found.length ? found.join(', ') : 'ok')];
+      const lines = [
+        `${pad(where, 20)} ${pad(c.n, 20)} root ${size.root}px body ${size.body}px  ` +
+          (found.length ? found.join(', ') : 'ok'),
+      ];
       for (const k of ['clip', 'over', 'away']) {
         lines.push(...r[k].slice(0, 4).map((x) => `    ${k}: ${x}`));
         if (r[k].length > 4) lines.push(`    ${k}: … ${r[k].length - 4} more`);
@@ -200,7 +238,12 @@ const HEADS = () => {
   return out;
 };
 for (const path of PATHS) {
-  for (const [w, h] of [[1280, 720], [1440, 900], [1920, 1080], [2560, 1440]]) {
+  for (const [w, h] of [
+    [1280, 720],
+    [1440, 900],
+    [1920, 1080],
+    [2560, 1440],
+  ]) {
     test(`headings grow with zoom ${path} ${w}x${h}`, async ({ browser }) => {
       const at = [];
       for (const z of STEPS) {
@@ -209,17 +252,22 @@ for (const path of PATHS) {
         await ctx.close();
       }
       const px = (i, k) => Math.round(at[i][k] * STEPS[i] * 10) / 10; // on screen
-      const found = [], two = [];
+      const found = [],
+        two = [];
       for (const [k, one] of Object.entries(at[0])) {
         let last = 0; // the step it was last seen at
         STEPS.forEach((z, i) => {
           if (!i || !(k in at[i])) return;
-          if (px(i, k) < px(last, k) * 0.99) found.push(`${k}: ${px(last, k)}px on screen at ${Math.round(STEPS[last] * 100)}%, ${px(i, k)}px at ${Math.round(z * 100)}%`);
+          if (px(i, k) < px(last, k) * 0.99)
+            found.push(
+              `${k}: ${px(last, k)}px on screen at ${Math.round(STEPS[last] * 100)}%, ${px(i, k)}px at ${Math.round(z * 100)}%`,
+            );
           last = i;
         });
         if (k in at[5]) {
           two.push(Math.round((px(5, k) / one) * 100));
-          if (px(5, k) < one * FLOOR * 0.99) found.push(`${k}: ${one}px at 100%, ${px(5, k)}px on screen at 200% (under ${FLOOR * 100}%)`);
+          if (px(5, k) < one * FLOOR * 0.99)
+            found.push(`${k}: ${one}px at 100%, ${px(5, k)}px on screen at 200% (under ${FLOOR * 100}%)`);
         }
       }
       const line = `${pad(path, 20)} ${w}x${h}  at 200%: ${two.length ? `${Math.min(...two)}% to ${Math.max(...two)}%` : '-'}`;

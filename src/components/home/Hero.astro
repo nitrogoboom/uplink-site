@@ -17,62 +17,114 @@ import HoldButton from '../HoldButton.astro';
 // the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
-  { href: '/contact#message', book: true, img: 'security', tag: 'Free', tone: 'accent', title: 'IT and security check-up', line: '30 minutes. We look first, then quote.' },
-  { href: '/soon#windows-10-guide', book: false, img: 'cloud', tag: 'Guide', tone: 'sky', title: 'Windows 10 support has ended', line: 'Your upgrade plan, step by step' },
+  {
+    href: '/contact#message',
+    book: true,
+    img: 'security',
+    tag: 'Free',
+    tone: 'accent',
+    title: 'IT and security check-up',
+    line: '30 minutes. We look first, then quote.',
+  },
+  {
+    href: '/soon#windows-10-guide',
+    book: false,
+    img: 'cloud',
+    tag: 'Guide',
+    tone: 'sky',
+    title: 'Windows 10 support has ended',
+    line: 'Your upgrade plan, step by step',
+  },
 ];
 // the menu under the button: the featured services (each its own page), then all of them. A list, not a <nav>:
 // the header holds the one main menu.
 const featured = (await getServices()).filter((s) => s.data.featured);
 const menu = [
   ...featured.map(({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card })),
-  { href: PAGES.services.path, icon: 'grid' as IconName, title: 'All services', sub: 'Help desk, security, cloud, networks, phones' },
+  {
+    href: PAGES.services.path,
+    icon: 'grid' as IconName,
+    title: 'All services',
+    sub: 'Help desk, security, cloud, networks, phones',
+  },
 ];
 const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
 ---
+
 <section class="hero fold fold-always" id="top" aria-labelledby="hero-title">
   <div class="container hero-grid">
     <div class="hero-menu">
       <div class="hero-top">
-        <p class="eyebrow"><span>Managed IT<Sep />Ontario</span></p>
+        <p class="eyebrow">
+          <span>Managed IT<Sep />Ontario</span>
+        </p>
         <h1 id="hero-title"><span class="line">Your IT team,</span> <em class="line">always online</em></h1>
-      <p class="lead"><span class="lead-long">We run the technology behind your business: help desk, security, cloud, network and phones. You run the business.</span><span class="lead-short">We run your IT: help desk, security, cloud, network and phones.</span></p>
+        <p class="lead">
+          <span class="lead-long"
+            >We run the technology behind your business: help desk, security, cloud, network and phones. You run the
+            business.</span
+          ><span class="lead-short">We run your IT: help desk, security, cloud, network and phones.</span>
+        </p>
       </div>
       <div class="hero-cta">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Get started<Icon name="arrow" /></a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog"
+          >Get started<Icon name="arrow"
+        /></a>
         <span class="small muted">Free check-up. No contract to look.</span>
       </div>
       <div class="hero-services">
         <p class="label menu-label" id="hero-menu-label">Services</p>
         <ul class="menu" aria-labelledby="hero-menu-label">
-          {menu.map(({ href, icon, title, sub }) => (
-            <li>
-              <a class="mi" href={href}>
-                <span class="icon-tile" aria-hidden="true"><Icon name={icon} /></span>
-                <span class="mi-text"><span class="mi-title">{title}</span><Pause /><span class="mi-sub">{sub}</span></span>
-                <Icon name="chevronR" class="mi-go" />
-              </a>
-            </li>
-          ))}
+          {menu.map(({ href, icon, title, sub }) => <li>
+            <a class="mi" href={href}>
+              <span class="icon-tile" aria-hidden="true"><Icon name={icon} /></span>
+              <span class="mi-text"
+                ><span class="mi-title">{title}</span><Pause /><span class="mi-sub">{sub}</span></span
+              >
+              <Icon name="chevronR" class="mi-go" />
+            </a>
+          </li>)}
         </ul>
       </div>
     </div>
 
     <div class="hero-art">
-      <div class="stage" data-hero={HERO.full} data-hero-tablet={HERO.tablet} data-hero-phone={HERO.phone} data-hero-phone-flows={HERO.phoneFlows} data-tablet={HERO.media.tablet}>
-        <noscript><picture><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></noscript>
+      <div
+        class="stage"
+        data-hero={HERO.full}
+        data-hero-tablet={HERO.tablet}
+        data-hero-phone={HERO.phone}
+        data-hero-phone-flows={HERO.phoneFlows}
+        data-tablet={HERO.media.tablet}
+      >
+        <noscript
+          ><picture
+            ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
+            <img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"
+          /></picture></noscript
+        >
         <!-- the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) -->
-        <template class="hero-still"><picture><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900"><img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"></picture></template>
+        <template class="hero-still"
+          ><picture
+            ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
+            <img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"
+          /></picture></template
+        >
         <Fragment set:html={flows} />
         <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
         <HoldButton class="hero-pause" />
       </div>
       <div class="hero-dock">
-        {news.map((n) => (
-          <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
-            <span class="news-thumb well"><img src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" fetchpriority="low"></span>
-            <span class="news-text"><span class="news-title">{n.title}</span><Pause /><span class={`news-tag news-tag--${n.tone}`}>{n.tag}</span><Pause /><span class="small muted">{n.line}</span></span>
-          </a>
-        ))}
+        {news.map((n) => <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
+          <span class="news-thumb well"
+            ><img src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" fetchpriority="low"
+          /></span>
+          <span class="news-text"
+            ><span class="news-title">{n.title}</span
+            ><Pause /><span class={`news-tag news-tag--${n.tone}`}>{n.tag}</span
+            ><Pause /><span class="small muted">{n.line}</span></span
+          >
+        </a>)}
       </div>
     </div>
   </div>
