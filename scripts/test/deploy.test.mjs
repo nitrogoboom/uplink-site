@@ -72,7 +72,7 @@ const deploy = async ({ smoke = 'none', args = [], deployExit = 0, deployLands =
   const live = await serve(() => (liveBuild || ((s) => (s === 'deployed' ? 'new' : 'old')))(now()));
   try {
     const child = spawn(process.execPath, ['scripts/deploy.mjs', address(live), ...args], {
-      env: { ...process.env, DEPLOY_WRANGLER: tool('wrangler', WRANGLER), DEPLOY_SMOKE: tool('smoke', SMOKE), DEPLOY_POLL: '0',
+      env: { ...process.env, DEPLOY_WRANGLER: tool('wrangler.cjs', WRANGLER), DEPLOY_SMOKE: tool('smoke.cjs', SMOKE), DEPLOY_POLL: '0',
         DEPLOY_WAIT: '1', DEPLOY_SETTLE: '0', DEPLOY_RETRY: '0', ...env, FAKE_LOG: log, FAKE_STATE: state, FAKE_SMOKE_FAIL: smoke, FAKE_PREVIEW: address(preview),
         FAKE_DEPLOY_EXIT: String(deployExit), FAKE_DEPLOY_LANDS: deployLands, GITHUB_STEP_SUMMARY: summary, GITHUB_SHA: 'abc123def4567890',
         CLOUDFLARE_API_TOKEN: 'fake-token', CLOUDFLARE_ACCOUNT_ID: 'fake-account' },

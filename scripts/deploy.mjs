@@ -50,7 +50,11 @@ const POLL = Number(process.env.DEPLOY_POLL ?? 5);
 const WAIT = Number(process.env.DEPLOY_WAIT ?? 120);    // seconds by the clock; each ask gives up after 15 s
 const SETTLE = Number(process.env.DEPLOY_SETTLE ?? 15);
 const RETRY = Number(process.env.DEPLOY_RETRY ?? 30);
-const command = (name, fallback) => (process.env[name] ? [process.env[name]] : fallback);
+// a .cjs fake (the test's) runs under this Node, so it needs no shebang and runs on Windows too
+const command = (name, fallback) => {
+  const cmd = process.env[name];
+  return cmd ? (cmd.endsWith('.cjs') ? [process.execPath, cmd] : [cmd]) : fallback;
+};
 const WRANGLER = command('DEPLOY_WRANGLER', [process.execPath, join(ROOT, 'node_modules/wrangler/bin/wrangler.js')]);
 const SMOKE = command('DEPLOY_SMOKE', [process.execPath, join(ROOT, 'scripts/check.mjs'), 'smoke']);
 const CLOUDFLARE = ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID'];   // wrangler's; the smoke runs never need them

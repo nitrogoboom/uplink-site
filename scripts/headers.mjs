@@ -62,7 +62,7 @@ const attrs = [];
 const styleBlocks = (file, text) => {
   for (const m of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) styles.add(sha(m[1]));
   const n = [...text.matchAll(/<[a-zA-Z][^>]*\sstyle=["']/g)].length;   // inside a tag, not prose about one
-  if (n) attrs.push(`${relative(DIST, file)} (${n})`);
+  if (n) attrs.push(`${relative(DIST, file).split(sep).join('/')} (${n})`);
 };
 for (const file of pages) {
   const html = readFileSync(file, 'utf-8');
