@@ -1,10 +1,16 @@
-"""Light-mode copies of the drawings the light Home test page (/light) shows.
+"""Light theme for the drawings (Settings, light or dark; docs/light-theme-2026-11-08.md).
 
     python tools/gen_light.py           write them
-    python tools/gen_light.py --check   fail if a written copy differs from what this script makes now
+    python tools/gen_light.py --check   fail if a written file differs from what this script makes now
 
-The dark drawings stay the source: each light copy is the dark SVG with its colours swapped, so a change to a
-gen_*.py reaches the light copy on the next run of this script. Nothing else changes (shapes, classes, timings).
+The dark drawings stay the source: a change to a gen_*.py reaches the light theme on the next run of this script
+(tools/regen.py runs it last). Two outputs, one colour table:
+  - Pictures (<img>, <picture>): NAME-light.svg beside each dark NAME.svg in public/assets/img/, the dark SVG with its
+    colours swapped. Drawing.astro shows one or the other by theme.
+  - Drawings inside the page (the Home hero, which home.js fetches in, its dashes, and the Grow world): no copies.
+    src/styles/theme-drawings.css swaps their colours with CSS when <html data-theme="light">: an attribute
+    selector per colour (author CSS beats an SVG's fill="" attribute), and a light copy of each colour rule in the
+    drawings' own <style>. So the switch is instant, and home.js and grow.js keep one drawing.
 
 How a colour is swapped (docs/palette.md, light columns of 5.1 and 5.4):
   1. Roles with a light value in the palette take it (box faces, blue and green boxes, ground, grid, edges).
@@ -14,8 +20,6 @@ How a colour is swapped (docs/palette.md, light columns of 5.1 and 5.4):
   4. Any other navy shade (5.5) keeps its place between the box faces: its dark lightness is mapped onto the light
      box faces' lightness (right 0.295 -> 0.81, left 0.375 -> 0.88, top 0.455 -> 1.0) and redrawn with navy(L).
 Screens stay dark (a monitor is dark in a lit room too), so what is drawn on them keeps its dark-mode colours.
-
-Writes NAME-light.svg next to each source (public/assets/img/, src/components/home/).
 """
 import pathlib
 import re
@@ -28,12 +32,23 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 IMG = ROOT / 'public' / 'assets' / 'img'
 HOME = ROOT / 'src' / 'components' / 'home'
 
-SOURCES = [IMG / n for n in (
-    'hero-office.svg', 'hero-office-tablet.svg', 'hero-office-phone.svg', 'office-compact-build.svg',
-    'office-compact-flows.svg', 'office.svg',
-    'backup-card.svg', 'cloud-card.svg', 'helpdesk-card.svg', 'network-card.svg', 'office-card.svg',
-    'security-card.svg', 'strategy-card.svg', 'voip-card.svg',
-)] + [HOME / 'grow-world.svg', HOME / 'hero-flows.svg']
+CSS_OUT = ROOT / 'src' / 'styles' / 'theme-drawings.css'
+
+# drawings that live inside the page, by the box that holds them (the CSS's scope); office: a gen_office.py drawing
+INLINE = [
+    ('.hero-art', True, [IMG / 'hero-office.svg', IMG / 'hero-office-tablet.svg', IMG / 'office-compact-build.svg',
+                         IMG / 'office-compact-flows.svg', HOME / 'hero-flows.svg']),
+    ('.grow-stage', False, [HOME / 'grow-world.svg']),
+]
+_INLINE_NAMES = {p.name for _, _, files in INLINE for p in files}
+
+
+def picture_sources():
+    """Every drawing shown as a picture: the SVGs in public/assets/img/ that aren't inlined, the footer map (styled
+    by footer.css from the tokens) or a light copy."""
+    return sorted(p for p in IMG.glob('*.svg')
+                  if p.name not in _INLINE_NAMES and p.name != 'campus.svg' and not p.stem.endswith('-light'))
+
 
 # 1-3: fixed swaps, any attribute. Keys and values upper case.
 SWAP = {
@@ -135,11 +150,68 @@ def target(src):
     return src.with_name(src.stem + '-light.svg')
 
 
+def is_office(src):
+    return src.name.startswith(('office', 'hero-office'))
+
+
+def _css(hex_):
+    """A colour as the site's CSS writes it (stylelint): lower case, short where it can be."""
+    return _forms(hex_)[-1]
+
+
+def _forms(hex_):
+    """The colour as an attribute selector value. SVGO writes colours in lower case, and short where it can."""
+    h = hex_.lower()
+    short = '#' + h[1] + h[3] + h[5] if h[1] == h[2] and h[3] == h[4] and h[5] == h[6] else None
+    return [h] + ([short] if short else [])
+
+
+def inline_css():
+    """theme-drawings.css: the light colours for the drawings inside the page."""
+    out = ['/* Written by tools/gen_light.py: do not edit by hand. The light theme colours for the drawings inside',
+           '   the page (the Home hero and the Grow world); src/styles/global.css imports it. Attribute rules sit in',
+           '   :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */']
+    for scope, office, files in INLINE:
+        uses = set()      # (attribute, colour, kind)
+        rules = []        # (selector, property, colour) from the drawings' own <style>
+        for src in files:
+            svg = src.read_text(encoding='utf-8')
+            for m in TAG.finditer(svg):
+                for a in ATTR.finditer(m.group(0)):
+                    uses.add((a.group(1), a.group(2).upper(), kind_of(a.group(1), m.group(1))))
+            # home.js writes the phone captions' colours (data-items) as a title's fill and its line's stroke
+            for c in re.findall(r'&quot;c&quot;:&quot;(#[0-9A-Fa-f]{6})&quot;', svg):
+                uses |= {('fill', c.upper(), 'text'), ('fill', c.upper(), 'fill'), ('stroke', c.upper(), 'stroke')}
+            for s in re.findall(r'<style[^>]*>(.*?)</style>', svg, flags=re.S):
+                for sel, body in re.findall(r'([^{}@]+)\{([^{}]*)\}', s):
+                    for prop, col in CSS.findall(body):
+                        rules.append((sel.strip(), prop, col.upper()))
+        root = f":where(:root[data-theme='light'] {scope})"
+        out.append(f'\n/* {scope}: {", ".join(p.name for p in files)} */')
+        for attr, col, kind in sorted(uses, key=lambda u: (u[2] == 'text', u)):
+            new = swap(col, kind, office)
+            if new.upper() == col:
+                continue
+            tag = ':is(text, tspan)' if kind == 'text' else ''
+            sels = ',\n'.join(f"{root} {tag}[{attr}='{f}' i]" for f in _forms(col))
+            out.append(f'{sels} {{\n  {attr}: {_css(new)};\n}}')
+        seen = set()
+        for sel, prop, col in rules:
+            new = swap(col, 'stroke' if prop == 'stroke' else 'fill', office)
+            key = (sel, prop)
+            if new.upper() == col or key in seen:
+                continue
+            seen.add(key)
+            scoped = ',\n'.join(f":root[data-theme='light'] {scope} {s.strip()}" for s in sel.split(','))
+            out.append(f'{scoped} {{\n  {prop}: {_css(new)};\n}}')
+    return '\n'.join(out) + '\n'
+
+
 def main(check=False):
+    files = {target(src): lighten(src.read_text(encoding='utf-8'), office=is_office(src)) for src in picture_sources()}
+    files[CSS_OUT] = inline_css()
     bad = []
-    for src in SOURCES:
-        out = lighten(src.read_text(encoding='utf-8'), office=src.name.startswith(('office', 'hero-office')))
-        dst = target(src)
+    for dst, out in files.items():
         if check:
             if not dst.exists() or dst.read_text(encoding='utf-8') != out:
                 bad.append(str(dst.relative_to(ROOT)))

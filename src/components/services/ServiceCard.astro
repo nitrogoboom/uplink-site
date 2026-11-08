@@ -6,6 +6,7 @@
 //   on        shown (kept from the picker's styles in service-card.css)
 //   first     the drawing loads eagerly
 //   heading   h1 on the service's own page. "What's included" and "Best for" are one level down.
+import Drawing from '../Drawing.astro';
 import type { CollectionEntry } from 'astro:content';
 import { fit } from '../../lib/fit';
 import './service-card.css';
@@ -34,17 +35,15 @@ const two = (k: number) => String(k).padStart(2, '0');
       <div class="tags">
         <span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span>
       </div>
-      <picture>
-        <source media="(width < 75em)" srcset={`/assets/img/${s.image}-compact.svg`} />
-        <img
-          src={`/assets/img/${s.image}.svg`}
-          fetchpriority={first ? 'high' : undefined}
-          loading={first ? undefined : 'lazy'}
-          alt={s.alt}
-          width="640"
-          height="480"
-        />
-      </picture>
+      <Drawing
+        src={`/assets/img/${s.image}.svg`}
+        sources={[{ media: '(width < 75em)', srcset: `/assets/img/${s.image}-compact.svg` }]}
+        fetchpriority={first ? 'high' : undefined}
+        loading="lazy"
+        alt={s.alt}
+        width="640"
+        height="480"
+      />
     </div>
   </div>
   <div class="picker-detail">

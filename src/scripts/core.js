@@ -312,6 +312,49 @@ holdBtns.forEach((b) =>
 showHold();
 reduceMotion.addEventListener('change', showHold);
 
+/* ---------- theme (Settings: System, Light or Dark) --------------------- */
+// html[data-theme] is "light" or "dark"; theme-light.css holds the light colours. Base.astro's head script sets it
+// before the page paints, from the saved choice or the device's setting; this keeps it right after that: a choice in
+// Settings applies at once and is saved, System follows the device when it changes (prefers-color-scheme), another
+// tab's choice arrives by the storage event, and a page restored from the back/forward cache re-reads it (review
+// J12). Without script the page stays dark. Drawings follow by CSS; theme.ev's 'change' is for parts a script drew
+// in one colour (home.js's hero captions).
+const THEME_KEY = 'uplink.theme';
+const THEMES = ['system', 'light', 'dark'];
+const deviceLight = window.matchMedia('(prefers-color-scheme: light)');
+const theme = { ev: new EventTarget() };
+const themeChoice = () => {
+  const t = store.get(THEME_KEY);
+  return t && THEMES.includes(t) ? t : 'system';
+};
+const themeInputs = /** @type {HTMLInputElement[]} */ ($$('input[name="theme"]'));
+const applyTheme = () => {
+  const choice = themeChoice();
+  const t = choice === 'system' ? (deviceLight.matches ? 'light' : 'dark') : choice;
+  themeInputs.forEach((i) => {
+    i.checked = i.value === choice;
+  });
+  if (root.dataset.theme === t) return;
+  root.dataset.theme = t;
+  // the page colour, for the browser's own bar (as Base.astro's head script)
+  $('meta[name="theme-color"]')?.setAttribute('content', t === 'light' ? '#F2F7FC' : '#0E1A27');
+  theme.ev.dispatchEvent(new Event('change'));
+};
+themeInputs.forEach((i) =>
+  i.addEventListener('change', () => {
+    store.set(THEME_KEY, i.value);
+    applyTheme();
+  }),
+);
+deviceLight.addEventListener('change', applyTheme);
+window.addEventListener('storage', (e) => {
+  if (e.key === THEME_KEY) applyTheme();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) applyTheme();
+});
+applyTheme();
+
 /* ======================================================================
    Keyboard shortcuts
    ====================================================================== */
@@ -539,4 +582,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, held, html, reduceMotion, replay, toast, openDialog, shortcutsOn, whenOnScreen };
+export { $, $$, held, html, reduceMotion, replay, theme, toast, openDialog, shortcutsOn, whenOnScreen };

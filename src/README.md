@@ -38,7 +38,6 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `type` | The page's schema.org type, such as `FAQPage` or `AboutPage`. |
 | `ldPage` | More fields merged into the page's own JSON-LD node. |
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
-| `theme` | `'light'` sets `<html data-theme="light">` and a light `theme-color`. Only `/light` uses it; the page also imports `styles/theme-light.css`, which holds the light tokens. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
 The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
@@ -59,7 +58,8 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
 | `Footer.astro` | The footer: one `<nav aria-label="Footer">` of six `<details name="footer">` sections (the summary is the tile, the rest its panel), the campus map, and the base bar, from `data/footer.json` (through `lib/footer.ts`) and the services collection. CSS lays it out (`styles/footer.css`). |
-| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the keyboard-shortcuts switch. Text size is the browser's own zoom. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the theme (System, Light or Dark: radios in a fieldset, `.seg` in `forms.css`) and the keyboard-shortcuts switch. Text size is the browser's own zoom. |
+| `Drawing.astro` | A drawing shown as a picture, in both themes: the dark `NAME.svg` and the light `NAME-light.svg`, one hidden by `theme-light.css`. Takes `src`, optional `sources` (a `<picture>`'s cuts), and the `<img>`'s own attributes. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
 | `HoldButton.astro` | A pause button for animations. Every pause button on the page shares one state (see `core.js`). |
@@ -94,7 +94,7 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 
 `styles/global.css` imports the shared stylesheets in cascade order. Order matters: when two rules tie, the later file wins. The order is:
 
-1. Foundations: `tokens.css`, `fonts.css`, `base.css`, `layout.css`, and `type.css`.
+1. Foundations: `tokens.css`, the light theme (`theme-light.css`, `theme-drawings.css`), `fonts.css`, `base.css`, `layout.css`, and `type.css`.
 2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
 3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares, and `.fold-foot` for content after a section's main block), and `compact-cuts.css`. A one-screen section is one screen as a floor (`min-height: var(--fold-inner)`): its picture takes the height its words leave, down to a floor in rem, and longer words make the section taller.
 4. Blocks more than one page uses: `hero-section.css` (the `.hero` section: Home's hero, the service and case-study pages; Home's own hero layout is `components/home/hero.css`), `facts.css`, and `detail-pages.css`.
@@ -104,7 +104,7 @@ Each section's desktop layout sits at the end of its own CSS file, so it always 
 
 All colours, sizes, and timings are tokens in `styles/tokens.css`. Use the tokens; don't type values in.
 
-The light theme (test, `/light` only) is `styles/theme-light.css`: the palette's light values for the same tokens, on `:root[data-theme='light']`, plus a few Home rules the swap alone doesn't cover. Only `light.astro` imports it, so the dark pages don't carry it.
+The site has a light and a dark theme (Settings: System, Light or Dark). `html[data-theme]` is `light` or `dark`: `Base.astro`'s head script sets it before the page paints, from the saved choice (`uplink.theme`) or the device's setting, and `core.js` keeps it right after that (a choice, a change of device setting, another tab, the back/forward cache). Without script the page is dark. `tokens.css` holds the dark values (the drawings read them, `tools/palette.py`). `styles/theme-light.css` holds the light values of the same tokens on `:root[data-theme='light']`, the few rules a token swap alone doesn't cover, and the rule that shows a picture's theme copy. `styles/theme-drawings.css` recolours the drawings inside the page (the Home hero and Grow); `tools/gen_light.py` writes it. Pictures go through `components/Drawing.astro`. Why each light value differs from the palette: `docs/light-theme-2026-11-08.md`.
 
 The visitor's display settings: with "increase contrast" on (`prefers-contrast: more`), `tokens.css` raises the faint lines (`--c-line`, `--c-line-2`) to `--c-edge` (3:1). In forced colours (Windows contrast themes), the theme paints fills away, so a state shown only by a fill (a current dot, step, tab or pressed icon) opts out of the forcing (`forced-color-adjust: none`) and takes the theme's system colours (`Highlight` and `HighlightText` for the current one, `GrayText` or `CanvasText` for the rest). Each sits in a `@media (forced-colors: active)` block beside the rule it fixes; the site check tests them (B4).
 
@@ -134,7 +134,7 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 
 | Script | Where it runs | What it does |
 | --- | --- | --- |
-| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
+| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the theme (`theme.ev` says when it changes), the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
 | `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. On desktop it rounds any Home section whose words make it taller than its one-screen floor up to the next 100px wheel step, so every section still starts on the wheel grid. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |

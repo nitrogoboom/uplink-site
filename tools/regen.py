@@ -1,6 +1,6 @@
 """Run every drawing generator, then (with --check) every drawing check.
 
-    python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py, then their 16 light copies (gen_light.py)
+    python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py, then the light theme (gen_light.py)
     python tools/regen.py --check    # then check.py and painter.py, as each rules_NAME.py lists them
     python tools/regen.py --checks-only
 

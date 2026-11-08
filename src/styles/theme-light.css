@@ -1,8 +1,11 @@
 /* ==========================================================================
-   Light theme (test): the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens.
-   Only the light Home copy (/light) imports this, and only <html data-theme="light"> takes it, so the dark site is
-   unchanged. Screen only: print keeps its own colours (tokens.css). Where the palette's light value didn't hold up
-   on Home, the change and the reason are noted beside it (docs/light-theme-2026-11-08.md).
+   Light theme: the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens.
+   It applies when <html data-theme="light">: the visitor chose Light in Settings, or chose System (the default) and
+   their device is set to light. Base.astro's head script sets the attribute before the page paints; core.js changes
+   it. Without script the page stays dark, the site's own look. Screen only: print keeps its own colours
+   (tokens.css). Where the palette's light value didn't hold up, the change and the reason are noted beside it
+   (docs/light-theme-2026-11-08.md). The drawings: theme-drawings.css (inside the page) and .th-dark / .th-light
+   (pictures, Drawing.astro), at the end.
    ========================================================================== */
 
 @media screen {
@@ -82,7 +85,7 @@
   }
 }
 
-/* ---- Home fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
+/* ---- fixes the palette swap alone doesn't cover -------------------------------------------------------------- */
 @media screen {
   /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
      (#fff on #b24438 5.6:1, on #004f2e 9.7:1; the dark label was 3.2:1 on red) */
@@ -97,4 +100,11 @@
   :root[data-theme='light'] .grow-item.is-done :is(.grow-item-t, .grow-item-m) {
     opacity: 1;
   }
+}
+
+/* Pictures: Drawing.astro writes the dark and the light copy of a drawing; only the theme's own shows. Both are
+   lazy where the drawing was, and a lazy picture that isn't shown isn't fetched. Without script: dark. */
+:root:not([data-theme='light']) .th-light,
+:root[data-theme='light'] .th-dark {
+  display: none;
 }

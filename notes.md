@@ -2,8 +2,9 @@
 
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
-## Light theme (test)
-- [ ] Look at `/light` (a light copy of Home) and decide: make light/dark a Settings option for every page, or drop it. What changed from the palette and why: `docs/light-theme-2026-11-08.md`.
+## Light theme
+- [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
+- [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
 ## Review of November 7, 2026
 - [ ] Finish `docs/review-2026-11-07.md`: only C12 is left (merge the docs, trim file headers). Status lives in that file.

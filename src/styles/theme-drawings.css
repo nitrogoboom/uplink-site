@@ -1,0 +1,377 @@
+/* Written by tools/gen_light.py: do not edit by hand. The light theme colours for the drawings inside
+   the page (the Home hero and the Grow world); src/styles/global.css imports it. Attribute rules sit in
+   :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
+
+/* .hero-art: hero-office.svg, hero-office-tablet.svg, office-compact-build.svg, office-compact-flows.svg, hero-flows.svg */
+:where(:root[data-theme='light'] .hero-art) [fill='#0e1a27' i] {
+  fill: #f2f7fc;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#182430' i] {
+  fill: #222e3a;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#182431' i] {
+  fill: #dce2e8;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#198152' i] {
+  fill: #00683f;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#222e3a' i] {
+  fill: #bbc2c9;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#25313d' i] {
+  fill: #c0c6cd;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#28333f' i] {
+  fill: #c3cad1;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#283440' i] {
+  fill: #c5cbd2;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#293440' i] {
+  fill: #c5cbd2;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2a3541' i] {
+  fill: #c6cdd3;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2b3642' i] {
+  fill: #c8ced5;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2c3743' i] {
+  fill: #cad0d6;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2d3844' i] {
+  fill: #cbd1d8;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2e3945' i] {
+  fill: #cdd3d9;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2f3a46' i] {
+  fill: #ced4da;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#2f3b47' i] {
+  fill: #cfd5dc;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#313c48' i] {
+  fill: #d1d7dd;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#333d49' i] {
+  fill: #d3d9df;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#343f4b' i] {
+  fill: #d6dce2;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#353f4b' i] {
+  fill: #d6dce2;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#37414d' i] {
+  fill: #d9dfe5;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#37424e' i] {
+  fill: #d2d8de;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#39434f' i] {
+  fill: #dce2e8;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#3a4450' i] {
+  fill: #dee3e9;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#3a4551' i] {
+  fill: #dfe4eb;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#3c4753' i] {
+  fill: #e2e7ee;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#3e4955' i] {
+  fill: #e5eaf0;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#3f4a56' i] {
+  fill: #e6ecf2;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#404b57' i] {
+  fill: #e8edf3;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#414b57' i] {
+  fill: #e8eef4;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#424d59' i] {
+  fill: #ebf0f6;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#444e5a' i] {
+  fill: #edf2f7;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#444f5b' i] {
+  fill: #eef3f8;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#46505c' i] {
+  fill: #f0f5fa;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#46515d' i] {
+  fill: #f1f6fb;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#47515d' i] {
+  fill: #f1f6fb;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#48525e' i] {
+  fill: #f3f8fd;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#49535f' i] {
+  fill: #f4f9fe;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#4a5460' i] {
+  fill: #f6fbff;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#4b5561' i] {
+  fill: #f7fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#4c5662' i] {
+  fill: #f8fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#4d5763' i] {
+  fill: #f8fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#4d5863' i] {
+  fill: #fff;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#97c8ea' i] {
+  fill: #4a93c1;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#a9e9c3' i] {
+  fill: #198152;
+}
+:where(:root[data-theme='light'] .hero-art) [fill='#fff5ec' i] {
+  fill: #7c4900;
+}
+:where(:root[data-theme='light'] .hero-art) [stop-color='#2c3844' i] {
+  stop-color: #cbd1d7;
+}
+:where(:root[data-theme='light'] .hero-art) [stop-color='#3d4853' i] {
+  stop-color: #e3e9ef;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#0e1a27' i] {
+  stroke: #f2f7fc;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#28333f' i] {
+  stroke: #c3cad1;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#293440' i] {
+  stroke: #c5cbd2;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2a3541' i] {
+  stroke: #c6cdd3;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2b3642' i] {
+  stroke: #c8ced5;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2b3743' i] {
+  stroke: #c5ccd3;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2c3743' i] {
+  stroke: #cad0d6;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2d3844' i] {
+  stroke: #cbd1d8;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2e3945' i] {
+  stroke: #cdd3d9;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#2f3a46' i] {
+  stroke: #ced4da;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#313c48' i] {
+  stroke: #d1d7dd;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#333d49' i] {
+  stroke: #d3d9df;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#343f4b' i] {
+  stroke: #d6dce2;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#353f4b' i] {
+  stroke: #d6dce2;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#37414d' i] {
+  stroke: #d9dfe5;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#39434f' i] {
+  stroke: #dce2e8;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#3a4450' i] {
+  stroke: #dee3e9;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#3a4551' i] {
+  stroke: #dfe4eb;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#3c4753' i] {
+  stroke: #e2e7ee;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#3e4955' i] {
+  stroke: #e5eaf0;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#404b57' i] {
+  stroke: #e8edf3;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#414b57' i] {
+  stroke: #e8eef4;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#424d59' i] {
+  stroke: #ebf0f6;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#444e5a' i] {
+  stroke: #edf2f7;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#46505c' i] {
+  stroke: #f0f5fa;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#46515d' i] {
+  stroke: #f1f6fb;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#47515d' i] {
+  stroke: #f1f6fb;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#48525e' i] {
+  stroke: #f3f8fd;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#49535f' i] {
+  stroke: #f4f9fe;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#4a5460' i] {
+  stroke: #f6fbff;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#4b5561' i] {
+  stroke: #f7fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#4c5662' i] {
+  stroke: #f8fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#4d5763' i] {
+  stroke: #f8fcff;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#97c8ea' i] {
+  stroke: #1f75a6;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#e6ecf2' i] {
+  stroke: #37424e;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#f2f7fc' i] {
+  stroke: #0e1a27;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#ffad51' i] {
+  stroke: #c37600;
+}
+:where(:root[data-theme='light'] .hero-art) [stroke='#fff5ec' i] {
+  stroke: #7c4900;
+}
+:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#97c8ea' i] {
+  fill: #005d8a;
+}
+:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#a9e9c3' i] {
+  fill: #004f2e;
+}
+:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#bbc2c9' i] {
+  fill: #4d5863;
+}
+:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#f2f7fc' i] {
+  fill: #0e1a27;
+}
+:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#ffad51' i] {
+  fill: #88520a;
+}
+:root[data-theme='light'] .hero-art .ob-tile .f-l {
+  fill: #d2d8de;
+}
+:root[data-theme='light'] .hero-art .ob-tile .f-r {
+  fill: #bbc2c9;
+}
+:root[data-theme='light'] .hero-art .ob-tile .f-t {
+  fill: #fff;
+}
+:root[data-theme='light'] .hero-art .ob-tile .f-l,
+:root[data-theme='light'] .hero-art .ob-tile .f-r,
+:root[data-theme='light'] .hero-art .ob-tile .f-t {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .ob-tile .f-ic {
+  stroke: #0e1a27;
+}
+:root[data-theme='light'] .hero-art .ob-tile.is-on .f-l,
+:root[data-theme='light'] .hero-art .ob-tile.is-on .f-r,
+:root[data-theme='light'] .hero-art .ob-tile.is-on .f-t {
+  stroke: #7c4900;
+}
+:root[data-theme='light'] .hero-art .ob-tile.is-on .f-ic {
+  stroke: #f2f7fc;
+}
+:root[data-theme='light'] .hero-art .ob-seg {
+  fill: #198152;
+}
+
+/* .grow-stage: grow-world.svg */
+:where(:root[data-theme='light'] .grow-stage) [fill='#0e1a27' i] {
+  fill: #f2f7fc;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#182430' i] {
+  fill: #222e3a;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#198152' i] {
+  fill: #00683f;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#1f2b37' i] {
+  fill: #b7bdc5;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#222e3a' i] {
+  fill: #bbc2c9;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#25303c' i] {
+  fill: #bfc5cc;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#283440' i] {
+  fill: #c5cbd2;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#37424e' i] {
+  fill: #d2d8de;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#414c58' i] {
+  fill: #bbc2c9;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#4d5863' i] {
+  fill: #fff;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#535d68' i] {
+  fill: #d2d8de;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#656f78' i] {
+  fill: #fff;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#73afd9' i] {
+  fill: #005d8a;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#97c8ea' i] {
+  fill: #4a93c1;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#a9e9c3' i] {
+  fill: #198152;
+}
+:where(:root[data-theme='light'] .grow-stage) [fill='#b7ddf8' i] {
+  fill: #97c8ea;
+}
+:where(:root[data-theme='light'] .grow-stage) [stop-color='#97c8ea' i] {
+  stop-color: #4a93c1;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#0e1a27' i] {
+  stroke: #f2f7fc;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#2b3743' i] {
+  stroke: #c5ccd3;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#97c8ea' i] {
+  stroke: #1f75a6;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#e6ecf2' i] {
+  stroke: #37424e;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#ffad51' i] {
+  stroke: #c37600;
+}
+:where(:root[data-theme='light'] .grow-stage) [stroke='#fff5ec' i] {
+  stroke: #7c4900;
+}

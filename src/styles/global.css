@@ -3,6 +3,8 @@
    A section's own CSS, desktop layout included, sits next to its component (src/components/<page>/*.css) and is
    imported there; a block more than one page uses lives here. ---*/
 @import './tokens.css';
+@import './theme-light.css'; /* the light theme's tokens (Settings) */
+@import './theme-drawings.css'; /* its colours for the drawings inside the page (tools/gen_light.py) */
 @import './fonts.css';
 @import './base.css';
 @import './layout.css';

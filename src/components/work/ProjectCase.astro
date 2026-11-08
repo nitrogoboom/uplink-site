@@ -1,5 +1,6 @@
 ---
 // One project in full: the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
+import Drawing from '../Drawing.astro';
 import { getEntries, type CollectionEntry } from 'astro:content';
 import { svgSize } from '../../lib/site';
 import { fit } from '../../lib/fit';
@@ -18,7 +19,13 @@ const size = svgSize(`${p.image}.svg`);
   <div class="case">
     <div class="case-fig">
       <div class="case-img well">
-        <img src={`/assets/img/${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy" />
+        <Drawing
+          src={`/assets/img/${p.image}.svg`}
+          alt={p.alt}
+          width={size.width}
+          height={size.height}
+          loading="lazy"
+        />
       </div>
     </div>
     <div class="stack">

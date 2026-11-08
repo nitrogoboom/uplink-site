@@ -7,7 +7,6 @@ import './work.css';
 import ProjectCard from '../work/ProjectCard.astro';
 import { getProjects } from '../../lib/site';
 const projects = (await getProjects()).slice(0, 3);
-const { light = false } = Astro.props as { light?: boolean }; // the light test page (/light)
 ---
 
 <section class="section section--band fold" id="work" aria-labelledby="work-title">
@@ -20,7 +19,7 @@ const { light = false } = Astro.props as { light?: boolean }; // the light test 
       <a class="link-arrow" href="/work">See all work<Icon name="arrow" /></a>
     </div>
     <ul class="card-row">
-      {projects.map((project) => <li><ProjectCard project={project} light={light} /></li>)}
+      {projects.map((project) => <li><ProjectCard project={project} /></li>)}
     </ul>
   </div>
 </section>

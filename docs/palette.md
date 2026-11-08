@@ -319,7 +319,7 @@ A project lists its own names here so an agent can apply the roles without guess
 Notes for this project:
 - Logo files: `Documents/Design.MD/svs-design/assets/logo/` (copy them; don't use the rest of that folder).
 - The drawings come from `tools/gen_*.py`. Their colours come from `tools/palette.py`, which reads the roles from `tokens.css` and computes the 5.5 shades (names there match 5.5 in capitals: `pal.APP_BAR`). A recolour: change `tokens.css`, rerun the gen scripts; never edit SVGs.
-- Landed on 28 Oct 2026 (dark mode only). The site has no light mode yet.
+- Landed on 28 Oct 2026 (dark mode). Light mode landed on November 8, 2026, as a Settings choice: `src/styles/theme-light.css` maps the light column onto the same tokens, and `tools/gen_light.py` gives the drawings their light colours. Where it departs from this file, and why: `docs/light-theme-2026-11-08.md`.
 - Ready-made values in the site's names: `editing-room/palette/final/tokens.css` on the `archive/editing-room` branch (the source for `tokens.css`).
 
 ### Adding a new project

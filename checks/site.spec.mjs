@@ -1828,6 +1828,96 @@ test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.1
 
 // B10: each drawing a page inserts carries ?v=, a hash of the file as served (after SVGO), so a drawing whose shrunk
 // output changes gets a new address and a visitor's cached copy can't meet a CSP without its style hash
+// Settings: theme (System, Light or Dark). The rest of this check runs on a dark device (playwright.config.mjs), the
+// site's own look; this one covers the light theme. Base.astro's head script sets html[data-theme] before the page
+// paints, even with the page's modules blocked; System follows the device and changes with it; a choice made with the
+// arrow keys applies at once, is saved, survives a reload and reaches another open tab; the browser's bar colour
+// follows; each picture shows only its theme's copy and only that copy is fetched; and axe passes on every page in
+// light, at phone and desktop size, with Settings open on Home.
+test('theme: System, Light and Dark in Settings; light passes axe on every page', async ({ browser }) => {
+  const fails = [];
+  const page_bg = (q) => q.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const state = (q) =>
+    q.evaluate(() => ({
+      theme: document.documentElement.dataset.theme,
+      saved: localStorage.getItem('uplink.theme'),
+      bar: document.querySelector('meta[name="theme-color"]')?.getAttribute('content'),
+      checked: document.querySelector('input[name="theme"]:checked')?.value,
+    }));
+
+  // the head script alone: modules blocked, a light device
+  {
+    const ctx = await browser.newContext({ colorScheme: 'light' });
+    const q = await ctx.newPage();
+    await q.route('**/_astro/*.js', (r) => r.abort());
+    await q.goto(url('index'));
+    const s = await state(q);
+    if (s.theme !== 'light' || s.bar !== '#F2F7FC')
+      fails.push(`head script on a light device: ${JSON.stringify(s)}, want theme light, bar #F2F7FC`);
+    if ((await page_bg(q)) !== 'rgb(242, 247, 252)') fails.push(`light page ground: ${await page_bg(q)}`);
+    await ctx.close();
+  }
+
+  // the choice: a dark device, System, then Light with the arrow keys, a reload, another tab, then System again
+  const ctx = await browser.newContext({ colorScheme: 'dark', viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('index'));
+  let s = await state(q);
+  if (s.theme !== 'dark' || s.checked !== 'system' || s.saved !== null)
+    fails.push(`first visit on a dark device: ${JSON.stringify(s)}, want dark, System, nothing saved`);
+  const other = await ctx.newPage();
+  await other.goto(url('services'));
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('input[name="theme"][value="system"]').focus();
+  await q.keyboard.press('ArrowRight'); // System -> Light
+  s = await state(q);
+  if (s.theme !== 'light' || s.saved !== 'light' || s.checked !== 'light' || s.bar !== '#F2F7FC')
+    fails.push(`Light by the arrow key: ${JSON.stringify(s)}`);
+  const results = await axe(q).include('#settings-dialog').analyze();
+  for (const v of axeFails(results.violations)) fails.push(`axe, Settings open in light: ${v.id} (${v.nodes.length})`);
+  await other
+    .waitForFunction(() => document.documentElement.dataset.theme === 'light', null, { timeout: 3000 })
+    .catch(() => fails.push("another open tab didn't take the choice (storage event)"));
+  await q.reload();
+  s = await state(q);
+  if (s.theme !== 'light' || s.checked !== 'light') fails.push(`after a reload: ${JSON.stringify(s)}`);
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('input[name="theme"][value="system"]').check();
+  if ((await state(q)).theme !== 'dark') fails.push('System on a dark device: not dark');
+  await q.emulateMedia({ colorScheme: 'light' });
+  await q
+    .waitForFunction(() => document.documentElement.dataset.theme === 'light', null, { timeout: 3000 })
+    .catch(() => fails.push("System: the device turned light and the page didn't follow"));
+  await ctx.close();
+
+  // pictures: only the theme's copy shows, and only it is fetched; then axe on every page, light
+  for (const [w, h] of [
+    [390, 844],
+    [1440, 900],
+  ]) {
+    const lc = await browser.newContext({ colorScheme: 'light', viewport: { width: w, height: h } });
+    const lq = await lc.newPage();
+    const fetched = [];
+    lq.on('request', (r) => r.url().includes('/assets/img/') && fetched.push(r.url().split('/').pop().split('?')[0]));
+    for (const page of PAGES.filter((p) => p !== MISSING)) {
+      await lq.goto(url(page));
+      const shown = await lq.$$eval('.th-dark, .th-light', (es) =>
+        es.filter((e) => getComputedStyle(e).display !== 'none').map((e) => e.className),
+      );
+      if (shown.some((c) => c.includes('th-dark'))) fails.push(`${page} ${w}: a dark picture shows in light`);
+      const v = axeFails((await axe(lq).analyze()).violations);
+      for (const x of v) fails.push(`axe ${page} ${w} light: ${x.id} (${x.nodes.length}) ${x.nodes[0]?.target}`);
+    }
+    // the hero and the footer map are one drawing, recoloured in place (theme-drawings.css, footer.css)
+    const wrong = [...new Set(fetched)].filter(
+      (n) => !n.includes('-light') && !/^(hero-office|office-compact|campus)/.test(n),
+    );
+    if (wrong.length) fails.push(`${w}: dark pictures fetched in light: ${wrong.join(' ')}`);
+    await lc.close();
+  }
+  verdict(fails);
+});
+
 test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
   const html = await (await fetch(BASE + '/')).text();
   const urls = [

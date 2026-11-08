@@ -38,16 +38,7 @@ const WORKER_DIR = process.env.WORKER_DIR || fileURLToPath(new URL('worker', ROO
 // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's preloads with
 // no media).
 const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
-// the light Home test copy (light.html) inserts the light copies of the hero drawings (tools/gen_light.py)
-let light = '';
-try {
-  light = readFileSync(join(DIST, 'light.html'), 'utf-8');
-} catch {
-  /* no light copy in this build */
-}
-const INSERTED = [
-  ...new Set([...(home + light).matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1])),
-];
+const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
 const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)]
   .filter((m) => !/\smedia=/.test(m[0]))
   .map((m) => m[1]);

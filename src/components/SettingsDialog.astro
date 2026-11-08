@@ -3,11 +3,19 @@
 // invoker commands (commandfor) and a click on the backdrop closes it (closedby="any"), so it works in browsers that
 // have them before core.js runs, or if it never loads; core.js takes over when it runs. With script off the gear
 // hides (header.css): the one setting needs script.
-// Keyboard shortcuts: the single-key switch (off if they clash with a screen reader or voice control) and the keys
-// there are. More display options go here later (light or dark, English or French). Text size is the browser's own
-// zoom and font setting. core.js applies a choice at once and remembers it on this device (localStorage
-// uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.switch).
+// Theme: System (the default: follows the device's light or dark setting), Light or Dark. Native radios in a
+// fieldset, so the arrow keys move between them and a screen reader reads the group and each option. Base.astro's head
+// script applies the saved choice before the page paints. Keyboard shortcuts: the single-key switch (off if they clash
+// with a screen reader or voice control) and the keys there are. More display options go here later (English or
+// French). Text size is the browser's own zoom and font setting. core.js applies a choice at once and remembers it on
+// this device (localStorage uplink.theme, uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.seg,
+// .switch).
 import Icon from './Icon.astro';
+const THEMES = [
+  ['system', 'System'],
+  ['light', 'Light'],
+  ['dark', 'Dark'],
+];
 ---
 
 <dialog class="dialog" id="settings-dialog" aria-labelledby="st-title" closedby="any">
@@ -26,6 +34,15 @@ import Icon from './Icon.astro';
     </button>
   </div>
   <div class="dlg-body">
+    <fieldset class="seg-field" aria-describedby="st-theme-note">
+      <legend class="label">Theme</legend>
+      <div class="seg">
+        {THEMES.map(([value, name]) => <label class="seg-opt"
+          ><input type="radio" name="theme" value={value} checked={value === 'system'} /><span>{name}</span></label
+        >)}
+      </div>
+      <p class="small muted" id="st-theme-note">System follows your device. Saved on this device.</p>
+    </fieldset>
     <section class="keys-group" aria-labelledby="st-keys">
       <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
       <label class="switch" for="sc-toggle">

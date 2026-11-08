@@ -6,12 +6,12 @@
 // tools/gen_office.py; don't edit by hand.
 // The dashes come in as text (?raw): a plain import would also write a copy to dist/_astro that nothing uses.
 // Without script, office.svg shows (on phones hero-office-phone.svg, the phone cut as a still). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
-import flowsDark from './hero-flows.svg?raw';
-import flowsLight from './hero-flows-light.svg?raw';
+import Drawing from '../Drawing.astro';
+import flows from './hero-flows.svg?raw';
 import './hero.css';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
-import { HERO as HERO_DARK, HERO_LIGHT, PAGES, getServices } from '../../lib/site';
+import { HERO, PAGES, getServices } from '../../lib/site';
 import type { IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
@@ -49,10 +49,6 @@ const menu = [
     sub: 'Help desk, security, cloud, networks, phones',
   },
 ];
-// light: the light test page (/light) shows the light copies of the drawings (tools/gen_light.py)
-const { light = false } = Astro.props as { light?: boolean };
-const HERO = light ? HERO_LIGHT : HERO_DARK;
-const sfx = light ? '-light' : '';
 const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
 ---
 
@@ -105,24 +101,27 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
         <noscript
           ><picture
             ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
-            <img class="hero-nojs" src={`/assets/img/office${sfx}.svg`} alt={still} width="1200" height="800"
+            <img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"
           /></picture></noscript
         >
         <!-- the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) -->
         <template class="hero-still"
-          ><picture
-            ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
-            <img class="hero-nojs" src={`/assets/img/office${sfx}.svg`} alt={still} width="1200" height="800"
-          /></picture></template
-        >
-        <Fragment set:html={light ? flowsLight : flowsDark} />
+          ><Drawing
+            src="/assets/img/office.svg"
+            sources={[{ media: HERO.media.phone, srcset: HERO.still, width: 962, height: 900 }]}
+            class="hero-nojs"
+            alt={still}
+            width="1200"
+            height="800"
+        /></template>
+        <Fragment set:html={flows} />
         <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
         <HoldButton class="hero-pause" />
       </div>
       <div class="hero-dock">
         {news.map((n) => <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
           <span class="news-thumb well"
-            ><img src={`/assets/img/${n.img}-card${sfx}.svg`} alt="" width="640" height="480" fetchpriority="low"
+            ><Drawing src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="news-text"
             ><span class="news-title">{n.title}</span
