@@ -5,7 +5,6 @@ Things to fix, polish or decide. Remove a line when it's done; add new ones as t
 ## Light theme
 - [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
 - [ ] Light theme, optional: a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
-- [ ] Settings: a Motion choice (System, Reduced, Full) beside the theme, built the theme's way (`uplink.motion`, `html[data-motion]` set in the head script; the 10 `prefers-reduced-motion` rules in 7 CSS files and core.js's `reduceMotion` read it too). Today: the device setting, plus the pause button (remembered site-wide).
 - [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
 ## Review of November 7, 2026

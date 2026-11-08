@@ -53,11 +53,12 @@ To stop floods, our site counts how many reports come from one IP address in a s
 
 ### Settings saved on your device
 
-If you change a setting, the site remembers it in your browser, so it's the same next time you visit. It saves up to three settings:
+If you change a setting, the site remembers it in your browser, so it's the same next time you visit. It saves up to four settings:
 
 | Saved as | What it remembers |
 | --- | --- |
 | uplink.theme | the theme you picked: system, light or dark |
+| uplink.motion | whether you turned on Reduce motion |
 | uplink.shortcuts | whether keyboard shortcuts are on or off |
 | uplink-held | whether you paused the animations |
 

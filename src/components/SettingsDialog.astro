@@ -3,13 +3,14 @@
 // invoker commands (commandfor) and a click on the backdrop closes it (closedby="any"), so it works in browsers that
 // have them before core.js runs, or if it never loads; core.js takes over when it runs. With script off the gear
 // hides (header.css): the one setting needs script.
+// Motion: Reduce motion, a switch (core.js; on and fixed when the device asks for less motion).
 // Theme: System (the default: follows the device's light or dark setting), Light or Dark, each with its icon
 // (screen, sun, moon in icons.ts) beside the word. Native radios in a
 // fieldset, so the arrow keys move between them and a screen reader reads the group and each option. Base.astro's head
 // script applies the saved choice before the page paints. Keyboard shortcuts: the single-key switch (off if they clash
 // with a screen reader or voice control) and the keys there are. More display options go here later (English or
 // French). Text size is the browser's own zoom and font setting. core.js applies a choice at once and remembers it on
-// this device (localStorage uplink.theme, uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.seg,
+// this device (localStorage uplink.theme, uplink.motion, uplink.shortcuts). Styles: src/styles/dialogs.css and forms.css (.seg,
 // .switch).
 import Icon from './Icon.astro';
 const THEMES = [
@@ -46,6 +47,19 @@ const THEMES = [
       </div>
       <p class="small muted" id="st-theme-note">System follows your device. Saved on this device.</p>
     </fieldset>
+    <section class="keys-group" aria-labelledby="st-motion">
+      <h3 class="label" id="st-motion">Motion</h3>
+      <label class="switch" for="mo-toggle">
+        <span class="stack-2"
+          ><strong id="mo-name">Reduce motion</strong
+          ><span class="small muted" id="mo-hint"
+            >Stops the moving drawings and the slide and fade effects on every
+            page.<span id="mo-device" hidden> On: your device is set to reduce motion.</span></span
+          ></span
+        >
+        <input id="mo-toggle" type="checkbox" role="switch" aria-labelledby="mo-name" aria-describedby="mo-hint" />
+      </label>
+    </section>
     <section class="keys-group" aria-labelledby="st-keys">
       <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
       <label class="switch" for="sc-toggle">

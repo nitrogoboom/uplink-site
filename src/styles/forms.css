@@ -185,6 +185,13 @@ select.input:hover {
   background: var(--c-on-accent);
   box-shadow: none;
 }
+.switch:has(input:disabled),
+.switch input:disabled {
+  cursor: default;
+}
+.switch input:disabled {
+  opacity: 0.55;
+} /* fixed by a setting elsewhere (Reduce motion, when the device asks for less): it shows, but reads as locked */
 .switch input:focus-visible {
   border-radius: var(--r-pill);
 } /* the site's focus ring squares corners (base.css); keep the pill */

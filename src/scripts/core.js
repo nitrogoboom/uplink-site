@@ -38,7 +38,16 @@ const $ = (sel, ctx = document) => /** @type {E | null} */ (ctx.querySelector(se
  * @returns {E[]}
  */
 const $$ = (sel, ctx = document) => /** @type {E[]} */ (Array.from(ctx.querySelectorAll(sel)));
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+// Less motion: the device's setting (prefers-reduced-motion) or the visitor's own (Settings, Reduce motion; below).
+// Shaped like the MediaQueryList it replaced, so every script asks it the same way: .matches, and 'change' events.
+const deviceReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+class MotionChoice extends EventTarget {
+  get matches() {
+    return deviceReduce.matches || store.get(MOTION_KEY) === 'reduce';
+  }
+}
+const MOTION_KEY = 'uplink.motion';
+const reduceMotion = new MotionChoice();
 
 /* ---------- error reports ---------------------------------------------- */
 // A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
@@ -354,6 +363,44 @@ window.addEventListener('pageshow', (e) => {
   if (e.persisted) applyTheme();
 });
 applyTheme();
+
+/* ---------- Reduce motion (Settings) --------------------------------------- */
+// html[data-motion="reduce"] when the visitor turns it on (saved as uplink.motion) or the device asks for less motion.
+// Base.astro's head script sets it before the page paints; this keeps it right after that, as the theme does: the
+// switch, the device's setting changing, another tab (storage) and the back/forward cache (pageshow). The CSS keys off
+// the attribute (postcss.config.mjs writes a copy of every prefers-reduced-motion rule for it), and the scripts ask
+// reduceMotion (top), which says 'change' when the answer changes. With the device asking for less motion, the switch
+// shows on and can't be turned off here: the device's setting comes first.
+const moToggle = /** @type {HTMLInputElement | null} */ (document.getElementById('mo-toggle'));
+let motionWas = reduceMotion.matches;
+const applyMotion = () => {
+  const on = reduceMotion.matches;
+  if (on) root.dataset.motion = 'reduce';
+  else delete root.dataset.motion;
+  if (moToggle) {
+    moToggle.checked = on;
+    moToggle.disabled = deviceReduce.matches;
+    const dev = document.getElementById('mo-device');
+    if (dev) dev.hidden = !deviceReduce.matches;
+  }
+  if (on !== motionWas) {
+    motionWas = on;
+    reduceMotion.dispatchEvent(new Event('change'));
+  }
+};
+moToggle?.addEventListener('change', () => {
+  store.set(MOTION_KEY, moToggle.checked ? 'reduce' : 'full');
+  applyMotion();
+  toast({ title: moToggle.checked ? 'Motion reduced' : 'Motion on', tone: 'info', timeout: 3000 });
+});
+deviceReduce.addEventListener('change', applyMotion);
+window.addEventListener('storage', (e) => {
+  if (e.key === MOTION_KEY) applyMotion();
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) applyMotion();
+});
+applyMotion();
 
 /* ======================================================================
    Keyboard shortcuts

@@ -1921,6 +1921,78 @@ test('theme: System, Light and Dark in Settings; light passes axe on every page'
   verdict(fails);
 });
 
+// Settings: Reduce motion. On a device that doesn't ask for less motion, the switch is off and the drawings run; turned
+// on, html[data-motion] is set, the choice is saved, and nothing on the page animates (no running animation once the
+// footer map has come in, and transitions are instant); it survives a reload. On a device that asks for less motion
+// the switch shows on and can't be turned off. Without script, that device still gets no animation (the CSS keeps its
+// prefers-reduced-motion queries; postcss.config.mjs only adds the attribute's copy).
+test('motion: Reduce motion in Settings stops every animation, is saved, and the device setting wins', async ({
+  browser,
+}) => {
+  const fails = [];
+  const running = (q) =>
+    q.evaluate(async () => {
+      window.scrollTo(0, document.body.scrollHeight);
+      await new Promise((r) => setTimeout(r, 2500));
+      return document.getAnimations().filter((a) => a.playState === 'running').length;
+    });
+  const state = (q) =>
+    q.evaluate(() => {
+      const sw = /** @type {HTMLInputElement} */ (document.getElementById('mo-toggle'));
+      return {
+        motion: document.documentElement.dataset.motion ?? null,
+        saved: localStorage.getItem('uplink.motion'),
+        on: sw.checked,
+        locked: sw.disabled,
+      };
+    });
+
+  const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const q = await ctx.newPage();
+  await q.goto(url('index'));
+  await q.waitForLoadState('networkidle');
+  let s = await state(q);
+  if (s.motion !== null || s.on || s.locked)
+    fails.push(`first visit: ${JSON.stringify(s)}, want motion on, switch off`);
+  if ((await running(q)) === 0) fails.push('first visit: nothing animates, so this check proves nothing');
+  await q.evaluate(() => window.scrollTo(0, 0));
+  await q.locator('[data-open="settings-dialog"]:visible').first().click();
+  await q.locator('label[for="mo-toggle"]').click();
+  s = await state(q);
+  if (s.motion !== 'reduce' || s.saved !== 'reduce' || !s.on) fails.push(`switched on: ${JSON.stringify(s)}`);
+  await q.reload();
+  await q.waitForLoadState('networkidle');
+  s = await state(q);
+  if (s.motion !== 'reduce' || !s.on) fails.push(`after a reload: ${JSON.stringify(s)}`);
+  const n = await running(q);
+  if (n) fails.push(`Reduce motion on: ${n} animation(s) still running`);
+  const t = await q.evaluate(() => getComputedStyle(document.querySelector('.btn')).transitionDuration);
+  if (parseFloat(t) > 0.001) fails.push(`Reduce motion on: a button still eases (${t})`);
+  await ctx.close();
+
+  const dev = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+  const d = await dev.newPage();
+  await d.goto(url('index'));
+  await d.waitForLoadState('networkidle');
+  s = await state(d);
+  if (s.motion !== 'reduce' || !s.on || !s.locked)
+    fails.push(`device asks for less motion: ${JSON.stringify(s)}, want on and locked`);
+  await dev.close();
+
+  const nojs = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    reducedMotion: 'reduce',
+    javaScriptEnabled: false,
+  });
+  const z = await nojs.newPage();
+  await z.goto(url('index'));
+  await z.waitForLoadState('networkidle');
+  const zn = await z.evaluate(() => document.getAnimations().filter((a) => a.playState === 'running').length);
+  if (zn) fails.push(`no script, device asks for less motion: ${zn} animation(s) running`);
+  await nojs.close();
+  verdict(fails);
+});
+
 test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
   const html = await (await fetch(BASE + '/')).text();
   const urls = [
