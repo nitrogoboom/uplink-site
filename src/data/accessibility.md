@@ -4,7 +4,7 @@ Uplink Technology wants everyone to be able to use our website and our services,
 
 ## The standard we build to
 
-We build and test this site to the Web Content Accessibility Guidelines (WCAG) 2.0, Level AA. Ontario requires that standard from organizations with 50 or more staff. We're smaller, so it's our own choice, and we hold ourselves to it. Where we can, we also follow the newer WCAG 2.2, Level AA.
+We build and test this site to the Web Content Accessibility Guidelines (WCAG) 2.2, Level AA. That includes WCAG 2.0, Level AA, the standard Ontario requires from organizations with 50 or more staff. We're smaller, so it's our own choice, and we hold ourselves to it.
 
 ### How we check it
 

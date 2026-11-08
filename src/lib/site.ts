@@ -96,7 +96,7 @@ export const PAGES = {
     name: 'Accessibility',
     title: 'Accessibility · Uplink Technology',
     description:
-      'How we build this website to WCAG 2.0 AA, the aids built into it, its known limits, and how to give feedback.',
+      'How we build this website to WCAG 2.2 AA, the aids built into it, its known limits, and how to give feedback.',
   },
 } as const;
 

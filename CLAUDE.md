@@ -9,7 +9,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - `notes.md`: open items. Start here. Add new items there; remove a line when it's done.
 - `README.md`: every command, tool and flag, the repo layout, drawing rules, hosting. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
 - `src/README.md`: the source map: pages, `Base.astro` props, components, content fields, CSS order, breakpoints, scripts.
-- `docs/sop.md`: how a change ships, the standards (WCAG 2.0 AA, security, browsers), the release checklist.
+- `docs/sop.md`: how a change ships, the standards (WCAG 2.2 AA, security, browsers), the release checklist.
 - `docs/spacing.md`: which `--sp-*` step goes where. Read it before touching any margin, padding, gap or line height.
 - `docs/palette.md`: colour roles.
 - `docs/secrets.md`: secret names and where they live, never values.
