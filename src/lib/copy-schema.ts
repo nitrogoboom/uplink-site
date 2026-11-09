@@ -126,6 +126,14 @@ export const home = obj({
     handle: text,
   }),
   work: texts('eyebrow', 'title', 'seeAll'),
+  reviews: obj({
+    eyebrow: text,
+    title: text,
+    accent: text,
+    sample: text, // the note beside the stars that these are samples (remove with the real reviews)
+    readAll: text,
+    list: text, // the list's name
+  }),
   proof: band,
 });
 

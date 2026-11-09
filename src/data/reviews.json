@@ -1,0 +1,39 @@
+[
+  {
+    "featured": true,
+    "quote": "Our server died on a Monday morning. Uplink had us back on the backups by lunch, and nobody lost a file. We stopped worrying about IT that week.",
+    "name": "Dana Whitfield",
+    "initials": "DW",
+    "role": "Office manager",
+    "company": "Whitfield & Lo, law office",
+    "rating": 5,
+    "date": "2026-10"
+  },
+  {
+    "quote": "One phone number for every problem, and a real person picks up. Our staff actually call now instead of putting up with it.",
+    "name": "Marc Gagnon",
+    "initials": "MG",
+    "role": "Owner",
+    "company": "Gagnon Dental",
+    "rating": 5,
+    "date": "2026-09"
+  },
+  {
+    "quote": "They moved 30 people to Microsoft 365 over a weekend. Monday, everyone logged in and got to work.",
+    "name": "Priya Raman",
+    "initials": "PR",
+    "role": "Operations lead",
+    "company": "Northline Logistics",
+    "rating": 5,
+    "date": "2026-08"
+  },
+  {
+    "quote": "The phishing training paid for itself. Two staff reported a fake invoice before anyone clicked it.",
+    "name": "Tom Becker",
+    "initials": "TB",
+    "role": "Controller",
+    "company": "Becker Accounting",
+    "rating": 5,
+    "date": "2026-07"
+  }
+]

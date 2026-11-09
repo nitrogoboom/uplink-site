@@ -1,0 +1,134 @@
+/*--- HOME · 5. What clients say (Reviews.astro): stars and the "sample" note beside the heading, one big review and
+   three small ones. Phones: one column. Tablet and up: the big review across the top, the small ones three in a row
+   under it. On desktop the section is one screen as every Home fold (fold.css), its content centred in it at its own
+   height: nothing is stretched to fill the screen. ---*/
+
+#reviews-title em {
+  color: var(--c-accent-text);
+}
+
+/* beside the heading: the stars, the sample note, the link */
+.rev-score {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-2) var(--sp-4);
+}
+.rev-stars {
+  display: inline-flex;
+  gap: var(--sp-1);
+  color: var(--c-accent-text);
+}
+.rev-stars svg {
+  width: var(--sp-5);
+  height: var(--sp-5);
+}
+
+/* the reviews */
+.rev-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-4);
+  list-style: none;
+}
+.rev {
+  display: flex;
+  padding: var(--sp-5);
+}
+.rev-fig {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  width: 100%;
+  margin: 0;
+}
+.rev-quote {
+  margin: 0;
+  color: var(--c-text);
+}
+/* who said it: at the card's foot, however long the quote */
+.rev-who {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin-top: auto;
+}
+.rev-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--r-2);
+  background: var(--c-surface-2);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-4);
+  color: var(--c-muted);
+}
+.rev-id {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 0;
+  line-height: var(--lh-snug);
+}
+.rev-name {
+  font-weight: 600;
+}
+
+/* the big review: a larger quote in the display face, under an open-quote mark, and a line over who said it */
+.rev--big {
+  padding: var(--sp-6);
+}
+.rev-mark {
+  width: var(--sp-7);
+  height: var(--sp-7);
+  color: var(--c-accent-text);
+}
+.rev--big .rev-quote {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-6);
+  line-height: var(--lh-snug);
+}
+.rev--big .rev-who {
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
+}
+.rev--big .rev-avatar {
+  width: var(--control-lg);
+  height: var(--control-lg);
+  font-size: var(--fs-6);
+}
+.rev--big .rev-name {
+  font-size: var(--fs-4);
+}
+
+/* below desktop, Reviews and the check-up band (Proof) are both plain sections: drop Proof's top padding so the two
+   don't show a double gap (docs/design.md, R1). On desktop each is its own screen */
+@media (--below-desktop) {
+  #reviews + #proof {
+    padding-top: 0;
+  }
+}
+
+/* tablet and up: the big review across the top, the small ones three in a row */
+@media (--tablet-up) {
+  .rev-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .rev--big {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (--desktop) {
+  .rev-grid {
+    gap: var(--sp-5);
+  }
+  .rev--big {
+    padding: var(--sp-7);
+  }
+}

@@ -7,6 +7,7 @@ import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
 import Work from '../components/home/Work.astro';
+import Reviews from '../components/home/Reviews.astro';
 import Proof from '../components/home/Proof.astro';
 import { phone, email, office } from '../lib/footer';
 import Words from '../components/Words.astro';
@@ -57,6 +58,7 @@ const business = {
   <Services />
   <Grow />
   <Work />
+  <Reviews />
   <Proof />
   <Fragment slot="scripts">
     <Words id="words-page" words={{ cloud, grow: { team: grow.team, play: grow.play } } satisfies HomeWords} />

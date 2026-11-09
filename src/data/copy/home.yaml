@@ -89,6 +89,14 @@ work:
   title: Setups we built and still run
   seeAll: See all work
 
+reviews: # sample reviews (src/data/reviews.json) until the real ones come from Google
+  eyebrow: What clients say
+  title: Offices that stopped
+  accent: worrying # second line, emphasized
+  sample: Sample reviews for the mock-up.
+  readAll: Read reviews on Google
+  list: Client reviews
+
 proof:
   title: Start with a free check-up
   lead: Thirty minutes, no contract. We show you what we find and what we would fix first.

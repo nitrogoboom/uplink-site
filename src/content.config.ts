@@ -101,6 +101,22 @@ const grow = defineCollection({
   }),
 });
 
+// Home "What clients say": sample reviews until the real ones come from Google (notes.md). One entry may be `featured`
+// (the big card); the rest are the small cards, in file order.
+const reviews = defineCollection({
+  loader: file('./src/data/reviews.json', { parser: numbered }),
+  schema: item({
+    featured: z.boolean().optional(),
+    quote: z.string(),
+    name: z.string(),
+    initials: z.string().max(3),
+    role: z.string(), // "Office manager"
+    company: z.string(), // "Whitfield & Lo, law office"
+    rating: z.number().int().min(1).max(5), // not shown yet: every sample is 5; the real ones will vary
+    date: z.string().regex(/^\d{4}-\d{2}$/), // "2026-10": the page shows "October 2026" in a <time>
+  }),
+});
+
 // The site's words: one YAML file a page or area in src/data/copy/, each its own collection checked against its schema
 // in src/lib/copy-schema.ts (a missing or unknown key stops the build). Read them with copy() from src/lib/copy.ts.
 // A YAML file there with no schema stops the build too, so no file is read by nothing.
@@ -117,6 +133,7 @@ export const collections = {
   faq,
   team,
   grow,
+  reviews,
   'copy-ui': copy('ui'),
   'copy-home': copy('home'),
   'copy-about': copy('about'),
