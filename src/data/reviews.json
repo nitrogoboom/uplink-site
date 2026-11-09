@@ -6,9 +6,8 @@
     "initials": "DW",
     "role": "Office manager",
     "company": "Whitfield & Lo, law office",
-    "service": "backup",
     "rating": 5,
-    "date": "October 2026"
+    "date": "2026-10"
   },
   {
     "quote": "One phone number for every problem, and a real person picks up. Our staff actually call now instead of putting up with it.",
@@ -16,9 +15,8 @@
     "initials": "MG",
     "role": "Owner",
     "company": "Gagnon Dental",
-    "service": "help-desk",
     "rating": 5,
-    "date": "September 2026"
+    "date": "2026-09"
   },
   {
     "quote": "They moved 30 people to Microsoft 365 over a weekend. Monday, everyone logged in and got to work.",
@@ -26,9 +24,8 @@
     "initials": "PR",
     "role": "Operations lead",
     "company": "Northline Logistics",
-    "service": "cloud",
     "rating": 5,
-    "date": "August 2026"
+    "date": "2026-08"
   },
   {
     "quote": "The phishing training paid for itself. Two staff reported a fake invoice before anyone clicked it.",
@@ -36,8 +33,7 @@
     "initials": "TB",
     "role": "Controller",
     "company": "Becker Accounting",
-    "service": "security",
     "rating": 5,
-    "date": "July 2026"
+    "date": "2026-07"
   }
 ]

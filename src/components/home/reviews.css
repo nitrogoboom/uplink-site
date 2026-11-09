@@ -1,50 +1,27 @@
-/*--- HOME · 5. What clients say (Reviews.astro): the rating summary, one big review and three small ones.
-   Phones: one column. Tablet: the big review across the top, the small ones three in a row under it. Desktop: the big
-   review on the left, the small ones stacked on the right, the whole section one screen (as Work). ---*/
+/*--- HOME · 5. What clients say (Reviews.astro): stars and the "sample" note beside the heading, one big review and
+   three small ones. Phones: one column. Tablet and up: the big review across the top, the small ones three in a row
+   under it. On desktop the section is one screen as every Home fold (fold.css), its content centred in it at its own
+   height: nothing is stretched to fill the screen. ---*/
 
 #reviews-title em {
   color: var(--c-accent-text);
 }
 
-/* the summary beside the heading: the score, its stars and count, the link */
+/* beside the heading: the stars, the sample note, the link */
 .rev-score {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-2) var(--sp-4);
 }
-.rev-num {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-style: italic;
-  font-size: var(--fs-7);
-  line-height: var(--lh-display);
-}
-.rev-score-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-1);
-  line-height: var(--lh-snug);
-}
-.rev-all {
-  flex-basis: 100%;
-}
-
 .rev-stars {
   display: inline-flex;
   gap: var(--sp-1);
   color: var(--c-accent-text);
 }
 .rev-stars svg {
-  width: var(--sp-4);
-  height: var(--sp-4);
-}
-.rev-score .rev-stars svg {
   width: var(--sp-5);
   height: var(--sp-5);
-}
-.rev-stars .off {
-  color: var(--c-line-2);
 }
 
 /* the reviews */
@@ -65,13 +42,6 @@
   width: 100%;
   margin: 0;
 }
-.rev-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-2) var(--sp-4);
-}
 .rev-quote {
   margin: 0;
   color: var(--c-text);
@@ -79,12 +49,9 @@
 /* who said it: at the card's foot, however long the quote */
 .rev-who {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   gap: var(--sp-3);
   margin-top: auto;
-  padding-top: var(--sp-4);
-  border-top: 1px solid var(--c-line);
 }
 .rev-avatar {
   display: grid;
@@ -97,11 +64,11 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-4);
-  color: var(--c-accent-text);
+  color: var(--c-muted);
 }
 .rev-id {
   display: flex;
-  flex: 1 1 10rem;
+  flex: 1;
   flex-direction: column;
   gap: var(--sp-1);
   min-width: 0;
@@ -111,7 +78,7 @@
   font-weight: 600;
 }
 
-/* the big review: a larger quote in the display face, under an open-quote mark */
+/* the big review: a larger quote in the display face, under an open-quote mark, and a line over who said it */
 .rev--big {
   padding: var(--sp-6);
 }
@@ -125,7 +92,10 @@
   font-weight: 600;
   font-size: var(--fs-6);
   line-height: var(--lh-snug);
-  margin-bottom: auto; /* with the mark's auto top: the quote sits in the middle of a tall card */
+}
+.rev--big .rev-who {
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--c-line);
 }
 .rev--big .rev-avatar {
   width: var(--control-lg);
@@ -136,27 +106,6 @@
   font-size: var(--fs-4);
 }
 
-/* the small cards: tighter, with no line over who said it, so three fit one screen beside the big one */
-.rev:not(.rev--big) .rev-fig {
-  gap: var(--sp-3);
-}
-.rev:not(.rev--big) .rev-who {
-  flex-wrap: nowrap;
-  padding-top: 0;
-  border-top: 0;
-}
-.rev:not(.rev--big) .rev-id {
-  flex-basis: 0;
-}
-
-/* desktop, where the big card is taller than its words: the quote sits in the middle of the room left */
-.rev--big .rev-mark {
-  margin-top: auto;
-}
-.rev--big .rev-who {
-  margin-top: 0;
-}
-
 /* below desktop, Reviews and the check-up band (Proof) are both plain sections: drop Proof's top padding so the two
    don't show a double gap (docs/design.md, R1). On desktop each is its own screen */
 @media (--below-desktop) {
@@ -165,13 +114,7 @@
   }
 }
 
-@media (forced-colors: active) {
-  .rev-stars .off {
-    color: GrayText;
-  }
-}
-
-/* tablet: the big review across the top, the small ones three in a row */
+/* tablet and up: the big review across the top, the small ones three in a row */
 @media (--tablet-up) {
   .rev-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -180,43 +123,12 @@
     grid-column: 1 / -1;
   }
 }
-/* tablet only: three narrow cards, so the date goes under the stars in each, the same in all three */
-@media (--tablet) {
-  .rev:not(.rev--big) .rev-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
 
-/* desktop: the big review on the left, the small ones stacked on the right */
 @media (--desktop) {
   .rev-grid {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
     gap: var(--sp-5);
   }
   .rev--big {
-    grid-column: 1;
-    grid-row: span 3;
     padding: var(--sp-7);
-  }
-  .rev-all {
-    flex-basis: auto;
-  }
-}
-
-/* desktop fold (>= 1100 wide and >= 700 tall): one screen as a floor, as Work. The grid takes what the heading leaves;
-   more words make the section taller */
-@media (width >= 68.75em) and (height >= 43.75em) {
-  .rev-wrap {
-    display: flex;
-    flex-direction: column;
-    min-height: var(--fold-inner);
-  }
-  .rev-grid {
-    flex: 1;
-  }
-  .rev--big .rev-mark {
-    width: var(--sp-8);
-    height: var(--sp-8);
   }
 }

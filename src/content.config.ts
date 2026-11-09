@@ -102,7 +102,7 @@ const grow = defineCollection({
 });
 
 // Home "What clients say": sample reviews until the real ones come from Google (notes.md). One entry may be `featured`
-// (the big card); the rest are the small cards, in file order. `service` names the service the review is about.
+// (the big card); the rest are the small cards, in file order.
 const reviews = defineCollection({
   loader: file('./src/data/reviews.json', { parser: numbered }),
   schema: item({
@@ -112,9 +112,8 @@ const reviews = defineCollection({
     initials: z.string().max(3),
     role: z.string(), // "Office manager"
     company: z.string(), // "Whitfield & Lo, law office"
-    service: reference('services'),
-    rating: z.number().int().min(1).max(5),
-    date: z.string(), // "October 2026", as Google shows it
+    rating: z.number().int().min(1).max(5), // not shown yet: every sample is 5; the real ones will vary
+    date: z.string().regex(/^\d{4}-\d{2}$/), // "2026-10": the page shows "October 2026" in a <time>
   }),
 });
 

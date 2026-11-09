@@ -36,7 +36,7 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, the hero's `lead-short`, Grow's six tags, the "Windows 10" hero card.
 - [ ] With real content: drawn team avatars, Business JSON-LD (phone, address, hours, `logo`, `sameAs`), and a real status page for "All systems normal" (or drop it).
 - [ ] Services: a plans or pricing section once real pricing exists.
-- [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/data/reviews.json`, score and count in `home.yaml`; swap in the real Google reviews, point "Read reviews on Google" (now `/soon`) at the Google profile, drop the "Sample reviews" line. Owner to look at the layout first.
+- [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/data/reviews.json`. With the real Google reviews: their fields (photo, "2 months ago", rating shown per card if they vary), a score and count beside the stars, "Read reviews on Google" (now `/soon`) to the Google profile, quotes that don't retell "Our work", drop the "Sample reviews" line. Maybe fold the check-up band into this section (`.fold-foot`, as About Team).
 - [ ] Home "Our work" row is a placeholder until its real section is decided (`src/components/home/Work.astro`).
 - [ ] Contact: "Open a ticket" and "Start a remote session" go to `/soon`.
 - [ ] Grow: final copy and team sizes, people drawn as more than blocks, timing on real phones (`DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`).

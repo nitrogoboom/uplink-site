@@ -130,12 +130,8 @@ export const home = obj({
     eyebrow: text,
     title: text,
     accent: text,
-    score: text, // "4.9", the average the summary shows
-    scoreLabel: tpl('score'), // the summary's stars, read aloud
-    count: text, // "48 Google reviews"
-    sample: text, // the note that these are samples (remove with the real reviews)
+    sample: text, // the note beside the stars that these are samples (remove with the real reviews)
     readAll: text,
-    stars: tpl('n'), // a review's stars, read aloud
     list: text, // the list's name
   }),
   proof: band,

@@ -1,57 +1,47 @@
 ---
-// HOME · 5. What clients say: the rating summary beside the heading, one big review and three small ones, from
-// src/data/reviews.json. Sample reviews for now; the real ones come from Google later (notes.md). No review JSON-LD:
-// Google ignores a business's own reviews of itself, and these are samples.
-// Each review is a <figure>: the stars (one image, read as "5 out of 5 stars"), the quote, then who said it.
-// The hidden ", " between name and role: a screen reader says "Dana Whitfield, Office manager, Whitfield & Lo".
+// HOME · 5. What clients say: a line of stars and the "sample" note beside the heading, then one big review across the
+// top and three small ones under it, from src/data/reviews.json. Sample reviews for now; the real ones come from Google
+// later (notes.md). No score or count until then, and no review JSON-LD: Google ignores a business's own reviews of
+// itself, and these are samples.
+// Each review is a <figure>: the quote first (a screen reader hears it before who said it), then the name, role and
+// date. The hidden ", " between parts: "Dana Whitfield, Office manager, Whitfield & Lo, October 2026".
 // Styles: reviews.css.
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
 import './reviews.css';
-import { getReviews, getServices } from '../../lib/site';
-import { copy, fill } from '../../lib/copy';
+import { getReviews } from '../../lib/site';
+import { copy } from '../../lib/copy';
 import { fit } from '../../lib/fit';
 const t = (await copy('home')).reviews;
 const reviews = await getReviews();
-const services = new Map((await getServices()).map((s) => [s.id, s.data.title]));
 const big = reviews.find((r) => r.featured) ?? reviews[0];
 const rest = reviews.filter((r) => r !== big);
-const stars = (n: number) => Array.from({ length: 5 }, (_, i) => i < n);
+// "2026-10" → "October 2026"
+const month = (ym: string) =>
+  new Date(`${ym}-01T00:00:00Z`).toLocaleDateString('en-CA', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 ---
 
 <section class="section fold" id="reviews" aria-labelledby="reviews-title">
-  <div class="container rev-wrap">
+  <div class="container">
     <div class="section-head section-head--split">
       <div>
         <p class="eyebrow">{t.eyebrow}</p>
         <h2 id="reviews-title" class={fit(`${t.title} ${t.accent}`)}>{t.title} <em>{t.accent}</em></h2>
       </div>
       <div class="rev-score">
-        <p class="rev-num" aria-hidden="true">{t.score}</p>
-        <div class="rev-score-text">
-          <span class="rev-stars" role="img" aria-label={fill(t.scoreLabel, { score: t.score })}
-            >{stars(5).map(() => (
-              <Icon name="star" />
-            ))}</span
-          >
-          <span class="small muted">{t.count}</span>
-          <span class="small muted">{t.sample}</span>
-        </div>
-        <a class="link-arrow rev-all" href="/soon">{t.readAll}<Icon name="arrow" /></a>
+        <span class="rev-stars" aria-hidden="true"
+          >{Array.from({ length: 5 }, () => (
+            <Icon name="star" />
+          ))}</span
+        >
+        <span class="small muted">{t.sample}</span>
+        <a class="link-arrow" href="/soon">{t.readAll}<Icon name="arrow" /></a>
       </div>
     </div>
 
     <ul class="rev-grid" aria-label={t.list}>
       {[big, ...rest].map((r) => <li class:list={['rev panel', { 'rev--big': r === big }]}>
         <figure class="rev-fig">
-          <div class="rev-top">
-            <span class="rev-stars" role="img" aria-label={fill(t.stars, { n: r.rating })}>
-              {stars(r.rating).map((on) => (
-                <Icon name="star" class={on ? undefined : 'off'} />
-              ))}
-            </span>
-            <span class="small muted">{r.date}</span>
-          </div>
           {r === big && <Icon name="quote" class="rev-mark" />}
           <blockquote class="rev-quote">
             <p>{r.quote}</p>
@@ -62,8 +52,9 @@ const stars = (n: number) => Array.from({ length: 5 }, (_, i) => i < n);
               <span class="rev-name">{r.name}</span>
               <span class="sr-only">, </span>
               <span class="small muted">{r.role}<Sep />{r.company}</span>
+              <span class="sr-only">, </span>
+              <time class="small muted" datetime={r.date}>{month(r.date)}</time>
             </span>
-            {r === big && <span class="chip rev-chip">{services.get(r.service.id)}</span>}
           </figcaption>
         </figure>
       </li>)}
