@@ -264,7 +264,7 @@ for (const page of PAGES) {
 
 // sideways scroll (WCAG 1.4.10) at the widths where layouts change, every page, walked down a screen at a time so
 // whatever starts once it's on screen (Grow, the footer map) has started. KNOWN: failures found by this check and
-// fixed in a later batch of the review (docs/review-2026-11-07.md); the test is expected to fail until then.
+// fixed in a later batch of the review (docs/history/review-2026-11-07.md); the test is expected to fail until then.
 const WIDTHS = [320, 390, 600, 768, 1024, 1280];
 // in the page: two frames on, how far the page is wider than the screen
 const WIDE = () =>
@@ -498,7 +498,7 @@ for (const page of PAGES) {
   }
 }
 
-// Behaviour the review's quick bugs (batch 2b, docs/review-2026-11-07.md) broke, one test each, on Home unless named.
+// Behaviour the review's quick bugs (batch 2b, docs/history/review-2026-11-07.md) broke, one test each, on Home unless named.
 // Each test counts the frames the page's scripts ask for (requestAnimationFrame, wrapped before the page loads),
 // reads Grow's open step from its card (.grow-card.is-on) and its timer from the play ring.
 const frames = () => {

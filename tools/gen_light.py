@@ -1,5 +1,5 @@
 """Light theme for the drawings: NAME-light.svg beside each dark picture, and src/styles/theme-drawings.css for the
-drawings inside the page (README, "Generators"; why each colour: docs/light-theme-2026-11-08.md). The dark drawings
+drawings inside the page (README, "Generators"; why each colour: docs/history/light-theme-2026-11-08.md). The dark drawings
 stay the source, so tools/regen.py runs this last. How a colour is swapped: above SWAP.
 
     python tools/gen_light.py           write them
@@ -34,7 +34,7 @@ def picture_sources():
                   if p.name not in _INLINE_NAMES and p.name != 'campus.svg' and not p.stem.endswith('-light'))
 
 
-# How a colour is swapped (docs/palette.md, light columns of 5.1 and 5.4):
+# How a colour is swapped (docs/design.md, light columns of "Roles and tokens" and "Drawing colours"):
 #   1. Roles with a light value in the palette take it (box faces, blue and green boxes, ground, grid, edges).
 #   2. Text and the page colour flip: label ink becomes dark, halos and dot rims become the light page.
 #   3. Bright ink on a light ground darkens to its ink step (amber lines to amber 500, sky lines to the logo blue,

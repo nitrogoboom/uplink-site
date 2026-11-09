@@ -136,7 +136,7 @@
 } /* "40 staff" on one line: the client line breaks at its dot */
 /* phones: a row, so more projects fit on a screen. The drawing on the left at a fixed width, as tall as the row; the
    chip, name and client beside it as one block, centred on the drawing (the empty rows above and below share what
-   is left). Chip, name and client share one left edge; the client sits close under the name (docs/spacing.md R4).
+   is left). Chip, name and client share one left edge; the client sits close under the name (docs/design.md R4).
    Under 20em (a phone with a big default font or zoom) a row leaves the words no room: the card stacks as on wider
    screens. The name is a step smaller only under 30em: wider (a desktop window at 200% zoom) it keeps the tablet's
    size, so zooming in never makes it smaller on screen (review C1) */

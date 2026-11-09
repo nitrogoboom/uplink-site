@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-*Last updated: November 8, 2026*
+*Last updated: November 9, 2026*
 
 This repository holds the website for Uplink Technology, a made-up IT company. The content is placeholder text, and the look is inspired by the Overwatch 2 menus. This page explains how to run the site, how it's organized, and how to use the tools that build and check it.
 
@@ -13,76 +13,53 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 
 | Document | What it covers |
 | --- | --- |
-| [`notes.md`](notes.md) | Open items: bugs, polish, and decisions still to make. Start here. |
-| [`docs/sop.md`](docs/sop.md) | How a change reaches the live site, the standards the site meets, and the release checklist. |
-| [`src/README.md`](src/README.md) | A map of the source code: pages, components (the footer included), content, styles, and scripts. |
-| [`docs/spacing.md`](docs/spacing.md) | Spacing and line-height rules. |
-| [`docs/security-and-compliance.md`](docs/security-and-compliance.md) | Security, privacy, and accessibility controls, and how to check each one. |
-| [`docs/secrets.md`](docs/secrets.md) | Every secret and key the site uses, and where it's kept. Names only, never values. |
-| [`docs/go-live-checklist.md`](docs/go-live-checklist.md) and [`docs/launch-runbook.md`](docs/launch-runbook.md) | What's left before the real domain goes live, and the steps for launch day. |
+| [`CLAUDE.md`](CLAUDE.md) | The rules for every change, and which checks to run for which change. |
+| [`notes.md`](notes.md) | Open items, one line each. Start here. |
+| [`src/README.md`](src/README.md) | A map of the source code: pages, components (the footer included), content, copy, styles, and scripts. |
+| [`docs/design.md`](docs/design.md) | Colour roles and tokens, spacing, line height, corners, and layout. |
+| [`docs/release.md`](docs/release.md) | The standards the site meets, the release checklist, what's left before launch, and launch day. |
+| [`docs/security.md`](docs/security.md) | Security and privacy controls, how to check them, and every secret by name and place. |
 | [`SECURITY.md`](SECURITY.md) | How to report a security problem. |
-| [`docs/history/`](docs/history/) | Finished work kept for its reasoning. Read it to learn why something is the way it is, not as instructions. |
+| [`docs/history/`](docs/history/) | Records and reasoning. Read them to learn why, not as instructions. |
 
 ## Before you begin
 
-You need the following:
-
-- Node.js 24. The exact version is in `.node-version`, and CI reads the same file.
-- For the drawing tools only: Python 3.12 or later. The site's checks need only Node.
+You need Node.js 24 (the exact version is in `.node-version`, which CI reads too). For the drawing tools only, you also need Python 3.12 or later; the site's checks need only Node.
 
 ## Run the site locally
 
-1. Install the dependencies:
+1. Install the dependencies and start the development server:
 
    ```bash
    npm install
-   ```
-
-2. Start the development server:
-
-   ```bash
    npm run dev
    ```
 
-3. Open http://localhost:4321.
+2. Open http://localhost:4321.
 
-The development server doesn't apply the response headers, the 404 page, or the redirects. To see the site exactly as Cloudflare serves it, build it and serve the result:
-
-```bash
-npm run build
-npm run serve
-```
-
-Then open http://localhost:8787.
+The development server doesn't apply the response headers, the 404 page, or the redirects. To see the site as Cloudflare serves it, run `npm run build` and then `npm run serve`, and open http://localhost:8787.
 
 ### Install the browsers for the checks
 
-The site checks run in Playwright Test, which `npm install` installs. They need a browser of their own. To install it:
+The site checks need Playwright's Chromium; the release audit also needs Firefox and WebKit:
 
 ```bash
 npx playwright install chromium
-```
-
-The release audit also needs Firefox and WebKit:
-
-```bash
 npx playwright install firefox webkit
 ```
 
-Claude Code's sandbox on Windows can't start Firefox from Playwright's usual folder (`%LOCALAPPDATA%\ms-playwright`: Windows refuses to load its `mozglue` library there). So Claude's sessions keep their browsers in `%USERPROFILE%\.cache\ms-playwright` instead, set by `PLAYWRIGHT_BROWSERS_PATH` in `.claude/settings.local.json` (on this machine only, not in git). The install commands above, run from a Claude session, put the browsers there; your own terminal keeps the usual folder.
+> **Note:** Claude Code's sandbox on Windows can't start Firefox from `%LOCALAPPDATA%\ms-playwright` (Windows refuses its `mozglue` library there), so Claude's sessions keep their browsers in `%USERPROFILE%\.cache\ms-playwright`, set by `PLAYWRIGHT_BROWSERS_PATH` in `.claude/settings.local.json` (that machine only, not in git).
 
 ### Install the Python drawing tools
 
-The drawing generators are Python. You need them only to change a drawing. To install them:
+You need them only to change a drawing. Python's Chromium is used only by `gen_og.py`, which screenshots the share picture.
 
 ```bash
 pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Python's Chromium is used only by `gen_og.py`, which screenshots the share picture.
-
-`requirements.txt` is locked: every package, the ones they need included, at one version with its hashes, so `pip` installs exactly what CI installs. You change `requirements.in` and then lock it again:
+`requirements.txt` is locked with hashes, so `pip` installs exactly what CI installs. Change `requirements.in`, then lock it again:
 
 ```bash
 uv pip compile requirements.in --universal --python-version 3.12 --generate-hashes -o requirements.txt
@@ -100,11 +77,11 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `npm test` | Tests the build's after-steps and the Worker with Node's built-in test runner (`scripts/test/`). |
 | `npm run lint` | Runs ESLint, Stylelint, and Prettier. Prettier checks the format of the code (JS, TS, Astro, CSS) and of JSON and YAML; Markdown, HTML and SVG are left alone (`.prettierignore`). On `src/scripts/` and `src/lib/`, ESLint also runs typescript-eslint's rules that need types (`recommendedTypeCheckedOnly`), such as a promise left floating (`no-floating-promises`) or handed to a listener (`no-misused-promises`). |
 | `npm run format` | Fixes what the linters can fix on their own, then formats the code with Prettier (`.prettierrc.json`: 120 characters a line, single quotes). Its `astroCompressHTML` matches `compressHTML` in `astro.config.mjs`, so Prettier never adds or removes whitespace a page renders; change the two together. A commit that only reformats goes in `.git-blame-ignore-revs`, which GitHub's blame skips. |
-| `npm run ci` | Runs what CI runs: check, tests, lint, build, the site check, the link check, and the smoke check. Steps that don't depend on each other run side by side: the tests and lint run beside the type check and the build, and the link and smoke checks run together after the site check. It prints each step's time and fails if any step fails. It starts its own `wrangler dev` on a free port for the checks and stops it after, so a server you already have running is never the one checked. Needs Node and Playwright's Chromium, no Python. It doesn't run the screenshot comparison, the workflow lint, the preview upload, or the deploy. |
-| `npm run quick` | The draft-mode check for CSS and markup: type check, lint, build (about 20 seconds). Which check to run for which change is in CLAUDE.md, "Checking a change". |
-| `npm run verify` | Runs the site check in a browser. See [Site checks](#site-checks). With `RELEASE=1` it also runs the checks that expect today's exact copy. |
+| `npm run ci` | Runs what CI's full run runs: check, tests, lint, build, the site check, the link check, and the smoke check, independent steps side by side, with each step's time. It starts its own `wrangler dev` on a free port, so a server you already run is never the one checked. Needs Node and Playwright's Chromium, no Python. It skips the screenshot comparison, the workflow lint, the preview, and the deploy. |
+| `npm run quick` | Type check, lint, build (about 20 seconds). Which check to run for which change: CLAUDE.md, "Checking a change". |
+| `npm run verify` | Runs the site check and the zoom check in a browser. With `RELEASE=1` it also runs the checks that expect today's exact copy. See [Site checks](#site-checks). |
 | `npm run verify:zoom`, `verify:links`, `verify:spacing`, `verify:styles`, `visual-diff` | Run the other site checks. See [Site checks](#site-checks). |
-| `npm run release-audit` | Runs the release audit. See [Site checks](#site-checks) and [`docs/sop.md`](docs/sop.md). |
+| `npm run release-audit` | Runs the release audit. See [Site checks](#site-checks) and [`docs/release.md`](docs/release.md). |
 | `npm run smoke`, `npm run pagespeed` | Check a deployed site. See [Live-site checks](#live-site-checks). |
 | `npm run deploy` | Deploys to the live Worker by hand. It runs `npm run ci` first, which builds the site and runs every check, and deploys only if they pass. It deploys in one step (`wrangler deploy`), without CI's check of the new version at its own address or its rollback (see [Deploys](#deploys)). |
 
@@ -123,7 +100,7 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
 | `.github/workflows/clean-previews.yml` | Deletes old pull request previews from Cloudflare every 3 days (`scripts/clean-previews.mjs`). |
-| `docs/` | Reference pages, records, and dated decisions. `docs/palette.md` is the colour spec. |
+| `docs/` | `design.md`, `release.md`, `security.md`, and `history/` (records). |
 
 ### Links and addresses
 
@@ -159,7 +136,7 @@ Every other word the pages show or announce (headings, buttons, labels, hidden s
 Every drawing follows these rules. The values are measured in the files.
 
 - **True isometric.** One axis runs right and down at 30°, one runs left and down at 30°, and verticals go straight up.
-- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. The colour roles come from `docs/palette.md`. Scripts use names, never hex values.
+- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. The colour roles are in [`docs/design.md`](docs/design.md#drawing-colours). Scripts use names, never hex values.
 - **Box faces.** Every box has a top of `pal.TOP` (#4D5863), a left side of `pal.LEFT` (#37424E), and a right side of `pal.RIGHT` (#222E3A). The top is lightest and the right is darkest. Edges are `pal.EDGE` (#E6ECF2), width 1, opacity 0.3.
 - **Highlight faces:** `pal.HI_TOP`, `pal.HI_LEFT`, and `pal.HI_RIGHT` (#FFCD9B, #FFAD51, #C37600).
 - **Accents:** `pal.AMBER` (#FFAD51) and `pal.SKY` (#97C8EA).
@@ -190,7 +167,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | `gen_office.py public` | The office floor plan: `office.svg` and `office-card.svg`. The hero: `hero-office.svg`, its tablet cut `hero-office-tablet.svg`, the animated phone cut `office-compact-build.svg` with its dashes `office-compact-flows.svg`, the phone cut as a still `hero-office-phone.svg`, and the hero's moving dashes `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | The Home "We grow with you" world, `src/components/home/grow-world.svg`. One business grows in six steps. Every part carries the step it arrives on (`data-s`), and `src/scripts/grow.js` plays them. Given a folder, it also writes the five separate scenes the mockups used (`editing-room/grow-options/` on the `archive/editing-room` branch). |
 | `gen_campus.py` | The footer's campus map, `public/assets/img/campus.svg`. No phone cut. `src/styles/footer.css` styles its parts by class (SVGO writes its polygons and lines as paths). The map is decoration, so it has `aria-hidden="true"` and no role or label: screen readers skip it, and the footer's own words say what it shows (`tools/tests/test_campus.py`). |
-| `gen_light.py` | The light theme's drawings, from the dark ones with their colours swapped by role (`docs/light-theme-2026-11-08.md`). Pictures: `NAME-light.svg` beside each `NAME.svg` (`src/components/Drawing.astro` shows one or the other). Drawings inside the page (the Home hero, its dashes, Grow): `src/styles/theme-drawings.css`, which recolours them with CSS. It follows the dark drawings: `regen.py` runs it last. `--check` fails if an output is out of date. |
+| `gen_light.py` | The light theme's drawings, from the dark ones with their colours swapped by role (`docs/design.md`, "Drawing colours"). Pictures: `NAME-light.svg` beside each `NAME.svg` (`src/components/Drawing.astro` shows one or the other). Drawings inside the page (the Home hero, its dashes, Grow): `src/styles/theme-drawings.css`, which recolours them with CSS. It follows the dark drawings: `regen.py` runs it last. `--check` fails if an output is out of date. |
 | `gen_og.py public` | The share picture `og.png` (1200×630) and `apple-touch-icon.png` (180×180). Both are screenshots of a small page built from the site's tokens, fonts, and `office-card.svg`. Run it again after you change any of those. |
 
 A generator that runs with nothing changed writes the same file, byte for byte, on any machine. A `git diff` shows only what you changed.
@@ -211,7 +188,7 @@ When you change a drawing's labels or layout, check its phone cut too.
 
 | Module | What it provides |
 | --- | --- |
-| `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `docs/palette.md` are worked out here from the palette. To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
+| `palette.py` | Every drawing colour by name, such as `pal.AMBER`, `pal.EDGE`, and `pal.SCREEN`. Roles are read from `tokens.css`. Shades with no role in `docs/design.md` are worked out here from the palette (`navy(L)`, `tone(hue, L, C)`). To change a colour, change it in `tokens.css`, then run the generators again. Part files in `tools/office_parts/` write colours as `{{pal:NAME}}`. |
 | `iso.py` | The projection, `W(ox, oy, u)`. |
 | `isogen.py` | Writing a drawing: boxes (`box()`, the one box writer, which can log each box to the generator's `BOXES`), the document (`doc(crop=)`), labels (`label(scale=)`; a newline in a title or subline wraps it) and the floor gaps round their words (`label_text_gaps()`), the card cut (`card()`), `esc()` for any words written into a drawing, and `hoist_styles`, which turns inline timings into classes in a `<style>` block. |
 | `isoprops.py` | Shared props: office chair, monitor on a stand (with `screen_glass` and `app_window` for its screen), and VoIP desk phone. Also `on_front`, `on_side`, and `on_top`, which draw flat details exactly on a box face. Props sit on a grid (x and y in steps of 0.25, z in steps of 0.125) so their parts can never nearly touch. Keep the scene around them on the same grid. |
@@ -248,15 +225,15 @@ These checks open the built site in a browser. Each is a Playwright Test spec in
 
 Each check fails, and exits with status 1, on any finding. Every check takes its pages from the build: each `.html` file in `dist/` (another folder with `--dist DIR`), with the 404 page asked for at an address that doesn't exist. It also reads the served `sitemap.xml` and fails unless the sitemap lists exactly those pages, apart from `/soon` and the 404 page. So build before you check, and check the build you're serving. The page list and screen sizes are in `checks/lib.mjs` (`pages`, `SIZES`, `MISSING`). A failed check leaves its details in `out/test-results/`.
 
-| Command | What it checks |
-| --- | --- |
-| `npm run verify [-- --all] [--out DIR]` | The main browser check, which CI runs before every deploy (`checks/site.spec.mjs`). On Home: the hero builds, tiles respond to hover, the Grow section plays, and every footer tile works at 1440×900 (one screen tall below the header, no panel overflow, the map's label and camera on its spot; with none picked, or after one is shut, Contact is open and shows). The header's tabs stay 8 px clear of the logo and buttons at every width from 320 to 1440 in 10 px steps, plus 1600, 1920, 2560, and 3440. On every page: script errors are watched until the network is idle and while the page's timers run 3 seconds on (Home 5; Playwright's clock, so no real wait), while the screen turns and back, and while each of the page's own buttons is pressed; exactly one `h1`; every JSON-LD block parses; no sideways scroll at the footer, nor at 320, 390, 600, 768, 1024, and 1280 px wide; each pop-up the page opens shows, passes axe while open, closes on Esc, and gives focus back, and a toast leaves on its own; on Home at phone size the services row follows a swipe. All of it runs twice: as is and with the site's pause on, when on Home nothing may loop. The sideways check picks each Grow step by hand, so it doesn't wait on Grow's own timer. Plus an axe pass on each page (the WCAG 2.2 A and AA rules and axe's best practices; it fails on anything serious or critical, or moderate unless `AXE_ALLOW` in the spec names the rule and why), and checks of behaviour the November 7, 2026 review found broken (each test names its item): Grow asks for no frames and runs no loops once its story ends or while off screen, picks up a held or hidden step where it stopped, keeps your own pause, and pauses when reduced motion comes on; its Next button keeps keyboard focus at the last step; a double-click on a pop-up's opener leaves it open; with the page's scripts blocked, the header's gear still opens Settings (an invoker command), Esc, its close button, and a click on the backdrop close it, and focus goes back to the gear; without script the gear stays hidden and a Book link goes to the form on Contact; with script, each pop-up's close button shuts it once, with nothing in the console, and gives focus back to what opened it; a form error adds and removes only its own id in a field's `aria-describedby`, so a hint stays linked; in a browser without `scrollend` (Safari before 26.2), Next on the phone services row steps from the card showing after a swipe cuts a slide short; each pop-up has its own live region and an "Esc" in its close button's name; the skip link moves focus to `<main>`; a toast dismissed with Enter gives focus back; with the drawings blocked, the hero shows the still office and no broken-image box shows; the footer works without script (one section open at a time), Tab reaches each of its summaries and Enter or Space opens one, focus inside it stays put through a resize from desktop to phone and a turn, it has one navigation landmark, and each summary reports its open state (on desktop the panel on screen is always the open one; on a phone every row starts shut); a late font moves nothing (CLS under 0.01 on Home at 1440 and the 404 at phone size); printed, Home and Contact show every Grow step, no footer, no form or button that opens a pop-up (cards that open one keep their words), a contact line, and no section a screen tall; and each drawing's `?v=` is the hash of the file served; a card in a list of cards has its title as a heading holding its link, which covers the card, no heading in `<main>` skips a level, and no chip or other word a link shows is aria-hidden; on Home, the hero is one wheel step tall with its menu and news cards on the first screen and every section starts on the 100 px wheel grid (1100×700 to 3440×1440, including 1100×800, 1280×800, 1366×768, 1470×956, 1536×864 and short ultrawides), and the hero's news cards split no word and cut no word at 1100 to 1240 px wide; the footer map's label sits on the drawing's base; no word in a heading, stat number or Home service tile title breaks across lines (every page at 320, 768, 1060, 1440, and 2560, plus /services/security at 1024 to 1099, Home at 1440×900 with 200% zoom, and every page at 320 and 390 with a 32 px default font); and Contact's queue ring keeps "1 day" on one line and its words inside the stroke from 1100 to 1920 wide, with WCAG text spacing too; and the `/work` filters are one radio group whose options carry their counts, filter the cards without script, follow the arrow keys, and pass axe with one chosen; in forced colours, dark and light, the checked one stands out with its word readable and the focus ring shows (checked as pixels); and a printout shows every project, whatever filter is chosen; and in forced colours, dark and light, Home's open Grow step (its dot on a phone, its row on desktop), the services row's current dot, the pressed pause button's play icon, and the bottom bar's current tab are each filled with a colour of their own; on a phone, every state of Home's Grow step dots and services dots is at least 3:1 against what is behind it (WCAG 1.4.11); and on Home at 1440×900 and at 200% zoom, the "View service" bar a service tile shows on hover or keyboard focus covers none of its words (WCAG 1.4.13). Home runs at phone, tablet, 1440×900, and 3440×1440 (pop-ups and axe at phone and 1440, with a footer tile's panel at 1440), every other page at phone size, because Home is the page being worked on (`FOCUS` in the spec). The zoom check runs after it (see `verify:zoom`). Add `--all` to give every page the full check. A known bug that a later fix will close is marked as an expected failure (`KNOWN` in the spec, naming the review item); the test fails once the bug is gone, so the mark comes out with the fix. Screenshots go to `out/`. |
-| `npm run verify:zoom [-- --all]` | Text at browser zoom and at a bigger default font (WCAG 1.4.4 and 1.4.10; `checks/zoom.spec.mjs`). `npm run verify` runs it too. Zoom is emulated as the browser does it: a screen of (screen ÷ zoom) CSS pixels, each drawn at (zoom) device pixels. The default font is set as in the browser's settings. The cases: a 1280×720 laptop at 100%; 200% zoom on 1280×720, 1920×1080, 2560×1440, and an 820×1180 tablet; 400% zoom on 1280×1024 (320×256 CSS pixels); and a 20 px default font on a 430×932 phone, 24 px on 1920×1080, and 32 px on 2560×1440. Every case keeps at least 20em of width (320 px at 16 px). On Home, Services, a service page, About, Contact, Work, and Privacy (`--all`: every page), each case fails if the root font size isn't the default font size, if body text at zoom isn't at least zoom × its size at 100% on the same screen, or on text that is clipped or drawn over other text, text or a control out of reach above or left of the page, or sideways scroll. Home's Grow section is read at each of its steps. It also checks every `h1`, `h2`, stat number and footer heading at 110, 125, 150, 175 and 200% zoom on 1280×720, 1440×900, 1920×1080 and 2560×1440: on screen, none may be smaller than at the zoom step before, and at 200% each is at least 150% of its size at 100%. Each run prints how much they grow at 200%. |
-| `npm run verify:links [-- --external]` | Every link, picture, script, and preload on every page answers, the 404 page's included, and every `#section` link finds its id. It also rests the pointer on a link and checks that Chromium prefetches the page and uses the prefetch on the click, and that it doesn't prefetch `/api/` or `.md` links. CI runs it. `--external` also checks links to other sites. |
-| `npm run verify:spacing [-- PAGE …]` | Every margin, padding, and gap on screen is a step of the spacing scale. See [`docs/spacing.md`](docs/spacing.md). |
-| `npm run verify:styles -- BEFORE_URL AFTER_URL [PAGE …]` | Compares the computed style of every element on every page at four sizes between two builds. Run it after you move CSS to prove nothing changed. |
-| `npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]` | Screenshots every page of both sites at phone, tablet, and desktop, with the drawings masked, and lists what looks different (`out/visual/`). CI runs it against the live site on a pull request with the `full-checks` label and puts the list in the run's summary. It reports and never fails, unless you add `--strict`. `--wide` adds 1280×720 and 2560×1440, for a layout change. |
-| `npm run release-audit [-- --only PARTS] [--html-all]` | The release audit (`checks/audit.spec.mjs`). It runs every page in Chromium, Firefox, WebKit, and emulated phones, plus a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. It takes a few minutes, so run it before a release, not on every build. The report is `out/audit/report.md`. |
+Each test's name says what it holds, often with the WCAG number or the review item it guards; read them in the spec files rather than a list here.
+
+- **`npm run verify [-- --all] [--out DIR]`**: the main browser check (`checks/site.spec.mjs`), then the zoom check. On every page: no script error or CSP block while it loads, its timers run on (Playwright's clock), the screen turns, and each of its buttons is pressed; one `h1` and no skipped heading level; JSON-LD parses; no sideways scroll from 320 to 1280 px; each pop-up shows, passes axe, closes on Esc, and gives focus back; card titles are headings holding their link; no word in a heading or stat breaks across lines; and an axe pass (WCAG 2.2 A and AA plus best practices), which fails on anything serious or critical, or moderate unless `AXE_ALLOW` names the rule and why. On Home it also checks the hero, Grow, the services row, the footer at 1440×900, the header's room at every width, the 100 px wheel grid, forced colours, 1.4.11 and 1.4.13, print, and the pages with script blocked. Everything runs twice, as is and with the site's pause on. Home runs at phone, tablet, 1440×900 and 3440×1440 (`FOCUS`), every other page at phone size; `--all` gives every page the full check. A known bug is an expected failure (`KNOWN`, naming its review item), so the mark comes out with the fix. Screenshots go to `out/`.
+- **`npm run verify:zoom [-- --all]`**: text at browser zoom and at a bigger default font (WCAG 1.4.4, 1.4.10; `checks/zoom.spec.mjs`), emulated as the browser does it: 200% and 400% zoom, and 20, 24 and 32 px default fonts, on phone to 2560×1440 screens, never under 20em wide. It fails if the root font size isn't the default, body text doesn't grow by the zoom, text is clipped, overlapped, or out of reach, or the page scrolls sideways; and if any `h1`, `h2`, stat number or footer heading gets smaller on screen from one zoom step (110 to 200%) to the next. It prints how much they grow at 200%.
+- **`npm run verify:links [-- --external]`**: every link, picture, script, and preload on every page answers (the 404 page's too), every `#section` finds its id, and Chromium prefetches a page on hover but never `/api/` or `.md` links. `--external` also checks links to other sites.
+- **`npm run verify:spacing [-- PAGE …]`**: every margin, padding, and gap on screen is a step of the spacing scale ([`docs/design.md`](docs/design.md#spacing)).
+- **`npm run verify:styles -- BEFORE_URL AFTER_URL [PAGE …]`**: compares every element's computed style at four sizes between two builds. Run it after you move CSS.
+- **`npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]`**: screenshots every page of both sites at phone, tablet, and desktop, drawings masked, and lists what looks different (`out/visual/`). CI runs it against the live site on a pull request with the `full-checks` label. It never fails unless you add `--strict`; `--wide` adds 1280×720 and 2560×1440.
+- **`npm run release-audit [-- --only PARTS] [--html-all]`**: the release audit (`checks/audit.spec.mjs`): every page in Chromium, Firefox, WebKit, and emulated phones, a keyboard Tab-through, a screen-reader transcript (Guidepup's Virtual Screen Reader), motion and pause, form errors, and the W3C HTML validator. A few minutes; run it before a release ([`docs/release.md`](docs/release.md)). The report is `out/audit/report.md`.
 
 ### Live-site checks
 
@@ -265,7 +242,7 @@ These checks ask a deployed site over plain HTTP. They need no local server.
 | Command | What it checks |
 | --- | --- |
 | `npm run smoke -- ADDRESS [--launch] [--preview] [--old OLD_ADDRESS]` | Checks a deployed site: every sitemap page, the security headers (and that `X-Permitted-Cross-Domain-Policies` is gone), `noindex`, redirects (the other spellings of an address, and `http://`), the 404 page (its status, asked again with `If-None-Match`, and for a missing `.md`, `.txt`, script, font, or drawing, with the pages' headers), the Worker's own headers, the report endpoint, the Speculation Rules, `robots.txt`, `llms.txt`, and the Markdown copies of `/services` and Home (`noindex` and a canonical `Link` to the page, with `--launch` too). Run it after a deploy. `--launch` expects `noindex` to be gone from the pages, and a page asked for over `http://` to redirect. `--preview` checks a version at its own preview address, before it takes traffic: the sitemap, `robots.txt`, and the canonicals name the live address, and the `http://` redirect is left for the live run. `--old` checks that the old address redirects to the new one. CI also runs it against the local build (`npm run smoke -- http://localhost:8787`); on `localhost` it leaves out the `http://` redirect and the sitemap's host, which only a deployed site has. |
-| `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/secrets.md`](docs/secrets.md). |
+| `npm run pagespeed -- ADDRESS [--strict] [--min N] [--sample]` | Runs Google PageSpeed Insights on the sitemap's pages, on phone and desktop. It reports whether Home scores 100 in all four categories. `--strict` holds every page to that. Needs `PSI_API_KEY` in `.dev.vars` or the environment. See [`docs/security.md`](docs/security.md#secrets). |
 
 ## Hosting
 
@@ -310,7 +287,7 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 - Beside it, the `drawings` job installs the locked `requirements.txt` on Python 3.12, regenerates every drawing (`python tools/regen.py`) and fails if `git diff` then shows any, then runs the tools' tests and every drawing check (`python tools/regen.py --checks-only`). It runs alongside the build and check jobs, which take longer, so it adds no time to a run. A failure there stops the deploy.
 - Every run also lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. Each pull request also gets a dependency review (`actions/dependency-review-action`), which fails on a new high-severity vulnerability. It runs only while the repository is public (it went public on November 7, 2026); on a private repository it needs GitHub Advanced Security.
 - Every step runs in `bash` with `pipefail`, and every job has a time limit (`timeout-minutes`).
-- A change that touches only root `*.md` files or `docs/` runs no CI and deploys nothing.
+- A change that touches only root `*.md` files or `docs/` starts no run of `site.yml` (`paths-ignore`), so it deploys nothing. On a pull request that also means the required `build` check never reports: see [Repository rules](#repository-rules).
 - A push to `main` that passes the `build` gate, the drawings job and the workflow lint deploys to the live Worker. The deploy and preview jobs install the exact dependencies in `package-lock.json` (`npm ci`) and run that `wrangler`. The deploy job runs `node scripts/deploy.mjs LIVE_ADDRESS` on the `dist/` the `dist` job built and the checks passed, in these steps:
   1. It notes the version that is live now (`wrangler deployments status --json`).
   2. It uploads the build as a new version that takes no traffic (`wrangler versions upload`). The version answers at its own preview address.
@@ -332,51 +309,28 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
 
 ### Clean up previews by hand
 
-1. See what would be deleted, without deleting anything:
+1. See what would be deleted: `gh workflow run clean-previews.yml`.
+2. Delete them: `gh workflow run clean-previews.yml -f dry_run=false`. For one branch only, add `-f only_alias=ALIAS` (the branch as it appears in its preview address).
 
-   ```
-   gh workflow run clean-previews.yml
-   ```
-
-2. Delete them:
-
-   ```
-   gh workflow run clean-previews.yml -f dry_run=false
-   ```
-
-3. To delete one branch's previews only, add `-f only_alias=ALIAS`, where `ALIAS` is the branch as it appears in its preview address.
-
-The run's summary in the Actions tab lists each preview and what happened to it.
-
-> **Note:** The script deletes through Cloudflare's `/workers/workers/WORKER/versions/VERSION_ID` path. The older `/workers/scripts/` path lists versions but refuses a delete (error 10405).
+The run's summary lists each preview and what happened to it. The script deletes through Cloudflare's `/workers/workers/WORKER/versions/VERSION_ID` path; the older `/workers/scripts/` path refuses a delete (error 10405).
 
 ### Repository rules
 
 Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
 
 - **main: no force push or delete.** Applies to everyone.
-- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job (the gate over the build and every check) must pass. Repository admins can bypass it, so a change to only root `*.md` files or `docs/` (which runs no CI) can still go straight to `main`.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job (the gate over the build and every check) must pass. Repository admins can bypass it (bypass mode "always").
+
+A pull request that changes only root `*.md` files or `docs/` never gets a `build` result: `paths-ignore` skips `site.yml`, and GitHub leaves a required check from a skipped workflow at "Expected — Waiting for status to be reported", so the pull request can't merge on its own. To land such a change, put it in a pull request that also changes something CI runs for, or, as an admin, merge it with "Merge without waiting for requirements to be met (bypass rules)" or push it straight to `main`. Making docs-only pull requests mergeable without the bypass needs a workflow change (for example, no `paths-ignore` on `pull_request`); that's the owner's call (`notes.md`).
 
 Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
 
 ### Roll back a bad deploy
 
-The deploy job rolls back on its own when the live site fails the smoke check straight after a deploy (see [Deploys](#deploys)). Roll back by hand when something breaks that the smoke check doesn't catch, or when the run's summary says "Rollback failed".
+The deploy job rolls back on its own when the live site fails the smoke check straight after a deploy. Roll back by hand when something breaks that the smoke check doesn't catch, or when the run's summary says "Rollback failed":
 
-1. List the recent deploys:
-
-   ```bash
-   npx wrangler deployments list
-   ```
-
-2. Put the previous version back live:
-
-   ```bash
-   npx wrangler rollback
-   ```
-
-   For an older version, add its ID: `npx wrangler rollback VERSION_ID`. A rollback takes seconds and needs no build.
-
+1. List the recent deploys: `npx wrangler deployments list`.
+2. Put the previous version back live: `npx wrangler rollback` (for an older one, `npx wrangler rollback VERSION_ID`). It takes seconds and needs no build.
 3. Fix `main`. The next push to `main` deploys it again.
 
 ### Response headers
@@ -392,6 +346,9 @@ Keep these rules in mind:
 - **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
 - **Trusted Types.** The CSP requires Trusted Types. A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`, or the browser blocks it.
 - **No `style=""` attributes.** `style-src` has no `'unsafe-inline'`, and the build fails on any `style=""` attribute. Scripts set styles with `el.style.x = …` instead.
+- **Font files keep their names.** `/assets/fonts/` is cached immutable for a year but has no hash in its file names: if a font file changes, give it a new name.
+
+Every control and how to check it: [`docs/security.md`](docs/security.md).
 
 ### Search engines
 

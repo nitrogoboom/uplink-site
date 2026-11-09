@@ -165,7 +165,7 @@
   opacity: 1;
 }
 
-/* the news cards: a card grid, so its gap is every card grid's (docs/spacing.md R6) */
+/* the news cards: a card grid, so its gap is every card grid's (docs/design.md R6) */
 .hero-dock {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

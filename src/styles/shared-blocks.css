@@ -128,7 +128,7 @@
   .card-row {
     gap: var(--sp-5);
   }
-} /* every card grid: --sp-4, --sp-5 from 1100 (docs/spacing.md R6) */
+} /* every card grid: --sp-4, --sp-5 from 1100 (docs/design.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the
    current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current).

@@ -24,7 +24,7 @@
           "/(?<![\\w.])(?:\\d*\\.\\d+|[1-9]\\d*)(?:px|rem|em)\\b/"
         ]
       },
-      { "message": "Off-scale spacing: use a --sp-* token (docs/spacing.md)" }
+      { "message": "Off-scale spacing: use a --sp-* token (docs/design.md, Spacing)" }
     ],
     "value-keyword-case": [
       "lower",

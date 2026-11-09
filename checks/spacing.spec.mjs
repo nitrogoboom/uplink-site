@@ -1,7 +1,7 @@
 // Off-scale spacing on the built site: every margin, padding and gap that ends up on screen must be a step of the
 // space scale (--sp-1 to --sp-9, read from tokens.css) or 0. Stylelint catches a raw value in our CSS; this catches
 // the rest: browser defaults nobody reset (a <dl>'s 1em margin, a <button>'s 1px padding) and calc() sums that land
-// between steps. Rules: docs/spacing.md. Fails on anything off scale.
+// between steps. Rules: docs/design.md, "Spacing". Fails on anything off scale.
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify:spacing [-- --base URL] [PAGE ...]
 // Pages default to the sitemap plus /soon and a 404; sizes are the site check's four. Values print as px at a 16px
 // root (the browser's default; a visitor's bigger font scales them all).

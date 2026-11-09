@@ -5,7 +5,7 @@
 //   npm run pagespeed -- ADDRESS --min 100 --strict                            every page held to the bar
 //   npm run pagespeed -- ADDRESS --sample                                      Home, one service, one project
 // The API key: PSI_API_KEY in .dev.vars (gitignored) or in the environment. It lives in Google Cloud, project
-// uplink-site, APIs & Services > Credentials > pagespeed-gate (limited to the PageSpeed Insights API; docs/secrets.md).
+// uplink-site, APIs & Services > Credentials > pagespeed-gate (limited to the PageSpeed Insights API; docs/security.md, "Secrets").
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { test } from '@playwright/test';

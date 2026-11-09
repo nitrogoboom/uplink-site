@@ -1,7 +1,7 @@
-// Release audit: the machine half of the release checklist (docs/sop.md, "Release checklist"). Run it before a
+// Release audit: the machine half of the release checklist (docs/release.md, "Release checklist"). Run it before a
 // release, not on every build (it takes minutes), against `npm run serve` or --base. Each part is described above it.
 // usage: npm run release-audit [-- --base http://localhost:8787] [--only browsers,keyboard,reader,motion,forms,html] [--html-all]
-// Writes out/audit/report.md (the summary to paste into docs/releases/), with per-page files in out/audit/reader/,
+// Writes out/audit/report.md (the summary to paste into docs/history/releases/), with per-page files in out/audit/reader/,
 // keyboard/ and shots/. Needs: npx playwright install chromium firefox webkit (the reader is bundled with esbuild).
 import { mkdirSync, statSync, existsSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
