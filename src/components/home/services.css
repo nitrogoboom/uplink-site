@@ -480,17 +480,21 @@
     grid-column: 4;
   }
   /* the three drawings share one height, so the titles under them line up whatever their words: what the screen
-     leaves after the tallest card's words (about 46rem), never under 6rem; words that need more grow the card */
+     leaves after the tallest card's words (about 44.5rem, with a pointer's slimmer bar below), never under 6rem; words
+     that need more take it from the drawing first (it may shrink to 6rem), so a few pixels more text on another
+     machine don't push the section a whole step taller */
   .svc-big .svc-art {
-    flex: none;
+    flex: 1 1 0;
     aspect-ratio: auto;
-    height: max(6rem, 100svh - 46rem);
+    min-height: 6rem;
+    max-height: max(6rem, 100svh - 44.5rem);
   }
   /* on paper there is no screen to share: the drawing keeps its own shape */
   @media print {
     .svc-big .svc-art {
+      flex: none;
       aspect-ratio: 4 / 3;
-      height: auto;
+      max-height: none;
     }
   }
   .svc-big .svc-line {
@@ -503,7 +507,7 @@
     margin-top: var(--sp-3);
     padding-top: var(--sp-4);
     border-top: 1px solid var(--c-line);
-    text-align: left;
+    text-align: center; /* centred like the chip, title and line above (owner, November 9, 2026) */
   }
   /* body font, sentence case: short list lines read better than the condensed display face */
   .svc-feat-t {
@@ -524,15 +528,55 @@
   }
 }
 
-/* desktop with a pointer: the room kept for the bar (above) comes out of the icon, so a short tile still fits its
-   quarter of the screen (1280x800, 1366x768). From 60em tall (1920x1080 and up) there is room for the full icon. */
-@media (hover: hover) and (width >= 68.75em) and (43.75em <= height < 60em) and (aspect-ratio >= 3 / 2) {
+/* desktop, mouse or touch: a short tile's icon is --sp-6, so the tile still fits its quarter of the screen (1280x800,
+   1366x768). From 60em tall (1920x1080 and up) there is room for the full icon. */
+@media (width >= 68.75em) and (43.75em <= height < 60em) and (aspect-ratio >= 3 / 2) {
   .svc-small .svc-icon svg {
     width: var(--sp-6);
     height: var(--sp-6);
   }
+}
+
+/* desktop with a pointer: a slimmer bar (2.25rem, --sp-7 less --sp-3, not --control-h; it is part of the tile's link, not a target of its
+   own), so less room is kept under a tall card's features and the drawing gets it. A short tile keeps no room at all:
+   its icon and name sit centred, and slide up out of the bar's way while it shows (WCAG 1.4.13). */
+@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-go {
+    min-height: calc(var(--sp-7) - var(--sp-3));
+  }
+  .svc-big .svc-text {
+    padding-bottom: var(--sp-7);
+  }
   .svc-small .svc-text {
-    padding-top: var(--sp-2);
+    padding-bottom: 0;
+  }
+  .svc-small :is(.svc-icon, .svc-text) {
+    transition: transform var(--dur-2) var(--ease);
+  }
+  .svc-small .svc-tile:is(:hover, :focus-visible) :is(.svc-icon, .svc-text) {
+    transform: translateY(calc(-1 * var(--sp-5)));
+  }
+}
+
+/* desktop on a touch screen (no hover: a touch laptop, a tablet in desktop mode): the bar would show all the time,
+   under every tile's words, and push the section past one screen. The whole tile is the link, so the bar goes from
+   sight; "View service" stays in the link's name (M10). The drawings take the room a pointer's bar would keep. */
+@media (hover: none) and (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
+  .svc-go {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .svc-big .svc-art {
+    max-height: max(6rem, 100svh - 43rem);
+  }
+  /* no bar, so no room kept under a short tile's name: icon and name sit centred, as with a mouse */
+  .svc-small .svc-text {
+    padding-bottom: 0;
   }
 }
 
