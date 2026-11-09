@@ -19,8 +19,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
 - [ ] Before launch, `/accessibility` gets back two Ontario lines: what happens after feedback (O. Reg. 191/11 s. 80.50(2)) and free accessible formats on request (s. 12(3)).
-- [ ] "Only a few people at Uplink will be able to open the inbox" (privacy, "How we protect it") is an assumption: confirm or cut.
-- [ ] AODA compliance report: due **December 31, 2026** for 20–49 Ontario employees (the site says 22 technicians), through the Accessibility Compliance Reporting Portal.
 
 ## Forms
 
