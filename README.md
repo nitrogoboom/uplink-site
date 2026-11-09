@@ -102,7 +102,6 @@ uv pip compile requirements.in --universal --python-version 3.12 --generate-hash
 | `worker/index.js` | The Worker script. See [`docs/ops.md`](docs/ops.md#the-worker). |
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
-| `.github/workflows/clean-previews.yml` | Deletes old pull request previews from Cloudflare every 3 days (`scripts/clean-previews.mjs`). |
 | `docs/` | `design.md`, `release.md`, `security.md`, and `history/` (records). |
 
 ### Links and addresses
