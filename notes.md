@@ -70,7 +70,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 ## Code and tools
 
 - [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
-- [ ] Parked from the November 7 review: J3, J4, J5 (Grow internals), J6 (narrow the Trusted Types policy), C2, C3, C7, C8, L4, L5, L11 (`docs/history/review-2026-11-07.md`).
 - [ ] Review C4 leftovers: `scripts/check.mjs` picks a check by project and `CHECK_ARGS`; the server starts in two places (Playwright's `webServer` could do both); the audit bundles Guidepup at run time.
 - [ ] Dependabot's pip relock drops Windows' `colorama` line from `requirements.txt`: relock with the command in `requirements.in` after each one.
 - [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
