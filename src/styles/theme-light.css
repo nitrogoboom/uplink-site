@@ -95,6 +95,15 @@
   :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-wall-item, .fc-soc, .svc-tile, .fc-tile, .feat) {
     box-shadow: var(--shadow-card);
   }
+  /* A hovered card keeps its own fill. --c-surface-2 is a see-through navy wash: in dark mode it lightens a card
+     (lifts it), but here it greyed the card below the ground it sits on, as if it sank (owner, November 9, 2026).
+     The lift, the border and the shadow show the hover */
+  @media (hover: hover) {
+    :root[data-theme='light'] :is(.card, .fc-wall-item, .fc-sec:not([open]) > .fc-tile):hover,
+    :root[data-theme='light'] .svc-tile:is(:hover, :has(.svc-link:focus-visible)) {
+      background: var(--c-surface);
+    }
+  }
 
   /* Grow tags: in light mode red and green are the dark ink steps, so the words on them go white
      (#fff on #b24438 5.6:1, on #004f2e 9.7:1; the dark label was 3.2:1 on red) */
