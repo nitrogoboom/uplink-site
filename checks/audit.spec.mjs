@@ -172,7 +172,12 @@ const STOP = () => {
     const c = getComputedStyle(k);
     return c.outlineStyle !== 'none' || c.boxShadow !== 'none';
   });
-  const ring = s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
+  // a card whose whole box is the link draws its ring on the link's ::after (surfaces.css, .card-link)
+  const pseudo = ['::before', '::after'].some((p) => {
+    const c = getComputedStyle(e, p);
+    return c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0;
+  });
+  const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || pseudo;
   const name = (e.getAttribute('aria-label') || e.innerText || e.value || e.title || e.getAttribute('alt') || '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -201,7 +206,14 @@ async function keyboard(paths) {
     for (let i = 0; i < 600; i++) {
       await pg.keyboard.press('Tab');
       await pg.evaluate(SETTLE);
-      const s = await pg.evaluate(STOP);
+      let s = await pg.evaluate(STOP);
+      // Home lines a section up with the screen after focus lands in it (home.js, a smooth scroll that starts after
+      // SETTLE has seen the page still): give that scroll its time before calling a stop off screen
+      if (s && !s.onScreen) {
+        await pg.waitForTimeout(1500);
+        await pg.evaluate(SETTLE);
+        s = await pg.evaluate(STOP);
+      }
       if (s === null || seenKb.has(s.kb)) {
         back = true; // back to the start: the page is done
         break;

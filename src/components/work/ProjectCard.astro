@@ -34,15 +34,15 @@ const H = level === 2 ? 'h2' : 'h3';
       fetchpriority={first ? 'high' : undefined}
       loading="lazy"
   /></span>
-  <span class="card-body"
-    ><H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H
+  <div class="card-body">
+    <H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H
     ><span class="card-meta muted small"
       >{p.clientShort
         .split(' · ')
         .map((part, i) => <Fragment
           >{i > 0 ? <Fragment><Sep /><span class="keep">{part}</span></Fragment> : part}</Fragment
         >)}</span
-    ></span
-  >
+    >
+  </div>
   <span class="chip"><span class="sr-only">, </span>{p.tag}</span>
 </div>
