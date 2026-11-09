@@ -26,6 +26,8 @@ The rules for each kind of file are in `.claude/rules/`. Claude Code loads a fil
 | CSS, or the classes and headings in a component | `.claude/rules/css.md` |
 | A drawing, `tools/`, or a colour token | `.claude/rules/drawings.md` |
 
+Two long, rare jobs have a skill that holds their steps in order: `release` (a release or launch day) and `drawing` (any drawing or drawing-colour change), in `.claude/skills/`. Use the skill before you start one.
+
 Two that hold everywhere: type no words into markup or scripts (they live in `src/content/` and `src/data/`), and never edit an output SVG by hand.
 
 ## Checking a change
