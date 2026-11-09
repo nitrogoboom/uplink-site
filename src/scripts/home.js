@@ -4,7 +4,7 @@
    phones, and Proof's wheel-grid height. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, held, html, reduceMotion, replay, settle, theme, whenOnScreen } from './core.js';
+import { $, $$, held, html, reduceMotion, replay, settle, theme, whenOnScreen, words } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
@@ -40,14 +40,13 @@ const afterLayout = (/** @type {() => void} */ fn) => {
    ------------------------------------------------------------------ */
 const stage = $('.hero-art .stage[data-hero]');
 // Pause buttons (HoldButton.astro, wired in core.js): while held, the cloud and the phone captions stop their timers.
-const APPS = [
-  { id: 'mail', name: 'Email', state: 'Online', detail: 'Spam and phishing filtered' },
-  { id: 'files', name: 'Files', state: 'Synced', detail: 'OneDrive and Drive backed up' },
-  { id: 'meet', name: 'Meetings', state: 'Ready', detail: 'Teams and Meet, one-click join' },
-  { id: 'chat', name: 'Chat', state: 'Online', detail: 'Every channel watched' },
-  { id: 'cal', name: 'Calendar', state: 'Synced', detail: 'Shared calendars in step' },
-  { id: 'secure', name: 'Sign-in', state: 'Secured', detail: 'MFA on for every user' },
-];
+// The cloud's apps, in the order they show; each id is its tile in the drawing (data-tile, tools/gen_office.py) and
+// its words come from src/data/copy/home.yaml, cloud (index.astro carries them).
+const WORDS = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).cloud;
+const APPS = /** @type {const} */ (['mail', 'files', 'meet', 'chat', 'cal', 'secure']).map((id) => ({
+  id,
+  ...WORDS.apps[id],
+}));
 // A timer that runs tick every `every` ms only while it may: el on screen, the tab showing, motion allowed, the
 // pause button off, and ready() (default: always). It stops and starts itself as those change. start() restarts
 // the count (after a hover or a tap); off() lets go of the timer and every listener, when the cut is swapped out.
@@ -217,7 +216,7 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const CAP_EVERY = 2200; // ms between caption changes, the two captions taking turns (each one every 4.4s)
 const CAP_SWAP = 170; // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
 const CAP_SECOND = 1100; // ms from the first caption to the second
-const CLOUD_TITLE = 'Cloud workspace';
+const CLOUD_TITLE = WORDS.title;
 /** @param {string} tag @param {string} cls @param {Element} parent */
 const make = (tag, cls, parent) => {
   const el = document.createElementNS(SVG_NS, tag);

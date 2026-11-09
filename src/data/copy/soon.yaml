@@ -1,0 +1,26 @@
+# Coming soon (/soon): the one page every link to a page that isn't built yet goes to. `names` and `pageTitle` are
+# read by soon.js in the browser: it names the page from the address (/soon#client-portal). Schema:
+# src/lib/copy-schema.ts.
+
+title: Coming soon · Uplink Technology # <title>
+description: This part of the Uplink Technology site is not built yet.
+eyebrow: Placeholder
+heading:
+  page: This page # soon.js puts the page's name here
+  rest: is not built yet
+lead: This prototype links here for pages that come later, such as the client portal, legal pages and the blog.
+home: Back to home
+contact: Contact
+
+pageTitle: '{name} · Coming soon' # <title> once soon.js knows the page
+names: # by the address's #part
+  client-portal: The client portal
+  remote-support: Remote support
+  system-status: System status
+  careers: Careers
+  blog: The blog
+  terms: The terms of service
+  windows-10-guide: The Windows 10 upgrade guide
+  security-checklist: The security checklist
+  social: Our social channels
+  francais: The French site

@@ -138,7 +138,7 @@ export const getServices = async () => (await getCollection('services')).sort((a
 export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data); // in file order
 
-// The /work filters (components/work/Projects.astro): "All", then one radio per project tag, in the order the projects
+// The /work filters (components/work/Projects.astro): "All" (label null: its word is the copy's, work.yaml), then one radio per project tag, in the order the projects
 // first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
 // tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head>, and
 // scripts/headers.mjs hashes it for the CSP like any inline <style>. A browser without :has() ignores the rules and
@@ -148,7 +148,7 @@ export const workFilters = async () => {
   const projects = await getProjects();
   const tags = [...new Set(projects.map((p) => p.data.tag))];
   return [
-    { key: 'all', label: 'All', count: projects.length },
+    { key: 'all', label: null, count: projects.length },
     ...tags.map((t) => ({ key: t.toLowerCase(), label: t, count: projects.filter((p) => p.data.tag === t).length })),
   ];
 };
@@ -161,28 +161,37 @@ export const workFilterCss = async () =>
     )
     .join('\n');
 
-// The source files behind each static page, for lastmod. Shared parts (layout, header, footer) are left out
-// on purpose: a footer tweak is not a reason for a crawler to refetch every page. A service or project page dates
+// The source files behind each static page, for lastmod (its copy file in src/data/copy/ included). Shared parts
+// (layout, header, footer, ui.yaml) are left out on purpose: a footer tweak is not a reason for a crawler to refetch
+// every page. A service or project page dates
 // from its own entry file alone (entryFile()), the date its JSON-LD carries too: editing one changes one URL.
 const SOURCES: Record<keyof typeof PAGES, string[]> = {
   home: [
     'src/pages/index.astro',
     'src/components/home',
+    'src/data/copy/home.yaml',
     'src/data/grow.json',
     'src/content/services',
     'src/content/projects',
   ],
-  services: ['src/pages/services.astro', 'src/components/services', 'src/content/services', 'src/data/faq.json'],
-  work: ['src/pages/work.astro', 'src/components/work', 'src/content/projects'],
-  about: ['src/pages/about.astro', 'src/components/about', 'src/data/team.json'],
+  services: [
+    'src/pages/services.astro',
+    'src/components/services',
+    'src/data/copy/services.yaml',
+    'src/content/services',
+    'src/data/faq.json',
+  ],
+  work: ['src/pages/work.astro', 'src/components/work', 'src/data/copy/work.yaml', 'src/content/projects'],
+  about: ['src/pages/about.astro', 'src/components/about', 'src/data/copy/about.yaml', 'src/data/team.json'],
   contact: [
     'src/pages/contact.astro',
     'src/components/contact',
+    'src/data/copy/contact.yaml',
     'src/content/services',
     'src/components/ServiceOptions.astro',
   ],
-  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md'],
-  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md'],
+  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md', 'src/data/copy/text-pages.yaml'],
+  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md', 'src/data/copy/text-pages.yaml'],
 };
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };

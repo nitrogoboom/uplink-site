@@ -1,0 +1,68 @@
+# Contact (/contact): Message (the ways to reach us, the form and the queue card) and Support. The phone number and
+# email address are data (src/data/footer.json). `toast` is read by contact.js in the browser.
+# Schema: src/lib/copy-schema.ts.
+
+message:
+  eyebrow: Lobby
+  title: Talk to a real person
+  lead: No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk options further down.
+  direct: Reach us directly
+  call: Call
+  copyPhone: Copy phone number
+  email: Email
+  copyEmail: Copy email address
+  book: Free, 30 minutes # under "Book a check-up"
+  form:
+    title: Send us a message
+    nameError: Add your name so we know who to reply to.
+    topic:
+      label: What do you need?
+      checkup: Free IT check-up # the first choice
+      other: Something else # the last choice
+      error: Pick what you need, or Something else.
+    message:
+      label: Message
+      placeholder: Tell us a little about your team and what is going on.
+      error: Write at least a sentence so we can help.
+    send: Send message
+  queue:
+    label: Queue status
+    open: Open now
+    queued: You're in the queue # after a message is sent
+    reply: Reply to new messages
+    replyIn: 1 day
+    title: Hours and office # hidden heading
+    facts:
+      - term: Monday to Friday
+        value: 7 am to 7 pm ET
+      - term: Weekends
+        value: Emergency line
+      - term: Monitoring
+        value: 24/7 for clients
+      - term: Office
+        value: Toronto, ON
+
+support:
+  eyebrow: Already a client
+  title: Get help now
+  lead: Clients skip the queue. Pick whichever is fastest for you.
+  cards:
+    call:
+      title: Call the help desk
+      text: '{phone}, then press 1. After hours this rings our on-call technician.'
+    ticket:
+      title: Open a ticket
+      text: Log in to the client portal to open a ticket and follow its progress.
+    remote:
+      title: Start a remote session
+      text: A technician will give you a six-digit code to share your screen.
+
+# shown by contact.js
+toast:
+  copied: Copied # then the number or address
+  selected:
+    title: Selected
+    text: Copy it with Ctrl+C, or long-press on a phone.
+  received:
+    title: Message received
+    text: You are in the queue. We reply within one business day.

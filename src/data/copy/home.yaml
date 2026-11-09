@@ -1,0 +1,94 @@
+# Home (/): every section's own words, in page order. The services, projects and Grow's six steps are data
+# (src/content/, src/data/grow.json). `cloud` and the Grow button's names are read by home.js and grow.js in the
+# browser. Schema: src/lib/copy-schema.ts.
+
+hero:
+  eyebrow: # "Managed IT · Ontario"
+    - Managed IT
+    - Ontario
+  title: Your IT team, # first line
+  accent: always online # second line, emphasized
+  lead: 'We run the technology behind your business: help desk, security, cloud, network and phones. You run the business.'
+  leadShort: 'We run your IT: help desk, security, cloud, network and phones.' # phones
+  cta: Get started
+  ctaNote: Free check-up. No contract to look.
+  menu: Services # the list under the button
+  allServices:
+    title: All services
+    sub: Help desk, security, cloud, networks, phones
+  alt: Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace # the still picture
+  news: # the two cards under the drawing
+    checkup:
+      tag: Free
+      title: IT and security check-up
+      line: 30 minutes. We look first, then quote.
+    windows:
+      tag: Guide
+      title: Windows 10 support has ended
+      line: Your upgrade plan, step by step
+
+# the phone captions and the cloud panel in the hero drawing (home.js), one entry per app, in the order they show
+cloud:
+  title: Cloud workspace
+  apps:
+    mail:
+      name: Email
+      state: Online
+      detail: Spam and phishing filtered
+    files:
+      name: Files
+      state: Synced
+      detail: OneDrive and Drive backed up
+    meet:
+      name: Meetings
+      state: Ready
+      detail: Teams and Meet, one-click join
+    chat:
+      name: Chat
+      state: Online
+      detail: Every channel watched
+    cal:
+      name: Calendar
+      state: Synced
+      detail: Shared calendars in step
+    secure:
+      name: Sign-in
+      state: Secured
+      detail: MFA on for every user
+
+services:
+  eyebrow: What we run
+  title: Everything your office runs on
+  seeAll: See all services
+  list: Services # the row's name
+  view: View service # each tile's bar, and the end of its link's name
+  more: All services # the last tile
+  viewAll: View services
+  previous: Previous service
+  next: Next service
+  swipe: Swipe
+
+grow:
+  eyebrow: Built to scale
+  title: We grow with you
+  lead: As your team spreads out, here's what to watch, and what we take care of.
+  steps: Where your people work # the step list's and the dots' name
+  team: Team of {n}
+  play: # the play button's name (grow.js)
+    pause: Pause
+    play: Play
+    again: Play again
+  previous: Previous place
+  next: Next place
+  dot: '{i} of {n}: {place}'
+  watch: Watch for
+  handle: We handle
+
+work:
+  eyebrow: Our work
+  title: Setups we built and still run
+  seeAll: See all work
+
+proof:
+  title: Start with a free check-up
+  lead: Thirty minutes, no contract. We show you what we find and what we would fix first.

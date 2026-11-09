@@ -5,14 +5,17 @@ import { getCollection } from 'astro:content';
 import { byOrder } from '../../content.config';
 import Icon from '../Icon.astro';
 import { phone } from '../../lib/footer';
+import { copy } from '../../lib/copy';
 const faq = (await getCollection('faq')).sort(byOrder);
+const t = (await copy('services')).faq;
+const ui = await copy('ui');
 ---
 
 <section class="section fold fold-always" id="faq" aria-labelledby="faq-title">
   <div class="container split">
     <div class="section-head">
-      <p class="eyebrow">Questions</p>
-      <h2 id="faq-title">Things people ask first</h2>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 id="faq-title">{t.title}</h2>
     </div>
     <div class="faq">
       {faq.map(({ data: f }) => <details>
@@ -22,11 +25,11 @@ const faq = (await getCollection('faq')).sort(byOrder);
     </div>
     <div class="panel cta-band fold-foot" id="start">
       <div class="stack">
-        <h2 id="start-title">Not sure which plan fits?</h2>
-        <p class="lead">Start with the free check-up. We will tell you what you need and what you can skip.</p>
+        <h2 id="start-title">{t.cta.title}</h2>
+        <p class="lead">{t.cta.lead}</p>
       </div>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
         <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
       </div>
     </div>

@@ -4,24 +4,20 @@
 // One full screen on every size and no footer (footer={false}): .fold-always holds the section to the screen under
 // the header (and above the phone tab bar); it grows past that only when its content needs more (zoom).
 import Base from '../layouts/Base.astro';
+import { copy } from '../lib/copy';
+const t = await copy('not-found');
 ---
 
-<Base
-  title="Page not found · Uplink Technology"
-  description="There is no page at this address."
-  page="notfound"
-  robots="noindex"
-  footer={false}
->
+<Base title={t.title} description={t.description} page="notfound" robots="noindex" footer={false}>
   <section class="page-intro fold fold-always" aria-labelledby="nf-title">
     <div class="container">
-      <p class="eyebrow">Error 404</p>
-      <h1 id="nf-title">Page not found</h1>
-      <p class="lead">There is no page at this address. It may have moved, or the link has a typo.</p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 id="nf-title">{t.heading}</h1>
+      <p class="lead">{t.lead}</p>
       <div class="row">
-        <a class="btn btn--primary" href="/">Back to home</a>
-        <a class="btn btn--secondary" href="/services">See our services</a>
-        <a class="btn btn--secondary" href="/contact">Contact</a>
+        <a class="btn btn--primary" href="/">{t.home}</a>
+        <a class="btn btn--secondary" href="/services">{t.services}</a>
+        <a class="btn btn--secondary" href="/contact">{t.contact}</a>
       </div>
     </div>
   </section>

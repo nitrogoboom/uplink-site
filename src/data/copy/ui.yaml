@@ -1,0 +1,118 @@
+# Shared UI and screen-reader text, on every page: the head, header, phone tab bar, footer chrome, both pop-ups, the
+# pause buttons, form fields both forms share, and the toasts core.js and footer.js show. Schema: src/lib/copy-schema.ts.
+# Page names in the menus are PAGES in src/lib/site.ts; the footer's lists and contact details are src/data/footer.json.
+
+site:
+  name: Uplink Technology # og:site_name, the print contact line, About's card
+  short: Uplink # the logo's word in the header and footer
+  pageTitle: '{name} · Uplink Technology' # a service or project page's <title>
+  ogImageAlt: 'Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack.'
+
+skipLink: Skip to content
+
+header:
+  home: Uplink Technology management, home page # the logo link's name
+  sub: Technology management # the line under the logo's word
+  nav: Main
+  support:
+    label: Get support, for existing clients
+    text: Get support
+  portal:
+    label: Client portal, sign in
+    text: Client portal
+  settings: Accessibility settings # the gear
+
+bottomNav: Main (bottom bar)
+
+breadcrumb: Breadcrumb # a service or project page's trail
+
+hold: Pause animations # every pause button (HoldButton.astro)
+
+cta:
+  book: Book a check-up # every button that opens the Book pop-up
+
+dialog:
+  key: Esc # the key hint beside each close button
+  close: Close (Esc) # the close button's name
+
+form:
+  required: Fields are required unless marked optional.
+  optional: (optional)
+  choose: Choose…
+  prototype: 'Prototype form: nothing is sent yet.'
+  name:
+    label: Name
+    title: Your name (more than spaces)
+  email:
+    label: Work email
+    title: An email address like name@company.com
+    placeholder: you@company.com
+    error: Enter an email like name@company.com.
+  company: Company
+
+book:
+  title: Book your free check-up
+  lead: We scan your network, devices and accounts, walk you through what we find, then talk options. It takes 30 minutes and there is no contract to look.
+  nameError: Add your name so we know who to ask for.
+  size:
+    label: Team size
+    options:
+      - 1 to 10 people
+      - 11 to 50 people
+      - 51 to 150 people
+      - More than 150
+    error: Pick how many people work with you.
+  service:
+    label: Main interest
+    unsure: Not sure yet
+  cancel: Cancel
+  submit: Request check-up
+
+settings:
+  title: Settings
+  theme:
+    legend: Theme
+    system: System
+    light: Light
+    dark: Dark
+    note: System follows your device. Saved on this device.
+  motion:
+    title: Motion
+    name: Reduce motion
+    hint: Stops the moving drawings and the slide and fade effects on every page.
+    device: Your device asks for less motion; turn this off to see them on this site only.
+  keys:
+    title: Keyboard shortcuts
+    name: Single-key shortcuts
+    hint: Turn off if they clash with a screen reader or voice control.
+    open: Open these settings
+    note: Shortcuts pause while you type or while a pop-up is open.
+
+footer:
+  title: Site footer # the footer's hidden heading
+  nav: Footer
+  contact:
+    tile: Contact
+    count: Start here
+  links: '{n} links' # a link panel's tile and eyebrow
+  channels: '{n} channels' # Follow's tile and eyebrow
+  callOrEmail: Call or email
+  office: Office
+  follow: Follow
+  emailFor: Email for # hidden, before the newsletter's name: "Email for The Monthly Patch"
+  subscribe: Subscribe
+  legal: Legal
+
+# shown by core.js and footer.js
+toast:
+  dismiss: Dismiss # each toast's close button
+  motionReduced: Motion reduced
+  motionOn: Motion on
+  shortcutsOn: Shortcuts on
+  shortcutsOff: Shortcuts off
+  booked:
+    title: Check-up requested
+    text: We will email you within one business day to pick a time.
+  subscribed:
+    title: Subscribed
+    text: 'Prototype form: nothing is sent yet.'

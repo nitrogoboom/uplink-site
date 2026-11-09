@@ -9,6 +9,10 @@ import Grow from '../components/home/Grow.astro';
 import Work from '../components/home/Work.astro';
 import Proof from '../components/home/Proof.astro';
 import { phone, email, office } from '../lib/footer';
+import Words from '../components/Words.astro';
+import { copy } from '../lib/copy';
+import type { HomeWords } from '../lib/copy-schema';
+const { cloud, grow } = await copy('home');
 
 const site = Astro.site!.href;
 const business = {
@@ -55,6 +59,7 @@ const business = {
   <Work />
   <Proof />
   <Fragment slot="scripts">
+    <Words id="words-page" words={{ cloud, grow: { team: grow.team, play: grow.play } } satisfies HomeWords} />
     <script>
       import '../scripts/home.js';
     </script>

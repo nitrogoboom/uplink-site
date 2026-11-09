@@ -41,6 +41,19 @@ class MotionChoice extends EventTarget {
 const MOTION_KEY = 'uplink.motion';
 const reduceMotion = new MotionChoice();
 
+/* ---------- words ------------------------------------------------------ */
+// What a script shows (toasts, button names) comes from src/data/copy/*.yaml, carried by the page as JSON
+// (components/Words.astro): #words-ui on every page (Base.astro), #words-page for the page's own script. Cast what
+// it gives to the shape in src/lib/copy-schema.ts: /** @type {HomeWords} */ (words('words-page')).
+/** @param {'words-ui' | 'words-page'} id @returns {unknown} */
+const words = (id) => {
+  const el = document.getElementById(id);
+  if (!el) throw new Error(`no #${id} on this page: its script's words are missing (components/Words.astro)`);
+  return JSON.parse(el.textContent || '');
+};
+/** @typedef {import('../lib/copy-schema').UiWords} UiWords */
+const UI = /** @type {UiWords} */ (words('words-ui'));
+
 /* ---------- error reports ---------------------------------------------- */
 // A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
 // What goes: the page's path, the message, the script's address and line. Never form contents or anything typed.
@@ -152,7 +165,7 @@ function toast({ title, text = '', tone = 'ok', timeout = 6000 }) {
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'iconbtn';
-  btn.setAttribute('aria-label', 'Dismiss');
+  btn.setAttribute('aria-label', UI.toast.dismiss);
   btn.innerHTML = html(ICON.close);
 
   el.append(ic, body, btn);
@@ -384,7 +397,7 @@ const applyMotion = () => {
 moToggle?.addEventListener('change', () => {
   store.set(MOTION_KEY, moToggle.checked ? 'reduce' : 'full');
   applyMotion();
-  toast({ title: moToggle.checked ? 'Motion reduced' : 'Motion on', tone: 'info', timeout: 3000 });
+  toast({ title: moToggle.checked ? UI.toast.motionReduced : UI.toast.motionOn, tone: 'info', timeout: 3000 });
 });
 deviceReduce.addEventListener('change', applyMotion);
 window.addEventListener('storage', (e) => {
@@ -413,7 +426,7 @@ if (scToggle) {
       root.dataset.shortcuts = 'off';
       store.set(SC_KEY, 'off');
     }
-    toast({ title: scToggle.checked ? 'Shortcuts on' : 'Shortcuts off', tone: 'info', timeout: 3000 });
+    toast({ title: scToggle.checked ? UI.toast.shortcutsOn : UI.toast.shortcutsOff, tone: 'info', timeout: 3000 });
   });
 }
 
@@ -499,7 +512,7 @@ document.addEventListener('keydown', (e) => {
     });
 
     if (kind === 'book') {
-      toast({ title: 'Check-up requested', text: 'We will email you within one business day to pick a time.' });
+      toast(UI.toast.booked);
     }
     // page scripts can react to a sent form (contact.js updates the queue card)
     form.dispatchEvent(new CustomEvent('uplink:sent', { bubbles: true }));
@@ -634,4 +647,19 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, held, html, reduceMotion, replay, settle, theme, toast, openDialog, shortcutsOn, whenOnScreen };
+export {
+  $,
+  $$,
+  UI,
+  held,
+  html,
+  reduceMotion,
+  replay,
+  settle,
+  theme,
+  toast,
+  openDialog,
+  shortcutsOn,
+  whenOnScreen,
+  words,
+};

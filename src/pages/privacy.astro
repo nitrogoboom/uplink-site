@@ -3,11 +3,8 @@
 // src/data/privacy.md; sources and open questions in docs/privacy-and-accessibility-2026-11-03.md.
 import TextPage from '../components/TextPage.astro';
 import * as md from '../data/privacy.md';
+import { copy } from '../lib/copy';
+const t = await copy('text-pages');
 ---
 
-<TextPage
-  page="privacy"
-  md={md}
-  eyebrow="Your data"
-  lead="What this website collects, why, and what you can ask of us."
-/>
+<TextPage page="privacy" md={md} eyebrow={t.privacy.eyebrow} lead={t.privacy.lead} />

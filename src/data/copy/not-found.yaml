@@ -1,0 +1,10 @@
+# Page not found: the 404 page, served at any missing address. Schema: src/lib/copy-schema.ts.
+
+title: Page not found · Uplink Technology # <title>
+description: There is no page at this address.
+eyebrow: Error 404
+heading: Page not found
+lead: There is no page at this address. It may have moved, or the link has a typo.
+home: Back to home
+services: See our services
+contact: Contact

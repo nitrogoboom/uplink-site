@@ -8,24 +8,26 @@
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, tabCurrent } from '../lib/site';
+import { copy } from '../lib/copy';
 interface Props {
   current: Page;
 }
 const { current } = Astro.props;
 const here = Astro.url.pathname;
+const { site, header: t } = await copy('ui');
 ---
 
 <header class="site-header">
   <div class="container">
-    <a class="brand" href="/" aria-label="Uplink Technology management, home page">
+    <a class="brand" href="/" aria-label={t.home}>
       <span class="brand-mark" aria-hidden="true"><Icon name="mark" /></span>
       <span class="brand-text">
-        <span class="brand-name">Uplink</span>
-        <span class="brand-sub">Technology management</span>
+        <span class="brand-name">{site.short}</span>
+        <span class="brand-sub">{t.sub}</span>
       </span>
     </a>
 
-    <nav class="tabs" aria-label="Main">
+    <nav class="tabs" aria-label={t.nav}>
       <ul>
         {NAV.map(({ page }) => <li>
           <a class="tab" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
@@ -36,11 +38,11 @@ const here = Astro.url.pathname;
     </nav>
 
     <div class="hdr-actions">
-      <a class="hbtn" href="/contact#support" aria-label="Get support, for existing clients">
-        <Icon name="headset" /><span class="hbtn-text">Get support</span>
+      <a class="hbtn" href="/contact#support" aria-label={t.support.label}>
+        <Icon name="headset" /><span class="hbtn-text">{t.support.text}</span>
       </a>
-      <a class="hbtn" href="/soon#client-portal" aria-label="Client portal, sign in">
-        <Icon name="person" /><span class="hbtn-text">Client portal</span>
+      <a class="hbtn" href="/soon#client-portal" aria-label={t.portal.label}>
+        <Icon name="person" /><span class="hbtn-text">{t.portal.text}</span>
       </a>
       <button
         class="hbtn hbtn-settings"
@@ -48,7 +50,7 @@ const here = Astro.url.pathname;
         data-open="settings-dialog"
         commandfor="settings-dialog"
         command="show-modal"
-        aria-label="Accessibility settings"
+        aria-label={t.settings}
       >
         <Icon name="gear" />
       </button>

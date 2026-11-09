@@ -9,26 +9,26 @@ import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
 import { phone, email } from '../../lib/footer';
 import { fit } from '../../lib/fit';
-const TITLE = 'Talk to a real person';
+import { copy } from '../../lib/copy';
+const t = (await copy('contact')).message;
+const { form, cta } = await copy('ui');
+const TITLE = t.title;
 ---
 
 <section class="page-intro fold fold-always" id="message" aria-labelledby="contact-title">
   <div class="container">
     <div class="lobby">
       <div class="lobby-intro">
-        <p class="eyebrow">Lobby</p>
+        <p class="eyebrow">{t.eyebrow}</p>
         <h1 id="contact-title" class={fit(TITLE)}>{TITLE}</h1>
-        <p class="lead">
-          No phone tree and no bots. New here? Send a message or book a check-up. Already a client? Use the help desk
-          options further down.
-        </p>
+        <p class="lead">{t.lead}</p>
       </div>
       <div class="lobby-chan">
-        <span class="label">Reach us directly</span>
+        <span class="label">{t.direct}</span>
         <div class="chan panel">
           <span class="icon-tile" aria-hidden="true"><Icon name="phone" /></span>
           <span class="chan-text"
-            ><span class="chan-title">Call</span
+            ><span class="chan-title">{t.call}</span
             ><a class="chan-value" id="tel-val" href={phone.href}>{phone.display}</a></span
           >
           <button
@@ -36,7 +36,7 @@ const TITLE = 'Talk to a real person';
             type="button"
             data-copy={phone.display}
             data-copy-target="tel-val"
-            aria-label="Copy phone number"
+            aria-label={t.copyPhone}
           >
             <Icon name="copy" />
           </button>
@@ -44,7 +44,7 @@ const TITLE = 'Talk to a real person';
         <div class="chan panel">
           <span class="icon-tile" aria-hidden="true"><Icon name="mail" /></span>
           <span class="chan-text"
-            ><span class="chan-title">Email</span
+            ><span class="chan-title">{t.email}</span
             ><a class="chan-value" id="mail-val" href={`mailto:${email}`}
               >{email.split('@')[0]}@<wbr />{email.split('@')[1]}</a
             ></span
@@ -54,7 +54,7 @@ const TITLE = 'Talk to a real person';
             type="button"
             data-copy={email}
             data-copy-target="mail-val"
-            aria-label="Copy email address"
+            aria-label={t.copyEmail}
           >
             <Icon name="copy" />
           </button>
@@ -62,8 +62,7 @@ const TITLE = 'Talk to a real person';
         <a class="chan panel card" href="/contact#message" data-open="book-dialog">
           <span class="icon-tile" aria-hidden="true"><Icon name="calendar" /></span>
           <span class="chan-text"
-            ><span class="chan-title">Book a check-up</span
-            ><Pause /><span class="chan-value">Free, 30 minutes</span></span
+            ><span class="chan-title">{cta.book}</span><Pause /><span class="chan-value">{t.book}</span></span
           >
         </a>
       </div>
@@ -71,13 +70,13 @@ const TITLE = 'Talk to a real person';
       <div class="lobby-form">
         <form class="form-panel panel" action="/soon" data-validate="contact" aria-labelledby="form-title">
           <div class="form-head">
-            <h2 id="form-title">Send us a message</h2>
-            <p class="small muted">Fields are required unless marked optional.</p>
+            <h2 id="form-title">{t.form.title}</h2>
+            <p class="small muted">{form.required}</p>
           </div>
           <div class="form-body">
             <div class="form-grid">
               <div class="field">
-                <label for="c-name">Name</label>
+                <label for="c-name">{form.name.label}</label>
                 <input
                   class="input"
                   id="c-name"
@@ -85,62 +84,62 @@ const TITLE = 'Talk to a real person';
                   autocomplete="name"
                   required
                   pattern=".*\S.*"
-                  title="Your name (more than spaces)"
+                  title={form.name.title}
                 />
-                <span class="field-error" id="c-name-err">Add your name so we know who to reply to.</span>
+                <span class="field-error" id="c-name-err">{t.form.nameError}</span>
               </div>
               <div class="field">
-                <label for="c-email">Work email</label>
+                <label for="c-email">{form.email.label}</label>
                 <input
                   class="input"
                   id="c-email"
                   type="email"
                   pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
-                  title="An email address like name@company.com"
+                  title={form.email.title}
                   autocomplete="email"
-                  placeholder="you@company.com"
+                  placeholder={form.email.placeholder}
                   required
                 />
-                <span class="field-error" id="c-email-err">Enter an email like name@company.com.</span>
+                <span class="field-error" id="c-email-err">{form.email.error}</span>
               </div>
               <div class="field">
-                <label for="c-company">Company <span class="opt">(optional)</span></label>
+                <label for="c-company">{form.company} <span class="opt">{form.optional}</span></label>
                 <input class="input" id="c-company" type="text" autocomplete="organization" />
               </div>
               <div class="field">
-                <label for="c-topic">What do you need?</label>
+                <label for="c-topic">{t.form.topic.label}</label>
                 <select class="input" id="c-topic" required>
-                  <option value="">Choose…</option>
-                  <option>Free IT check-up</option>
+                  <option value="">{form.choose}</option>
+                  <option>{t.form.topic.checkup}</option>
                   <ServiceOptions />
-                  <option>Something else</option>
+                  <option>{t.form.topic.other}</option>
                 </select>
-                <span class="field-error" id="c-topic-err">Pick what you need, or Something else.</span>
+                <span class="field-error" id="c-topic-err">{t.form.topic.error}</span>
               </div>
               <div class="field span-2">
-                <label for="c-msg">Message</label>
+                <label for="c-msg">{t.form.message.label}</label>
                 <textarea
                   class="input"
                   id="c-msg"
                   required
                   minlength="10"
-                  placeholder="Tell us a little about your team and what is going on."
+                  placeholder={t.form.message.placeholder}
                 ></textarea>
-                <span class="field-error" id="c-msg-err">Write at least a sentence so we can help.</span>
+                <span class="field-error" id="c-msg-err">{t.form.message.error}</span>
               </div>
             </div>
           </div>
           <div class="form-foot">
-            <span class="small muted">Prototype form: nothing is sent yet.</span>
-            <button class="btn btn--primary" type="submit">Send message</button>
+            <span class="small muted">{form.prototype}</span>
+            <button class="btn btn--primary" type="submit">{t.form.send}</button>
           </div>
         </form>
       </div>
 
       <div class="lobby-queue panel pad" data-queue>
         <div class="row" data-md-skip>
-          <span class="label">Queue status</span>
-          <span class="chip chip--ok chip--dot" data-queue-text="You're in the queue">Open now</span>
+          <span class="label">{t.queue.label}</span>
+          <span class="chip chip--ok chip--dot" data-queue-text={t.queue.queued}>{t.queue.open}</span>
         </div>
         <div class="queue-ring" data-md-skip>
           <svg viewBox="0 0 168 168" aria-hidden="true">
@@ -159,27 +158,15 @@ const TITLE = 'Talk to a real person';
             />
           </svg>
           <div class="queue-ring-label">
-            <span class="label">Reply to new messages</span><Pause /><span class="stat-val">1 day</span>
+            <span class="label">{t.queue.reply}</span><Pause /><span class="stat-val">{t.queue.replyIn}</span>
           </div>
         </div>
-        <h2 class="sr-only">Hours and office</h2>
+        <h2 class="sr-only">{t.queue.title}</h2>
         <dl class="facts">
-          <div>
-            <dt>Monday to Friday</dt>
-            <dd>7 am to 7 pm ET</dd>
-          </div>
-          <div>
-            <dt>Weekends</dt>
-            <dd>Emergency line</dd>
-          </div>
-          <div>
-            <dt>Monitoring</dt>
-            <dd>24/7 for clients</dd>
-          </div>
-          <div>
-            <dt>Office</dt>
-            <dd>Toronto, ON</dd>
-          </div>
+          {t.queue.facts.map((f) => <div>
+            <dt>{f.term}</dt>
+            <dd>{f.value}</dd>
+          </div>)}
         </dl>
       </div>
     </div>

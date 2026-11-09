@@ -4,6 +4,10 @@ import Base from '../layouts/Base.astro';
 import { PAGES } from '../lib/site';
 import Message from '../components/contact/Message.astro';
 import Support from '../components/contact/Support.astro';
+import Words from '../components/Words.astro';
+import { copy } from '../lib/copy';
+import type { ContactWords } from '../lib/copy-schema';
+const { toast } = await copy('contact');
 ---
 
 <Base
@@ -16,6 +20,7 @@ import Support from '../components/contact/Support.astro';
   <Message />
   <Support />
   <Fragment slot="scripts">
+    <Words id="words-page" words={toast satisfies ContactWords} />
     <script>
       import '../scripts/contact.js';
     </script>

@@ -2,28 +2,26 @@
 // COMING SOON: one page for every link that has no page yet. soon.js reads the #address and fills in which
 // page it is. No canonical or Open Graph (no `path`); kept out of search results. Styles: shared (.page-intro).
 import Base from '../layouts/Base.astro';
+import Words from '../components/Words.astro';
+import { copy } from '../lib/copy';
+import type { SoonWords } from '../lib/copy-schema';
+const t = await copy('soon');
 ---
 
-<Base
-  title="Coming soon · Uplink Technology"
-  description="This part of the Uplink Technology site is not built yet."
-  page="soon"
-  robots="noindex, follow"
->
+<Base title={t.title} description={t.description} page="soon" robots="noindex, follow">
   <section class="page-intro" aria-labelledby="soon-title">
     <div class="container">
-      <p class="eyebrow">Placeholder</p>
-      <h1 id="soon-title"><span data-soon-name>This page</span> is not built yet</h1>
-      <p class="lead">
-        This prototype links here for pages that come later, such as the client portal, legal pages and the blog.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 id="soon-title"><span data-soon-name>{t.heading.page}</span> {t.heading.rest}</h1>
+      <p class="lead">{t.lead}</p>
       <div class="row">
-        <a class="btn btn--primary" href="/">Back to home</a>
-        <a class="btn btn--secondary" href="/contact">Contact</a>
+        <a class="btn btn--primary" href="/">{t.home}</a>
+        <a class="btn btn--secondary" href="/contact">{t.contact}</a>
       </div>
     </div>
   </section>
   <Fragment slot="scripts">
+    <Words id="words-page" words={{ pageTitle: t.pageTitle, names: t.names } satisfies SoonWords} />
     <script>
       import '../scripts/soon.js';
     </script>

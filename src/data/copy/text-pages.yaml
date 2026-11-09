@@ -1,0 +1,11 @@
+# Privacy (/privacy) and Accessibility (/accessibility): the words over each page's Markdown. The pages themselves
+# are src/data/privacy.md and src/data/accessibility.md; their titles PAGES in src/lib/site.ts.
+# Schema: src/lib/copy-schema.ts.
+
+privacy:
+  eyebrow: Your data
+  lead: What this website collects, why, and what you can ask of us.
+
+accessibility:
+  eyebrow: For everyone
+  lead: How this site works for everyone, and how to tell us when it doesn't.

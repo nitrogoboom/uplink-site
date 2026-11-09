@@ -1,6 +1,6 @@
 # Source code map
 
-*Last updated: November 8, 2026*
+*Last updated: November 9, 2026*
 
 This page maps the `src/` folder: where each page, component, content file, stylesheet, and script lives, and how they fit together. For how to run and build the site, see the [project README](../README.md).
 
@@ -66,6 +66,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | `Pause.astro` | A pause for screen readers between two parts of one link, so the title doesn't run into the next words. Nothing shows on screen. |
 | `Sep.astro` | The " · " between two short phrases. Screen readers hear a comma instead of "dot". |
 | `Icon.astro`, `icons.ts` | Every inline icon, by name. Add new icons to `ICONS` in `icons.ts`; the content schemas accept only those names. |
+| `Words.astro` | The words a page script shows, as a `<script type="application/json">` (`#words-ui` in `Base.astro`, `#words-page` for a page's own script). See [Copy](#copy). |
 
 ### Section components
 
@@ -105,6 +106,25 @@ The content types are defined in `content.config.ts`, and `footer.json`'s in `li
 | `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, the contact placeholders (`{phone}`, `{email}`, `{street}` …, as in the privacy page), and on Home also `{services}` and `{grow}`. Type no contact details into them. |
 
 Every other page's Markdown copy is generated at build time from its `<main>` (`scripts/markdown.mjs`). An element with `data-md-skip` is left out.
+
+### Copy
+
+The words the components, layouts and scripts show or announce (headings, buttons, labels, `aria-label`s, hidden text, `alt`, `title`, placeholders, toasts) are in `data/copy/`, one YAML file a page or area. Each file says at its top which page it feeds.
+
+| File | What it holds |
+| --- | --- |
+| `ui.yaml` | Shared UI and screen-reader text: the head, header, phone tab bar, footer chrome, both pop-ups, the pause button, the form fields both forms share, and the toasts `core.js` and `footer.js` show. |
+| `home.yaml`, `about.yaml`, `contact.yaml`, `soon.yaml`, `not-found.yaml` | That page's own words, by section. |
+| `services.yaml`, `work.yaml` | The `/services` and `/work` pages' own words, and the words every service page or case study shares around its own copy. |
+| `text-pages.yaml` | The eyebrow and lead over the privacy and accessibility pages. |
+
+Each file is a content collection (`copy-NAME` in `content.config.ts`) checked against its schema in `lib/copy-schema.ts`: a missing key, an unknown key, a YAML file with no schema, or a template whose `{names}` aren't the ones its schema lists stops the build. A component reads a file with `const t = await copy('home')` from `lib/copy.ts`; the object it gives throws on a key the file doesn't have, so a typo in a component stops the build too. A template such as `Team of {n}` goes through `fill(t.grow.team, { n })` (`lib/fill.js`, shared with the scripts).
+
+To add a string, add its key to the YAML file and to the file's schema, then use it in the component. A list (`stats`, `facts`) can take more or fewer items.
+
+A page script gets its words as JSON: the page writes `<Words id="words-page" words={…} />` with the parts its script needs, and the script reads them with `words('words-page')` from `core.js`, typed by the shapes at the end of `lib/copy-schema.ts` (`HomeWords`, `ContactWords`, `SoonWords`). `core.js` reads `#words-ui` (`UiWords`) on every page and exports it as `UI`. The block runs nothing, so the CSP needs no hash for it, and it sits outside `<main>`, so the Markdown copy leaves it out.
+
+Kept out of the copy files on purpose: the content collections and `data/*.json` and `data/*.md` (already data), `PAGES` and `NAV` in `lib/site.ts`, JSON-LD fields, the words inside the drawings (`tools/gen_*.py`), and punctuation that only separates parts (`Sep.astro`, `Pause.astro`, the hidden `, ` between a name and a role).
 
 ## Styles
 
@@ -157,8 +177,8 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. On desktop it rounds any Home section whose words make it taller than its one-screen floor up to the next 100px wheel step, so every section still starts on the wheel grid. It imports `grow.js`. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `contact.js` | Contact | The copy buttons and the queue card. |
-| `soon.js` | Coming soon | Names the page that isn't built yet. |
+| `soon.js` | Coming soon | Names the page that isn't built yet, from the names in `data/copy/soon.yaml`. |
 
-Every page script imports `core.js`, so `core.js` always runs first.
+Every page script imports `core.js`, so `core.js` always runs first. A script's words come from `data/copy/` through `words()` (see [Copy](#copy)); type none into a script.
 
 The scripts are type-checked (`npm run check`; `checkJs` in `tsconfig.json`), with JSDoc for the types: `/** @param {number} i */` on a parameter, `/** @type {HTMLDialogElement | null} */` on a variable, and `/** @type {SVGElement} */ (expr)` (the parentheses matter) to say what a lookup finds. `$` and `$$` give an HTML element unless the variable they go in says otherwise. A promise you don't wait for is marked with `void`. `globals.d.ts` holds the browser types TypeScript's library lacks (Trusted Types).

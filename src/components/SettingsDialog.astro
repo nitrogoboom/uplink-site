@@ -7,16 +7,18 @@
 // core.js applies a choice at once and keeps it on this device (localStorage uplink.theme, uplink.motion,
 // uplink.shortcuts). More display options (English or French) go here later. Styles: dialogs.css, forms.css.
 import Icon from './Icon.astro';
+import { copy } from '../lib/copy';
+const { settings: t, dialog } = await copy('ui');
 const THEMES = [
-  ['system', 'System', 'screen'],
-  ['light', 'Light', 'sun'],
-  ['dark', 'Dark', 'moon'],
+  ['system', t.theme.system, 'screen'],
+  ['light', t.theme.light, 'sun'],
+  ['dark', t.theme.dark, 'moon'],
 ] as const;
 ---
 
 <dialog class="dialog" id="settings-dialog" aria-labelledby="st-title" closedby="any">
   <div class="dlg-head">
-    <h2 id="st-title">Settings</h2>
+    <h2 id="st-title">{t.title}</h2>
     <button
       class="hbtn"
       type="button"
@@ -25,13 +27,13 @@ const THEMES = [
       command="close"
       aria-keyshortcuts="Escape"
     >
-      <span class="kbd kbd-hint" aria-hidden="true">Esc</span
-      ><Icon name="close" /><span class="sr-only">Close (Esc)</span>
+      <span class="kbd kbd-hint" aria-hidden="true">{dialog.key}</span
+      ><Icon name="close" /><span class="sr-only">{dialog.close}</span>
     </button>
   </div>
   <div class="dlg-body">
     <fieldset class="seg-field" aria-describedby="st-theme-note">
-      <legend class="label">Theme</legend>
+      <legend class="label">{t.theme.legend}</legend>
       <div class="seg">
         {THEMES.map(([value, name, icon]) => <label class="seg-opt"
           ><input type="radio" name="theme" value={value} checked={value === 'system'} /><span
@@ -39,30 +41,25 @@ const THEMES = [
           ></label
         >)}
       </div>
-      <p class="small muted" id="st-theme-note">System follows your device. Saved on this device.</p>
+      <p class="small muted" id="st-theme-note">{t.theme.note}</p>
     </fieldset>
     <section class="keys-group" aria-labelledby="st-motion">
-      <h3 class="label" id="st-motion">Motion</h3>
+      <h3 class="label" id="st-motion">{t.motion.title}</h3>
       <label class="switch" for="mo-toggle">
         <span class="stack-2"
-          ><strong id="mo-name">Reduce motion</strong
+          ><strong id="mo-name">{t.motion.name}</strong
           ><span class="small muted" id="mo-hint"
-            >Stops the moving drawings and the slide and fade effects on every
-            page.<span id="mo-device" hidden>
-              Your device asks for less motion; turn this off to see them on this site only.</span></span
+            >{t.motion.hint}<span id="mo-device" hidden> {t.motion.device}</span></span
           ></span
         >
         <input id="mo-toggle" type="checkbox" role="switch" aria-labelledby="mo-name" aria-describedby="mo-hint" />
       </label>
     </section>
     <section class="keys-group" aria-labelledby="st-keys">
-      <h3 class="label" id="st-keys">Keyboard shortcuts</h3>
+      <h3 class="label" id="st-keys">{t.keys.title}</h3>
       <label class="switch" for="sc-toggle">
         <span class="stack-2"
-          ><strong id="sc-name">Single-key shortcuts</strong
-          ><span class="small muted" id="sc-hint"
-            >Turn off if they clash with a screen reader or voice control.</span
-          ></span
+          ><strong id="sc-name">{t.keys.name}</strong><span class="small muted" id="sc-hint">{t.keys.hint}</span></span
         >
         <input
           id="sc-toggle"
@@ -75,10 +72,10 @@ const THEMES = [
       </label>
       <ul class="keys-list">
         <li>
-          <span>Open these settings</span><span class="keys"><span class="kbd">?</span></span>
+          <span>{t.keys.open}</span><span class="keys"><span class="kbd">?</span></span>
         </li>
       </ul>
-      <p class="small muted">Shortcuts pause while you type or while a pop-up is open.</p>
+      <p class="small muted">{t.keys.note}</p>
     </section>
   </div>
   <div class="toasts" aria-live="polite"></div>

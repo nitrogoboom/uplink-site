@@ -11,6 +11,9 @@ import BookDialog from '../components/BookDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
 import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
+import Words from '../components/Words.astro';
+import { copy } from '../lib/copy';
+import type { UiWords } from '../lib/copy-schema';
 
 export type Page =
   'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -75,6 +78,7 @@ const jsonld = type &&
 // inline, and their fallbacks take the same room, so nothing moves when they arrive. Preloading all of them split
 // the bandwidth and made the title and body faces arrive later (review L2, November 7, 2026).
 const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
+const ui = await copy('ui');
 ---
 
 <!doctype html>
@@ -92,7 +96,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     {canonical && <Fragment>
       <meta property="og:type" content={ogType} />
-      <meta property="og:site_name" content="Uplink Technology" />
+      <meta property="og:site_name" content={ui.site.name} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonical} />
@@ -100,10 +104,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
       <meta property="og:image" content={ogImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta
-        property="og:image:alt"
-        content="Uplink Technology: your IT team, always online. An office floor plan with Wi-Fi and a server rack."
-      />
+      <meta property="og:image:alt" content={ui.site.ogImageAlt} />
       <meta name="twitter:card" content="summary_large_image" />
     </Fragment>}
     <meta name="theme-color" content="#0E1A27" />
@@ -143,7 +144,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
     {jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
   </head>
   <body data-page={page} class={footer ? undefined : 'no-footer'}>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{ui.skipLink}</a>
     <Header current={page} />
 
     <main id="main" tabindex="-1">
@@ -151,7 +152,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
     </main>
     {footer && <Footer />}
     {footer && <p class="print-contact">
-      Uplink Technology · {contact.phone.display} · {contact.email} · {contact.office.street}, {contact.office.city}
+      {ui.site.name} · {contact.phone.display} · {contact.email} · {contact.office.street}, {contact.office.city}
     </p>}
 
     <BottomNav current={page} />
@@ -162,6 +163,7 @@ const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
 
     <div class="toasts" aria-live="polite"></div>
 
+    <Words id="words-ui" words={{ toast: ui.toast, emailError: ui.form.email.error } satisfies UiWords} />
     <script>
       import '../scripts/core.js';
       import '../scripts/footer.js';

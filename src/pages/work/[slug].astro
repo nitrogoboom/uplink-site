@@ -8,6 +8,7 @@ import ProjectCase from '../../components/work/ProjectCase.astro';
 import { PAGES, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
 import { created, entryFile, lastmod } from '../../lib/git-dates.mjs';
 import '../../components/work/project-page.css';
+import { copy, fill } from '../../lib/copy';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -15,6 +16,8 @@ export async function getStaticPaths() {
 }
 const { project } = Astro.props;
 const { id, data: p } = project;
+const ui = await copy('ui');
+const t = (await copy('work')).case.story;
 const url = new URL(`/work/${id}`, Astro.site).href;
 const description = `${p.client}. ${p.result}.`; // as the sitemap list and llms.txt say it (allPages in src/lib/site.ts)
 const services = await getEntries(p.services);
@@ -52,7 +55,7 @@ const ld = {
 ---
 
 <Base
-  title={`${p.name} · Uplink Technology`}
+  title={fill(ui.site.pageTitle, { name: p.name })}
   description={description}
   page="work"
   path={`/work/${id}`}
@@ -61,9 +64,9 @@ const ld = {
   <Fragment slot="head"> <script is:inline type="application/ld+json" set:html={jsonLd(ld)} /></Fragment>
   <section class="hero proj-page" aria-labelledby={`case-${id}-t`}>
     <div class="container proj-page-grid">
-      <nav class="crumbs" aria-label="Breadcrumb">
+      <nav class="crumbs" aria-label={ui.breadcrumb}>
         <ol>
-          <li><a href="/work">Our work</a></li>
+          <li><a href="/work">{PAGES.work.name}</a></li>
           <li aria-current="page">{p.name}</li>
         </ol>
       </nav>
@@ -73,18 +76,18 @@ const ld = {
   <section class="section section--band" aria-labelledby="story-title">
     <div class="container split">
       <div class="section-head">
-        <p class="eyebrow">Case study</p>
-        <h2 id="story-title">How it went</h2>
+        <p class="eyebrow">{t.eyebrow}</p>
+        <h2 id="story-title">{t.title}</h2>
       </div>
       <div class="stack-5 detail-body">
         <div class="prose">
-          <h3>Where they started</h3>
+          <h3>{t.start}</h3>
           {p.page.challenge.map((t) => <p>{t}</p>)}
-          <h3>What we did</h3>
+          <h3>{t.did}</h3>
           <ol>
             {p.page.steps.map((t) => <li><strong>{t.title}.</strong> {t.detail}</li>)}
           </ol>
-          <h3>The result</h3>
+          <h3>{t.result}</h3>
           <ul>
             {p.page.results.map((t) => <li>{t}</li>)}
           </ul>

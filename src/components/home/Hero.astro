@@ -15,6 +15,8 @@ import { HERO, PAGES, getServices } from '../../lib/site';
 import type { IconName } from '../Icon.astro';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
+import { copy } from '../../lib/copy';
+const t = (await copy('home')).hero;
 // the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
@@ -22,19 +24,15 @@ const news = [
     href: '/contact#message',
     book: true,
     img: 'security',
-    tag: 'Free',
     tone: 'accent',
-    title: 'IT and security check-up',
-    line: '30 minutes. We look first, then quote.',
+    ...t.news.checkup,
   },
   {
     href: '/soon#windows-10-guide',
     book: false,
     img: 'cloud',
-    tag: 'Guide',
     tone: 'sky',
-    title: 'Windows 10 support has ended',
-    line: 'Your upgrade plan, step by step',
+    ...t.news.windows,
   },
 ];
 // the menu under the button: the featured services (each its own page), then all of them. A list, not a <nav>:
@@ -45,11 +43,10 @@ const menu = [
   {
     href: PAGES.services.path,
     icon: 'grid' as IconName,
-    title: 'All services',
-    sub: 'Help desk, security, cloud, networks, phones',
+    ...t.allServices,
   },
 ];
-const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace';
+const still = t.alt;
 ---
 
 <section class="hero fold fold-always" id="top" aria-labelledby="hero-title">
@@ -57,24 +54,19 @@ const still = 'Drawing of an office with desks, a firewall rack, Wi-Fi and a clo
     <div class="hero-menu">
       <div class="hero-top">
         <p class="eyebrow">
-          <span>Managed IT<Sep />Ontario</span>
+          <span>{t.eyebrow.map((part, i) => <Fragment>{i > 0 && <Sep />}{part}</Fragment>)}</span>
         </p>
-        <h1 id="hero-title"><span class="line">Your IT team,</span> <em class="line">always online</em></h1>
-        <p class="lead">
-          <span class="lead-long"
-            >We run the technology behind your business: help desk, security, cloud, network and phones. You run the
-            business.</span
-          ><span class="lead-short">We run your IT: help desk, security, cloud, network and phones.</span>
-        </p>
+        <h1 id="hero-title"><span class="line">{t.title}</span> <em class="line">{t.accent}</em></h1>
+        <p class="lead"><span class="lead-long">{t.lead}</span><span class="lead-short">{t.leadShort}</span></p>
       </div>
       <div class="hero-cta">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog"
-          >Get started<Icon name="arrow"
+          >{t.cta}<Icon name="arrow"
         /></a>
-        <span class="small muted">Free check-up. No contract to look.</span>
+        <span class="small muted">{t.ctaNote}</span>
       </div>
       <div class="hero-services">
-        <p class="label menu-label" id="hero-menu-label">Services</p>
+        <p class="label menu-label" id="hero-menu-label">{t.menu}</p>
         <ul class="menu" aria-labelledby="hero-menu-label">
           {menu.map(({ href, icon, title, sub }) => <li>
             <a class="mi" href={href}>

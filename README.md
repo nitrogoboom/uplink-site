@@ -150,6 +150,10 @@ A project works the same way. Its file is `src/content/projects/SLUG.json`, and 
 
 The smaller lists (FAQ, team, footer, and the Grow section's copy) are in `src/data/*.json`.
 
+### Change the site's words
+
+Every other word the pages show or announce (headings, buttons, labels, hidden screen-reader text, toasts) is in `src/data/copy/`: one YAML file a page, and `ui.yaml` for the parts every page shares. Edit the YAML and rebuild. A missing or misspelled key stops the build and names the file and key. To add a new string, see "Copy" in [src/README.md](src/README.md#copy).
+
 ## Drawing rules
 
 Every drawing follows these rules. The values are measured in the files.
