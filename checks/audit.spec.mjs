@@ -177,7 +177,14 @@ const STOP = () => {
     const c = getComputedStyle(e, p);
     return c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0;
   });
-  const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || pseudo;
+  // a link inside a card may ring the card round it instead (Home's services tiles: .svc-tile:has(:focus-visible))
+  let up = e.parentElement,
+    around = false;
+  for (let i = 0; up && i < 3 && !around; i++, up = up.parentElement) {
+    const c = getComputedStyle(up);
+    around = c.outlineStyle !== 'none' && parseFloat(c.outlineWidth) > 0;
+  }
+  const ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || pseudo || around;
   const name = (e.getAttribute('aria-label') || e.innerText || e.value || e.title || e.getAttribute('alt') || '')
     .replace(/\s+/g, ' ')
     .trim()
