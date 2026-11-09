@@ -27,7 +27,7 @@ updates:
     groups:
       actions:
         patterns: ['*']
-  # requirements.in, locked into requirements.txt with hashes (uv pip compile): the drawing tools, which CI's drawings job installs
+  # requirements.in, locked into requirements.txt with hashes (uv pip compile): the drawing tools, run locally (README, "Check a drawing")
   - package-ecosystem: pip
     directory: /
     schedule:
