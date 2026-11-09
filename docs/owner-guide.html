@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uplink site: owner guide</title>
+<style>
+  :root { --bg:#f4f7fb; --card:#fff; --text:#0e1a27; --muted:#4d5863; --line:#d7dee6; --accent:#88520a; --link:#005d8a; --chip:#fff3e3; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0e1a27; --card:#14202d; --text:#f2f7fc; --muted:#bbc2c9; --line:#2b3743; --accent:#ffad51; --link:#97c8ea; --chip:#2a2318; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 1.9rem; margin: 0 0 4px; }
+  h2 { font-size: 1.25rem; margin: 36px 0 12px; padding-top: 4px; }
+  h3 { font-size: 1rem; margin: 20px 0 6px; }
+  p { margin: 0 0 12px; }
+  .sub { color: var(--muted); margin-bottom: 24px; }
+  a { color: var(--link); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:12px 0; }
+  ul { margin: 0 0 8px; padding-left: 20px; }
+  li { margin: 4px 0; }
+  table { width:100%; border-collapse: collapse; }
+  th, td { text-align:left; vertical-align: top; padding: 8px 10px; border-bottom:1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; font-size: .9rem; }
+  code { font: .9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  .tag { display:inline-block; font-size:.78rem; font-weight:600; padding:1px 8px; border-radius:99px; background:var(--chip); color:var(--accent); margin-left:6px; }
+  nav a { margin-right: 14px; white-space: nowrap; }
+  .steps li { margin: 8px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Uplink site: owner guide</h1>
+  <p class="sub">Your plain-language map of the project. Last updated November 9, 2026. Agents keep this page current when the docs change.</p>
+  <nav><a href="#site">The site</a><a href="#work">How work gets done</a><a href="#you">Waiting on you</a><a href="#where">Where things live</a><a href="#words">The site's words</a></nav>
+
+  <h2 id="site">The site</h2>
+  <div class="card">
+    <ul>
+      <li><strong>Live:</strong> <a href="https://uplink-site.johnoreilly.workers.dev">uplink-site.johnoreilly.workers.dev</a> (hidden from search engines until launch).</li>
+      <li><strong>Code and docs:</strong> <a href="https://github.com/nitrogoboom/uplink-site">github.com/nitrogoboom/uplink-site</a>.</li>
+      <li><strong>Previews:</strong> each pull request gets its own preview link, posted as a comment on it. Previews never touch the live site.</li>
+      <li><strong>Stage:</strong> draft. Almost every word is placeholder and about to be rewritten.</li>
+    </ul>
+  </div>
+
+  <h2 id="work">How work gets done</h2>
+  <div class="card">
+    <ol class="steps">
+      <li><strong>You ask</strong> a Claude session for a change, in plain words.</li>
+      <li><strong>The agent does everything else:</strong> edits, builds, runs the right checks, and opens a pull request. You don't run commands.</li>
+      <li><strong>Visual changes wait for you.</strong> The agent sends the preview link; you look, then say merge.</li>
+      <li><strong>Everything else merges by itself</strong> once its checks pass.</li>
+      <li><strong>Each merge goes live in about 2 minutes.</strong> The deploy tests the new version first and rolls back by itself if it's broken.</li>
+      <li><strong>Docs changes</strong> are saved to GitHub but never go to the live site.</li>
+    </ol>
+    <p>Checks scale with the change: a wording change takes seconds, layout a minute, scripts and setup run the full set. The full release checks run only before launch.</p>
+  </div>
+
+  <h2 id="you">Waiting on you</h2>
+  <div class="card">
+    <h3>Accounts and security</h3>
+    <ul>
+      <li>GitHub environments (H5): split the Cloudflare key into a live key and a preview-only key. <span class="tag">later, Claude walks you through it</span></li>
+      <li>Cloudflare: a company account with two-factor sign-in, and a key limited to this one site.</li>
+      <li>Give each secret an owner and a date to replace it.</li>
+      <li>An outside uptime check on the live address.</li>
+      <li>The repository is public for now; making it private turns off its protection rules unless the plan is GitHub Pro.</li>
+    </ul>
+    <h3>Legal and privacy</h3>
+    <ul>
+      <li>Real inboxes for privacy, accessibility and security, and the office postal code.</li>
+      <li>Name the Privacy Officer.</li>
+      <li>Two Ontario lines go back on the accessibility page before launch.</li>
+      <li>Confirm or cut "only a few people at Uplink can open the inbox" on the privacy page.</li>
+      <li>AODA compliance report: due <strong>December 31, 2026</strong> if the real company has 20–49 Ontario staff.</li>
+    </ul>
+    <h3>Decisions and checks</h3>
+    <ul>
+      <li>The content rewrite: tell an agent what to change; it edits the words files below.</li>
+      <li>Forms are paused (pull request #38): they need a real domain on Cloudflare before they can send email.</li>
+      <li>Light theme: signed off, still open to change.</li>
+      <li>Before launch: your crew's spot check on real iPhones, Android phones and Safari.</li>
+    </ul>
+    <p>The full list, one line each: <a href="https://github.com/nitrogoboom/uplink-site/blob/main/notes.md">notes.md</a>. Launch-only steps: <a href="https://github.com/nitrogoboom/uplink-site/blob/main/docs/release.md">docs/release.md</a>.</p>
+  </div>
+
+  <h2 id="where">Where things live</h2>
+  <div class="card">
+    <table>
+      <tr><th>Doc</th><th>What it's for</th></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/notes.md">notes.md</a></td><td>Open items, one line each. Start here.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/CLAUDE.md">CLAUDE.md</a></td><td>The rules every agent follows: how to check, merge and write.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/README.md">README.md</a></td><td>Setup, commands, hosting, deploys and rollback. For agents.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/README.md">src/README.md</a></td><td>Map of the code: pages, components, styles, scripts.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/docs/design.md">docs/design.md</a></td><td>Colours, spacing and layout rules.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/docs/release.md">docs/release.md</a></td><td>Standards (accessibility, privacy, security), the release checklist, launch day.</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/docs/security.md">docs/security.md</a></td><td>Security and privacy controls; every secret by name and where it lives (never the values).</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/tree/main/docs/history">docs/history/</a></td><td>Records: past reviews and the reasons behind decisions.</td></tr>
+    </table>
+  </div>
+
+  <h2 id="words">The site's words</h2>
+  <div class="card">
+    <p>Every word on the site lives in plain text files, so a rewrite never touches code. A missing or misspelled entry stops the build, so nothing breaks silently.</p>
+    <table>
+      <tr><th>File</th><th>Words for</th></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/home.yaml">home.yaml</a></td><td>Home page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/about.yaml">about.yaml</a></td><td>About page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/contact.yaml">contact.yaml</a></td><td>Contact page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/services.yaml">services.yaml</a></td><td>Services page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/work.yaml">work.yaml</a></td><td>Our work page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/blob/main/src/data/copy/ui.yaml">ui.yaml</a></td><td>Shared: header, menus, dialogs, buttons, messages, screen-reader text</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/tree/main/src/data/copy">copy/</a> (others)</td><td>Coming soon, not-found and the text pages</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/tree/main/src/content/services">content/services/</a></td><td>Each service and its own page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/tree/main/src/content/projects">content/projects/</a></td><td>Each project and its own page</td></tr>
+      <tr><td><a href="https://github.com/nitrogoboom/uplink-site/tree/main/src/data">data/</a></td><td>FAQ, team, footer, Grow steps, privacy and accessibility pages</td></tr>
+    </table>
+  </div>
+</main>
+</body>
+</html>

@@ -10,6 +10,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - `docs/design.md`: colour roles and their tokens, spacing (`--sp-*` rules R0–R7), line height, corners, layout. Read it before you style anything.
 - `docs/release.md`: the standards (WCAG 2.2 AA, privacy, security, browsers), the release checklist, what's left before launch, launch day. Before a release or launch only.
 - `docs/security.md`: security and privacy controls, and every secret by name and place (never values).
+- `docs/owner-guide.html`: the owner's plain-language page (opened locally, never deployed): what's waiting on them, where each doc and words file lives. When a doc, a words file or an owner item it lists changes, update it in the same PR.
 - `docs/history/`: records and reasoning (the November 7, 2026 review, dated decisions, release records). Read them for why; take instructions only from the files above.
 - Docs can lag the code. When a doc and the code disagree, the code and its tests are right: fix the doc in the same PR. Treat any rule below as a claim to check, not a law.
 
