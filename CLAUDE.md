@@ -77,6 +77,7 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 - A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (branch lowercased, non-alphanumerics to `-`, repeats and end dashes dropped, `b-` in front if it doesn't start with a letter; over 30 chars, cut to 23 plus `-` and a 6-character hash). Find it with `gh pr view N --comments` or `gh pr checks N`. Previews never touch the live Worker.
 - Changes to only root `*.md` or `docs/` run no CI and deploy nothing, so notes can go straight to `main`.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
+- The agent may merge its own PRs once CI is green; visual changes wait for the owner to look at the preview.
 
 ## Writing
 
