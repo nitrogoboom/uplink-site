@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm ci)",
+      "Bash(npm run build)",
+      "Bash(npm run check)",
+      "Bash(npm run lint)",
+      "Bash(npm run format)",
+      "Bash(npm run test)",
+      "Bash(npm run quick)",
+      "Bash(npm run ci)",
+      "Bash(npm run verify)",
+      "Bash(npm run verify -- *)",
+      "Bash(npm run verify:zoom)",
+      "Bash(npm run verify:links)",
+      "Bash(npm run verify:spacing)",
+      "Bash(npm run verify:styles -- *)",
+      "Bash(node scripts/preview-alias.mjs *)",
+      "Bash(python tools/regen.py --check)",
+      "Bash(python -m pytest tools/tests)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh run view *)",
+      "Bash(gh run list *)"
+    ]
+  }
+}
