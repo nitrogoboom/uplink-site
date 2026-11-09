@@ -4,72 +4,54 @@
 // Styles: profile.css (industry chips included), plus .facts (src/styles/facts.css). Desktop layout: at the end of its CSS.
 import Drawing from '../Drawing.astro';
 import './profile.css';
+import { copy } from '../../lib/copy';
+const t = (await copy('about')).profile;
+const { site } = await copy('ui');
 ---
 
 <section class="page-intro fold fold-always" id="profile" aria-labelledby="about-title">
   <div class="container">
     <div class="profile">
       <div class="profile-text">
-        <p class="eyebrow">About</p>
-        <h1 id="about-title">We're your IT company</h1>
+        <p class="eyebrow">{t.eyebrow}</p>
+        <h1 id="about-title">{t.title}</h1>
         <div class="prose">
-          <p>
-            We are the IT department for businesses that do not want to build one. We look at your setup first, tell you
-            straight what is covered and what is not, then run it for you: help desk, security, cloud and the network
-            underneath.
-          </p>
-          <p>
-            Everyone who answers your call works here, in our office. We do not hand your tickets to an overseas call
-            centre, and the person who fixes your problem today is the same person who will know your setup next year.
-          </p>
+          {t.body.map((p) => <p>{p}</p>)}
         </div>
         <ul class="stats">
-          <li class="stat panel"><span class="label">Clients supported</span><span class="stat-val">120+</span></li>
-          <li class="stat panel">
-            <span class="label">Average first response</span><span class="stat-val">12 min</span>
-          </li>
-          <li class="stat panel"><span class="label">Devices looked after</span><span class="stat-val">3,400</span></li>
-          <li class="stat panel"><span class="label">Client renewal rate</span><span class="stat-val">96%</span></li>
+          {t.stats.map((s) => <li class="stat panel">
+            <span class="label">{s.label}</span><span class="stat-val">{s.value}</span>
+          </li>)}
         </ul>
       </div>
-      <aside class="profile-card panel" aria-label="Uplink at a glance">
+      <aside class="profile-card panel" aria-label={t.card.label}>
         <div class="profile-art well">
           <Drawing
             src="/assets/img/hq.svg"
             sources={[{ media: '(width < 100em)', srcset: '/assets/img/hq-compact.svg' }]}
             fetchpriority="high"
             loading="lazy"
-            alt="Illustration of the Uplink office building with the help desk floor highlighted"
+            alt={t.card.alt}
             width="640"
             height="480"
           />
-          <span class="chip chip--accent">Since 2011</span>
+          <span class="chip chip--accent">{t.card.since}</span>
         </div>
         <div class="stack-2">
-          <span class="brand-name">Uplink Technology</span>
-          <p class="muted">Your outsourced IT department. Help desk, security and cloud under one roof.</p>
+          <span class="brand-name">{site.name}</span>
+          <p class="muted">{t.card.line}</p>
         </div>
         <div class="stack-2">
-          <span class="label">Known for</span>
+          <span class="label">{t.card.knownFor}</span>
           <ul class="industries">
-            <li><span class="chip">Plain-English help</span></li>
-            <li><span class="chip">Look before we quote</span></li>
-            <li><span class="chip">Security first</span></li>
+            {t.card.chips.map((c) => <li><span class="chip">{c}</span></li>)}
           </ul>
         </div>
         <dl class="facts">
-          <div>
-            <dt>Based in</dt>
-            <dd>Toronto, ON</dd>
-          </div>
-          <div>
-            <dt>Team</dt>
-            <dd>22 technicians</dd>
-          </div>
-          <div>
-            <dt>Languages</dt>
-            <dd>English, French</dd>
-          </div>
+          {t.card.facts.map((f) => <div>
+            <dt>{f.term}</dt>
+            <dd>{f.value}</dd>
+          </div>)}
         </dl>
       </aside>
     </div>

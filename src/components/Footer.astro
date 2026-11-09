@@ -10,7 +10,9 @@ import HoldButton from './HoldButton.astro';
 import { footer as f } from '../lib/footer';
 import { CAMPUS, getServices } from '../lib/site';
 import { fit } from '../lib/fit';
+import { copy, fill } from '../lib/copy';
 const services = await getServices();
+const { site, footer: t, form } = await copy('ui');
 type Spot = keyof typeof f.spots;
 const spot = (k: Spot) => f.spots[k];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
@@ -24,13 +26,13 @@ const sections: {
   count: string;
   panel?: (typeof panels)[number];
 }[] = [
-  { id: 'contact', map: 'hq', icon: 'bubble', name: 'Contact', count: 'Start here' },
+  { id: 'contact', map: 'hq', icon: 'bubble', name: t.contact.tile, count: t.contact.count },
   ...panels.map((p) => ({
     id: p.id,
     map: p.map,
     icon: p.icon,
     name: p.tile,
-    count: `${p.links.length} links`,
+    count: fill(t.links, { n: p.links.length }),
     panel: p,
   })),
   {
@@ -38,14 +40,14 @@ const sections: {
     map: 'follow',
     icon: f.follow.icon,
     name: f.follow.tile,
-    count: `${f.follow.socials.length} channels`,
+    count: fill(t.channels, { n: f.follow.socials.length }),
   },
 ];
 ---
 
 <footer class="site-footer fc" id="footer" aria-labelledby="fc-title">
-  <h2 class="sr-only" id="fc-title">Site footer</h2>
-  <nav class="fc-nav" aria-label="Footer">
+  <h2 class="sr-only" id="fc-title">{t.title}</h2>
+  <nav class="fc-nav" aria-label={t.nav}>
     <div class="container fc-deck">
       {sections.map((s) => <details class="fc-sec" name="footer" id={`fc-${s.id}`} data-map={s.map}>
         <summary class="fc-tile">
@@ -65,12 +67,12 @@ const sections: {
             <div class="fc-body">
               <div class="fc-facts">
                 <div>
-                  <p class="label">Call or email</p>
+                  <p class="label">{t.callOrEmail}</p>
                   <a class="fc-cl" href={f.phone.href}><Icon name="phone" /><span>{f.phone.display}</span></a>
                   <a class="fc-cl" href={`mailto:${f.email}`}><Icon name="mail" /><span>{f.email}</span></a>
                 </div>
                 <div>
-                  <p class="label">Office</p>
+                  <p class="label">{t.office}</p>
                   <p class="fc-cl fc-cl--two">
                     <Icon name="pin" /><span>{f.office.city}<small>{f.office.street}</small></span>
                   </p>
@@ -80,7 +82,7 @@ const sections: {
                 </div>
               </div>
               <div class="fc-follow">
-                <span class="label">Follow</span>
+                <span class="label">{t.follow}</span>
                 <ul class="fc-socials">
                   {f.follow.socials.map((x) => <li>
                     <a class="fc-soc" href={x.href} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a>
@@ -120,7 +122,7 @@ const sections: {
               </ul>
               <form class="fc-nl" action="/soon" data-fc-nl novalidate>
                 <label class="label" for="fc-nl-email"
-                  ><span class="sr-only">Email for </span>{f.follow.newsletter.name}</label
+                  ><span class="sr-only">{t.emailFor} </span>{f.follow.newsletter.name}</label
                 >
                 <div class="fc-nl-row">
                   <input
@@ -128,12 +130,12 @@ const sections: {
                     id="fc-nl-email"
                     type="email"
                     pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
-                    title="An email address like name@company.com"
-                    placeholder="you@company.com"
+                    title={form.email.title}
+                    placeholder={form.email.placeholder}
                     autocomplete="email"
                     required
                     aria-describedby="fc-nl-msg"
-                  /><button class="btn btn--secondary" type="submit">Subscribe</button>
+                  /><button class="btn btn--secondary" type="submit">{t.subscribe}</button>
                 </div>
                 <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
               </form>
@@ -153,10 +155,10 @@ const sections: {
     <div class="fc-base">
       <div class="container">
         <span class="fc-brand"
-          ><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>Uplink</b
+          ><span class="fc-mark" aria-hidden="true"><Icon name="mark" /></span><b>{site.short}</b
           ><span>{f.copyright}</span></span
         >
-        <ul class="fc-legal" aria-label="Legal">
+        <ul class="fc-legal" aria-label={t.legal}>
           {f.legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
         </ul>
         <span class="fc-base-end">

@@ -6,23 +6,23 @@ import Drawing from '../Drawing.astro';
 import './overview.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
+import { copy } from '../../lib/copy';
 const services = await getServices();
+const t = (await copy('services')).overview;
+const ui = await copy('ui');
 ---
 
 <section class="page-intro" id="overview" aria-labelledby="svc-page-title">
   <div class="container svc-overview">
     <div class="svc-overview-head">
-      <p class="eyebrow">Services</p>
-      <h1 id="svc-page-title">Managed IT, one team</h1>
-      <p class="lead">
-        We run the technology behind your office: help desk, security, cloud, network and phones. We look first, then
-        quote.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 id="svc-page-title">{t.title}</h1>
+      <p class="lead">{t.lead}</p>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
       </div>
     </div>
-    <ul class="svc-grid" aria-label="Services">
+    <ul class="svc-grid" aria-label={t.list}>
       {services.map(({ id, data: s }) => <li>
         <div class="card">
           <span class="card-media well"

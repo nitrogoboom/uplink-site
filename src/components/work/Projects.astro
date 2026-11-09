@@ -7,25 +7,23 @@
 import './projects.css';
 import ProjectCard from './ProjectCard.astro';
 import { WORK_FILTER, getProjects, workFilters } from '../../lib/site';
+import { copy } from '../../lib/copy';
 const projects = await getProjects();
 const filters = await workFilters();
+const t = (await copy('work')).projects;
 ---
 
 <section class="page-intro fold fold-always" id="projects" aria-labelledby="work-title">
   <div class="container work-layout">
     <div class="work-side">
-      <p class="eyebrow">Our work</p>
-      <h1 id="work-title">Setups we built and still run</h1>
-      <p class="lead">
-        Every project here is a client we still look after today. Open one to see what we found, what we did and how it
-        turned out.
-      </p>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 id="work-title">{t.title}</h1>
+      <p class="lead">{t.lead}</p>
       <fieldset class="filters" data-md-skip>
-        <legend class="sr-only">Filter projects</legend>
+        <legend class="sr-only">{t.filter}</legend>
         {filters.map((f) => <label class="filter"
-          ><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'} />{
-            f.label
-          }<span class="sr-only">, </span
+          ><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'} />{f.label ??
+            t.all}<span class="sr-only">, </span
           ><span class="count">{f.count}</span></label
         >)}
       </fieldset>

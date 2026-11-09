@@ -10,6 +10,7 @@ import Drawing from '../Drawing.astro';
 import type { CollectionEntry } from 'astro:content';
 import { fit } from '../../lib/fit';
 import './service-card.css';
+import { copy, fill } from '../../lib/copy';
 interface Props {
   service: CollectionEntry<'services'>;
   n: number;
@@ -22,6 +23,7 @@ const { service, n, total, on = false, first = false, heading: Heading = 'h2' } 
 const Sub = Heading === 'h1' ? 'h2' : 'h3';
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
+const t = (await copy('services')).page;
 ---
 
 <article class:list={['svc', { 'is-on': on }]} id={id} aria-labelledby={`svc-${id}`}>
@@ -33,7 +35,7 @@ const two = (k: number) => String(k).padStart(2, '0');
   <div class="picker-prev panel">
     <div class="picker-art">
       <div class="tags">
-        <span class="chip">Service {two(n)} of {two(total)}</span><span class="chip">{s.tag}</span>
+        <span class="chip">{fill(t.count, { n: two(n), total: two(total) })}</span><span class="chip">{s.tag}</span>
       </div>
       <Drawing
         src={`/assets/img/${s.image}.svg`}
@@ -47,7 +49,7 @@ const two = (k: number) => String(k).padStart(2, '0');
     </div>
   </div>
   <div class="picker-detail">
-    <Sub class="label">What's included</Sub>
+    <Sub class="label">{t.included}</Sub>
     <ul class="feat-list">
       {s.features.map((f, i) => <li class="feat">
         <span class="icon-tile" aria-hidden="true">{i + 1}</span
@@ -55,7 +57,7 @@ const two = (k: number) => String(k).padStart(2, '0');
       </li>)}
     </ul>
     <div class="row">
-      <Sub class="label">Best for</Sub>
+      <Sub class="label">{t.bestFor}</Sub>
       <p>{s.bestFor}</p>
     </div>
   </div>

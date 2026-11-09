@@ -1,35 +1,22 @@
 ---
 // ABOUT · 2. How we work: four numbered steps.
 // Styles: shared (.steps in src/styles/shared-blocks.css).
+import { copy } from '../../lib/copy';
+const t = (await copy('about')).process;
 ---
 
 <section class="section section--band" id="process" aria-labelledby="process-title">
   <div class="container">
     <div class="section-head">
-      <p class="eyebrow">How we work</p>
-      <h2 id="process-title">Four steps, in this order</h2>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h2 id="process-title">{t.title}</h2>
     </div>
     <ol class="steps">
-      <li class="step panel">
-        <span class="step-n" aria-hidden="true">1</span>
-        <h3>Look first</h3>
-        <p class="muted">A free check-up of your network, devices and accounts.</p>
-      </li>
-      <li class="step panel">
-        <span class="step-n" aria-hidden="true">2</span>
-        <h3>Straight answers</h3>
-        <p class="muted">What is covered, what is not, and what it costs.</p>
-      </li>
-      <li class="step panel">
-        <span class="step-n" aria-hidden="true">3</span>
-        <h3>Fix the basics</h3>
-        <p class="muted">We close the biggest gaps before anything else.</p>
-      </li>
-      <li class="step panel">
-        <span class="step-n" aria-hidden="true">4</span>
-        <h3>Run it for you</h3>
-        <p class="muted">Day-to-day support, plus a review every quarter.</p>
-      </li>
+      {t.steps.map((s, i) => <li class="step panel">
+        <span class="step-n" aria-hidden="true">{i + 1}</span>
+        <h3>{s.title}</h3>
+        <p class="muted">{s.text}</p>
+      </li>)}
     </ol>
   </div>
 </section>

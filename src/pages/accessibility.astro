@@ -3,11 +3,8 @@
 // feedback. The words are src/data/accessibility.md; sources in docs/privacy-and-accessibility-2026-11-03.md.
 import TextPage from '../components/TextPage.astro';
 import * as md from '../data/accessibility.md';
+import { copy } from '../lib/copy';
+const t = await copy('text-pages');
 ---
 
-<TextPage
-  page="accessibility"
-  md={md}
-  eyebrow="For everyone"
-  lead="How this site works for everyone, and how to tell us when it doesn't."
-/>
+<TextPage page="accessibility" md={md} eyebrow={t.accessibility.eyebrow} lead={t.accessibility.lead} />

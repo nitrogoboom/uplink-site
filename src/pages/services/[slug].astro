@@ -10,6 +10,7 @@ import ProjectCard from '../../components/work/ProjectCard.astro';
 import '../../components/services/service-page.css';
 import { PAGES, getServices, getProjects, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
 import { fit } from '../../lib/fit';
+import { copy, fill } from '../../lib/copy';
 
 export async function getStaticPaths() {
   const services = await getServices();
@@ -26,6 +27,9 @@ export async function getStaticPaths() {
 }
 const { service, n, total, projects } = Astro.props;
 const { id, data: s } = service;
+const ui = await copy('ui');
+const t = (await copy('services')).page;
+const questions = fill(t.questions.title, { service: s.title });
 const url = new URL(`/services/${id}`, Astro.site).href;
 const business = { '@id': `${Astro.site!.href}#business` };
 const ld = {
@@ -62,20 +66,20 @@ const ld = {
 };
 ---
 
-<Base title={`${s.title} · Uplink Technology`} description={s.lead} page="services" path={`/services/${id}`}>
+<Base title={fill(ui.site.pageTitle, { name: s.title })} description={s.lead} page="services" path={`/services/${id}`}>
   <Fragment slot="head"> <script is:inline type="application/ld+json" set:html={jsonLd(ld)} /></Fragment>
   <section class="hero svc-page" aria-labelledby={`svc-${id}`}>
     <div class="container svc-page-grid">
-      <nav class="crumbs" aria-label="Breadcrumb">
+      <nav class="crumbs" aria-label={ui.breadcrumb}>
         <ol>
-          <li><a href="/services">Services</a></li>
+          <li><a href="/services">{PAGES.services.name}</a></li>
           <li aria-current="page">{s.title}</li>
         </ol>
       </nav>
       <ServiceCard service={service} n={n} total={total} on first heading="h1" />
       <div class="svc-page-cta row">
         <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}
-          >Talk to us about this</a
+          >{t.cta}</a
         >
       </div>
     </div>
@@ -83,7 +87,7 @@ const ld = {
   <section class="section section--band" aria-labelledby="how-title">
     <div class="container split">
       <div class="section-head">
-        <p class="eyebrow">How it works</p>
+        <p class="eyebrow">{t.how}</p>
         <h2 id="how-title" class={fit(s.page.heading)}>{s.page.heading}</h2>
       </div>
       <div class="stack-5 detail-body">
@@ -94,8 +98,8 @@ const ld = {
   <section class="section" id="questions" aria-labelledby="questions-title">
     <div class="container split">
       <div class="section-head">
-        <p class="eyebrow">Questions</p>
-        <h2 id="questions-title" class={fit(`Questions about ${s.title}`)}>Questions about {s.title}</h2>
+        <p class="eyebrow">{t.questions.eyebrow}</p>
+        <h2 id="questions-title" class={fit(questions)}>{questions}</h2>
       </div>
       <div class="faq">
         {s.page.faq.map((f) => <details>
@@ -108,8 +112,8 @@ const ld = {
   {projects.length > 0 && <section class="section section--band" id="projects" aria-labelledby="projects-title">
     <div class="container stack-5">
       <div class="section-head">
-        <p class="eyebrow">Our work</p>
-        <h2 id="projects-title">Where we've done this</h2>
+        <p class="eyebrow">{t.projects.eyebrow}</p>
+        <h2 id="projects-title">{t.projects.title}</h2>
       </div>
       <ul class="card-row">
         {projects.map((project) => <li><ProjectCard project={project} /></li>)}

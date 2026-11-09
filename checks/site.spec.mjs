@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { PNG } from 'pngjs';
-import { BASE, MISSING, ROOT, SIZES, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
+import { BASE, MISSING, ROOT, SIZES, copy, flag, lanes, option, pad, pages, verdict, watch } from './lib.mjs';
 import { LONG, longest } from '../src/lib/fit.js';
 
 const ALL = flag('--all');
@@ -19,6 +19,9 @@ const PAGES = (await pages(BASE)).map((p) => p.replace(/^\/|\/$/g, '') || 'index
 const url = (page) => `${BASE}/${page === 'index' ? '' : page}`;
 const FOCUS = new Set(['index']); // pages checked in full; the rest get the quick look unless --all
 const full = (page) => ALL || FOCUS.has(page);
+// the site's words the checks look for (src/data/copy/*.yaml), so a rewrite of the copy doesn't break them
+const UI = copy('ui');
+const GROW = copy('home').grow;
 
 test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
   const fails = [];
@@ -581,8 +584,8 @@ test('Grow: no frames and no loops once the story ends, or off screen (B2, B21)'
   await q.locator('#grow .grow-play').click();
   const ended = await q
     .waitForFunction(
-      () => document.querySelector('#grow .grow-play').getAttribute('aria-label') === 'Play again',
-      null,
+      (again) => document.querySelector('#grow .grow-play').getAttribute('aria-label') === again,
+      GROW.play.again,
       { timeout: 15000 },
     )
     .then(
@@ -627,7 +630,7 @@ test('Grow: a held or hidden step resumes where it was; your own pause wins (B17
   await q.evaluate(() => document.querySelector('[data-hold]').click());
   await q.waitForTimeout(600);
   const label = await growLabel(q);
-  if (label !== 'Play')
+  if (label !== GROW.play.play)
     fails.push(`paused by hand under the site's pause, then the site's pause released: Grow plays (button "${label}")`);
   // off screen for 2.5 s at 1.5 s into step 3
   await q.locator('#grow .grow-play').click();
@@ -785,10 +788,13 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
     if (!region || region.live !== 'polite')
       fails.push(`#${id}: no aria-live="polite" .toasts of its own: ${JSON.stringify(region)}`);
     const tree = await q.locator(`#${id}`).ariaSnapshot();
-    const close = tree.match(/button "([^"]*Close[^"]*)"/);
-    if (!close || !close[1].includes('Esc'))
+    const close = tree
+      .match(/button "([^"]*)"/g)
+      ?.map((b) => b.slice(8, -1))
+      .find((n) => n === UI.dialog.close);
+    if (!close || !close.includes(UI.dialog.key))
       fails.push(
-        `#${id}: its close button is named ${close ? `"${close[1]}"` : '(not found)'}, without the "Esc" it shows`,
+        `#${id}: no close button named "${UI.dialog.close}" (ui.yaml, dialog), or the name lacks the "${UI.dialog.key}" it shows`,
       );
     await q.keyboard.press('Escape');
     await q.waitForTimeout(300);
@@ -1037,8 +1043,8 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
   await q.fill('#book-email', 'test@example.com');
   await q.selectOption('#book-size', { index: 1 });
   await q.locator('#book-dialog [type="submit"]').click();
-  if (!(await toastShown('Check-up requested')))
-    fails.push(`the Book form's confirmation isn't shown on the page (${await where('Check-up requested')})`);
+  if (!(await toastShown(UI.toast.booked.title)))
+    fails.push(`the Book form's confirmation isn't shown on the page (${await where(UI.toast.booked.title)})`);
   await ctx.close();
   verdict([...fails, ...errs]);
 });
@@ -2103,13 +2109,15 @@ test('Markdown copies: team, facts links, hours heading, Home contact (C15)', as
   test.skip(!process.env.RELEASE, 'release only: expects the current copy');
   const md = async (path) => (await fetch(BASE + path)).text();
   const fails = [];
-  const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith('The people who pick up')) || '';
+  const ABOUT = copy('about');
+  const QUEUE = copy('contact').message.queue;
+  const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith(ABOUT.team.title)) || '';
   const people = team.split('\n').filter((l) => l.startsWith('- '));
   if (!people.length || people.some((l) => !/^- [^,]+, \S/.test(l)))
     fails.push(`/about.md team lines run names into roles: ${people.join(' | ')}`);
   if (!/^- Services: \[[^\]]+\]\(https?:\/\/[^)]+\/services\/[a-z-]+\)/m.test(await md('/work/office-move.md')))
     fails.push('/work/office-move.md: Services are not links');
-  if (!/^## Hours and office\n\n- Monday to Friday: /m.test(await md('/contact.md')))
+  if (!(await md('/contact.md')).includes(`\n## ${QUEUE.title}\n\n- ${QUEUE.facts[0].term}: `))
     fails.push('/contact.md: the hours have no heading');
   const home = await md('/index.md');
   const html = await (await fetch(BASE + '/contact')).text();

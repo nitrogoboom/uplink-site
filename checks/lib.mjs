@@ -5,11 +5,14 @@
 // exactly the built pages other than /soon and the 404, so a page can't drop out of the sitemap, or out of the checks,
 // unnoticed.
 // SIZES: phone, tablet, 1440 x 900 and 3440 x 1440 (site and spacing checks).
-import { existsSync, readdirSync } from 'node:fs';
+// copy(name): src/data/copy/NAME.yaml, so a check that looks for the site's words reads them where the pages do.
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse } from 'yaml'; // the parser Astro reads the copy files with (a dependency of astro, not ours)
 
 export const ROOT = fileURLToPath(new URL('..', import.meta.url));
+export const copy = (name) => parse(readFileSync(join(ROOT, 'src/data/copy', `${name}.yaml`), 'utf-8'));
 
 // scripts/check.mjs passes its arguments here, as JSON: `npm run verify -- --out DIR` gives ['--out', 'DIR']
 export const ARGS = JSON.parse(process.env.CHECK_ARGS || '[]');

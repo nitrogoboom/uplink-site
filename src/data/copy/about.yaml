@@ -1,0 +1,56 @@
+# About (/about): Profile, Process and Team, in page order. The people are data (src/data/team.json).
+# Schema: src/lib/copy-schema.ts.
+
+profile:
+  eyebrow: About
+  title: We're your IT company
+  body: # the paragraphs under the heading
+    - 'We are the IT department for businesses that do not want to build one. We look at your setup first, tell you straight what is covered and what is not, then run it for you: help desk, security, cloud and the network underneath.'
+    - Everyone who answers your call works here, in our office. We do not hand your tickets to an overseas call centre, and the person who fixes your problem today is the same person who will know your setup next year.
+  stats:
+    - label: Clients supported
+      value: 120+
+    - label: Average first response
+      value: 12 min
+    - label: Devices looked after
+      value: 3,400
+    - label: Client renewal rate
+      value: 96%
+  card: # the HQ building card
+    label: Uplink at a glance
+    alt: Illustration of the Uplink office building with the help desk floor highlighted
+    since: Since 2011
+    line: Your outsourced IT department. Help desk, security and cloud under one roof.
+    knownFor: Known for
+    chips:
+      - Plain-English help
+      - Look before we quote
+      - Security first
+    facts:
+      - term: Based in
+        value: Toronto, ON
+      - term: Team
+        value: 22 technicians
+      - term: Languages
+        value: English, French
+
+process:
+  eyebrow: How we work
+  title: Four steps, in this order
+  steps:
+    - title: Look first
+      text: A free check-up of your network, devices and accounts.
+    - title: Straight answers
+      text: What is covered, what is not, and what it costs.
+    - title: Fix the basics
+      text: We close the biggest gaps before anything else.
+    - title: Run it for you
+      text: Day-to-day support, plus a review every quarter.
+
+team:
+  eyebrow: Team
+  title: The people who pick up
+  cta: # the band under the team
+    title: Meet the team on a call
+    lead: The free check-up is run by the same technicians who would look after you.
+    join: Join the team

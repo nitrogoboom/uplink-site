@@ -6,7 +6,7 @@
    it only keeps one open (Contact when none is picked).
    ========================================================================== */
 
-import { $, $$, html, reduceMotion, toast, whenOnScreen } from './core.js';
+import { $, $$, UI, html, reduceMotion, toast, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 
 /* ======================================================================
@@ -139,14 +139,14 @@ if (fc) {
         msg = /** @type {HTMLElement} */ ($('[data-fc-nl-msg]', nl));
       if (!input.checkValidity()) {
         input.setAttribute('aria-invalid', 'true');
-        msg.textContent = 'Enter an email like name@company.com.';
+        msg.textContent = UI.emailError;
         input.focus();
         return;
       }
       input.removeAttribute('aria-invalid');
-      msg.textContent = 'One email a month. Threats to watch and fixes that matter.';
+      msg.textContent = note; // the form's own note, put back
       nl.reset();
-      toast({ title: 'Subscribed', text: 'Prototype form: nothing is sent yet.' });
+      toast(UI.toast.subscribed);
     });
 
   // the map is fetched when its box comes within a screen of view; phones hide the box (footer.css), so they never

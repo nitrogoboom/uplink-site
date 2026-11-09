@@ -2,17 +2,20 @@
 // HOME · 5. The "free check-up" call-to-action band. (The stats moved to About on 2 Nov 2026.)
 // Styles: shared (.cta-band in src/styles/shared-blocks.css).
 import { phone } from '../../lib/footer';
+import { copy } from '../../lib/copy';
+const t = (await copy('home')).proof;
+const ui = await copy('ui');
 ---
 
 <section class="section" id="proof" aria-labelledby="start-title">
   <div class="container">
     <div class="panel cta-band" id="start">
       <div class="stack">
-        <h2 id="start-title">Start with a free check-up</h2>
-        <p class="lead">Thirty minutes, no contract. We show you what we find and what we would fix first.</p>
+        <h2 id="start-title">{t.title}</h2>
+        <p class="lead">{t.lead}</p>
       </div>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">Book a check-up</a>
+        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
         <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
       </div>
     </div>

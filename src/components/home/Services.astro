@@ -14,9 +14,11 @@ import Pause from '../Pause.astro';
 import './services.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
+import { copy } from '../../lib/copy';
 const SLOTS = 4;
-const TITLE = 'Everything your office runs on';
-const MORE = 'All services';
+const t = (await copy('home')).services;
+const TITLE = t.title;
+const MORE = t.more;
 const services = await getServices();
 // services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
 // different count stops the build here instead of leaving a broken grid
@@ -38,12 +40,12 @@ const tiles = [
   <div class="container svc-wrap">
     <div class="section-head section-head--split">
       <div>
-        <p class="eyebrow">What we run</p>
+        <p class="eyebrow">{t.eyebrow}</p>
         <h2 id="services-title" class={fit(TITLE)}>{TITLE}</h2>
       </div>
-      <a class="link-arrow" href="/services">See all services<Icon name="arrow" /></a>
+      <a class="link-arrow" href="/services">{t.seeAll}<Icon name="arrow" /></a>
     </div>
-    <ul class="svc-menu" id="services-row" aria-label="Services">
+    <ul class="svc-menu" id="services-row" aria-label={t.list}>
       {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
         <div class="svc-tile">
           <span class="svc-art"
@@ -53,7 +55,7 @@ const tiles = [
           <div class="svc-text">
             <a class="svc-link" href={`/services/${id}`}
               ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
-              ><Pause /><span class="svc-line">{s.card}</span><span class="sr-only"> View service</span></a
+              ><Pause /><span class="svc-line">{s.card}</span><span class="sr-only"> {t.view}</span></a
             >{size === 'big' && <ul class="svc-feats">
               {s.features.map((f) => <li class="svc-feat">
                 <span class="svc-feat-t">{f.title}</span><span class="sr-only">: </span
@@ -61,7 +63,7 @@ const tiles = [
               </li>)}
             </ul>}
           </div>
-          <span class="svc-go" aria-hidden="true">View service<Icon name="chevronR" /></span>
+          <span class="svc-go" aria-hidden="true">{t.view}<Icon name="chevronR" /></span>
         </div>
       </li>)}
       <li class="svc-small svc-more">
@@ -69,10 +71,10 @@ const tiles = [
           <span class="svc-icon"><Icon name="grid" /></span>
           <div class="svc-text">
             <a class="svc-link" href="/services"
-              ><span class:list={['svc-title', fit(MORE)]}>{MORE}</span><span class="sr-only"> View services</span></a
+              ><span class:list={['svc-title', fit(MORE)]}>{MORE}</span><span class="sr-only"> {t.viewAll}</span></a
             >
           </div>
-          <span class="svc-go" aria-hidden="true">View services<Icon name="chevronR" /></span>
+          <span class="svc-go" aria-hidden="true">{t.viewAll}<Icon name="chevronR" /></span>
         </div>
       </li>
     </ul>
@@ -82,7 +84,7 @@ const tiles = [
         type="button"
         data-step="-1"
         aria-controls="services-row"
-        aria-label="Previous service"
+        aria-label={t.previous}
       >
         <Icon name="chevronL" />
       </button>
@@ -91,16 +93,10 @@ const tiles = [
           <i class="pip" />
         ))}</span
       >
-      <button
-        class="iconbtn svc-step"
-        type="button"
-        data-step="1"
-        aria-controls="services-row"
-        aria-label="Next service"
-      >
+      <button class="iconbtn svc-step" type="button" data-step="1" aria-controls="services-row" aria-label={t.next}>
         <Icon name="chevronR" />
       </button>
-      <span class="svc-swipe" aria-hidden="true">Swipe<Icon name="arrow" /></span>
+      <span class="svc-swipe" aria-hidden="true">{t.swipe}<Icon name="arrow" /></span>
     </div>
   </div>
 </section>

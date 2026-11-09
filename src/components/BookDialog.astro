@@ -4,26 +4,25 @@
 // Styles: src/styles/dialogs.css, src/styles/forms.css.
 import ServiceOptions from './ServiceOptions.astro';
 import Icon from './Icon.astro';
+import { copy } from '../lib/copy';
+const { book: t, form, dialog } = await copy('ui');
 ---
 
 <dialog class="dialog" id="book-dialog" aria-labelledby="book-title">
   <form data-validate="book" method="dialog">
     <div class="dlg-head">
-      <h2 id="book-title">Book your free check-up</h2>
+      <h2 id="book-title">{t.title}</h2>
       <button class="hbtn" type="button" data-close aria-keyshortcuts="Escape">
-        <span class="kbd kbd-hint" aria-hidden="true">Esc</span
-        ><Icon name="close" /><span class="sr-only">Close (Esc)</span>
+        <span class="kbd kbd-hint" aria-hidden="true">{dialog.key}</span
+        ><Icon name="close" /><span class="sr-only">{dialog.close}</span>
       </button>
     </div>
     <div class="dlg-body">
-      <p class="muted">
-        We scan your network, devices and accounts, walk you through what we find, then talk options. It takes 30
-        minutes and there is no contract to look.
-      </p>
-      <p class="small muted">Fields are required unless marked optional.</p>
+      <p class="muted">{t.lead}</p>
+      <p class="small muted">{form.required}</p>
       <div class="form-grid">
         <div class="field">
-          <label for="book-name">Name</label>
+          <label for="book-name">{form.name.label}</label>
           <input
             class="input"
             id="book-name"
@@ -32,53 +31,50 @@ import Icon from './Icon.astro';
             autocomplete="name"
             required
             pattern=".*\S.*"
-            title="Your name (more than spaces)"
+            title={form.name.title}
           />
-          <span class="field-error" id="book-name-err">Add your name so we know who to ask for.</span>
+          <span class="field-error" id="book-name-err">{t.nameError}</span>
         </div>
         <div class="field">
-          <label for="book-email">Work email</label>
+          <label for="book-email">{form.email.label}</label>
           <input
             class="input"
             id="book-email"
             name="email"
             type="email"
             pattern="[^@\s]+@[^@\s]+\.[^@\s]+"
-            title="An email address like name@company.com"
+            title={form.email.title}
             autocomplete="email"
-            placeholder="you@company.com"
+            placeholder={form.email.placeholder}
             required
           />
-          <span class="field-error" id="book-email-err">Enter an email like name@company.com.</span>
+          <span class="field-error" id="book-email-err">{form.email.error}</span>
         </div>
         <div class="field">
-          <label for="book-company">Company <span class="opt">(optional)</span></label>
+          <label for="book-company">{form.company} <span class="opt">{form.optional}</span></label>
           <input class="input" id="book-company" name="company" type="text" autocomplete="organization" />
         </div>
         <div class="field">
-          <label for="book-size">Team size</label>
+          <label for="book-size">{t.size.label}</label>
           <select class="input" id="book-size" name="size" required>
-            <option value="">Choose…</option>
-            <option>1 to 10 people</option>
-            <option>11 to 50 people</option>
-            <option>51 to 150 people</option>
-            <option>More than 150</option>
+            <option value="">{form.choose}</option>
+            {t.size.options.map((o) => <option>{o}</option>)}
           </select>
-          <span class="field-error" id="book-size-err">Pick how many people work with you.</span>
+          <span class="field-error" id="book-size-err">{t.size.error}</span>
         </div>
         <div class="field span-2">
-          <label for="book-service">Main interest</label>
+          <label for="book-service">{t.service.label}</label>
           <select class="input" id="book-service" name="service">
-            <option>Not sure yet</option>
+            <option>{t.service.unsure}</option>
             <ServiceOptions />
           </select>
         </div>
       </div>
-      <p class="small muted">Prototype form: nothing is sent yet.</p>
+      <p class="small muted">{form.prototype}</p>
     </div>
     <div class="dlg-actions">
-      <button class="btn btn--secondary" type="button" data-close>Cancel</button>
-      <button class="btn btn--primary" type="submit">Request check-up</button>
+      <button class="btn btn--secondary" type="button" data-close>{t.cancel}</button>
+      <button class="btn btn--primary" type="submit">{t.submit}</button>
     </div>
   </form>
   <div class="toasts" aria-live="polite"></div>

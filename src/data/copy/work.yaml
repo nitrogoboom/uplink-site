@@ -1,0 +1,22 @@
+# Our work: the /work page's own words, and the words every case study (/work/SLUG) shares around its own copy. Each
+# project's words are data (src/content/projects/SLUG.json). Schema: src/lib/copy-schema.ts.
+
+projects:
+  eyebrow: Our work
+  title: Setups we built and still run
+  lead: Every project here is a client we still look after today. Open one to see what we found, what we did and how it turned out.
+  filter: Filter projects # the filters' hidden legend
+  all: All # the first filter; the others are the projects' tags
+
+# a project's own page, /work/SLUG
+case:
+  client: Client
+  services: Services
+  timeline: Timeline
+  result: Result
+  story:
+    eyebrow: Case study
+    title: How it went
+    start: Where they started
+    did: What we did
+    result: The result

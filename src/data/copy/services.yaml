@@ -1,0 +1,30 @@
+# Services: the /services page's own words (Overview, Faq), and the words every service page (/services/SLUG) shares
+# around its own copy. Each service's words are data (src/content/services/SLUG.json), the questions on /services
+# too (src/data/faq.json). Schema: src/lib/copy-schema.ts.
+
+overview:
+  eyebrow: Services
+  title: Managed IT, one team
+  lead: 'We run the technology behind your office: help desk, security, cloud, network and phones. We look first, then quote.'
+  list: Services # the cards' list name
+
+faq:
+  eyebrow: Questions
+  title: Things people ask first
+  cta: # the band under the questions
+    title: Not sure which plan fits?
+    lead: Start with the free check-up. We will tell you what you need and what you can skip.
+
+# a service's own page, /services/SLUG
+page:
+  cta: Talk to us about this
+  how: How it works # the eyebrow over the service's `page.heading`
+  questions:
+    eyebrow: Questions
+    title: Questions about {service}
+  projects:
+    eyebrow: Our work
+    title: Where we've done this
+  count: Service {n} of {total} # the chip on the drawing ("Service 03 of 07")
+  included: What's included
+  bestFor: Best for

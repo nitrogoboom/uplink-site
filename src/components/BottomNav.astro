@@ -4,14 +4,16 @@
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, tabCurrent } from '../lib/site';
+import { copy } from '../lib/copy';
 interface Props {
   current: Page;
 }
 const { current } = Astro.props;
 const here = Astro.url.pathname;
+const ui = await copy('ui');
 ---
 
-<nav class="botnav" aria-label="Main (bottom bar)">
+<nav class="botnav" aria-label={ui.bottomNav}>
   <ul>
     {NAV.map(({ page, icon, short }) => <li>
       <a class="bn" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}

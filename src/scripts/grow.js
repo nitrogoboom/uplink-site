@@ -8,7 +8,8 @@
    orbits too) until you play it again. Builds no HTML: this only sets classes, attributes and text.
    ========================================================================== */
 
-import { $, $$, held, reduceMotion, whenOnScreen } from './core.js';
+import { $, $$, held, reduceMotion, whenOnScreen, words } from './core.js';
+import { fill } from '../lib/fill.js';
 
 const DWELL = 4500; // ms a step
 const RISK_AT = 900; // ms into a step: its risks show (the parts have dropped in by then)
@@ -25,6 +26,8 @@ const grow = section && $('.grow', section);
 /** @type {SVGSVGElement | null} */
 const svg = grow && $('.grow-stage svg', grow);
 if (grow && svg) {
+  // the button's names and the team counter's words: src/data/copy/home.yaml, grow (index.astro carries them)
+  const T = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
   const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));
   const steps = $$('.grow-card', grow);
@@ -158,7 +161,7 @@ if (grow && svg) {
     reached = -1;
   const setTeam = (/** @type {number} */ v) => {
     teamNow = v;
-    team.textContent = v ? `Team of ${v}` : '';
+    team.textContent = v ? fill(T.team, { n: v }) : '';
   };
   const count = (/** @type {number} */ i, /** @type {boolean} */ animate) => {
     window.cancelAnimationFrame(teamRaf);
@@ -312,7 +315,7 @@ if (grow && svg) {
   const icon = () => {
     const end = cur >= LAST;
     playIcon.setAttribute('d', playing ? PAUSE : end ? REPLAY : PLAY);
-    play.setAttribute('aria-label', playing ? 'Pause' : end ? 'Play again' : 'Play');
+    play.setAttribute('aria-label', playing ? T.play.pause : end ? T.play.again : T.play.play);
     stage.classList.toggle('is-paused', !playing && started); // paused, and at the end: nothing loops
   };
   const go = (/** @type {number} */ i, /** @type {boolean} */ animate) => {

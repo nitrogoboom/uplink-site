@@ -8,8 +8,9 @@
 import { defineCollection, reference } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob, file } from 'astro/loaders';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { ICON_NAMES } from './components/icons';
+import { COPY, type CopyName } from './lib/copy-schema';
 
 // A drawing's name, with the cuts the pages show (NAME.svg, NAME-compact.svg …) checked in public/assets/img/.
 const drawing = (...cuts: string[]) =>
@@ -100,4 +101,29 @@ const grow = defineCollection({
   }),
 });
 
-export const collections = { services, projects, faq, team, grow };
+// The site's words: one YAML file a page or area in src/data/copy/, each its own collection checked against its schema
+// in src/lib/copy-schema.ts (a missing or unknown key stops the build). Read them with copy() from src/lib/copy.ts.
+// A YAML file there with no schema stops the build too, so no file is read by nothing.
+const COPY_DIR = './src/data/copy';
+const unknown = readdirSync(COPY_DIR).filter((f) => !(f.replace(/\.yaml$/, '') in COPY));
+if (unknown.length)
+  throw new Error(`src/data/copy/: ${unknown.join(', ')} has no schema (COPY in src/lib/copy-schema.ts)`);
+const copy = <N extends CopyName>(name: N) =>
+  defineCollection({ loader: glob({ pattern: `${name}.yaml`, base: COPY_DIR }), schema: COPY[name] });
+
+export const collections = {
+  services,
+  projects,
+  faq,
+  team,
+  grow,
+  'copy-ui': copy('ui'),
+  'copy-home': copy('home'),
+  'copy-about': copy('about'),
+  'copy-services': copy('services'),
+  'copy-work': copy('work'),
+  'copy-contact': copy('contact'),
+  'copy-soon': copy('soon'),
+  'copy-not-found': copy('not-found'),
+  'copy-text-pages': copy('text-pages'),
+};

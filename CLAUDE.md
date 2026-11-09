@@ -21,6 +21,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - A service is `src/content/services/SLUG.json`, a project `src/content/projects/SLUG.json`; the slug is the address. The `page` field holds the copy only that item's own page shows. Smaller lists are `src/data/*.json`, kept in file order through `byOrder`.
 - Schemas are strict (`src/content.config.ts`; `footer.json`'s in `src/lib/footer.ts`): an unknown key, an icon not in `src/components/icons.ts` or an `image` with no drawing fails the build. Import footer data from `src/lib/footer.ts`, not the JSON; the JSON holds no HTML.
 - Every card, footer link, select option, page, sitemap line and JSON-LD block reads from those files. Change words in the data, once.
+- Every other word a component, layout or script shows or announces is in `src/data/copy/*.yaml`: one file a page (`home.yaml` …), `ui.yaml` for shared UI and screen-reader text. Each file has a strict schema in `src/lib/copy-schema.ts`, so a missing or unknown key fails the build. Read with `await copy('home')` (`src/lib/copy.ts`; a key it lacks throws too), fill `{n}`-style templates with `fill()`. To add a string: the key in the YAML and the schema, then use it. A page script gets its words as JSON (`<Words>`, read with `words()` from `core.js`). Type no words into markup or scripts.
 - The seven static pages' `<title>` and description live in `PAGES` in `src/lib/site.ts`.
 - Privacy and accessibility are Markdown in `src/data/`. Contact details there are placeholders (`{privacy}`, `{phone}`, `{street}` …) filled from `src/data/footer.json` while the Markdown renders (`src/lib/placeholders.mjs`, a plugin in `astro.config.mjs`); a name with no value fails the build. When the site starts collecting something new or a processor changes, update `src/data/privacy.md` in the same PR.
 - Home's Markdown copy (`src/data/index.md`) and `src/data/agents.md` are hand-written, with the same contact placeholders. Every other page's `.md` copy is generated from its `<main>`; `data-md-skip` leaves a decorative part out. Two parts in separate boxes that read as one line get a hidden separator (`<span class="sr-only">, </span>`, or `<Pause />`) so neither a screen reader nor the copy runs them together.
@@ -77,6 +78,7 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 - A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (branch lowercased, non-alphanumerics to `-`, repeats and end dashes dropped, `b-` in front if it doesn't start with a letter; over 30 chars, cut to 23 plus `-` and a 6-character hash). Find it with `gh pr view N --comments` or `gh pr checks N`. Previews never touch the live Worker.
 - Changes to only root `*.md` or `docs/` run no CI and deploy nothing, so notes can go straight to `main`.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
+- The agent may merge its own PRs once CI is green; visual changes wait for the owner to look at the preview.
 
 ## Writing
 
