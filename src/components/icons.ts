@@ -61,6 +61,14 @@ export const ICONS = {
   sun: {
     d: '<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
   },
+  // Home reviews: a filled star (the rating) and the open-quote mark on the featured review
+  star: {
+    d: '<path fill="currentColor" d="M12 3.5l2.6 5.3 5.9.86-4.27 4.15 1 5.87L12 16.9l-5.27 2.78 1-5.87L3.5 9.66l5.9-.86z"/>',
+    sw: 1.2,
+  },
+  quote: {
+    d: '<path fill="currentColor" stroke="none" d="M3 19v-6c0-4.6 2.4-7.7 6.6-8.4l.7 1.8C7.9 7.3 6.7 9 6.6 11.2H10V19zm11 0v-6c0-4.6 2.4-7.7 6.6-8.4l.7 1.8c-2.4.9-3.6 2.6-3.7 4.8H21V19z"/>',
+  },
   moon: { d: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>' },
 } satisfies Record<string, Def>;
 export type IconName = keyof typeof ICONS;

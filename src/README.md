@@ -12,7 +12,7 @@ Each file in `pages/` is one address. Most pages are a stack of sections, with o
 
 | File | Address | Sections |
 | --- | --- | --- |
-| `index.astro` | `/` | Hero (with the office drawing), Services, Grow (with the world drawing), Work, and Proof |
+| `index.astro` | `/` | Hero (with the office drawing), Services, Grow (with the world drawing), Work, Reviews, and Proof |
 | `services.astro` | `/services` | Overview and Faq |
 | `services/[slug].astro` | `/services/SLUG` | One page per service, from `content/services/SLUG.json` |
 | `work.astro` | `/work` | Projects. No page script: the filters are radios, and the CSS that hides the other cards (`workFilterCss()` in `lib/site.ts`) goes in its `<head>` |
@@ -99,7 +99,7 @@ The content types are defined in `content.config.ts`, and `footer.json`'s in `li
 | --- | --- |
 | `content/services/SLUG.json` | One service. The slug is its address. Fields: `order`, `title`, `chip`, `tag`, `icon`, `image` (the drawing's name in `public/assets/img/`), `alt`, `lead`, `card`, `features` (three), `bestFor`, and `page`, which is the longer copy only the service's own page shows. Optional: `featured`, `footerLabel`, and `optionLabel`. |
 | `content/projects/SLUG.json` | One project. Fields: `order`, `name`, `tag`, `client`, `clientShort`, `services` (service slugs), `result`, `image`, `alt`, `story`, and `page` (the case study). |
-| `data/faq.json`, `data/team.json`, `data/grow.json` | The smaller lists. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
+| `data/faq.json`, `data/team.json`, `data/grow.json`, `data/reviews.json` | The smaller lists. `reviews.json` is Home's client reviews (sample ones for now): the one marked `featured` is the big card, and `service` names a service by its slug. They keep their file order through `byOrder`; the content store would otherwise sort them by ID. |
 | `data/footer.json` | The footer's lists, the contact details, and the map's spots. `lib/footer.ts` checks it against its schema and exports it typed. A heading with an emphasized word is `title` plus `accent` ("Reach" + "us"); the JSON holds no HTML. |
 | `data/privacy.md`, `data/accessibility.md` | The privacy and accessibility pages. Contact details are placeholders such as `{privacy}` and `{phone}`, filled from `data/footer.json` (`PLACEHOLDERS` in `lib/footer.ts`) by a Markdown plugin (`lib/placeholders.mjs`), so each value is escaped as text. A name with no value stops the build. Don't type an email address or phone number into them. |
 | `data/index.md`, `data/agents.md` | Hand-written Markdown for AI agents: Home's Markdown copy and the agents' guide. Their endpoints fill in `{site}`, the contact placeholders (`{phone}`, `{email}`, `{street}` …, as in the privacy page), and on Home also `{services}` and `{grow}`. Type no contact details into them. |

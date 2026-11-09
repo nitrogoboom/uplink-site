@@ -137,6 +137,7 @@ export const breadcrumbs = (trail: [string, string][]) => ({
 export const getServices = async () => (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data); // in file order
+export const getReviews = async () => (await getCollection('reviews')).sort(byOrder).map((e) => e.data); // in file order
 
 // The /work filters (components/work/Projects.astro): "All" (label null: its word is the copy's, work.yaml), then one radio per project tag, in the order the projects
 // first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
