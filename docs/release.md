@@ -130,6 +130,9 @@ When CI starts checking something new, take it off the checklist. If a checklist
 
 What's left before the real domain, beyond the checklist. Tick a line with its date and proof. **(you)** needs a person or a sign-in, **(domain)** waits for the domain, **(content)** for real copy. What's already done is recorded in [`history/go-live-checklist.md`](history/go-live-checklist.md).
 
+- [ ] Narrow the Trusted Types policy (review J6): `html()` in `core.js` passes every string; accept only the site's own drawings (an `<svg` string from a same-origin `/assets/img/` fetch) and icons.
+- [ ] One cached stylesheet instead of the CSS inlined in every page (review L4): about 10 KB compressed a page now, re-downloaded each time; drops the CSP style hashes.
+- [ ] Hashed drawing file names (review L5), so drawings can be cached for a year instead of a day.
 - [ ] Review PR #38's form routes (`/api/contact`, `/api/book`, `/api/newsletter`) as `/api/report` was: Turnstile, honeypot, rate limit, what reaches the email, header injection in subject and reply-to.
 - [ ] **(domain)** SSL Labs (A or A+), securityheaders.com, and Mozilla Observatory again on the real domain.
 - [ ] **(domain)** Registrar lock, auto-renew, and 2FA on the registrar account.
