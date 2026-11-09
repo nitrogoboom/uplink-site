@@ -15,7 +15,6 @@
       "Bash(npm run verify:links)",
       "Bash(npm run verify:spacing)",
       "Bash(npm run verify:styles -- *)",
-      "Bash(node scripts/preview-alias.mjs *)",
       "Bash(python tools/regen.py --check)",
       "Bash(python -m pytest tools/tests)",
       "Bash(git status *)",

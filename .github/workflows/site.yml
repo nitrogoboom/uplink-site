@@ -343,32 +343,33 @@ jobs:
         with:
           name: dist
           path: dist
-      # the alias comes from the branch name (scripts/preview-alias.mjs), so every push to a branch keeps the same
-      # address. No address in wrangler's output fails the step, rather than posting an empty link
+      # a Worker Preview (wrangler preview, https://developers.cloudflare.com/workers/previews/), named after the pull
+      # request: pr-N, so every push keeps the same address, https://pr-N-uplink-site.johnoreilly.workers.dev.
+      # Cloudflare keeps 100 previews and drops the one deployed to longest ago. Wrangler prints its own lines (the
+      # build command, the asset upload) before the JSON, so the JSON is read from the first line that is "{"; no
+      # address in it fails the step, rather than posting an empty link
       - id: upload
         run: |
-          alias=$(node scripts/preview-alias.mjs "$BRANCH")
-          npx wrangler versions upload --preview-alias "$alias" | tee upload.log
-          branch=$(grep -o "https://$alias-[^ ]*workers\.dev" upload.log | head -1 || true)
-          version=$(grep -o 'https://[^ ]*workers\.dev' upload.log | grep -v "^https://$alias-" | head -1 || true)
-          if [ -z "$branch" ]; then echo "::error::no preview address for alias $alias in wrangler's output"; exit 1; fi
-          echo "branch=$branch" >> "$GITHUB_OUTPUT"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          npx wrangler preview --name "pr-$PR" --message "$SHA" --json > preview.out || { cat preview.out; exit 1; }
+          cat preview.out
+          url=$(sed -n '/^{/,$p' preview.out | jq -er '.preview.urls[0]')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
         env:
-          BRANCH: ${{ github.head_ref }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          WRANGLER_SEND_METRICS: 'false'
       # one comment on the pull request with the address, updated on each push
       - run: |
-          body=$(printf '**Preview:** %s\n\nThis push only: %s\n' "${BRANCH_URL:-$VERSION_URL}" "$VERSION_URL")
+          body=$(printf '**Preview:** %s\n' "$URL")
           echo "$body" >> "$GITHUB_STEP_SUMMARY"
           gh pr comment "$PR" --body "$body" --edit-last --create-if-none
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
-          BRANCH_URL: ${{ steps.upload.outputs.branch }}
-          VERSION_URL: ${{ steps.upload.outputs.version }}
+          URL: ${{ steps.upload.outputs.url }}
 
   # the workflows themselves: zizmor (https://docs.zizmor.sh) fails on any high-severity finding, such as a template
   # injection or an unpinned action

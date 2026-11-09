@@ -31,6 +31,11 @@
   // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38 (open, paused) adds a FORMS limit, namespace 1001.
   "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
   "preview_urls": true,
+  // Worker Previews (CI's preview job runs `wrangler preview`): the block must be here. A preview takes the assets
+  // and the settings above, but not the bindings: REPORTS is named again so /api/report is limited there too
+  "previews": {
+    "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
+  },
   // The script's own console.log lines (one per report, worker/index.js) are kept, 3 days on the free plan. Cloudflare's
   // own record of each run (the invocation log: the request and response, headers included) is off: we don't need it.
   "observability": { "enabled": true, "logs": { "invocation_logs": false } },

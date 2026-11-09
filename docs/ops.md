@@ -25,7 +25,7 @@ A report it can't read gets a `400`. Anything else that goes wrong in the Worker
 
 The Workers logs keep the Worker's own lines, one per report, for 3 days on the free plan. Cloudflare's own record of each run, the invocation log, is off (`observability.logs.invocation_logs` in `wrangler.jsonc`).
 
-> **Note:** Before `wrangler dev`, `wrangler deploy`, and `wrangler versions upload`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
+> **Note:** Before `wrangler dev`, `wrangler deploy`, `wrangler versions upload`, and `wrangler preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
 
 ## Deploys
 
@@ -59,16 +59,11 @@ GitHub Actions deploys the site (`.github/workflows/site.yml`).
   > **Note:** `wrangler versions deploy` doesn't apply routes, custom domains, cron triggers, `workers_dev`, or `preview_urls` from `wrangler.jsonc`, as `wrangler deploy` did. After a change to those (the custom domain at launch), run `npx wrangler triggers deploy` once, or deploy by hand with `npx wrangler deploy`. Keep `preview_urls` on: every deploy checks the new version at its preview address.
 
   > **Note:** The first deploy of a new Worker has no live version to roll back to, so the script stops before it changes anything. It also stops if `wrangler deployments status` fails. In either case, deploy by hand with `npx wrangler deploy` after `npm run build`, then let the next push to `main` use the checked flow.
-- A pull request with the `full-checks` label also runs the screenshot comparison (`npm run visual-diff`) against the live site in its own job. Every pull request uploads a preview version, and posts its address as a comment. The address comes from the branch name, `https://ALIAS-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. `node scripts/preview-alias.mjs BRANCH` prints the alias: the branch name lowercased, each run of other characters turned into one `-`, no `-` at either end, and `b-` in front if it doesn't start with a letter. A name longer than 30 characters is cut to 23 and ends in `-` and 6 characters of a hash of the branch name. The preview job fails if wrangler's output has no address for the alias.
+- A pull request with the `full-checks` label also runs the screenshot comparison (`npm run visual-diff`) against the live site in its own job. Every pull request gets a Worker Preview (`npx wrangler preview --name pr-N`), and the job posts its address as a comment. The address comes from the pull request's number, `https://pr-N-uplink-site.johnoreilly.workers.dev`, so it stays the same on every push. The preview takes the built site and the `previews` block in `wrangler.jsonc`, which names the `REPORTS` rate limit again: a preview doesn't inherit bindings. The preview job fails if wrangler's JSON has no address.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, a pull request's preview job is skipped, and a push to `main` fails at the `build` gate, as it can't deploy. The environments `production` (deploys from `main` only) and `preview` are set up to replace it (`notes.md`).
-- Cloudflare keeps every preview, each with its own address, until it's deleted. Every 3 days, `.github/workflows/clean-previews.yml` deletes previews older than 3 days. It keeps every deployed version, so rollback still works, and the newest preview of each open pull request. It deletes nothing in git.
+- Cloudflare keeps up to 100 previews for the Worker. Past that, it deletes the one deployed to longest ago, so nothing here cleans them up. To delete one by hand: `npx wrangler preview delete --name pr-N`.
 
-## Clean up previews by hand
-
-1. See what would be deleted: `gh workflow run clean-previews.yml`.
-2. Delete them: `gh workflow run clean-previews.yml -f dry_run=false`. For one branch only, add `-f only_alias=ALIAS` (the branch as it appears in its preview address).
-
-The run's summary lists each preview and what happened to it. The script deletes through Cloudflare's `/workers/workers/WORKER/versions/VERSION_ID` path; the older `/workers/scripts/` path refuses a delete (error 10405).
+> **Note:** `wrangler preview` is an open beta (November 9, 2026). If Cloudflare changes it, the preview job fails and nothing else does: the gate, the deploy, and the live site don't depend on it. The earlier way, `wrangler versions upload --preview-alias`, is in git history (`scripts/preview-alias.mjs`, `scripts/clean-previews.mjs`).
 
 ## Repository rules
 
