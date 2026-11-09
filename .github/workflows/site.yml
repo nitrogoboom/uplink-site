@@ -239,7 +239,7 @@ jobs:
           path: out/visual
           retention-days: 14
 
-  # the gate, under the name the ruleset on main requires (`build`), and what deploy and preview wait for. It passes
+  # the gate, under the name the ruleset on main requires (`build`), and what deploy waits for. It passes
   # only when the build, the static checks, every verify shard and, on a pull request, the screenshot comparison
   # passed; a failed, cancelled or skipped one fails it. always(), so it reports even when one of them failed (a
   # skipped required check would count as passed)
@@ -317,12 +317,13 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           WRANGLER_SEND_METRICS: 'false'
 
-  # a pull request gets a preview address (wrangler prints it) without touching the live Worker
+  # a pull request gets a preview address (wrangler prints it) without touching the live Worker. It waits for the
+  # built site only (dist), not for the gate: a preview is for looking, and the link shouldn't wait for lint, types,
+  # tests or the browser checks. A preview can so exist for a pull request whose checks then fail; the gate (build)
+  # still decides whether it merges
   preview:
-    needs: build
-    if: >- # the result named, as in deploy
-      !cancelled() && github.event_name == 'pull_request' && needs.build.outputs.cloudflare == 'true' &&
-      needs.build.result == 'success'
+    needs: dist
+    if: github.event_name == 'pull_request' && needs.dist.outputs.cloudflare == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
