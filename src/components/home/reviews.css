@@ -106,14 +106,6 @@
   font-size: var(--fs-4);
 }
 
-/* below desktop, Reviews and the check-up band (Proof) are both plain sections: drop Proof's top padding so the two
-   don't show a double gap (docs/design.md, R1). On desktop each is its own screen */
-@media (--below-desktop) {
-  #reviews + #proof {
-    padding-top: 0;
-  }
-}
-
 /* tablet and up: the big review across the top, the small ones three in a row */
 @media (--tablet-up) {
   .rev-grid {

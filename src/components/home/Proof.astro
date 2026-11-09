@@ -1,5 +1,6 @@
 ---
 // HOME · 6. The "free check-up" call-to-action band. (The stats moved to About on 2 Nov 2026.)
+// On the band ground, so it stands apart from Reviews above and the footer below (both plain).
 // Styles: shared (.cta-band in src/styles/shared-blocks.css).
 import { phone } from '../../lib/footer';
 import { copy } from '../../lib/copy';
@@ -7,7 +8,7 @@ const t = (await copy('home')).proof;
 const ui = await copy('ui');
 ---
 
-<section class="section" id="proof" aria-labelledby="start-title">
+<section class="section section--band" id="proof" aria-labelledby="start-title">
   <div class="container">
     <div class="panel cta-band" id="start">
       <div class="stack">
