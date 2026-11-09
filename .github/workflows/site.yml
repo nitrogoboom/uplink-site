@@ -345,13 +345,15 @@ jobs:
           path: dist
       # a Worker Preview (wrangler preview, https://developers.cloudflare.com/workers/previews/), named after the pull
       # request: pr-N, so every push keeps the same address, https://pr-N-uplink-site.johnoreilly.workers.dev.
-      # Cloudflare keeps 100 previews and drops the one deployed to longest ago. Wrangler's JSON goes to a file, and
-      # no address in it fails the step, rather than posting an empty link
+      # Cloudflare keeps 100 previews and drops the one deployed to longest ago. Wrangler prints its own lines (the
+      # build command, the asset upload) before the JSON, so the JSON is read from the first line that is "{"; no
+      # address in it fails the step, rather than posting an empty link
       - id: upload
         run: |
-          npx wrangler preview --name "pr-$PR" --message "$SHA" --json > preview.json || { cat preview.json; exit 1; }
-          cat preview.json
-          echo "url=$(jq -er '.preview.urls[0]' preview.json)" >> "$GITHUB_OUTPUT"
+          npx wrangler preview --name "pr-$PR" --message "$SHA" --json > preview.out || { cat preview.out; exit 1; }
+          cat preview.out
+          url=$(sed -n '/^{/,$p' preview.out | jq -er '.preview.urls[0]')
+          echo "url=$url" >> "$GITHUB_OUTPUT"
         env:
           PR: ${{ github.event.pull_request.number }}
           SHA: ${{ github.event.pull_request.head.sha }}
