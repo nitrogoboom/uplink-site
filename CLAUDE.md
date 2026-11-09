@@ -54,7 +54,7 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 - `tools/gen_light.py` makes each `NAME-light.svg` and `src/styles/theme-drawings.css`. Show a picture through `<Drawing src="/assets/img/NAME.svg" … />`, which writes both copies. Colour new CSS from tokens, which `theme-light.css` swaps.
 - Timings in a drawing become classes in a `<style>` block (`hoist_styles` in `tools/isogen.py`).
 - True isometric, per "Drawing rules" in README. After touching a drawing, run `tools/check.py` and `tools/painter.py` on it (each `rules_NAME.py` gives the command), and look at its `NAME-compact.svg` phone cut.
-- `python tools/regen.py --check` reruns every generator and check; CI's `drawings` job fails if a committed SVG differs from its script's output. Commit the SVGs with the script. Tool tests: `python -m pytest tools/tests`.
+- Drawings change only locally, when the owner wants them changed; CI doesn't touch them (`docs/history/drawings-local-2026-11-09.md`). A colour change in `tokens.css` changes drawing colours too: rerun the generators. After changing one, `python tools/regen.py --check` reruns every generator and check, and `git diff` must show only the drawings you meant to change. Commit the SVGs with the script. Tool tests: `python -m pytest tools/tests`.
 
 ## Checking a change
 
@@ -62,11 +62,11 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 
 | Kind of change | Locally | On the PR (CI) |
 |---|---|---|
-| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s: schemas, placeholders, CSP hashes) | build, static, drawings, preview |
+| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s: schemas, placeholders, CSP hashes) | build, static, preview |
 | CSS or markup | look at it in `npm run dev`, then `npm run quick` (types, lint, build: about 20 s) | same |
-| A drawing | `python tools/regen.py --check` | the `drawings` job |
+| A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | build, static, preview (no drawing check in CI) |
 | Scripts (`src/scripts/`, `scripts/`), Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site checks for that area (`npm run verify -- -g "NAME"`); `npm run ci` when it touches many | the full browser checks run by themselves (the `scope` job in `site.yml` matches these paths) |
-| Before launch or a release | `npm run ci`, `RELEASE=1 npm run verify -- --all`, `npm run release-audit`, the checklist in `docs/release.md` | add the `full-checks` label to the PR (also runs the screenshot comparison) |
+| Before launch or a release | `npm run ci`, `RELEASE=1 npm run verify -- --all`, `npm run release-audit`, `python tools/regen.py --check`, the checklist in `docs/release.md` | add the `full-checks` label to the PR (also runs the screenshot comparison) |
 
 - Any PR can get the full browser checks with the `full-checks` label; "Run workflow" on `site.yml` runs everything.
 - Checks that expect today's exact copy run only with `RELEASE=1`.
