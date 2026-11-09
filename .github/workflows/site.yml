@@ -21,6 +21,7 @@ on:
     paths-ignore: ['*.md', 'docs/**']
   pull_request:
     paths-ignore: ['*.md', 'docs/**']
+    types: [opened, synchronize, reopened, labeled] # labeled: adding "full-checks" runs the browser checks
   workflow_dispatch: # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
 
 permissions:
@@ -40,6 +41,41 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Draft mode (CLAUDE.md, "Checking a change"): the browser checks (verify, visual-diff) run on a pull request only
+  # when it touches what they guard (scripts, the Worker, headers, the checks, workflows, dependencies, config) or
+  # carries the "full-checks" label; a copy or CSS change gets the build, static, drawings and a preview. A push to
+  # main doesn't run them again: its pull request did, and the deploy's own smoke check and rollback stay.
+  # "Run workflow" (workflow_dispatch) runs everything.
+  scope:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      full: ${{ steps.s.outputs.full }}
+      visual: ${{ steps.s.outputs.visual }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: s
+        run: |
+          full=false; visual=false
+          if [ "$EVENT" = workflow_dispatch ] || [ "$LABELLED" = true ]; then full=true; fi
+          if [ "$LABELLED" = true ]; then visual=true; fi
+          if [ "$EVENT" = pull_request ] && [ "$full" = false ]; then
+            if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/scripts/|scripts/|worker/|checks/|public/_headers|\.github/workflows/|package(-lock)?\.json|astro\.config\.mjs|wrangler\.jsonc|postcss\.config\.mjs|src/layouts/)'; then
+              full=true
+            fi
+          fi
+          echo "full=$full" >> "$GITHUB_OUTPUT"
+          echo "visual=$visual" >> "$GITHUB_OUTPUT"
+          echo "browser checks: $full, screenshot comparison: $visual" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          EVENT: ${{ github.event_name }}
+          LABELLED: ${{ contains(github.event.pull_request.labels.*.name, 'full-checks') }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+
   # the build, once: its dist/ is what every check below opens, what the preview uploads and what deploy puts live
   dist:
     runs-on: ubuntu-latest
@@ -93,7 +129,8 @@ jobs:
   # Playwright's Chromium is kept between runs, for as long as package-lock.json names the same @playwright/test
   # (the browser build goes with that version); the system libraries it needs are installed each time
   verify:
-    needs: dist
+    needs: [dist, scope]
+    if: needs.scope.outputs.full == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20 # about 3 minutes
     strategy:
@@ -150,8 +187,8 @@ jobs:
   # a pull request: each page next to the live site (main) at three sizes. It reports, it never fails: a person reads
   # the list in the run's summary and says whether each change was meant
   visual-diff:
-    needs: dist
-    if: github.event_name == 'pull_request'
+    needs: [dist, scope]
+    if: github.event_name == 'pull_request' && needs.scope.outputs.visual == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15 # about 2 minutes
     steps:
@@ -199,7 +236,7 @@ jobs:
   # passed; a failed, cancelled or skipped one fails it. always(), so it reports even when one of them failed (a
   # skipped required check would count as passed)
   build:
-    needs: [dist, static, verify, visual-diff]
+    needs: [scope, dist, static, verify, visual-diff]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -208,12 +245,15 @@ jobs:
     steps:
       - name: Every check passed
         run: |
-          for r in "dist=$DIST" "static=$STATIC" "verify=$VERIFY"; do
+          # verify and visual-diff may be skipped on purpose (the scope job); skipped is fine, failed or cancelled isn't
+          for r in "scope=$SCOPE" "dist=$DIST" "static=$STATIC"; do
             [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
           done
-          if [ "$EVENT" = pull_request ] && [ "$VISUAL" != success ]; then echo "::error::visual-diff: $VISUAL"; exit 1; fi
+          for r in "verify=$VERIFY" "visual-diff=$VISUAL"; do
+            case "${r#*=}" in success | skipped) ;; *) echo "::error::${r%%=*}: ${r#*=}"; exit 1 ;; esac
+          done
         env:
-          EVENT: ${{ github.event_name }}
+          SCOPE: ${{ needs.scope.result }}
           DIST: ${{ needs.dist.result }}
           STATIC: ${{ needs.static.result }}
           VERIFY: ${{ needs.verify.result }}

@@ -18,6 +18,7 @@
     "verify:styles": "node scripts/check.mjs styles",
     "visual-diff": "node scripts/check.mjs visual",
     "ci": "node scripts/ci.mjs",
+    "quick": "npm run check && npm run lint && npm run build",
     "release-audit": "node scripts/check.mjs audit",
     "smoke": "node scripts/check.mjs smoke",
     "pagespeed": "node scripts/check.mjs pagespeed",

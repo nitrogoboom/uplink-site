@@ -1,4 +1,4 @@
-# Weekly dependency updates. Minor and patch bumps come as one pull request; a major gets its own.
+# Monthly dependency updates (weekly until November 9, 2026: each one ran full CI during the draft). Minor and patch bumps come as one pull request; a major gets its own.
 # cooldown: a release is proposed only once it is a week old (5 days for an npm or pip patch; Actions take one wait only), so a hijacked or broken release
 # has time to be found and pulled before it reaches this repository.
 version: 2
@@ -6,7 +6,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     cooldown:
       default-days: 7
       semver-patch-days: 5
@@ -21,7 +21,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     cooldown:
       default-days: 7
     groups:
@@ -31,7 +31,7 @@ updates:
   - package-ecosystem: pip
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
     cooldown:
       default-days: 7
       semver-patch-days: 5

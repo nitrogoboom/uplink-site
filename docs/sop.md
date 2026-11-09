@@ -23,7 +23,7 @@ A *release* is the first production launch, and any later change to layout, navi
 | Hosting | Cloudflare Workers: static files, plus one small Worker for `/api/*`, `/404` and addresses with no file. See "The Worker" in the [README](../README.md#the-worker). | `wrangler.jsonc`, `worker/index.js`, `public/_headers` |
 | CI/CD | GitHub Actions, with every action pinned to a commit. The jobs and the checked deploy: "Deploys" in the [README](../README.md#deploys). | `.github/workflows/site.yml` |
 | Tests | Node's built-in test runner, no extra packages: the build's after-steps and the Worker | `scripts/test/` (`npm test`) |
-| Dependencies | Dependabot, weekly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
+| Dependencies | Dependabot, monthly: npm, pip (the drawing tools), and GitHub Actions | `.github/dependabot.yml` |
 | Code checks | TypeScript (`astro check`, the page scripts and `src/lib` included through `checkJs`), ESLint (with type-aware rules on `src/scripts` and `src/lib`), Stylelint, Prettier (code, JSON and YAML) | `tsconfig.json`, `eslint.config.js`, `.stylelintrc.json`, `.prettierrc.json` |
 | Site checks | Playwright Test and axe-core (`@axe-core/playwright`), in Chromium | `checks/*.spec.mjs` (`npm run verify`, `npm run verify:links`, and the rest in the README) |
 | Release audit | Playwright Test in Chromium, Firefox, and WebKit; Guidepup Virtual Screen Reader; the W3C Nu HTML Checker | `checks/audit.spec.mjs` (`npm run release-audit`) |
@@ -204,7 +204,7 @@ The site doesn't need a paid whole-site scanner: CI runs axe on every page, and 
 - **Errors and CSP blocks:** real visitors' browsers report them to `/api/report` (`worker/index.js`). They appear in the Workers logs, which the free plan keeps for 3 days. Look after each deploy and at each release.
 - **Speed and visits:** Cloudflare Web Analytics, which sets no cookies. Its token still points at the old address (`notes.md`).
 - **Up or down:** an outside uptime check is still to set up (`notes.md`).
-- **Dependencies:** Dependabot opens pull requests weekly. CI checks each one like any other change. Merge when it passes.
+- **Dependencies:** Dependabot opens pull requests monthly (weekly until November 9, 2026). CI checks each one like any other change. Merge when it passes.
 
 ## Keep this page accurate
 
