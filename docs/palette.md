@@ -171,14 +171,24 @@ Light comes from the top. On every box: **top lightest, left middle, right darke
 | `box-blue-top` / `-left` / `-right` | `#B7DDF8` / `#97C8EA` / `#73AFD9` | `#97C8EA` / `#4A93C1` / `#005D8A` | blue box |
 | `box-green-top` / `-left` / `-right` | `#82D6A6` / `#3BA16E` / `#198152` | `#82D6A6` / `#3BA16E` / `#00683F` | green box, trees |
 | `ground` | `#15212E` | `#E6ECF2` | map platform |
-| `grid` | `#2B3743` | `#D2D8DE` | floor grid lines |
+| `grid` | `#2B3743` | `#C5CCD3` | floor grid lines (light: one step darker than `#D2D8DE`, which vanished on the `band` ground) |
 | `window` | `#182431` | `#A1A9B1` | unlit window |
 | `window-lit` | `#FFF5EC` | `#FFF5EC` | lit window, white LED |
 | `shadow` | `#000000` | `#0E1A27` | drop shadow, drawn at 0.35 opacity |
-| `led` | `#A9E9C3` | DESIGN-GAP | green LED and online dot in a drawing (same value as `success` in dark, its own job) |
+| `led` | `#A9E9C3` | `#198152` | green LED and online dot in a drawing (same value as `success` in dark, its own job; light needs the darker green) |
 | `window-lit-cool` | `box-blue-left` at 0.38 opacity | DESIGN-GAP | window lit by screens, not lamps |
 
 Illustration roles are for drawings only. Never use them for text, even where a value matches a text role.
+
+**Lines in light drawings take ink steps.** A bright line that reads on navy disappears on a light ground, so `tools/gen_light.py` swaps drawn lines (not fills) one or two steps darker (signed off November 9, 2026):
+
+| Dark line | Light | Where |
+|---|---|---|
+| amber `#FFAD51` | `#C37600` | amber lines; amber fills stay `#FFAD51` |
+| sky `#97C8EA` | `#1F75A6` lines, `#4A93C1` fills, `#005D8A` words | network lines, labels |
+| online `#A9E9C3` | `#198152` | online and LED dots |
+| `screen` (5.5) | `#222E3A` | a monitor is dark in a lit room too, so what is drawn on it keeps its dark colours |
+| office floor (uses `window`) | `#DCE2E8` | the office slab; at `#A1A9B1` the hero read as a grey block. Windows elsewhere keep `#A1A9B1` |
 
 ### 5.5 Derived drawing shades
 
@@ -187,7 +197,7 @@ Small parts of the drawings need shades the roles above don't cover. Each is wor
 - **navy(L):** the neutral (hue 250) at OKLCH lightness L, with the chroma the neutral ramp has at that lightness.
 - **tone(hue, L, C):** a colour on one of the five hues (4.1) at lightness L and chroma C.
 
-L and C are the shade's old lightness and chroma, so each part keeps its weight in the drawing. Dark values only; a light drawing set would derive its own from the light ramp (DESIGN-GAP until then).
+L and C are the shade's old lightness and chroma, so each part keeps its weight in the drawing. Dark values only. The light drawings don't restate these: `tools/gen_light.py` swaps each drawing's colours by role (5.4 and the table above it), from the dark drawings.
 
 | Name | Dark | Rule | Job |
 |---|---|---|---|

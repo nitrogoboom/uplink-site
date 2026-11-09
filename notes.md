@@ -3,7 +3,7 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Light theme
-- [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
+- [ ] Light theme: the owner signed off its current state on November 9, 2026, and folded into `docs/palette.md`; still open to change ("nothing is done").
 - [ ] Light theme, optional: a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
