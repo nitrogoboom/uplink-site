@@ -72,6 +72,7 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
 - [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
 - [ ] Review C4 leftovers: `scripts/check.mjs` picks a check by project and `CHECK_ARGS`; the server starts in two places (Playwright's `webServer` could do both); the audit bundles Guidepup at run time.
+- [ ] After a Dependabot bump of `wrangler` or `esbuild`: set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns, and npm 12 won't run their install scripts.
 - [ ] Dependabot's pip relock drops Windows' `colorama` line from `requirements.txt`: relock with the command in `requirements.in` after each one.
 - [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
 - [ ] `npm run verify:styles` sometimes reports a `div.container`'s side margins as 0 at 3440 on `/` or `/work` (a Chrome quirk): rerun before you trust such a line.
