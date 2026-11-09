@@ -9,7 +9,6 @@
 tools/office_parts/
 dist/
 out/
-site/
 node_modules/
 .astro/
 .wrangler/

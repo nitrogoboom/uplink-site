@@ -9,7 +9,7 @@ import globals from 'globals';
 
 export default defineConfig(
   // .claude/ holds the app's git worktrees (whole copies of the repo), which would be linted twice
-  { ignores: ['dist/', 'out/', 'site/', '.astro/', '.wrangler/', 'node_modules/', '.claude/'] },
+  { ignores: ['dist/', 'out/', '.astro/', '.wrangler/', 'node_modules/', '.claude/'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } } },

@@ -18,6 +18,10 @@ updates:
     ignore:
       - dependency-name: typescript
         update-types: [version-update:semver-major]
+      # @types/node follows Node's own major (.node-version: 24): a newer one describes APIs this Node doesn't have.
+      # Raise the two together.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
   - package-ecosystem: github-actions
     directory: /
     schedule:

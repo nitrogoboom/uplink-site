@@ -2,5 +2,5 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": { "checkJs": true },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "site", "tools", "src/legacy", "out", "checks", "scripts", "worker", "postcss.config.mjs"]
+  "exclude": ["dist", "tools", "out", "checks", "scripts", "worker", "postcss.config.mjs"]
 }
