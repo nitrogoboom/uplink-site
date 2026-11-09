@@ -8,6 +8,9 @@
 // Without script, office.svg shows (on phones hero-office-phone.svg, the phone cut as a still). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
 import Drawing from '../Drawing.astro';
 import flows from './hero-flows.svg?raw';
+// the light theme's colours for the drawings inside the page (this hero and Grow, both on Home only): written by
+// tools/gen_light.py, and first here so hero.css and grow.css still come after it
+import '../../styles/theme-drawings.css';
 import './hero.css';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';

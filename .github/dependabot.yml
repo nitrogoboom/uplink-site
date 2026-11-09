@@ -1,5 +1,5 @@
 # Monthly dependency updates (weekly until November 9, 2026: each one ran full CI during the draft). Minor and patch bumps come as one pull request; a major gets its own.
-# cooldown: a release is proposed only once it is a week old (5 days for an npm or pip patch; Actions take one wait only), so a hijacked or broken release
+# cooldown: a release is proposed only once it is a week old (5 days for an npm patch; Actions take one wait only), so a hijacked or broken release
 # has time to be found and pulled before it reaches this repository.
 version: 2
 updates:
@@ -31,14 +31,3 @@ updates:
     groups:
       actions:
         patterns: ['*']
-  # requirements.in, locked into requirements.txt with hashes (uv pip compile): the drawing tools, run locally (README, "Check a drawing")
-  - package-ecosystem: pip
-    directory: /
-    schedule:
-      interval: monthly
-    cooldown:
-      default-days: 7
-      semver-patch-days: 5
-    groups:
-      minor-and-patch:
-        update-types: [minor, patch]

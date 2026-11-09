@@ -62,11 +62,7 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-`requirements.txt` is locked with hashes, so `pip` installs exactly what CI installs. Change `requirements.in`, then lock it again:
-
-```bash
-uv pip compile requirements.in --universal --python-version 3.12 --generate-hashes -o requirements.txt
-```
+`requirements.txt` is a plain list of pinned versions, kept by hand: the tools run only on your machine, so Dependabot leaves it alone. After you change a version, run `python tools/regen.py --check` and read the diff.
 
 ## Commands
 

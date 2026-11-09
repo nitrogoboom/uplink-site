@@ -6,7 +6,6 @@ paths:
   - "src/styles/theme-drawings.css"
   - "src/styles/theme-light.css"
   - "src/styles/tokens.css"
-  - "requirements.in"
   - "requirements.txt"
 ---
 

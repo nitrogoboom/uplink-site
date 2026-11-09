@@ -60,8 +60,8 @@ The CSP reports to `/api/report` (`report-to` and `report-uri`, with `Reporting-
 ### Supply chain
 
 - Every GitHub Action is pinned to a commit. zizmor lints the workflows on every run.
-- Dependabot proposes npm, pip, and Actions updates monthly, each release held a week first (5 days for an npm or pip patch; `.github/dependabot.yml`). CI checks each like any other change.
-- `requirements.txt` is locked with hashes.
+- Dependabot proposes npm and Actions updates monthly, each release held a week first (5 days for an npm patch; `.github/dependabot.yml`). CI checks each like any other change.
+- `requirements.txt` pins the Python drawing tools by version. They run only on the owner's machine, never in CI or on the site.
 - Fonts are self-hosted. The only third-party script is the analytics beacon, loaded after the page.
 - Treat every new third-party script as a security and privacy decision.
 

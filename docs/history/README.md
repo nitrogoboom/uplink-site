@@ -21,5 +21,6 @@ Records of finished work and the reasoning behind decisions. Read them to learn 
 | [`motion-setting-2026-11-08.md`](motion-setting-2026-11-08.md) | November 8, 2026: the Reduce motion setting. |
 | [`palette-1.2.md`](palette-1.2.md) | November 8, 2026: the portable Navy & Amber spec, version 1.2, with guidance for documents, slides, email, and print. The site's colour rules are in `docs/design.md`. |
 | [`recommendations-fable-5.2-2026-11-09.md`](recommendations-fable-5.2-2026-11-09.md) | November 9, 2026: a review of the framework, workflow, and hosting, with ten ranked recommendations and six decisions for the owner. Proposals, not rules: one is adopted only when it gets a line in `notes.md`. |
+| [`decisions-2026-11-09.md`](decisions-2026-11-09.md) | November 9, 2026: the owner's answers to that review's decisions (wheel grid, French, the `?` shortcut, phone hero captions), and the standing permission for its CSS, script and markup work. |
 | [`creative.md`](creative.md) | Ideas for later, not planned: the office fire drill. |
 | [`releases/`](releases/) | One record per release, `YYYY-MM-DD.md`: a filled-in copy of the release checklist in `docs/release.md`. The first, `2026-11-03.md`, predates the release audit. |
