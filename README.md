@@ -14,6 +14,7 @@ The site is built with Astro 7, plain CSS, and plain JavaScript, with no UI fram
 | Document | What it covers |
 | --- | --- |
 | [`CLAUDE.md`](CLAUDE.md) | The rules for every change, and which checks to run for which change. |
+| [`.claude/rules/`](.claude/rules) | The rules for one kind of file each: content, markup and scripts, CSS, drawings. Claude Code loads each one when it opens a matching file. |
 | [`notes.md`](notes.md) | Open items, one line each. Start here. |
 | [`src/README.md`](src/README.md) | A map of the source code: pages, components (the footer included), content, copy, styles, and scripts. |
 | [`docs/design.md`](docs/design.md) | Colour roles and tokens, spacing, line height, corners, and layout. |
