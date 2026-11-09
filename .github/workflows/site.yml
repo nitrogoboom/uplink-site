@@ -19,8 +19,7 @@ on:
   push:
     branches: [main]
     paths-ignore: ['*.md', 'docs/**']
-  pull_request:
-    paths-ignore: ['*.md', 'docs/**']
+  pull_request: # every pull request runs, so the required `build` check always reports; a docs-only one passes in seconds (scope)
     types: [opened, synchronize, reopened, labeled] # labeled: adding "full-checks" runs the browser checks
   workflow_dispatch: # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
 
@@ -52,6 +51,7 @@ jobs:
     outputs:
       full: ${{ steps.s.outputs.full }}
       visual: ${{ steps.s.outputs.visual }}
+      docs: ${{ steps.s.outputs.docs }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -59,17 +59,21 @@ jobs:
           persist-credentials: false
       - id: s
         run: |
-          full=false; visual=false
+          full=false; visual=false; docs=false
+          # a pull request that changes only root Markdown or docs/: nothing to build or check, `build` passes at once
+          if [ "$EVENT" = pull_request ] && ! git diff --name-only "$BASE...$HEAD" | grep -qvE '^([^/]+\.md|docs/.*)$'; then docs=true; fi
           if [ "$EVENT" = workflow_dispatch ] || [ "$LABELLED" = true ]; then full=true; fi
           if [ "$LABELLED" = true ]; then visual=true; fi
           if [ "$EVENT" = pull_request ] && [ "$full" = false ]; then
-            if git diff --name-only "$BASE" "$HEAD" | grep -qE '^(src/scripts/|scripts/|worker/|checks/|public/_headers|\.github/workflows/|package(-lock)?\.json|astro\.config\.mjs|wrangler\.jsonc|postcss\.config\.mjs|src/layouts/)'; then
+            if git diff --name-only "$BASE...$HEAD" | grep -qE '^(src/scripts/|scripts/|worker/|checks/|public/_headers|\.github/workflows/|package(-lock)?\.json|astro\.config\.mjs|wrangler\.jsonc|postcss\.config\.mjs|src/layouts/)'; then
               full=true
             fi
           fi
+          if [ "$docs" = true ]; then full=false; visual=false; fi
+          echo "docs=$docs" >> "$GITHUB_OUTPUT"
           echo "full=$full" >> "$GITHUB_OUTPUT"
           echo "visual=$visual" >> "$GITHUB_OUTPUT"
-          echo "browser checks: $full, screenshot comparison: $visual" >> "$GITHUB_STEP_SUMMARY"
+          echo "docs only: $docs, browser checks: $full, screenshot comparison: $visual" >> "$GITHUB_STEP_SUMMARY"
         env:
           EVENT: ${{ github.event_name }}
           LABELLED: ${{ contains(github.event.pull_request.labels.*.name, 'full-checks') }}
@@ -78,6 +82,8 @@ jobs:
 
   # the build, once: its dist/ is what every check below opens, what the preview uploads and what deploy puts live
   dist:
+    needs: scope
+    if: needs.scope.outputs.docs != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15 # about 2 minutes
     environment: cloudflare # so the step below can see whether the deploy secrets exist
@@ -107,6 +113,8 @@ jobs:
 
   # beside the build: types, the build scripts' tests, lint
   static:
+    needs: scope
+    if: needs.scope.outputs.docs != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15 # about 2 minutes
     steps:
@@ -245,8 +253,11 @@ jobs:
     steps:
       - name: Every check passed
         run: |
-          # verify and visual-diff may be skipped on purpose (the scope job); skipped is fine, failed or cancelled isn't
-          for r in "scope=$SCOPE" "dist=$DIST" "static=$STATIC"; do
+          # verify and visual-diff may be skipped on purpose (the scope job); skipped is fine, failed or cancelled isn't.
+          # A docs-only pull request skips everything after scope and passes here
+          [ "$SCOPE" = success ] || { echo "::error::scope: $SCOPE"; exit 1; }
+          if [ "$DOCS" = true ]; then echo "docs only: nothing to build"; exit 0; fi
+          for r in "dist=$DIST" "static=$STATIC"; do
             [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
           done
           for r in "verify=$VERIFY" "visual-diff=$VISUAL"; do
@@ -254,6 +265,7 @@ jobs:
           done
         env:
           SCOPE: ${{ needs.scope.result }}
+          DOCS: ${{ needs.scope.outputs.docs }}
           DIST: ${{ needs.dist.result }}
           STATIC: ${{ needs.static.result }}
           VERIFY: ${{ needs.verify.result }}
@@ -362,6 +374,8 @@ jobs:
   # output). Then the tools' tests, and check.py and painter.py as each tools/rules_*.py lists them. A minute or two,
   # beside the build job. The Python packages are installed from requirements.txt, locked with hashes
   drawings:
+    needs: scope
+    if: needs.scope.outputs.docs != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

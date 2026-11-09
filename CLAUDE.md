@@ -75,7 +75,8 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 
 - One branch per session. Commit locally as often as you like. Each push to a PR runs CI and each merge to `main` deploys, so batch: one PR per batch of work, pushed when a phone preview is wanted.
 - A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (rules: README, "Deploys"). Find it with `gh pr view N --comments`. Previews never touch the live Worker.
-- `main` takes changes only through a PR with a passing `build`. A PR that changes only root `*.md` or `docs/` runs no CI, so `build` never reports and the PR can't merge on its own: put docs changes in a PR that also runs CI, or ask the owner to merge it with the admin bypass (README, "Repository rules").
+- `main` takes changes only through a PR with a passing `build`. A PR that changes only root `*.md` or `docs/` passes `build` in seconds (the `scope` job skips everything else) and merges like any other; its merge deploys nothing.
+- The owner directs and doesn't run commands: agents run every build, check and merge. Tell the owner what changed and what needs their eyes or decision, in plain words, not commands to run.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
 - The agent may merge its own PRs once CI is green; visual changes wait for the owner to look at the preview.
 
