@@ -1839,16 +1839,16 @@ test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.1
         else {
           await q.mouse.move(0, 0);
           await q.keyboard.press('Shift'); // a key, so the focus that follows is a keyboard one (:focus-visible)
-          await tile.focus();
+          await tile.locator('.svc-link').focus(); // the tile is a box; its link takes the focus
         }
         await q.waitForTimeout(400); // the bar's slide and the lift
         const out = await tile.evaluate((t, how) => {
           const go = /** @type {Element} */ (t.querySelector('.svc-go')).getBoundingClientRect();
-          if (how === 'focus' && !t.matches(':focus-visible')) return ['not :focus-visible'];
+          if (how === 'focus' && !t.querySelector('.svc-link:focus-visible')) return ['not :focus-visible'];
           if (getComputedStyle(/** @type {Element} */ (t.querySelector('.svc-go'))).clipPath.includes('100%'))
             return ['bar not shown'];
           const hit = [];
-          for (const w of t.querySelectorAll('.svc-title, .svc-line, .chip')) {
+          for (const w of t.querySelectorAll('.svc-title, .svc-line, .chip, .svc-feat')) {
             const r = w.getBoundingClientRect();
             if (r.width <= 1 || r.height <= 1 || !w.checkVisibility()) continue; // the small tiles' line is for screen readers only
             const over = Math.min(r.bottom, go.bottom) - Math.max(r.top, go.top);
@@ -1857,7 +1857,7 @@ test('services tiles: the hover bar covers no words, hover and focus (WCAG 1.4.1
           }
           return hit;
         }, how);
-        if (how === 'focus') await tile.blur();
+        if (how === 'focus') await tile.locator('.svc-link').blur();
         const name = (await tile.locator('.svc-title').textContent()).trim();
         for (const h of out) fails.push(`${zoom * 100}% zoom, ${how}, ${name}: ${h}`);
       }
@@ -1885,7 +1885,7 @@ test('services row on a touch screen at desktop size: one screen, no bar in sigh
       sec: Math.round(/** @type {Element} */ (document.querySelector('#services')).getBoundingClientRect().height),
       bars: [...document.querySelectorAll('#services .svc-go')].filter((g) => g.getBoundingClientRect().height > 1)
         .length,
-      names: [...document.querySelectorAll('#services .svc-tile')].filter((t) => !/view service/i.test(t.textContent))
+      names: [...document.querySelectorAll('#services .svc-link')].filter((t) => !/view service/i.test(t.textContent))
         .length,
     }));
     if (r.hover) fails.push(`${w}x${h}: the touch context reports hover, so this check proves nothing`);

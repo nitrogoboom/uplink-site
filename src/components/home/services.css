@@ -55,6 +55,39 @@
   gap: var(--sp-2);
   padding: var(--sp-5);
 } /* the tile's width: the title's column (container, layout.css) */
+/* the tile's link: its chip, title and line, laid out as the text column was; its ::after covers the whole tile, so a
+   click or tap anywhere on it opens the service (Services.astro) */
+.svc-link {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  align-items: center;
+  gap: var(--sp-2);
+  color: inherit;
+  text-decoration: none;
+}
+.svc-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+/* the focus ring goes round the whole tile, as it did when the tile was the link; the tile clips its overflow, so
+   without :has() it is drawn just inside the tile's edge */
+.svc-link:focus-visible {
+  outline: none;
+}
+.svc-tile:has(.svc-link:focus-visible) {
+  outline: 2px solid var(--c-accent-text);
+  outline-offset: 2px;
+}
+@supports not selector(:has(*)) {
+  .svc-link:focus-visible::after {
+    border-radius: var(--r-3);
+    outline: 2px solid var(--c-accent-text);
+    outline-offset: -3px;
+  }
+}
 .svc-text .chip {
   align-self: center;
 }
@@ -80,6 +113,9 @@
 /* a tall card's three features: desktop only (below), where the card is taller than its drawing and words */
 .svc-feats {
   display: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 /* the bar along the bottom of the card you point at */
 .svc-go {
@@ -176,14 +212,14 @@
     padding-bottom: calc(var(--control-h) + var(--sp-2));
   }
   .svc-tile:hover,
-  .svc-tile:focus-visible {
+  .svc-tile:has(.svc-link:focus-visible) {
     z-index: 1;
     transform: scale(1.03);
     background: var(--c-surface-2);
     border-color: var(--c-accent);
   }
   .svc-tile:hover .svc-go,
-  .svc-tile:focus-visible .svc-go {
+  .svc-tile:has(.svc-link:focus-visible) .svc-go {
     clip-path: inset(0);
     transform: none;
   }
@@ -204,7 +240,7 @@
       transform var(--dur-2) var(--ease);
   }
   .svc-menu > li:hover::after,
-  .svc-menu > li:has(> .svc-tile:focus-visible)::after {
+  .svc-menu > li:has(.svc-link:focus-visible)::after {
     opacity: 1;
     transform: scale(1.03);
   }
@@ -444,7 +480,7 @@
   }
   .svc-menu > li > .svc-tile,
   .svc-tile:hover,
-  .svc-tile:focus-visible {
+  .svc-tile:has(.svc-link:focus-visible) {
     transform: none;
   }
   .svc-menu .svc-art,
@@ -553,7 +589,7 @@
   .svc-small :is(.svc-icon, .svc-text) {
     transition: transform var(--dur-2) var(--ease);
   }
-  .svc-small .svc-tile:is(:hover, :focus-visible) :is(.svc-icon, .svc-text) {
+  .svc-small .svc-tile:is(:hover, :has(.svc-link:focus-visible)) :is(.svc-icon, .svc-text) {
     transform: translateY(calc(-1 * var(--sp-5)));
   }
 }
