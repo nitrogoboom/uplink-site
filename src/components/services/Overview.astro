@@ -31,12 +31,12 @@ const services = await getServices();
               >{s.chip}</span
             ></span
           >
-          <span class="card-body"
-            ><h2 class:list={['card-title', fit(s.title)]}>
+          <div class="card-body">
+            <h2 class:list={['card-title', fit(s.title)]}>
               <a class="card-link" href={`/services/${id}`}>{s.title}</a>
             </h2>
-            <span class="muted small">{s.card}</span></span
-          >
+            <span class="muted small">{s.card}</span>
+          </div>
         </div>
       </li>)}
     </ul>

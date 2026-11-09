@@ -3,7 +3,7 @@
 Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
 
 ## Light theme
-- [ ] Look at the light theme (Settings: Light) on every page and sign off the palette changes in `docs/light-theme-2026-11-08.md`; then fold them into `docs/palette.md`.
+- [ ] Light theme: the owner signed off its current state on November 9, 2026, and folded into `docs/palette.md`; still open to change ("nothing is done").
 - [ ] Light theme, optional: a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
 
@@ -23,9 +23,11 @@ Quick, visible:
 Design, nice to have:
 - [ ] Home services, tall cards (November 8, 2026): on desktop each lists its three features, and the three drawings share one height (`100svh - 46rem`, never under 6rem) so the titles line up. At 1280×800 and 1366×768 the drawings come out small (96 px); look on a real laptop and decide whether short screens should drop the features instead.
 
+- [ ] Home services, tall cards (release audit, November 9, 2026): each card is one link, so its three features are part of the link's name (250 to 307 characters for a screen reader). Fix: make them cards like the project cards (`.card-link` in the title, its `::after` covering the card), so the features are plain text outside the link; hover, focus and the phone swipe row (`home.js`) move with it. A shorter `aria-label` fails axe (label-content-name-mismatch) and `aria-hidden` features break M10 (the cards check).
+
 ## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
 - [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
-- [ ] GitHub environments, review H5 (owner, planned November 9, 2026; made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`.
+- [ ] GitHub environments, review H5 (owner, planned November 9, 2026; made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`. Plan (owner, November 9, 2026): after the browser checks, Claude drives the owner's computer (computer use) through the Cloudflare and GitHub settings pages with them.
 - [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
 - [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
 - [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.

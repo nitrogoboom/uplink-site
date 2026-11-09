@@ -67,4 +67,4 @@ The palette's light values (`docs/palette.md`, light columns) are used as writte
 ## Still open
 
 - The header's wordmark has no light-ground file in this repo (palette 3). The amber mark works on both grounds.
-- Fold the departures above into `docs/palette.md` once signed off.
+- ~~Fold the departures above into `docs/palette.md` once signed off.~~ The owner signed off the light theme as it stands on November 9, 2026 (still open to change). The palette now holds the token and drawing values (4.3, 5.1, 5.4); the component choices in the table (Grow's tags and steps, Home's news-card border) stay here.
