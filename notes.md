@@ -11,7 +11,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 - [ ] The repository is public "for now" (November 6, 2026); making it private turns the rulesets off unless the plan is GitHub Pro.
 - [ ] Finish the baseline in `docs/history/releases/2026-11-03.md`: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
 - [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.
-- [ ] Docs-only PRs never get a `build` result (paths-ignore), so only an admin bypass merges them: decide whether to drop `paths-ignore` for pull requests (README, "Repository rules").
 
 ## Privacy and accessibility pages
 
