@@ -1,5 +1,5 @@
 // Password lock for the whole site. Off, and not deployed: to turn it on, copy lock() and passwordOk() into
-// worker/index.js after the http-to-https redirect and the /api/report line. Steps in README, "Password lock".
+// worker/index.js after the http-to-https redirect and the /api/report line. Steps in docs/ops.md, "Password lock".
 
 const REALM = 'Uplink mockup';
 

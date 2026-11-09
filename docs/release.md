@@ -2,7 +2,7 @@
 
 *Last updated: November 9, 2026*
 
-Use this page before a release or the launch only. It holds the standards the site meets, the release checklist, what's left before the real domain, and the launch-day steps. Day-to-day checks are in CLAUDE.md, "Checking a change"; CI and deploys are in the README.
+Use this page before a release or the launch only. It holds the standards the site meets, the release checklist, what's left before the real domain, and the launch-day steps. Day-to-day checks are in CLAUDE.md, "Checking a change"; CI and deploys are in [`ops.md`](ops.md#deploys).
 
 A *release* is the first production launch, and any later change to layout, navigation, or forms, or a new page. A copy fix or a style tweak isn't one. Run the release checklist at least every three months anyway.
 
@@ -28,7 +28,7 @@ Don't repeat these by hand. The site checks (README, "Site checks"; each test's 
 ## Ship a release
 
 1. Merge the change as usual (CLAUDE.md, "Branches, pushes, previews"). Before you merge, add the `full-checks` label, and read the run summary's "Screenshot changes": make sure you meant each one (pictures in the `visual-diff` artifact).
-2. Read the deploy job's summary: it names the version that went live, or says why nothing did. A failed live check rolls back on its own; for anything else, see "Roll back a bad deploy" in the README.
+2. Read the deploy job's summary: it names the version that went live, or says why nothing did. A failed live check rolls back on its own; for anything else, see [Roll back a bad deploy](ops.md#roll-back-a-bad-deploy).
 3. Run the [release checklist](#release-checklist) and save the record.
 4. Tag the release, replacing `YYYY.MM.DD`, `COMMIT` (the merge commit), and `SUMMARY`:
 

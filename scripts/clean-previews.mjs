@@ -1,5 +1,5 @@
 // Deletes old pull request previews from Cloudflare, run by .github/workflows/clean-previews.yml (every 3 days, and
-// by hand). What it deletes and keeps: README, "Deploys" and "Clean up previews by hand". Dry run unless DRY_RUN=false.
+// by hand). What it deletes and keeps: docs/ops.md, "Deploys" and "Clean up previews by hand". Dry run unless DRY_RUN=false.
 // Env: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, OPEN_BRANCHES (file: one open pull request branch a line), KEEP_DAYS (3), ONLY_ALIAS (one alias only),
 // DRY_RUN ('false' to delete), GITHUB_STEP_SUMMARY (optional: the list goes there too).
 import { appendFileSync, readFileSync } from 'node:fs';

@@ -1,5 +1,5 @@
 // CI's deploy on main: uploads dist/ as a version that takes no traffic, smoke-checks it, puts it live, and rolls back
-// on its own if the live address then fails (review H3). The steps, timings and marker: README, "Deploys".
+// on its own if the live address then fails (review H3). The steps, timings and marker: docs/ops.md, "Deploys".
 //   node scripts/deploy.mjs LIVE_ADDRESS [SMOKE_ARGUMENTS ...]
 //   e.g. node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev
 //        node scripts/deploy.mjs https://uplinkit.ca --launch            (after launch: both smoke runs get --launch)

@@ -1,6 +1,6 @@
 // The site's one Worker script: it runs only for /api/*, /404 and addresses with no file (wrangler.jsonc); every
 // other request is a static file from dist/. Routing, the http:// redirect, the 404 page and its own headers:
-// README, "The Worker".
+// docs/ops.md, "The Worker".
 //
 // PR #38 (open, paused until a sending domain exists) adds the forms' routes (/api/contact, /api/book, /api/newsletter) to this same file: keep both.
 

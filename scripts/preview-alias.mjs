@@ -1,5 +1,5 @@
 // The preview alias for a branch: the name in a pull request's preview address,
-// https://ALIAS-uplink-site.johnoreilly.workers.dev (CI's preview job runs this; README "Deploys").
+// https://ALIAS-uplink-site.johnoreilly.workers.dev (CI's preview job runs this; docs/ops.md, "Deploys").
 //   node scripts/preview-alias.mjs BRANCH      prints the alias
 // Wrangler takes an alias only if it matches ^[a-z](?:[a-z0-9-]*[a-z0-9])?$, so: lowercase, each run of other
 // characters becomes one dash, no dash at either end, and "b-" in front of a name that doesn't start with a letter.
