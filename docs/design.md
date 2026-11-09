@@ -180,7 +180,7 @@ Inside a card, gaps are smaller than its padding, and related lines sit closer t
 
 ### R7. Line height
 
-Write line heights as tokens, never as numbers.
+Write line heights as tokens, never as numbers. Lint refuses anything else.
 
 | Text | Sizes | Line height |
 | --- | --- | --- |
@@ -206,6 +206,6 @@ The look is inspired by the Overwatch 2 menus: take their layout (how boxes sit,
 
 - **Small corners.** `--r-1` (0.125rem) key caps and tiny tags; `--r-2` (0.25rem) buttons, inputs, tiles, image wells; `--r-3` (0.5rem) cards, panels, dialogs. Only status items are round (`--r-pill`).
 - **No slanted or skewed boxes.** The current header tab is a straight, full-height block: square corners, a lighter fill, and a short accent line along the bar's bottom edge (`src/styles/header.css`).
-- **No left-side accents** on cards or tabs (colour rule 11).
+- **No left-side accents** on cards or tabs (colour rule 11). Lint refuses `border-left` and `border-inline-start`.
 - **One centred block.** On a `fold` screen, `--container` is `max(94rem + 2 * var(--gutter), 85vw)`: the full width up to 1,600px, 85% of a wider screen. Elsewhere it's 80rem. The header, the hero, and the footer's stage and base bar run full width. Extra width goes to the art and the margins, never to the text.
 - **Text never follows the screen**; see [`.claude/rules/css.md`](../.claude/rules/css.md) and "Styles" in [`src/README.md`](../src/README.md#styles).

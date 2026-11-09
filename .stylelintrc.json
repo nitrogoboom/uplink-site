@@ -22,9 +22,27 @@
       {
         "/^(margin|padding|gap|row-gap|column-gap|scroll-margin|scroll-padding)/": [
           "/(?<![\\w.])(?:\\d*\\.\\d+|[1-9]\\d*)(?:px|rem|em)\\b/"
-        ]
+        ],
+        "/^(font|font-size|--fs-.+)$/": ["/\\dpx\\b/"],
+        "/^(font|font-size)$/": ["/\\d(vw|vh|vi|vb|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh)\\b/"]
       },
-      { "message": "Off-scale spacing: use a --sp-* token (docs/design.md, Spacing)" }
+      {
+        "message": "Spacing takes a --sp-* token. Text size takes a --fs-* token: never px, and never the screen (vw, svh) outside a token (docs/design.md)"
+      }
+    ],
+    "declaration-property-value-allowed-list": [
+      { "line-height": ["/^var\\(--lh-[a-z]+\\)$/", "inherit", "normal"] },
+      { "message": "Line height takes a --lh-* token (docs/design.md, R7)" }
+    ],
+    "property-disallowed-list": [
+      ["/^border-(left|inline-start)/"],
+      {
+        "message": "No left-side accent: a card or tab has even borders (docs/design.md, Layout). A real divider says why in a stylelint-disable comment"
+      }
+    ],
+    "media-feature-name-value-allowed-list": [
+      { "/^(min-|max-)?(width|height)$/": ["/^-?[\\d.]+em$/"] },
+      { "message": "Breakpoints are in em (src/README.md, Breakpoints)" }
     ],
     "value-keyword-case": [
       "lower",
