@@ -507,7 +507,7 @@
     margin-top: var(--sp-3);
     padding-top: var(--sp-4);
     border-top: 1px solid var(--c-line);
-    text-align: left;
+    text-align: center; /* centred like the chip, title and line above (owner, November 9, 2026) */
   }
   /* body font, sentence case: short list lines read better than the condensed display face */
   .svc-feat-t {
