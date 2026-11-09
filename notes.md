@@ -1,102 +1,82 @@
 # Notes: open items
 
-Things to fix, polish or decide. Remove a line when it's done; add new ones as they come up.
+One line each. Remove a line when it's done; add new ones as they come up. Launch-only work is in `docs/release.md`, "Before launch".
 
-## Light theme
-- [ ] Light theme: the owner signed off its current state on November 9, 2026, and folded into `docs/palette.md`; still open to change ("nothing is done").
-- [ ] Light theme, optional: a quieter amber tower on the footer map (`docs/light-theme-home-review-2026-11-08.md` items 6–8). Both themes: ghost-button edges to `--c-edge` (palette rule 6).
-- [ ] Logo: the header's wordmark has no light-ground file in this repo (palette 3). Add it when the logo files are here.
+## Owner and accounts
 
-## Review of November 7, 2026
-- [ ] Owner: merge the docs further into one README + CLAUDE.md (review C12's last step), or call the trimmed docs enough.
-- [ ] Parked from the November 7 review (owner's lean process, November 8, 2026: not bugs, or refactors that can wait): J3, J4, J5 (Grow animation internals: layouts per frame, JS orbits, timeout chains), J6 (Trusted Types hardening: the policy in `core.js` passes every string, `createHTML: (s) => s`; accept only the site's own drawings, such as an `<svg` string from a same-origin `/assets/img/` fetch, and say so in the docs), C2 (`@layer`), C3 (build post-steps as an Astro integration), C7 (Lightning CSS + browserslist), C8 (relative colour tints), L4 (one cached stylesheet instead of inline CSS), L5 (hashed drawing file names), L11 (307 vs 308 on odd paths). Details in `docs/review-2026-11-07.md`.
-- [ ] Firefox 144+ and Safari 26.2+ (review J8, J15, November 7, 2026; checked in Chromium only): with the page's scripts blocked (DevTools request blocking on `/_astro/*.js`), the header's gear opens Settings, Esc and its close button shut it, and focus goes back to the gear. A click on the backdrop shuts it too where the browser has `closedby` (Chromium does; check whether each of Firefox and Safari does). With script, a double-click on the gear leaves Settings open (B12). In Safari before 26.2 (no `scrollend`), on Home's phone services row, press Next, swipe before the slide ends, then press Next again: it steps from the card showing. Older browsers without `commandfor` can't open Settings until `core.js` runs, as before.
-- [ ] Review C4, what batch 4 (checks) left (only speed was in scope): `scripts/check.mjs` still picks a check by Playwright project and passes its arguments in `CHECK_ARGS`, and the browser server starts in two places (`scripts/ci.mjs`, `.github/workflows/site.yml`); Playwright's `webServer` could do both. The release audit still bundles Guidepup with esbuild at run time (`ariaSnapshot()` could replace it). `verify:spacing` and `verify:styles`, `visual-diff`, `pagespeed` stay as tools outside `npm run ci`.
-- [ ] Real Android phone: check the "Fallback Roboto" faces in `src/styles/fonts.css` (review B5, November 7, 2026). Their sizes were measured from Google Fonts' Roboto and checked in Chromium on Linux, which has no Roboto installed, so whether Android's Chrome finds `local('Roboto')` and `local('Roboto Bold')` (its Roboto may be one variable font) is unproven. Load the 404 page on a slow connection and watch for text jumping when Barlow arrives.
+- [ ] GitHub environments (review H5): put the Cloudflare secrets in `production` and a preview token in `preview`, switch `site.yml` to them, delete `cloudflare`. See `docs/security.md`, "Secrets".
+- [ ] Cloudflare: a company account with 2FA, and an API token scoped to this one Worker.
+- [ ] Secrets: give each one an owner and a rotation date (`docs/security.md`, "Secrets").
+- [ ] Uptime check from outside Cloudflare, on the `workers.dev` address for now.
+- [ ] The repository is public "for now" (November 6, 2026); making it private turns the rulesets off unless the plan is GitHub Pro.
+- [ ] Finish the baseline in `docs/history/releases/2026-11-03.md`: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
+- [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.
+- [ ] Docs-only PRs never get a `build` result (paths-ignore), so only an admin bypass merges them: decide whether to drop `paths-ignore` for pull requests (README, "Repository rules").
 
-## Outside review (6 Nov 2026, independent session, 7.5/10)
+## Privacy and accessibility pages
 
-Quick, visible:
-- [ ] Phone hero (opens on the furnished room since 6 Nov 2026, `PHONE_AHEAD` in `tools/gen_office.py`): on a slow phone (150 ms, 1.6 Mbps, CPU x4) the stage is still empty for about 0.5 s between first paint and the drawing arriving (fetched by `home.js`). Closing it means inlining the phone cut in Home's HTML (about 14 KB gzipped on every Home load); a still `<img>` underneath would become the LCP. Check on a real phone first.
-- [ ] Backup for the hero (later): if the drawing still ends up blank or never builds, show the still office (`template.hero-still`, already used when the fetch fails) instead of an empty stage.
+Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
-Design, nice to have:
-- [ ] Home services, tall cards (November 8, 2026): on desktop each lists its three features, and the three drawings share one height (`100svh - 46rem`, never under 6rem) so the titles line up. At 1280×800 and 1366×768 the drawings come out small (96 px); look on a real laptop and decide whether short screens should drop the features instead.
-
-## Production readiness (3 Nov 2026, no domain needed; talk in `docs/history/conversation-2026-11-03.md`)
-- [ ] Browsers: write the support list (`browserslist`), and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly where missing. (Trusted Types already does: `core.js` checks for `window.trustedTypes`.)
-- [ ] GitHub environments, review H5 (owner, planned November 9, 2026; made November 6, 2026): `production` (deploys from `main` only) and `preview` are empty. Put `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in `production`, and a separate preview token plus the account ID in `preview`. Then switch `site.yml` from `cloudflare` to them (the `build` job's secrets check can't use `production` on a pull request) and delete `cloudflare`. Plan (owner, November 9, 2026): after the browser checks, Claude drives the owner's computer (computer use) through the Cloudflare and GitHub settings pages with them.
-- [ ] The repository is public "for now" (November 6, 2026). Making it private again turns off the rulesets unless the plan is GitHub Pro.
-- [ ] Cloudflare: company account with 2FA; API token scoped to this one Worker.
-- [ ] Uptime check from outside Cloudflare, pointed at the `workers.dev` address for now.
-- [ ] Secrets: give each one an owner and a rotation date (`docs/secrets.md` lists them all, with where each lives).
-- [ ] Finish the baseline in `docs/releases/2026-11-03.md`: the 15-minute hand part (real iPhone and Android, a 5-minute NVDA listen, the judgement checks). The machine part, W3C included, passes.
-- [ ] Decide later, on hold: who edits copy. Today it's Claude editing on your behalf about 90% of the time, which suits copy as JSON and Markdown in git (`src/content/`, `src/data/`): every change is reviewed, checked by CI and can be undone. A CMS only earns its place if staff will edit the site themselves.
-- [ ] Decide later, on hold: if the real company has a site today, map its old addresses to the new ones (redirects) before the domain moves.
-
-## Privacy and accessibility pages (3 Nov 2026; sources and the full list in `docs/privacy-and-accessibility-2026-11-03.md`)
-- [ ] Real inboxes for `privacy@`, `accessibility@` and `security@` (placeholders in `src/data/footer.json`, `inboxes`), and a postal code for the office address.
+- [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
-- [ ] Before launch, the accessibility page needs back two short lines Ontario requires (O. Reg. 191/11; cut 3 Nov 2026 as too much for the mockup): what happens after someone sends feedback (s. 80.50(2), e.g. reply times) and that accessible formats are available on request at no cost (s. 12(3)). Sources in `docs/privacy-and-accessibility-2026-11-03.md`.
-- [ ] "only a few people at Uplink will be able to open the inbox" (privacy page, "How we protect it") is an assumption: confirm or cut.
-- [ ] AODA compliance report: businesses with 20 to 49 employees in Ontario file one every three years; **the next deadline is 31 Dec 2026** (checked on ontario.ca, 5 Nov 2026: "Accessibility rules for businesses and non-profits"). The site says 22 technicians, so it applies to the real company if that's true. Filed through the Accessibility Compliance Reporting Portal.
+- [ ] Before launch, `/accessibility` gets back two Ontario lines: what happens after feedback (O. Reg. 191/11 s. 80.50(2)) and free accessible formats on request (s. 12(3)).
+- [ ] "Only a few people at Uplink will be able to open the inbox" (privacy, "How we protect it") is an assumption: confirm or cut.
+- [ ] AODA compliance report: due **December 31, 2026** for 20–49 Ontario employees (the site says 22 technicians), through the Accessibility Compliance Reporting Portal.
 
-## Home fixes (review 2 Nov 2026, GPT review checked against the code)
-- [ ] Booking toast says "We will email you within one business day" (`core.js`), but nothing is sent. Fixed by PR #38 (shows success only once the server accepts); left as is on `main` to avoid a conflict while forms are paused.
+## Forms
 
-## Code (whole-project review 2 Nov 2026; docs review 5 Nov 2026)
-- [ ] Dependabot's pip relock drops the Windows-only `colorama` line from `requirements.txt` (seen in #110, November 8, 2026), so a `pip install --require-hashes` on Windows fails after its pip bumps. Relock with the command in `requirements.in` after each one, until Dependabot locks with `--universal`.
-- [ ] TypeScript 7 (Dependabot #63, November 8, 2026): `astro check` refuses it, so `.github/dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7, or switch to `@astrojs/ts-content-mapper` (Astro's experimental type check for 7.1+), then drop the ignore.
-- [ ] Small, left as they are: `gen_campus.py` keeps its own `box()` (class-only faces that `footer.css` colours; every other generator draws through `isogen.box()`, review C11, November 7, 2026); `ServiceCard`'s `on`/`first`/`heading` props have one caller.
-- [ ] The styles check (`npm run verify:styles`) now and then reports a `div.container`'s side margins as 0 instead of 440px at 3440 on `/` or `/work`, even comparing a build with itself: the Chrome quirk the comment in `service-page.css` describes, on other pages. Seen with the old Python check and the Node one alike (November 6, 2026). Rerun it before you trust such a line.
-- [ ] Real Safari: Playwright's WebKit (27.2) refuses a style of its own for every `<select>` under our CSP (one each, even on a bare page with nothing of ours; Chromium doesn't), so twice a page from the booking dialog's dropdowns. The release audit expects that many and the Worker drops that report (November 6, 2026). Open: look at Safari's console on a Mac (Develop menu) for "Refused to apply a stylesheet"; if it's there too, report it to WebKit (bugs.webkit.org).
+- [ ] Forms are paused. PR #38 (`claude/sweet-chaum-b12ca0`) has the Worker endpoint, Turnstile, honeypot and rate limit, email a stub; leave it open. Needs `TURNSTILE_SECRET`, `FORM_TO`, a sending domain.
+- [ ] PR #38 conflicts with `main`: keep both routes in `worker/index.js`, both `ratelimits`, and `main`'s `run_worker_first` (`["/api/*", "/404"]`) with `not_found_handling: "none"`.
+- [ ] With the endpoint: give the contact and newsletter fields their `name` back (without script they go to `/soon`); CSP and the Trusted Types policy allow Turnstile (`docs/security.md`).
+- [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`, link privacy beside each Send.
+- [ ] Newsletter: a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."), what sends it (a processor to name), where consent records live.
+- [ ] Decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).
+- [ ] The booking toast says "We will email you within one business day" (`src/data/copy/ui.yaml`), but nothing is sent. PR #38 fixes it.
 
-## Page structure
-- [ ] Plans or pricing section: dropped with the placeholder table. Add one back to Services once real pricing exists.
-- [ ] Home "Our work" row is a placeholder for that spot until its real section is decided.
-- [ ] Home "We grow with you" (built 4 Nov 2026 from the round 8 mockups, `editing-room/grow-options/` on the `archive/editing-room` branch): one world that grows in six steps by where people work, played by `src/scripts/grow.js`; copy in `src/data/grow.json`; drawing `tools/gen_grow.py`. Open: final copy and team sizes (my guesses), people drawn as more than blocks, a real iPhone and Android pass (timing: `DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`). Desktop: the steps are a list in the left column (option C, November 6, 2026, mockup in `editing-room/grow-list/` on the `archive/editing-room` branch).
-- [ ] Contact: "Open a ticket" and "Start a remote session" go to the coming-soon page.
-- [ ] Desktop gaps: Home and About done (About 3 Nov 2026: "How we work" is a short band at its own height, Team one screen on desktop and its own height below). Rule agreed 2 Nov 2026: on desktop a section is one screen (`.fold`) when it has enough to fill it, and a short band keeps its own height; below desktop a section takes its own height, except `.fold-always` (the hero and each page's first screen). Next: Contact (Support) and Services (Faq), which still carry `fold-always` past their first screen. (Work's Projects is its first screen, so `fold-always` is right there.) Classes in `src/styles/layout.css`, desktop rules in `fold.css`.
+## Content
 
-- [ ] Home wheel grid (4 Nov 2026, `docs/fold-wheel-grid-2026-11-04.md`): folds are whole 100px wheel steps on desktop. Open: Page Down still moves 87.5% of a screen and leaves the grid (a small key handler could step one fold); the other pages' folds could take the same grid once their desktop gaps are done.
+- [ ] Service and project copy (each entry's `page` in `src/content/`) stays sample until there's a real client.
+- [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, the hero's `lead-short`, Grow's six tags, the "Windows 10" hero card.
+- [ ] With real content: drawn team avatars, a spot for client quotes, Business JSON-LD (phone, address, hours, `logo`, `sameAs`), and a real status page for "All systems normal" (or drop it).
+- [ ] Services: a plans or pricing section once real pricing exists.
+- [ ] Home "Our work" row is a placeholder until its real section is decided (`src/components/home/Work.astro`).
+- [ ] Contact: "Open a ticket" and "Start a remote session" go to `/soon`.
+- [ ] Grow: final copy and team sizes, people drawn as more than blocks, timing on real phones (`DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`).
 
-## Drawings
-- [ ] 404 page: a three-panel heist comic, draft on branch `404-comic-draft` (`editing-room/404-comic/`). Panels 2 and 3 work; panel 1 (the van) needs a rethink, and the punchline balloon clips the "t" in "typed".
+## Layout and look
 
-## Look and feel
-- [ ] Footer on `<details name="footer">` (layout plan phase 5, November 7, 2026): six rows under 700 px, tiles above. Rows ease open and shut with `::details-content` and `interpolate-size` (Chrome only; at once elsewhere), and the browser's own scroll anchoring holds a tapped row still. Open: try it on a real iPhone (Safari 18.4+ should get the tiles on an iPad or Mac) and Android, including a row shutting while the page is still scrolling (iOS momentum), and in Firefox ESR 140 (rows on every screen, no map).
-- [ ] Sideways scroll with text at 200% (found 6 Nov 2026, also on the build before that day's changes): Firefox at 390 wide, Home's services row (`.svc-big`) makes the page 458px wide; Edge at 320 wide, the Grow stage (`.grow-stage`) ends at 328px (8px). The text check (`verify:text`, retired with the Settings text size on November 7, 2026) ran Chromium only and not at 320, so it missed both. The Grow one is fixed (B13, November 8, 2026: the zoom check at 400% on 1280×1024 and the sideways check at 320 hold it); the Firefox one is still to check by hand.
-- [ ] Narrower than 20em (zoom check, November 7, 2026): a 390 px phone at 200% zoom (195 CSS px) or with a 24 px default font (16.25em) scrolls sideways (the header buttons, `.hdr-actions`, reach 419 px at 24 px; Home's Grow 492 px), and the tab bar's words overlap. Below WCAG's 320 px reflow floor, so the zoom check stops at 20em; decide whether to support it.
-- [ ] Short windows after the rem root (layout phase 4, November 7, 2026): text is 16 px at 1280×720 (14 px before), so some one-screen sections outgrow the screen and grow; nothing is cut. Home keeps its wheel grid at every desktop size: a section whose words outgrow it (Services and Grow at 1100×700, Services at 1100 to 1200 wide and 800 tall) is rounded up to the next 100px step by `home.js`, as Proof always was. The layout plan (D6) means to drop that script for Proof; it now does the other sections too, so decide it with D6. At 1280×720 /services FAQ, /about profile and /contact message outgrow one screen by 12 to 99 px, and the footer (688 of 656 px since its heading lost its screen-height cap, November 8, 2026) leaves the page's end off the grid on 720 px-tall windows. Owner: accept, or trim those sections at short heights.
-- [ ] Project cards on phones (6 Nov 2026): rows, option A from `editing-room/work-phone/` on the `archive/editing-room` branch (`.card--project` in `surfaces.css`, `ProjectCard.astro`). Home's "Setups we built and still run" now fits one screen; five of the Work page's six per screen. Open: a look on a real iPhone and Android.
-- [ ] Home services, small tiles (review of PR #103, November 8, 2026): with a mouse at 768×1024 the section runs 6 px past the screen.
-- [ ] Small, left as they are: Home-only hero rules in the shared `compact-cuts.css`; the services observer (`home.js`) also runs at 700px and up, where its dots are hidden; JSON-LD is pretty-printed (about 20 B gzipped).
+- [ ] Desktop folds: Contact (Support) and Services (Faq) still carry `fold-always` past their first screen; rule in `src/styles/layout.css` and `fold.css`.
+- [ ] Wheel grid: Page Down moves 87.5% of a screen and leaves the grid; other pages could take the grid (`docs/history/fold-wheel-grid-2026-11-04.md`).
+- [ ] Short windows (1280×720): /services FAQ, /about profile, /contact message and the footer outgrow one screen by 12 to 99px. Accept, or trim; decide with layout plan D6.
+- [ ] Home services, tall cards: drawings are 96px at 1280×800 and 1366×768; look on a real laptop, maybe drop the features on short screens.
+- [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
+- [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
+- [ ] Narrower than 20em (390px phone at 200% zoom, or a 24px font) scrolls sideways; below WCAG's 320px floor. Decide whether to support it.
+- [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
+- [ ] Hero fallback: if the drawing never builds, show the still office (`template.hero-still`) instead of an empty stage.
+- [ ] Light theme: signed off November 9, 2026, still open to change. Optional: a quieter amber tower on the footer map; ghost-button edges to `--c-edge` (colour rule 6).
+- [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
+- [ ] 404 page: a three-panel heist comic, draft on branch `404-comic-draft`; panel 1 (the van) needs a rethink, and the balloon clips the "t" in "typed".
+- [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).
+- [ ] Idea, not planned: the office fire drill (`docs/history/creative.md`).
+- [ ] Small, left as they are: Home-only hero rules in `compact-cuts.css`; the services observer runs at 700px and up; JSON-LD is pretty-printed.
 
-## Checks to repeat
-- [ ] Smoke from a cloud session (November 8, 2026): the environment must allow the site's host, and Node needs `NODE_USE_ENV_PROXY=1` to use the proxy. The `http://` redirect check can't run there (the proxy carries HTTPS only); it passes from a normal machine.
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1 s locally) with `npm run pagespeed`. Reduced-motion phones now show the same scene, and the hero text stays the LCP there too (6 Nov 2026).
+## Real devices
 
-## Before going live
+- [ ] Real iPhone and Android: the footer's `<details>` rows (including a row shutting during iOS momentum scroll), project cards as rows, Grow, and Firefox ESR 140's footer rows.
+- [ ] Android: do the "Fallback Roboto" faces in `src/styles/fonts.css` find `local('Roboto')`? Load the 404 on a slow connection and watch for a jump (review B5).
+- [ ] Firefox 144+ and Safari 26.2+ (review J8, J15): with page scripts blocked, the gear opens Settings, Esc and close shut it, focus returns; does a backdrop click shut it (`closedby`)?
+- [ ] Safari before 26.2 (no `scrollend`): Home's phone services row, Next, swipe mid-slide, Next again: it steps from the card showing.
+- [ ] Real Safari: does it refuse a style for every `<select>` under the CSP, as Playwright's WebKit does? If so, report it to bugs.webkit.org.
+- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1s locally) with `npm run pagespeed`.
 
-- [ ] Launch day, the deploy's preview smoke (review H3, November 8, 2026): at launch the deploy runs smoke with `--launch`, which fails on `noindex`. If Cloudflare adds `X-Robots-Tag: noindex` to version preview addresses (`*-uplink-site.*.workers.dev`), that run fails and blocks every deploy. Check one version address's headers before launch day.
+## Code and tools
 
-Forms and content:
-- [ ] Forms: PAUSED (2 Nov 2026). [PR #38](https://github.com/nitrogoboom/uplink-site/pull/38) (`claude/sweet-chaum-b12ca0`) has the Worker endpoint, Turnstile, honeypot and rate limit, with email as a stub; leave it open, unmerged. To pick it up: set the Worker secrets `TURNSTILE_SECRET` (Turnstile widget "uplink-site forms") and `FORM_TO`, put a sending domain on Cloudflare, then wire the send step.
-- [ ] Forms PR #38 now conflicts with `main` (GitHub, 5 Nov 2026). Both have `worker/index.js` (`main` has `/api/report`): merge by keeping both routes; `wrangler.jsonc` already has `main` and `run_worker_first`, and its `ratelimits` keeps both entries (`REPORTS` 1002 here, `FORMS` 1001 there). `run_worker_first` on `main` is `["/api/*", "/404"]` with `not_found_handling: "none"` (the 404 page comes from the Worker), so PR #38's `["/api/*"]` and `404-page` must not win the merge.
-- [ ] When forms send: delete the "send nothing yet" lines and the `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`; link the privacy page beside each Send button; give the newsletter a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."); decide what sends the newsletter (a mailing service is another processor to name) and where consent records are kept; decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).
-- [ ] Forms (decided 2 Nov 2026: build now, email via Cloudflare Email Service): contact, book-a-call and newsletter send nothing yet. Without script, the contact and newsletter forms go to `/soon` and their fields have no `name`; give the fields names back with the endpoint. Plan: a Worker endpoint (same origin, so `form-action 'self'` holds) with Turnstile, a honeypot field and a rate limit. Email Service sends from a domain on a Cloudflare zone, and `workers.dev` is not one, so the sending domain (the real one, or any domain moved to Cloudflare) comes first. CSP then needs `challenges.cloudflare.com` in `script-src` and `frame-src`, and the Trusted Types policy in `core.js` must allow Turnstile's script.
-- [ ] Service and project copy (how it works, questions, case studies) is sample text, and stays sample (decided 2 Nov 2026) until there is a real client. Then rewrite with real details (each entry's `page` field in `src/content/`).
-- [ ] Copy to confirm: VoIP wording ("Phones & Teams calling" section, card and footer); backup drawing subline "a separate, locked site" (`gen_backup.py`); network label VOIP PHONES "calls over your network" (`gen_network.py`); hero phone line `lead-short` in `Hero.astro`; the six grow tags (`tags` in `src/data/grow.json`); the "Windows 10 support has ended" hero card (slot for the first real article).
-- [ ] 20 to 22 links per page go to `soon` (client portal, remote support, status, careers, blog, Windows 10 guide, security checklist, terms, five social links; privacy and accessibility have pages since 3 Nov 2026). Kept on `soon` while this is a mockup (decided 2 Nov 2026); at launch each needs a page or no link. Add `Français` back with a real French page.
-- [ ] Once there is real content: drawn avatars for the team cards instead of initials; a spot for client quotes on Home or Work.
-- [ ] Business JSON-LD with real phone, address, hours, `logo`, `image`, `sameAs`, `priceRange`. "All systems normal" in the footer (`footer.json` `status`) is hard-coded: link it to a real status page or drop the claim.
-
-Domain and hosting:
-- [ ] Put the real domain's DNS on Cloudflare and add the domain to the Worker. Then redirect or switch off `workers.dev` (both ways are in `docs/launch-runbook.md`).
-- [ ] Remove `X-Robots-Tag: noindex` from `public/_headers`, put the `Sitemap:` line back in `robots.txt` (`src/pages/robots.txt.ts` says how; left out while every page is noindex), and set `SITE_URL` to the real domain (environment, or the default in `astro.config.mjs`).
-- [ ] Cloudflare zone: TLS 1.2 minimum, HTTP/3, Early Hints, Bot Fight Mode (it sets the `__cf_bm` cookie: change "The site sets no cookies" on the privacy page as `docs/privacy-and-accessibility-2026-11-03.md` item 17 says). Auto Minify and Rocket Loader stay off (they break the hashes and the CSP). Then check the 103 arrives with `curl -I --http2`. Check the Browser Integrity Check doesn't block agents reading `llms.txt` and the `.md` copies (on `workers.dev` it 403s a client with no user agent of its own).
-- [ ] HTTPS: turn on Always Use HTTPS on the real domain's zone (SSL/TLS > Edge Certificates), then check that plain `http://` to a page redirects (`npm run smoke -- https://DOMAIN --launch` does). On `workers.dev`, only the Worker's own addresses redirect (November 7, 2026, review H1): browsers never ask a `.dev` host over `http://`.
-- [ ] HSTS: add `includeSubDomains; preload` once every subdomain is HTTPS, then submit to hstspreload.org.
-- [ ] Web Analytics: the site in Cloudflare was set up for the old `pages.dev` host, but data already arrives from `uplink-site.johnoreilly.workers.dev` under the token in `core.js` (checked 6 Nov 2026). At launch, add the real domain to that site (or make a new site and swap the token), and drop the "old pages.dev host" remarks in `core.js` and `docs/secrets.md`.
-- [ ] Search Console: verify the domain, submit the sitemap.
-- [ ] `FAQPage` markup stays but gives no rich result (Google shows it only for government and health sites).
+- [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
+- [ ] Parked from the November 7 review: J3, J4, J5 (Grow internals), J6 (narrow the Trusted Types policy), C2, C3, C7, C8, L4, L5, L11 (`docs/history/review-2026-11-07.md`).
+- [ ] Review C4 leftovers: `scripts/check.mjs` picks a check by project and `CHECK_ARGS`; the server starts in two places (Playwright's `webServer` could do both); the audit bundles Guidepup at run time.
+- [ ] Dependabot's pip relock drops Windows' `colorama` line from `requirements.txt`: relock with the command in `requirements.in` after each one.
+- [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
+- [ ] `npm run verify:styles` sometimes reports a `div.container`'s side margins as 0 at 3440 on `/` or `/work` (a Chrome quirk): rerun before you trust such a line.
+- [ ] Smoke from a cloud session needs the site's host allowed and `NODE_USE_ENV_PROXY=1`; the `http://` redirect check runs only from a normal machine.
+- [ ] Small, left as they are: `gen_campus.py` keeps its own `box()`; `ServiceCard`'s `on`/`first`/`heading` props have one caller.

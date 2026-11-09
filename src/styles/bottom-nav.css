@@ -82,7 +82,7 @@
      runs down behind the bar instead of a strip of page background */
   .fc-base {
     padding-bottom: calc(var(--botnav-h) + var(--sp-6) + env(safe-area-inset-bottom, 0px));
-  } /* 96px: on the scale (docs/spacing.md R0) */
+  } /* 96px: on the scale (docs/design.md R0) */
   /* a page with no footer (Base.astro footer={false}: the 404) keeps that room under <main>: its one-screen section
      (--fold-h, already short of the bar) ends where the bar starts, and the page is exactly one screen */
   .no-footer main {

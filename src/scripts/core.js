@@ -630,7 +630,7 @@ document.addEventListener(
 // canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
 // Not in a browser driven by a test (navigator.webdriver): our own checks after each deploy were about 140 of a
 // page's visits a week in Web Analytics.
-const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053'; // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; see notes.md)
+const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053'; // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; docs/release.md, "Launch day")
 const startBeacon = () => {
   if (navigator.webdriver) return;
   const canon = /** @type {HTMLLinkElement | null} */ ($('link[rel="canonical"]'));

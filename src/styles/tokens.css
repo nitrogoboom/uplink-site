@@ -3,13 +3,13 @@
    Every size, colour and timing on the site comes from this file.
    Layout concept: game-client chrome (sticky top bar) around calm scrolling
    sections. Heroes and the header run full width; cards and lists sit in one
-   centred block (--container: 1600px, or 85% of a wider desktop screen; docs/layout-reference.md).
+   centred block (--container: 1600px, or 85% of a wider desktop screen; docs/design.md, "Corners, boxes, and layout").
    ========================================================================== */
 
 :root {
   color-scheme: dark;
 
-  /* ---- colour: Navy & Amber, dark (docs/palette.md) */
+  /* ---- colour: Navy & Amber, dark (docs/design.md) */
   --c-bg: #0e1a27; /* page */
   --c-bg-band: #14202d; /* alternate section band */
   --c-solid: #222e3a; /* dialogs, toasts, menus */
@@ -245,7 +245,7 @@
 }
 
 /* More contrast (the system's "increase contrast" setting, L8): the faint decorative lines (card borders, dividers,
-   about 1.3:1) take the palette's edge role, 3:1 (docs/palette.md). Before print, so paper keeps its own */
+   about 1.3:1) take the palette's edge role, 3:1 (docs/design.md). Before print, so paper keeps its own */
 @media (prefers-contrast: more) {
   :root {
     --c-line: var(--c-edge);

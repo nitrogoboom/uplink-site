@@ -2,9 +2,9 @@
 
     import palette as pal        then pal.AMBER, pal.EDGE, pal.SCREEN ...
 
-Roles come straight from tokens.css (the roles in docs/palette.md), so a colour change
+Roles come straight from tokens.css (the roles in docs/design.md), so a colour change
 there reaches the drawings on the next run of each gen script.
-Shades the drawings need but docs/palette.md has no role for (DESIGN-GAP) are worked out here from the
+Shades the drawings need but docs/design.md has no role for (DESIGN-GAP) are worked out here from the
 palette: navy(L) is the palette's neutral at OKLCH lightness L, tone(hue, L, C) a colour on one of
 its hues. The numbers are the old shade's lightness and chroma, so each keeps its weight in the drawing.
 """
@@ -89,9 +89,9 @@ def _hex(L, C, h):
     return '#%02X%02X%02X' % tuple(out)
 
 
-HUE = {'neutral': 250, 'blue': 239.4, 'amber': 66, 'green': 158, 'red': 29}   # docs/palette.md 4.1
+HUE = {'neutral': 250, 'blue': 239.4, 'amber': 66, 'green': 158, 'red': 29}   # docs/design.md, "Ramps"
 _NEUTRAL = sorted(_oklch(h) for h in ('#F2F7FC', '#E6ECF2', '#D2D8DE', '#BBC2C9', '#A1A9B1', '#838C95',
-                                      '#656E78', '#4D5863', '#37424E', '#222E3A', '#0E1A27'))   # docs/palette.md 4.2
+                                      '#656E78', '#4D5863', '#37424E', '#222E3A', '#0E1A27'))   # docs/design.md, "Ramps"
 
 
 def navy(L):

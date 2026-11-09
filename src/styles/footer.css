@@ -639,7 +639,7 @@ a.fc-cl:hover {
 .fc-w .win.lit {
   fill: var(--iso-sky-left);
   fill-opacity: 0.38;
-} /* cool lit window (docs/palette.md 5.4) */
+} /* cool lit window (docs/design.md, "Drawing colours") */
 .fc-w .on .win {
   fill: var(--c-on-accent);
   fill-opacity: 0.35;

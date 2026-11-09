@@ -27,4 +27,4 @@ We reply within two business days and tell you when it's fixed.
 - Cloudflare's own systems. Report those to Cloudflare.
 - Anything that needs a visitor's device to be compromised first.
 
-> **Note:** The inbox is a placeholder until the site moves to its real domain. See "Before going live" in [`notes.md`](notes.md).
+> **Note:** The inbox is a placeholder until the site moves to its real domain. See "Launch day" in [`docs/release.md`](docs/release.md#launch-day).

@@ -1,8 +1,8 @@
 /* ==========================================================================
-   Light theme: the palette's light mode (docs/palette.md, light columns of 5.1-5.4) on the site's tokens, on
+   Light theme: the palette's light mode (docs/design.md, the light columns of "Roles and tokens" and "Drawing colours") on the site's tokens, on
    <html data-theme="light"> (src/README.md, "Styles"). Screen only: print keeps its own colours (tokens.css). Where
    the palette's light value didn't hold up, the change and the reason are noted beside it
-   (docs/light-theme-2026-11-08.md). The drawings' rules (.th-dark / .th-light, Drawing.astro) are at the end.
+   (docs/history/light-theme-2026-11-08.md). The drawings' rules (.th-dark / .th-light, Drawing.astro) are at the end.
    ========================================================================== */
 
 @media screen {
@@ -109,8 +109,8 @@
      rules would outrank them */
   @media (forced-colors: none) {
     /* A mark that says "chosen" or "you are here" is drawn in amber ink, as the open footer tile already is: bright amber
-       on white is under 3:1 (WCAG 1.4.11), amber ink is 5-6:1. The fills stay amber. (docs/light-theme-home-review-2026-11-08.md
-       items 1-2, docs/light-theme-site-review-2026-11-08.md S1-S2) */
+       on white is under 3:1 (WCAG 1.4.11), amber ink is 5-6:1. The fills stay amber. (docs/history/light-theme-home-review-2026-11-08.md
+       items 1-2, docs/history/light-theme-site-review-2026-11-08.md S1-S2) */
     :root[data-theme='light'] :is(.pip.on, [aria-current='step'] > .pip) {
       background: var(--c-accent-text); /* the current dot, Services row and Grow */
     }
@@ -157,7 +157,7 @@
 
 /* Amber buttons: bright amber on white has no edge of its own (1.6-1.8:1), so it read as a glow. A 1px amber 500
    border (palette 4.2; 3.3:1 on the page) gives it one; the fill and its label (9.5:1) stay. Not in forced colours,
-   where the system draws the button's border. (docs/light-theme-home-review-2026-11-08.md item 7) */
+   where the system draws the button's border. (docs/history/light-theme-home-review-2026-11-08.md item 7) */
 @media screen and (forced-colors: none) {
   :root[data-theme='light'] .btn--primary {
     border-color: #c37600;
