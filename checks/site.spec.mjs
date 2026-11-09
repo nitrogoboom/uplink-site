@@ -2097,7 +2097,10 @@ test("drawing addresses: ?v= is the served file's hash (B10)", async () => {
 
 // C15: the Markdown copies say what the pages say: team names apart from their roles, a case study's services as
 // links, Contact's hours under a heading of their own, and Home's contact lines from the footer data
+// Release only (RELEASE=1 npm run verify): it expects the current copy's headings and lines, which the content
+// rewrite will change; a routine run skips it (CLAUDE.md, "Checking a change")
 test('Markdown copies: team, facts links, hours heading, Home contact (C15)', async () => {
+  test.skip(!process.env.RELEASE, 'release only: expects the current copy');
   const md = async (path) => (await fetch(BASE + path)).text();
   const fails = [];
   const team = (await md('/about.md')).split('\n## ').find((s) => s.startsWith('The people who pick up')) || '';

@@ -57,14 +57,23 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 
 ## Checking a change
 
-- Local first: `npm run dev`, then `npm run ci` (what CI runs).
-- After layout changes: `npm run build && npm run serve`, then `npm run verify`. `npm run verify -- --all` gives every page the full check.
-- Before a release: `npm run release-audit` and the checklist in `docs/sop.md`.
-- After a deploy: `npm run smoke -- ADDRESS`.
+The site is in **draft mode** (owner, November 9, 2026): almost every word is about to change, so check in proportion to the change. Never run the full suite for a copy or CSS change, and never run it twice for one change.
+
+| Kind of change | Locally | On the PR (CI) |
+|---|---|---|
+| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s: schemas, placeholders, CSP hashes) | build, static, drawings, preview |
+| CSS or markup | look at it in `npm run dev`, then `npm run quick` (types, lint, build: about 20 s) | same |
+| A drawing | `python tools/regen.py --check` | the `drawings` job |
+| Scripts (`src/scripts/`, `scripts/`), Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site checks for that area (`npm run verify -- -g "NAME"`); `npm run ci` when it touches many | the full browser checks run by themselves (the `scope` job in `site.yml` matches these paths) |
+| Before launch or a release | `npm run ci`, `RELEASE=1 npm run verify -- --all`, `npm run release-audit`, the checklist in `docs/sop.md` | add the `full-checks` label to the PR (also runs the screenshot comparison) |
+
+- Any PR can get the full browser checks with the `full-checks` label; "Run workflow" on `site.yml` runs everything.
+- Checks that expect today's exact copy run only with `RELEASE=1`.
+- The deploy smoke-checks the new version and rolls back on failure (`scripts/deploy.mjs`), so no separate smoke run after a merge.
 
 ## Branches, pushes, previews
 
-- One branch per session. Commit locally as often as you like. Each push to a PR runs CI (about 3 minutes) and each merge to `main` deploys, so push when a phone preview is wanted and merge when the batch is done.
+- One branch per session. Commit locally as often as you like. Each push to a PR runs CI and each merge to `main` deploys, so batch: one PR per batch of work, pushed when a phone preview is wanted.
 - A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (branch lowercased, non-alphanumerics to `-`, repeats and end dashes dropped, `b-` in front if it doesn't start with a letter; over 30 chars, cut to 23 plus `-` and a 6-character hash). Find it with `gh pr view N --comments` or `gh pr checks N`. Previews never touch the live Worker.
 - Changes to only root `*.md` or `docs/` run no CI and deploy nothing, so notes can go straight to `main`.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
