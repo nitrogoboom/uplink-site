@@ -4,7 +4,7 @@
 
 This page lists the site's security and privacy controls, how to check each one, and every secret the site uses (names and places, never values). How to report a problem: [`SECURITY.md`](../SECURITY.md). The accessibility standard and its checks: [`release.md`](release.md).
 
-The site is static: pages are built ahead of time and served by Cloudflare. One small Worker runs only for `/api/*`, `/404`, and addresses with no file (README, "The Worker"). There are no accounts, no database, and no third-party script except Cloudflare Web Analytics.
+The site is static: pages are built ahead of time and served by Cloudflare. One small Worker runs only for `/api/*`, `/404`, and addresses with no file ([`ops.md`](ops.md#the-worker)). There are no accounts, no database, and no third-party script except Cloudflare Web Analytics.
 
 | Area | Standard | What the site does |
 | --- | --- | --- |
@@ -91,7 +91,7 @@ Planned, with the forms in [PR #38](https://github.com/nitrogoboom/uplink-site/p
 | `FORM_TO` | The inbox the forms send to. | Worker secret |
 | `FORM_FROM` | The sending address, on a domain on Cloudflare. | Worker variable |
 | `EMAIL` binding | Cloudflare Email Service. Not a secret. | `wrangler.jsonc` |
-| `SITE_PASSWORD` | The optional site-wide lock, which is off (README, "Password lock"). | Worker secret |
+| `SITE_PASSWORD` | The optional site-wide lock, which is off ([`ops.md`](ops.md#password-lock)). | Worker secret |
 
 Not secrets: `GH_TOKEN` in CI is GitHub's short-lived token for the run. The placeholder inboxes (`privacy@`, `accessibility@`, `security@uplinkit.ca`) are under `inboxes` in `src/data/footer.json`.
 

@@ -2227,7 +2227,7 @@ const WORDS = () => {
   }
   return [out, plain];
 };
-// one test per page, so the shards (README, "CI") share the work evenly
+// one test per page, so the shards (docs/ops.md, "Deploys") share the work evenly
 for (const page of PAGES) {
   test(`headings and numbers: no word split across lines, ${page} (B18, B20)`, async ({ browser }) => {
     const jobs = [

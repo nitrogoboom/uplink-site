@@ -1,5 +1,5 @@
 // Finishes dist/_headers from the public/_headers template after `astro build` (npm run build runs it): the script
-// and style hashes, the Early Hints and Markdown-copy rules, X-Build, and dist/_redirects (308s). README,
+// and style hashes, the Early Hints and Markdown-copy rules, X-Build, and dist/_redirects (308s). docs/ops.md,
 // "Response headers", "Search engines" and "Deploys". Each part's details sit beside its code below.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';

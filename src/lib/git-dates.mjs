@@ -1,5 +1,5 @@
 // When a page's source files were first added and last changed, from git history: the sitemap's <lastmod>
-// (allPages() in site.ts) and a case study's datePublished and dateModified (README, "Search engines").
+// (allPages() in site.ts) and a case study's datePublished and dateModified (docs/ops.md, "Search engines").
 // A shallow clone (git clone --depth N) stops at a cut-off commit that seems to add every file, so its dates would
 // all be that commit's: the history is checked once, before any date is read (CI: the build stops; elsewhere: one
 // warning, and no dates).

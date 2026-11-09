@@ -5,8 +5,9 @@ Static mockup site (placeholder content) for a made-up IT company, with an Overw
 ## Where things are written down
 
 - `notes.md`: open items, one line each. Start here. Add new items there; remove a line when it's done.
-- `README.md`: setup, every command, tool and flag, the repo layout, drawing rules, the Worker, CI, deploys, rollback, repository rules. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
+- `README.md`: setup, every command, tool and flag, the repo layout, drawing rules. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
 - `src/README.md`: the source map: pages, `Base.astro` props, components, content and copy files, CSS order, breakpoints, heading fit, scripts.
+- `docs/ops.md`: hosting: the Worker, CI, deploys, previews, rollback, repository rules, response headers, search engines. Read it before you touch the Worker, a workflow or the headers.
 - `docs/design.md`: colour roles and their tokens, spacing (`--sp-*` rules R0–R7), line height, corners, layout. Read it before you style anything.
 - `docs/release.md`: the standards (WCAG 2.2 AA, privacy, security, browsers), the release checklist, what's left before launch, launch day. Before a release or launch only.
 - `docs/security.md`: security and privacy controls, and every secret by name and place (never values).
@@ -46,7 +47,7 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 ## Branches, pushes, previews
 
 - One branch per session. Commit locally as often as you like. Each push to a PR runs CI and each merge to `main` deploys, so batch: one PR per batch of work, pushed when a phone preview is wanted.
-- A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (rules: README, "Deploys"). Find it with `gh pr view N --comments`. Previews never touch the live Worker.
+- A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://ALIAS-uplink-site.johnoreilly.workers.dev`; `node scripts/preview-alias.mjs BRANCH` prints the alias (rules: `docs/ops.md`, "Deploys"). Find it with `gh pr view N --comments`. Previews never touch the live Worker.
 - `main` takes changes only through a PR with a passing `build`. A PR that changes only root `*.md` or `docs/` passes `build` in seconds (the `scope` job skips everything else) and merges like any other; its merge deploys nothing.
 - The owner directs and doesn't run commands: agents run every build, check and merge. Tell the owner what changed and what needs their eyes or decision, in plain words, not commands to run.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
