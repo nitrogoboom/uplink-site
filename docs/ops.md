@@ -39,7 +39,7 @@ Other rules:
 - CI doesn't regenerate or check the drawings. When you change one, run `python tools/regen.py --check` and `python -m pytest tools/tests` ([Check a drawing](drawing-tools.md#check-a-drawing)).
 - Every run lints the workflows with [zizmor](https://docs.zizmor.sh) and fails on a high-severity finding. Each pull request gets a dependency review (`actions/dependency-review-action`); on a private repository it needs GitHub Advanced Security.
 - Every step runs in `bash` with `pipefail`, and every job has `timeout-minutes`.
-- A push to `main` that touches only root `*.md` files or `docs/` starts no run (`paths-ignore`), so it deploys nothing. A pull request always runs: for a docs-only one, `scope` skips every other job and `build` passes at once.
+- A push to `main` that touches only root `*.md` files, `docs/`, `.claude/` or a `README.md` starts no run (`paths-ignore`), so it deploys nothing. A pull request always runs: for a docs-only one, `scope` skips every other job and `build` passes at once.
 - Every pull request gets a Worker Preview (`npx wrangler preview --name pr-N`), and the job comments its address, `https://pr-N-uplink-site.johnoreilly.workers.dev`. The preview takes the `previews` block in `wrangler.jsonc`, which names the `REPORTS` rate limit again: a preview doesn't inherit bindings. Cloudflare keeps up to 100 previews and deletes the oldest. To delete one by hand: `npx wrangler preview delete --name pr-N`.
 - The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the preview job is skipped and a push to `main` fails at the `build` gate.
 
