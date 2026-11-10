@@ -526,19 +526,16 @@
 <ellipse cx="381.9" cy="336.9" rx="43.1" ry="24.9" fill="none" stroke="#FFAD51" stroke-width="1.1" stroke-opacity="0.8"/>
 </g>
 <g>
-<polygon points="613.4,352.7 628.6,361.5 628.6,358.0 613.4,349.2" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="643.8,352.7 628.6,361.5 628.6,358.0 643.8,349.2" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="628.6,340.4 643.8,349.2 628.6,358.0 613.4,349.2" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<path d="M617.8 349.2L617.8 352.7A10.8 6.2 0 0 0 639.3 352.7L639.3 349.2Z" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<ellipse cx="628.6" cy="349.2" rx="10.8" ry="6.2" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55"/>
 </g>
 <g>
-<polygon points="759.5,437.1 774.7,445.9 774.7,442.4 759.5,433.6" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="790.0,437.1 774.7,445.9 774.7,442.4 790.0,433.6" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="774.7,424.8 790.0,433.6 774.7,442.4 759.5,433.6" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<path d="M764.0 433.6L764.0 437.1A10.8 6.2 0 0 0 785.5 437.1L785.5 433.6Z" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<ellipse cx="774.7" cy="433.6" rx="10.8" ry="6.2" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55"/>
 </g>
 <g>
-<polygon points="366.7,336.9 381.9,345.7 381.9,342.2 366.7,333.4" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="397.2,336.9 381.9,345.7 381.9,342.2 397.2,333.4" fill="#C37600" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
-<polygon points="381.9,324.6 397.2,333.4 381.9,342.2 366.7,333.4" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<path d="M371.2 333.4L371.2 336.9A10.8 6.2 0 0 0 392.7 336.9L392.7 333.4Z" fill="#FFAD51" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55" stroke-linejoin="round"/>
+<ellipse cx="381.9" cy="333.4" rx="10.8" ry="6.2" fill="#FFCD9B" stroke="#FFF5EC" stroke-width="1" stroke-opacity="0.55"/>
 </g>
 <g>
 <polyline points="1040.2,430.1 1040.2,250.0" fill="none" stroke="#FFAD51" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>

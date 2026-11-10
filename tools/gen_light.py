@@ -77,6 +77,10 @@ BY_USE = {
     ('#198152', 'text'): '#004F2E', ('#A9E9C3', 'text'): '#004F2E',
 }
 
+# CSS rules whose colour stays as it is: the ink on a lit amber tile is the dark navy in both themes (the tile stays
+# amber), not the page colour, which flips. (selector, property)
+KEEP_RULES = {('.ob-tile.is-on .f-ic', 'stroke')}
+
 # the office drawings (gen_office.py) floor their room with the window colour: a light floor there, not a grey slab
 OFFICE = {'#182431': '#DCE2E8'}
 
@@ -132,9 +136,12 @@ def lighten(svg, office=False):
     # the phone cut's caption list (data-items, JSON): home.js writes each title in its "c" colour, as words
     out = re.sub(r'(&quot;c&quot;:&quot;)(#[0-9A-Fa-f]{6})(&quot;)',
                  lambda m: m.group(1) + swap(m.group(2), 'text', office) + m.group(3), out)
+    def rule_sub(r):   # one CSS rule: swap its colours unless (selector, property) is kept
+        sel = r.group(1).strip()
+        return r.group(1) + '{' + CSS.sub(lambda c: c.group(0) if (sel, c.group(1)) in KEEP_RULES
+                                          else f'{c.group(1)}:{swap(c.group(2), kind_of(c.group(1), "style"), office)}', r.group(2)) + '}'
     out = re.sub(r'(<style[^>]*>)(.*?)(</style>)',
-                 lambda m: m.group(1) + CSS.sub(lambda c: f'{c.group(1)}:{swap(c.group(2), kind_of(c.group(1), "style"), office)}',
-                                                m.group(2)) + m.group(3), out, flags=re.S)
+                 lambda m: m.group(1) + re.sub(r'([^{}]+)\{([^{}]*)\}', rule_sub, m.group(2)) + m.group(3), out, flags=re.S)
     return out
 
 
@@ -191,7 +198,7 @@ def inline_css():
         for sel, prop, col in rules:
             new = swap(col, 'stroke' if prop == 'stroke' else 'fill', office)
             key = (sel, prop)
-            if new.upper() == col or key in seen:
+            if new.upper() == col or key in seen or key in KEEP_RULES:
                 continue
             seen.add(key)
             scoped = ',\n'.join(f":root[data-theme='light'] {scope} {s.strip()}" for s in sel.split(','))
