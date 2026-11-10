@@ -25,7 +25,7 @@ A report it can't read gets a `400`. Anything else that goes wrong in the Worker
 
 The Workers logs keep the Worker's own lines, one per report, for 3 days on the free plan. Cloudflare's own record of each run, the invocation log, is off (`observability.logs.invocation_logs` in `wrangler.jsonc`).
 
-> **Note:** Before `wrangler dev`, `wrangler deploy`, `wrangler versions upload`, and `wrangler preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, as it does after a plain `astro build`. Build with `npm run build`.
+> **Note:** Before `wrangler dev`, `wrangler deploy`, `wrangler versions upload`, and `wrangler preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command` in `wrangler.jsonc`). It builds nothing. It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, or `dist/_redirects` is missing. A finished build never leaves them, but a build that stops part way leaves `dist/` half done. Run `npm run build` again and fix what it reports.
 
 ## Deploys
 
@@ -90,7 +90,7 @@ The deploy job rolls back on its own when the live site fails the smoke check st
 
 The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`, served as `application/speculationrules+json`. When a pointer rests on a link to one of the site's pages for 200 ms (on phones, when the link comes into view), the browser fetches that page in the background, so the click doesn't wait for the HTML. Links to `/api/` and to the `.md` and `.txt` copies are left out. A header, unlike an inline `<script type="speculationrules">`, needs no change to the CSP. Other browsers ignore it.
 
-The file is a template. `npm run build` runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also fills in `X-Build`, the build's ID (see [Deploys](#deploys)), writes an Early Hints `Link` rule for each page, and a rule for each Markdown copy (see [Search engines](#search-engines)). Don't paste a hash in by hand.
+The file is a template. The build's last step (the `astro:build:done` hook in `astro.config.mjs`, after the drawings are shrunk and the Markdown copies written) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert. It also fills in `X-Build`, the build's ID (see [Deploys](#deploys)), writes an Early Hints `Link` rule for each page, and a rule for each Markdown copy (see [Search engines](#search-engines)). Don't paste a hash in by hand.
 
 Keep these rules in mind:
 

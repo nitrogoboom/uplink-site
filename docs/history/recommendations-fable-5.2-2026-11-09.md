@@ -29,7 +29,7 @@ No browser checks were run and no page was looked at. Every layout suggestion be
 | 5 | One full-screen section model | **Part done.** Wheel grid removed (#138); only a page's first section is one screen on every size (#139). The shared blocks and the hero's layouts are open. |
 | 6 | Move drawing maths out of the page scripts | **Open.** Needs the Python generators to write the numbers. Old-browser fallbacks and two unused exports went (#138). |
 | 7 | One way to colour drawings | **Part done.** The colour CSS now ships on Home only (#137). Role classes in `gen_office.py` and `gen_grow.py` are open. |
-| 8 | Make the build one step | **Open.** |
+| 8 | Make the build one step | **Done** (#144). `astro build` alone finishes `dist/`: an integration in `astro.config.mjs` runs `svgo.mjs`, `markdown.mjs` and `headers.mjs` on `astro:build:done`. `check-dist.mjs` stays as wrangler's guard: a build that fails in that step still leaves a half-done `dist/`. |
 | 9 | Decide French | **Decided:** `/fr/` addresses. The words still in code are in the copy files now: page titles and descriptions, and Home's business description (#143). The `/fr/` routing and the move of copy files to `src/data/copy/en/` are open. |
 | 10 | Tighten the Cloudflare and GitHub keys | **Open.** For the owner, before launch. |
 
@@ -40,7 +40,7 @@ No browser checks were run and no page was looked at. Every layout suggestion be
 **Astro.**
 
 - Drawing colour CSS only where it's used: **done** (#137). Every page but Home is about 9 KB smaller.
-- One-step build; Markdown copies from the data: **open.**
+- One-step build: **done** (#144). Markdown copies from the data: **open.**
 - Generate the copy schema from the YAML: **not planned.** The review says do it only if copy structure keeps changing.
 
 **Page scripts.**

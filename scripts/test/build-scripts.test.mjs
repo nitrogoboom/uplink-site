@@ -1,5 +1,6 @@
-// Tests for the build's after-steps (npm test; CI runs it before the build). Each one builds a tiny dist/ in a temp
-// folder, runs the real script on it (DIST points the script there) and checks what it wrote, or that it refused.
+// Tests for the build's last steps (npm test; CI runs it before the build). astro.config.mjs calls them in one hook;
+// here each one builds a tiny dist/ in a temp folder, runs the real script on it (DIST points the script there) and
+// checks what it wrote, or that it refused.
 // A break here would otherwise show up as a page whose scripts the CSP blocks, or a Markdown copy gone wrong.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -102,7 +103,7 @@ test("headers.mjs: /index and a page's /index.html and /index spellings go to th
   }
 });
 
-// a dist/ the way a plain `astro build` leaves it (the template copied as is), then finished by headers.mjs
+// a dist/ the way a build that stopped before headers.mjs leaves it (the template copied as is), then finished by it
 test('check-dist.mjs (wrangler build.command): refuses an unfinished dist/, passes a finished one (review H11)', async () => {
   const dir = base();
   try {

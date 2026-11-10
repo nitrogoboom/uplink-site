@@ -13,8 +13,8 @@
 //                      but with the _headers rules of the missing path (a missing .md as text/markdown, a missing
 //                      /_astro/ file cached for a year): review B8.
 // build.command runs before every wrangler dev, deploy and versions upload. It builds nothing: it refuses dist/ if
-// the build's last step (scripts/headers.mjs) didn't run, so a plain `astro build` can't ship _headers with its
-// placeholders in the CSP (scripts/check-dist.mjs). Build with npm run build.
+// the build's last step (scripts/headers.mjs, called from astro.config.mjs) didn't finish, as after a build that
+// stopped part way, so _headers never ships with its placeholders in the CSP (scripts/check-dist.mjs).
 // To put the password lock back, see tools/site-lock/worker.js.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
