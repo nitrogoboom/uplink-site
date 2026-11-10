@@ -47,7 +47,7 @@ No browser checks were run and no page was looked at. Every layout suggestion be
 
 - Old-browser fallbacks and two unused exports: **done** (#138).
 - The `?` shortcut, the phone bar hiding on scroll (D4), the wheel grid: **done** (#138). Page script went from 2,184 to 2,043 lines.
-- Phone hero captions as HTML: **decided to try, not built.** It needs the owner's eyes.
+- Phone hero captions as HTML: **done** (#141), kept by the owner after three rounds on a phone. The captions keep a line, drawn as the desktop labels draw theirs; `home.js` went from 683 to 588 lines.
 - Grow's ring as a CSS animation; Grow's dome orbits as CSS dashes: **open.** Each changes an animation, so each needs the owner's eyes.
 - Link paths and camera boxes written by the generators; the footer map camera as generated CSS: **open.** Drawing-generator work.
 - Grow's `placeTags` on every frame: **looked at, left.** The camera move changes the drawing's view every frame, so one layout pass a frame happens anyway; caching or a throttle saves nothing.
