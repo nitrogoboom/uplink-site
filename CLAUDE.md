@@ -47,7 +47,7 @@ The site is in **draft mode**: check in proportion to the change. Never run the 
 
 | Kind of change | Locally | On the PR (CI) |
 |---|---|---|
-| Docs only: root `*.md`, `docs/` | nothing | `build` passes in seconds; the merge deploys nothing |
+| Docs only: root `*.md`, `docs/`, `.claude/`, any `README.md` | nothing | `build` passes in seconds; the merge deploys nothing |
 | Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s) | build, static, core, preview |
 | CSS or markup | look at it in `npm run dev`, then `npm run quick` (about 20 s) | same |
 | A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | same (no drawing check in CI) |

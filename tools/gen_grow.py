@@ -1,4 +1,4 @@
-"""Draws the Home "We grow with you" world, src/components/home/grow-world.svg (README, "Generators"): one business in
+"""Draws the Home "We grow with you" world, src/components/home/grow-world.svg (docs/drawing-tools.md, "Generators"): one business in
 six steps. Every part carries data-s, its step, and data-o, its order in the step; grow.js plays them, and later steps
 only add (nothing moves or rebuilds). Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_grow.py                       (writes src/components/home/grow-world.svg)

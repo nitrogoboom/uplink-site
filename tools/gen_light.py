@@ -1,5 +1,5 @@
 """Light theme for the drawings: NAME-light.svg beside each dark picture, and src/styles/theme-drawings.css for the
-drawings inside the page (README, "Generators"; why each colour: docs/history/light-theme-2026-11-08.md). The dark drawings
+drawings inside the page (docs/drawing-tools.md, "Generators"; why each colour: docs/history/light-theme-2026-11-08.md). The dark drawings
 stay the source, so tools/regen.py runs this last. How a colour is swapped: above SWAP.
 
     python tools/gen_light.py           write them

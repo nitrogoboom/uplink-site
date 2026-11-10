@@ -47,7 +47,7 @@
   --c-cool-surface-2: rgb(216 239 255 / 0.1);
   --c-cool-muted: #adc5d6;
 
-  /* ---- drawing palette (isometric illustrations, see README "Drawing rules") */
+  /* ---- drawing palette (isometric illustrations, see docs/drawing-tools.md "Drawing rules") */
   --iso-top: #4d5863; /* box faces */
   --iso-left: #37424e;
   --iso-right: #222e3a;

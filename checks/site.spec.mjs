@@ -1,6 +1,6 @@
 // The browser check against the built site (npm run verify; CI runs it before every deploy). Home (FOCUS) gets
 // everything, other pages the per-page checks at phone size; each review-bug test names its item. What it checks:
-// README, "Site checks". Known failures are marked test.fail with the item that fixes them (KNOWN, below).
+// docs/site-checks.md, "Site checks". Known failures are marked test.fail with the item that fixes them (KNOWN, below).
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
 // Screenshots go to out/ (--out): Home and /soon at each size.
 // The core (npm run verify:core; CI runs it on every pull request): the tests tagged @core (CORE, below). The tests

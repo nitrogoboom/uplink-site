@@ -1,5 +1,5 @@
 // Zoom check (WCAG 1.4.4 resize text, 1.4.10 reflow; review C1): pages at browser zoom and at a bigger default font,
-// looking for what W3C's failure F69 names. The cases and what fails: README, "Site checks"; the details sit beside
+// looking for what W3C's failure F69 names. The cases and what fails: docs/site-checks.md, "Site checks"; the details sit beside
 // CASES and PROBE below. Known failures are marked test.fail with the review item that fixes them (KNOWN, below).
 // usage: npm run build && npm run serve   then   npm run verify:zoom [-- --all] [--base URL]
 //   (npm run verify runs it too, after the site check)

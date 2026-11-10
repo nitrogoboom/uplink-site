@@ -14,12 +14,12 @@
 # stays green and says "skipped"), but a push to main fails: it would otherwise look deployed when it isn't.
 name: site
 
-# the notes (root Markdown, docs/) aren't part of the site, so a change to only those
+# the notes (root Markdown, docs/, .claude/, any README.md) aren't part of the site, so a change to only those
 # runs nothing and deploys nothing (src/data/*.md are part of the site and still count)
 on:
   push:
     branches: [main]
-    paths-ignore: ['*.md', 'docs/**']
+    paths-ignore: ['*.md', 'docs/**', '.claude/**', '**/README.md']
   pull_request: # every pull request runs, so the required `build` check always reports; a docs-only one passes in seconds (scope)
     types: [opened, synchronize, reopened, labeled] # labeled: adding "full-checks" runs the browser checks
   workflow_dispatch: # "Run workflow" in the Actions tab, or: gh workflow run site.yml --ref <branch>
@@ -61,7 +61,7 @@ jobs:
       - id: s
         run: |
           full=false; visual=false; docs=false
-          # a pull request that changes only root Markdown or docs/: nothing to build or check, `build` passes at once
+          # a pull request that changes only root Markdown, docs/, .claude/ or a README.md: nothing to build or check, `build` passes at once
           if [ "$EVENT" = pull_request ] && ! git diff --name-only "$BASE...$HEAD" | grep -qvE '^([^/]+\.md|docs/.*)$'; then docs=true; fi
           if [ "$EVENT" = workflow_dispatch ] || [ "$LABELLED" = true ]; then full=true; fi
           if [ "$LABELLED" = true ]; then visual=true; fi

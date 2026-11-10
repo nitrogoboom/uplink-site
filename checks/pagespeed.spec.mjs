@@ -1,5 +1,5 @@
 // PageSpeed check: Google's PageSpeed Insights tests every sitemap page on its own servers, phone and desktop, and
-// this fails if Home scores under the bar (README, "Live-site checks"). Run it when you want it; CI doesn't.
+// this fails if Home scores under the bar (docs/site-checks.md, "Live-site checks"). Run it when you want it; CI doesn't.
 //   npm run pagespeed -- https://uplink-site.johnoreilly.workers.dev           the live site
 //   npm run pagespeed -- https://VERSION-uplink-site.johnoreilly.workers.dev   a preview version
 //   npm run pagespeed -- ADDRESS --min 100 --strict                            every page held to the bar

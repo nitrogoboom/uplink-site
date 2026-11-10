@@ -1,5 +1,5 @@
 """Shared kit for the drawings: office chair, monitor on a stand, desk phone (VoIP), and the helpers that put flat
-details exactly on an iso face (README, "Shared drawing code", which gives the grid rule).
+details exactly on an iso face (docs/drawing-tools.md, "Shared drawing code", which gives the grid rule).
 
 Every prop is built in its own local frame, centred on (0, 0) on the floor or desk top, then turned to face
 one of '+x', '-x', '+y', '-y' and moved into place. It comes back as (name, box) pairs already in back-to-front

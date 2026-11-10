@@ -1,5 +1,5 @@
 // Playwright Test settings for the site checks. Run them through scripts/check.mjs (the npm scripts do), which picks
-// one check (a project here) and hands it its arguments; README "Tools" lists them. The site check (npm run verify)
+// one check (a project here) and hands it its arguments; docs/site-checks.md lists them. The site check (npm run verify)
 // also runs the zoom check; verify:zoom runs the zoom check alone. The core (npm run verify:core) is the site check's
 // tests tagged @core, the few every pull request runs. checks/parked/ holds tests no project matches, so none runs.
 import { availableParallelism } from 'node:os';

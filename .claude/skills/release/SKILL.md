@@ -20,7 +20,7 @@ The owner doesn't run commands. You run each step, and hand over only the parts 
    python tools/regen.py --check
    ```
 
-   `RELEASE=1` turns on the checks that expect today's exact copy. `python tools/regen.py --check` needs the Python tools (README, "Install the Python drawing tools"). `git diff` must be empty after it.
+   `RELEASE=1` turns on the checks that expect today's exact copy. `python tools/regen.py --check` needs the Python tools (docs/drawing-tools.md, "Install the Python drawing tools"). `git diff` must be empty after it.
 
 2. Add the `full-checks` label to the pull request. CI then runs the browser checks and the screenshot comparison.
 3. Read the run summary's "Screenshot changes". Make sure each one is meant; the pictures are in the `visual-diff` artifact. Tell the owner which pages changed, in plain words.

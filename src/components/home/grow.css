@@ -36,6 +36,7 @@
   position: absolute;
   top: var(--sp-3);
   z-index: 1;
+  max-width: calc(50% - var(--sp-5)); /* each keeps its own half, and wraps there, so the two never meet (zoom) */
   font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: var(--tracking-label);
@@ -50,6 +51,7 @@
   right: var(--sp-4);
   color: var(--c-muted);
   font-variant-numeric: tabular-nums;
+  text-align: end;
 }
 
 /* tags: a step's risks in red, then its fixes in green, pinned to the drawing's anchors (grow.js places them) */

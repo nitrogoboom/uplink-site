@@ -1,5 +1,5 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
-Colours match README "Drawing rules" and the drawing palette in src/styles/tokens.css."""
+Colours match docs/drawing-tools.md "Drawing rules" and the drawing palette in src/styles/tokens.css."""
 import hashlib, html, math, re
 from shapely.geometry import LineString, MultiPoint, Point, box as box_shape
 from iso import fmt

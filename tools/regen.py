@@ -1,5 +1,5 @@
 """Run every drawing generator, then (with --check) every drawing check. Run it from the project root. What CI's
-drawings job does with it, and why gen_og.py is left out: README, "Generators" and "Check a drawing".
+drawings job does with it, and why gen_og.py is left out: docs/drawing-tools.md, "Generators" and "Check a drawing".
 
     python tools/regen.py            # rewrite the 33 SVGs from their gen_*.py, then the light theme (gen_light.py)
     python tools/regen.py --check    # then check.py and painter.py, as each rules_NAME.py lists them

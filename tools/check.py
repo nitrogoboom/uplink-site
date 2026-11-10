@@ -1,5 +1,5 @@
 """Geometry checks on one drawing: ANGLE, SNAP and TJOIN findings (exit 1 on any), and DOT lines that only list where
-each leader dot sits. What each reports and what it skips: README, "Check a drawing".
+each leader dot sits. What each reports and what it skips: docs/drawing-tools.md, "Check a drawing".
 usage: python check.py <svgfile> [startline endline] [--step PX]   (lines for inline svg inside html)
 """
 import sys, math
