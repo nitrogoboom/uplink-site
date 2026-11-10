@@ -131,13 +131,14 @@ jobs:
       - run: npm test
       - run: npm run lint
 
-  # the core, on every run that builds (every pull request but a docs-only one, and every push to main): the site
+  # the core, on a pull request that doesn't get the full browser checks (a copy, CSS or markup change): the site
   # check's tests tagged @core (checks/site.spec.mjs: no script error or CSP block, no sideways scroll at 390 and 1280,
   # axe in both themes, the path without script, pop-ups closing), against the built site served by wrangler dev.
-  # About 35 s of tests. The gate (build) needs it to pass
+  # About 1 minute of tests, 4 minutes for the job. Not when verify runs (it runs the same tests), and not on a push
+  # to main (its pull request ran them). The gate (build) needs core or verify to pass on a pull request
   core:
     needs: [dist, scope]
-    if: needs.scope.outputs.docs != 'true'
+    if: github.event_name == 'pull_request' && needs.scope.outputs.docs != 'true' && needs.scope.outputs.full != 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10 # about 2 minutes
     steps:
@@ -308,18 +309,23 @@ jobs:
           # A docs-only pull request skips everything after scope and passes here
           [ "$SCOPE" = success ] || { echo "::error::scope: $SCOPE"; exit 1; }
           if [ "$DOCS" = true ]; then echo "docs only: nothing to build"; exit 0; fi
-          for r in "dist=$DIST" "static=$STATIC" "core=$CORE"; do
+          for r in "dist=$DIST" "static=$STATIC"; do
             [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
           done
-          for r in "verify=$VERIFY" "visual-diff=$VISUAL"; do
+          for r in "core=$CORE" "verify=$VERIFY" "visual-diff=$VISUAL"; do
             case "${r#*=}" in success | skipped) ;; *) echo "::error::${r%%=*}: ${r#*=}"; exit 1 ;; esac
           done
+          # a pull request gets a browser check one way or the other
+          if [ "$EVENT" = pull_request ] && [ "$CORE" != success ] && [ "$VERIFY" != success ]; then
+            echo "::error::neither core nor verify ran"; exit 1
+          fi
         env:
           SCOPE: ${{ needs.scope.result }}
           DOCS: ${{ needs.scope.outputs.docs }}
           DIST: ${{ needs.dist.result }}
           STATIC: ${{ needs.static.result }}
           CORE: ${{ needs.core.result }}
+          EVENT: ${{ github.event_name }}
           VERIFY: ${{ needs.verify.result }}
           VISUAL: ${{ needs.visual-diff.result }}
       # a push to main that can't deploy fails, after the checks above have had their say
