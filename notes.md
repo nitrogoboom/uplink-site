@@ -17,7 +17,6 @@ Needs the owner's eyes on a preview:
 
 Layout and look:
 
-- [ ] Home has drifted from the Overwatch look and sits small (owner, November 10, 2026): compare it with `docs/design.md` and show the owner before changing anything.
 - [ ] Home services, tall cards: drawings are 96px at 1280×800 and 1366×768; look on a real laptop, maybe drop the features on short screens.
 - [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
