@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node scripts/svgo.mjs && node scripts/markdown.mjs && node scripts/headers.mjs",
+    "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
     "test": "node --test \"scripts/test/*.test.mjs\"",

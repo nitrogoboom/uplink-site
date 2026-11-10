@@ -1,4 +1,4 @@
-// Writes a Markdown copy of every page after `astro build` (npm run build runs it): dist/services.html →
+// Writes a Markdown copy of every page once Astro has built them (astro.config.mjs runs it after svgo.mjs): dist/services.html →
 // dist/services.md, dist/services/backup.html → dist/services/backup.md. AI agents read these instead of the HTML;
 // each page links to its copy with <link rel="alternate" type="text/markdown"> (Base.astro), and llms.txt lists them.
 // Only <main> is converted, so the header, footer and pop-ups stay out. Left out as well: drawings, buttons, chips,
@@ -9,20 +9,10 @@
 // 404 and soon are skipped: they are not pages anyone should cite.
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import TurndownService from 'turndown';
 
-const DIST = process.env.DIST || 'dist'; // another folder only for the tests (scripts/test/)
 const SKIP = ['index.html', '404.html', 'soon.html'];
-
-const pages = [];
-const walk = (dir) => {
-  for (const name of readdirSync(dir)) {
-    const p = join(dir, name);
-    if (statSync(p).isDirectory()) walk(p);
-    else if (name.endsWith('.html') && !SKIP.includes(relative(DIST, p).split(sep).join('/'))) pages.push(p);
-  }
-};
-walk(DIST);
 
 const cls = (node, ...names) =>
   names.some((n) => (' ' + (node.getAttribute?.('class') || '') + ' ').includes(` ${n} `));
@@ -122,34 +112,51 @@ const md = (site, page) => {
 };
 
 const attr = (html, re) => (html.match(re) || [])[1] || '';
-let n = 0;
-for (const file of pages) {
-  const html = readFileSync(file, 'utf-8');
-  const main = attr(html, /<main[^>]*>([\s\S]*?)<\/main>/);
-  const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/);
-  const description = attr(html, /<meta name="description" content="([^"]*)"/)
-    .replace(/&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, '&'); // last, so "&amp;quot;" stays "&quot;" (decoded once, not twice)
-  if (!main || !canonical) throw new Error(`markdown: ${relative(DIST, file)} has no <main> or no canonical`);
-  const site = new URL(canonical).origin;
-  let body = md(site, canonical)
-    .turndown(main)
-    .replace(/^[ \t\xa0]+$/gm, '') // lines left holding only a space (or a no-break space)
-    .replace(/^(\s*)(-|\d+\.) +/gm, '$1$2 ') // "-   item" → "- item"
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-  // the page's summary (unless the page already opens with it) and address go right under its title
-  const said = description.split(/(?<=\.) /).some((s) => s.length > 40 && body.includes(s));
-  const summary = said ? '' : `> ${description}\n\n`;
-  // anything before the title moves under it (no page has any today; kept so a card placed first can't lead the copy)
-  const at = body.search(/^# /m);
-  const before = at > 0 ? body.slice(0, at).trim() : '';
-  if (before) body = body.slice(at);
-  body = body.replace(/^(# .+)$/m, `$1\n\n${summary}Page: ${canonical}`);
-  if (before) body = body.replace(/^(Page: .+)$/m, `$1\n\n${before}`);
-  const note = 'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.';
-  writeFileSync(file.replace(/\.html$/, '.md'), `${body}\n\n---\n\n${note}\n`);
-  n++;
+// DIST: the built site's folder (dist/)
+export function markdown(DIST) {
+  const pages = [];
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const p = join(dir, name);
+      if (statSync(p).isDirectory()) walk(p);
+      else if (name.endsWith('.html') && !SKIP.includes(relative(DIST, p).split(sep).join('/'))) pages.push(p);
+    }
+  };
+  walk(DIST);
+
+  let n = 0;
+  for (const file of pages) {
+    const html = readFileSync(file, 'utf-8');
+    const main = attr(html, /<main[^>]*>([\s\S]*?)<\/main>/);
+    const canonical = attr(html, /<link rel="canonical" href="([^"]+)"/);
+    const description = attr(html, /<meta name="description" content="([^"]*)"/)
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, '&'); // last, so "&amp;quot;" stays "&quot;" (decoded once, not twice)
+    if (!main || !canonical) throw new Error(`markdown: ${relative(DIST, file)} has no <main> or no canonical`);
+    const site = new URL(canonical).origin;
+    let body = md(site, canonical)
+      .turndown(main)
+      .replace(/^[ \t\xa0]+$/gm, '') // lines left holding only a space (or a no-break space)
+      .replace(/^(\s*)(-|\d+\.) +/gm, '$1$2 ') // "-   item" → "- item"
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    // the page's summary (unless the page already opens with it) and address go right under its title
+    const said = description.split(/(?<=\.) /).some((s) => s.length > 40 && body.includes(s));
+    const summary = said ? '' : `> ${description}\n\n`;
+    // anything before the title moves under it (no page has any today; kept so a card placed first can't lead the copy)
+    const at = body.search(/^# /m);
+    const before = at > 0 ? body.slice(0, at).trim() : '';
+    if (before) body = body.slice(at);
+    body = body.replace(/^(# .+)$/m, `$1\n\n${summary}Page: ${canonical}`);
+    if (before) body = body.replace(/^(Page: .+)$/m, `$1\n\n${before}`);
+    const note = 'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.';
+    writeFileSync(file.replace(/\.html$/, '.md'), `${body}\n\n---\n\n${note}\n`);
+    n++;
+  }
+  console.log(`markdown: ${n} pages`);
 }
-console.log(`markdown: ${n} pages`);
+
+// Run on its own (node scripts/markdown.mjs) only by the tests in scripts/test/, on the folder DIST names. The build
+// calls markdown() from the integration in astro.config.mjs.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) markdown(process.env.DIST || 'dist');
