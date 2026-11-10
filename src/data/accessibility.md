@@ -22,8 +22,7 @@ A person also checks what a machine can't judge: the site on real phones, how a 
 
 - **Bigger text.** Use your browser's zoom (Ctrl and +, or Cmd and + on a Mac) to make the page bigger, or set a bigger font size in your browser's settings. The text grows with both, on every screen size.
 - **Pause animations.** The pause button stops the moving drawings, and the site remembers your choice next time.
-- **Less motion.** If your device is set to reduce motion, the site doesn't animate at all. You can also choose here: turn Reduce motion on or off in Settings (the gear, or press ?). The site remembers your choice next time.
-- **Keyboard shortcuts.** You'll find them in Settings (the gear, or press the question mark key). You can turn them off there if they get in the way of your own tools.
+- **Less motion.** If your device is set to reduce motion, the site doesn't animate at all. You can also choose here: turn Reduce motion on or off in Settings (the gear). The site remembers your choice next time.
 - **Skip to content.** The first press of the Tab key on any page lets you jump past the menu, straight to the main content.
 - **Works without a mouse.** Every link, button, and pop-up works from the keyboard, and you can always see where you are on the page.
 

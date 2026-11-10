@@ -1,5 +1,4 @@
-/*--- Key caps (.kbd) and the Esc hint beside a pop-up's close button: desktop with a mouse, when shortcuts are on. ---*/
-/* ---------- keyboard hints (desktop + mouse only, and only when on) --- */
+/*--- Key caps (.kbd) and the Esc hint beside a pop-up's close button, shown with a mouse or trackpad. ---*/
 .kbd {
   display: inline-grid;
   place-items: center;
@@ -19,15 +18,9 @@
 .kbd-hint {
   display: none;
 }
-/* any-: a touchscreen PC with a mouse or trackpad still gets the key hints */
-/* Esc beside a pop-up's close button: any width, shortcuts on or off (Esc is the browser's own close, not ours) */
+/* any-: a touchscreen PC with a mouse or trackpad still gets the hint. Esc is the browser's own close, not ours */
 @media (any-hover: hover) and (any-pointer: fine) {
   .dlg-head .kbd-hint {
-    display: inline-grid;
-  }
-}
-@media (any-hover: hover) and (any-pointer: fine) and (--desktop) {
-  :root:not([data-shortcuts='off']) .kbd-hint {
     display: inline-grid;
   }
 }

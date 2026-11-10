@@ -12,11 +12,6 @@
     calc(var(--sp-1) + env(safe-area-inset-bottom, 0px)) max(var(--sp-1), env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--c-line-2);
   background: var(--c-glass-2);
-  transition: transform var(--dur-2) var(--ease);
-}
-/* scrolling down (core.js): slides off the bottom; page-transitions.css's reduced-motion rule makes it instant for reduced motion */
-.botnav.is-hidden {
-  transform: translateY(100%);
 }
 .botnav ul {
   display: grid;

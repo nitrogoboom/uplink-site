@@ -44,8 +44,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 ## Layout and look
 
 - [ ] Desktop folds: Contact (Support) and Services (Faq) still carry `fold-always` past their first screen; rule in `src/styles/layout.css` and `fold.css`.
-- [ ] Wheel grid: Page Down moves 87.5% of a screen and leaves the grid; other pages could take the grid (`docs/history/fold-wheel-grid-2026-11-04.md`).
-- [ ] Short windows (1280×720): /services FAQ, /about profile, /contact message and the footer outgrow one screen by 12 to 99px. Accept, or trim; decide with layout plan D6.
 - [ ] Home services, tall cards: drawings are 96px at 1280×800 and 1366×768; look on a real laptop, maybe drop the features on short screens.
 - [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.

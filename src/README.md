@@ -57,7 +57,7 @@ The script lands at the end of `<body>`. Put it inside `<Base>`: after `</Base>`
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | The logo, page tabs, and buttons; and the phone tab bar. `current` marks the page's tab. |
 | `Footer.astro` | The footer. See [The footer](#the-footer). |
-| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the theme (System, Light or Dark: radios in a fieldset, `.seg` in `forms.css`), the Reduce motion switch and the keyboard-shortcuts switch. Text size is the browser's own zoom. |
+| `BookDialog.astro`, `SettingsDialog.astro` | The two pop-ups. Settings holds the theme (System, Light or Dark: radios in a fieldset, `.seg` in `forms.css`), and the Reduce motion switch. Text size is the browser's own zoom. |
 | `Drawing.astro` | A drawing shown as a picture, in both themes: the dark `NAME.svg` and the light `NAME-light.svg`, one hidden by `theme-light.css`. Takes `src`, optional `sources` (a `<picture>`'s cuts), and the `<img>`'s own attributes. |
 | `ServiceOptions.astro` | The service `<option>` items for both "What do you need?" lists. |
 | `TextPage.astro` | Renders the privacy and accessibility Markdown. The contact placeholders are filled as it renders (`lib/placeholders.mjs`); TextPage stops the build if one is left. |
@@ -83,7 +83,7 @@ On desktop, the footer is at least one screen tall. It has three parts:
 
 - **Stage:** the open section's panel on the left, and a live campus map on the right. One section is always open on tablet and desktop: `footer.js` opens Contact at load and again when a visitor shuts the one they picked. Without script, CSS shows Contact's panel while nothing is open.
 - **Tile row:** the six summaries.
-- **Base bar:** the brand, legal links, and status. Keyboard shortcuts live in the Settings dialog, which the header's gear opens.
+- **Base bar:** the brand, legal links, and status. The header's gear opens Settings.
 
 On a tablet, the tile row comes first, then the map, then the panel. Below 700 px wide, the sections are six rows that open in place, with no map. A row grows open and shrinks shut where the browser can animate to `auto` (`interpolate-size`), and opens at once elsewhere and with reduced motion. The browser's own scroll anchoring keeps a tapped row in place while the one above it shuts.
 
@@ -171,9 +171,9 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 
 | Script | Where it runs | What it does |
 | --- | --- | --- |
-| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, keyboard shortcuts, the theme (`theme.ev` says when it changes), the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
+| `core.js` | Every page, from `Base.astro` | Helpers, toasts, pop-ups, forms, the theme (`theme.ev` says when it changes), the shared pause state, error reports, pictures that fail to load (`.is-broken`, no broken-image box), and the Trusted Types policy (`html()`). The keyboard map is at the top. |
 | `footer.js` | Every page, from `Base.astro` | The footer's campus map: fetches it when the footer scrolls near, and on each `toggle` of a section lights its spot and flies the camera there. On tablet and up it keeps one section open (Contact unless another is picked), so the panel on screen is always the open one; phones start with every row shut. Also the newsletter mockup. The sections open and shut without it. Does nothing on a page without the footer (the 404). |
-| `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. On desktop it rounds any Home section whose words make it taller than its one-screen floor up to the next 100px wheel step, so every section still starts on the wheel grid. It imports `grow.js`. |
+| `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `contact.js` | Contact | The copy buttons and the queue card. |
 | `soon.js` | Coming soon | Names the page that isn't built yet, from the names in `data/copy/soon.yaml`. |

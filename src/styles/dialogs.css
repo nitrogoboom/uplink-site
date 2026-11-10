@@ -80,34 +80,9 @@
   }
 }
 
-/* keyboard shortcuts (Settings): the switch, the keys, the note */
+/* a group in Settings: its label, then its switch */
 .keys-group {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-}
-.keys-list {
-  display: flex;
-  flex-direction: column;
-  list-style: none;
-}
-.keys-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  padding-block: var(--sp-3);
-  border-bottom: 1px solid var(--c-line);
-}
-.keys-list li:last-child {
-  border-bottom: 0;
-}
-.keys-list .kbd {
-  font-size: var(--fs-2);
-}
-.keys-list .keys {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-1);
-  flex: none;
 }

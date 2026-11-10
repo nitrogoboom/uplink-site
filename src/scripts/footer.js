@@ -151,16 +151,14 @@ if (fc) {
 
   // the map is fetched when its box comes within a screen of view; phones hide the box (footer.css), so they never
   // fetch it, and a phone turned past 700 px fetches it then
-  if ('IntersectionObserver' in window) {
-    const near = new IntersectionObserver(
-      ([en]) => {
-        if (en.isIntersecting) {
-          near.disconnect();
-          void build();
-        }
-      },
-      { rootMargin: '100% 0px' },
-    );
-    near.observe(mapBox);
-  } else if (!matchMedia(MEDIA.phone).matches) void build(); // window is "never" here to the type check
+  const near = new IntersectionObserver(
+    ([en]) => {
+      if (en.isIntersecting) {
+        near.disconnect();
+        void build();
+      }
+    },
+    { rootMargin: '100% 0px' },
+  );
+  near.observe(mapBox);
 }

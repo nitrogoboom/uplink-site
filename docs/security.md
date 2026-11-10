@@ -67,7 +67,7 @@ The CSP reports to `/api/report` (`report-to` and `report-uri`, with `Reporting-
 
 ## Privacy
 
-- **No cookies, no tracking.** Cloudflare Web Analytics uses no cookies. Settings (theme, motion, pause, shortcuts) stay in the browser's own storage and never leave the device. There's nothing to consent to, so there's no banner.
+- **No cookies, no tracking.** Cloudflare Web Analytics uses no cookies. Settings (theme, motion, pause) stay in the browser's own storage and never leave the device. There's nothing to consent to, so there's no banner.
 - **What a report holds:** the page address without its query string, the error message, the script address and line, and the user agent cut to 200 characters; a CSP report also the blocked address (no query) and the directive. Never anything a visitor typed. Cloudflare keeps its own request log, IP included, for up to three days; the privacy page says so.
 - **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same pull request.
 
