@@ -23,7 +23,7 @@ Drawing generators (the owner directs drawing work):
 - [ ] On Windows a generator writes CRLF line ends (found November 9, 2026): git puts them right on commit, but `prettier --check` fails on the working copy of `theme-drawings.css` until it's checked out again.
 - [ ] Decide: delete `tools/site-lock/` if the password lock isn't coming back.
 
-The agent can do alone:
+The agent can do alone, in this order (each is its own pull request; the first three change no look):
 
 - [ ] French as `/fr/` addresses (decided): Astro's i18n routing, copy files to `src/data/copy/en/`. First move the words still in code to data: page titles and descriptions (`PAGES` in `src/lib/site.ts`) and the business description (`src/pages/index.astro`).
 - [ ] One-step build: `svgo.mjs`, `markdown.mjs` and `headers.mjs` in an Astro integration (`astro:build:done`); `check-dist.mjs` then goes.
