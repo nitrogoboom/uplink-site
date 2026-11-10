@@ -9,6 +9,8 @@
    or when Ctrl / Cmd / Alt is held.
    ========================================================================== */
 
+import { MEDIA } from '../lib/media.js';
+
 const root = document.documentElement;
 // For the type check (JSDoc, tsconfig checkJs) what they find is an HTML element, or the type of the variable it goes
 // in (an SVG part, a <dialog>): what a selector finds is up to the markup.
@@ -470,6 +472,48 @@ applyMotion();
     form.dispatchEvent(new CustomEvent('uplink:sent', { bubbles: true }));
   });
 });
+
+/* ---------- phone tab bar: out of the way while reading ----------------- */
+// Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back. It always
+// shows at the top and end of the page and while one of its links has focus. Phones only: the bar is hidden elsewhere.
+const botnav = $('.botnav');
+if (botnav) {
+  const STEP = 12; // px of travel before the bar reacts, so small jitters don't flicker it
+  const phone = window.matchMedia(MEDIA.phone);
+  /** @type {number | null} */
+  let lastY = null; // set on the first scroll: reading scrollY as the page loads would force an early layout
+  let queued = false;
+  const show = (/** @type {boolean} */ on) => botnav.classList.toggle('is-hidden', !on);
+  const update = () => {
+    queued = false;
+    const y = window.scrollY;
+    if (lastY === null) lastY = y;
+    const end = root.scrollHeight - window.innerHeight - STEP;
+    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) {
+      show(true);
+      lastY = y;
+      return;
+    }
+    if (Math.abs(y - lastY) < STEP) return;
+    show(y < lastY);
+    lastY = y;
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!queued && phone.matches) {
+        queued = true;
+        window.requestAnimationFrame(update);
+      }
+    },
+    { passive: true },
+  );
+  phone.addEventListener('change', () => {
+    lastY = null;
+    show(true);
+  });
+  botnav.addEventListener('focusin', () => show(true));
+}
 
 /* ---------- replay ----------------------------------------------------- */
 // Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
