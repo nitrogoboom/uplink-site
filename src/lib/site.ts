@@ -8,6 +8,7 @@ import { getCollection } from 'astro:content';
 import { MEDIA } from './media.js';
 import { byOrder } from '../content.config';
 import { entryFile, lastmod } from './git-dates.mjs';
+import { copy } from './copy';
 
 // Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
 // page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file as the
@@ -36,59 +37,24 @@ export const HERO = {
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
 export const CAMPUS = fresh('/assets/img/campus.svg');
 
-// The static pages (five in the menu, plus privacy and accessibility): address, name, <title>, description. The
-// .astro pages read their title and description from here, so the sitemap and llms.txt say the same thing.
+// The static pages (five in the menu, plus privacy and accessibility): address and name. Each page's <title> and
+// description are words, in its copy file (pageMeta() below).
 export const PAGES = {
-  home: {
-    path: '/',
-    name: 'Home',
-    title: 'Uplink Technology · Managed IT for Ontario businesses',
-    description:
-      'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.',
-  },
-  services: {
-    path: '/services',
-    name: 'Services',
-    title: 'Services · Uplink Technology',
-    description:
-      'Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.',
-  },
-  work: {
-    path: '/work',
-    name: 'Our work',
-    title: 'Our work · Uplink Technology',
-    description:
-      'Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.',
-  },
-  about: {
-    path: '/about',
-    name: 'About',
-    title: 'About · Uplink Technology',
-    description:
-      'Uplink Technology is an in-house team of 22 technicians running IT for Ontario businesses since 2011.',
-  },
-  contact: {
-    path: '/contact',
-    name: 'Contact',
-    title: 'Contact · Uplink Technology',
-    description:
-      'Call, email or book a free IT check-up with Uplink Technology. A real person replies within one business day.',
-  },
-  privacy: {
-    path: '/privacy',
-    name: 'Privacy',
-    title: 'Privacy · Uplink Technology',
-    description:
-      'What this website collects, why, who handles it and where, how long it is kept, and your rights under Canadian law.',
-  },
-  accessibility: {
-    path: '/accessibility',
-    name: 'Accessibility',
-    title: 'Accessibility · Uplink Technology',
-    description:
-      'How we build this website to WCAG 2.2 AA, the aids built into it, its known limits, and how to give feedback.',
-  },
+  home: { path: '/', name: 'Home' },
+  services: { path: '/services', name: 'Services' },
+  work: { path: '/work', name: 'Our work' },
+  about: { path: '/about', name: 'About' },
+  contact: { path: '/contact', name: 'Contact' },
+  privacy: { path: '/privacy', name: 'Privacy' },
+  accessibility: { path: '/accessibility', name: 'Accessibility' },
 } as const;
+
+// A static page's <title> and description, from src/data/copy/: NAME.yaml's top for the five in the menu,
+// text-pages.yaml for privacy and accessibility. The page, the sitemap and llms.txt all read them here.
+export const pageMeta = async (page: keyof typeof PAGES) => {
+  const t = page === 'privacy' || page === 'accessibility' ? (await copy('text-pages'))[page] : await copy(page);
+  return { title: t.title, description: t.description };
+};
 
 // Name and address come from PAGES. short: the phone tab bar's word, where it differs.
 type Tab = { page: keyof typeof PAGES; icon: IconName; short?: string };
@@ -204,7 +170,13 @@ export async function allPages(): Promise<SitePage[]> {
   const services = await getServices();
   const projects = await getProjects();
   return [
-    ...(Object.keys(PAGES) as (keyof typeof PAGES)[]).map((k) => ({ ...PAGES[k], lastmod: lastmod(SOURCES[k]) })),
+    ...(await Promise.all(
+      (Object.keys(PAGES) as (keyof typeof PAGES)[]).map(async (k) => ({
+        ...PAGES[k],
+        description: (await pageMeta(k)).description,
+        lastmod: lastmod(SOURCES[k]),
+      })),
+    )),
     ...services.map(({ id, data: s }) => ({
       path: `/services/${id}`,
       name: s.title,

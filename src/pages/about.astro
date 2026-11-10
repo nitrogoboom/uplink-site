@@ -1,13 +1,14 @@
 ---
 // ABOUT. Sections in page order; each is one component in src/components/about/.
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
+import { pageMeta } from '../lib/site';
 import Profile from '../components/about/Profile.astro';
 import Process from '../components/about/Process.astro';
 import Team from '../components/about/Team.astro';
+const meta = await pageMeta('about');
 ---
 
-<Base title={PAGES.about.title} description={PAGES.about.description} page="about" path="/about" type="AboutPage">
+<Base title={meta.title} description={meta.description} page="about" path="/about" type="AboutPage">
   <Profile />
   <Process />
   <Team />

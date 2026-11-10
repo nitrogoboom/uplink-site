@@ -2,6 +2,9 @@
 # email address are data (src/data/footer.json). `toast` is read by contact.js in the browser.
 # Schema: src/lib/copy-schema.ts.
 
+title: Contact · Uplink Technology # <title>
+description: Call, email or book a free IT check-up with Uplink Technology. A real person replies within one business day.
+
 message:
   eyebrow: Lobby
   title: Talk to a real person

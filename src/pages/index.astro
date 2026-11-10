@@ -2,7 +2,7 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
-import { HERO, PAGES, jsonLd } from '../lib/site';
+import { HERO, jsonLd, pageMeta } from '../lib/site';
 import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
@@ -13,7 +13,8 @@ import { phone, email, office } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
 import type { HomeWords } from '../lib/copy-schema';
-const { cloud, grow } = await copy('home');
+const { cloud, grow, business: about } = await copy('home');
+const meta = await pageMeta('home');
 
 const site = Astro.site!.href;
 const business = {
@@ -22,8 +23,7 @@ const business = {
   '@id': `${site}#business`,
   name: 'Uplink Technology',
   url: site,
-  description:
-    'Managed IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.',
+  description: about,
   telephone: `+${phone.display}`,
   email,
   address: {
@@ -46,7 +46,7 @@ const business = {
 };
 ---
 
-<Base title={PAGES.home.title} description={PAGES.home.description} page="home" path="/">
+<Base title={meta.title} description={meta.description} page="home" path="/">
   <Fragment slot="head">
     <script is:inline type="application/ld+json" set:html={jsonLd(business)} />
     <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone} />

@@ -2,6 +2,11 @@
 # (src/content/, src/data/grow.json). `cloud` and the Grow button's names are read by home.js and grow.js in the
 # browser. Schema: src/lib/copy-schema.ts.
 
+title: Uplink Technology · Managed IT for Ontario businesses # <title>
+description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'
+# the business itself, in Home's JSON-LD block (the one every page points at)
+business: 'Managed IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'
+
 hero:
   eyebrow: # "Managed IT · Ontario"
     - Managed IT

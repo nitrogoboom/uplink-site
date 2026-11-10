@@ -2,6 +2,9 @@
 # around its own copy. Each service's words are data (src/content/services/SLUG.json), the questions on /services
 # too (src/data/faq.json). Schema: src/lib/copy-schema.ts.
 
+title: Services · Uplink Technology # <title>
+description: Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.
+
 overview:
   eyebrow: Services
   title: Managed IT, one team

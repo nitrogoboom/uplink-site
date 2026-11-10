@@ -39,7 +39,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
-The seven static pages take their title and description from `PAGES` in `lib/site.ts`: the five in the menu, plus privacy and accessibility. The sitemap and `llms.txt` read the same list. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
+The seven static pages (the five in the menu, plus privacy and accessibility) are listed in `PAGES` in `lib/site.ts`: each one's address and menu name. Each page's `<title>` and description are copy: `title` and `description` at the top of its file in `data/copy/` (privacy's and accessibility's in `text-pages.yaml`, under the page's key). Read them with `await pageMeta('NAME')` from `lib/site.ts`; the page, the sitemap and `llms.txt` all do. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
 
 A page adds its own script inside `<Base>`, like this:
 
@@ -123,7 +123,7 @@ To add a string, add its key to the YAML file and to the file's schema, then use
 
 A page script gets its words as JSON: the page writes `<Words id="words-page" words={…} />` with the parts its script needs, and the script reads them with `words('words-page')` from `core.js`, typed by the shapes at the end of `lib/copy-schema.ts` (`HomeWords`, `ContactWords`, `SoonWords`). `core.js` reads `#words-ui` (`UiWords`) on every page and exports it as `UI`. The block runs nothing, so the CSP needs no hash for it, and it sits outside `<main>`, so the Markdown copy leaves it out.
 
-Kept out of the copy files on purpose: the content collections and `data/*.json` and `data/*.md` (already data), `PAGES` and `NAV` in `lib/site.ts`, JSON-LD fields, the words inside the drawings (`tools/gen_*.py`), and punctuation that only separates parts (`Sep.astro`, `Pause.astro`, the hidden `, ` between a name and a role).
+Kept out of the copy files on purpose: the content collections and `data/*.json` and `data/*.md` (already data), the menu names in `PAGES` and `NAV` in `lib/site.ts`, JSON-LD fields (but Home's business description, `business` in `home.yaml`), the words inside the drawings (`tools/gen_*.py`), and punctuation that only separates parts (`Sep.astro`, `Pause.astro`, the hidden `, ` between a name and a role).
 
 ## Styles
 

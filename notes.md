@@ -25,7 +25,7 @@ Drawing generators (the owner directs drawing work):
 
 The agent can do alone, in this order (each is its own pull request; the first three change no look):
 
-- [ ] French as `/fr/` addresses (decided): Astro's i18n routing, copy files to `src/data/copy/en/`. First move the words still in code to data: page titles and descriptions (`PAGES` in `src/lib/site.ts`) and the business description (`src/pages/index.astro`).
+- [ ] French as `/fr/` addresses (decided): Astro's i18n routing, copy files to `src/data/copy/en/`.
 - [ ] One-step build: `svgo.mjs`, `markdown.mjs` and `headers.mjs` in an Astro integration (`astro:build:done`); `check-dist.mjs` then goes.
 - [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
 - [ ] Checks: park the tests that pin today's layout and the regression pins lint or axe now catch; keep a core of about eight browser tests for every pull request.

@@ -4,7 +4,7 @@
 import { getCollection } from 'astro:content';
 import { byOrder } from '../content.config';
 import Base from '../layouts/Base.astro';
-import { PAGES, getServices } from '../lib/site';
+import { pageMeta, getServices } from '../lib/site';
 import Overview from '../components/services/Overview.astro';
 import Faq from '../components/services/Faq.astro';
 
@@ -28,11 +28,12 @@ const serviceNodes = services.map(({ id, data: s }) => {
     areaServed: 'Ontario',
   };
 });
+const meta = await pageMeta('services');
 ---
 
 <Base
-  title={PAGES.services.title}
-  description={PAGES.services.description}
+  title={meta.title}
+  description={meta.description}
   page="services"
   path="/services"
   type="FAQPage"

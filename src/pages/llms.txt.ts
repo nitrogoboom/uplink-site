@@ -2,17 +2,20 @@
 // service and project. Each links to the page's Markdown copy (the address plus .md; Home's is /index.md),
 // written at build by scripts/markdown.mjs.
 import type { APIRoute } from 'astro';
-import { PAGES, getServices, getProjects } from '../lib/site';
+import { PAGES, getServices, getProjects, pageMeta } from '../lib/site';
 
 export const GET: APIRoute = async ({ site }) => {
   const url = (path: string) => new URL(path, site).href;
   const md = (path: string) => url(path === '/' ? '/index.md' : `${path}.md`);
   const services = await getServices();
   const projects = await getProjects();
+  const pages = await Promise.all(
+    (Object.keys(PAGES) as (keyof typeof PAGES)[]).map(async (k) => ({ ...PAGES[k], ...(await pageMeta(k)) })),
+  );
   const lines = [
     '# Uplink Technology',
     '',
-    `> ${PAGES.home.description}`,
+    `> ${(await pageMeta('home')).description}`,
     '',
     'This is a test build: Uplink Technology is a placeholder company and the copy is sample text.',
     '',
@@ -20,7 +23,7 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     '## Pages',
     '',
-    ...Object.values(PAGES).map((p) => `- [${p.name}](${md(p.path)}): ${p.description}`),
+    ...pages.map((p) => `- [${p.name}](${md(p.path)}): ${p.description}`),
     '',
     '## Services',
     '',

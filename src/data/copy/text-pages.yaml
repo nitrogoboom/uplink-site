@@ -1,11 +1,16 @@
 # Privacy (/privacy) and Accessibility (/accessibility): the words over each page's Markdown. The pages themselves
-# are src/data/privacy.md and src/data/accessibility.md; their titles PAGES in src/lib/site.ts.
+# are src/data/privacy.md and src/data/accessibility.md; each page's <title> and description are
+# here too.
 # Schema: src/lib/copy-schema.ts.
 
 privacy:
+  title: Privacy · Uplink Technology # <title>
+  description: What this website collects, why, who handles it and where, how long it is kept, and your rights under Canadian law.
   eyebrow: Your data
   lead: What this website collects, why, and what you can ask of us.
 
 accessibility:
+  title: Accessibility · Uplink Technology # <title>
+  description: How we build this website to WCAG 2.2 AA, the aids built into it, its known limits, and how to give feedback.
   eyebrow: For everyone
   lead: How this site works for everyone, and how to tell us when it doesn't.
