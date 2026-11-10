@@ -108,22 +108,26 @@ COMPACT_LABELS = [  # dot (world), elbow (screen), colour, title, subline, side
 # Front half, left to right: the meeting room (7.25 x 7.5, glass on its two inner sides with a door, 7 seats facing
 # the screen); the entrance mat; reception beside it, facing the door; the waiting area beside reception.
 # Three Wi-Fi points hung from the ceiling, each on its own cable run at ceiling height from the server closet.
-HERO_WIN = ((6.75, 9.75, 12.75), 2.0, 0, 1.5, 3.75)   # back wall window starts (one centred over each desk of row A), width, -, sill, head
-HERO_LEFT_WIN = ((12.25,), 1.5, 0, 1.5, 3.75)   # left wall: one window in the meeting room, past the table
+HERO_WIN = ((2.875, 15.5), 2.0, 0, 1.5, 3.75)  # back wall window starts, width, -, sill, head: on the clear wall left of the desks and
+                                                # between desk A3 and the closet, none behind a monitor (was one over each desk: 6.75, 9.75, 12.75)
+HERO_LEFT_WIN = ((5.625,), 1.5, 0, 2.0, 3.75)   # left wall: one window over the coffee counter, sill above the machine. The meeting
+                                                # room's TV wall has none (was 12.25, sill 1.5: beside the TV)
 HERO_DESKS = {(6.5, 0.25): 1000, (9.5, 0.25): 1100, (12.5, 0.25): 1200}    # row A, flush to the back wall
 HERO_DESKS_B = {(9.5, 4.25): 1400, (12.5, 4.25): 1500}   # row B: two desks (a walkway by the meeting room); aisle y 2.5..4.25
 PRINTER = [(0.375, 1.375, 4.25, 5.25, 0, 0.875), (0.5, 1.25, 4.375, 5.125, 0.875, 1.0)]   # body, lid: print nook, below the cabinet
 PAPER = (0.625, 1.125, 4.5, 5.0)                # a sheet on the printer lid (x0 x1 y0 y1)
+CAB_PLANT = (0.75, 1.5)                         # small planter on the filing cabinet's top (centre), at its back-wall end (right on screen)
+SMALL_BLADES = [(-0.1875, -0.125, 0.8), (0.0625, -0.125, 1.0), (-0.0625, 0.0625, 0.75)]   # its leaf blades: corner (0.125 square), top z above the cabinet
 COFFEE = [(0.25, 1.25, 5.5, 7.25, 0, 1.25), (0.375, 0.875, 5.75, 6.375, 1.25, 1.875), (0.5, 0.75, 6.75, 7.0, 1.25, 1.5)]   # counter on the left wall, machine, mug
 MUG = (pal.MUG_LEFT, pal.MUG_RIGHT, pal.MUG_TOP)
-HERO_APS = [(15.25, 7.875), (RACKS[0] + RACK[0] / 2, 8.5), (6.5, 13.875)]
+HERO_APS = [(15.25, 7.875), (RACKS[0] + RACK[0] / 2, 8.5), (5.75, 13.25)]
 # The desks' and meeting room's points: on screen a ceiling AP shows 4.5 back-left of where it hangs, so these read
-# as over the desks (10.75, 3.375) and the middle of the meeting room's box (centred left to right on screen).
+# as over the desks (10.75, 3.375) and the visual middle of the meeting room, over the table (was 6.5, 13.875).
 # The guest point hangs at the true ceiling centre above the sofa and table, in line with the rack, so its blue
 # cable runs out of the closet in one straight line.
 GUEST_AP = 1                                    # index in HERO_APS drawn blue (guest network), rings at GUEST_RINGS of the staff size
 GUEST_RINGS = 0.55
-MEET_GLASS = (7.5, 7.5, 15.0, 4)                # meeting room glass: x = 7.5 side (out to the outer edge), y = 7.5 back; height
+MEET_GLASS = (8.0, 8.0, 15.0, 4)                # meeting room glass: x = 8 side (out to the outer edge), y = 8 back; height. On floor grid lines (was 7.5, 7.5)
 HERO_GLASS = (18.0, 3.25, 4)                    # network closet glass: x = 18 from the back wall to y = 3.25, then to the right edge
 HERO_RACK = (2.25, 6)                           # one short rack (height, slots) on rack 1's footprint: the tray stays put
 UPS = (20.0, 20.875, 1.25, 2.25, 0, 1.0)        # battery backup beside the rack
@@ -133,11 +137,13 @@ MEET_TABLE = (1.75, 5.75, 9.75, 11.5, 1.25)     # x0 x1 y0 y1 h: points at the s
 MEET_CHAIRS = ([(x, 9.25, '+y') for x in (2.5, 3.75, 5.0)] + [(x, 12.0, '-y') for x in (2.5, 3.75, 5.0)]
                + [(6.5, 10.625, '-x')])          # far side, near side, the end facing the screen (0.25 apart: no doubled edges)
 RUG = ((17.375, 21.125, 6.625, 10.375), pal.RUG)  # waiting area, flat (x0 x1 y0 y1, fill), edges off the floor grid lines
-MAT = ((9.0, 11.5, 13.875, 14.875), pal.MAT)    # entrance, flat; chevrons point in
+MAT = ((11.0, 14.0, 13.5, 15.0), pal.MAT)       # entrance, flat, out to the floor's front edge; chevrons point in (was 9..11.5, 13.875..14.875).
+                                                # 2 right of where it was, so its door stands clear of the meeting room's glass on screen
+FRONT_DOOR = (11.5, 13.5, 3.0)                  # glass entrance door standing on the front edge (y = 15) over the mat: x0, x1, head
 SOFA = [(19.75, 20.5, 7.0, 7.25, 0, 1.0), (19.75, 20.5, 7.25, 9.75, 0, 0.75),     # far arm, seat,
         (19.75, 20.5, 9.75, 10.0, 0, 1.0), (20.5, 21.0, 7.0, 10.0, 0, 1.375)]     # near arm, back: faces -x, towards reception
 LOW_TABLE = (18.0, 19.0, 7.75, 9.25, 0, 0.5)
-PLANT_AT = (18.75, 5.0)                         # pot centre: the waiting area's back corner, by the closet, out of the doorway
+PLANT_AT = (20.25, 12.75)                       # pot centre: front-right open floor, in front of the waiting area, clear of the server closet
 POT = [(0.375, 0, 0.625), (0.5, 0.625, 0.75)]   # pot, rim: half width, z0, z1
 BLADES = [(-0.375, -0.375, 1.75), (0.125, -0.375, 2.125), (-0.125, -0.125, 2.5), (-0.375, 0.125, 2.0), (0.125, 0.125, 1.625)]   # leaf blades: cell corner (0.25 square), top z
 LEAF = (pal.GREEN_DARK, pal.LEAF_SHADE, pal.LEAF_LIGHT)
@@ -145,9 +151,9 @@ LEAF_EDGE = f'stroke="{pal.EDGE}" stroke-width="1" stroke-opacity="0.22"'
 RECEPTION_CHAIR = (14.75, 10.5)                 # faces +y, behind the counter
 COUNTER = (13.0, 16.5, 11.25, 12.25, 0, 1.25)   # beside the mat, facing the door
 COUNTER_TOP = (12.75, 16.75, 11.0, 12.5, 1.25, 1.375)
-RECEPTION_MON = (13.75, 12.125)                 # monitor: left end, at the back of the counter (an arm's length off), screen face y
+RECEPTION_MON = (14.75, 11.6875)                # monitor: centred on the counter (x and y), screen face y; faces -y, to the receptionist
 RECEPTION_PHONE = (15.875, 11.75)               # desk phone on the counter, turned to the receptionist
-MEET_DOOR = (12.25, 13.25, 3.0)                 # door in the meeting room's side glass: y0, y1, head
+MEET_DOOR = (10.0, 12.0, 3.0)                   # door in the meeting room's side glass: y0, y1, head. 2 tiles, on grid lines, back from the entrance door on screen (was 12.25..13.25)
 # Leaders run straight from the object and the tail carries on the same way to the words (no kinks, no doubling
 # back): WI-FI straight up; GUEST and WORKSTATIONS on one shared diagonal (LEADER_SLOPE, dx per dy); TEAMS ROOM
 # straight across; FIREWALL RACK near-straight down past the open front edge.
@@ -429,9 +435,17 @@ def ring(ap, r, op, colour=pal.AMBER):
 
 
 def access_point(ap, cols=HIGH):
+    """A round ceiling puck, s across and t thick: its side band (lit face colour), then its top disc."""
     s, t, z = AP
     x, y = ap
-    return box((x - s / 2, x + s / 2, y - s / 2, y + s / 2, z, z + t), cols, HIGH_EDGE)
+    rx, ry = s / 2 * w.u * math.sqrt(1.5), s / 2 * w.u / math.sqrt(2)   # a floor-plane circle on screen
+    cx, cb = w.p(x, y, z)
+    _cx, ct = w.p(x, y, z + t)
+    L, R = fmt(cx - rx), fmt(cx + rx)
+    side = (f'<path d="M{L} {fmt(ct)}L{L} {fmt(cb)}A{fmt(rx)} {fmt(ry)} 0 0 0 {R} {fmt(cb)}L{R} {fmt(ct)}Z" '
+            f'fill="{cols[0]}" {HIGH_EDGE} stroke-linejoin="round"/>')
+    top = f'<ellipse cx="{fmt(cx)}" cy="{fmt(ct)}" rx="{fmt(rx)}" ry="{fmt(ry)}" fill="{cols[2]}" {HIGH_EDGE}/>'
+    return [side, top]
 
 
 def uplink(v, rack_h=RACK[3]):
@@ -470,13 +484,19 @@ def tile(i, v):
 
 
 def entrance():
-    """Rug under the lounge and the entrance mat, flat on the floor, with two chevrons pointing in."""
-    out = [poly([(x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0)], f'fill="{fill}" {LEAF_EDGE}')
-           for (x0, x1, y0, y1), fill in (RUG, MAT)]
-    cx = (MAT[0][0] + MAT[0][1]) / 2
-    for y in (14.75, 14.5):
-        out.append(line([(cx - 0.5, y, 0), (cx, y - 0.5, 0), (cx + 0.5, y, 0)], f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.55" {ROUND}'))
-    return out
+    """Rug under the lounge and the entrance mat, flat on the floor (plain: the door over it says entrance)."""
+    return [poly([(x0, y0, 0), (x1, y0, 0), (x1, y1, 0), (x0, y1, 0)], f'fill="{fill}" {LEAF_EDGE}')
+            for (x0, x1, y0, y1), fill in (RUG, MAT)]
+
+
+def front_door():
+    """Glass entrance door on the open front edge (y = FLOOR[1]) over the mat: one framed pane with a single pull
+    handle near its right edge. Frontmost thing in the room, so drawn last."""
+    x0, x1, h = FRONT_DOOR
+    y = FLOOR[1]
+    hx = x1 - 0.3
+    return [poly(wall_y(y, x0, x1, 0, h), f'fill="{pal.SKY}" fill-opacity="0.12" stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.85"'),
+            line([(hx, y, 1.1), (hx, y, 1.9)], f'stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.9" {ROUND}')]
 
 
 def lounge():
@@ -488,8 +508,8 @@ def lounge():
 
 
 def nook():
-    """Print nook on the left wall: the filing cabinet, then the printer in front of it."""
-    out = cabinet()
+    """Print nook on the left wall: the filing cabinet with a small planter on top, then the printer in front of it."""
+    out = cabinet() + small_plant(*CAB_PLANT, CABINET[5])
     for b in PRINTER:
         out += box(b)
     x0, x1, y0, y1 = PAPER
@@ -537,7 +557,16 @@ def meeting_glass_front():
     front = [poly(wall_y(y1, WALL_T, x, 0, h), GLASS_STYLE)] if y1 < FLOOR[1] else []
     return front + [poly(wall_x(x, y0, y1, 0, h), GLASS_STYLE),
             poly(wall_x(x, d0, d1, 0, dh), f'fill="{pal.SKY}" fill-opacity="0.12" stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.85"'),
+            line([(x, d0 + 0.3, 1.1), (x, d0 + 0.3, 1.9)], f'stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.9" {ROUND}'),   # pull handle, right edge on screen (like the entrance door's)
             line([(x, y0, 0), (x, y0, h)], post)] + ([line([(x, y1, 0), (x, y1, h)], post)] if front else [])
+
+
+def small_plant(cx, cy, z):
+    """A small planter standing at height z: a low pot and three short leaf blades (a tabletop snake plant)."""
+    out = box((cx - 0.25, cx + 0.25, cy - 0.25, cy + 0.25, z, z + 0.3))
+    for dx, dy, h in sorted(SMALL_BLADES, key=lambda b: b[0] + b[1]):
+        out += box((cx + dx, cx + dx + 0.125, cy + dy, cy + dy + 0.125, z + 0.3, z + h), LEAF, LEAF_EDGE)
+    return out
 
 
 def plant(at):
@@ -566,10 +595,9 @@ def reception():
         out += box(b)
     out += box(COUNTER) + box(COUNTER_TOP)
     top = COUNTER_TOP[5]
-    mon, scr = monitor(*RECEPTION_MON, top, '+y', s=PROP_S, width=MON[2], height=MON[3])
+    mon, _scr = monitor(*RECEPTION_MON, top, '-y', s=PROP_S, width=MON[2], height=MON[3])   # screen to the receptionist: we see its back
     for _n, b in mon:
         out += box(b)
-    out.append(screen_glass(w, scr, screen_ui(scr)))
     ph, ph_top = desk_phone(*RECEPTION_PHONE, top, '-y', s=PROP_S)
     for _n, b in ph:
         out += box(b)
@@ -654,9 +682,10 @@ def hero_groups(v):
           ('class="ob-i ob-fade" style="--d:650ms;animation-duration:450ms"', meeting_glass_back()),   # rows A, B are behind the room
           ('class="ob-i" style="--d:700ms"', hero_meeting()),
           ('class="ob-i ob-fade" style="--d:950ms;animation-duration:450ms"', meeting_glass_front()),
-          ('class="ob-i" style="--d:1650ms"', plant(PLANT_AT)),
           ('class="ob-i" style="--d:1700ms"', reception()),
-          ('class="ob-i" style="--d:1750ms"', lounge())]
+          ('class="ob-i" style="--d:1750ms"', lounge()),
+          ('class="ob-i" style="--d:1650ms"', plant(PLANT_AT)),   # in front of the waiting area now, so drawn after it
+          ('class="ob-i ob-fade" style="--d:1800ms;animation-duration:450ms"', front_door())]   # on the front edge: in front of everything
     if v == 'tablet':
         return air(v, G, HERO_APS, TABLET_LABELS, HERO_RACK[0], GUEST_AP, TABLET_K)
     if v == 'phone':

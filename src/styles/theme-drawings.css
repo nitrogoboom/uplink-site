@@ -298,9 +298,6 @@
 :root[data-theme='light'] .hero-art .ob-tile.is-on .f-t {
   stroke: #7c4900;
 }
-:root[data-theme='light'] .hero-art .ob-tile.is-on .f-ic {
-  stroke: #e8eff7;
-}
 :root[data-theme='light'] .hero-art .ob-seg {
   fill: #198152;
 }

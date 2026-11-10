@@ -86,6 +86,7 @@ def chair(x, y, facing='-y', s=1.0, z=0):
 def monitor(x, y, top, facing='+y', s=1.0, width=4.0, height=2.625):
     """Monitor centred on x (or y) with its screen face at y (or x), standing on a desk whose top is z = top.
     Facing '+y' puts the screen on the panel's y1 face, '+x' on its x1 face (the faces the viewer sees).
+    Facing '-y' turns the screen away from the viewer (we see the panel's back), and screen is None.
     Returns (parts back to front, screen) where screen = (facing, (x, y, z) top-left of the glass, width, height) for screen_glass()."""
     hw = width / 2
     local = [  # local facing -y: the screen is on the -y side at y = 0
@@ -93,8 +94,10 @@ def monitor(x, y, top, facing='+y', s=1.0, width=4.0, height=2.625):
         ('neck', (-0.25, 0.25, 0.25, 0.5, 0.125, 0.5)),       # behind the panel, up to its underside
         ('panel', (-hw, hw, 0, 0.25, 0.5, 0.5 + height)),
     ]
-    turn = {'+y': '+y', '+x': '+x'}[facing]
+    turn = {'+y': '+y', '+x': '+x', '-y': '-y'}[facing]
     parts = dict(place(local, x, y, top, turn, s))
+    if facing == '-y':   # the neck stands on the viewer's side of the panel: draw it last
+        return [(n, parts[n]) for n in ('foot', 'panel', 'neck')], None
     order = [(n, parts[n]) for n in ('neck', 'panel')]
     order.insert(0, ('foot', parts['foot']))
     # the foot sticks out in front of the panel; drawn first it sits under it, which is right from this view
