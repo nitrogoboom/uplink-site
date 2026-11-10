@@ -68,3 +68,9 @@ test('src/data/index.md and agents.md: contact details are placeholders, and Hom
   for (const p of ['[{phone}](tel:{tel})', '{email}', '{street}, {city}', '{hours}'])
     assert.ok(home.includes(p), `index.md uses ${p}`);
 });
+
+test('markdown.mjs: a table cell escapes a backslash before a pipe', () => {
+  // a cell holding a\|b must come out as a\\\|b, and a plain pipe as \|
+  const md = convert(String.raw`<table><tr><th>A</th><th>B</th></tr><tr><td>a\|b</td><td>c|d</td></tr></table>`);
+  assert.ok(md.includes(String.raw`| a\\\|b | c\|d |`), md);
+});
