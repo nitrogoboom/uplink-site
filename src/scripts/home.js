@@ -189,9 +189,10 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
    captions sit over its free corners: the cloud's (top left; the app it
    names is lit on the tray) and the office's (bottom left; one item at a
    time). They are plain HTML boxes (hero.css, .hero-cap), so their words
-   wrap and grow with the visitor's text size and nothing is measured.
-   Each has a dot on the drawing at what it names, and the same colour
-   dot beside its title. Each changes every 4.4s, 2.2s after the other.
+   wrap and grow with the visitor's text size. Each has a dot on the
+   drawing at what it names, the same colour dot after its title, and a
+   line between the two: the one thing read from the page, the title
+   dot's place, once a change. Each changes every 4.4s, 2.2s after the other.
    Tapping the drawing moves the office one on. Words and points come
    from the drawing (data-cloud, data-items: tools/gen_office.py).
    ------------------------------------------------------------------ */
@@ -209,38 +210,62 @@ const span = (cls, parent) => {
 };
 const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   const box = /** @type {HTMLElement} */ (svg.parentElement); // the stage
+  const vb = svg.viewBox.baseVal;
   const [cloudX, cloudY] = /** @type {string} */ (svg.dataset.cloud).split(',').map(Number);
   // the drawing's own list (tools/gen_office.py); lint can't see a JSDoc cast, so it would call this an any
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const items = /** @type {{ t: string, s: string, c: string, x: number, y: number }[]} */ (
     JSON.parse(/** @type {string} */ (svg.dataset.items))
   );
-  // a caption: its box over the drawing, and its dot on the drawing (a line of no length with round ends, so the
-  // dot keeps its size on screen whatever the drawing's scale: hero.css, .ob-mark)
+  // a caption: its box over the drawing, and on the drawing its line and its dot (a line of no length with round
+  // ends, so the dot keeps its size on screen whatever the drawing's scale: hero.css, .ob-mark)
   const spot = (/** @type {'cloud' | 'office'} */ name) => {
     const el = document.createElement('div');
     el.className = 'hero-cap hero-cap--' + name;
     el.setAttribute('aria-hidden', 'true'); // the drawing's own label says what it shows
     const head = span('hero-cap-t', el);
-    const dot = span('hero-cap-dot', head);
     const t = span('', head);
+    const dot = span('hero-cap-dot', head);
     const s = span('hero-cap-s', el);
     box.append(el);
     const mark = document.createElementNS(SVG_NS, 'g');
     mark.setAttribute('class', 'ob-mark ob-mark-' + name);
-    const pin = ['ob-mark-edge', 'ob-mark-pin'].map((cls) => {
+    const [lead, ...pin] = ['ob-mark-lead', 'ob-mark-edge', 'ob-mark-pin'].map((cls) => {
       const p = document.createElementNS(SVG_NS, 'path');
       p.setAttribute('class', cls);
       mark.append(p);
       return p;
     });
     svg.append(mark);
-    return { el, dot, t, s, mark, pin };
+    return { el, dot, t, s, mark, lead, pin };
   };
   const spots = { cloud: spot('cloud'), office: spot('office') };
   const at = { cloud: -1, office: -1 };
-  /** @param {ReturnType<typeof spot>} sp @param {number} x @param {number} y */
-  const pinAt = (sp, x, y) => sp.pin.forEach((p) => p.setAttribute('d', `M${x},${y}h0.01`));
+  /** @typedef {ReturnType<typeof spot>} Spot */
+  // where each caption points now, so its line can be drawn again when the drawing's size changes
+  /** @type {{ sp: Spot, x: number, y: number, level: boolean }[]} */
+  const aims = [];
+  // the line from the dot after a caption's title to its dot on the drawing. The title dot's place comes from the
+  // boxes' offsets (a transform on the way in doesn't move those), turned into the drawing's units: the drawing
+  // fills the stage. level: a flat run first, then down to the point (the cloud's, which sits beside its caption)
+  /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
+  const lineTo = (sp, x, y, level) => {
+    if (!box.clientWidth) return;
+    const k = vb.width / box.clientWidth;
+    const sx = vb.x + (sp.el.offsetLeft + sp.dot.offsetLeft + sp.dot.offsetWidth / 2) * k;
+    const sy = vb.y + (sp.el.offsetTop + sp.dot.offsetTop + sp.dot.offsetHeight / 2) * k;
+    const run = level ? `H${Math.max(sx, x - 50).toFixed(1)}` : '';
+    sp.lead.setAttribute('d', `M${sx.toFixed(1)},${sy.toFixed(1)}${run}L${x},${y}`);
+  };
+  /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
+  const pinAt = (sp, x, y, level) => {
+    sp.pin.forEach((p) => p.setAttribute('d', `M${x},${y}h0.01`));
+    const aim = aims.find((a) => a.sp === sp);
+    if (aim) Object.assign(aim, { x, y });
+    else aims.push({ sp, x, y, level });
+    lineTo(sp, x, y, level);
+  };
+  const redraw = () => aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
   // the office's dot beside its title: the colour its dot on the drawing shows, which the light theme changes
   const match = () => {
     if (at.office >= 0) spots.office.dot.style.background = window.getComputedStyle(spots.office.pin[1]).stroke;
@@ -254,7 +279,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
       name.className = 'hero-cap-app';
       name.textContent = app.name;
       sp.s.replaceChildren(name, ' · ' + app.detail);
-      pinAt(sp, cloudX, cloudY);
+      pinAt(sp, cloudX, cloudY, true);
       /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) =>
         t.classList.toggle('is-on', t.dataset.tile === app.id),
       );
@@ -264,8 +289,9 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
         it = items[at.office];
       sp.t.textContent = it.t;
       sp.s.textContent = it.s;
-      pinAt(sp, it.x, it.y);
       sp.pin[1].setAttribute('stroke', it.c);
+      sp.lead.setAttribute('stroke', it.c);
+      pinAt(sp, it.x, it.y, false);
       match();
     },
   };
@@ -315,6 +341,10 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   svg.addEventListener('click', tap);
   theme.ev.addEventListener('change', match);
+  // the stage's size changes (a turned phone), or the web font arrives and the titles change width: the lines again
+  const sized = new ResizeObserver(redraw);
+  sized.observe(box);
+  void document.fonts.ready.then(redraw);
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
@@ -344,6 +374,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     cancel(swaps.office);
     svg.removeEventListener('click', tap);
     theme.ev.removeEventListener('change', match);
+    sized.disconnect();
     spots.cloud.el.remove();
     spots.office.el.remove();
   };

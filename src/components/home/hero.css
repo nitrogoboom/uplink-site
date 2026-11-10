@@ -367,7 +367,8 @@
   text-transform: uppercase;
   color: var(--c-text);
 }
-/* the colour of the caption's dot on the drawing: the cloud's here, the office item's from home.js */
+/* after the title, where the caption's line starts: the colour of its dot on the drawing (the cloud's here, the
+   office item's from home.js) */
 .hero-cap-dot {
   flex: none;
   width: calc(var(--cap-dot) * 2);
@@ -386,8 +387,9 @@
   text-transform: uppercase;
   color: var(--c-text);
 }
-/* a caption's dot on the drawing: a line of no length with round ends and a stroke that doesn't scale, so the dot is
-   the same size on every phone; under it, a wider one in the page's colour as its edge */
+/* a caption's line and dot on the drawing. The dot: a line of no length with round ends and a stroke that doesn't
+   scale, so it is the same size on every phone; under it, a wider one in the page's colour as its edge. The line
+   runs from the dot after the caption's title to that dot */
 .ob-mark {
   opacity: 0;
   transition: opacity var(--dur-2) var(--ease);
@@ -403,6 +405,14 @@
   fill: none;
   stroke-linecap: round;
   vector-effect: non-scaling-stroke;
+}
+.ob-mark-lead {
+  stroke-linejoin: round;
+  stroke-width: var(--cap-line);
+  stroke-opacity: 0.6;
+}
+.ob-mark-cloud .ob-mark-lead {
+  stroke: var(--c-sky);
 }
 .ob-mark-edge {
   stroke: var(--c-bg);
