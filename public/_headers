@@ -60,6 +60,13 @@
 /speculation-rules.json
   ! Content-Type
   Content-Type: application/speculationrules+json
+/speculation-rules-home.json
+  ! Content-Type
+  Content-Type: application/speculationrules+json
+# Home also fetches the other menu pages as soon as it opens (src/pages/speculation-rules-home.json.ts). Cloudflare
+# joins this with the site-wide Speculation-Rules line above into one list, which is what the header takes.
+/
+  Speculation-Rules: "/speculation-rules-home.json"
 
 # Astro names every bundled CSS and JS file by its content hash (/_astro/x.ab12cd34.css), so a year is safe.
 /_astro/*

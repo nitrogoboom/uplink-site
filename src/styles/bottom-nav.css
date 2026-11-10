@@ -14,7 +14,7 @@
   background: var(--c-glass-2);
   transition: transform var(--dur-2) var(--ease);
 }
-/* scrolling down (core.js): slides off the bottom; the reduced-motion rule (page-transitions.css) makes it instant */
+/* scrolling down (core.js): slides off the bottom; the reduced-motion rule (motion.css) makes it instant */
 .botnav.is-hidden {
   transform: translateY(100%);
 }

@@ -13,6 +13,7 @@ Needs the owner's eyes on a preview:
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
 - [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.
+- [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Look on the preview: tabs feel instant, nothing flashes.
 - [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
 
 Layout and look:

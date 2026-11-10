@@ -22,8 +22,8 @@ const names = {
 //   @media (... prefers-reduced-motion: no-preference) { B }   B's selectors take :root:not([data-motion='reduce']),
 //                                                   and B is copied with :root[data-motion='full'] under the rest of
 //                                                   the query (or none)
-// Without script there's no attribute, so the queries alone decide. A rule with no selector (@view-transition) can't
-// follow an attribute: page-transitions.css says what it does instead.
+// Without script there's no attribute, so the queries alone decide. A rule with no selector (say @view-transition)
+// can't follow an attribute, so the copies drop it.
 const REDUCE = "[data-motion='reduce']";
 const NOT_REDUCE = ":not([data-motion='reduce'])";
 const FULL = "[data-motion='full']";

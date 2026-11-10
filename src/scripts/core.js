@@ -57,16 +57,13 @@ const UI = /** @type {UiWords} */ (words('words-ui'));
 /* ---------- error reports ---------------------------------------------- */
 // A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
 // What goes: the page's path, the message, the script's address and line. Never form contents or anything typed.
-// Left out: "Script error." (an outside script's error, which the browser hides), "ResizeObserver loop" (a
-// browser notice that a resize took two frames, not a fault) and a page-change animation the browser gave up on
-// ("Transition was aborted …", say when a phone's screen size changes mid-change: page-transitions.css; the page
-// still loads, so it isn't a fault to hear about). Five reports a page at most.
+// Left out: "Script error." (an outside script's error, which the browser hides) and "ResizeObserver loop" (a
+// browser notice that a resize took two frames, not a fault). Five reports a page at most.
 // CSP blocks are reported by the browser itself (public/_headers).
 let reportsLeft = 5;
 /** @type {(message: string, source?: string, line?: number, column?: number) => void} */
 const reportError = (message, source, line, column) => {
-  if (!message || message === 'Script error.' || /ResizeObserver loop|^Transition was (aborted|skipped)/.test(message))
-    return;
+  if (!message || message === 'Script error.' || /ResizeObserver loop/.test(message)) return;
   if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
   const body = { kind: 'error', page: location.pathname, message: String(message).slice(0, 300), source, line, column };
   navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
