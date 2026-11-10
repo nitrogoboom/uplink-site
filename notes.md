@@ -8,7 +8,6 @@ From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" sectio
 
 Needs the owner's eyes on a preview:
 
-- [ ] Grow on desktop: the steps as a growth line beside the picture, no team sizes (PR for `claude/grow-growth-line`).
 - [ ] Hero: six layouts down to three (stacked, two columns, ultrawide).
 - [ ] Home services on desktop: four variants in `services.css` become one block where the drawing flexes above a floor.
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
