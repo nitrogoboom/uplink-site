@@ -27,12 +27,15 @@ Also:
 
 GitHub Actions deploys the site (`.github/workflows/site.yml`). CI runs on every pull request and every push to `main`, in these jobs:
 
-- `scope` decides whether the browser checks run. On a pull request they run when it changes `src/scripts/`, `scripts/`, `worker/`, `checks/`, `src/layouts/`, `public/_headers`, the workflows, `package.json` or its lock, or the Astro, PostCSS or Wrangler config, or when it has the `full-checks` label (which also runs `visual-diff`). "Run workflow" runs them all. A push to `main` skips them.
+- `scope` decides whether the browser checks (`core`, `verify`, `visual-diff`) run. On a pull request they run only with the `full-checks` label; "Run workflow" runs `core` and `verify`. No path turns them on. A push to `main` skips them.
 - `dist` runs `npm ci` and the build once, and uploads `dist/` as an artifact for every later job.
-- `static` runs the type check, the tests, and lint.
+- `static` runs the type check, the tests, and lint, on a pull request or "Run workflow". A push to `main` skips it.
+- `preview`, on a pull request, builds the same commit on its own runner and uploads it as a Worker Preview. It waits for no other job.
+- `core` (when `scope` says so) runs `npm run verify:core`.
 - `verify` (when `scope` says so) runs `npm run verify` against the built site served by `wrangler dev`, in three shards. The first also runs `npm run verify:links` and `npm run smoke`. A failed part uploads its screenshots as `site-check-N`. One shard by hand: `npm run verify -- -- --shard=N/3`.
 - `visual-diff`, with the `full-checks` label, runs `npm run visual-diff` against the live site.
-- `build` is the gate: it passes only when `scope`, `dist` and `static` passed and `verify` and `visual-diff` passed or were skipped. The ruleset on `main` requires it, and the deploy job waits for it. The preview job waits for `dist` only.
+- `build` is the gate: it passes only when `scope` and `dist` passed, `static` passed (except on a push to `main`), and `core`, `verify` and `visual-diff` passed or were skipped on purpose. The ruleset on `main` requires it, and the deploy job waits for it.
+- `deploy`, on a push to `main`, waits for `build` and the workflow lint, then runs `scripts/deploy.mjs` (below).
 
 Other rules:
 
@@ -41,7 +44,7 @@ Other rules:
 - Every step runs in `bash` with `pipefail`, and every job has `timeout-minutes`.
 - A push to `main` that touches only root `*.md` files, `docs/`, `.claude/` or a `README.md` starts no run (`paths-ignore`), so it deploys nothing. A pull request always runs: for a docs-only one, `scope` skips every other job and `build` passes at once.
 - Every pull request gets a Worker Preview (`npx wrangler preview --name pr-N`), and the job comments its address, `https://pr-N-uplink-site.johnoreilly.workers.dev`. The preview takes the `previews` block in `wrangler.jsonc`, which names the `REPORTS` rate limit again: a preview doesn't inherit bindings. Cloudflare keeps up to 100 previews and deletes the oldest. To delete one by hand: `npx wrangler preview delete --name pr-N`.
-- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the preview job is skipped and a push to `main` fails at the `build` gate.
+- The workflow needs two secrets in a GitHub environment named `cloudflare`: `CLOUDFLARE_API_TOKEN` (with "Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them, the preview job skips its steps and a push to `main` fails at the `build` gate.
 
 A push to `main` that passes the `build` gate and the workflow lint deploys. The deploy job runs `node scripts/deploy.mjs LIVE_ADDRESS` on the `dist/` the checks passed:
 

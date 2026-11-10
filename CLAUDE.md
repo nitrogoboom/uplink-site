@@ -48,13 +48,12 @@ The site is in **draft mode**: check in proportion to the change. Never run the 
 | Kind of change | Locally | On the PR (CI) |
 |---|---|---|
 | Docs only: root `*.md`, `docs/`, `.claude/`, any `README.md` | nothing | `build` passes in seconds; the merge deploys nothing |
-| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s) | build, static, core, preview |
-| CSS or markup | look at it in `npm run dev`, then `npm run quick` (about 20 s) | same |
+| Home copy, CSS or markup: `src/content/`, `src/data/`, alt or screen-reader text, styles, components | look at it in `npm run dev`, then `npm run build` (about 5 s) | build, static, preview |
 | A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | same (no drawing check in CI) |
-| Scripts, Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site check for that area: `npm run verify -- -- -g "NAME"` | the full browser checks run by themselves |
-| Before launch or a release | the `release` skill | add the `full-checks` label |
+| Scripts, Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site check for that area: `npm run verify -- -- -g "NAME"` | same; browser checks only with the `full-checks` label |
+| Before launch or a release | the `release` skill | add the `full-checks` label: the only time browser checks run |
 
-- `core` is nine browser tests (`npm run verify:core`, tagged `@core` in `checks/site.spec.mjs`). CI runs it on a PR that doesn't get the full checks, which include the same tests. It takes about 4 minutes there.
+- `core` is nine browser tests (`npm run verify:core`, tagged `@core` in `checks/site.spec.mjs`). CI runs it, beside the full checks, only with the `full-checks` label or from "Run workflow".
 - Tests that pinned today's layout are parked in `checks/parked/`. Nothing runs them.
 - The deploy smoke-checks the new version and rolls back on failure, so run no smoke check after a merge.
 
