@@ -119,7 +119,7 @@ Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size to
 ### R1. Section padding
 
 - **Flow section** (`.section`): `--section-y` top and bottom: `--sp-8` on phone and tablet, `--sp-9` on desktop.
-- **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad`, which follows the screen's height: `--sp-5` up to 760px tall, `--sp-7` up to 1080px, `--sp-8` from 1080px. The content is centred.
+- **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad`, which follows the screen's height: `--sp-5` up to 760px tall, `--sp-7` up to 1080px, `--sp-8` from 1080px. The content is centred. A fold must fit one screen from 1080px tall; on shorter screens it may run past (owner, November 10, 2026).
 - **The first section under the header:** `--sp-6` at the top; a fold hero can drop to `--sp-5`. A text-only page's top (`.page-intro`): `--sp-7`, or `--sp-8` on desktop.
 - Alternate banded and plain sections so gaps don't double.
 
