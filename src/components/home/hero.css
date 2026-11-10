@@ -475,11 +475,20 @@
   .hero-grid {
     /* on a tall, near-square window the hero stops at --hero-max and centres in the screen, so the
        office and news cards stay beside the text and not at opposite ends of a tall column */
-    min-height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
-    grid-template-columns: minmax(0, 34rem) minmax(0, 1fr);
+    --hero-inner: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
+    /* the office's height: the hero less the news cards (a card is about 6.4rem tall; taller ones only leave the
+       office a little short of its box) and the gap above them */
+    --hero-stage-h: calc(var(--hero-inner) - 6.4rem - var(--sp-6));
+
+    min-height: var(--hero-inner);
+    /* the office column is no wider than the drawing at that height (aspect 40/31), and the columns sit together in
+       the middle: on a wide screen the spare width falls at the two edges, not as a hole between the text and the
+       office, and the news cards run exactly as wide as the office (owner, November 10, 2026) */
+    grid-template-columns: minmax(0, 34rem) minmax(0, calc(var(--hero-stage-h) * 40 / 31));
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: 'menu stage' 'menu dock';
-    column-gap: var(--sp-8);
+    justify-content: center;
+    column-gap: var(--fold-gap);
     /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
     row-gap: var(--sp-6);
   }
@@ -489,11 +498,12 @@
   .hero-menu {
     min-height: 0;
     justify-content: safe center;
+    gap: var(--fold-stack);
   }
-  /* the menu is its own group: the column's --sp-6 gap plus this, --sp-8 under the button */
+  /* the menu is its own group: the column's gap plus this, --sp-8 under the button (more on a 4K screen) */
   .hero-menu .hero-services {
     display: block;
-    margin-top: var(--sp-6);
+    margin-top: var(--fold-stack);
   }
   /* icons and text line up with the headline; the highlight hangs outside */
   .hero-menu .menu {
@@ -519,23 +529,17 @@
     }
   }
 
-  /* very wide screens (21:9 and wider): news in a column beside the office.
-     A maximised 16:9 browser is about 2:1, so this starts well past that. */
-  @media (aspect-ratio >= 7 / 3) {
-    /* the office is as wide as its height allows (aspect 40/31), no wider, and
-       the three columns sit together in the middle, so the spare width falls
-       at the two edges and not as holes between the parts */
+  /* super-wide screens (32:9): news in a column beside the office, which takes the hero's full height. A maximised
+     21:9 browser (3440 x 1305, about 2.6:1) keeps the news under the office (owner, November 10, 2026); a
+     maximised 32:9 one is about 3.9:1, so this starts between the two. */
+  @media (aspect-ratio >= 16 / 5) {
     .hero-grid {
-      grid-template-columns: minmax(0, 34rem) auto 24rem;
+      --hero-stage-h: var(--hero-inner);
+
+      grid-template-columns: minmax(0, 34rem) minmax(0, calc(var(--hero-stage-h) * 40 / 31)) 24rem;
       grid-template-rows: minmax(0, 1fr);
       grid-template-areas: 'menu stage dock';
       column-gap: var(--sp-6);
-      justify-content: center;
-    }
-    /* the hero's own height, written out: the grid's height is only a floor, so 100% of it wouldn't resolve */
-    .hero-art .stage {
-      aspect-ratio: 40 / 31;
-      height: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
     }
     .hero-menu {
       margin-right: var(--sp-6);
