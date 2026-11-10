@@ -15,7 +15,7 @@ hero:
   accent: always online # second line, emphasized
   lead: 'We manage the technology behind your business: help desk, security, AI solutions, network and communications.'
   cta: Get started
-  ctaNote: Free check-up. No contract to look.
+  ctaNote: Free check-up. No contract needed.
   menu: Services # the list under the button
   allServices:
     title: All services
