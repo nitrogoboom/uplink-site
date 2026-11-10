@@ -1,5 +1,6 @@
 # Build and check on every push and pull request: the build once (dist), beside it types, the build scripts' tests and
-# lint (static), then the built site in a browser, split across three runners (verify: the site check, plus the link
+# lint (static), then a few browser tests on every run (core: npm run verify:core, a CSS or markup change too), and
+# when the change calls for it the built site in a browser, split across three runners (verify: the site check, plus the link
 # check and the header check, Playwright Test in checks/; on a pull request also a screenshot comparison with the live
 # site, visual-diff). The build job is the gate over all of them, the required check on main. Deploy to the Cloudflare
 # Worker on main only if all of that passed, and then only a version that passes the smoke check at its own address
@@ -42,7 +43,7 @@ concurrency:
 jobs:
   # Draft mode (CLAUDE.md, "Checking a change"): the browser checks (verify, visual-diff) run on a pull request only
   # when it touches what they guard (scripts, the Worker, headers, the checks, workflows, dependencies, config) or
-  # carries the "full-checks" label; a copy or CSS change gets the build, static and a preview. A push to
+  # carries the "full-checks" label; a copy or CSS change gets the build, static, the core and a preview. A push to
   # main doesn't run them again: its pull request did, and the deploy's own smoke check and rollback stay.
   # "Run workflow" (workflow_dispatch) runs everything.
   scope:
@@ -129,6 +130,56 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run lint
+
+  # the core, on every run that builds (every pull request but a docs-only one, and every push to main): the site
+  # check's tests tagged @core (checks/site.spec.mjs: no script error or CSP block, no sideways scroll at 390 and 1280,
+  # axe in both themes, the path without script, pop-ups closing), against the built site served by wrangler dev.
+  # About 35 s of tests. The gate (build) needs it to pass
+  core:
+    needs: [dist, scope]
+    if: needs.scope.outputs.docs != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # about 2 minutes
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist
+      - id: pw
+        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
+      - id: pw-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
+      - if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - name: Run the core browser tests
+        run: |
+          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
+          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
+          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
+          npm run verify:core
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+      - if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: core-check
+          path: |
+            out/test-results
+            wrangler.log
+          retention-days: 7
 
   # open the built site in a browser, served the way Cloudflare serves it (headers, CSP, 404), before anything
   # deploys: the site check (checks/site.spec.mjs) fails on a script error, a CSP block, a dead hero or Grow section,
@@ -240,11 +291,11 @@ jobs:
           retention-days: 14
 
   # the gate, under the name the ruleset on main requires (`build`), and what deploy waits for. It passes
-  # only when the build, the static checks, every verify shard and, on a pull request, the screenshot comparison
+  # only when the build, the static checks, the core, every verify shard and, on a pull request, the screenshot comparison
   # passed; a failed, cancelled or skipped one fails it. always(), so it reports even when one of them failed (a
   # skipped required check would count as passed)
   build:
-    needs: [scope, dist, static, verify, visual-diff]
+    needs: [scope, dist, static, core, verify, visual-diff]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -257,7 +308,7 @@ jobs:
           # A docs-only pull request skips everything after scope and passes here
           [ "$SCOPE" = success ] || { echo "::error::scope: $SCOPE"; exit 1; }
           if [ "$DOCS" = true ]; then echo "docs only: nothing to build"; exit 0; fi
-          for r in "dist=$DIST" "static=$STATIC"; do
+          for r in "dist=$DIST" "static=$STATIC" "core=$CORE"; do
             [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
           done
           for r in "verify=$VERIFY" "visual-diff=$VISUAL"; do
@@ -268,6 +319,7 @@ jobs:
           DOCS: ${{ needs.scope.outputs.docs }}
           DIST: ${{ needs.dist.result }}
           STATIC: ${{ needs.static.result }}
+          CORE: ${{ needs.core.result }}
           VERIFY: ${{ needs.verify.result }}
           VISUAL: ${{ needs.visual-diff.result }}
       # a push to main that can't deploy fails, after the checks above have had their say

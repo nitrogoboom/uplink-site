@@ -2,7 +2,9 @@
 // everything, other pages the per-page checks at phone size; each review-bug test names its item. What it checks:
 // README, "Site checks". Known failures are marked test.fail with the item that fixes them (KNOWN, below).
 // usage: npm run build && npm run serve   (wrangler dev on 8787)   then   npm run verify [-- --all] [--base URL] [--out DIR]
-// Screenshots go to out/ (--out): the footer tiles at 1440, and Home and /soon at each size.
+// Screenshots go to out/ (--out): Home and /soon at each size.
+// The core (npm run verify:core; CI runs it on every pull request): the tests tagged @core (CORE, below). The tests
+// that pinned today's layout are parked in checks/parked/, which nothing runs.
 import { createHash } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -22,172 +24,21 @@ const full = (page) => ALL || FOCUS.has(page);
 // the site's words the checks look for (src/data/copy/en/*.yaml), so a rewrite of the copy doesn't break them
 const UI = copy('ui');
 const GROW = copy('home').grow;
-
-test('index 1440: hero, Grow, footer tiles', async ({ browser }) => {
-  const fails = [];
-  const errs = [];
-  const rep = [];
-  const pg = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  watch(pg, 'index 1440 (hero, grow, footer)', errs);
-  await pg.goto(BASE + '/');
-  await pg.waitForTimeout(5500);
-  // hover a tile three along from the one showing, so the cloud's own timer can't have got there first
-  const tiles = await pg.$$eval('.ob-tile', (t) => t.map((x) => [x.dataset.tile, x.classList.contains('is-on')]));
-  const on = Math.max(
-    0,
-    tiles.findIndex(([, o]) => o),
-  );
-  const want = tiles[(on + 3) % tiles.length][0];
-  const before = await pg.$eval('.ob-app', (e) => e.textContent);
-  await pg.locator(`.ob-tile[data-tile="${want}"]`).first().hover({ force: true });
-  await pg.waitForTimeout(500);
-  const after = await pg.$eval('.ob-app', (e) => e.textContent);
-  const lit = await pg.$eval(`.ob-tile[data-tile="${want}"]`, (e) => e.classList.contains('is-on'));
-  rep.push(`hero tile hover (${want}): ${before} -> ${after}`);
-  if (!lit || after === before) fails.push(`hero: hovering the ${want} tile did not show it (${before} -> ${after})`);
-  // the Grow section plays on its own once it's on screen (a step every 4.5 s): a few seconds in, its first steps are
-  // built; then the last dot jumps to the end, where every part shows
-  await pg.$eval('#grow', (e) => e.scrollIntoView());
-  await pg.waitForTimeout(6000);
-  const probe = () => {
-    const pcs = [...document.querySelectorAll('#grow .pc')];
-    const on = document.querySelector('#grow .grow-dot[aria-current="step"]');
-    return {
-      built: pcs.filter((p) => !p.classList.contains('hide')).length,
-      total: pcs.length,
-      step: on ? Number(on.dataset.i) : -1,
-    };
-  };
-  let g = await pg.evaluate(probe);
-  rep.push(`grow playing: step ${g.step + 1}, ${g.built} of ${g.total} parts built`);
-  if (g.total === 0 || g.built === 0 || g.step < 1)
-    fails.push(`grow: didn't play on its own (step ${g.step + 1}, ${g.built} of ${g.total} parts built)`);
-  await pg.locator('#grow :is(.grow-dot, .grow-item):visible').last().click(); // the last step: the list on desktop, the dots below
-  await pg.waitForTimeout(300);
-  g = await pg.evaluate(probe);
-  rep.push(`grow last dot: step ${g.step + 1}, ${g.built} of ${g.total} parts`);
-  if (g.built !== g.total) fails.push(`grow: the last dot left ${g.total - g.built} parts unbuilt`);
-  // footer behaviour on home at 1440
-  await pg.$eval('#footer', (e) => e.scrollIntoView());
-  await pg.waitForTimeout(400);
-  // the map is fetched as the footer comes near (footer.js): wait for it, as a slow CI machine can take over a second
-  await pg
-    .waitForSelector('svg.fc-w', { state: 'attached', timeout: 15000 })
-    .catch(() => fails.push('footer: the campus map never loaded'));
-  // review M6: the map is decoration (the footer's own words say what it shows), so the inserted map stays out of the
-  // accessibility tree: aria-hidden, no role or name, and nothing of it in the map box's tree but the hold button
-  const mapA11y = await pg
-    .$eval('svg.fc-w', (s) => ['aria-hidden', 'role', 'aria-label'].map((a) => `${a}=${s.getAttribute(a)}`).join(' '))
-    .catch(() => '');
-  const mapTree = await pg
-    .locator('.fc-map')
-    .ariaSnapshot()
-    .catch(() => '');
-  if (mapA11y && (mapA11y !== 'aria-hidden=true role=null aria-label=null' || /\bimg\b/.test(mapTree)))
-    fails.push(
-      `footer: the campus map is in the accessibility tree (${mapA11y}; tree: ${mapTree.replace(/\s+/g, ' ')}) (review M6)`,
-    );
-  // each tile (a <details>' summary, Footer.astro) opens its section: one screen tall, its panel above the tile row
-  // and not cut off, and the map's label and camera move to its spot
-  const fcTiles = pg.locator('.fc-tile');
-  const n = await fcTiles.count();
-  if (n !== 6) fails.push(`footer: ${n} tiles (.fc-tile), not 6`);
-  const seen = { hud: new Set(), vb: new Set() };
-  for (let i = 0; i < n; i++) {
-    await fcTiles.nth(i).click();
-    await pg.waitForTimeout(850);
-    const info = await pg.evaluate(() => {
-      const f = document.getElementById('footer');
-      const open = [...document.querySelectorAll('.fc-sec[open]')];
-      const p = open[0]?.querySelector('.fc-panel');
-      const r = p ? p.getBoundingClientRect() : null;
-      const hud = [...document.querySelectorAll('.fc-hud-l')].filter((e) => e.getClientRects().length);
-      return {
-        h: f.offsetHeight,
-        fold: innerHeight - document.querySelector('.site-header').offsetHeight,
-        open: open.map((d) => d.id),
-        map: open[0]?.dataset.map,
-        panelH: r ? Math.round(r.height) : 0,
-        over: p
-          ? Math.max(
-              p.scrollHeight - p.clientHeight,
-              Math.ceil(r.bottom - document.querySelector('.fc-tile').getBoundingClientRect().top),
-            )
-          : 0,
-        hud: hud.map((e) => e.querySelector('b').textContent).join(' | '),
-        vb: document.querySelector('svg.fc-w')?.getAttribute('viewBox'),
-      };
-    });
-    rep.push(`tile ${i}: ${JSON.stringify(info)}`);
-    if (info.open.length !== 1 || info.panelH < 50)
-      fails.push(`footer tile ${i} at 1440: open ${JSON.stringify(info.open)}, panel ${info.panelH}px tall`);
-    if (Math.abs(info.h - info.fold) > 1)
-      fails.push(`footer tile ${i} at 1440: ${info.h}px tall, the screen below the header is ${info.fold}px`);
-    if (info.over > 0) fails.push(`footer tile ${i} at 1440: panel overflows by ${info.over}px`);
-    seen.hud.add(info.hud);
-    seen.vb.add(info.vb);
-    await pg.screenshot({ path: join(OUT, `f-1440-${i}.png`) });
-  }
-  if (seen.hud.size !== n || [...seen.hud].some((h) => !h || h.includes('|')))
-    fails.push(`footer: the map's label didn't name one spot per section: ${[...seen.hud].join(' / ')}`);
-  if (seen.vb.size !== n)
-    fails.push(`footer: the map's camera didn't move to each section's spot (${seen.vb.size} views for ${n} sections)`);
-  // shut the open one: Contact opens again (footer.js), shows, and its tile looks picked
-  await fcTiles.nth(n - 1).click();
-  await pg.waitForTimeout(500);
-  const none = await pg.evaluate(() => {
-    const p = document.querySelector('.fc-sec:first-of-type .fc-panel');
-    return {
-      open: [...document.querySelectorAll('.fc-sec[open]')].map((d) => d.id),
-      contact: p.getBoundingClientRect().height,
-      tile: getComputedStyle(document.querySelector('.fc-tile')).borderTopWidth,
-    };
-  });
-  rep.push(`after shutting the open section: ${JSON.stringify(none)}`);
-  if (none.open.join() !== 'fc-contact' || none.contact < 50 || none.tile !== '2px')
-    fails.push(`footer after shutting the open section doesn't show Contact, open and picked: ${JSON.stringify(none)}`);
-  await pg.close();
-  console.log(rep.join('\n'));
-  verdict([...fails, ...errs]);
-});
-
-// header fit: at every 10px from 320 to 1440 (and four wider screens), the tabs keep 8px clear of the logo and the
-// buttons and don't scroll, and nothing scrolls sideways. Room for a new header button has to be made in
-// bottom-nav.css (its measured rules), not found here later.
-test('header fit', async ({ browser }) => {
-  const fails = [];
-  const q = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await q.goto(url('about'));
-  let worst = null;
-  const widths = [...Array.from({ length: 113 }, (_, i) => 320 + i * 10), 1600, 1920, 2560, 3440];
-  for (const w of widths) {
-    await q.setViewportSize({ width: w, height: 900 });
-    await q.waitForTimeout(60);
-    const r = await q.evaluate(() => {
-      const t = document.querySelector('.tabs'),
-        u = t.querySelector('ul').getBoundingClientRect(),
-        b = document.querySelector('.brand').getBoundingClientRect(),
-        a = document.querySelector('.hdr-actions').getBoundingClientRect();
-      const on = getComputedStyle(t).display !== 'none';
-      return {
-        room: Math.round(on ? Math.min(u.left - b.right, a.left - u.right) : a.left - b.right),
-        cut: on ? t.scrollWidth - t.clientWidth : 0,
-        side: document.documentElement.scrollWidth - innerWidth,
-      };
-    });
-    if (worst === null || r.room < worst[1]) worst = [w, r.room];
-    if (r.room < 8 || r.cut > 0 || r.side > 0)
-      fails.push(`header at ${w}px: ${r.room}px room, tabs cut ${r.cut}px, sideways ${r.side}px`);
-  }
-  console.log(`header fit: tightest ${worst[1]}px at ${worst[0]}px wide`);
-  await q.close();
-  verdict(fails);
-});
+// the core: a few tests on Home that every pull request runs, a CSS or markup one too (the core project in
+// checks/playwright.config.mjs runs the tag): no script error or CSP block (Home phone and 1440), no sideways scroll at
+// 390 and 1280, axe in the dark theme with every pop-up opened and shut with Esc (pop-ups, phone and 1440) and in the
+// light one on every page (theme), the path with page scripts blocked or off, and close buttons
+const CORE = new Set([
+  ...['index phone', 'index 1440', 'sideways index 390', 'sideways index 1280'],
+  ...['pop-ups index phone', 'pop-ups index 1440'],
+]);
+const CORE_ONLY = { tag: '@core' };
+const core = (name) => (CORE.has(name) ? CORE_ONLY : { tag: [] });
 
 // each page at its sizes (each in its own tab, so they can't disturb each other)
 for (const page of PAGES) {
   for (const { n, w, h } of full(page) ? SIZES : SIZES.slice(0, 1)) {
-    test(`${page} ${n}`, async ({ browser }) => {
+    test(`${page} ${n}`, core(`${page} ${n}`), async ({ browser }) => {
       const errs = [];
       const fails = [];
       const q = await browser.newPage({ viewport: { width: w, height: h } });
@@ -275,7 +126,7 @@ const WIDE = () =>
 const KNOWN = {};
 for (const page of PAGES) {
   for (const width of WIDTHS) {
-    test(`sideways ${page} ${width}`, async ({ browser }) => {
+    test(`sideways ${page} ${width}`, core(`sideways ${page} ${width}`), async ({ browser }) => {
       const known = KNOWN[`${page} ${width}`];
       test.fail(!!known, known);
       const q = await browser.newPage({ viewport: { width, height: 800 } });
@@ -343,7 +194,7 @@ for (const page of PAGES) {
   for (const { n, w, h } of full(page) ? [SIZES[0], SIZES[2]] : [SIZES[0]]) {
     for (const held of [false, true]) {
       const name = `pop-ups ${page} ${n}${held ? ', paused' : ''}`;
-      test(name, async ({ browser }) => {
+      test(name, core(name), async ({ browser }) => {
         const fails = [];
         const errs = [];
         const rep = [];
@@ -1058,9 +909,9 @@ test('page toasts: shown on the page, not in a closed pop-up (B6)', async ({ bro
 // focus goes back to the gear. With script off altogether the gear stays hidden (header.css: the one setting needs
 // script), and the Book links stay links that go to the form on /contact. With script, the close buttons give focus
 // back to whatever opened the pop-up (core.js keeps the opener in a WeakMap).
-test('pop-ups before or without script: Settings opens and closes, focus goes back; Book links reach the form (J8)', async ({
-  browser,
-}) => {
+const NO_SCRIPT =
+  'pop-ups before or without script: Settings opens and closes, focus goes back; Book links reach the form (J8)';
+test(NO_SCRIPT, CORE_ONLY, async ({ browser }) => {
   const fails = [];
   const rep = [];
   const blocked = await browser.newContext({ viewport: { width: 1440, height: 900 } });
@@ -1140,7 +991,7 @@ test('pop-ups before or without script: Settings opens and closes, focus goes ba
 // J8 follow-up: with script, a pop-up's close button (Settings' is also command="close") shuts it once. core.js closes
 // it and cancels the command; the command running after it made Chromium warn "A command attempted to close an
 // already closed Dialog" on every click. No console warning or error from opening and closing either pop-up.
-test('pop-ups: a close button closes once, with nothing in the console (J8)', async ({ browser }) => {
+test('pop-ups: a close button closes once, with nothing in the console (J8)', CORE_ONLY, async ({ browser }) => {
   const fails = [];
   const { ctx, q, errs } = await home(browser);
   const said = [];
@@ -1914,7 +1765,7 @@ test('services row on a touch screen at desktop size: one screen, no bar in sigh
 // arrow keys applies at once, is saved, survives a reload and reaches another open tab; the browser's bar colour
 // follows; each picture shows only its theme's copy and only that copy is fetched; and axe passes on every page in
 // light, at phone and desktop size, with Settings open on Home.
-test('theme: System, Light and Dark in Settings; light passes axe on every page', async ({ browser }) => {
+test('theme: System, Light and Dark in Settings; light passes axe on every page', CORE_ONLY, async ({ browser }) => {
   const fails = [];
   const page_bg = (q) => q.evaluate(() => getComputedStyle(document.body).backgroundColor);
   const state = (q) =>
@@ -2263,163 +2114,3 @@ for (const page of PAGES) {
     verdict(fails);
   });
 }
-
-// C1 (layout phase 4: text in rem, the room round it from the screen). Home on desktop windows people use: the hero's
-// menu and news cards are on the first screen. The hero's news cards at 1100 to 1240 wide (where the
-// office column is narrowest): no word in a card split across lines, and the words and tag inside the card. The footer
-// map's label sits on the drawing's base, not in empty space under it.
-const FIRST = [
-  [1100, 700],
-  [1100, 800],
-  [1165, 800],
-  [1280, 720],
-  [1280, 800],
-  [1366, 768],
-  [1440, 900],
-  [1470, 956],
-  [1536, 864],
-  [1920, 1080],
-  [2560, 1440],
-  [3440, 720],
-  [3440, 900],
-  [3440, 1080],
-  [3440, 1440],
-];
-test('Home: hero menu and news cards on the first screen (C1)', async ({ browser }) => {
-  const fails = (
-    await lanes(FIRST, 4, async ([w, h]) => {
-      const q = await browser.newPage({ viewport: { width: w, height: h } });
-      await q.goto(url('index'));
-      await q.waitForLoadState('networkidle');
-      await q.evaluate(() => document.fonts.ready);
-      const r = await q.evaluate(() => {
-        const out = [];
-        for (const sel of ['.hero-menu .menu li:last-child', '.hero-cta', '.hero-dock']) {
-          const e = document.querySelector(sel);
-          if (!e || !e.getClientRects().length) continue;
-          const b = e.getBoundingClientRect().bottom;
-          if (b > innerHeight + 1)
-            out.push(`${sel} ends at ${Math.round(b)}px, below the first screen (${innerHeight}px)`);
-        }
-        return out;
-      });
-      await q.close();
-      return r.length ? `${w}x${h}: ${r.join('; ')}` : null;
-    })
-  ).filter(Boolean);
-  verdict(fails);
-});
-test('Home: hero news cards whole at 1100 to 1240 wide (C1)', async ({ browser }) => {
-  const jobs = [800, 900, 1080].flatMap((h) => [1100, 1120, 1140, 1160, 1180, 1200, 1220, 1240].map((w) => [w, h]));
-  const fails = (
-    await lanes(jobs, 4, async ([w, h]) => {
-      const q = await browser.newPage({ viewport: { width: w, height: h } });
-      await q.goto(url('index'));
-      await q.evaluate(() => document.fonts.ready);
-      const r = await q.evaluate(() => {
-        const out = [];
-        for (const card of document.querySelectorAll('.hero-dock .news')) {
-          const c = card.getBoundingClientRect();
-          for (const el of card.querySelectorAll('.news-title, .news-tag, .news-text p')) {
-            const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-            for (let t; (t = tw.nextNode());) {
-              for (const m of t.data.matchAll(/[^\s-]+-?/g)) {
-                const g = document.createRange();
-                g.setStart(t, m.index);
-                g.setEnd(t, m.index + m[0].length);
-                const rects = [...g.getClientRects()].filter((x) => x.width);
-                if (new Set(rects.map((x) => Math.round(x.top))).size > 1) out.push(`"${m[0]}" split across lines`);
-                for (const x of rects)
-                  if (x.right > c.right + 1 || x.left < c.left - 1) out.push(`"${m[0]}" cut by its card`);
-              }
-            }
-          }
-        }
-        return [...new Set(out)];
-      });
-      await q.close();
-      return r.length ? `${w}x${h}: ${r.join(', ')}` : null;
-    })
-  ).filter(Boolean);
-  verdict(fails);
-});
-test('footer map: its label on the drawing (C1)', async ({ browser }) => {
-  const fails = [];
-  for (const [w, h] of [
-    [1440, 900],
-    [1920, 1080],
-    [2560, 1440],
-    [3440, 1440],
-  ]) {
-    const q = await browser.newPage({ viewport: { width: w, height: h } });
-    await q.goto(url('contact'));
-    await q.$eval('#footer', (e) => e.scrollIntoView());
-    await q.waitForFunction(() => document.querySelector('.fc-map > svg'));
-    await q.waitForTimeout(1500); // the camera settles on the open section's spot
-    const r = await q.evaluate(() => {
-      const m = document.querySelector('.fc-map'),
-        vb = m.querySelector(':scope > svg').viewBox.baseVal,
-        b = m.getBoundingClientRect();
-      const drawn = vb.height * Math.min(b.width / vb.width, b.height / vb.height); // drawn centred, its whole shape shown
-      return { gap: b.top + (b.height + drawn) / 2 - document.querySelector('.fc-hud').getBoundingClientRect().bottom };
-    });
-    await q.close();
-    if (Math.abs(r.gap) > 4)
-      fails.push(
-        `${w}x${h}: the map label sits ${Math.round(Math.abs(r.gap))}px ${r.gap > 0 ? 'above' : 'below'} the drawing's base`,
-      );
-  }
-  verdict(fails);
-});
-
-// B19, B7: Contact's queue ring holds its words. "1 day" stays on one line, and it and the label sit inside the
-// ring's stroke (the drawing's circle of radius 64 in 168: r 70, stroke 12; each line by its letters' height, 0.35em
-// either side of its middle), at the desktop widths where the review saw it break, and with WCAG 1.4.12 text spacing.
-const SPACING =
-  '* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }';
-test('queue ring: its words inside the ring, with text spacing too (B19, B7)', async ({ browser }) => {
-  const fails = [];
-  for (const w of [1100, 1280, 1440, 1920]) {
-    for (const spacing of [false, true]) {
-      const ctx = await browser.newContext({ viewport: { width: w, height: 900 }, bypassCSP: spacing });
-      const q = await ctx.newPage();
-      await q.goto(url('contact'));
-      if (spacing) await q.addStyleTag({ content: SPACING });
-      await q.evaluate(() => document.fonts.ready);
-      const r = await q.evaluate(() => {
-        const ring = document.querySelector('.queue-ring'),
-          box = ring.getBoundingClientRect();
-        const cx = box.left + box.width / 2,
-          cy = box.top + box.height / 2,
-          rad = (box.width * 64) / 168;
-        const out = [],
-          val = ring.querySelector('.stat-val');
-        const lines = new Set([...val.getClientRects()].map((x) => Math.round(x.top))).size;
-        if (lines > 1) out.push(`"${val.textContent}" on ${lines} lines`);
-        for (const el of ring.querySelectorAll('.queue-ring-label > span:not(.sr-only)')) {
-          const range = document.createRange();
-          range.selectNodeContents(el);
-          const half = parseFloat(getComputedStyle(el).fontSize) * 0.35;
-          const far = Math.max(
-            ...[...range.getClientRects()]
-              .filter((x) => x.width)
-              .flatMap((x) => {
-                const mid = (x.top + x.bottom) / 2;
-                return [x.left, x.right].flatMap((px) =>
-                  [mid - half, mid + half].map((py) => Math.hypot(px - cx, py - cy)),
-                );
-              }),
-          );
-          if (far > rad + 0.5)
-            out.push(
-              `"${el.textContent.trim()}" reaches ${far.toFixed(1)}px from the centre, past the stroke at ${rad.toFixed(1)}px`,
-            );
-        }
-        return out;
-      });
-      await ctx.close();
-      fails.push(...r.map((x) => `contact at ${w}${spacing ? ' with text spacing' : ''}: ${x}`));
-    }
-  }
-  verdict(fails);
-});
