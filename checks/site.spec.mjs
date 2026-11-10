@@ -673,14 +673,14 @@ test('hero: paused, the drawing shows built on load and after a resize', async (
     if (!ok) return fails.push(`${name}: the ${phone ? 'phone' : 'wide'} cut never arrived`);
     if (phone) {
       const caps = await q
-        .waitForFunction(() => document.querySelectorAll('.stage[data-hero] .ob-cap-lead.is-draw').length === 2, null, {
+        .waitForFunction(() => document.querySelectorAll('.stage[data-hero] .hero-cap.is-on').length === 2, null, {
           timeout: 6000,
         })
         .then(
           () => true,
           () => false,
         );
-      if (!caps) fails.push(`${name}: the two captions never drew`);
+      if (!caps) fails.push(`${name}: the two captions never showed`);
     }
     await q.waitForTimeout(200);
     const r = await q.evaluate(() => {

@@ -189,7 +189,7 @@
   --loop-grow-ring: 3s;
   --loop-grow-rim: 2.4s;
 
-  /* ---- home hero captions on phones (home.js draws them at these sizes on screen) -- */
+  /* ---- home hero captions on phones (hero.css, .hero-cap) -- */
   /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
      under --fs-8 so the hero fits one screen; wider, a share of the window up to --fs-8. All vw, no negative rem part,
      so a narrower window at zoom never makes it smaller on screen (review C1) */
@@ -198,28 +198,14 @@
   --cap-sub: var(--fs-2);
   --cap-edge: var(--sp-3); /* words to the drawing's edge */
   --cap-gap: var(--sp-1); /* title to subline; line to words */
-  --cap-line: 1.75px;
-  --cap-dot: 4.5px;
-  --cap-halo: 4px; /* page-colour edge round the words, so lines under them break cleanly */
+  --cap-dot: 4.5px; /* a dot's radius, on the drawing and beside the title */
+  --cap-halo: 4px; /* page-colour edge round the words and the dots, so lines under them break cleanly */
   --cap-tracking: 0.06em; /* as the drawings' own labels (tools/gen_*.py) */
 
   /* ---- layers ---------------------------------------------------------- */
   --z-header: 30;
   --z-botnav: 30;
   --z-toast: 60;
-}
-
-/* the hero captions' sizes are read as numbers by home.js. They are registered as lengths, so the browser works
-   them out to plain px for it */
-@property --cap-title {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0;
-}
-@property --cap-sub {
-  syntax: '<length>';
-  inherits: true;
-  initial-value: 0;
 }
 
 /* breakpoints: phone < 700, tablet 700-1099, desktop >= 1100 (named in src/lib/media.js) */
