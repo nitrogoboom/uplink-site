@@ -41,7 +41,7 @@ Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a 
 
 ## Styles
 
-`styles/global.css` imports in cascade order: tokens and themes, base and type; shared parts (header, buttons, surfaces, forms, dialogs, footer, tab bar); `shared-blocks.css`, `fold.css`, `compact-cuts.css`; multi-page blocks; `page-transitions.css`, `print.css`. Tokens: `styles/tokens.css` (dark), `theme-light.css`, `theme-drawings.css` (generated).
+`styles/global.css` imports in cascade order: tokens and themes, base and type; shared parts (header, buttons, surfaces, forms, dialogs, footer, tab bar); `shared-blocks.css`, `fold.css`, `compact-cuts.css`; multi-page blocks; `motion.css`, `print.css`. Tokens: `styles/tokens.css` (dark), `theme-light.css`, `theme-drawings.css` (generated).
 
 - Theme: `html[data-theme]`, set before paint by `Base.astro`, kept by `core.js`; dark without script.
 - Headings: `min(var(--fs-8|7), var(--fit))` in a `container-type: inline-size` column; `fit(text)` from `lib/fit.js` picks `fit` (a 10+ letter word) or `fit-loose`. Never smaller as zoom grows.

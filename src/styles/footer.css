@@ -162,7 +162,7 @@
 /* a row's panel grows open and shrinks shut: the details' content box animates its height to and from auto
    (interpolate-size: Chrome; elsewhere it opens at once), as the links fade and settle in; shutting is a little
    quicker. Only the height is clipped, so a link's hover box still reaches past its text. With reduced motion a row
-   opens and shuts at once (no transition at all, not the near-zero one in page-transitions.css). Phones only: tiles (below) place
+   opens and shuts at once (no transition at all, not the near-zero one in motion.css). Phones only: tiles (below) place
    the same box in the stage. */
 @media (--phone) and (prefers-reduced-motion: no-preference) {
   @supports selector(::details-content) {
