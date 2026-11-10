@@ -1,13 +1,14 @@
 ---
-// HOME · 2. Services, laid out like a game-mode menu: the featured services are tall cards, then SLOTS short tiles;
-// the last short tile is always "All services", a link to the Services page. Phones get the same cards in one
-// swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it. Styles: services.css (imported here). Desktop layout: at the end of its CSS.
+// HOME · 2. Services, laid out like a game-mode menu: the three featured services are tall cards, then SLOTS short
+// tiles; the last short tile is always "All services", a link to the Services page. The first service that isn't
+// featured (Cloud workspace) is in the hero's menu instead (Hero.astro), so the short tiles start after it. Phones get
+// the same cards in one swipe row (home.js lights the dots); with a mouse, arrows beside the dots step through it.
+// Styles: services.css (imported here). Desktop layout: at the end of its CSS.
 // A tile is a box whose link (.svc-link) holds its chip, title and line, and its ::after covers the whole tile, so a
 // click anywhere opens it (as the project cards do). The link reads "Support. Managed help desk. Real people… View
 // service": the chip and "View service" are heard too, so the name starts with the word the eye reads first and voice
-// control finds it (review M10); the "View service" bar is its picture (aria-hidden). A tall card also lists its
-// service's three features (`features`, the copy its own page shows) outside the link, so they are read as a list and
-// not as part of its name (release audit, November 9, 2026); on desktop only, where it has the room.
+// control finds it (review M10); the "View service" bar is its picture (aria-hidden). A card's features are on its
+// own page only (owner, November 10, 2026).
 import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
 import Pause from '../Pause.astro';
@@ -15,13 +16,13 @@ import './services.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import { copy } from '../../lib/copy';
-const SLOTS = 4;
+const SLOTS = 3;
 const t = (await copy('home')).services;
 const TITLE = t.title;
 const MORE = t.more;
 const services = await getServices();
-// services.css lays out exactly three tall cards (four columns each on tablet, a column each on desktop), so a
-// different count stops the build here instead of leaving a broken grid
+// services.css lays out exactly three tall cards and three short tiles (a row of three each on tablet, three columns
+// beside a column of three on desktop), so a different count stops the build here instead of leaving a broken grid
 const featured = services.filter((s) => s.data.featured);
 if (featured.length !== 3)
   throw new Error(
@@ -31,7 +32,7 @@ const tiles = [
   ...featured.map((s) => ({ ...s, size: 'big' })),
   ...services
     .filter((s) => !s.data.featured)
-    .slice(0, SLOTS - 1)
+    .slice(1, SLOTS) // the first is in the hero's menu
     .map((s) => ({ ...s, size: 'small' })),
 ];
 ---
@@ -56,12 +57,7 @@ const tiles = [
             <a class="svc-link" href={`/services/${id}`}
               ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
               ><Pause /><span class="svc-line">{s.card}</span><span class="sr-only"> {t.view}</span></a
-            >{size === 'big' && <ul class="svc-feats">
-              {s.features.map((f) => <li class="svc-feat">
-                <span class="svc-feat-t">{f.title}</span><span class="sr-only">: </span
-                ><span class="svc-feat-d">{f.detail}</span>
-              </li>)}
-            </ul>}
+            >
           </div>
           <span class="svc-go" aria-hidden="true">{t.view}<Icon name="chevronR" /></span>
         </div>

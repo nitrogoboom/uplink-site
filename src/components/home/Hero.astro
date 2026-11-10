@@ -14,8 +14,7 @@ import '../../styles/theme-drawings.css';
 import './hero.css';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
-import { HERO, PAGES, getServices } from '../../lib/site';
-import type { IconName } from '../Icon.astro';
+import { HERO, getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
@@ -38,17 +37,12 @@ const news = [
     ...t.news.windows,
   },
 ];
-// the menu under the button: the featured services (each its own page), then all of them. A list, not a <nav>:
-// the header holds the one main menu.
-const featured = (await getServices()).filter((s) => s.data.featured);
-const menu = [
-  ...featured.map(({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card })),
-  {
-    href: PAGES.services.path,
-    icon: 'grid' as IconName,
-    ...t.allServices,
-  },
-];
+// the menu under the button: the featured services, then the first of the rest (Cloud workspace, by order), each its
+// own page. Services.astro starts its short tiles after that one. A list, not a <nav>: the header holds the one main menu.
+const services = await getServices();
+const menu = [...services.filter((s) => s.data.featured), services.filter((s) => !s.data.featured)[0]].map(
+  ({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card }),
+);
 const still = t.alt;
 ---
 

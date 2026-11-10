@@ -102,7 +102,6 @@ export const home = obj({
     cta: text,
     ctaNote: text,
     menu: text,
-    allServices: texts('title', 'sub'),
     alt: text,
     news: obj({ checkup: texts('tag', 'title', 'line'), windows: texts('tag', 'title', 'line') }),
   }),
