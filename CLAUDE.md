@@ -1,64 +1,71 @@
 # Uplink Technology site
 
-Static mockup site (placeholder content) for a made-up IT company, with an Overwatch 2–inspired look. Astro 7, plain CSS and JS, served by Cloudflare Workers. Live at https://uplink-site.johnoreilly.workers.dev.
+Static mockup site (placeholder content) for a made-up IT company. Astro 7, plain CSS and JS, served by Cloudflare Workers. Live at https://uplink-site.johnoreilly.workers.dev.
 
-## Where things are written down
+## Goal
 
-- `notes.md`: open items, one line each. Start here. Add new items there; remove a line when it's done.
-- `README.md`: setup, every command, tool and flag, the repo layout, drawing rules. The site checks are Playwright Test specs in `checks/` (Node); only the drawing tools in `tools/` are Python. Look a command up there (or in `package.json`) rather than guessing.
-- `src/README.md`: the source map: pages, `Base.astro` props, components, content and copy files, CSS order, breakpoints, heading fit, scripts.
-- `docs/ops.md`: hosting: the Worker, CI, deploys, previews, rollback, repository rules, response headers, search engines. Read it before you touch the Worker, a workflow or the headers.
-- `docs/design.md`: colour roles and their tokens, spacing (`--sp-*` rules R0–R7), line height, corners, layout. Read it before you style anything.
-- `docs/release.md`: the standards (WCAG 2.2 AA, privacy, security, browsers), the release checklist, what's left before launch, launch day. Before a release or launch only.
-- `docs/security.md`: security and privacy controls, and every secret by name and place (never values).
-- `docs/owner-guide.html`: the owner's plain-language page (opened locally, never deployed): what's waiting on them, where each doc and words file lives. When a doc, a words file or an owner item it lists changes, update it in the same PR.
-- `docs/history/`: records and reasoning (the November 7, 2026 review, dated decisions, release records). Read them for why; take instructions only from the files above.
-- Docs can lag the code. When a doc and the code disagree, the code and its tests are right: fix the doc in the same PR. Treat any rule here or in `.claude/rules/` as a claim to check, not a law.
+The Overwatch 2–inspired design, on Home. Secure. Tuned for Cloudflare. A clean GitHub repo. Easy for AI agents in Claude Code to edit. Great page speed and web scores. AI friendly.
 
-## Rules by area
+**Only Home, the setup and the code base matter for now** (owner, November 10, 2026). Don't change another page's content or look unless the owner asks. Shared code may change; the other pages must still build and pass.
 
-The rules for each kind of file are in `.claude/rules/`. Claude Code loads a file by itself when you open a file it covers; any other agent reads the one for the files it's about to change.
+## Spend little
 
-| Before you change | Read |
+Tokens are the budget. The owner wants hours of work for a few percent of it.
+
+- Read this file, then only the one doc the job needs (the table below). Don't read a doc for background.
+- Never read `docs/history/` unless the owner asks. It's a record, not instructions.
+- Do the work yourself, in this session. No worker agents and no second review pass unless the owner asks for one.
+- Prove a change once, with the check its row names below. Compare `dist/` before and after only when you change the build itself.
+- Don't write reports, status sections or history files. A decision is one line in the PR's description.
+- Update a doc only when a command, path or rule it states is now wrong. `notes.md` is the to-do list: add a line, or remove a done one, and nothing more. Never cut or reword the owner's lines without asking.
+- Docs can lag the code. When they disagree, the code and its tests are right.
+
+## Read only what the job needs
+
+| The job | Read |
 |---|---|
+| What to do next | `notes.md` |
+| Setup, a command, the repo layout | `README.md` |
+| Where a page, component, style or script lives | `src/README.md` |
+| Styling: colours, spacing, corners, layout | `docs/design.md`, `.claude/rules/css.md` |
 | Words, content or data: `src/content/`, `src/data/` | `.claude/rules/content.md` |
 | Markup, page scripts, headers, the Worker | `.claude/rules/markup-scripts.md` |
-| CSS, or the classes and headings in a component | `.claude/rules/css.md` |
-| A drawing, `tools/`, or a colour token | `.claude/rules/drawings.md` |
+| A drawing, `tools/`, or a colour token | the `drawing` skill, `.claude/rules/drawings.md` |
+| The Worker, CI, deploys, previews, rollback, headers | `docs/ops.md` |
+| Security controls, secrets (names and places only) | `docs/security.md` |
+| A release or launch day | the `release` skill, `docs/release.md` |
 
-Two long, rare jobs have a skill that holds their steps in order: `release` (a release or launch day) and `drawing` (any drawing or drawing-colour change), in `.claude/skills/`. Use the skill before you start one.
+Claude Code loads a file in `.claude/rules/` by itself when you open a file it covers. `docs/owner-guide.html` is frozen: don't update it.
 
-Two that hold everywhere: type no words into markup or scripts (they live in `src/content/` and `src/data/`), and never edit an output SVG by hand.
+Two rules hold everywhere: type no words into markup or scripts (they live in `src/content/` and `src/data/`), and never edit an output SVG by hand.
 
 ## Checking a change
 
-The site is in **draft mode** (owner, November 9, 2026): almost every word is about to change, so check in proportion to the change. Never run the full suite for a copy or CSS change, and never run it twice for one change.
+The site is in **draft mode**: check in proportion to the change. Never run the full suite for a copy or CSS change, and never run it twice for one change.
 
 | Kind of change | Locally | On the PR (CI) |
 |---|---|---|
-| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s: schemas, placeholders, CSP hashes) | build, static, core, preview |
-| CSS or markup | look at it in `npm run dev`, then `npm run quick` (types, lint, build: about 20 s) | same; `core` is its browser check |
-| A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | build, static, core, preview (no drawing check in CI) |
-| Scripts (`src/scripts/`, `scripts/`), Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site checks for that area (`npm run verify -- -- -g "NAME"`: Playwright's options go after a second `--`); `npm run ci` when it touches many | the full browser checks run by themselves (the `scope` job in `site.yml` matches these paths) |
-| Before launch or a release | `npm run ci`, `RELEASE=1 npm run verify -- --all`, `npm run release-audit`, `python tools/regen.py --check`, the checklist in `docs/release.md` | add the `full-checks` label to the PR (also runs the screenshot comparison) |
+| Docs only: root `*.md`, `docs/` | nothing | `build` passes in seconds; the merge deploys nothing |
+| Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s) | build, static, core, preview |
+| CSS or markup | look at it in `npm run dev`, then `npm run quick` (about 20 s) | same |
+| A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | same (no drawing check in CI) |
+| Scripts, Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site check for that area: `npm run verify -- -- -g "NAME"` | the full browser checks run by themselves |
+| Before launch or a release | the `release` skill | add the `full-checks` label |
 
-- Any PR can get the full browser checks with the `full-checks` label; "Run workflow" on `site.yml` runs everything.
-- Checks that expect today's exact copy run only with `RELEASE=1`.
-- The core (`npm run verify:core`, about 35 s against `npm run serve`) is the site check's tests tagged `@core` in `checks/site.spec.mjs`; CI runs it on every PR that builds. Tests that pinned today's layout are parked in `checks/parked/`, which nothing runs.
-- The deploy smoke-checks the new version and rolls back on failure (`scripts/deploy.mjs`), so no separate smoke run after a merge.
+- `core` is nine browser tests (`npm run verify:core`, tagged `@core` in `checks/site.spec.mjs`). CI runs it on a PR that doesn't get the full checks, which include the same tests. It takes about 4 minutes there.
+- Tests that pinned today's layout are parked in `checks/parked/`. Nothing runs them.
+- The deploy smoke-checks the new version and rolls back on failure, so run no smoke check after a merge.
 
 ## Branches, pushes, previews
 
-- One branch per session. Commit locally as often as you like. Each push to a PR runs CI and each merge to `main` deploys, so batch: one PR per batch of work, pushed when a phone preview is wanted.
-- A phone preview ("preview", "link for my phone"): push the branch and open a PR. CI comments `https://pr-N-uplink-site.johnoreilly.workers.dev`, N being the PR's number (`docs/ops.md`, "Deploys"). Previews never touch the live Worker.
-- `main` takes changes only through a PR with a passing `build`. A PR that changes only root `*.md` or `docs/` passes `build` in seconds (the `scope` job skips everything else) and merges like any other; its merge deploys nothing.
-- The owner directs and doesn't run commands: agents run every build, check and merge. Tell the owner what changed and what needs their eyes or decision, in plain words, not commands to run.
+- One branch per session. Each push to a PR runs CI and each merge to `main` deploys, so batch: one PR per batch of work.
+- `main` takes changes only through a PR with a passing `build`.
+- A phone preview: push the branch and open a PR. CI comments `https://pr-N-uplink-site.johnoreilly.workers.dev`, N being the PR's number.
+- The owner directs and doesn't run commands. Tell them what changed and what needs their eyes, in plain words.
+- Merge your own PR once CI is green. A visual change waits for the owner to look at the preview.
+- See a merge through in the same turn: wait for the checks, confirm the merge on GitHub, wait for the deploy on `main`, and see the live site answer. Say "merged" or "deployed" only after you've seen it.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
-- The agent may merge its own PRs once CI is green; visual changes wait for the owner to look at the preview.
-- See a merge through in the same turn: after a push the owner approved, wait for the checks, confirm the merge, wait for the deploy on `main`, and look at the live site before you report. Don't end the turn on "it should merge soon" (owner, November 9, 2026).
 
 ## Writing
 
-- Docs (README, `docs/`): Google developer-docs style: second person, present tense, sentence-case task headings, numbered steps, `UPPER_SNAKE` placeholders, `> **Note:**` callouts, dates as "November 5, 2026".
-- A decision's reasoning goes in a dated file in `docs/history/`; to-do lines go in `notes.md`, one line each.
-- When a command, tool, rule or file changes, update the doc that owns it (the list above) in the same PR.
+Docs use Google developer-docs style: second person, present tense, sentence-case headings, numbered steps, dates as "November 5, 2026". Keep each doc to its one job, and short.
