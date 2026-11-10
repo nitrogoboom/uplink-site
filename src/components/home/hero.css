@@ -365,9 +365,17 @@
   text-transform: uppercase;
   color: var(--c-text);
 }
-/* the cloud's title in the cloud's colour; the office's takes its item's (home.js) */
+/* the cloud's title in the cloud's colour; the office's takes its item's (--cap-c, from home.js). On the light page
+   the drawing's amber and blue are too pale for words (3.1:1 and 4.4:1), so the title takes 70% of the colour and
+   30% of the text colour: about 5:1 and 6.4:1, and still the item's hue. The line and dot keep the full colour */
 .hero-cap--cloud .hero-cap-t {
   color: var(--c-sky);
+}
+.hero-cap--office .hero-cap-t {
+  color: var(--cap-c, var(--c-text));
+}
+:root[data-theme='light'] .hero-cap--office .hero-cap-t {
+  color: color-mix(in sRGB, var(--cap-c, var(--c-text)) 70%, var(--c-text));
 }
 .hero-cap-s {
   font-size: var(--cap-sub);

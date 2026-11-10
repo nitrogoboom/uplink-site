@@ -12,7 +12,7 @@ Needs the owner's eyes on a preview:
 - [ ] Home services on desktop: four variants in `services.css` become one block where the drawing flexes above a floor.
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
-- [ ] Phone hero captions (HTML since #141): in the light theme the amber title is about 3.1:1 and the blue about 4.4:1 against the page, under WCAG's 4.5:1 for text; darken the two for the light theme, or accept. Also look with larger text set on a phone: the two captions grow and could come close.
+- [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.
 - [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
 
 Drawing generators (the owner directs drawing work):

@@ -271,9 +271,11 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     lineTo(sp, x, y, level);
   };
   const redraw = () => aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
-  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes
+  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes.
+  // Handed to hero.css as --cap-c, which darkens it for the light theme so the words pass 4.5:1
   const match = () => {
-    if (at.office >= 0) spots.office.t.style.color = window.getComputedStyle(spots.office.pin[1]).stroke;
+    if (at.office >= 0)
+      spots.office.el.style.setProperty('--cap-c', window.getComputedStyle(spots.office.pin[1]).stroke);
   };
   const write = {
     cloud: () => {
