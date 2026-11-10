@@ -29,10 +29,40 @@
   [data-page='home'] .hero.fold {
     grid-template-rows: minmax(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), auto);
   }
-  [data-page='home'] #proof {
+  /* Home: What clients say and the free check-up share one screen, each on its own ground (owner, November 10, 2026).
+     The reviews take the room the band leaves, centred in it; the band runs full width along the screen's foot, the
+     check-up laid straight on it (no card inside), with the warm light behind its buttons. More words grow the pair
+     past one screen, as any fold. */
+  [data-page='home'] .fold-pair {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    min-height: var(--fold-h);
+  }
+  [data-page='home'] .fold-pair > .fold {
+    flex: 1;
+    grid-template-rows: 1fr; /* never shorter than the reviews: more words grow the pair */
+    min-height: 0;
+    padding-bottom: var(--sp-6); /* the band's top line closes the reviews: less air needed above it */
+  }
+  [data-page='home'] .fold-pair > .section--band {
+    padding-block: var(--sp-5);
+    background: radial-gradient(30% 140% at 88% 50%, var(--c-glow-accent), transparent 70%), var(--c-bg-band);
+  }
+  [data-page='home'] .fold-pair .cta-band {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+  [data-page='home'] .fold-pair .cta-band .lead {
+    max-width: none; /* one line in the strip, not two */
+  }
+  /* under 1080 tall the big review takes a panel's smaller padding, so the pair fits a 1536 x 864 laptop */
+  @media (height < 67.5em) {
+    [data-page='home'] .fold-pair .rev--big {
+      padding: var(--sp-6);
+    }
   }
   /* heading beside its content */
   .split {

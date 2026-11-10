@@ -8,6 +8,7 @@ From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" sectio
 
 Needs the owner's eyes on a preview:
 
+- [ ] What clients say and the free check-up as one desktop screen, each on its own ground (`.fold-pair` in `fold.css`). Fits 1536×864 and up; 1366×768 and 1280×720 still grow past the screen.
 - [ ] Hero: six layouts down to three (stacked, two columns, ultrawide).
 - [ ] Home services on desktop: four variants in `services.css` become one block where the drawing flexes above a floor.
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).

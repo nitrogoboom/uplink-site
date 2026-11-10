@@ -58,8 +58,11 @@ const business = {
   <Services />
   <Grow />
   <Work />
-  <Reviews />
-  <Proof />
+  <!-- What clients say and the free check-up: one screen on desktop, each on its own ground (fold.css) -->
+  <div class="fold-pair">
+    <Reviews />
+    <Proof />
+  </div>
   <Fragment slot="scripts">
     <Words id="words-page" words={{ cloud, grow: { team: grow.team, play: grow.play } } satisfies HomeWords} />
     <script>
