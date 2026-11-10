@@ -124,3 +124,21 @@
     padding: var(--sp-7);
   }
 }
+
+/* desktop, one screen: the check-up card (Proof.astro) a step further from the reviews than they are from each other,
+   so it reads as its own block (owner, November 10, 2026). Under 1440 tall the section's fold padding and the two big
+   cards' padding drop a step, so the reviews and the card fit a 1920 x 1080 screen. */
+@media (--fold) {
+  #reviews .fold-foot {
+    margin-top: var(--sp-7);
+  }
+  @media (height < 90em) {
+    #reviews {
+      --fold-pad: var(--sp-6);
+      --fold-inner: calc(var(--fold-h) - 2 * var(--fold-pad));
+    }
+    #reviews :is(.rev--big, .cta-band) {
+      padding: var(--sp-6);
+    }
+  }
+}

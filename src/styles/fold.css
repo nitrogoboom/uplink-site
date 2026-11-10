@@ -29,34 +29,6 @@
   [data-page='home'] .hero.fold {
     grid-template-rows: minmax(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), auto);
   }
-  /* Home: What clients say and the free check-up band share one screen (owner, November 10, 2026). Both look as they
-     do on their own, on their own grounds; only the space round them is less. The screen's spare height is shared
-     evenly: each section grows by half of it and centres its content, so the four gaps (over and under the reviews,
-     over and under the check-up card) stay equal. More words grow the pair past one screen, as any fold. */
-  [data-page='home'] .fold-pair {
-    display: flex;
-    flex-direction: column;
-    min-height: var(--fold-h);
-  }
-  [data-page='home'] .fold-pair > .section {
-    flex: 1 1 auto;
-    padding-block: var(--sp-6);
-  }
-  [data-page='home'] .fold-pair > .fold {
-    grid-template-rows: 1fr; /* never shorter than the reviews */
-    min-height: 0;
-  }
-  [data-page='home'] .fold-pair > .section--band {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  /* under 1440 tall the two big cards take a panel's smaller padding, so the pair fits 1920 x 1080 and 1920 x 1200 */
-  @media (height < 90em) {
-    [data-page='home'] .fold-pair :is(.rev--big, .cta-band) {
-      padding: var(--sp-6);
-    }
-  }
   /* heading beside its content */
   .split {
     display: grid;

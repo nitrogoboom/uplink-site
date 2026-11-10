@@ -1,25 +1,20 @@
 ---
-// HOME · 6. The "free check-up" call-to-action band. (The stats moved to About on 2 Nov 2026.)
-// On the band ground, so it stands apart from Reviews above and the footer below (both plain). On desktop it shares one
-// screen with Reviews (.fold-pair in src/styles/fold.css).
-// Styles: shared (.cta-band in src/styles/shared-blocks.css).
+// HOME · 6. The "free check-up" card, at the foot of What clients say (Reviews.astro's slot) on the same plain ground,
+// so the two are one screen on desktop (owner, November 10, 2026). As About's Team and the Services FAQ end.
+// Styles: shared (.cta-band in src/styles/shared-blocks.css, .fold-foot in src/styles/fold.css).
 import { phone } from '../../lib/footer';
 import { copy } from '../../lib/copy';
 const t = (await copy('home')).proof;
 const ui = await copy('ui');
 ---
 
-<section class="section section--band" id="proof" aria-labelledby="start-title">
-  <div class="container">
-    <div class="panel cta-band" id="start">
-      <div class="stack">
-        <h2 id="start-title">{t.title}</h2>
-        <p class="lead">{t.lead}</p>
-      </div>
-      <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
-        <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
-      </div>
-    </div>
+<div class="panel cta-band fold-foot" id="start">
+  <div class="stack">
+    <h2 id="start-title">{t.title}</h2>
+    <p class="lead">{t.lead}</p>
   </div>
-</section>
+  <div class="row">
+    <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
+    <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
+  </div>
+</div>
