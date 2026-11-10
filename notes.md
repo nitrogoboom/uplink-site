@@ -25,7 +25,7 @@ Drawing generators (the owner directs drawing work):
 
 The agent can do alone, in this order (each is its own pull request; the first three change no look):
 
-- [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (PR_NUMBER); a `fr/` folder, the French words and the `/fr/` addresses are left.
+- [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (#146); a `fr/` folder, the French words and the `/fr/` addresses are left.
 - [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
 - [ ] Checks: park the tests that pin today's layout and the regression pins lint or axe now catch; keep a core of about eight browser tests for every pull request.
 - [ ] `site.yml`: the Playwright cache steps are written twice; the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
