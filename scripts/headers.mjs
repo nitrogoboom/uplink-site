@@ -52,7 +52,7 @@ export function headers(DIST) {
     const html = readFileSync(file, 'utf-8');
     // {script-hashes}: today the one line in every head that adds html.js; change that line and the hash follows.
     // every inline script the browser runs: no src, and no type or a script type (JSON-LD and the like run nothing)
-    for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)) {
+    for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi)) {
       const type = m[1].match(/\stype=["']?([^"'\s>]+)/)?.[1];
       if (!/\ssrc=/.test(m[1]) && (!type || /^(module|text\/javascript)$/i.test(type))) hashes.add(sha(m[2]));
     }
