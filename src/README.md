@@ -129,7 +129,7 @@ Kept out of the copy files on purpose: the content collections and `data/*.json`
 
 `styles/global.css` imports the shared stylesheets in cascade order. Order matters: when two rules tie, the later file wins. The order is:
 
-1. Foundations: `tokens.css`, the light theme (`theme-light.css`, `theme-drawings.css`), `fonts.css`, `base.css`, `layout.css`, and `type.css`.
+1. Foundations: `tokens.css`, the light theme (`theme-light.css`; `theme-drawings.css`, the drawings' light colours, is imported by `Hero.astro` so only Home carries it), `fonts.css`, `base.css`, `layout.css`, and `type.css`.
 2. Shared parts: the header, key hints, buttons, surfaces, forms, dialogs, toasts, footer, and phone tab bar.
 3. Layout systems: `shared-blocks.css`, `fold.css` (the desktop one-section-per-screen rules every page shares, and `.fold-foot` for content after a section's main block), and `compact-cuts.css`. A one-screen section is one screen as a floor (`min-height: var(--fold-inner)`): its picture takes the height its words leave, down to a floor in rem, and longer words make the section taller.
 4. Blocks more than one page uses: `hero-section.css` (the `.hero` section: Home's hero, the service and case-study pages; Home's own hero layout is `components/home/hero.css`), `facts.css`, and `detail-pages.css`.

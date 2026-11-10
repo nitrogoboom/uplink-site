@@ -3,3 +3,5 @@
 *.woff2 binary
 *.png binary
 *.ttf binary
+# written by npm, never by hand: GitHub folds it away in a pull request
+package-lock.json linguist-generated

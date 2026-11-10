@@ -161,7 +161,7 @@ def _forms(hex_):
 def inline_css():
     """theme-drawings.css: the light colours for the drawings inside the page."""
     out = ['/* Written by tools/gen_light.py: do not edit by hand. The light theme colours for the drawings inside',
-           '   the page (the Home hero and the Grow world); src/styles/global.css imports it. Attribute rules sit in',
+           '   the page (the Home hero and the Grow world); Hero.astro imports it, so only Home carries it. Attribute rules sit in',
            '   :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */']
     for scope, office, files in INLINE:
         uses = set()      # (attribute, colour, kind)

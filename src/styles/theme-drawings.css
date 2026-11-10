@@ -1,5 +1,5 @@
 /* Written by tools/gen_light.py: do not edit by hand. The light theme colours for the drawings inside
-   the page (the Home hero and the Grow world); src/styles/global.css imports it. Attribute rules sit in
+   the page (the Home hero and the Grow world); Hero.astro imports it, so only Home carries it. Attribute rules sit in
    :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
 
 /* .hero-art: hero-office.svg, hero-office-tablet.svg, office-compact-build.svg, office-compact-flows.svg, hero-flows.svg */
