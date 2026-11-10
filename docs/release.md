@@ -90,7 +90,7 @@ A clean run ticks every box here; a failure names the page and the problem.
 **Look and judge**
 
 - [ ] Each link's words, read alone in the transcript, say where it goes (2.4.4).
-- [ ] Headings and labels say what follows (2.4.6). Each page's tab title is clear (2.4.2) [`title` in each file in `src/data/copy/`].
+- [ ] Headings and labels say what follows (2.4.6). Each page's tab title is clear (2.4.2) [`title` in each file in `src/data/copy/en/`].
 - [ ] Colour is never the only way to show meaning (1.4.1).
 - [ ] Any new colour pair passes a check in axe DevTools or WAVE (1.4.3) [tokens in `tokens.css`].
 - [ ] Pictures hold no words that aren't also real text (1.4.5).

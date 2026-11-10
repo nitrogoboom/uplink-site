@@ -117,13 +117,13 @@ const reviews = defineCollection({
   }),
 });
 
-// The site's words: one YAML file a page or area in src/data/copy/, each its own collection checked against its schema
+// The site's words: one YAML file a page or area in src/data/copy/en/, each its own collection checked against its schema
 // in src/lib/copy-schema.ts (a missing or unknown key stops the build). Read them with copy() from src/lib/copy.ts.
 // A YAML file there with no schema stops the build too, so no file is read by nothing.
-const COPY_DIR = './src/data/copy';
+const COPY_DIR = './src/data/copy/en';
 const unknown = readdirSync(COPY_DIR).filter((f) => !(f.replace(/\.yaml$/, '') in COPY));
 if (unknown.length)
-  throw new Error(`src/data/copy/: ${unknown.join(', ')} has no schema (COPY in src/lib/copy-schema.ts)`);
+  throw new Error(`src/data/copy/en/: ${unknown.join(', ')} has no schema (COPY in src/lib/copy-schema.ts)`);
 const copy = <N extends CopyName>(name: N) =>
   defineCollection({ loader: glob({ pattern: `${name}.yaml`, base: COPY_DIR }), schema: COPY[name] });
 

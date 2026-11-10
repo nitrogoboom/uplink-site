@@ -25,7 +25,7 @@ Drawing generators (the owner directs drawing work):
 
 The agent can do alone, in this order (each is its own pull request; the first three change no look):
 
-- [ ] French as `/fr/` addresses (decided): Astro's i18n routing, copy files to `src/data/copy/en/`.
+- [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (PR_NUMBER); a `fr/` folder, the French words and the `/fr/` addresses are left.
 - [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
 - [ ] Checks: park the tests that pin today's layout and the regression pins lint or axe now catch; keep a core of about eight browser tests for every pull request.
 - [ ] `site.yml`: the Playwright cache steps are written twice; the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
@@ -59,12 +59,12 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`, link privacy beside each Send.
 - [ ] Newsletter: a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."), what sends it (a processor to name), where consent records live.
 - [ ] Decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).
-- [ ] The booking toast says "We will email you within one business day" (`src/data/copy/ui.yaml`), but nothing is sent. PR #38 fixes it.
+- [ ] The booking toast says "We will email you within one business day" (`src/data/copy/en/ui.yaml`), but nothing is sent. PR #38 fixes it.
 
 ## Content
 
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
-- [ ] Home has two descriptions that differ: the page's ("Outsourced IT…", `description` in `src/data/copy/home.yaml`) and the business one ("Managed IT…", `business`). Decide when the real copy is written.
+- [ ] Home has two descriptions that differ: the page's ("Outsourced IT…", `description` in `src/data/copy/en/home.yaml`) and the business one ("Managed IT…", `business`). Decide when the real copy is written.
 - [ ] Service and project copy (each entry's `page` in `src/content/`) stays sample until there's a real client.
 - [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, the hero's `lead-short`, Grow's six tags, the "Windows 10" hero card.
 - [ ] With real content: drawn team avatars, Business JSON-LD (phone, address, hours, `logo`, `sameAs`), and a real status page for "All systems normal" (or drop it).

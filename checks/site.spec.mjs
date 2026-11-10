@@ -19,7 +19,7 @@ const PAGES = (await pages(BASE)).map((p) => p.replace(/^\/|\/$/g, '') || 'index
 const url = (page) => `${BASE}/${page === 'index' ? '' : page}`;
 const FOCUS = new Set(['index']); // pages checked in full; the rest get the quick look unless --all
 const full = (page) => ALL || FOCUS.has(page);
-// the site's words the checks look for (src/data/copy/*.yaml), so a rewrite of the copy doesn't break them
+// the site's words the checks look for (src/data/copy/en/*.yaml), so a rewrite of the copy doesn't break them
 const UI = copy('ui');
 const GROW = copy('home').grow;
 

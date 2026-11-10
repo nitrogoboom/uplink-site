@@ -40,7 +40,7 @@ const MOTION_KEY = 'uplink.motion';
 const reduceMotion = new MotionChoice();
 
 /* ---------- words ------------------------------------------------------ */
-// What a script shows (toasts, button names) comes from src/data/copy/*.yaml, carried by the page as JSON
+// What a script shows (toasts, button names) comes from src/data/copy/en/*.yaml, carried by the page as JSON
 // (components/Words.astro): #words-ui on every page (Base.astro), #words-page for the page's own script. Cast what
 // it gives to the shape in src/lib/copy-schema.ts: /** @type {HomeWords} */ (words('words-page')).
 /** @param {'words-ui' | 'words-page'} id @returns {unknown} */

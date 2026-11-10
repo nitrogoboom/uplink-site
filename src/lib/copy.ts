@@ -1,4 +1,4 @@
-// Reads the site's words: src/data/copy/NAME.yaml, checked against its schema (src/lib/copy-schema.ts) when the build
+// Reads the site's words: src/data/copy/en/NAME.yaml, checked against its schema (src/lib/copy-schema.ts) when the build
 // loads it (content.config.ts). In a component:  const t = await copy('home');  then  {t.hero.title}.
 // What it gives back throws on a key the file doesn't have (t.hero.titel), so a typo in a component stops the build
 // as one in the YAML does, instead of leaving the words out. fill() fills a template's {names}.
@@ -13,7 +13,7 @@ const strict = <T>(value: T, where: string): T => {
   return new Proxy(value, {
     get(target, key, receiver) {
       if (typeof key === 'string' && !(key in target) && !PASS.has(key))
-        throw new Error(`copy: ${where} has no "${key}" (the key's spelling, or src/data/copy/ and copy-schema.ts)`);
+        throw new Error(`copy: ${where} has no "${key}" (the key's spelling, or src/data/copy/en/ and copy-schema.ts)`);
       return strict(Reflect.get(target, key, receiver) as unknown, `${where}.${String(key)}`);
     },
   });
@@ -22,7 +22,7 @@ const strict = <T>(value: T, where: string): T => {
 const entry = getEntry as (collection: string, id: string) => Promise<{ data: unknown } | undefined>;
 export async function copy<N extends CopyName>(name: N): Promise<Copy<N>> {
   const e = await entry(`copy-${name}`, name);
-  if (!e) throw new Error(`src/data/copy/${name}.yaml is missing`);
+  if (!e) throw new Error(`src/data/copy/en/${name}.yaml is missing`);
   return strict(e.data as Copy<N>, `${name}.yaml`);
 }
 

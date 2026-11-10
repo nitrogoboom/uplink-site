@@ -49,7 +49,7 @@ export const PAGES = {
   accessibility: { path: '/accessibility', name: 'Accessibility' },
 } as const;
 
-// A static page's <title> and description, from src/data/copy/: NAME.yaml's top for the five in the menu,
+// A static page's <title> and description, from src/data/copy/en/: NAME.yaml's top for the five in the menu,
 // text-pages.yaml for privacy and accessibility. The page, the sitemap and llms.txt all read them here.
 export const pageMeta = async (page: keyof typeof PAGES) => {
   const t = page === 'privacy' || page === 'accessibility' ? (await copy('text-pages'))[page] : await copy(page);
@@ -128,7 +128,7 @@ export const workFilterCss = async () =>
     )
     .join('\n');
 
-// The source files behind each static page, for lastmod (its copy file in src/data/copy/ included). Shared parts
+// The source files behind each static page, for lastmod (its copy file in src/data/copy/en/ included). Shared parts
 // (layout, header, footer, ui.yaml) are left out on purpose: a footer tweak is not a reason for a crawler to refetch
 // every page. A service or project page dates
 // from its own entry file alone (entryFile()), the date its JSON-LD carries too: editing one changes one URL.
@@ -136,7 +136,7 @@ const SOURCES: Record<keyof typeof PAGES, string[]> = {
   home: [
     'src/pages/index.astro',
     'src/components/home',
-    'src/data/copy/home.yaml',
+    'src/data/copy/en/home.yaml',
     'src/data/grow.json',
     'src/content/services',
     'src/content/projects',
@@ -144,21 +144,21 @@ const SOURCES: Record<keyof typeof PAGES, string[]> = {
   services: [
     'src/pages/services.astro',
     'src/components/services',
-    'src/data/copy/services.yaml',
+    'src/data/copy/en/services.yaml',
     'src/content/services',
     'src/data/faq.json',
   ],
-  work: ['src/pages/work.astro', 'src/components/work', 'src/data/copy/work.yaml', 'src/content/projects'],
-  about: ['src/pages/about.astro', 'src/components/about', 'src/data/copy/about.yaml', 'src/data/team.json'],
+  work: ['src/pages/work.astro', 'src/components/work', 'src/data/copy/en/work.yaml', 'src/content/projects'],
+  about: ['src/pages/about.astro', 'src/components/about', 'src/data/copy/en/about.yaml', 'src/data/team.json'],
   contact: [
     'src/pages/contact.astro',
     'src/components/contact',
-    'src/data/copy/contact.yaml',
+    'src/data/copy/en/contact.yaml',
     'src/content/services',
     'src/components/ServiceOptions.astro',
   ],
-  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md', 'src/data/copy/text-pages.yaml'],
-  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md', 'src/data/copy/text-pages.yaml'],
+  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md', 'src/data/copy/en/text-pages.yaml'],
+  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md', 'src/data/copy/en/text-pages.yaml'],
 };
 
 export type SitePage = { path: string; name: string; description: string; lastmod?: string };

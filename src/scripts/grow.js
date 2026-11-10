@@ -26,7 +26,7 @@ const grow = section && $('.grow', section);
 /** @type {SVGSVGElement | null} */
 const svg = grow && $('.grow-stage svg', grow);
 if (grow && svg) {
-  // the button's names and the team counter's words: src/data/copy/home.yaml, grow (index.astro carries them)
+  // the button's names and the team counter's words: src/data/copy/en/home.yaml, grow (index.astro carries them)
   const T = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
   const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));
