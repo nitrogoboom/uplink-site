@@ -500,10 +500,11 @@
   .svc-small {
     grid-column: 4;
   }
-  /* the drawing keeps its 4:3 (tablet, above); in a short, wide window (an ultrawide) it is capped so the section
-     fits one screen with the band showing round it: 24rem is the card's words and bar and the heading (about 20rem)
-     plus room to breathe. Never under 6rem; words that need more grow the section instead. */
+  /* a tall 4:5 drawing box, so the cards stand like a game menu's, not square (owner, November 10, 2026); on a short
+     screen it is capped so the section fits one screen with the band showing round it: 24rem is the card's words and
+     bar and the heading (about 20rem) plus room to breathe. Never under 6rem; words that need more grow the section. */
   .svc-big .svc-art {
+    aspect-ratio: 4 / 5;
     min-height: 6rem;
     max-height: max(6rem, var(--fold-inner) - 24rem);
   }
