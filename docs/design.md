@@ -1,16 +1,12 @@
 # Design rules
 
-The rules for styling the site: colours, spacing, line height, corners, and layout. Every value is a token in `src/styles/tokens.css` (dark) and `src/styles/theme-light.css` (light). The tokens are the truth: when this page and a token disagree, fix this page.
+Values are tokens in `src/styles/tokens.css` (dark) and `theme-light.css` (light); the tokens win.
 
 ## Colour
 
-### Intent
+Calm and reliable; the drawings and one amber action colour carry the personality. Dark first; light is its own mode. About 60% neutrals, 30% blues, 10% amber at most.
 
-- A calm, reliable technology firm. The drawings and one warm action colour carry the personality; text and grounds stay quiet.
-- Dark first. Light is a full mode of its own, not an inversion.
-- Balance by area: about 60% neutrals, 30% the blue family, 10% or less amber. Status colours appear only where there is a status.
-
-### Colour rules
+### Rules
 
 1. **One amber fill per view.** Amber means "do this". Don't use it for decoration, status, or emphasis.
 2. **Amber fill vs amber ink.** Bright amber is a fill with a dark label. Amber words, icons, and marks use `--c-accent-text`.
@@ -20,7 +16,7 @@ The rules for styling the site: colours, spacing, line height, corners, and layo
 6. **Edges that matter use `--c-edge`.** Inputs, selects, and ghost buttons need 3:1. `--c-line` and `--c-line-2` are decoration only.
 7. **Focus** is a 2px solid `--c-accent-text` outline with a 2–3px offset. `--c-accent-ring` may sit outside it as a halo, never instead of it.
 8. **No crimson**, and no red ramp step 700 or darker, anywhere outside the logo.
-9. **No new colours.** No extra tints or "10% variants". If you need one, mark the spot `DESIGN-GAP: WHAT_WAS_MISSING` and say so in your report.
+9. **No new colours.** If you need one, mark the spot `DESIGN-GAP: WHAT_WAS_MISSING` and say so.
 10. **Headline accent.** One word in a headline may take `--c-accent-text`. One word, no glow, no underline.
 11. **Cards.** Border `--c-line`, fill `--c-surface`, even on all four sides. No coloured left-edge accent. At most one selected card, shown with `--c-accent-tint` plus a label.
 12. **Grounds stay calm.** Grounds and text stay under OKLCH chroma 0.04.
@@ -28,13 +24,11 @@ The rules for styling the site: colours, spacing, line height, corners, and layo
 
 ### Logo
 
-- Two fixed colours: blue `#1F75A6` and crimson `#8D242E`. Crimson lives inside the logo only.
-- Copy the logo files; never retype SVG path data or recolour them. White wordmark on dark grounds, `#15181C` on light grounds; below 120px wide, use the triangle mark alone. Clear space: 25% of the mark's width.
-- The files are in `Documents/Design.MD/svs-design/assets/logo/` on the owner's computer, not in this repository.
+Blue `#1F75A6`, crimson `#8D242E` (logo only). Copy the files from `Documents/Design.MD/svs-design/assets/logo/` on the owner's computer; never retype or recolour. Below 120px wide, the mark alone; clear space 25%.
 
 ### Roles and tokens
 
-Use the token, never the hex. Each role has one job; a second job needs a second role. The values are in `tokens.css` and `theme-light.css`.
+Use the token, never the hex. One job per role.
 
 | Role | Token | Job |
 | --- | --- | --- |
@@ -72,29 +66,14 @@ Use the token, never the hex. Each role has one job; a second job needs a second
 | cool-surface-hover | `--c-cool-surface-2` | its hover |
 | cool-text-muted | `--c-cool-muted` | secondary text on cool surfaces |
 
-`tokens.css` also holds the print inks (`@media print`). Forced colours: "Styles" in [`src/README.md`](../src/README.md#styles).
 
 ### Ramps
 
-Raw sources: components use roles, not ramp steps. One anchor hue, the logo blue (OKLCH hue 239.4). Neutrals sit at hue 250, amber at 66, green at 158, red at 29; green and red are for status only. All five share one lightness ladder: 50 0.975 · 100 0.94 · 200 0.88 · 300 0.81 · 400 0.73 · 500 0.635 · 600 0.535 · 700 0.455 · 800 0.375 · 900 0.295 · 950 0.215. `tools/palette.py` holds the hues and the neutral ramp.
-
-| Step | Neutral | Blue | Amber | Green | Red |
-| --- | --- | --- | --- | --- | --- |
-| 50 | `#F2F7FC` | `#F0F8FE` | `#FFF5EC` | `#E3FFED` | `#FFF4F2` |
-| 100 | `#E6ECF2` | `#D8EFFF` | `#FFE6CF` | `#CCF7DD` | `#FFE4E0` |
-| 200 | `#D2D8DE` | `#B7DDF8` | `#FFCD9B` | `#A9E9C3` | `#FFC8C0` |
-| 300 | `#BBC2C9` | `#97C8EA` | `#FFAD51` | `#82D6A6` | `#FFA699` |
-| 400 | `#A1A9B1` | `#73AFD9` | `#E5922B` | `#5ABF89` | `#EF8677` |
-| 500 | `#838C95` | `#4A93C1` | `#C37600` | `#3BA16E` | `#D66254` |
-| 600 | `#656E78` | `#1F75A6` (logo) | `#9B5D00` | `#198152` | `#B24438` |
-| 700 | `#4D5863` | `#005D8A` | `#7C4900` | `#00683F` | `#952E24` (never) |
-| 800 | `#37424E` | `#004669` | `#5E3600` | `#004F2E` | `#781811` (never) |
-| 900 | `#222E3A` | `#00304A` | `#422500` | `#00371F` | `#5B0000` |
-| 950 | `#0E1A27` | `#001C2E` | `#281400` | `#002010` | `#390000` |
+Components use roles, not ramp steps. Hues (OKLCH): blue 239.4 (logo), neutral 250, amber 66, green 158, red 29 (green and red for status only). Hex values: `tokens.css`; hues and neutrals: `tools/palette.py`. Red 700 and 800 are never used.
 
 ### Drawing colours
 
-Light comes from the top: on every box, the top is lightest, the left middle, and the right darkest, in both modes. Drawing roles are for drawings only, never for text. The generators read them by name through `tools/palette.py` (`pal.TOP`, `pal.AMBER` …); never type a hex into a generator. The values are in `tokens.css` and `theme-light.css`.
+Light from the top: top face lightest, left middle, right darkest. Drawing roles are for drawings only; generators read them through `tools/palette.py` (`pal.TOP` …), never a typed hex.
 
 | Role | Token |
 | --- | --- |
@@ -111,7 +90,7 @@ Light comes from the top: on every box, the top is lightest, the left middle, an
 | drop shadow (at 0.35) | `--iso-shadow` |
 | green LED, online dot | `--iso-led` |
 
-`tools/gen_light.py` makes the light drawings from the dark ones by role. Drawn lines (not fills) take a darker ink step on a light ground:
+`tools/gen_light.py` makes the light drawings by role; lines (not fills) take a darker step:
 
 | Dark line | Light | Where |
 | --- | --- | --- |
@@ -123,11 +102,11 @@ Light comes from the top: on every box, the top is lightest, the left middle, an
 
 ### Check a colour change
 
-Measure with a script (WCAG 2 ratio and APCA Lc), not by eye. In both modes: `--c-text` on every ground is 4.5:1 (Lc 75); muted, link, success, and accent ink are 4.5:1 (Lc 60); `--c-alert` is 4.5:1; the amber label is 7:1; `--c-edge` and the focus outline are 3:1; box faces keep top > left > right; one amber fill per view.
+Measure with a script (WCAG 2 and APCA), both modes: `--c-text` on every ground is 4.5:1 (Lc 75); muted, link, success, and accent ink are 4.5:1 (Lc 60); `--c-alert` is 4.5:1; the amber label is 7:1; `--c-edge` and the focus outline are 3:1; box faces keep top > left > right; one amber fill per view.
 
 ## Spacing
 
-The spacing scale is `--sp-1` to `--sp-9`; the type scale is `--fs-1` to `--fs-8`. Pixels below are at a 16px root. The root is the visitor's own font size up to a 1440px window; wider, it grows with the window to 125% (`--fs-root`).
+Spacing `--sp-1`–`--sp-9`, type `--fs-1`–`--fs-8`; pixels at a 16px root (`--fs-root` grows to 125% past 1440px).
 
 | Token | `--sp-1` | `--sp-2` | `--sp-3` | `--sp-4` | `--sp-5` | `--sp-6` | `--sp-7` | `--sp-8` | `--sp-9` |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -135,14 +114,14 @@ The spacing scale is `--sp-1` to `--sp-9`; the type scale is `--fs-1` to `--fs-8
 
 ### R0. Stay on the scale
 
-Every margin, padding, and gap is a `--sp-*` token, `0`, or a `calc()` of tokens and other size tokens (such as `--icon` or `--tap`). Reset browser defaults to `0` or a token. An exception needs a `stylelint-disable` comment that says why; there are two today: the 1px clip on `.sr-only` (`base.css`) and the footer icon nudge (`footer.css`).
+Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size tokens. Exceptions need a `stylelint-disable` comment saying why.
 
 ### R1. Section padding
 
 - **Flow section** (`.section`): `--section-y` top and bottom: `--sp-8` on phone and tablet, `--sp-9` on desktop.
 - **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad`, which follows the screen's height: `--sp-5` up to 760px tall, `--sp-7` up to 1080px, `--sp-8` from 1080px. The content is centred.
 - **The first section under the header:** `--sp-6` at the top; a fold hero can drop to `--sp-5`. A text-only page's top (`.page-intro`): `--sp-7`, or `--sp-8` on desktop.
-- **Two touching sections with the same background** would show a double gap: alternate a banded section with a plain one.
+- Alternate banded and plain sections so gaps don't double.
 
 ### R2 to R4. Headings
 
@@ -155,7 +134,7 @@ Every margin, padding, and gap is a `--sp-*` token, `0`, or a `calc()` of tokens
 | Title | Its own meta line (name and role, title and date) | `--sp-1` (R4) |
 | H3 in running text (`.prose`) | — | `--sp-6` above, `--sp-3` below (R4) |
 
-The space below a heading is smaller than the space above it.
+Space below a heading is smaller than above.
 
 ### R5. Card padding
 
@@ -166,7 +145,7 @@ The same on all four sides:
 - **Panel** (call-to-action band, forms, big panels): `--sp-6`, or `--sp-7` from 1100px.
 - **Picture cards** (`.card`): `--sp-3` round the picture and the body.
 
-Inside a card, gaps are smaller than its padding, and related lines sit closer than separate blocks.
+Gaps inside a card are smaller than its padding.
 
 ### R6. Grid gaps
 
@@ -176,7 +155,7 @@ Inside a card, gaps are smaller than its padding, and related lines sit closer t
 
 ### R7. Line height
 
-Write line heights as tokens, never as numbers.
+Tokens only.
 
 | Text | Sizes | Line height |
 | --- | --- | --- |
@@ -187,18 +166,15 @@ Write line heights as tokens, never as numbers.
 | Running text | `--fs-1` to `--fs-4` | `--lh-body` (1.6) |
 | Two-line meta under a title | `--fs-1`, `--fs-2` | `--lh-snug` |
 
-Keep the 4px scale: the controls (`--tap` 44px, `--control-h` 48px, `--header-h` 64px) sit on it.
+Controls sit on the 4px scale: `--tap` 44px, `--control-h` 48px, `--header-h` 64px.
 
-### How spacing is checked
+### Checks
 
-- `npm run lint`: Stylelint refuses a raw length in `margin*`, `padding*`, `gap`, `row-gap`, `column-gap`, `scroll-margin*`, and `scroll-padding*` (`.stylelintrc.json`).
-- `npm run verify:spacing`, against `npm run serve`: every computed margin, padding, and gap on every page at four sizes is a step of the scale. Its allowed exceptions are in its `SKIP` list.
-
-To change spacing, change one page per pull request, then build `main` and your branch and run `npm run verify:styles -- OLD_URL NEW_URL` (only the differences you meant) and `npm run verify:spacing` (nothing new off the scale).
+`npm run lint` refuses raw lengths; `npm run verify:spacing` (against `npm run serve`) checks computed spacing. After a spacing change: `npm run verify:styles -- OLD_URL NEW_URL`.
 
 ## Corners, boxes, and layout
 
-Take the Overwatch 2 menus' layout (how boxes sit, corners, spacing, how one design fills a 21:9 and a 1080p screen), never their colours, backgrounds, or brand.
+Take the Overwatch 2 menus' layout (boxes, corners, spacing, filling 21:9 and 1080p), never their colours or brand.
 
 - **Small corners.** `--r-1` (0.125rem) key caps and tiny tags; `--r-2` (0.25rem) buttons, inputs, tiles, image wells; `--r-3` (0.5rem) cards, panels, dialogs. Only status items are round (`--r-pill`).
 - **No slanted or skewed boxes.** The current header tab is a straight, full-height block: square corners, a lighter fill, and a short accent line along the bar's bottom edge (`src/styles/header.css`).

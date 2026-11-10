@@ -1,6 +1,6 @@
 # Drawing tools
 
-The drawing generators and their checks: Python 3.12 or later, in `tools/`. Run them from the project root. The order of work is the `drawing` skill, the rules are `.claude/rules/drawings.md`, and the colour roles are in [`design.md`](design.md#drawing-colours).
+Python 3.12+, in `tools/`, run from the project root. Workflow: the `drawing` skill. Colour roles: [`design.md`](design.md#drawing-colours).
 
 ## Install the Python drawing tools
 
@@ -9,15 +9,12 @@ pip install -r requirements.txt
 python -m playwright install chromium
 ```
 
-Only `gen_og.py` uses Python's Chromium. `requirements.txt` is pinned by hand. After you change a version, run `python tools/regen.py --check` and read the diff.
+Only `gen_og.py` needs Chromium. After changing a pinned version, run `python tools/regen.py --check`.
 
 ## Drawing rules
 
 - **True isometric.** One axis runs right and down at 30°, one runs left and down at 30°, and verticals go straight up.
-- **Colours by name.** Every colour comes from `tools/palette.py`, which reads `src/styles/tokens.css`. Scripts use names, never hex values.
-- **Box faces.** Top `pal.TOP`, left `pal.LEFT`, right `pal.RIGHT`: the top is lightest and the right is darkest. Edges are `pal.EDGE`, width 1, opacity 0.3.
-- **Highlight faces:** `pal.HI_TOP`, `pal.HI_LEFT`, and `pal.HI_RIGHT`.
-- **Accents:** `pal.AMBER` and `pal.SKY`.
+- **Colours by name** from `tools/palette.py` (reads `tokens.css`), never hex. Faces `pal.TOP`/`LEFT`/`RIGHT` (highlight `HI_*`), edges `pal.EDGE` width 1 at 0.3, accents `pal.AMBER`, `pal.SKY`.
 - **Labels.** A thin leader line (width 1.2, opacity 0.55) ends in a dot of radius 3 with a 1.5 ring of `pal.PAGE`. The title is capitals at 13px, weight 600. The subline is 11px in `pal.GREY`.
 - **Windows on walls:** outlined in `pal.SKY`, width 0.9, opacity 0.5.
 - **Floor discs** are true isometric circles (height ÷ width = 0.577), with gaps cut around labels.
@@ -44,19 +41,11 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | `gen_light.py` | The light drawings: `NAME-light.svg` beside each `NAME.svg`, and `src/styles/theme-drawings.css` for the drawings inside the page. `regen.py` runs it last. `--check` fails if an output is out of date. |
 | `gen_og.py public` | `og.png` (1200×630) and `apple-touch-icon.png` (180×180): screenshots of a page built from the tokens, fonts, and `office-card.svg`. Rerun it after you change any of those. |
 
-A generator that runs with nothing changed writes the same file, byte for byte.
-
-To run every generator but `gen_og.py` (its screenshots depend on the machine):
-
-```bash
-python tools/regen.py
-```
-
-CI doesn't run the generators. Before you commit a drawing change, run `python tools/regen.py --check`, and commit the SVGs with the script. A `git diff` that shows a drawing you didn't mean to change is a hand edit, or a script changed without its output.
+Generators are deterministic. `python tools/regen.py` runs all but `gen_og.py`. CI doesn't run them: run `python tools/regen.py --check` and commit the SVGs with the script; an unexpected drawing in `git diff` means a hand edit or a stale output.
 
 **Which cut shows where.** The phone cut (`NAME-compact.svg`) is the same scene framed closer, with fewer and bigger labels (`COMPACT` in each generator). Pages swap it in with `<picture>`: on a service's page below 1200 px, and on About below 1600 px. Cards always use `NAME-card.svg`: the phone cut without labels (`isogen.card()`). On phones, the Home hero plays `office-compact-build.svg`, starting on the furnished room (`PHONE_AHEAD` in `gen_office.py`); with reduced motion it stands still, and without script phones show `hero-office-phone.svg`.
 
-When you change a drawing's labels or layout, check its phone cut too.
+Check the phone cut after changing labels or layout.
 
 ### Shared drawing code
 
@@ -71,20 +60,9 @@ When you change a drawing's labels or layout, check its phone cut too.
 
 ### Check a drawing
 
-After you change a drawing, run both checks on it. Each exits with status 1 on any finding.
+Both exit 1 on any finding. Each `rules_NAME.py` lists the exact commands for every cut.
 
-- **`check.py FILE.svg`** finds edges near an isometric angle but not on it (`ANGLE`), vertices of different shapes that nearly meet (`SNAP`), and vertices that nearly touch another shape's edge (`TJOIN`). It lists where each leader dot sits (`DOT`), which doesn't fail the check. For an SVG inline in an HTML file: `check.py FILE START_LINE END_LINE`.
-  - It skips leader lines in `.co` groups, `class="mark"` parts, and the floor grid (`class="floor"` on a line or its group). `class="free"` parts skip only `ANGLE`.
-  - A near-miss that a later opaque face covers isn't reported.
-  - `<g class="curve">` holds a curved surface cut into flat strips. Its strips aren't checked against each other.
-  - `--step PX` counts vertex pairs exactly one grid step apart along an isometric axis, instead of listing them. Use it for drawings whose props sit on a grid finer than 2 px on screen. For the office: `--step 1.758` (0.0625 × 28.127).
-- A drawing's CSS, its own `<style>` or the site's, styles parts by class, never by tag: SVGO writes `<polygon>`, `<line>` and `<rect>` as `<path>`. `npm run build` stops on a drawing whose `<style>` breaks this rule.
-- **`painter.py`** finds boxes drawn in the wrong order or poking into each other. It fails when it finds no boxes, or when the rules file resolves none of them (usually a wrong origin or unit in the command). Each drawing has a `rules_NAME.py`; its first lines give the exact commands for both checks, on every cut. For Grow:
-
-  ```bash
-  python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py
-  python tools/check.py src/components/home/grow-world.svg
-  ```
-
-- **Every check at once:** `python tools/regen.py --check` regenerates the drawings, then runs every command the rules files list. `--checks-only` skips the generators.
-- **The tools' own tests:** `python -m pytest tools/tests`.
+- **`check.py FILE.svg`**: `ANGLE` (edge near but off an isometric angle), `SNAP` (vertices that nearly meet), `TJOIN` (vertex nearly on another edge); `DOT` lists leader dots (no fail). Skips `.co` leaders, `class="mark"`, the floor grid; `class="free"` skips `ANGLE` only; `<g class="curve">` strips aren't checked against each other; covered near-misses aren't reported. `--step PX` counts one-grid-step pairs (office: `--step 1.758`). Inline SVG: `check.py FILE START END`.
+- **`painter.py`**: boxes drawn out of order or overlapping. Fails if it finds or resolves no boxes (usually a wrong origin or unit). Grow: `python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py`.
+- Drawing CSS styles by class, never by tag (SVGO turns shapes into `<path>`); the build enforces it.
+- Everything: `python tools/regen.py --check` (`--checks-only` skips generating). Tool tests: `python -m pytest tools/tests`.
