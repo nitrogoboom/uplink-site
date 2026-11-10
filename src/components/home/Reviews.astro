@@ -5,6 +5,7 @@
 // itself, and these are samples.
 // Each review is a <figure>: the quote first (a screen reader hears it before who said it), then the name, role and
 // date. The hidden ", " between parts: "Dana Whitfield, Office manager, Whitfield & Lo, October 2026".
+// The slot after the reviews holds the free check-up card (Proof.astro).
 // Styles: reviews.css.
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
@@ -59,5 +60,6 @@ const month = (ym: string) =>
         </figure>
       </li>)}
     </ul>
+    <slot />
   </div>
 </section>

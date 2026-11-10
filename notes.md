@@ -17,6 +17,7 @@ Needs the owner's eyes on a preview:
 
 Layout and look:
 
+- [ ] Home "What clients say" with the check-up card at its foot (#169) is one screen from 1080 tall; laptops (1440×900, 1536×864) run 105–140px past. A compact laptop option (quote mark beside the featured quote, check-up lead on one line) was shown November 10, 2026, not chosen.
 - [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Home at 1280×720: Services, Grow and Reviews run 41–72px past the screen (so before the screen-size work of November 10, 2026).
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.

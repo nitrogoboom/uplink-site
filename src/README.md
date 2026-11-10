@@ -8,7 +8,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 
 | File | Address | Sections |
 | --- | --- | --- |
-| `index.astro` | `/` | Hero, Services, Grow, Work, Reviews, Proof |
+| `index.astro` | `/` | Hero, Services, Grow, Work, Reviews (Proof, the check-up card, at its foot) |
 | `services.astro`, `services/[slug].astro` | `/services`, `/services/SLUG` | Overview, Faq; one page per `content/services/SLUG.json` |
 | `work.astro`, `work/[slug].astro` | `/work`, `/work/SLUG` | Projects (filters are radios; `workFilterCss()` in `lib/site.ts`); one page per `content/projects/SLUG.json` |
 | `about.astro`, `contact.astro` | `/about`, `/contact` | Profile, Process, Team; Message, Support |

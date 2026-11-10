@@ -29,11 +29,6 @@
   [data-page='home'] .hero.fold {
     grid-template-rows: minmax(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), auto);
   }
-  [data-page='home'] #proof {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
   /* heading beside its content */
   .split {
     display: grid;
