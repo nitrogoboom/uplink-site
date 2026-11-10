@@ -27,8 +27,8 @@ The agent can do alone, in this order (each is its own pull request; the first t
 
 - [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (#146); a `fr/` folder, the French words and the `/fr/` addresses are left.
 - [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
-- [ ] Checks: park the tests that pin today's layout and the regression pins lint or axe now catch; keep a core of about eight browser tests for every pull request.
-- [ ] `site.yml`: the Playwright cache steps are written twice; the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
+- [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
+- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone; `bottom-nav.css` comments still cite the parked header-fit check.
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 
 For launch (the owner): the scoped Cloudflare token and split environments are under "Owner and accounts"; the paid Workers plan, Always Use HTTPS, and an alert on the error reports belong in `docs/release.md`, "Before launch".
@@ -105,6 +105,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] After a Dependabot bump of `wrangler` or `esbuild`: set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns, and npm 12 won't run their install scripts.
 - [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
 - [ ] `npm run verify:styles` sometimes reports a `div.container`'s side margins as 0 at 3440 on `/` or `/work` (a Chrome quirk): rerun before you trust such a line.
-- [ ] `npm run verify -- -- -g "NAME"`: a worker reported (November 9, 2026, not confirmed) that a name with a space, such as "Markdown copies", gets split on Windows; a one-word name such as "C15" works. Confirm, then fix `scripts/check.mjs` or say so in `CLAUDE.md`.
+- [ ] `wrangler dev` kept serving the `_headers` it started with after a rebuild (November 9, 2026: stale X-Build and CSP hashes, so new inline styles were blocked); restart it after a build, or find why, and say so in README.
 - [ ] Smoke from a cloud session needs the site's host allowed and `NODE_USE_ENV_PROXY=1`; the `http://` redirect check runs only from a normal machine.
 - [ ] Small, left as they are: `gen_campus.py` keeps its own `box()`; `ServiceCard`'s `on`/`first`/`heading` props have one caller.

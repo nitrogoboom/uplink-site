@@ -12,6 +12,7 @@
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "node scripts/check.mjs site",
+    "verify:core": "node scripts/check.mjs core",
     "verify:zoom": "node scripts/check.mjs zoom",
     "verify:links": "node scripts/check.mjs links",
     "verify:spacing": "node scripts/check.mjs spacing",
