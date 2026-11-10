@@ -74,7 +74,6 @@ grow:
   title: We grow with you
   lead: As your team spreads out, here's what to watch, and what we take care of.
   steps: Where your people work # the step list's and the dots' name
-  team: Team of {n}
   play: # the play button's name (grow.js)
     pause: Pause
     play: Play

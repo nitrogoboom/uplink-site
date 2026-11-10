@@ -9,13 +9,11 @@
    ========================================================================== */
 
 import { $, $$, held, reduceMotion, whenOnScreen, words } from './core.js';
-import { fill } from '../lib/fill.js';
 
 const DWELL = 4500; // ms a step
 const RISK_AT = 900; // ms into a step: its risks show (the parts have dropped in by then)
 const FIX_AT = 2300; // ms into a step: the risks flip to fixes
 const GLOW = 3400; // ms the new parts glow
-const COUNT = 300; // ms the team counter takes to climb to a new step's size (short: the desktop list shows it at once)
 const PAUSE = 'M2 1h3v10H2zM7 1h3v10H7z',
   PLAY = 'M2 1l9 5-9 5z',
   REPLAY = 'M6 1a5 5 0 1 0 5 5h-2a3 3 0 1 1-3-3v2l3-3-3-3z';
@@ -26,7 +24,7 @@ const grow = section && $('.grow', section);
 /** @type {SVGSVGElement | null} */
 const svg = grow && $('.grow-stage svg', grow);
 if (grow && svg) {
-  // the button's names and the team counter's words: src/data/copy/en/home.yaml, grow (index.astro carries them)
+  // the play button's names: src/data/copy/en/home.yaml, grow (index.astro carries them)
   const T = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
   const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));
@@ -52,9 +50,7 @@ if (grow && svg) {
   const play = /** @type {HTMLElement} */ ($('.grow-play', grow)),
     playIcon = /** @type {SVGPathElement} */ ($('.grow-play-i path', grow)),
     ring = /** @type {SVGCircleElement} */ ($('.grow-ring circle', grow));
-  const place = /** @type {HTMLElement} */ ($('.grow-place', grow)),
-    team = /** @type {HTMLElement} */ ($('.grow-team', grow));
-  const teams = steps.map((c) => Number(c.dataset.team) || 0);
+  const place = /** @type {HTMLElement} */ ($('.grow-place', grow));
   const places = steps.map((c) => c.dataset.place);
   const full = /** @type {string} */ (svg.getAttribute('viewBox')).split(' ').map(Number);
   let built = -1,
@@ -76,7 +72,7 @@ if (grow && svg) {
     const r = stage.getBoundingClientRect(),
       pad = 6,
       gap = 4;
-    const top = Math.max(pad, ...[place, team].map((l) => (l.offsetHeight ? l.offsetTop + l.offsetHeight + gap : 0))); // below the place and team count
+    const top = Math.max(pad, place.offsetHeight ? place.offsetTop + place.offsetHeight + gap : 0); // below the place
     const spots = tags.map((t) => {
       if (!t.at) return null;
       const p = new DOMPoint(Number(t.at.getAttribute('cx')), Number(t.at.getAttribute('cy'))).matrixTransform(m);
@@ -152,36 +148,6 @@ if (grow && svg) {
     camRaf = window.requestAnimationFrame(step);
   };
 
-  // ---- the team counter: the step's size. The desktop list shows every step's size all along, so the counter
-  // mustn't stay on another number: it climbs, briefly, only when the story reaches a step for the first time since
-  // bare ground, from the number it shows; going back, to a step already reached, paused, or with reduced motion, it
-  // changes at once, with the list. ----
-  let teamNow = 0,
-    teamRaf = 0,
-    reached = -1;
-  const setTeam = (/** @type {number} */ v) => {
-    teamNow = v;
-    team.textContent = v ? fill(T.team, { n: v }) : '';
-  };
-  const count = (/** @type {number} */ i, /** @type {boolean} */ animate) => {
-    window.cancelAnimationFrame(teamRaf);
-    const n = i < 0 ? 0 : teams[i],
-      a = teamNow,
-      climb = animate && i > reached && n > a && !reduceMotion.matches;
-    reached = i < 0 ? -1 : Math.max(reached, i);
-    if (!climb) {
-      setTeam(n);
-      return;
-    }
-    const t0 = performance.now();
-    const f = (/** @type {number} */ now) => {
-      const k = Math.min(1, Math.max(0, (now - t0) / COUNT));
-      setTeam(Math.round(a + (n - a) * k));
-      if (k < 1) teamRaf = window.requestAnimationFrame(f);
-    };
-    teamRaf = window.requestAnimationFrame(f);
-  };
-
   // ---- the open step's clock: how long it has played. It holds while the story waits (paused, off screen, the
   // site's pause), so the step goes on from there, not from the start. A step picked by hand shows done (DWELL). ----
   let playedAt = 0,
@@ -213,8 +179,8 @@ if (grow && svg) {
     drawRing(ringAt());
   };
 
-  // ---- the open row's foot (desktop list), from the same clock: it fills while the step plays, waits where it is
-  // while the step does, and goes once the step is done or was picked by hand ----
+  // ---- the open step's stretch of the growth line (desktop list), from the same clock: it fills while the step
+  // plays, waits where it is while the step does, and goes once the step is done or was picked by hand ----
   const bar = () => {
     const k = played(),
       d = cur >= 0 ? items[cur] : null,
@@ -274,7 +240,6 @@ if (grow && svg) {
     }
     if (animate) glowT = window.setTimeout(() => pcs.forEach(({ g }) => g.classList.remove('glow')), GLOW);
     camTo(target(i), animate);
-    count(i, animate);
     tags.forEach((t) => t.el.classList.remove('is-on', 'is-fixed', 'is-flip'));
     steps.forEach((c, k) => {
       c.classList.toggle('is-on', k === Math.max(0, i));
@@ -288,7 +253,7 @@ if (grow && svg) {
     // Two sets of step buttons do the same job: the dots under the picture (phones, tablets) and the list in the left
     // column (desktop, .grow-item); CSS shows one. They're marked aria-current="step" (one of a set is the open one,
     // not a pressed toggle). At the ends the arrows are aria-disabled, not disabled, so a keyboard user's focus stays.
-    // While the story plays, the open row's foot fills over the step's time.
+    // While the story plays, the open step's stretch of the line fills over the step's time.
     [dots, items].forEach((set) =>
       set.forEach((d, j) => {
         if (j === i) d.setAttribute('aria-current', 'step');

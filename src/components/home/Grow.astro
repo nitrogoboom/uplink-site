@@ -1,10 +1,11 @@
 ---
 // HOME · 3. We grow with you: the six-step world and its controls, played by src/scripts/grow.js (which describes how
 // it plays). Copy: src/data/grow.json. Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
-// On desktop the steps are a list in the left column (.grow-list) in place of the dots and arrows under the picture;
-// CSS shows one or the other, so the steps are read once at every size. Each row is a button named by its own words
-// ("1 Your office Team of 8"): an aria-label would have to contain them all (WCAG 2.5.3). Without script the whole
-// world shows, finished, with every step's card in a list.
+// The steps are one list (.grow-list): each row holds its step's button and its card. On desktop the buttons are a
+// growth line in the left column, in place of the dots and arrows under the picture, and the open step's card opens
+// under its button; on phones and tablets the buttons hide and the open card sits under the picture. CSS shows the
+// dots or the buttons, so the steps are read once at every size. A button is named by its own words, the place.
+// Without script the whole world shows, finished, with every step's card in the list.
 // Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
 // with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
 import raw from './grow-world.svg?raw';
@@ -22,7 +23,6 @@ const world = optimize(raw, SVGO)
   .replace(' id="plain"', '');
 const last = steps.length - 1;
 const t = (await copy('home')).grow;
-const team = (n: number) => fill(t.team, { n });
 ---
 
 <section class="section fold grow-section" id="grow" aria-labelledby="grow-title">
@@ -33,18 +33,9 @@ const team = (n: number) => fill(t.team, { n });
         <h2 id="grow-title">{t.title}</h2>
         <p class="lead">{t.lead}</p>
       </div>
-      <ol class="grow-list" aria-label={t.steps} data-md-skip>
-        {steps.map((s, i) => <li>
-          <button type="button" class="grow-item" data-i={i}>
-            <span class="grow-item-n">{i + 1}</span><span class="grow-item-t">{s.place}</span
-            ><span class="grow-item-m">{team(s.team)}</span>
-          </button>
-        </li>)}
-      </ol>
       <div class="grow-player">
         <div class="grow-stage" data-md-skip>
           <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
-          <span class="grow-team" aria-hidden="true">{team(steps[last].team)}</span>
           <Fragment set:html={world} />
           {steps.map((s, i) =>
             s.tags.map((t, k) => <span
@@ -82,17 +73,20 @@ const team = (n: number) => fill(t.team, { n });
           </button>
         </div>
       </div>
-      <ol class="grow-cards">
-        {steps.map((s, i) => <li class="grow-card" data-i={i} data-place={s.place} data-team={s.team}>
-          <h3>{s.title}</h3>
-          <div class="grow-rows">
-            <div class="grow-row grow-watch">
-              <span class="grow-lbl"><i></i>{t.watch}</span>
-              <p>{s.watch}</p>
-            </div>
-            <div class="grow-row grow-handle">
-              <span class="grow-lbl"><i></i>{t.handle}</span>
-              <p>{s.handle}</p>
+      <ol class="grow-list" aria-label={t.steps}>
+        {steps.map((s, i) => <li class="grow-step">
+          <button type="button" class="grow-item" data-i={i}>{s.place}</button>
+          <div class="grow-card" data-i={i} data-place={s.place}>
+            <h3>{s.title}</h3>
+            <div class="grow-rows">
+              <div class="grow-row grow-watch">
+                <span class="grow-lbl"><i></i>{t.watch}</span>
+                <p>{s.watch}</p>
+              </div>
+              <div class="grow-row grow-handle">
+                <span class="grow-lbl"><i></i>{t.handle}</span>
+                <p>{s.handle}</p>
+              </div>
             </div>
           </div>
         </li>)}
