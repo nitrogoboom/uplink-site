@@ -17,9 +17,6 @@ hero:
   cta: Get started
   ctaNote: Free check-up. No contract needed.
   menu: Services # the list under the button
-  allServices:
-    title: All services
-    sub: Help desk, security, cloud, networks, phones
   alt: Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace # the still picture
   news: # the two cards under the drawing
     checkup:

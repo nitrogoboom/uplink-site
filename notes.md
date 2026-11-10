@@ -17,7 +17,6 @@ Needs the owner's eyes on a preview:
 
 Layout and look:
 
-- [ ] Home services, tall cards: drawings are 96px at 1280×800 and 1366×768; look on a real laptop, maybe drop the features on short screens.
 - [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Home at 1280×720: Services, Grow and Reviews run 41–72px past the screen (so before the screen-size work of November 10, 2026).
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
