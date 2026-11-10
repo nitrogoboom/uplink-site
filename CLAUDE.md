@@ -54,6 +54,7 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 - The owner directs and doesn't run commands: agents run every build, check and merge. Tell the owner what changed and what needs their eyes or decision, in plain words, not commands to run.
 - Cloudflare work: the `cloudflare:*` skills cover Workers and Wrangler.
 - The agent may merge its own PRs once CI is green; visual changes wait for the owner to look at the preview.
+- See a merge through in the same turn: after a push the owner approved, wait for the checks, confirm the merge, wait for the deploy on `main`, and look at the live site before you report. Don't end the turn on "it should merge soon" (owner, November 9, 2026).
 
 ## Writing
 
