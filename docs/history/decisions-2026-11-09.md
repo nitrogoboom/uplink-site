@@ -9,7 +9,7 @@ The review ([`recommendations-fable-5.2-2026-11-09.md`](recommendations-fable-5.
 | Wheel grid on Home | Remove it | One fold rule for every page: a section is at least one screen tall, and may grow. The grid's CSS, its script, and its tests go. A short window that runs a little past one screen is expected, not a bug. |
 | French | `/fr/` addresses | French pages get their own addresses (Astro's i18n routing), not a Settings switch. Copy files become `src/data/copy/en/` and `fr/` when French starts. `CLAUDE.md`'s "EN/FR goes in Settings" no longer holds. |
 | The `?` shortcut | Remove it | The shortcut, its on/off switch, its copy, and its lines in the privacy and accessibility pages go. The gear still opens Settings. |
-| Phone hero captions | Try HTML captions on a preview | Built on a pull request and left open. The owner looks on a phone and keeps or drops it. |
+| Phone hero captions | Try HTML captions on a preview | Built on pull request #141. The owner looked on a phone three times: dots alone didn't say what a caption names; a plain straight line looked hand-drawn; the desktop labels' line (a diagonal, then a level tail beside the title) was kept and merged. |
 
 Not asked, because the review's pick is to change nothing now:
 

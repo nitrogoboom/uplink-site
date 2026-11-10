@@ -8,11 +8,11 @@ From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" sectio
 
 Needs the owner's eyes on a preview:
 
-- [ ] Phone hero captions as HTML, without leader lines (decided: try it). It replaces about 300 lines of `home.js`: the captions, their timing, the tap, the pause, and their tests.
 - [ ] Hero: six layouts down to three (stacked, two columns, ultrawide).
 - [ ] Home services on desktop: four variants in `services.css` become one block where the drawing flexes above a floor.
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
+- [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.
 - [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
 
 Drawing generators (the owner directs drawing work):
