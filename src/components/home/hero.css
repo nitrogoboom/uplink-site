@@ -358,8 +358,6 @@
 }
 .hero-cap-t {
   display: flex;
-  align-items: center;
-  gap: var(--sp-2);
   font-size: var(--cap-title);
   font-weight: 600;
   letter-spacing: var(--cap-tracking);
@@ -367,14 +365,9 @@
   text-transform: uppercase;
   color: var(--c-text);
 }
-/* after the title, where the caption's line starts: the colour of its dot on the drawing (the cloud's here, the
-   office item's from home.js) */
-.hero-cap-dot {
-  flex: none;
-  width: calc(var(--cap-dot) * 2);
-  height: calc(var(--cap-dot) * 2);
-  border-radius: var(--r-pill);
-  background: var(--c-sky);
+/* the cloud's title in the cloud's colour; the office's takes its item's (home.js) */
+.hero-cap--cloud .hero-cap-t {
+  color: var(--c-sky);
 }
 .hero-cap-s {
   font-size: var(--cap-sub);
@@ -387,9 +380,10 @@
   text-transform: uppercase;
   color: var(--c-text);
 }
-/* a caption's line and dot on the drawing. The dot: a line of no length with round ends and a stroke that doesn't
-   scale, so it is the same size on every phone; under it, a wider one in the page's colour as its edge. The line
-   runs from the dot after the caption's title to that dot */
+/* a caption's line and dot on the drawing, at the weights the desktop labels have on screen (label() in
+   tools/gen_office.py). The dot: a line of no length with round ends and a stroke that doesn't scale, so it is the
+   same size on every phone; under it, a wider one in the page's colour as its ring. The line: from that dot a
+   diagonal, then a level tail to the caption's title (home.js) */
 .ob-mark {
   opacity: 0;
   transition: opacity var(--dur-2) var(--ease);
@@ -416,7 +410,7 @@
 }
 .ob-mark-edge {
   stroke: var(--c-bg);
-  stroke-width: calc(var(--cap-dot) * 2 + var(--cap-halo));
+  stroke-width: calc(var(--cap-dot) * 2 + var(--cap-ring) * 2);
 }
 .ob-mark-pin {
   stroke-width: calc(var(--cap-dot) * 2);

@@ -189,10 +189,12 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
    captions sit over its free corners: the cloud's (top left; the app it
    names is lit on the tray) and the office's (bottom left; one item at a
    time). They are plain HTML boxes (hero.css, .hero-cap), so their words
-   wrap and grow with the visitor's text size. Each has a dot on the
-   drawing at what it names, the same colour dot after its title, and a
-   line between the two: the one thing read from the page, the title
-   dot's place, once a change. Each changes every 4.4s, 2.2s after the other.
+   wrap and grow with the visitor's text size. Each is tied to what it
+   names as the desktop drawing's labels are (label() in
+   tools/gen_office.py): a dot on the item, a diagonal, then a short
+   level tail that stops beside the title, which takes the item's
+   colour. The one thing read from the page is where the title ends,
+   once a change. Each changes every 4.4s, 2.2s after the other.
    Tapping the drawing moves the office one on. Words and points come
    from the drawing (data-cloud, data-items: tools/gen_office.py).
    ------------------------------------------------------------------ */
@@ -200,6 +202,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 const CAP_EVERY = 2200; // ms between caption changes, the two captions taking turns (each one every 4.4s)
 const CAP_SWAP = 170; // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
 const CAP_SECOND = 1100; // ms from the first caption to the second
+const CAP_GAP = 8; // px from the end of a caption's title to its line
+const CAP_TAIL = 18; // px the line runs level beside the title before it turns to its item
 const CLOUD_TITLE = WORDS.title;
 /** @param {string} cls @param {Element} parent */
 const span = (cls, parent) => {
@@ -225,7 +229,6 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     el.setAttribute('aria-hidden', 'true'); // the drawing's own label says what it shows
     const head = span('hero-cap-t', el);
     const t = span('', head);
-    const dot = span('hero-cap-dot', head);
     const s = span('hero-cap-s', el);
     box.append(el);
     const mark = document.createElementNS(SVG_NS, 'g');
@@ -237,7 +240,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
       return p;
     });
     svg.append(mark);
-    return { el, dot, t, s, mark, lead, pin };
+    return { el, t, s, mark, lead, pin };
   };
   const spots = { cloud: spot('cloud'), office: spot('office') };
   const at = { cloud: -1, office: -1 };
@@ -245,17 +248,19 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   // where each caption points now, so its line can be drawn again when the drawing's size changes
   /** @type {{ sp: Spot, x: number, y: number, level: boolean }[]} */
   const aims = [];
-  // the line from the dot after a caption's title to its dot on the drawing. The title dot's place comes from the
-  // boxes' offsets (a transform on the way in doesn't move those), turned into the drawing's units: the drawing
-  // fills the stage. level: a flat run first, then down to the point (the cloud's, which sits beside its caption)
+  // a caption's line, as the desktop labels draw theirs: from the item's dot a diagonal to an elbow level with the
+  // middle of the title, then a level tail that stops CAP_GAP short of the title's end. Where the title ends comes
+  // from the boxes' offsets (a transform on the way in doesn't move those), turned into the drawing's units: the
+  // drawing fills the stage. level: the tail runs on until it is near the point (the cloud's, beside its caption)
   /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
   const lineTo = (sp, x, y, level) => {
     if (!box.clientWidth) return;
     const k = vb.width / box.clientWidth;
-    const sx = vb.x + (sp.el.offsetLeft + sp.dot.offsetLeft + sp.dot.offsetWidth / 2) * k;
-    const sy = vb.y + (sp.el.offsetTop + sp.dot.offsetTop + sp.dot.offsetHeight / 2) * k;
-    const run = level ? `H${Math.max(sx, x - 50).toFixed(1)}` : '';
-    sp.lead.setAttribute('d', `M${sx.toFixed(1)},${sy.toFixed(1)}${run}L${x},${y}`);
+    const head = /** @type {HTMLElement} */ (sp.t.parentElement);
+    const sx = vb.x + (sp.el.offsetLeft + head.offsetLeft + sp.t.offsetWidth + CAP_GAP) * k;
+    const sy = vb.y + (sp.el.offsetTop + head.offsetTop + head.offsetHeight / 2) * k;
+    const ex = level ? Math.max(sx + CAP_TAIL * k, x - 50) : sx + CAP_TAIL * k;
+    sp.lead.setAttribute('d', `M${x},${y}L${ex.toFixed(1)},${sy.toFixed(1)}H${sx.toFixed(1)}`);
   };
   /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
   const pinAt = (sp, x, y, level) => {
@@ -266,9 +271,9 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     lineTo(sp, x, y, level);
   };
   const redraw = () => aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
-  // the office's dot beside its title: the colour its dot on the drawing shows, which the light theme changes
+  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes
   const match = () => {
-    if (at.office >= 0) spots.office.dot.style.background = window.getComputedStyle(spots.office.pin[1]).stroke;
+    if (at.office >= 0) spots.office.t.style.color = window.getComputedStyle(spots.office.pin[1]).stroke;
   };
   const write = {
     cloud: () => {
