@@ -31,6 +31,8 @@ Tokens are the budget. The owner wants hours of work for a few percent of it.
 | Words, content or data: `src/content/`, `src/data/` | `.claude/rules/content.md` |
 | Markup, page scripts, headers, the Worker | `.claude/rules/markup-scripts.md` |
 | A drawing, `tools/`, or a colour token | the `drawing` skill, `.claude/rules/drawings.md` |
+| A drawing tool's flags, the drawing rules | `docs/drawing-tools.md` |
+| A site check's flags, the smoke check | `docs/site-checks.md` |
 | The Worker, CI, deploys, previews, rollback, headers | `docs/ops.md` |
 | Security controls, secrets (names and places only) | `docs/security.md` |
 | A release or launch day | the `release` skill, `docs/release.md` |

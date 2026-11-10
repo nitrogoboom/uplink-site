@@ -1,8 +1,6 @@
 # Release and launch
 
-*Last updated: November 9, 2026*
-
-Use this page before a release or the launch only. It holds the standards the site meets, the release checklist, what's left before the real domain, and the launch-day steps. Day-to-day checks are in CLAUDE.md, "Checking a change"; CI and deploys are in [`ops.md`](ops.md#deploys).
+Use this page before a release or the launch only. Day-to-day checks are in CLAUDE.md, "Checking a change"; CI and deploys are in [`ops.md`](ops.md#deploys).
 
 A *release* is the first production launch, and any later change to layout, navigation, or forms, or a new page. A copy fix or a style tweak isn't one. Run the release checklist at least every three months anyway.
 
@@ -10,18 +8,18 @@ A *release* is the first production launch, and any later change to layout, navi
 
 | Area | Standard | Where it's shown |
 | --- | --- | --- |
-| Accessibility | **WCAG 2.2 Level AA** (includes WCAG 2.0 AA, Ontario's level). Our own choice: Ontario requires it only from 50 staff (decided November 3, 2026; raised to 2.2 on November 8, 2026). | `/accessibility` (`src/data/accessibility.md`) gives a feedback route. |
+| Accessibility | **WCAG 2.2 Level AA** (includes WCAG 2.0 AA, Ontario's level). | `/accessibility` (`src/data/accessibility.md`) gives a feedback route. |
 | Privacy | PIPEDA, and CASL for the newsletter | `/privacy` (`src/data/privacy.md`); [`security.md`](security.md#privacy) |
 | Security | HTTPS and HSTS, strict CSP with hashes, Trusted Types, the protective headers, a security contact, secrets never in the repository | [`security.md`](security.md) |
 | Browsers | Current Chrome, Edge, Firefox, and Safari, plus iOS Safari and Android Chrome. Older browsers get a working page without the extras. | The support list is still to write (`notes.md`). |
 | Performance | PageSpeed 100 on Home, phone and desktop | `npm run pagespeed -- ADDRESS` |
 | Language | English (Canada), `lang="en-CA"`; a French page gets `lang="fr-CA"` | `src/layouts/Base.astro` |
 
-**Ontario's website rule** ([O. Reg. 191/11](https://www.ontario.ca/laws/regulation/110191), s. 14): organizations with 50 or more employees in Ontario must meet WCAG 2.0 AA on public websites, except live captions (1.2.4) and pre-recorded audio description (1.2.5). The duties at 50 or more staff (policy, multi-year plan, feedback process, accessible formats) and the compliance report from 20 employees are listed, with sources, in [`history/privacy-and-accessibility-2026-11-03.md`](history/privacy-and-accessibility-2026-11-03.md).
+**Ontario's website rule** ([O. Reg. 191/11](https://www.ontario.ca/laws/regulation/110191), s. 14): organizations with 50 or more employees in Ontario must meet WCAG 2.0 AA on public websites, except live captions (1.2.4) and pre-recorded audio description (1.2.5).
 
 ## What the machines prove
 
-Don't repeat these by hand. The site checks (README, "Site checks"; each test's name says what it holds) cover: no script errors or CSP blocks while pages load, turn, and have their buttons pressed; no sideways scroll; one `h1` and no skipped heading level; card titles as headings holding their link; pop-ups that open, pass axe, close on Esc, and return focus; the hero, Grow, and footer; every link answering; zoom and a bigger default font (1.4.4, 1.4.10); forced colours; 1.4.11 and 1.4.13 on Home; print; and axe (WCAG 2.0 to 2.2 A and AA plus best practices) with nothing serious, critical, or off its allow-list (`AXE_ALLOW`). `npm test` covers the CSP hashes, the `style=""` refusal, the Markdown copies, the deploy order, and the report endpoint. `npm run smoke` covers the headers, `noindex`, redirects, and the 404 status.
+Don't repeat these by hand: what the site checks ([`site-checks.md`](site-checks.md); each test's name says what it holds), `npm test`, and `npm run smoke` already cover.
 
 > **Important:** axe finds only a third to a half of WCAG problems, and CI runs it only in Chromium. The release audit and the checks by hand cover the rest.
 
@@ -73,7 +71,7 @@ A clean run ticks every box here; a failure names the page and the problem.
 - [ ] **Forms (3.3.1, 3.3.2, 3.3.3):** each form sent empty and with a bad email. Every problem field has its message in words, tied to the field, and focus goes to the first one.
 - [ ] **HTML (4.1.1):** Home passes the W3C validator. When a release changes other pages' markup, run `npm run release-audit -- --html-all`. The report lists CSS the validator doesn't know yet once and doesn't count it.
 
-> **Caution:** The W3C validator limits requests per address ("429 Too Many Requests" after a day of full runs, November 3, 2026). While you fix things, rerun without `html` (`npm run release-audit -- --only browsers,keyboard,reader,motion,forms`) and run `html` once at the end.
+> **Caution:** The W3C validator limits requests per address ("429 Too Many Requests"). While you fix things, rerun without `html` (`npm run release-audit -- --only browsers,keyboard,reader,motion,forms`) and run `html` once at the end.
 
 ### C. By hand (15 minutes)
 
@@ -115,7 +113,7 @@ Proof for B and C: one line per failure, with the page, the problem, and the WCA
 - Result: `pass` / `pass with notes` / `fail` · signed `____`
 - [ ] Tagged and released ([Ship a release](#ship-a-release), step 4).
 
-Free tools for one page by hand: WAVE, axe DevTools, Accessibility Insights, ARC Toolkit, IBM Equal Access, Lighthouse, NVDA, VoiceOver, and Narrator. No paid whole-site scanner is needed: `npm run verify -- --all` runs axe on every page.
+Free tools for one page by hand: WAVE, axe DevTools, Accessibility Insights, ARC Toolkit, IBM Equal Access, Lighthouse, NVDA, VoiceOver, and Narrator.
 
 ## Watch the live site
 
@@ -128,7 +126,7 @@ When CI starts checking something new, take it off the checklist. If a checklist
 
 ## Before launch
 
-What's left before the real domain, beyond the checklist. Tick a line with its date and proof. **(you)** needs a person or a sign-in, **(domain)** waits for the domain, **(content)** for real copy. What's already done is recorded in [`history/go-live-checklist.md`](history/go-live-checklist.md).
+What's left before the real domain, beyond the checklist. Tick a line with its date and proof. **(you)** needs a person or a sign-in, **(domain)** waits for the domain, **(content)** for real copy.
 
 - [ ] Narrow the Trusted Types policy (review J6): `html()` in `core.js` passes every string; accept only the site's own drawings (an `<svg` string from a same-origin `/assets/img/` fetch) and icons.
 - [ ] One cached stylesheet instead of the CSS inlined in every page (review L4): about 10 KB compressed a page now, re-downloaded each time; drops the CSP style hashes.
