@@ -35,7 +35,6 @@ Content:
 
 The agent can do alone (each is its own pull request):
 
-- [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
 - [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
 - [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone; `bottom-nav.css` comments still cite the parked header-fit check.
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
@@ -65,6 +64,7 @@ Code and tools:
 
 Not Home, not setup. Leave these alone unless the owner asks.
 
+- [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go. Parked November 10, 2026: it needs a second template per page (about 250 lines for the 162 it replaces), and every page change would then need two edits.
 - [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (#146); a `fr/` folder, the French words and the `/fr/` addresses are left.
 
 ### Owner and accounts
