@@ -99,7 +99,6 @@ export const home = obj({
     title: text,
     accent: text,
     lead: text,
-    leadShort: text,
     cta: text,
     ctaNote: text,
     menu: text,

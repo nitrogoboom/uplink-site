@@ -273,13 +273,10 @@
   }
 }
 
-/* phones (under the bottom bar's 700px): headline and the short line, the button, then the office full width
+/* phones (under the bottom bar's 700px): headline and the lead, the button, then the office full width
    and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. The button sits
    above the office so it is on the first screen on every phone (under it, a 667px-tall screen put it half under
-   the bottom bar). No eyebrow, and the short line. */
-.lead-short {
-  display: none;
-}
+   the bottom bar). No eyebrow; the lead is the same line as on a big screen. */
 @media (--phone) {
   .hero.fold {
     --hero-pad-top: var(--sp-5);
@@ -296,12 +293,8 @@
     grid-area: top;
     gap: var(--sp-3);
   }
-  .hero-top .eyebrow,
-  .lead-long {
+  .hero-top .eyebrow {
     display: none;
-  }
-  .lead-short {
-    display: inline;
   }
   .hero-art .stage {
     grid-area: stage;
