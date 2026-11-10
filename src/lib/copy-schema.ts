@@ -1,4 +1,4 @@
-// The schema of each copy file in src/data/copy/ (one YAML file per page or area; ui.yaml is the shared UI and
+// The schema of each copy file in src/data/copy/en/ (one YAML file per page or area; ui.yaml is the shared UI and
 // screen-reader text). content.config.ts makes each file a collection checked against its schema here, and
 // src/lib/copy.ts reads them. Every object is strict: a key the schema doesn't name (a typo in the YAML) or one it
 // names that the YAML lacks stops the build, with the file and the key's path in the message. A template ({n},
@@ -262,7 +262,7 @@ export const textPages = obj({
   accessibility: texts('title', 'description', 'eyebrow', 'lead'),
 });
 
-// file name (src/data/copy/NAME.yaml) → its schema
+// file name (src/data/copy/en/NAME.yaml) → its schema
 export const COPY = {
   ui,
   home,

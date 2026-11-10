@@ -39,7 +39,7 @@ Every page is `<Base …>` with its sections inside. `layouts/Base.astro` holds 
 | `ldGraph` | More nodes added to the page's JSON-LD graph. |
 | `footer` | `false` leaves the footer out (the 404: one screen, nothing under it). Default `true`. With the footer comes a one-line contact block that shows only on paper (`.print-contact`), since print leaves the footer out. |
 
-The seven static pages (the five in the menu, plus privacy and accessibility) are listed in `PAGES` in `lib/site.ts`: each one's address and menu name. Each page's `<title>` and description are copy: `title` and `description` at the top of its file in `data/copy/` (privacy's and accessibility's in `text-pages.yaml`, under the page's key). Read them with `await pageMeta('NAME')` from `lib/site.ts`; the page, the sitemap and `llms.txt` all do. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
+The seven static pages (the five in the menu, plus privacy and accessibility) are listed in `PAGES` in `lib/site.ts`: each one's address and menu name. Each page's `<title>` and description are copy: `title` and `description` at the top of its file in `data/copy/en/` (privacy's and accessibility's in `text-pages.yaml`, under the page's key). Read them with `await pageMeta('NAME')` from `lib/site.ts`; the page, the sitemap and `llms.txt` all do. The sitemap's dates, and a case study's, come from `lib/git-dates.mjs`: one function for both, scoped to the entry's own file.
 
 A page adds its own script inside `<Base>`, like this:
 
@@ -108,7 +108,7 @@ Every other page's Markdown copy is generated at build time from its `<main>` (`
 
 ### Copy
 
-The words the components, layouts and scripts show or announce (headings, buttons, labels, `aria-label`s, hidden text, `alt`, `title`, placeholders, toasts) are in `data/copy/`, one YAML file a page or area. Each file says at its top which page it feeds.
+The words the components, layouts and scripts show or announce (headings, buttons, labels, `aria-label`s, hidden text, `alt`, `title`, placeholders, toasts) are in `data/copy/en/`, one YAML file a page or area. Each file says at its top which page it feeds. `en/` is the English copy and, for now, the only one: the French copy will go in its own folder beside it.
 
 | File | What it holds |
 | --- | --- |
@@ -176,8 +176,8 @@ Scripts in `scripts/` are ES modules, bundled by Astro.
 | `home.js` | Home | The hero: it fetches the drawing cut for the screen (if that fails, the still office from its `<noscript>` stands in), runs the cloud and the phone captions, and drives the phone Services row. |
 | `grow.js` | Home, through `home.js` | Plays the "We grow with you" world, step by step. Two sets of step buttons drive it: the dots under the picture (phones and tablets) and the step list in the left column (desktop). CSS shows one set at each size. |
 | `contact.js` | Contact | The copy buttons and the queue card. |
-| `soon.js` | Coming soon | Names the page that isn't built yet, from the names in `data/copy/soon.yaml`. |
+| `soon.js` | Coming soon | Names the page that isn't built yet, from the names in `data/copy/en/soon.yaml`. |
 
-Every page script imports `core.js`, so `core.js` always runs first. A script's words come from `data/copy/` through `words()` (see [Copy](#copy)); type none into a script.
+Every page script imports `core.js`, so `core.js` always runs first. A script's words come from `data/copy/en/` through `words()` (see [Copy](#copy)); type none into a script.
 
 The scripts are type-checked (`npm run check`; `checkJs` in `tsconfig.json`), with JSDoc for the types: `/** @param {number} i */` on a parameter, `/** @type {HTMLDialogElement | null} */` on a variable, and `/** @type {SVGElement} */ (expr)` (the parentheses matter) to say what a lookup finds. `$` and `$$` give an HTML element unless the variable they go in says otherwise. A promise you don't wait for is marked with `void`. `globals.d.ts` holds the browser types TypeScript's library lacks (Trusted Types).
