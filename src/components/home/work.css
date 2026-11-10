@@ -1,28 +1,25 @@
 /*--- HOME · 4. Our work. The row of project cards is shared (.card-row, src/styles/shared-blocks.css); this file
    holds only the desktop fold. ---*/
-/* desktop (>= 1100 wide and >= 700 tall): one screen, as Services. The heading sits at the top of the fold, where the
-   other folds' headings sit, and the three cards fill the rest; their pictures take the height that is left. One
-   screen is a floor, not a cap: words that need more room make the fold taller, and the pictures keep their floor.
-   Only in a window at least 3:2 wide, as Services: a taller one would stretch the cards into poles. */
-@media (width >= 68.75em) and (height >= 43.75em) and (aspect-ratio >= 3 / 2) {
-  .work-wrap {
-    display: flex;
-    flex-direction: column;
-    min-height: var(--fold-inner);
-  }
-  .work-wrap .card-row {
-    flex: 1;
-    min-height: 0;
-  }
+/* desktop (>= 1100 wide and >= 700 tall, any shape): sized as Services ("What we run", services.css). The cards take
+   the room their drawing and words need, not the whole screen: the fold centres them, with the band showing above and
+   below (owner, November 10, 2026). The drawing box is Services' tall 4:5 one, capped on a short screen so the row
+   stands as tall as the Services row: Services' 24rem less the 6rem more words its cards hold than a project card.
+   Never under 6rem; words that need more grow the section. */
+@media (--fold) {
   .work-wrap .card-media {
-    flex: 1;
-    min-height: 12rem;
-    aspect-ratio: auto;
+    aspect-ratio: 4 / 5;
+    min-height: 6rem;
+    max-height: max(6rem, var(--fold-inner) - 18rem);
   }
-  /* the picture asks for no room of its own (absolute): on a wide, short window (3440 x 1080) a card is wide, and a
-     picture in the flow would take its height from that width and make the fold taller than the screen */
+  /* the picture asks for no room of its own (absolute): the box's ratio and cap alone set its height */
   .work-wrap .card-media img {
     position: absolute;
     inset: 0;
+  }
+  /* on paper there is no screen to share */
+  @media print {
+    .work-wrap .card-media {
+      max-height: none;
+    }
   }
 }
