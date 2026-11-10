@@ -4,7 +4,6 @@
     "title": "Everyone in one place",
     "watch": "Laptops set up by hand, no backups, no one to call when it breaks.",
     "handle": "Every device set up the same way, Microsoft 365 backed up, one help desk number.",
-    "team": 8,
     "tags": [
       { "at": "s1a", "risk": "Who do we call?", "fix": "One help desk" },
       { "at": "s1b", "risk": "No backups", "fix": "Backed up" }
@@ -15,7 +14,6 @@
     "title": "Some people work from home",
     "watch": "Home Wi-Fi, personal devices, logins from anywhere.",
     "handle": "Two-step sign-in, company laptops we manage, and a 24/7 watch for strange logins.",
-    "team": 15,
     "tags": [
       { "at": "s2a", "risk": "Open home Wi-Fi", "fix": "Two-step sign-in" },
       { "at": "s2b", "risk": "Personal laptop", "fix": "Managed laptop" }
@@ -26,7 +24,6 @@
     "title": "Sales hit the road",
     "watch": "A laptop left in a cab, café Wi-Fi, files needed on a phone.",
     "handle": "Encrypted devices we can wipe from here, and safe access to files from anywhere.",
-    "team": 25,
     "tags": [
       { "at": "s3a", "risk": "Laptop left in the car", "fix": "Wiped from here" },
       { "at": "s3b", "risk": "Café Wi-Fi", "fix": "Safe access anywhere" }
@@ -37,7 +34,6 @@
     "title": "A second office opens",
     "watch": "Two networks, two phone systems, files people can't find.",
     "handle": "Both sites linked, one phone system, the same setup in every office.",
-    "team": 60,
     "tags": [
       { "at": "s4a", "risk": "Two networks", "fix": "Sites linked" },
       { "at": "s4b", "risk": "Two phone systems", "fix": "One phone system" }
@@ -48,7 +44,6 @@
     "title": "One team, wherever they work",
     "watch": "Too many apps and accounts, no plan, surprise bills.",
     "handle": "One map of every device and licence, and a budget review each quarter.",
-    "team": 120,
     "tags": [
       { "at": "s5a", "risk": "Too many accounts", "fix": "One map of it all" },
       { "at": "s5b", "risk": "Surprise bills", "fix": "Budget reviewed quarterly" }
@@ -59,7 +54,6 @@
     "title": "All of it, covered",
     "watch": "One gap is all an attacker needs, and the bill lands on you.",
     "handle": "Every place watched 24/7 under one plan, backed by our cyber warranty.",
-    "team": 120,
     "tags": [
       { "at": "s6a", "risk": "Who pays if it goes wrong?", "fix": "Cyber warranty" },
       { "at": "s6b", "risk": "Gaps between tools", "fix": "24/7 watch, one plan" }

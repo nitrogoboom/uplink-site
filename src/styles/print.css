@@ -20,6 +20,7 @@
   .site-footer,
   .svc-step,
   .grow-dots,
+  .grow-item,
   .hero-art .stage,
   .grow-stage,
   form,
@@ -52,6 +53,12 @@
   }
   .grow-row {
     opacity: 1 !important;
+  }
+  .grow-step::before {
+    display: none !important;
+  } /* the desktop growth line: its buttons don't print */
+  .grow.is-live .grow-step {
+    padding-left: 0 !important;
   }
   .work-grid > li {
     display: flex !important;

@@ -115,7 +115,6 @@ export const home = obj({
     title: text,
     lead: text,
     steps: text,
-    team: tpl('n'),
     play: texts('pause', 'play', 'again'),
     previous: text,
     next: text,
@@ -278,6 +277,6 @@ export type Copy<N extends CopyName> = z.infer<(typeof COPY)[N]>;
 // What each page script reads in the browser: the JSON a page carries in <script type="application/json"> (copy.ts
 // writes it; core.js's words() reads it).
 export type UiWords = { toast: Copy<'ui'>['toast']; emailError: string };
-export type HomeWords = { cloud: Copy<'home'>['cloud']; grow: Pick<Copy<'home'>['grow'], 'team' | 'play'> };
+export type HomeWords = { cloud: Copy<'home'>['cloud']; grow: Pick<Copy<'home'>['grow'], 'play'> };
 export type ContactWords = Copy<'contact'>['toast'];
 export type SoonWords = Pick<Copy<'soon'>, 'pageTitle' | 'names'>;

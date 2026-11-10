@@ -127,8 +127,11 @@
       background: var(--c-accent-text); /* Grow's steps already shown: amber ink, dimmed to 0.8 (3.8:1; was 1.35) */
       opacity: 0.8;
     }
-    :root[data-theme='light'] .grow-item[aria-current='step'] {
-      border-color: #c37600; /* amber 500 (palette 4.2), 3.3:1: amber ink beside the amber tile read as brown */
+    :root[data-theme='light'] .grow-item[aria-current='step'] .grow-mark {
+      border-color: var(--c-accent-text); /* Grow's open marker on the growth line */
+    }
+    :root[data-theme='light'] .grow-item[aria-current='step'] .grow-mark::after {
+      background: var(--c-accent-text);
     }
     :root[data-theme='light'] .seg-opt input:checked + span {
       border-color: var(--c-accent-text); /* Settings, the chosen theme */
@@ -149,11 +152,6 @@
   /* Home's news cards: their border was the cool fill's own colour (1:1); the card line gives them an edge */
   :root[data-theme='light'] .news {
     border-color: var(--c-line);
-  }
-
-  /* Grow steps already built: the dark mode's 0.7 fade takes amber ink under 4.5:1 on the light page, so it stays solid */
-  :root[data-theme='light'] .grow-item.is-done :is(.grow-item-t, .grow-item-m) {
-    opacity: 1;
   }
 }
 

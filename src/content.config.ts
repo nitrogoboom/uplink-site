@@ -96,7 +96,6 @@ const grow = defineCollection({
     title: z.string(), // the card's heading
     watch: z.string(), // "Watch for"
     handle: z.string(), // "We handle"
-    team: z.number().int().positive(), // "Team of 8"
     tags: z.array(z.strictObject({ at: z.string().regex(/^s\d+[a-z]$/), risk: z.string(), fix: z.string() })).min(1),
   }),
 });
