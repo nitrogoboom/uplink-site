@@ -66,7 +66,6 @@ export const ui = obj({
     title: text,
     theme: texts('legend', 'system', 'light', 'dark', 'note'),
     motion: texts('title', 'name', 'hint', 'device'),
-    keys: texts('title', 'name', 'hint', 'open', 'note'),
   }),
   footer: obj({
     title: text,
@@ -85,8 +84,6 @@ export const ui = obj({
     dismiss: text,
     motionReduced: text,
     motionOn: text,
-    shortcutsOn: text,
-    shortcutsOff: text,
     booked: texts('title', 'text'),
     subscribed: texts('title', 'text'),
   }),

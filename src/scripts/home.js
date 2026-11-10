@@ -1,7 +1,7 @@
 /* ==========================================================================
    Uplink Technology · Home page
    The hero (the drawing cut for the screen, the cloud, the phone captions), the Services row on
-   phones, and Proof's wheel-grid height. The "We grow with you" section runs from grow.js (imported here).
+   phones. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
 import { $, $$, held, html, reduceMotion, replay, settle, theme, whenOnScreen, words } from './core.js';
@@ -10,12 +10,8 @@ import './grow.js';
 
 // Runs fn right after the browser's next layout pass (a ResizeObserver's first report comes then), so sizes read
 // in fn cost nothing. Read straight after a change to the page, they make the browser lay it out again on the
-// spot (a forced layout). Old browsers: after the next paint, which is clean unless something else ran between.
+// spot (a forced layout).
 const afterLayout = (/** @type {() => void} */ fn) => {
-  if (!('ResizeObserver' in window)) {
-    requestAnimationFrame(() => setTimeout(fn, 0));
-    return;
-  } // window is "never" here to the type check
   const ro = new ResizeObserver(() => {
     ro.disconnect();
     fn();
@@ -111,7 +107,7 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
   const dot = svg.querySelector('.ob-state-dot');
   /** @type {ResizeObserver | null} */
   let dotSized = null;
-  if (dot && 'ResizeObserver' in window) {
+  if (dot) {
     const words = /** @type {Element} */ (stateText.parentNode);
     const right = +(/** @type {string} */ (words.getAttribute('x')));
     dotSized = new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1)));
@@ -464,17 +460,12 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     lastW = w;
     measure(w);
   };
-  const onResize = () => relayout(svg.getBoundingClientRect().width);
-  const sized = 'ResizeObserver' in window ? new ResizeObserver(([en]) => relayout(en.contentRect.width)) : null;
+  const sized = new ResizeObserver(([en]) => relayout(en.contentRect.width));
   // a new theme: measure again, which re-reads the cloud caption's colour (cloudFill) and redraws what's shown
   theme.ev.addEventListener('change', () => {
     if (lastW) measure(lastW);
   });
-  if (sized) sized.observe(svg);
-  else {
-    window.addEventListener('resize', onResize);
-    afterLayout(onResize);
-  }
+  sized.observe(svg);
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
@@ -503,8 +494,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     cancel(swaps.office);
     job++; // a measure still waiting for its paint drops its results
     svg.removeEventListener('click', tap);
-    if (sized) sized.disconnect();
-    else window.removeEventListener('resize', onResize);
+    sized.disconnect();
   };
 };
 if (stage) {
@@ -611,7 +601,7 @@ if (stage) {
 const svcRow = $('.svc-menu');
 const svcDots = $$('.svc-dots .pip');
 const svcHint = $('.svc-hint');
-if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
+if (svcRow && svcDots.length) {
   const cards = Array.from(svcRow.children);
   const hint = /** @type {HTMLElement} */ (svcHint); // Services.astro has it with the dots
   const steps = $$('.svc-step', hint);
@@ -708,35 +698,4 @@ if (svcRow && svcDots.length && 'IntersectionObserver' in window) {
     e.preventDefault();
     /** @type {HTMLElement} */ ($('a', next)).focus({ preventScroll: true });
   });
-}
-
-/* ------------------------------------------------------------------
-   Wheel grid (fold.css, tokens.css): on desktop every fold is a whole
-   number of wheel steps tall, so the wheel's stops land on fold edges.
-   CSS makes each fold at least one screen, rounded up to a step; a fold
-   whose words need more room than that (Proof always: it is as tall as
-   its words; Services and Grow on a narrow or short desktop, 1100 x 700
-   to 1200 x 800) grows by its content, which CSS can't round, so each
-   rounds its own height up to the next step here, and the next fold
-   starts on a stop too. Off below desktop, where sections take their
-   own height.
-   ------------------------------------------------------------------ */
-const folds = $$('main > .fold, #proof').filter((f) => f.firstElementChild);
-if (folds.length && 'ResizeObserver' in window) {
-  const fold = window.matchMedia(MEDIA.fold);
-  const fit = (/** @type {HTMLElement} */ f) => {
-    f.style.minHeight = '';
-    if (!fold.matches) return;
-    const step = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--wheel-step'));
-    const h = f.getBoundingClientRect().height; // its own height: the CSS floor, or its words if they need more
-    const up = Math.ceil(h / step - 0.001) * step;
-    if (step > 0 && up - h > 0.5) f.style.minHeight = `${up}px`;
-  };
-  // a fold's inner box keeps its height when the fold grows (centred in its row, not stretched; its words only rewrap
-  // with the width), so this never loops
-  const seen = new ResizeObserver((list) =>
-    list.forEach((e) => fit(/** @type {HTMLElement} */ (e.target.parentElement))),
-  );
-  folds.forEach((f) => seen.observe(/** @type {Element} */ (f.firstElementChild)));
-  fold.addEventListener('change', () => folds.forEach(fit));
 }

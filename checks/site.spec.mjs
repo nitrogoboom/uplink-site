@@ -404,21 +404,25 @@ for (const page of PAGES) {
             fails.push(`${name}: #${id} isn't shown once open: ${JSON.stringify(st)}`);
           const v = (await axe(q).include(`#${id}`).analyze()).violations;
           for (const x of axeFails(v)) fails.push(`${name}: axe in #${id}: [${x.impact}] ${x.id}`);
-          // a toast in the dialog: Settings' shortcuts switch says what it did, then leaves on its own (3 s)
-          if (id === 'settings-dialog' && (await q.locator('#sc-toggle').count())) {
-            await q.locator('#sc-toggle').click();
-            await q.waitForSelector(`#${id} .toast`, { timeout: 5000 }).catch(() => {});
-            await settled(q, `#${id} .toast`);
-            const t = await q.evaluate(shownStyle, `#${id} .toast`);
-            if (!t || t.opacity < 0.99) fails.push(`${name}: the shortcuts toast isn't shown: ${JSON.stringify(t)}`);
-            await q.clock.runFor(3000); // its time on screen; then it fades out (a CSS animation, in real time)
-            const gone = await q
-              .waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 })
-              .then(
-                () => true,
-                () => false,
-              );
-            if (!gone) fails.push(`${name}: the shortcuts toast never left`);
+          // a toast in the dialog: Settings' Reduce motion switch says what it did, then leaves on its own (3 s).
+          // Twice, so the choice is back where it was for the checks that follow
+          if (id === 'settings-dialog' && (await q.locator('#mo-toggle').count())) {
+            for (const turn of ['first', 'second']) {
+              await q.locator('#mo-toggle').click();
+              await q.waitForSelector(`#${id} .toast`, { timeout: 5000 }).catch(() => {});
+              await settled(q, `#${id} .toast`);
+              const t = await q.evaluate(shownStyle, `#${id} .toast`);
+              if (!t || t.opacity < 0.99)
+                fails.push(`${name}: the motion toast isn't shown (${turn} click): ${JSON.stringify(t)}`);
+              await q.clock.runFor(3000); // its time on screen; then it fades out (a CSS animation, in real time)
+              const gone = await q
+                .waitForFunction((d) => !document.querySelector(`#${d} .toast`), id, { timeout: 6000 })
+                .then(
+                  () => true,
+                  () => false,
+                );
+              if (!gone) fails.push(`${name}: the motion toast never left (${turn} click)`);
+            }
           }
           await q.keyboard.press('Escape');
           await q.waitForFunction((d) => !document.getElementById(d).open, id, { timeout: 2000 }).catch(() => {});
@@ -814,11 +818,11 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   if (skip !== 'main') fails.push(`Skip to content: focus went to ${skip}, not <main>`);
   // a toast, dismissed with Enter
   await q.locator('[data-open="settings-dialog"]:visible').first().click();
-  await q.locator('#sc-toggle').click();
+  await q.locator('#mo-toggle').click();
   await q.waitForTimeout(400);
   await q.keyboard.press('Tab');
   const inToast = await q.evaluate(() => !!document.activeElement?.closest('.toast'));
-  if (!inToast) fails.push("Tab from the shortcuts switch didn't reach the toast it showed");
+  if (!inToast) fails.push("Tab from the Reduce motion switch didn't reach the toast it showed");
   await q.keyboard.press('Enter');
   await q.waitForTimeout(500);
   const after = await q.evaluate(() => {
@@ -831,7 +835,6 @@ test('pop-ups: double-click, live regions, Esc in the name, skip link, toast foc
   });
   if (after.body || !after.inDialog) fails.push(`toast dismissed with Enter: focus went to ${after.what}`);
   console.log(`pop-ups: regions ${JSON.stringify(marked)}, skip -> ${skip}, toast dismissed -> ${after.what}`);
-  // the toast check toggled the shortcuts off: on again, for whoever is next in this context (nothing is)
   await ctx.close();
   verdict([...fails, ...errs]);
 });
@@ -2261,9 +2264,8 @@ for (const page of PAGES) {
   });
 }
 
-// C1 (layout phase 4: text in rem, the room round it from the screen). Home on desktop windows people use: the hero is
-// one wheel step tall and its menu and news cards are on the first screen; every Home section starts on the 100px
-// wheel grid (its top under the header a multiple of 100). The hero's news cards at 1100 to 1240 wide (where the
+// C1 (layout phase 4: text in rem, the room round it from the screen). Home on desktop windows people use: the hero's
+// menu and news cards are on the first screen. The hero's news cards at 1100 to 1240 wide (where the
 // office column is narrowest): no word in a card split across lines, and the words and tag inside the card. The footer
 // map's label sits on the drawing's base, not in empty space under it.
 const FIRST = [
@@ -2283,7 +2285,7 @@ const FIRST = [
   [3440, 1080],
   [3440, 1440],
 ];
-test('Home: hero on the first screen, sections on the wheel grid (C1)', async ({ browser }) => {
+test('Home: hero menu and news cards on the first screen (C1)', async ({ browser }) => {
   const fails = (
     await lanes(FIRST, 4, async ([w, h]) => {
       const q = await browser.newPage({ viewport: { width: w, height: h } });
@@ -2292,26 +2294,12 @@ test('Home: hero on the first screen, sections on the wheel grid (C1)', async ({
       await q.evaluate(() => document.fonts.ready);
       const r = await q.evaluate(() => {
         const out = [];
-        const head = document.querySelector('.site-header').getBoundingClientRect().height;
-        const probe = document.createElement('div');
-        probe.style.height = 'var(--fold-pitch)';
-        document.body.append(probe);
-        const pitch = probe.getBoundingClientRect().height;
-        probe.remove();
-        const hero = document.querySelector('#top').getBoundingClientRect();
-        if (hero.height > pitch + 1)
-          out.push(`hero ${Math.round(hero.height)}px tall, more than one wheel step (${Math.round(pitch)}px)`);
         for (const sel of ['.hero-menu .menu li:last-child', '.hero-cta', '.hero-dock']) {
           const e = document.querySelector(sel);
           if (!e || !e.getClientRects().length) continue;
           const b = e.getBoundingClientRect().bottom;
           if (b > innerHeight + 1)
             out.push(`${sel} ends at ${Math.round(b)}px, below the first screen (${innerHeight}px)`);
-        }
-        for (const s of document.querySelectorAll('main > section.fold')) {
-          const t = s.getBoundingClientRect().top + scrollY - head;
-          if (Math.abs(t - Math.round(t / 100) * 100) > 1)
-            out.push(`#${s.id} starts ${Math.round(t)}px under the header, off the 100px wheel grid`);
         }
         return out;
       });

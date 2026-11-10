@@ -9,8 +9,6 @@
    or when Ctrl / Cmd / Alt is held.
    ========================================================================== */
 
-import { MEDIA } from '../lib/media.js';
-
 const root = document.documentElement;
 // For the type check (JSDoc, tsconfig checkJs) what they find is an HTML element, or the type of the variable it goes
 // in (an SVG part, a <dialog>): what a selector finds is up to the markup.
@@ -409,52 +407,6 @@ window.addEventListener('pageshow', (e) => {
 applyMotion();
 
 /* ======================================================================
-   Keyboard shortcuts
-   ====================================================================== */
-const SC_KEY = 'uplink.shortcuts';
-if (store.get(SC_KEY) === 'off') root.dataset.shortcuts = 'off';
-const shortcutsOn = () => root.dataset.shortcuts !== 'off';
-
-const scToggle = /** @type {HTMLInputElement | null} */ (document.getElementById('sc-toggle'));
-if (scToggle) {
-  scToggle.checked = shortcutsOn();
-  scToggle.addEventListener('change', () => {
-    if (scToggle.checked) {
-      delete root.dataset.shortcuts;
-      store.set(SC_KEY, 'on');
-    } else {
-      root.dataset.shortcuts = 'off';
-      store.set(SC_KEY, 'off');
-    }
-    toast({ title: scToggle.checked ? UI.toast.shortcutsOn : UI.toast.shortcutsOff, tone: 'info', timeout: 3000 });
-  });
-}
-
-/** @param {HTMLElement} el */
-function isTyping(el) {
-  if (!el || el === document.body) return false;
-  if (el.isContentEditable) return true;
-  if (el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') return true;
-  if (el.tagName === 'INPUT') {
-    const nonText = ['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file'];
-    return !nonText.includes(/** @type {HTMLInputElement} */ (el).type);
-  }
-  return false;
-}
-
-document.addEventListener('keydown', (e) => {
-  if (e.defaultPrevented || e.isComposing || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
-  if (!shortcutsOn()) return;
-  if (isTyping(/** @type {HTMLElement} */ (e.target))) return;
-  if (document.querySelector('dialog[open]')) return;
-
-  if (e.key === '?') {
-    e.preventDefault();
-    openDialog('settings-dialog');
-  }
-});
-
-/* ======================================================================
    Forms: inline validation, then a confirmation toast.
    This prototype does not send anything anywhere yet.
    ====================================================================== */
@@ -519,55 +471,6 @@ document.addEventListener('keydown', (e) => {
   });
 });
 
-/* ---------- phone tab bar: out of the way while reading ----------------- */
-// Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back.
-// It always shows at the top and the end of the page and while one of its links has focus.
-// The header stays put. The bar shows on phones only (bottom-nav.css); elsewhere it is hidden, so the listener does
-// nothing there.
-const botnav = $('.botnav');
-if (botnav) {
-  const STEP = 12; // px of travel before the bar reacts, so small jitters don't flicker it
-  const phone = window.matchMedia(MEDIA.phone);
-  const barOn = () => phone.matches;
-  /** @type {number | null} */
-  let lastY = null; // set on the first scroll: reading scrollY as the page loads makes the browser lay it out early
-  let queued = false;
-  const show = (/** @type {boolean} */ on) => botnav.classList.toggle('is-hidden', !on);
-  const update = () => {
-    queued = false;
-    if (!barOn()) {
-      show(true);
-      return;
-    }
-    const y = window.scrollY;
-    if (lastY === null) lastY = y;
-    const end = root.scrollHeight - window.innerHeight - STEP;
-    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) {
-      show(true);
-      lastY = y;
-      return;
-    }
-    if (Math.abs(y - lastY) < STEP) return;
-    show(y < lastY);
-    lastY = y;
-  };
-  window.addEventListener(
-    'scroll',
-    () => {
-      if (!queued && barOn()) {
-        queued = true;
-        window.requestAnimationFrame(update);
-      }
-    },
-    { passive: true },
-  );
-  phone.addEventListener('change', () => {
-    lastY = window.scrollY;
-    show(true);
-  });
-  botnav.addEventListener('focusin', () => show(true));
-}
-
 /* ---------- replay ----------------------------------------------------- */
 // Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
 // read, so it costs no forced layout (offsetWidth would). While the pause is on it shows the animation's end
@@ -597,7 +500,7 @@ const settle = (/** @type {Element} */ el) => {
 // its looping animations) and tells onChange(onScreen) about each change.
 /** @param {Element | null | undefined} el @param {(onScreen: boolean) => void} [onChange] */
 function whenOnScreen(el, onChange) {
-  if (!el || !('IntersectionObserver' in window)) return null;
+  if (!el) return null;
   const io = new IntersectionObserver(([en]) => {
     el.classList.toggle('is-idle', !en.isIntersecting);
     if (onChange) onChange(en.isIntersecting);
@@ -647,19 +550,4 @@ if (document.readyState === 'complete') whenIdle(startBeacon);
 else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export {
-  $,
-  $$,
-  UI,
-  held,
-  html,
-  reduceMotion,
-  replay,
-  settle,
-  theme,
-  toast,
-  openDialog,
-  shortcutsOn,
-  whenOnScreen,
-  words,
-};
+export { $, $$, UI, held, html, reduceMotion, replay, settle, theme, toast, whenOnScreen, words };

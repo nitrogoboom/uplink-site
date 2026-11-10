@@ -35,7 +35,6 @@
   :root {
     --fold-h: initial !important;
     --fold-inner: initial !important;
-    --fold-pitch: initial !important;
   }
   .site-header {
     position: static;

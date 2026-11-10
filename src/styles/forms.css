@@ -204,7 +204,7 @@ select.input:hover {
 /* option buttons: one choice from a short row (Settings: theme). Native radios in a fieldset, so the arrow keys move
    between them and a screen reader says "radio, 1 of 3"; the input sits over its label, invisible, and the label
    draws the button. Brought back from the old text-size option (git 030a4f5^). The chosen one takes the palette's
-   selected look (amber tint and an even amber border, docs/design.md colour rule 11), not a fill: the shortcuts switch
+   selected look (amber tint and an even amber border, docs/design.md colour rule 11), not a fill: the Reduce motion switch
    below is the pop-up's one amber fill. */
 .seg-field {
   display: flex;

@@ -16,14 +16,10 @@
   :root {
     --fold-inner: calc(var(--fold-h) - 2 * var(--fold-pad));
   }
-  /* Home's wheel grid (docs/history/fold-wheel-grid-2026-11-04.md): each fold is --fold-pitch tall, whole wheel steps, so
-     from the top or a menu link every fold edge is a wheel stop. The content sits in a row one screen tall (less the
-     padding), centred there; the extra (under one step) is free space below that row, and the spacing check never
-     sees it. Content taller than the screen first grows into that extra, so the fold stays a whole number of steps;
-     only content taller than the step makes it taller. Proof rounds its own height up to a step (home.js); the footer
-     stays one screen, so the page's end is a stop too. */
+  /* Home: the content sits in a row one screen tall (less the padding), centred there; content that needs more room
+     grows the fold. The wheel grid that rounded each fold up to whole wheel steps is gone (owner, November 9, 2026:
+     docs/history/decisions-2026-11-09.md). */
   [data-page='home'] .fold {
-    min-height: var(--fold-pitch);
     display: grid;
     grid-template-columns: minmax(0, 1fr); /* the screen's width, never the content's */
     grid-template-rows: minmax(var(--fold-inner), auto);

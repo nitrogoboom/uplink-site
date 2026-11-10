@@ -81,12 +81,6 @@ settings:
     name: Reduce motion
     hint: Stops the moving drawings and the slide and fade effects on every page.
     device: Your device asks for less motion; turn this off to see them on this site only.
-  keys:
-    title: Keyboard shortcuts
-    name: Single-key shortcuts
-    hint: Turn off if they clash with a screen reader or voice control.
-    open: Open these settings
-    note: Shortcuts pause while you type or while a pop-up is open.
 
 footer:
   title: Site footer # the footer's hidden heading
@@ -108,8 +102,6 @@ toast:
   dismiss: Dismiss # each toast's close button
   motionReduced: Motion reduced
   motionOn: Motion on
-  shortcutsOn: Shortcuts on
-  shortcutsOff: Shortcuts off
   booked:
     title: Check-up requested
     text: We will email you within one business day to pick a time.
