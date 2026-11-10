@@ -5,14 +5,14 @@ description: Change, add or recolour one of the Uplink site's isometric drawings
 
 # Change a drawing
 
-Every drawing is the output of a Python script. You change numbers in the script and run it; you never edit an output SVG. The rules are in `.claude/rules/drawings.md`; the geometry and each tool's flags are in the README ("Drawing rules", "Tools"). This file is the order of work.
+Every drawing is the output of a Python script. You change numbers in the script and run it; you never edit an output SVG. The rules are in `.claude/rules/drawings.md`; the geometry and each tool's flags are in `docs/drawing-tools.md` ("Drawing rules", "Tools"). This file is the order of work.
 
 Drawings change only on the owner's machine, and only when the owner asks. CI doesn't check them, so these steps are the only check there is.
 
 ## Steps
 
-1. Find the script and how to run it. The README's "Generators" table lists each one, its arguments and every file it writes. A service scene is `python tools/gen_NAME.py public/assets/img/NAME.svg`; the office and hero are `python tools/gen_office.py public`; Grow (`gen_grow.py`) and the footer map (`gen_campus.py`) take no argument.
-2. Make sure the tools are installed (README, "Install the Python drawing tools"). If `python tools/regen.py --check` fails before it draws anything, that's the cause.
+1. Find the script and how to run it. The "Generators" table in `docs/drawing-tools.md` lists each one, its arguments and every file it writes. A service scene is `python tools/gen_NAME.py public/assets/img/NAME.svg`; the office and hero are `python tools/gen_office.py public`; Grow (`gen_grow.py`) and the footer map (`gen_campus.py`) take no argument.
+2. Make sure the tools are installed (docs/drawing-tools.md, "Install the Python drawing tools"). If `python tools/regen.py --check` fails before it draws anything, that's the cause.
 3. Change the numbers in the script. Colours come from `tools/palette.py`, which reads `src/styles/tokens.css`; don't type a hex value into a generator.
 4. Run the script, then both checks on what it wrote. The first lines of `tools/rules_NAME.py` give the exact commands for every cut, for example:
 
@@ -42,8 +42,8 @@ A change to a colour in `src/styles/tokens.css` changes drawings too. After it, 
 
 ## A new drawing
 
-Copy the closest `gen_NAME.py` and its `rules_NAME.py`, show the picture through `<Drawing src="/assets/img/NAME.svg" … />`, and add the new script to the README's "Generators" table and to `SCENES` or `GENERATORS` in `tools/regen.py`, which runs only the scripts it lists.
+Copy the closest `gen_NAME.py` and its `rules_NAME.py`, show the picture through `<Drawing src="/assets/img/NAME.svg" … />`, and add the new script to the "Generators" table in `docs/drawing-tools.md` and to `SCENES` or `GENERATORS` in `tools/regen.py`, which runs only the scripts it lists.
 
 ## When something here is wrong
 
-The scripts and the README win over this file. Fix this file in the same pull request.
+The scripts and `docs/drawing-tools.md` win over this file. Fix this file in the same pull request.

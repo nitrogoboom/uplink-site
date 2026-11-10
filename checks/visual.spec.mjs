@@ -1,4 +1,4 @@
-// Screenshot comparison: every page of the new build next to the old one, pixel by pixel (README, "Site checks"). It
+// Screenshot comparison: every page of the new build next to the old one, pixel by pixel (docs/site-checks.md, "Site checks"). It
 // reports and doesn't fail, because most changes are meant: a person looks at the list and says whether each one was.
 // usage: npm run visual-diff -- OLD_URL NEW_URL [--strict] [--wide]
 // Drawings, photos and the footer map are masked (painted over in both shots): their animation frames differ run to

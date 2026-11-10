@@ -1,5 +1,5 @@
 """Draws the office floor plan and the Home hero from one world-space description, in cuts that share every shape
-(README, "Generators" and "Which cut shows where"; each output is listed where it's written, at the end).
+(docs/drawing-tools.md, "Generators" and "Which cut shows where"; each output is listed where it's written, at the end).
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of them. Keep the hero's classes, --d delays and data-tile
 as the page's JS and CSS expect; its animation CSS and the cloud's frame are input parts in tools/office_parts/.

@@ -1,5 +1,5 @@
 // Smoke check: a deployed site answers the way it should, over plain HTTP with no browser. Run it after a deploy and
-// on launch day (docs/release.md, "Launch day"). What it checks and each flag: README, "Live-site checks".
+// on launch day (docs/release.md, "Launch day"). What it checks and each flag: docs/site-checks.md, "Live-site checks".
 //   npm run smoke -- https://uplink-site.johnoreilly.workers.dev        today: noindex expected
 //   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable, sitemap named
 //   npm run smoke -- https://uplinkit.ca --launch --old https://uplink-site.johnoreilly.workers.dev
