@@ -91,6 +91,9 @@ export const ui = obj({
 
 const app = texts('name', 'state', 'detail');
 export const home = obj({
+  title: text, // <title>
+  description: text,
+  business: text, // the business's description in Home's JSON-LD block
   hero: obj({
     eyebrow: list(text),
     title: text,
@@ -135,6 +138,8 @@ export const home = obj({
 });
 
 export const about = obj({
+  title: text, // <title>
+  description: text,
   profile: obj({
     eyebrow: text,
     title: text,
@@ -155,6 +160,8 @@ export const about = obj({
 });
 
 export const services = obj({
+  title: text, // <title>
+  description: text,
   overview: texts('eyebrow', 'title', 'lead', 'list'),
   faq: obj({ eyebrow: text, title: text, cta: band }),
   page: obj({
@@ -169,6 +176,8 @@ export const services = obj({
 });
 
 export const work = obj({
+  title: text, // <title>
+  description: text,
   projects: texts('eyebrow', 'title', 'lead', 'filter', 'all'),
   case: obj({
     client: text,
@@ -180,6 +189,8 @@ export const work = obj({
 });
 
 export const contact = obj({
+  title: text, // <title>
+  description: text,
   message: obj({
     eyebrow: text,
     title: text,
@@ -246,7 +257,10 @@ export const soon = obj({
 
 export const notFound = texts('title', 'description', 'eyebrow', 'heading', 'lead', 'home', 'services', 'contact');
 
-export const textPages = obj({ privacy: texts('eyebrow', 'lead'), accessibility: texts('eyebrow', 'lead') });
+export const textPages = obj({
+  privacy: texts('title', 'description', 'eyebrow', 'lead'),
+  accessibility: texts('title', 'description', 'eyebrow', 'lead'),
+});
 
 // file name (src/data/copy/NAME.yaml) → its schema
 export const COPY = {

@@ -1,6 +1,9 @@
 # Our work: the /work page's own words, and the words every case study (/work/SLUG) shares around its own copy. Each
 # project's words are data (src/content/projects/SLUG.json). Schema: src/lib/copy-schema.ts.
 
+title: Our work · Uplink Technology # <title>
+description: Office moves, security lockdowns, Microsoft 365 and Google moves, and backup projects we built and still run.
+
 projects:
   eyebrow: Our work
   title: Setups we built and still run

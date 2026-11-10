@@ -1,22 +1,17 @@
 ---
 // CONTACT. Sections in page order; each is one component in src/components/contact/.
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
+import { pageMeta } from '../lib/site';
 import Message from '../components/contact/Message.astro';
 import Support from '../components/contact/Support.astro';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
 import type { ContactWords } from '../lib/copy-schema';
 const { toast } = await copy('contact');
+const meta = await pageMeta('contact');
 ---
 
-<Base
-  title={PAGES.contact.title}
-  description={PAGES.contact.description}
-  page="contact"
-  path="/contact"
-  type="ContactPage"
->
+<Base title={meta.title} description={meta.description} page="contact" path="/contact" type="ContactPage">
   <Message />
   <Support />
   <Fragment slot="scripts">

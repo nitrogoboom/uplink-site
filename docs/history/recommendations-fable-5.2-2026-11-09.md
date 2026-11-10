@@ -30,7 +30,7 @@ No browser checks were run and no page was looked at. Every layout suggestion be
 | 6 | Move drawing maths out of the page scripts | **Open.** Needs the Python generators to write the numbers. Old-browser fallbacks and two unused exports went (#138). |
 | 7 | One way to colour drawings | **Part done.** The colour CSS now ships on Home only (#137). Role classes in `gen_office.py` and `gen_grow.py` are open. |
 | 8 | Make the build one step | **Open.** |
-| 9 | Decide French | **Decided:** `/fr/` addresses. The move of copy files and of the words still in code is open. |
+| 9 | Decide French | **Decided:** `/fr/` addresses. The words still in code are in the copy files now: page titles and descriptions, and Home's business description (#143). The `/fr/` routing and the move of copy files to `src/data/copy/en/` are open. |
 | 10 | Tighten the Cloudflare and GitHub keys | **Open.** For the owner, before launch. |
 
 ### Section by section

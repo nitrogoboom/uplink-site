@@ -3,12 +3,12 @@
 // contact placeholders ({privacy}, {phone}, {street} …) are filled while the Markdown renders (src/lib/placeholders.mjs).
 // A placeholder still in the page (one in raw HTML, which the plugin doesn't read), as {name} or %7Bname%7D, stops the build.
 // <!-- comments --> in the Markdown stay out of the page's text (the privacy page marks what applies once the forms send).
-// Styles: text-page.css. Title and description: PAGES in src/lib/site.ts.
+// Styles: text-page.css. Title and description: text-pages.yaml (pageMeta() in src/lib/site.ts).
 //   md        the Markdown module (import * as md from '../data/x.md')
 //   eyebrow   the small word over the heading
 //   lead      one sentence under the heading
 import Base from '../layouts/Base.astro';
-import { PAGES } from '../lib/site';
+import { PAGES, pageMeta } from '../lib/site';
 import { PLACEHOLDER } from '../lib/placeholders.mjs';
 import { fit } from '../lib/fit';
 import './text-page.css';
@@ -19,7 +19,7 @@ interface Props {
   lead: string;
 }
 const { page, md, eyebrow, lead } = Astro.props;
-const meta = PAGES[page];
+const meta = { ...PAGES[page], ...(await pageMeta(page)) };
 const body = await md.compiledContent();
 const unfilled = body.match(new RegExp(PLACEHOLDER.source, 'i'));
 if (unfilled) throw new Error(`${meta.path}: the placeholder ${unfilled[0]} was not filled (TextPage.astro)`);
