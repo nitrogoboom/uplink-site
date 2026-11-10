@@ -1,7 +1,7 @@
 /*--- HOME · 5. What clients say (Reviews.astro): stars and the "sample" note beside the heading, one big review and
    three small ones. Phones: one column. Tablet and up: the big review across the top, the small ones three in a row
    under it. On desktop it shares one screen with the check-up band under it (.fold-pair, fold.css), its content
-   centred in the room the band leaves: nothing is stretched to fill the screen. ---*/
+   centred at its own height: nothing is stretched to fill the screen. ---*/
 
 #reviews-title em {
   color: var(--c-accent-text);
@@ -122,14 +122,5 @@
   }
   .rev--big {
     padding: var(--sp-7);
-  }
-  /* the open-quote mark beside the quote, not over it: the check-up band shares this screen (fold.css) */
-  .rev--big .rev-fig {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--sp-4) var(--sp-5);
-  }
-  .rev--big :is(.rev-quote, .rev-who) {
-    grid-column: 2;
   }
 }
