@@ -35,6 +35,7 @@ Content:
 
 The agent can do alone (each is its own pull request):
 
+- [ ] Draft-mode CI (owner, November 10, 2026): only Home matters, so stop checking every page. A pull request runs the build, lint and the preview only (browser checks only with the `full-checks` label); a push to `main` builds and deploys without repeating the checks. Target: preview about 1 minute after a push, live about 2 minutes after a merge (today about 5 and 2).
 - [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
 - [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone; `bottom-nav.css` comments still cite the parked header-fit check.
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
