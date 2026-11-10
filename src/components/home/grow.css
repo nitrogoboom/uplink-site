@@ -366,6 +366,7 @@
    the rest). The two are one block, centred: extra width goes to the margins, never to the text (docs/design.md). */
 @media (--desktop) {
   .grow {
+    --grow-mark: var(--sp-5); /* the growth line's markers */
     grid-template-rows: 1fr auto auto 1fr;
     grid-template-columns: minmax(0, 44rem) auto;
     justify-content: center;
@@ -401,7 +402,7 @@
      open step lit, the ones already built amber, the ones to come grey. */
   .grow.is-live .grow-step {
     position: relative;
-    padding-left: calc(var(--sp-3) + var(--sp-4));
+    padding-left: calc(var(--grow-mark) + var(--sp-4));
   }
   .grow-item {
     display: flex;
@@ -421,44 +422,77 @@
     text-transform: uppercase;
     transition: color var(--dur-2) var(--ease);
   }
-  /* the dot, placed on the row (the button isn't positioned) */
-  .grow-item::before {
-    content: '';
+  /* the marker, placed on the row (the button isn't positioned), as a design system's vertical stepper draws it: a
+     step to come is an outline, a step built is a check on a tinted disc, the open step an amber ring round a dot */
+  .grow-mark {
     position: absolute;
-    top: calc((var(--tap) - var(--sp-3)) / 2);
+    top: calc((var(--tap) - var(--grow-mark)) / 2);
     left: 0;
-    z-index: 1;
-    width: var(--sp-3);
-    height: var(--sp-3);
+    display: grid;
+    place-items: center;
+    width: var(--grow-mark);
+    height: var(--grow-mark);
     border: 2px solid var(--c-line-2);
     border-radius: 50%;
     background: var(--c-bg);
+    color: var(--c-accent-text);
     transition:
       background-color var(--dur-2) var(--ease),
-      border-color var(--dur-2) var(--ease);
+      border-color var(--dur-2) var(--ease),
+      box-shadow var(--dur-2) var(--ease);
   }
-  /* the line from a dot to the next */
-  .grow.is-live .grow-step:not(:last-child)::before {
+  .grow-mark svg,
+  .grow-mark::after {
+    grid-area: 1 / 1;
+  }
+  .grow-mark svg {
+    width: var(--sp-3);
+    height: var(--sp-3);
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity var(--dur-2) var(--ease),
+      transform var(--dur-2) var(--ease);
+  }
+  .grow-mark::after {
+    content: '';
+    width: var(--sp-2);
+    height: var(--sp-2);
+    border-radius: 50%;
+    background: var(--c-accent);
+    transform: scale(0);
+    transition: transform var(--dur-2) var(--ease);
+  }
+  /* the line from a marker to the next, stopping short of both, as steppers draw it */
+  .grow.is-live .grow-step:not(:last-child)::before,
+  .grow-item::after {
     content: '';
     position: absolute;
-    top: calc(var(--tap) / 2);
-    bottom: calc(var(--tap) / -2);
-    left: calc(var(--sp-3) / 2 - 1px);
+    top: calc(var(--tap) / 2 + var(--grow-mark) / 2 + var(--sp-1));
+    bottom: calc(var(--sp-1) + var(--grow-mark) / 2 - var(--tap) / 2);
+    left: calc(var(--grow-mark) / 2 - 1px);
     width: 2px;
+    border-radius: var(--r-1);
+  }
+  .grow.is-live .grow-step:not(:last-child)::before {
     background: var(--c-line-2);
   }
   .grow.is-live .grow-step:has(> .grow-item.is-done)::before {
     background: var(--c-accent-text);
   }
-  /* built already: amber ink, the dot a tinted fill */
+  /* built already: its place in the text colour, the check marks it */
   .grow-item.is-done {
-    color: var(--c-accent-text);
+    color: var(--c-text);
   }
-  .grow-item.is-done::before {
-    border-color: var(--c-accent-text);
+  .grow-item.is-done .grow-mark {
+    border-color: transparent;
     background: var(--c-accent-tint);
   }
-  /* the open step: its place shrinks to a label over its card's title, its dot the amber fill */
+  .grow-item.is-done .grow-mark svg {
+    opacity: 1;
+    transform: none;
+  }
+  /* the open step: its place shrinks to a label over its card's title; its marker an amber ring round a dot */
   .grow-item[aria-current='step'] {
     color: var(--c-accent-text);
     font-family: inherit;
@@ -467,14 +501,19 @@
     letter-spacing: var(--tracking-label);
     line-height: var(--lh-tight);
   }
-  .grow-item[aria-current='step']::before {
+  .grow-item[aria-current='step'] .grow-mark {
     border-color: var(--c-accent);
-    background: var(--c-accent);
     box-shadow: 0 0 0 var(--sp-1) var(--c-accent-ring);
+  }
+  .grow-item[aria-current='step'] .grow-mark::after {
+    transform: none;
   }
   @media (hover: hover) {
     .grow-item:not([aria-current='step']):hover {
       color: var(--c-text);
+    }
+    .grow-item:not([aria-current='step'], .is-done):hover .grow-mark {
+      border-color: var(--c-edge);
     }
   }
   /* the open card, under its place: as tall as most steps' words, so the line doesn't jump as the story plays
@@ -494,12 +533,6 @@
   /* while the story plays, the open step's stretch of the line fills over the step's time (grow.js sets
      --grow-dwell and .is-timing); the last step has no line after it */
   .grow-item::after {
-    content: '';
-    position: absolute;
-    top: calc(var(--tap) / 2);
-    bottom: calc(var(--tap) / -2);
-    left: calc(var(--sp-3) / 2 - 1px);
-    width: 2px;
     background: var(--c-accent-text);
     transform: scaleY(0);
     transform-origin: top;
@@ -514,30 +547,36 @@
   .grow-item.is-timing.is-waiting::after {
     animation-play-state: paused;
   } /* off screen or paused, as the step's clock holds */
-  /* forced colours (B4): the dots and the line in system colours, the open dot Highlight */
+  /* forced colours (B4): the markers and the line in system colours, the open marker Highlight */
   @media (forced-colors: active) {
-    .grow-item::before {
+    .grow-mark {
       border-color: GrayText;
       background: Canvas;
+      color: CanvasText;
     }
     .grow.is-live .grow-step:not(:last-child)::before {
       background: GrayText;
     }
-    .grow-item.is-done::before,
+    .grow-item.is-done .grow-mark {
+      border-color: CanvasText;
+    }
     .grow.is-live .grow-step:has(> .grow-item.is-done)::before,
     .grow-item::after {
-      border-color: CanvasText;
       background: CanvasText;
     }
-    .grow-item[aria-current='step']::before {
+    .grow-item[aria-current='step'] .grow-mark {
       border-color: Highlight;
+    }
+    .grow-item[aria-current='step'] .grow-mark::after {
       background: Highlight;
     }
   }
   @media (prefers-reduced-motion: reduce) {
     /* after the rules above, so it wins */
     .grow-item,
-    .grow-item::before {
+    .grow-mark,
+    .grow-mark svg,
+    .grow-mark::after {
       transition: none;
     }
     .grow-item.is-timing::after {

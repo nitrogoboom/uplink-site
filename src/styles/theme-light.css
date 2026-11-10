@@ -127,8 +127,10 @@
       background: var(--c-accent-text); /* Grow's steps already shown: amber ink, dimmed to 0.8 (3.8:1; was 1.35) */
       opacity: 0.8;
     }
-    :root[data-theme='light'] .grow-item[aria-current='step']::before {
-      border-color: var(--c-accent-text); /* Grow's open dot on the growth line */
+    :root[data-theme='light'] .grow-item[aria-current='step'] .grow-mark {
+      border-color: var(--c-accent-text); /* Grow's open marker on the growth line */
+    }
+    :root[data-theme='light'] .grow-item[aria-current='step'] .grow-mark::after {
       background: var(--c-accent-text);
     }
     :root[data-theme='light'] .seg-opt input:checked + span {

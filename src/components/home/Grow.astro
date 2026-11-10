@@ -75,7 +75,9 @@ const t = (await copy('home')).grow;
       </div>
       <ol class="grow-list" aria-label={t.steps}>
         {steps.map((s, i) => <li class="grow-step">
-          <button type="button" class="grow-item" data-i={i}>{s.place}</button>
+          <button type="button" class="grow-item" data-i={i}>
+            <span class="grow-mark" aria-hidden="true"><Icon name="check" /></span>{s.place}
+          </button>
           <div class="grow-card" data-i={i} data-place={s.place}>
             <h3>{s.title}</h3>
             <div class="grow-rows">
