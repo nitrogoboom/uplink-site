@@ -112,7 +112,7 @@ The smaller lists are in `src/data/*.json`.
 
 ### Change the site's words
 
-Every other word is in `src/data/copy/en/`: one YAML file a page, and `ui.yaml` for the shared parts. Edit the YAML and rebuild. To add a string, see [Copy](src/README.md#copy).
+Every other word is in `src/data/copy/en/`: one YAML file a page, and `ui.yaml` for the shared parts. Edit the YAML and rebuild. To add a string, see [Copy](src/README.md#content-and-copy).
 
 ## Drawing rules
 

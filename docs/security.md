@@ -1,14 +1,6 @@
 # Security, privacy, and secrets
 
-The site's security and privacy controls, how to check each one, and every secret (names and places, never values). How to report a problem: [`SECURITY.md`](../SECURITY.md).
-
-The site is static. One small Worker runs only for `/api/*`, `/404`, and addresses with no file ([`ops.md`](ops.md#the-worker)). There are no accounts, no database, and no third-party script except Cloudflare Web Analytics.
-
-| Area | Standard | What the site does |
-| --- | --- | --- |
-| Privacy | [PIPEDA](https://www.priv.gc.ca/en/privacy-topics/privacy-laws-in-canada/the-personal-information-protection-and-electronic-documents-act-pipeda/), and CASL for the newsletter | Publishes what it collects, who processes it, where, and for how long (`/privacy`). Sets no cookies. |
-| Response headers | [OWASP Secure Headers Project](https://owasp.org/www-project-secure-headers/) | A+ on [Mozilla HTTP Observatory](https://developer.mozilla.org/en-US/observatory). |
-| Disclosure | [RFC 9116](https://www.rfc-editor.org/rfc/rfc9116) | `/.well-known/security.txt`, built with an expiry a year after the build, so rebuild at least once a year. |
+Controls, and every secret (names and places, never values). Reporting: [`SECURITY.md`](../SECURITY.md). The site is static; the Worker runs only for `/api/*`, `/404` and missing addresses. No accounts, no database, no third-party script but Cloudflare Web Analytics. Targets: PIPEDA and CASL, OWASP headers (Observatory A+), RFC 9116 `security.txt` (expires a year after the build: rebuild yearly).
 
 ## Security controls
 
@@ -57,11 +49,7 @@ Tests: `scripts/test/worker.test.mjs`. Each report becomes one line in the Worke
 
 ### Supply chain
 
-- Every GitHub Action is pinned to a commit. zizmor lints the workflows on every run.
-- Dependabot proposes npm and Actions updates monthly, each release held a week first (5 days for an npm patch; `.github/dependabot.yml`).
-- `requirements.txt` pins the Python drawing tools. They never run in CI or on the site.
-- Fonts are self-hosted. The only third-party script is the analytics beacon.
-- Treat every new third-party script as a security and privacy decision.
+Actions pinned to commits, zizmor on every run, Dependabot monthly (`.github/dependabot.yml`), `requirements.txt` pins the drawing tools, fonts self-hosted. A new third-party script is a security and privacy decision.
 
 ## Privacy
 
@@ -95,22 +83,8 @@ Not secrets: `GH_TOKEN` in CI is GitHub's short-lived token for the run. The pla
 
 > **Note:** The environments `production` (deploys from `main` only) and `preview` exist but are empty. The Cloudflare secrets move there, with a separate preview token (`notes.md`).
 
-If a secret may have leaked:
-
-1. Make a new one.
-2. Delete the old one.
-3. Note the change in this table's row.
+If a secret may have leaked: make a new one, delete the old one, note it in the table.
 
 ## Review checklist
 
-| Check | How | Pass |
-| --- | --- | --- |
-| HTTPS and HSTS | `curl -sI http://DOMAIN/services`, `curl -sI https://DOMAIN/ \| grep -i strict-transport` | `308` to `https://`; HSTS present |
-| Security headers | Mozilla HTTP Observatory | A+ |
-| CSP strength | [CSP Evaluator](https://csp-evaluator.withgoogle.com/) | No high-severity findings |
-| CSP in use | DevTools Console on several pages | No violations |
-| Trusted Types | `document.body.innerHTML = 'x'` in the Console | Blocked |
-| TLS | [SSL Labs](https://www.ssllabs.com/ssltest/) | A or higher |
-| Cookies | DevTools > Application > Cookies, private window | None |
-| Security contact | `/.well-known/security.txt` | Present, expiry in the future |
-| Privacy page | Compare with what the site collects | Every claim matches |
+`curl -sI` for the `308` to HTTPS and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console; `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.
