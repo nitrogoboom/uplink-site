@@ -39,7 +39,7 @@ The site is in **draft mode** (owner, November 9, 2026): almost every word is ab
 | Copy: `src/content/`, `src/data/`, alt or screen-reader text | `npm run build` (about 5 s: schemas, placeholders, CSP hashes) | build, static, preview |
 | CSS or markup | look at it in `npm run dev`, then `npm run quick` (types, lint, build: about 20 s) | same |
 | A drawing | `python tools/regen.py --check` and `python -m pytest tools/tests` | build, static, preview (no drawing check in CI) |
-| Scripts (`src/scripts/`, `scripts/`), Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site checks for that area (`npm run verify -- -g "NAME"`); `npm run ci` when it touches many | the full browser checks run by themselves (the `scope` job in `site.yml` matches these paths) |
+| Scripts (`src/scripts/`, `scripts/`), Worker, headers, checks, workflows, dependencies, config, layouts | `npm run quick`, then only the site checks for that area (`npm run verify -- -- -g "NAME"`: Playwright's options go after a second `--`); `npm run ci` when it touches many | the full browser checks run by themselves (the `scope` job in `site.yml` matches these paths) |
 | Before launch or a release | `npm run ci`, `RELEASE=1 npm run verify -- --all`, `npm run release-audit`, `python tools/regen.py --check`, the checklist in `docs/release.md` | add the `full-checks` label to the PR (also runs the screenshot comparison) |
 
 - Any PR can get the full browser checks with the `full-checks` label; "Run workflow" on `site.yml` runs everything.
