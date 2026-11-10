@@ -19,7 +19,8 @@
     inset 0 1px var(--c-line),
     inset 0 -1px var(--c-line);
 }
-/* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size.
+/* .fold: one screen tall on desktop (fold.css), its own height below that; .fold-always: one screen on every size,
+   for a page's first section only (a later section that small would leave a tablet half empty).
    safe: content too tall for the screen (zoom) overflows downward only, never off the top where nothing scrolls to it */
 .fold {
   display: flex;
