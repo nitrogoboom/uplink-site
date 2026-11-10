@@ -90,7 +90,7 @@ const md = (site, page) => {
       const cell = (c) => {
         // a cell's <small> note goes in brackets after its text (none today)
         const sub = text(all(c, 'small')[0]);
-        return (sub ? `${text(c).replace(sub, '').trim()} (${sub})` : text(c)).replace(/\|/g, '\\|');
+        return (sub ? `${text(c).replace(sub, '').trim()} (${sub})` : text(c)).replace(/[\\|]/g, '\\$&');
       };
       const rows = all(node, 'tr').map((tr) => kids(tr).map(cell));
       if (!rows.length) return '';
