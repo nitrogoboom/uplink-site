@@ -84,7 +84,7 @@
   --fs-root: clamp(100%, 100% + 0.625vw - 0.5625rem, 125%);
 
   /* 8-step scale: pixels at a 16px root */
-  --fs-1: 0.75rem; /* 12  labels, key caps */
+  --fs-1: 0.875rem; /* 14  labels, key caps (12 until November 10, 2026: too small beside the art) */
   --fs-2: 0.875rem; /* 14  small text, meta */
   --fs-3: 1rem; /* 16  body */
   --fs-4: 1.125rem; /* 18  lead, buttons */
