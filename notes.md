@@ -2,6 +2,38 @@
 
 One line each. Remove a line when it's done; add new ones as they come up. Launch-only work is in `docs/release.md`, "Before launch".
 
+## Fable 5.2 review: what's left
+
+From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" section says what's done. Decisions: `docs/history/decisions-2026-11-09.md`.
+
+Needs the owner's eyes on a preview:
+
+- [ ] Phone hero captions as HTML, without leader lines (decided: try it). It replaces about 300 lines of `home.js`: the captions, their timing, the tap, the pause, and their tests.
+- [ ] Hero: six layouts down to three (stacked, two columns, ultrawide).
+- [ ] Home services on desktop: four variants in `services.css` become one block where the drawing flexes above a floor.
+- [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
+- [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
+- [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
+
+Drawing generators (the owner directs drawing work):
+
+- [ ] `gen_office.py` and `gen_grow.py` write role classes, as `gen_campus.py` does; `theme-drawings.css` then goes.
+- [ ] The generators write the link paths and camera boxes into the drawings; the footer map camera becomes generated CSS with `:has()`.
+- [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
+- [ ] On Windows a generator writes CRLF line ends (found November 9, 2026): git puts them right on commit, but `prettier --check` fails on the working copy of `theme-drawings.css` until it's checked out again.
+- [ ] Decide: delete `tools/site-lock/` if the password lock isn't coming back.
+
+The agent can do alone:
+
+- [ ] French as `/fr/` addresses (decided): Astro's i18n routing, copy files to `src/data/copy/en/`. First move the words still in code to data: page titles and descriptions (`PAGES` in `src/lib/site.ts`) and the business description (`src/pages/index.astro`).
+- [ ] One-step build: `svgo.mjs`, `markdown.mjs` and `headers.mjs` in an Astro integration (`astro:build:done`); `check-dist.mjs` then goes.
+- [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go.
+- [ ] Checks: park the tests that pin today's layout and the regression pins lint or axe now catch; keep a core of about eight browser tests for every pull request.
+- [ ] `site.yml`: the Playwright cache steps are written twice; the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
+- [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
+
+For launch (the owner): the scoped Cloudflare token and split environments are under "Owner and accounts"; the paid Workers plan, Always Use HTTPS, and an alert on the error reports belong in `docs/release.md`, "Before launch".
+
 ## Owner and accounts
 
 - [ ] GitHub environments (review H5): put the Cloudflare secrets in `production` and a preview token in `preview`, switch `site.yml` to them, delete `cloudflare`. See `docs/security.md`, "Secrets".

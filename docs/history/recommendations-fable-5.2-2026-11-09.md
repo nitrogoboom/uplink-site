@@ -14,6 +14,70 @@ This is a review only. Nothing in the site, the code, or the settings changed. T
 
 No browser checks were run and no page was looked at. Every layout suggestion below needs your eyes on a preview before it's kept.
 
+## Status
+
+*Last updated: November 9, 2026.* What was done with each recommendation. What's left is in [`notes.md`](../../notes.md), "Fable 5.2 review: what's left". The owner's decisions are in [`decisions-2026-11-09.md`](decisions-2026-11-09.md).
+
+### The ten recommendations
+
+| # | Recommendation | Status |
+|---|---|---|
+| 1 | Move out of OneDrive, clear the strays | **Done.** Merged branches, stale work folders and 135 old Cloudflare previews removed. The OneDrive move doesn't apply: the owner works on a home PC. |
+| 2 | One rule, one place: cut the docs | **Done.** `CLAUDE.md` 90 to 59 lines, rules in `.claude/rules/`, `README.md` 7,100 to 4,400 words with `docs/ops.md` (#131, #133, #134). |
+| 3 | Faster previews with `wrangler preview` | **Done** (#135, and #132 starts the preview as soon as the build is done). It removed about 300 lines; it did not make the preview job faster (about 1 minute, as before). The command is an open beta. |
+| 4 | Park the checks that pin today's layout | **Open.** Only the wheel-grid lines and the two preview scripts' tests went. |
+| 5 | One full-screen section model | **Part done.** Wheel grid removed (#138); only a page's first section is one screen on every size (#139). The shared blocks and the hero's layouts are open. |
+| 6 | Move drawing maths out of the page scripts | **Open.** Needs the Python generators to write the numbers. Old-browser fallbacks and two unused exports went (#138). |
+| 7 | One way to colour drawings | **Part done.** The colour CSS now ships on Home only (#137). Role classes in `gen_office.py` and `gen_grow.py` are open. |
+| 8 | Make the build one step | **Open.** |
+| 9 | Decide French | **Decided:** `/fr/` addresses. The move of copy files and of the words still in code is open. |
+| 10 | Tighten the Cloudflare and GitHub keys | **Open.** For the owner, before launch. |
+
+### Section by section
+
+**The agent editing loop.** All seven done: 1, 4 and 5 (#131), 2 (#133), 3 and 6 (#134), 7 (#132).
+
+**Astro.**
+
+- Drawing colour CSS only where it's used: **done** (#137). Every page but Home is about 9 KB smaller.
+- One-step build; Markdown copies from the data: **open.**
+- Generate the copy schema from the YAML: **not planned.** The review says do it only if copy structure keeps changing.
+
+**Page scripts.**
+
+- Old-browser fallbacks and two unused exports: **done** (#138).
+- The `?` shortcut, the phone bar hiding on scroll (D4), the wheel grid: **done** (#138). Page script went from 2,184 to 2,043 lines.
+- Phone hero captions as HTML: **decided to try, not built.** It needs the owner's eyes.
+- Grow's ring as a CSS animation; Grow's dome orbits as CSS dashes: **open.** Each changes an animation, so each needs the owner's eyes.
+- Link paths and camera boxes written by the generators; the footer map camera as generated CSS: **open.** Drawing-generator work.
+- Grow's `placeTags` on every frame: **looked at, left.** The camera move changes the drawing's view every frame, so one layout pass a frame happens anyway; caching or a throttle saves nothing.
+- `soon.js` as one page per name: **left.** It would move about ten placeholder addresses that go when the real pages exist.
+- Newsletter validation into the shared form code; toast icons from a `<template>`: **left.** No change a visitor would notice.
+
+**Full-screen layouts.**
+
+- 1, remove the wheel grid: **done** (#138). A Home fold is exactly one screen at 1440×900 (836px, was 900).
+- 2, a fold is a minimum and may grow: **decided.** The two `notes.md` items it closes are gone. The extra height thresholds in the CSS are still there.
+- 3, `fold-always` only on a page's first section: **done** (#139). On a tablet, Contact's Support went from 1,116px to 632px.
+- 4 to 7 (one "fold with art" block, card grids that fit themselves, Home services as one block, hero layouts six to three): **open.** Each can change the look.
+
+**Drawings.**
+
+- 4, plain pins for the Python tools: **done** (#137). `requirements.txt` went from 736 lines to 23; Dependabot's pip entry is gone.
+- 1, 3 and 5: **open.** 2 (stop committing the light copies): **not wanted** for now.
+
+**Checks and tests.** **Open**, including the small core of about eight tests for every pull request.
+
+**GitHub.**
+
+- Delete merged branches automatically: **already on.**
+- Dependabot ignores `@types/node` majors: **already done** (#130). The pip entry: **gone** (#137). Whether the Actions group's wildcard skips the cooldown: **not checked.**
+- Split the `cloudflare` environment; the smaller items: **open.**
+
+**Cloudflare.** 1, Worker Previews: **done** (#135). 2 to 5: **open**, for launch.
+
+**File structure and cleanup.** Branches, work folders, and `package-lock.json` marked as generated (#137): **done.** Empty folders and `editing-room/`: **done** earlier (#130). `out/` and the older files in `docs/history/`: **left**; `.ignore` keeps history out of searches instead (#131).
+
 ## The short version
 
 The site itself is small, fast, and well built. Astro 7 as a static site on Cloudflare Workers is the right choice and the versions are current. There is nothing to upgrade or swap at the framework level.
