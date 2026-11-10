@@ -181,10 +181,14 @@ for (const path of PATHS) {
         const at100 = await plain.pg.evaluate(SIZE);
         await plain.ctx.close();
         // on screen, in device pixels: CSS px × zoom
+        // the root size grows with a window wider than 1440 (--fs-root, tokens.css) and zoom narrows the window, so
+        // 200% zoom on a wide screen gives less than 200%: at least FLOOR, and the REACH tests below hold the 200%.
+        // Where the window is 1440 or narrower at 100%, zoom still gives all of it
         const ratio = (size.body * c.zoom) / at100.body;
-        if (ratio < c.zoom * 0.98)
+        const need = c.w > 1440 && c.zoom < 4 ? FLOOR * 0.99 : c.zoom * 0.98;
+        if (ratio < need)
           found.push(
-            `body text ${at100.body}px at 100%, ${size.body}px at ${c.zoom * 100}%: ${Math.round(ratio * 100)}% on screen, not ${c.zoom * 100}%`,
+            `body text ${at100.body}px at 100%, ${size.body}px at ${c.zoom * 100}%: ${Math.round(ratio * 100)}% on screen, under ${Math.round(need * 100)}%`,
           );
       }
       const r = await pg.evaluate(PROBE);
@@ -272,6 +276,29 @@ for (const path of PATHS) {
       const line = `${pad(path, 20)} ${w}x${h}  at 200%: ${two.length ? `${Math.min(...two)}% to ${Math.max(...two)}%` : '-'}`;
       console.log(line);
       if (found.length) throw new Error(`${line}\n    ${found.join('\n    ')}`);
+    });
+  }
+}
+
+// WCAG 1.4.4 on a wide screen: body text reaches 200% of its size at 100% by REACH zoom (250%, a step every browser
+// has), on the two screens where the root size has grown (--fs-root, tokens.css).
+const REACH = 2.5;
+for (const path of PATHS) {
+  for (const [w, h] of [
+    [1920, 1080],
+    [2560, 1440],
+  ]) {
+    test(`body text reaches 200% by 250% zoom ${path} ${w}x${h}`, async ({ browser }) => {
+      const one = await open(browser, path, { w, h });
+      const at100 = await one.pg.evaluate(SIZE);
+      await one.ctx.close();
+      const far = await open(browser, path, { w, h, zoom: REACH });
+      const atReach = await far.pg.evaluate(SIZE);
+      await far.ctx.close();
+      const ratio = (atReach.body * REACH) / at100.body;
+      const line = `${pad(path, 20)} ${w}x${h}  body ${at100.body}px at 100%, ${atReach.body}px at 250%: ${Math.round(ratio * 100)}% on screen`;
+      console.log(line);
+      if (ratio < 2 * 0.99) throw new Error(line);
     });
   }
 }

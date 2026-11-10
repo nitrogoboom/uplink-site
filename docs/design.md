@@ -131,7 +131,7 @@ Measure with a script (WCAG 2 ratio and APCA Lc), not by eye. In both modes: `--
 
 ## Spacing
 
-The spacing scale is `--sp-1` to `--sp-9`; the type scale is `--fs-1` to `--fs-8`. Pixels below are at a 16px root, the browser's default: the root is the visitor's own font size, so spacing grows with zoom and their font setting, never with the screen. What grows with a big screen is the room round the text: `--container`, `--fold-pad`, and the pictures.
+The spacing scale is `--sp-1` to `--sp-9`; the type scale is `--fs-1` to `--fs-8`. Pixels below are at a 16px root, the browser's default. The root is the visitor's own font size up to a 1440px window; wider, it grows with the window to 125% (`--fs-root`: 19px at 1920, 20px from 2080), so text, controls, and spacing fill a big screen together, as a game menu does. Spacing also grows with zoom and the visitor's font setting.
 
 | Token | `--sp-1` | `--sp-2` | `--sp-3` | `--sp-4` | `--sp-5` | `--sp-6` | `--sp-7` | `--sp-8` | `--sp-9` |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -208,4 +208,4 @@ The look is inspired by the Overwatch 2 menus: take their layout (how boxes sit,
 - **No slanted or skewed boxes.** The current header tab is a straight, full-height block: square corners, a lighter fill, and a short accent line along the bar's bottom edge (`src/styles/header.css`).
 - **No left-side accents** on cards or tabs (colour rule 11). Lint refuses `border-left` and `border-inline-start`.
 - **One centred block.** On a `fold` screen, `--container` is `max(94rem + 2 * var(--gutter), 85vw)`: the full width up to 1,600px, 85% of a wider screen. Elsewhere it's 80rem. The header, the hero, and the footer's stage and base bar run full width. Extra width goes to the art and the margins, never to the text.
-- **Text never follows the screen**; see [`.claude/rules/css.md`](../.claude/rules/css.md) and "Styles" in [`src/README.md`](../src/README.md#styles).
+- **Text follows the screen in one place only**, the root size (`--fs-root`), capped at 125% so zoom still works; see [`.claude/rules/css.md`](../.claude/rules/css.md) and "Styles" in [`src/README.md`](../src/README.md#styles).

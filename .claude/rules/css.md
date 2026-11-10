@@ -14,7 +14,7 @@ Read `docs/design.md` before you style anything: colour roles, spacing (`--sp-*`
 
 - Values come from tokens in `src/styles/tokens.css`: colours, sizes, timings. Colour by role (`docs/design.md`).
 - Lint (`.stylelintrc.json`) refuses: raw spacing; a text size in `px` or screen units; a line height that isn't a `--lh-*` token; a breakpoint not in `em`; any `border-left` or `border-inline-start` (no left-side accents). Don't switch a rule off to get past it; fix the value.
-- Text sizes are `--fs-*` tokens, in `rem`; the root has no font size of its own, so zoom and the visitor's font setting work everywhere. The screen (`vw`, `svh`) may size pictures, gaps and page width, never text.
+- Text sizes are `--fs-*` tokens, in `rem`. The root size is `--fs-root` (`tokens.css`): the visitor's own font size up to a 1440 window, then it grows with the window to 125%, so text, controls and spacing fill a big screen together. Don't raise the 125% cap and don't size any other text by the screen (`vw`, `svh`): the cap is what keeps zoom working (at least 150% at 200% zoom, 200% by 250%; `npm run verify:zoom`).
 - Order matters: a later file wins a tie; `src/styles/global.css` is the cascade order. A section's CSS sits beside its component, desktop layout at the end; a block more than one page uses lives in `src/styles/`.
 - After moving CSS, prove nothing changed: build old and new, then `npm run verify:styles -- OLD_URL NEW_URL`.
 - Breakpoints use range syntax (`(width < 43.75em)`): the names in `src/lib/media.js`, one-off queries the same way.
