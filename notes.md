@@ -108,7 +108,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Narrower than 20em (390px phone at 200% zoom, or a 24px font) scrolls sideways; below WCAG's 320px floor. Decide whether to support it.
 - [ ] Light theme: signed off November 9, 2026, still open to change. Optional: a quieter amber tower on the footer map; ghost-button edges to `--c-edge` (colour rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
-- [ ] 404 page: a three-panel heist comic, draft on branch `404-comic-draft` (not on GitHub or this PC, November 11, 2026); panel 1 (the van) needs a rethink, and the balloon clips the "t" in "typed".
 - [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).
 - [ ] Idea, not planned: the office fire drill (`docs/history/creative.md`).
 - [ ] Small, left as they are: Home-only hero rules in `compact-cuts.css`; the services observer runs at 700px and up; JSON-LD is pretty-printed.
