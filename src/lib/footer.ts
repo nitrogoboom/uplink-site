@@ -13,7 +13,7 @@ import { ICON_NAMES } from '../components/icons';
 const text = z.string().min(1);
 const icon = z.enum(ICON_NAMES);
 const link = z.strictObject({ label: text, href: z.string().startsWith('/') }); // root-relative, as every link
-const SPOTS = ['hq', 'services', 'company', 'support', 'resources', 'follow'] as const;
+const SPOTS = ['hq', 'services', 'company', 'support', 'resources'] as const;
 const spot = z.strictObject({ name: text, sub: text });
 
 const schema = z.strictObject({
@@ -35,12 +35,8 @@ const schema = z.strictObject({
         path: ['links'],
       }),
   ),
+  // Contact's social icons and newsletter form
   follow: z.strictObject({
-    title: text,
-    accent: text,
-    lead: text,
-    icon,
-    tile: text,
     socials: z.array(z.strictObject({ name: text, href: z.string().startsWith('/'), icon })).min(1),
     newsletter: z.strictObject({ name: text, note: text }),
   }),

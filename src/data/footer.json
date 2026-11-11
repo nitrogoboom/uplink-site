@@ -110,11 +110,6 @@
     }
   ],
   "follow": {
-    "title": "Follow",
-    "accent": "Uplink",
-    "lead": "Short fixes, security alerts and the odd office tour.",
-    "icon": "signal",
-    "tile": "Follow",
     "socials": [
       {
         "name": "LinkedIn",
@@ -193,10 +188,6 @@
     "resources": {
       "name": "Archive",
       "sub": "guides and checklists"
-    },
-    "follow": {
-      "name": "Broadcast",
-      "sub": "news, alerts and how-tos"
     },
     "company": {
       "name": "The crew",

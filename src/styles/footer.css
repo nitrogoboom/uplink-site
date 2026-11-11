@@ -1,6 +1,6 @@
 /*--- Footer (src/components/Footer.astro). ---*/
 /* ---------- footer (hero select) -----------------------------------
-   Six <details name="footer"> (.fc-sec) in one nav: the summary is the
+   Five <details name="footer"> (.fc-sec) in one nav: the summary is the
    tile (.fc-tile), the rest its panel (.fc-panel). The browser opens one
    at a time; nothing here needs script.
    - Rows (the base rules): each section a row that opens in place. Phones,
@@ -53,10 +53,9 @@
   position: relative;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'icon name chev' 'icon count chev';
+  grid-template-areas: 'icon name chev';
   align-items: center;
   column-gap: var(--sp-3);
-  row-gap: var(--sp-1);
   min-height: calc(var(--sp-8) - var(--sp-1));
   padding: var(--sp-2) 0;
   border-bottom: 1px solid var(--c-line);
@@ -75,22 +74,11 @@
 }
 .fc-tile-n {
   grid-area: name;
-  align-self: end;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-5);
   line-height: var(--lh-tight);
   text-transform: uppercase;
-}
-.fc-tile-c {
-  grid-area: count;
-  align-self: start;
-  font-size: var(--fs-1);
-  font-weight: 600;
-  letter-spacing: var(--tracking-3);
-  line-height: var(--lh-tight);
-  text-transform: uppercase;
-  color: var(--c-muted);
 }
 .fc-tile-chev {
   grid-area: chev;
@@ -346,45 +334,6 @@ a.fc-cl:hover {
   height: var(--icon);
 }
 
-/* follow */
-.fc-wall {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-  gap: var(--sp-2);
-  list-style: none;
-}
-.fc-wall-item {
-  position: relative; /* keeps its screen-reader pause inside (see .fc-tile) */
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-2);
-  border: 1px solid var(--c-line);
-  border-radius: var(--r-2);
-  background: var(--c-surface);
-  color: var(--c-text);
-  text-decoration: none;
-  transition:
-    background-color var(--dur-1) var(--ease),
-    border-color var(--dur-1) var(--ease);
-}
-.fc-wall-item:hover {
-  background: var(--c-surface-2);
-  border-color: var(--c-line-2);
-}
-.fc-wall-item:hover .icon-tile {
-  background: var(--c-accent);
-  color: var(--c-on-accent);
-}
-.fc-wall-item .icon-tile {
-  width: calc(var(--sp-6) + var(--sp-1));
-  height: calc(var(--sp-6) + var(--sp-1));
-}
-.fc-wall-item b {
-  display: block;
-  font-weight: 600;
-  line-height: var(--lh-snug);
-}
 .fc-nl {
   display: flex;
   flex-direction: column;
@@ -464,7 +413,7 @@ a.fc-cl:hover {
   line-height: var(--lh-snug);
   color: var(--c-muted);
 }
-/* the label names the shown section's spot: all six are in the markup, in section order, and one shows */
+/* the label names the shown section's spot: all five are in the markup, in section order, and one shows */
 .fc-hud-l {
   display: none;
 }
@@ -473,8 +422,7 @@ a.fc-cl:hover {
 .fc-deck:has(> .fc-sec:nth-of-type(2)[open]) .fc-hud-l:nth-of-type(2),
 .fc-deck:has(> .fc-sec:nth-of-type(3)[open]) .fc-hud-l:nth-of-type(3),
 .fc-deck:has(> .fc-sec:nth-of-type(4)[open]) .fc-hud-l:nth-of-type(4),
-.fc-deck:has(> .fc-sec:nth-of-type(5)[open]) .fc-hud-l:nth-of-type(5),
-.fc-deck:has(> .fc-sec:nth-of-type(6)[open]) .fc-hud-l:nth-of-type(6) {
+.fc-deck:has(> .fc-sec:nth-of-type(5)[open]) .fc-hud-l:nth-of-type(5) {
   display: block;
 }
 /* pause button (HoldButton.astro, look in buttons.css), top right, clear of the label; only once the map is in */
@@ -857,16 +805,12 @@ a.fc-cl:hover {
   .fc-base .container {
     padding-top: var(--sp-4);
   }
-  .fc-wall-item b {
-    min-width: 0;
-    overflow-wrap: anywhere;
-  }
 }
 
 /* ---------- tiles: tablet and desktop, where the browser can place a details' panel ----------
    Each details has no box of its own (display: contents, above), so its summary and its content box
-   (::details-content) are items of the .fc-deck grid. The summaries go in the tile row, each in its own column (t1 … t6, in section order:
-   a seventh section needs a column here and a label rule above). The open section's content box goes in the stage;
+   (::details-content) are items of the .fc-deck grid. The summaries go in the tile row, each in its own column (t1 … t5, in section order:
+   a sixth section needs a column here and a label rule above). The open section's content box goes in the stage;
    the closed ones' have no box at all. With nothing open, Contact's shows and its tile looks picked. The tile row's
    band (::before) and its line (::after, a 1px row of its own) run the full width of the screen (their margins;
    .fc clips the scrollbar's width they add). */
@@ -911,9 +855,6 @@ a.fc-cl:hover {
     .fc-sec:nth-of-type(5) > .fc-tile {
       grid-column: t5;
     }
-    .fc-sec:nth-of-type(6) > .fc-tile {
-      grid-column: t6;
-    }
     .fc-sec::details-content {
       grid-column: 1 / -1;
       min-width: 0;
@@ -933,7 +874,7 @@ a.fc-cl:hover {
       justify-content: center;
       gap: var(--sp-1);
       min-width: calc(var(--sp-9) + var(--sp-6));
-      min-height: calc(var(--sp-9) - var(--sp-1)); /* the least it takes: it grows to fit its name and count */
+      min-height: calc(var(--sp-9) - var(--sp-1)); /* the least it takes: it grows to fit its name */
       margin-block: var(--sp-5);
       padding: var(--sp-2);
       border: 1px solid var(--c-line);
@@ -947,10 +888,6 @@ a.fc-cl:hover {
     }
     .fc-tile-n {
       font-size: var(--fs-4);
-    }
-    .fc-tile-n,
-    .fc-tile-c {
-      align-self: auto;
     }
     .fc-tile-chev {
       display: none;
@@ -1007,13 +944,13 @@ a.fc-cl:hover {
   }
 }
 
-/* tablet: the tile row on top (six even columns, no sideways scroll), then the map, then the panel */
+/* tablet: the tile row on top (five even columns, no sideways scroll), then the map, then the panel */
 @media (--tablet) {
   @supports selector(::details-content) {
     .fc-deck {
       grid-template-columns:
         [t1] minmax(0, 1fr) [t2] minmax(0, 1fr) [t3] minmax(0, 1fr) [t4] minmax(0, 1fr)
-        [t5] minmax(0, 1fr) [t6] minmax(0, 1fr);
+        [t5] minmax(0, 1fr);
       grid-template-rows: [dock] auto [line] auto [map] auto [panel] auto;
       padding-bottom: var(--sp-5);
     }
@@ -1035,7 +972,7 @@ a.fc-cl:hover {
 @media (--desktop) {
   @supports selector(::details-content) {
     .fc-deck {
-      grid-template-columns: minmax(0, 1fr) [t1] auto [t2] auto [t3] auto [t4] auto [t5] auto [t6] auto minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) [t1] auto [t2] auto [t3] auto [t4] auto [t5] auto minmax(0, 1fr);
       grid-template-rows: [stage] 1fr [line] auto [dock] auto;
       padding-top: var(--sp-6);
     }

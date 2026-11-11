@@ -23,7 +23,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | Component | What |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | Header and phone tab bar |
-| `Footer.astro` | Six `<details name="footer">` sections; data `data/footer.json` (import via `lib/footer.ts`), CSS `styles/footer.css`, map `tools/gen_campus.py`. Desktop: panel + map + tiles; tablet: tiles, map, panel; below 700px: rows, no map |
+| `Footer.astro` | Five `<details name="footer">` sections; data `data/footer.json` (import via `lib/footer.ts`), CSS `styles/footer.css`, map `tools/gen_campus.py`. Desktop: panel + map + tiles; tablet: tiles, map, panel; below 700px: rows, no map |
 | `BookDialog.astro`, `SettingsDialog.astro` | Pop-ups; Settings has theme and Reduce motion |
 | `Drawing.astro` | A drawing in both themes (`NAME.svg`, `NAME-light.svg`) |
 | `TextPage.astro` | Privacy and accessibility Markdown, placeholders filled |
