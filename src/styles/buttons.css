@@ -56,6 +56,11 @@
   padding-inline: var(--sp-6);
   font-size: var(--fs-6);
 }
+@media (width < 20em) {
+  .btn--lg {
+    padding-inline: var(--sp-3);
+  }
+} /* under 20em its longest words need the room (shared-blocks.css, .cta-band) */
 .btn--primary .kbd {
   background: var(--c-ink-tint);
   border-color: var(--c-ink-tint);
