@@ -36,7 +36,7 @@ Content:
 The agent can do alone (each is its own pull request):
 
 - [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
-- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone; `bottom-nav.css` comments still cite the parked header-fit check.
+- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone.
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 
