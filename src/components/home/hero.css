@@ -435,9 +435,11 @@
     /* the office's height: the hero less the news cards (a card is about 6.4rem tall; taller ones only leave the
        office a little short of its box) and the gap above them */
     --hero-stage-h: calc(var(--hero-inner) - 6.4rem - var(--sp-6));
+    /* the text column: 42% of the row up to 34rem; half the row where the services menu shows (below) */
+    --hero-text: min(34rem, 42%);
 
     min-height: var(--hero-inner);
-    grid-template-columns: min(34rem, 42%) minmax(0, calc(var(--hero-stage-h) * 40 / 31));
+    grid-template-columns: var(--hero-text) minmax(0, calc(var(--hero-stage-h) * 40 / 31));
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas: 'menu stage' 'menu dock';
     justify-content: center;
@@ -477,16 +479,20 @@
     grid-area: dock;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   }
-  /* the menu shows once the window is 800px tall: its own group, the column's gap plus this, --sp-8 under the
-     button (more on a 4K screen). Under 884px tall (1280 x 800, 1536 x 864) it drops its sublines and its gaps
-     step down, so the menu and the news cards stay on the first screen */
-  @media (height >= 50em) {
+  /* the menu shows on desktops (1100 wide) 800px tall and up: its own group, the column's gap plus this, --sp-8
+     under the button (more on a 4K screen). Narrower, its text column is too narrow and the hero runs past one
+     screen. Under 884px tall (1280 x 800, 1536 x 864) it drops its sublines and its gaps step down, so the menu
+     and the news cards stay on the first screen */
+  @media (width >= 68.75em) and (height >= 50em) {
+    .hero-grid {
+      --hero-text: min(34rem, 50%);
+    }
     .hero-menu .hero-services {
       display: block;
       margin-top: var(--fold-stack, var(--sp-6));
     }
   }
-  @media (50em <= height < 55.25em) {
+  @media (width >= 68.75em) and (50em <= height < 55.25em) {
     .hero-menu {
       gap: var(--sp-5);
     }
@@ -509,7 +515,7 @@
     .hero-grid {
       --hero-stage-h: var(--hero-inner);
 
-      grid-template-columns: min(34rem, 42%) minmax(0, calc(var(--hero-stage-h) * 40 / 31)) 24rem;
+      grid-template-columns: var(--hero-text) minmax(0, calc(var(--hero-stage-h) * 40 / 31)) 24rem;
       grid-template-rows: minmax(0, 1fr);
       grid-template-areas: 'menu stage dock';
       column-gap: var(--sp-6);
