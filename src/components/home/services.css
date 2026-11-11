@@ -485,8 +485,8 @@
 }
 
 /* desktop (>= 1100 wide and >= 700 tall, any shape): three tall cards beside a column of three short tiles (the last is
-   All services). The cards take the room their drawing and words need, not the whole screen: the fold centres them
-   (fold.css), with the band showing above and below (owner, November 10, 2026). */
+   All services). The cards take only the room their drawing and words need, never the whole screen: the fold centres
+   them (fold.css), with the band showing above and below (owner, November 11, 2026, restating November 10). */
 @media (--fold) {
   .svc-menu {
     gap: var(--sp-5);
@@ -500,19 +500,16 @@
   .svc-small {
     grid-column: 4;
   }
-  /* a tall 4:5 drawing box, so the cards stand like a game menu's, not square (owner, November 10, 2026); on a short
-     screen it is capped so the section fits one screen with the band showing round it: 24rem is the card's words and
-     bar and the heading (about 20rem) plus room to breathe. Never under 6rem; words that need more grow the section. */
+  /* a tall 4:5 drawing box at most, so the cards stand like a game menu's, not square (owner, November 10, 2026). On a
+     short screen it is capped so the section fits one screen with the band showing: 24rem is the card's words and bar
+     and the heading (about 20rem) plus room to breathe. Never under 6rem; words that need more grow the section.
+     The cap has to be tied to the screen: a box can only take "the height its words leave" inside a parent that is
+     screen-tall, and the cards must not be (owner, November 11, 2026). On paper print.css clears --fold-inner, so
+     the cap falls away. */
   .svc-big .svc-art {
     aspect-ratio: 4 / 5;
     min-height: 6rem;
     max-height: max(6rem, var(--fold-inner) - 24rem);
-  }
-  /* on paper there is no screen to share */
-  @media print {
-    .svc-big .svc-art {
-      max-height: none;
-    }
   }
   .svc-big .svc-line {
     font-size: var(--fs-4);
@@ -520,54 +517,48 @@
   .svc-small .svc-tile {
     padding-top: 0;
   }
-}
-
-/* desktop, mouse or touch: a short tile's icon is --sp-6 on a short screen (1280x800, 1366x768). From 60em tall
-   (1920x1080 and up) there is room for the full icon. */
-@media (width >= 68.75em) and (43.75em <= height < 60em) {
-  .svc-small .svc-icon svg {
-    width: var(--sp-6);
-    height: var(--sp-6);
-  }
-}
-
-/* desktop with a pointer: a slimmer bar (2.25rem, --sp-7 less --sp-3, not --control-h; it is part of the tile's link, not a target of its
-   own), so less room is kept under a tall card's words. A short tile keeps no room at all:
-   its icon and name sit centred, and slide up out of the bar's way while it shows (WCAG 1.4.13). */
-@media (hover: hover) and (width >= 68.75em) and (height >= 43.75em) {
-  .svc-go {
-    min-height: calc(var(--sp-7) - var(--sp-3));
-  }
-  .svc-big .svc-text {
-    padding-bottom: var(--sp-7);
-  }
+  /* no room is kept under a short tile's name for the bar: icon and name sit centred */
   .svc-small .svc-text {
     padding-bottom: 0;
   }
-  .svc-small :is(.svc-icon, .svc-text) {
-    transition: transform var(--dur-2) var(--ease);
+  /* a short screen (1280 x 800, 1366 x 768): a short tile's icon is --sp-6. From 60em tall (1920 x 1080 and up)
+     there is room for the full icon. */
+  @media (height < 60em) {
+    .svc-small .svc-icon svg {
+      width: var(--sp-6);
+      height: var(--sp-6);
+    }
   }
-  .svc-small .svc-tile:is(:hover, :has(.svc-link:focus-visible)) :is(.svc-icon, .svc-text) {
-    transform: translateY(calc(-1 * var(--sp-5)));
+  /* with a pointer: a slimmer bar (2.25rem, --sp-7 less --sp-3, not --control-h; it is part of the tile's link, not
+     a target of its own), so less room is kept under a tall card's words. A short tile's icon and name slide up out
+     of the bar's way while it shows (WCAG 1.4.13). */
+  @media (hover: hover) {
+    .svc-go {
+      min-height: calc(var(--sp-7) - var(--sp-3));
+    }
+    .svc-big .svc-text {
+      padding-bottom: var(--sp-7);
+    }
+    .svc-small :is(.svc-icon, .svc-text) {
+      transition: transform var(--dur-2) var(--ease);
+    }
+    .svc-small .svc-tile:is(:hover, :has(.svc-link:focus-visible)) :is(.svc-icon, .svc-text) {
+      transform: translateY(calc(-1 * var(--sp-5)));
+    }
   }
-}
-
-/* desktop on a touch screen (no hover: a touch laptop, a tablet in desktop mode): the bar would show all the time,
-   under every tile's words, and push the section past one screen. The whole tile is the link, so the bar goes from
-   sight; "View service" stays in the link's name (M10). */
-@media (hover: none) and (width >= 68.75em) and (height >= 43.75em) {
-  .svc-go {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    min-height: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  /* no bar, so no room kept under a short tile's name: icon and name sit centred, as with a mouse */
-  .svc-small .svc-text {
-    padding-bottom: 0;
+  /* on a touch screen (no hover: a touch laptop, a tablet in desktop mode) the bar would show all the time, under
+     every tile's words, and push the section past one screen. The whole tile is the link, so the bar goes from
+     sight; "View service" stays in the link's name (M10). */
+  @media (hover: none) {
+    .svc-go {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      min-height: 0;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
   }
 }
 
