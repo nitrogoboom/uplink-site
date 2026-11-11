@@ -16,7 +16,6 @@ Needs the owner's eyes on a preview:
 
 Layout and look:
 
-- [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
 - [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
 
 Content:
@@ -102,7 +101,6 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
 ### Layout and look
 
-- [ ] Narrower than 20em (390px phone at 200% zoom, or a 24px font) scrolls sideways; below WCAG's 320px floor. Decide whether to support it.
 - [ ] Light theme: signed off November 9, 2026, still open to change. Optional: a quieter amber tower on the footer map; ghost-button edges to `--c-edge` (colour rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
 - [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).

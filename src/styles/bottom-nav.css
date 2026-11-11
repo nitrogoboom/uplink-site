@@ -132,3 +132,34 @@
     display: none;
   }
 }
+/* under 20em (a 390px phone at 200% text, or a 24px default font): the header needs about 297px and the tab bar
+   about 281px, against 195px of room (owner, November 11, 2026: support it). The header keeps its height (one-screen
+   sections count on it), so it slims instead of wrapping: the mark alone (the link keeps its aria-label), 36px
+   buttons (above WCAG 2.5.8's 24px). The tabs keep their icons; their words stay for screen readers. */
+@media (width < 20em) {
+  .brand-text {
+    display: none;
+  }
+  .site-header .container {
+    gap: var(--sp-2);
+  }
+  .hdr-actions {
+    gap: var(--sp-1);
+  }
+  .hbtn {
+    min-width: calc(var(--tap) - var(--sp-2));
+    height: calc(var(--tap) - var(--sp-2));
+    padding-inline: 0;
+  }
+  .bn {
+    position: relative; /* holds the hidden word inside the tab, so it never widens the page */
+  }
+  .bn-t {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
