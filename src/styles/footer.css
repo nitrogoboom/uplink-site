@@ -51,9 +51,8 @@
 /* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile, so it never widens the page */
 .fc-tile {
   position: relative;
-  --fc-side: calc(var(--sp-6) + var(--sp-1)); /* the icon's width; the chevron's column matches it, so the name sits centred */
   display: grid;
-  grid-template-columns: var(--fc-side) minmax(0, 1fr) var(--fc-side);
+  grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-areas: 'icon name chev';
   align-items: center;
   column-gap: var(--sp-3);
@@ -70,12 +69,11 @@
 } /* Safari's own triangle */
 .fc-tile .icon-tile {
   grid-area: icon;
-  width: var(--fc-side);
-  height: var(--fc-side);
+  width: calc(var(--sp-6) + var(--sp-1));
+  height: calc(var(--sp-6) + var(--sp-1));
 }
 .fc-tile-n {
   grid-area: name;
-  text-align: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-5);
@@ -84,7 +82,6 @@
 }
 .fc-tile-chev {
   grid-area: chev;
-  justify-self: end;
   display: grid;
   color: var(--c-muted);
   transition: transform var(--dur-2) var(--ease);
