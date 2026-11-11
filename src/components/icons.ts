@@ -36,6 +36,7 @@ export const ICONS = {
   signal: { d: '<path d="M5 13a7 7 0 0 1 14 0M8.5 13a3.5 3.5 0 0 1 7 0"/><circle cx="12" cy="17" r="1.5"/>' },
   person: { d: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>' },
   play: { d: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4.5 2.5-4.5 2.5z"/>' },
+  layers: { d: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 16.5l9 5 9-5"/>' }, // the Work tab (play is YouTube's)
   people: {
     d: '<circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c1-3.5 3.5-5 6-5s5 1.5 6 5M15 15.5c2.5 0 4.5 1.2 5.5 4"/>',
   },

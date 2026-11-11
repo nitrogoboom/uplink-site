@@ -78,6 +78,10 @@
   .botnav {
     display: block;
   }
+  /* the tab words a step under the 14px labels elsewhere (owner, November 11, 2026: 0.1em smaller, in em) */
+  .bn {
+    font-size: 0.775em;
+  }
   /* room for the bar under the page: kept in the footer's base bar (the last thing on every page), so its band colour
      runs down behind the bar instead of a strip of page background */
   .fc-base {
