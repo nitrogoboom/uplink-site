@@ -13,7 +13,7 @@ Needs the owner's eyes on a preview:
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
 - [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.
-- [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Look on the preview: tabs feel instant, nothing flashes.
+- [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Live since #172; look on the live site: tabs feel instant, nothing flashes.
 - [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
 
 Layout and look:
@@ -21,13 +21,12 @@ Layout and look:
 - [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
 - [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
-- [ ] Hero fallback: if the drawing never builds, show the still office (`template.hero-still`) instead of an empty stage.
 
 Content:
 
 - [ ] Home has two descriptions that differ: the page's ("Outsourced IT…", `description` in `src/data/copy/en/home.yaml`) and the business one ("Managed IT…", `business`). Decide when the real copy is written.
 - [ ] All pages: where the same text comes from two content entries (such as a separate phone line), merge them into one, as Home's hero lead (PR #160, `t.lead` only) (owner, November 10, 2026).
-- [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, the hero's `lead-short`, Grow's six tags, the "Windows 10" hero card.
+- [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, Grow's six tags, the "Windows 10" hero card.
 - [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/data/reviews.json`. With the real Google reviews: their fields (photo, "2 months ago", rating shown per card if they vary), a score and count beside the stars, "Read reviews on Google" (now `/soon`) to the Google profile, quotes that don't retell "Our work", drop the "Sample reviews" line. Maybe fold the check-up band into this section (`.fold-foot`, as About Team).
 - [ ] Home "Our work" row is a placeholder until its real section is decided (`src/components/home/Work.astro`).
 - [ ] Grow: final copy and team sizes, people drawn as more than blocks, timing on real phones (`DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`).
@@ -37,7 +36,7 @@ Content:
 The agent can do alone (each is its own pull request):
 
 - [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
-- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone; `bottom-nav.css` comments still cite the parked header-fit check.
+- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone.
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 
@@ -83,7 +82,7 @@ For launch (the owner): the scoped Cloudflare token and split environments are u
 
 Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
-- [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`), and a postal code for the office.
+- [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`; its `uplinkit.ca` addresses are placeholders), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
 - [ ] Before launch, `/accessibility` gets back two Ontario lines: what happens after feedback (O. Reg. 191/11 s. 80.50(2)) and free accessible formats on request (s. 12(3)).
 
@@ -109,7 +108,7 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Narrower than 20em (390px phone at 200% zoom, or a 24px font) scrolls sideways; below WCAG's 320px floor. Decide whether to support it.
 - [ ] Light theme: signed off November 9, 2026, still open to change. Optional: a quieter amber tower on the footer map; ghost-button edges to `--c-edge` (colour rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
-- [ ] 404 page: a three-panel heist comic, draft on branch `404-comic-draft`; panel 1 (the van) needs a rethink, and the balloon clips the "t" in "typed".
+- [ ] 404 page: a three-panel heist comic, draft on branch `404-comic-draft` (not on GitHub or this PC, November 11, 2026); panel 1 (the van) needs a rethink, and the balloon clips the "t" in "typed".
 - [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).
 - [ ] Idea, not planned: the office fire drill (`docs/history/creative.md`).
 - [ ] Small, left as they are: Home-only hero rules in `compact-cuts.css`; the services observer runs at 700px and up; JSON-LD is pretty-printed.
