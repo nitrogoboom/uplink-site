@@ -5,7 +5,6 @@
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
-import Pause from './Pause.astro';
 import HoldButton from './HoldButton.astro';
 import { footer as f } from '../lib/footer';
 import { CAMPUS, getServices } from '../lib/site';
@@ -23,10 +22,10 @@ const sections: {
   map: Spot;
   icon: IconName;
   name: string;
-  count: string;
+  count?: string; // a panel's eyebrow
   panel?: (typeof panels)[number];
 }[] = [
-  { id: 'contact', map: 'hq', icon: 'bubble', name: t.contact.tile, count: t.contact.count },
+  { id: 'contact', map: 'hq', icon: 'bubble', name: t.contact.tile },
   ...panels.map((p) => ({
     id: p.id,
     map: p.map,
@@ -52,7 +51,6 @@ const sections: {
       {sections.map((s) => <details class="fc-sec" name="footer" id={`fc-${s.id}`} data-map={s.map}>
         <summary class="fc-tile">
           <span class="icon-tile"><Icon name={s.icon} /></span><span class="fc-tile-n">{s.name}</span
-          ><Pause /><span class="fc-tile-c">{s.count}</span
           ><span class="fc-tile-chev" aria-hidden="true"><Icon name="chevronR" /></span>
         </summary>
         <div class="fc-panel">

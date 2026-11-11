@@ -8,6 +8,8 @@ From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" sectio
 
 Needs the owner's eyes on a preview:
 
+- [ ] Footer tiles: names only, centred (no "N links", "N channels", "Start here"); the panel eyebrows keep their counts.
+
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
 - [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.

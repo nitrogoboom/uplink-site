@@ -70,9 +70,9 @@ export const ui = obj({
   footer: obj({
     title: text,
     nav: text,
-    contact: texts('tile', 'count'),
-    links: tpl('n'),
-    channels: tpl('n'),
+    contact: texts('tile'),
+    links: tpl('n'), // a panel's eyebrow
+    channels: tpl('n'), // Follow's eyebrow
     callOrEmail: text,
     office: text,
     follow: text,

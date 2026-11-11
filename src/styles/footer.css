@@ -51,12 +51,12 @@
 /* position: relative keeps the screen-reader pause (.sr-only, absolute) inside the tile, so it never widens the page */
 .fc-tile {
   position: relative;
+  --fc-side: calc(var(--sp-6) + var(--sp-1)); /* the icon's width; the chevron's column matches it, so the name sits centred */
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'icon name chev' 'icon count chev';
+  grid-template-columns: var(--fc-side) minmax(0, 1fr) var(--fc-side);
+  grid-template-areas: 'icon name chev';
   align-items: center;
   column-gap: var(--sp-3);
-  row-gap: var(--sp-1);
   min-height: calc(var(--sp-8) - var(--sp-1));
   padding: var(--sp-2) 0;
   border-bottom: 1px solid var(--c-line);
@@ -70,30 +70,21 @@
 } /* Safari's own triangle */
 .fc-tile .icon-tile {
   grid-area: icon;
-  width: calc(var(--sp-6) + var(--sp-1));
-  height: calc(var(--sp-6) + var(--sp-1));
+  width: var(--fc-side);
+  height: var(--fc-side);
 }
 .fc-tile-n {
   grid-area: name;
-  align-self: end;
+  text-align: center;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-5);
   line-height: var(--lh-tight);
   text-transform: uppercase;
 }
-.fc-tile-c {
-  grid-area: count;
-  align-self: start;
-  font-size: var(--fs-1);
-  font-weight: 600;
-  letter-spacing: var(--tracking-3);
-  line-height: var(--lh-tight);
-  text-transform: uppercase;
-  color: var(--c-muted);
-}
 .fc-tile-chev {
   grid-area: chev;
+  justify-self: end;
   display: grid;
   color: var(--c-muted);
   transition: transform var(--dur-2) var(--ease);
@@ -933,7 +924,7 @@ a.fc-cl:hover {
       justify-content: center;
       gap: var(--sp-1);
       min-width: calc(var(--sp-9) + var(--sp-6));
-      min-height: calc(var(--sp-9) - var(--sp-1)); /* the least it takes: it grows to fit its name and count */
+      min-height: calc(var(--sp-9) - var(--sp-1)); /* the least it takes: it grows to fit its name */
       margin-block: var(--sp-5);
       padding: var(--sp-2);
       border: 1px solid var(--c-line);
@@ -947,10 +938,6 @@ a.fc-cl:hover {
     }
     .fc-tile-n {
       font-size: var(--fs-4);
-    }
-    .fc-tile-n,
-    .fc-tile-c {
-      align-self: auto;
     }
     .fc-tile-chev {
       display: none;

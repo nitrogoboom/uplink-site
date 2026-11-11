@@ -87,9 +87,8 @@ footer:
   nav: Footer
   contact:
     tile: Contact
-    count: Start here
-  links: '{n} links' # a link panel's tile and eyebrow
-  channels: '{n} channels' # Follow's tile and eyebrow
+  links: '{n} links' # a link panel's eyebrow
+  channels: '{n} channels' # Follow's eyebrow
   callOrEmail: Call or email
   office: Office
   follow: Follow
