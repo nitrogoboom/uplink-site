@@ -92,14 +92,14 @@
   /* Cards and panels: a flat fill on a soft navy shadow with a top highlight (--shadow-card); no gradient (a fade
      down the card read as cheap). A rule that gives one a shadow of its own (the Services row's middle card, a hover)
      still wins: it comes later in the cascade */
-  :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-wall-item, .fc-soc, .svc-tile, .fc-tile, .feat) {
+  :root[data-theme='light'] :is(.panel, .card, .faq details, .fc-soc, .svc-tile, .fc-tile, .feat) {
     box-shadow: var(--shadow-card);
   }
   /* A hovered card keeps its own fill. --c-surface-2 is a see-through navy wash: in dark mode it lightens a card
      (lifts it), but here it greyed the card below the ground it sits on, as if it sank (owner, November 9, 2026).
      The lift, the border and the shadow show the hover */
   @media (hover: hover) {
-    :root[data-theme='light'] :is(.card, .fc-wall-item, .fc-sec:not([open]) > .fc-tile):hover,
+    :root[data-theme='light'] :is(.card, .fc-sec:not([open]) > .fc-tile):hover,
     :root[data-theme='light'] .svc-tile:is(:hover, :has(.svc-link:focus-visible)) {
       background: var(--c-surface);
     }

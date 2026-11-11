@@ -1,5 +1,5 @@
 ---
-// SHARED · Footer (every page): one <nav aria-label="Footer"> of six <details name="footer">, in reading order on every
+// SHARED · Footer (every page): one <nav aria-label="Footer"> of five <details name="footer">, in reading order on every
 // screen; no script moves or relabels anything. Layout, map and data: src/README.md, "The footer".
 // The newsletter form is a mockup (footer.js checks it and sends nothing). Without script it goes to the coming-soon
 // page, and the address field has no name, so the email never lands in the address bar. Name it with a real endpoint.
@@ -16,7 +16,7 @@ type Spot = keyof typeof f.spots;
 const spot = (k: Spot) => f.spots[k];
 const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
 const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : (p.links ?? []) }));
-// the six sections in reading order: Contact, the link panels, Follow. footer.css places the tiles by this order.
+// the five sections in reading order: Contact, then the link panels. footer.css places the tiles by this order.
 const sections: {
   id: string;
   map: Spot;
@@ -34,13 +34,6 @@ const sections: {
     count: fill(t.links, { n: p.links.length }),
     panel: p,
   })),
-  {
-    id: 'follow',
-    map: 'follow',
-    icon: f.follow.icon,
-    name: f.follow.tile,
-    count: fill(t.channels, { n: f.follow.socials.length }),
-  },
 ];
 ---
 
@@ -87,37 +80,6 @@ const sections: {
                   </li>)}
                 </ul>
               </div>
-            </div>
-          </Fragment>}
-          {s.panel && <Fragment>
-            <div class="fc-head">
-              <p class="eyebrow">{s.count}</p>
-              <h3 class={fit(s.panel.title)}>{s.panel.title}</h3>
-            </div>
-            <p class="fc-lead">{s.panel.lead}</p>
-            <div class="fc-body">
-              <ul class="fc-rows fc-rows--two">
-                {s.panel.links.map((l) => <li>
-                  <a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a>
-                </li>)}
-              </ul>
-              <a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a>
-            </div>
-          </Fragment>}
-          {s.id === 'follow' && <Fragment>
-            <div class="fc-head">
-              <p class="eyebrow">{s.count}</p>
-              <h3 class={fit(`${f.follow.title} ${f.follow.accent}`)}>{f.follow.title} <em>{f.follow.accent}</em></h3>
-            </div>
-            <p class="fc-lead">{f.follow.lead}</p>
-            <div class="fc-body">
-              <ul class="fc-wall">
-                {f.follow.socials.map((x) => <li>
-                  <a class="fc-wall-item" href={x.href}
-                    ><span class="icon-tile"><Icon name={x.icon} /></span><b>{x.name}</b></a
-                  >
-                </li>)}
-              </ul>
               <form class="fc-nl" action="/soon" data-fc-nl novalidate>
                 <label class="label" for="fc-nl-email"
                   ><span class="sr-only">{t.emailFor} </span>{f.follow.newsletter.name}</label
@@ -137,6 +99,21 @@ const sections: {
                 </div>
                 <p class="small muted" id="fc-nl-msg" data-fc-nl-msg>{f.follow.newsletter.note}</p>
               </form>
+            </div>
+          </Fragment>}
+          {s.panel && <Fragment>
+            <div class="fc-head">
+              <p class="eyebrow">{s.count}</p>
+              <h3 class={fit(s.panel.title)}>{s.panel.title}</h3>
+            </div>
+            <p class="fc-lead">{s.panel.lead}</p>
+            <div class="fc-body">
+              <ul class="fc-rows fc-rows--two">
+                {s.panel.links.map((l) => <li>
+                  <a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a>
+                </li>)}
+              </ul>
+              <a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a>
             </div>
           </Fragment>}
         </div>

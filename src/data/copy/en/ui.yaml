@@ -88,7 +88,6 @@ footer:
   contact:
     tile: Contact
   links: '{n} links' # a link panel's eyebrow
-  channels: '{n} channels' # Follow's eyebrow
   callOrEmail: Call or email
   office: Office
   follow: Follow

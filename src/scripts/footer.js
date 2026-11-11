@@ -12,7 +12,7 @@ import { MEDIA } from '../lib/media.js';
 /* ======================================================================
    Campus map (tablet and desktop; phones hide it). Decoration only.
    Each section's data-map names a spot on the map (hq, services, company,
-   support, resources, follow); the map's label is in the markup and CSS
+   support, resources); the map's label is in the markup and CSS
    shows the open section's words. Here the camera flies to the spot and
    lights it up whenever a section opens or shuts (the toggle event). With
    nothing open, Contact shows (footer.css, and Contact is opened for real

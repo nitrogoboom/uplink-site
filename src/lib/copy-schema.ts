@@ -72,7 +72,6 @@ export const ui = obj({
     nav: text,
     contact: texts('tile'),
     links: tpl('n'), // a panel's eyebrow
-    channels: tpl('n'), // Follow's eyebrow
     callOrEmail: text,
     office: text,
     follow: text,
