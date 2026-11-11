@@ -485,23 +485,10 @@
 }
 
 /* desktop (>= 1100 wide and >= 700 tall, any shape): three tall cards beside a column of three short tiles (the last is
-   All services). The fold centres the section (fold.css), with the band showing above and below (owner, November 10,
-   2026): the heading and cards fill one screen less --sp-5 each side, and the tall cards' drawings take the height
-   their words leave, so longer words shrink the drawing first and only then grow the section. */
+   All services). The cards take only the room their drawing and words need, never the whole screen: the fold centres
+   them (fold.css), with the band showing above and below (owner, November 11, 2026, restating November 10). */
 @media (--fold) {
-  /* the section is the container its width cap below measures */
-  .fold:has(> .svc-wrap) {
-    container-type: inline-size;
-  }
-  /* never taller than 70% of the section's width either: on a tall, narrow window (1100 x 1300) the cards would
-     otherwise stretch into thin strips; there the band takes the rest */
-  .svc-wrap {
-    display: flex;
-    flex-direction: column;
-    min-height: min(var(--fold-inner) - 2 * var(--sp-5), 70cqi);
-  }
   .svc-menu {
-    flex: 1;
     gap: var(--sp-5);
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: repeat(3, minmax(auto, 1fr));
@@ -513,13 +500,16 @@
   .svc-small {
     grid-column: 4;
   }
-  /* tall cards, so they stand like a game menu's, not square (owner, November 10, 2026): the drawing box takes what
-     the words leave, never under 8rem. The drawing keeps its own shape inside it (object-fit). On paper the fold
-     sizes are cleared (print.css), so the box falls back to its floor. */
+  /* a tall 4:5 drawing box at most, so the cards stand like a game menu's, not square (owner, November 10, 2026). On a
+     short screen it is capped so the section fits one screen with the band showing: 24rem is the card's words and bar
+     and the heading (about 20rem) plus room to breathe. Never under 6rem; words that need more grow the section.
+     The cap has to be tied to the screen: a box can only take "the height its words leave" inside a parent that is
+     screen-tall, and the cards must not be (owner, November 11, 2026). On paper print.css clears --fold-inner, so
+     the cap falls away. */
   .svc-big .svc-art {
-    flex: 1 1 0;
-    aspect-ratio: auto;
-    min-height: 8rem;
+    aspect-ratio: 4 / 5;
+    min-height: 6rem;
+    max-height: max(6rem, var(--fold-inner) - 24rem);
   }
   .svc-big .svc-line {
     font-size: var(--fs-4);
