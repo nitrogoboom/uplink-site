@@ -1,12 +1,18 @@
-/*--- HOME · 1. Hero, every screen size. Phone and portrait tablet first, then
-   the two-column layouts at the end of this file. The .hero section itself (colour, glow, padding) is
-   src/styles/hero-section.css, shared with the service pages and the case-study pages. ---*/
+/*--- HOME · 1. Hero, every screen size, in three layouts:
+   1. stacked (phones, portrait tablets, short or narrow windows): first here;
+   2. two columns (landscape, 900 x 560 and up) and 3. ultrawide (32:9): at the end of this file.
+   The .hero section itself (colour, glow, padding) is src/styles/hero-section.css, shared with the service pages
+   and the case-study pages. ---*/
 /* ---------- HOME ----------------------------------------------------- */
-/* phone + portrait tablet: one column. */
+/* 1. stacked: headline and lead, the button, the office, the news cards. At least one screen tall: the office
+   takes the height the words leave, never under its floor (.stage, below), so on a tall screen the news cards
+   come up into view and on a phone the drawing stays full width. */
 .hero-grid {
   max-width: none;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom));
   gap: var(--sp-7);
 }
 .hero-menu {
@@ -62,17 +68,35 @@
   text-wrap: pretty;
 }
 
+/* the office's shape: the full and tablet cuts are 40 / 31; the phone cut is 962 / 900 (office-compact-build.svg,
+   its PHONE_CROP), which its still for no script (hero-office-phone.svg) shares. --art-tall is height per width. */
 .hero-art {
+  --art-ratio: 40 / 31;
+  --art-tall: calc(31 / 40);
+
   position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--sp-4);
   min-width: 0;
+  container-type: inline-size;
 }
+@media (--small-phone) {
+  .hero-art {
+    --art-ratio: 962 / 900;
+    --art-tall: calc(900 / 962);
+  }
+}
+/* the office takes the column's leftover height and is as wide as that makes it. Floor: the full width, or 28rem
+   wide where the column is wider (so the labels stay readable); cap: the full width. */
 .hero-art .stage {
   position: relative;
-  aspect-ratio: 40 / 31;
+  flex: 1 1 auto;
+  align-self: center;
+  aspect-ratio: var(--art-ratio);
   max-width: 100%;
+  min-height: calc(min(100cqi, 28rem) * var(--art-tall));
+  max-height: calc(100cqi * var(--art-tall));
 }
 .hero-art .stage svg,
 .hero-art .stage .hero-nojs {
@@ -252,58 +276,28 @@
   text-transform: uppercase;
 }
 
-/* portrait tablets and tall narrow windows: the drawing is as tall as the screen leaves after the text, so the
-   news cards come up in view and not below the fold (never under 28rem wide, so the labels stay readable) */
-@media (--tablet-up) and (orientation: portrait) {
-  .hero-art .stage {
-    width: min(100%, max(28rem, calc((100svh - 39rem) * 40 / 31)));
-    margin-inline: auto;
-  }
-}
-
-/* phone: the box is the phone cut's shape (office-compact-build.svg, 962 x 900, its PHONE_CROP), which its still
-   for no script (hero-office-phone.svg) shares */
+/* phones show the phone cut, which a tap steps through */
 @media (--small-phone) {
-  .hero-art .stage {
-    aspect-ratio: 962 / 900;
-  }
   .hero-art .stage svg.ob-phone {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 }
 
-/* phones (under the bottom bar's 700px): headline and the lead, the button, then the office full width
-   and the news cards. .hero-menu and .hero-art step aside so their parts place on this grid. The button sits
-   above the office so it is on the first screen on every phone (under it, a 667px-tall screen put it half under
-   the bottom bar). No eyebrow; the lead is the same line as on a big screen. */
+/* phones (under the bottom bar's 700px), still the stacked layout: tighter gaps and no eyebrow, so the button
+   is on the first screen on every phone (a 667px-tall one too); the lead is the same line as on a big screen. */
 @media (--phone) {
   .hero.fold {
     --hero-pad-top: var(--sp-5);
   }
-  .hero-grid {
-    grid-template-areas: 'top' 'cta' 'stage' 'dock';
-    gap: var(--sp-3);
-  }
+  .hero-grid,
   .hero-menu,
+  .hero-top,
   .hero-art {
-    display: contents;
-  }
-  .hero-top {
-    grid-area: top;
     gap: var(--sp-3);
   }
   .hero-top .eyebrow {
     display: none;
-  }
-  .hero-art .stage {
-    grid-area: stage;
-  }
-  .hero-cta {
-    grid-area: cta;
-  }
-  .hero-dock {
-    grid-area: dock;
   }
 }
 
@@ -426,28 +420,42 @@
   }
 }
 
-/* ---- two columns: landscape tablets, short laptops and desktops ---------
-   Text on the left, the office on the right, sized so both fit the first
-   screen. The news cards sit just below it. .hero-art steps aside
-   (display: contents) so the stage and the news cards place on this grid. */
+/* ---- 2. two columns: every landscape window from 900 x 560 up -----------
+   Text on the left; the office over the news cards on the right; the hero one screen tall. Sizes follow the
+   screen, not steps: the text column is 42% of the row up to 34rem; the office column is as wide as the drawing
+   at the height the news cards leave it, so the spare width falls at the two edges, not as a hole between the
+   text and the office, and the news cards run exactly as wide as the office (owner, November 10, 2026). On a
+   tall, near-square window the hero stops at --hero-max (tokens.css) and centres in the screen. */
 @media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
+  .hero.fold {
+    --hero-pad-bottom: var(--sp-5);
+  }
   .hero-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    /* one screen with the news cards in it: the office row takes what the cards leave (less the hero's padding,
-       src/styles/hero-section.css), and grows past it only if the text needs more */
-    min-height: calc(var(--hero-h) - var(--hero-pad-top) - var(--hero-pad-bottom));
-    grid-template-rows: 1fr auto;
-    grid-template-areas: 'menu stage' 'dock dock';
-    column-gap: var(--sp-7);
+    --hero-inner: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max, 100svh));
+    /* the office's height: the hero less the news cards (a card is about 6.4rem tall; taller ones only leave the
+       office a little short of its box) and the gap above them */
+    --hero-stage-h: calc(var(--hero-inner) - 6.4rem - var(--sp-6));
+
+    min-height: var(--hero-inner);
+    grid-template-columns: min(34rem, 42%) minmax(0, calc(var(--hero-stage-h) * 40 / 31));
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas: 'menu stage' 'menu dock';
+    justify-content: center;
+    column-gap: var(--fold-gap, var(--sp-7));
+    /* the office fills its box to the bottom edge, so its labels need this much air above the cards */
     row-gap: var(--sp-6);
   }
+  /* wider letter and line spacing (WCAG 1.4.12, a reader's own style sheet): the text can outgrow one screen. The
+     hero's height is a floor, not a cap, so it grows, and the menu centres only while it fits (safe), so its top
+     never slides up under the header */
   .hero-menu {
     grid-area: menu;
-    justify-content: center;
-    gap: var(--sp-6);
+    min-height: 0;
+    justify-content: safe center;
+    gap: var(--fold-stack, var(--sp-6));
   }
   /* the headline keeps its two lines in its column: "Always online", the longer, is about 5.7em wide. A share of the
-     column, not of the screen, so zoom (a narrower column, then the tablet layout) never shrinks it on screen */
+     column, not of the screen, so zoom (a narrower column, then the stacked layout) never shrinks it on screen */
   .hero-menu h1 {
     font-size: min(var(--fs-8), 16.5cqi, var(--fit));
   }
@@ -459,59 +467,26 @@
   }
   .hero-art .stage {
     grid-area: stage;
+    align-self: stretch;
     aspect-ratio: auto;
     min-height: 0;
+    max-height: none;
   }
+  /* the news cards side by side while each gets 17rem, else one above the other */
   .hero-dock {
     grid-area: dock;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
   }
-}
-
-/* ---- desktop, tall enough for the menu ----------------------------------
-   The whole hero is one screen: headline, button and menu centred on the
-   left, the office over the news cards on the right. Text keeps the visitor's
-   size; the office takes the height and width left, so it fills big screens. */
-@media (width >= 68.75em) and (height >= 50em) and (orientation: landscape) {
-  .hero-grid {
-    /* on a tall, near-square window the hero stops at --hero-max and centres in the screen, so the
-       office and news cards stay beside the text and not at opposite ends of a tall column */
-    --hero-inner: min(calc(var(--fold-h) - var(--hero-pad-top) - var(--hero-pad-bottom)), var(--hero-max));
-    /* the office's height: the hero less the news cards (a card is about 6.4rem tall; taller ones only leave the
-       office a little short of its box) and the gap above them */
-    --hero-stage-h: calc(var(--hero-inner) - 6.4rem - var(--sp-6));
-
-    min-height: var(--hero-inner);
-    /* the office column is no wider than the drawing at that height (aspect 40/31), and the columns sit together in
-       the middle: on a wide screen the spare width falls at the two edges, not as a hole between the text and the
-       office, and the news cards run exactly as wide as the office (owner, November 10, 2026) */
-    grid-template-columns: minmax(0, 34rem) minmax(0, calc(var(--hero-stage-h) * 40 / 31));
-    grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas: 'menu stage' 'menu dock';
-    justify-content: center;
-    column-gap: var(--fold-gap);
-    /* on 16:9 screens the office fills its box to the bottom edge, so its labels need this much air above the cards */
-    row-gap: var(--sp-6);
+  /* the menu shows once the window is 800px tall: its own group, the column's gap plus this, --sp-8 under the
+     button (more on a 4K screen). Under 884px tall (1280 x 800, 1536 x 864) it drops its sublines and its gaps
+     step down, so the menu and the news cards stay on the first screen */
+  @media (height >= 50em) {
+    .hero-menu .hero-services {
+      display: block;
+      margin-top: var(--fold-stack, var(--sp-6));
+    }
   }
-  /* wider letter and line spacing (WCAG 1.4.12, a reader's own style sheet): the text can outgrow one screen. The
-     hero's height is a floor, not a cap, so it grows, and the menu centres only while it fits (safe), so its top
-     never slides up under the header */
-  .hero-menu {
-    min-height: 0;
-    justify-content: safe center;
-    gap: var(--fold-stack);
-  }
-  /* the menu is its own group: the column's gap plus this, --sp-8 under the button (more on a 4K screen) */
-  .hero-menu .hero-services {
-    display: block;
-    margin-top: var(--fold-stack);
-  }
-  /* icons and text line up with the headline; the highlight hangs outside */
-  .hero-menu .menu {
-    margin-inline: calc(-1 * var(--sp-3));
-  }
-  /* a window under 884px tall (1280 x 800, 1536 x 864): the menu drops its sublines and its gaps step down, so the
-     menu and the news cards stay on the first screen (the full menu needs 770px of the 688 a 800px window leaves) */
-  @media (height < 55.25em) {
+  @media (50em <= height < 55.25em) {
     .hero-menu {
       gap: var(--sp-5);
     }
@@ -522,21 +497,19 @@
       display: none;
     }
   }
-  /* narrow desktops: the office column is too narrow for two news cards side by side, so they stack */
-  @media (width < 77.5em) {
-    .hero-dock {
-      grid-template-columns: minmax(0, 1fr);
-    }
+  /* icons and text line up with the headline; the highlight hangs outside */
+  .hero-menu .menu {
+    margin-inline: calc(-1 * var(--sp-3));
   }
 
-  /* super-wide screens (32:9): news in a column beside the office, which takes the hero's full height. A maximised
+  /* ---- 3. ultrawide (32:9): news in a column beside the office, which takes the hero's full height. A maximised
      21:9 browser (3440 x 1305, about 2.6:1) keeps the news under the office (owner, November 10, 2026); a
      maximised 32:9 one is about 3.9:1, so this starts between the two. */
   @media (aspect-ratio >= 16 / 5) {
     .hero-grid {
       --hero-stage-h: var(--hero-inner);
 
-      grid-template-columns: minmax(0, 34rem) minmax(0, calc(var(--hero-stage-h) * 40 / 31)) 24rem;
+      grid-template-columns: min(34rem, 42%) minmax(0, calc(var(--hero-stage-h) * 40 / 31)) 24rem;
       grid-template-rows: minmax(0, 1fr);
       grid-template-areas: 'menu stage dock';
       column-gap: var(--sp-6);
