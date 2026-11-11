@@ -33,16 +33,9 @@
     radial-gradient(60% 70% at 72% 48%, var(--c-glow-sky), transparent 70%),
     radial-gradient(45% 55% at 8% 92%, var(--c-glow-accent), transparent 70%);
 }
-/* two columns (landscape tablets and up): the hero is one screen tall */
+/* landscape tablets and up: less room above (the home hero's two columns also take less below: home/hero.css) */
 @media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
   .hero {
-    --hero-h: calc(100svh - var(--header-h) - env(safe-area-inset-top, 0px));
     --hero-pad-top: var(--sp-5);
-  }
-}
-/* the home hero on a tall desktop: the news cards sit closer to the bottom edge */
-@media (width >= 68.75em) and (height >= 50em) and (orientation: landscape) {
-  .hero.fold {
-    --hero-pad-bottom: var(--sp-5);
   }
 }
