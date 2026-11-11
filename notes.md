@@ -16,7 +16,6 @@ Needs the owner's eyes on a preview:
 
 Layout and look:
 
-- [ ] Home services, small tiles: with a mouse at 768×1024 the section runs 6px past the screen.
 - [ ] Firefox at 390px wide, 200% text: Home's services row (`.svc-big`) made the page 458px wide (November 6, 2026). Check by hand.
 - [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
 
