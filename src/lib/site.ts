@@ -61,7 +61,7 @@ type Tab = { page: keyof typeof PAGES; icon: IconName; short?: string };
 export const NAV: readonly Tab[] = [
   { page: 'home', icon: 'home' },
   { page: 'services', icon: 'grid' },
-  { page: 'work', icon: 'repair', short: 'Work' },
+  { page: 'work', icon: 'layers', short: 'Work' },
   { page: 'about', icon: 'building' },
   { page: 'contact', icon: 'bubble' },
 ];
