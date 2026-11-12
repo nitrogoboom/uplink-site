@@ -4,7 +4,6 @@
 // 9-letter word), which binds only with big text in a narrow column. One whose words are all SHORT letters or fewer
 // ("Talk to a real person") may get the class fit-loose (30cqi), so a narrow column doesn't shrink it needlessly.
 // tokens.css and base.css hold the sizes. Components call fit(text) on a heading's text at build time;
-// checks/site.spec.mjs fails a long-word heading without the class fit.
 
 export const LONG = 10;
 export const SHORT = 6;

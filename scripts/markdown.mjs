@@ -157,6 +157,6 @@ export function markdown(DIST) {
   console.log(`markdown: ${n} pages`);
 }
 
-// Run on its own (node scripts/markdown.mjs) only by the tests in scripts/test/, on the folder DIST names. The build
+// Run on its own (node scripts/markdown.mjs) on the folder DIST names. The build
 // calls markdown() from the integration in astro.config.mjs.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) markdown(process.env.DIST || 'dist');

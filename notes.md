@@ -33,8 +33,7 @@ Content:
 
 The agent can do alone (each is its own pull request):
 
-- [ ] `site.yml`: the Playwright cache steps are written three times (`core`, `verify`, `visual-diff`); the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
-- [ ] Parked layout checks (`checks/parked/layout.mjs`): bring each back, rewritten, when the layout it pinned is redone.
+- [ ] `site.yml`: the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 
@@ -49,10 +48,8 @@ Drawing generators (the owner directs drawing work):
 Code and tools:
 
 - [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
-- [ ] Review C4 leftovers: `scripts/check.mjs` picks a check by project and `CHECK_ARGS`; the server starts in two places (Playwright's `webServer` could do both); the audit bundles Guidepup at run time.
 - [ ] After a Dependabot bump of `wrangler` or `esbuild`: set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns, and npm 12 won't run their install scripts.
 - [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
-- [ ] `npm run verify:styles` sometimes reports a `div.container`'s side margins as 0 at 3440 on `/` or `/work` (a Chrome quirk): rerun before you trust such a line.
 - [ ] `wrangler dev` kept serving the `_headers` it started with after a rebuild (November 9, 2026: stale X-Build and CSP hashes, so new inline styles were blocked); restart it after a build, or find why, and say so in README.
 - [ ] Smoke from a cloud session needs the site's host allowed and `NODE_USE_ENV_PROXY=1`; the `http://` redirect check runs only from a normal machine.
 - [ ] Small, left as they are: `gen_campus.py` keeps its own `box()`; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
@@ -116,4 +113,4 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Firefox 144+ and Safari 26.2+ (review J8, J15): with page scripts blocked, the gear opens Settings, Esc and close shut it, focus returns; does a backdrop click shut it (`closedby`)?
 - [ ] Safari before 26.2 (no `scrollend`): Home's phone services row, Next, swipe mid-slide, Next again: it steps from the card showing.
 - [ ] Real Safari: does it refuse a style for every `<select>` under the CSP, as Playwright's WebKit does? If so, report it to bugs.webkit.org.
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1s locally) with `npm run pagespeed`.
+- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1s locally).

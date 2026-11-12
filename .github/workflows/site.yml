@@ -1,7 +1,7 @@
 # Draft mode. A pull request: build (dist) and preview, in parallel; the gate (`build`, required on main) passes when
-# dist does. Static checks (types, tests, lint) and browser checks (core, verify, visual-diff) run only with the
-# "full-checks" label. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke
-# check at the new version's address, then live, rollback on failure). Drawings are checked locally, not here.
+# dist does. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke check at the
+# new version's address, then live, rollback on failure). Nothing else is checked here: site checks are done by hand,
+# when the owner asks (the `check` skill).
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
 # CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID.
 name: site
@@ -12,7 +12,6 @@ on:
     branches: [main]
     paths-ignore: ['*.md', 'docs/**', '.claude/**', '**/README.md']
   pull_request: # always runs, so the required `build` check reports; a docs-only one passes in seconds
-    types: [opened, synchronize, reopened, labeled] # labeled: "full-checks"
   workflow_dispatch: # "Run workflow" on main: deploy again (when a push's run was lost)
 
 permissions:
@@ -27,15 +26,11 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  # the build, once, and the scope: docs-only (skip the build), full (run every check), visual (screenshot diff)
+  # the build; a docs-only pull request skips it
   dist:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    outputs:
-      docs: ${{ steps.s.outputs.docs }}
-      full: ${{ steps.s.outputs.full }}
-      visual: ${{ steps.s.outputs.visual }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -43,16 +38,11 @@ jobs:
           persist-credentials: false
       - id: s
         run: |
-          docs=false; full=false; visual=false
-          if [ "$EVENT" = pull_request ] && ! git diff --name-only "$BASE...$HEAD" | grep -qvE '^([^/]+\.md|docs/.*)$'; then docs=true; fi
-          if [ "$LABELLED" = true ]; then full=true; fi
-          if [ "$LABELLED" = true ]; then visual=true; fi
-          if [ "$docs" = true ]; then full=false; visual=false; fi
-          printf 'docs=%s\nfull=%s\nvisual=%s\n' "$docs" "$full" "$visual" >> "$GITHUB_OUTPUT"
-          echo "docs only: $docs, full checks: $full, screenshot diff: $visual" >> "$GITHUB_STEP_SUMMARY"
+          docs=false
+          if ! git diff --name-only "$BASE...$HEAD" | grep -qvE '^([^/]+\.md|docs/.*)$'; then docs=true; fi
+          echo "docs=$docs" >> "$GITHUB_OUTPUT"
+          echo "docs only: $docs" >> "$GITHUB_STEP_SUMMARY"
         env:
-          EVENT: ${{ github.event_name }}
-          LABELLED: ${{ contains(github.event.pull_request.labels.*.name, 'full-checks') }}
           BASE: ${{ github.event.pull_request.base.sha }}
           HEAD: ${{ github.event.pull_request.head.sha }}
       - if: steps.s.outputs.docs != 'true'
@@ -64,205 +54,17 @@ jobs:
         run: npm ci
       - if: steps.s.outputs.docs != 'true'
         run: npm run build
-      - if: steps.s.outputs.full == 'true'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: dist
-          path: dist
-          include-hidden-files: true # dist/.well-known/
-          retention-days: 7
 
-  # types, the build scripts' tests, lint
-  static:
-    needs: dist
-    if: needs.dist.outputs.full == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - run: npm run check
-      - run: npm test
-      - run: npm run lint
-
-  # the @core browser tests (npm run verify:core) against dist/ served by wrangler dev
-  core:
-    needs: dist
-    if: needs.dist.outputs.full == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: dist
-          path: dist
-      - id: pw
-        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
-      - id: pw-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-      - name: Run the core browser tests
-        run: |
-          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
-          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
-          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
-          npm run verify:core
-        env:
-          WRANGLER_SEND_METRICS: 'false'
-      - if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: core-check
-          path: |
-            out/test-results
-            wrangler.log
-          retention-days: 7
-
-  # the site check (checks/site.spec.mjs) in three shards; shard 1 also runs the link check and the header smoke
-  verify:
-    needs: dist
-    if: needs.dist.outputs.full == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3]
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: dist
-          path: dist
-      - id: pw
-        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
-      - id: pw-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-      - name: Check the built site in a browser
-        run: |
-          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
-          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
-          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
-          npm run verify -- -- --shard="$SHARD/3"
-          if [ "$SHARD" = 1 ]; then
-            npm run verify:links
-            npm run smoke -- http://localhost:8787
-          fi
-        env:
-          WRANGLER_SEND_METRICS: 'false'
-          SHARD: ${{ matrix.shard }}
-      - if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: site-check-${{ matrix.shard }}
-          path: |
-            out/*.png
-            out/test-results
-            wrangler.log
-          retention-days: 7
-
-  # each page beside the live site at three sizes; reports in the run summary, never fails
-  visual-diff:
-    needs: dist
-    if: needs.dist.outputs.visual == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          name: dist
-          path: dist
-      - id: pw
-        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> "$GITHUB_OUTPUT"
-      - id: pw-cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
-      - if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: npx playwright install --with-deps chromium
-      - if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps chromium
-      - name: Compare each page with the live site
-        run: |
-          npx wrangler dev --port 8787 > wrangler.log 2>&1 &
-          for i in $(seq 60); do curl -sf http://localhost:8787/ > /dev/null && break; sleep 1; done
-          curl -sf http://localhost:8787/ > /dev/null || { cat wrangler.log; exit 1; }
-          npm run visual-diff -- https://uplink-site.johnoreilly.workers.dev http://localhost:8787 || true
-          cat out/visual/report.md >> "$GITHUB_STEP_SUMMARY" || true
-        env:
-          WRANGLER_SEND_METRICS: 'false'
-      - if: hashFiles('out/visual/*.png') != ''
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: visual-diff
-          path: out/visual
-          retention-days: 14
-
-  # the gate the ruleset on main requires. always(), so a failed check fails it rather than skipping it
+  # the gate the ruleset on main requires. always(), so a failed build fails it rather than skipping it
   build:
-    needs: [dist, static, core, verify, visual-diff]
+    needs: [dist]
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - run: |
-          [ "$DIST" = success ] || { echo "::error::dist: $DIST"; exit 1; }
-          if [ "$FULL" = true ]; then
-            for r in "static=$STATIC" "core=$CORE" "verify=$VERIFY"; do
-              [ "${r#*=}" = success ] || { echo "::error::${r%%=*}: ${r#*=}"; exit 1; }
-            done
-          fi
-          case "$VISUAL" in success | skipped) ;; *) echo "::error::visual-diff: $VISUAL"; exit 1 ;; esac
+      - run: '[ "$DIST" = success ] || { echo "::error::dist: $DIST"; exit 1; }'
         env:
           DIST: ${{ needs.dist.result }}
-          FULL: ${{ needs.dist.outputs.full }}
-          STATIC: ${{ needs.static.result }}
-          CORE: ${{ needs.core.result }}
-          VERIFY: ${{ needs.verify.result }}
-          VISUAL: ${{ needs.visual-diff.result }}
 
   # a push to main, or "Run workflow" on main: build here, then scripts/deploy.mjs (upload a version, smoke it at its own address, put it live,
   # smoke the live site, roll back on failure). Missing secrets fail it. One deploy at a time

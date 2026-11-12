@@ -23,6 +23,6 @@ export function svgo(dist) {
   console.log(`svgo: drawings ${(before / 1024).toFixed(0)} KB -> ${(after / 1024).toFixed(0)} KB`);
 }
 
-// Run on its own (node scripts/svgo.mjs) only by the tests in scripts/test/, on the folder DIST names. The build
+// Run on its own (node scripts/svgo.mjs) on the folder DIST names. The build
 // calls svgo() from the integration in astro.config.mjs.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) svgo(process.env.DIST || 'dist');

@@ -21,9 +21,9 @@ const POLL = Number(process.env.DEPLOY_POLL ?? 5);
 const WAIT = Number(process.env.DEPLOY_WAIT ?? 120); // seconds by the clock; each ask gives up after 15 s
 const SETTLE = Number(process.env.DEPLOY_SETTLE ?? 15);
 const RETRY = Number(process.env.DEPLOY_RETRY ?? 30);
-// DEPLOY_WRANGLER and DEPLOY_SMOKE name other commands to run in place of wrangler and the smoke check: only for the
-// test (scripts/test/deploy.test.mjs), which runs this against fakes.
-// a .cjs fake (the test's) runs under this Node, so it needs no shebang and runs on Windows too
+// DEPLOY_WRANGLER and DEPLOY_SMOKE name other commands to run in place of wrangler and the smoke check: for a dry
+// run against fakes.
+// a .cjs fake runs under this Node, so it needs no shebang and runs on Windows too
 const command = (name, fallback) => {
   const cmd = process.env[name];
   return cmd ? (cmd.endsWith('.cjs') ? [process.execPath, cmd] : [cmd]) : fallback;
