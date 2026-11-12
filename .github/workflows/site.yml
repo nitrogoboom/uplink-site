@@ -2,6 +2,7 @@
 # dist does. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke check at the
 # new version's address, then live, rollback on failure). Nothing else is checked here: site checks are done by hand,
 # when the owner asks (the `check` skill).
+# node_modules is cached by package-lock.json, so npm ci runs only when the packages change (57 s otherwise).
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
 # CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID.
 name: site
@@ -49,8 +50,13 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: npm
       - if: steps.s.outputs.docs != 'true'
+        id: nm
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+      - if: steps.s.outputs.docs != 'true' && steps.nm.outputs.cache-hit != 'true'
         run: npm ci
       - if: steps.s.outputs.docs != 'true'
         run: npm run build
@@ -83,8 +89,13 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: npm
-      - run: npm ci
+      - id: nm
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+      - if: steps.nm.outputs.cache-hit != 'true'
+        run: npm ci
       - run: npm run build
       - name: Upload, check, deploy (rolled back if the live site then fails its smoke check)
         run: |
@@ -124,9 +135,14 @@ jobs:
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: .node-version
-          cache: npm
       - if: steps.go.outputs.go == 'true'
-        run: npm ci # as in deploy: wrangler from package-lock.json
+        id: nm
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+      - if: steps.go.outputs.go == 'true' && steps.nm.outputs.cache-hit != 'true'
+        run: npm ci
       - if: steps.go.outputs.go == 'true'
         run: npm run build
       # Worker Preview named pr-N; the JSON starts at the first line that is "{"

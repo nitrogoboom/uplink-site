@@ -35,20 +35,21 @@ Each change:
 2. Show the owner: the `astro` dev server (`.claude/launch.json`) in the app's browser pane, at localhost.
 3. Commit on one local branch (`claude/…`). Later changes go on the same branch until it ships. A `notes.md` line goes in the same commit.
 
-| Change | Check locally | CI when it ships |
-|---|---|---|
-| Docs only | nothing | `build` passes in seconds |
-| Copy, CSS, markup | look in `npm run dev`, then `npm run build` | build, preview |
-| Scripts, Worker, config, deps | `npm run quick` | build, preview |
-| A drawing | `python tools/regen.py --check` | build, preview |
-| Launch or release | the `release` skill | build, preview |
+| Change | Check locally |
+|---|---|
+| Docs only | nothing |
+| Copy, CSS, markup | look in `npm run dev`, then `npm run build` |
+| Scripts, Worker, config, deps | `npm run quick` |
+| A drawing | `python tools/regen.py --check` |
+| Launch or release | the `release` skill |
 
-When the owner says push:
+When the owner says push, it goes straight to `main`, with no pull request (owner, November 12, 2026). About a minute:
 
-1. One pull request for everything since the last ship.
-2. Push, open it, then wait for CI once, in the background (`gh run watch`). The preview is `https://pr-N-uplink-site.johnoreilly.workers.dev`.
-3. Merge when `build` is green; the owner has already looked locally.
-4. Wait for the deploy on `main`, then check the live site shows the change. Only then say "deployed". If the deploy run never starts, run it again: `gh workflow run site.yml --ref main`.
-5. The deploy smoke-checks and rolls back by itself; run no smoke check after a merge.
+1. `npm run build` passes here first.
+2. `git checkout main`, `git merge --ff-only` the local branch, `git push origin main`. GitHub prints "Bypassed rule violations": expected, the owner's account may.
+3. Wait for the deploy run on `main`, in the background (`gh run watch`), then check the live site shows the change. Only then say "deployed". If the run never starts: `gh workflow run site.yml --ref main`.
+4. The deploy smoke-checks the new version and rolls back by itself; run no smoke check after it.
+
+A pull request, with its preview at `https://pr-N-uplink-site.johnoreilly.workers.dev`, only when the owner says "open a PR".
 
 The owner directs and doesn't run commands. Report in a few plain lines: what changed, where to look (localhost, or the link once shipped), anything they must do.

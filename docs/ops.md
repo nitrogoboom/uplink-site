@@ -25,7 +25,7 @@ Also:
 
 ## Deploys
 
-`.github/workflows/site.yml`. A pull request runs:
+`.github/workflows/site.yml`. A change normally goes straight to `main` (CLAUDE.md, "Check, ship"); a pull request is for when the owner wants a preview link. `node_modules` is cached by `package-lock.json`, so `npm ci` runs only when the packages change. A pull request runs:
 
 - `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build.
 - `preview`: builds the commit itself and posts `https://pr-N-uplink-site.johnoreilly.workers.dev`. Waits for no job.
@@ -51,7 +51,7 @@ Secrets, in the `cloudflare` environment: `CLOUDFLARE_API_TOKEN` ("Workers Scrip
 Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
 
 - **main: no force push or delete.** Applies to everyone.
-- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins can bypass it.
+- **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins bypass it, and in draft mode the owner's pushes do: straight to `main`.
 
 Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
 
