@@ -79,6 +79,7 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
 - [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`; its `uplinkit.ca` addresses are placeholders), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
+- [ ] `/accessibility`, "How we check it" (`src/data/accessibility.md`) still says every change is checked automatically in three browsers; that stopped November 12, 2026 (checks are looks by hand now). Rewrite it to what's true before launch.
 - [ ] Before launch, `/accessibility` gets back two Ontario lines: what happens after feedback (O. Reg. 191/11 s. 80.50(2)) and free accessible formats on request (s. 12(3)).
 
 ### Forms

@@ -44,6 +44,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 
 **(you)** needs a person or sign-in, **(domain)** the domain, **(content)** real copy. Tick with date and proof.
 
+- [ ] **(you)** Decide what gets a test: the "Set in stone" list in `CLAUDE.md`. Until then the repo has none but the deploy's smoke check.
 - [ ] Narrow the Trusted Types policy: `html()` in `core.js` accepts only the site's own drawings and icons (review J6).
 - [ ] One cached stylesheet instead of inlined CSS per page (review L4); hashed drawing file names (L5).
 - [ ] Review PR #38's form routes like `/api/report`: Turnstile, honeypot, rate limit, header injection.

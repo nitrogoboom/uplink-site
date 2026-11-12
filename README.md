@@ -38,12 +38,11 @@ You need Node.js 24 (the exact version is in `.node-version`). The drawing tools
 
 The development server doesn't apply the response headers, the 404 page, or the redirects. To see the site as Cloudflare serves it, run `npm run build` and then `npm run serve`, and open http://localhost:8787.
 
-### Install the browsers for the checks
+### Install Firefox and WebKit for a look
 
-The site checks need Playwright's Chromium; the release audit also needs Firefox and WebKit:
+Only for the `check` skill's browser compatibility look, which takes screenshots in Firefox and WebKit. Nothing else needs a browser:
 
 ```bash
-npx playwright install chromium
 npx playwright install firefox webkit
 ```
 

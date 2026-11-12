@@ -6,7 +6,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 
 ## Work fast
 
-- A check is a look you do when the owner asks, reported in your reply. The repo holds no tests, and gets none: no test files, specs or CI checks (owner, November 12, 2026). The deploy's smoke check is the one script.
+- No tests until launch: see "Tests" below.
 - Do the job yourself. No worker agents, review passes, reports or history files.
 - Read only the doc the job needs (table below). Never read `docs/history/`.
 - `notes.md` is the to-do list: add or remove a line. Never reword the owner's lines without asking.
@@ -24,6 +24,20 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 | Launch or release | the `release` skill |
 
 `.claude/rules/` load by themselves. Two rules everywhere: no words typed into markup or scripts (they live in `src/content/` and `src/data/`), and never hand-edit an output SVG.
+
+## Tests
+
+None until launch (owner, November 12, 2026). The site changes daily, so a test written today pins yesterday's page and blocks tomorrow's change.
+
+- **A check is a look**, done when the owner asks: the `check` skill. Findings go in your reply, never into a test file, spec or CI job.
+- **Set in stone.** Write a test only for something on the list below. Only the owner adds to it, in their own words ("set X in stone"). One small test per item, for that item alone.
+- **A test never blocks work.** When a change the owner asked for breaks one (the deploy's smoke check included), change or delete the test in the same commit and say so in your report. The change wins.
+- **Something looks worth guarding?** Add a line to `notes.md` for the owner to decide.
+- **At launch** the owner decides what gets a test (`docs/release.md`, "Before launch").
+
+Set in stone: nothing yet.
+
+What runs today: the deploy's smoke check (`docs/site-checks.md`), lint and types on this machine (`npm run quick`), and the drawing tools' own checks (the `drawing` skill).
 
 ## Check, ship
 
