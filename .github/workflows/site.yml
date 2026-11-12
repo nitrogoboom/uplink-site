@@ -1,7 +1,7 @@
 # Draft mode. A pull request: build (dist) and preview, in parallel; the gate (`build`, required on main) passes when
 # dist does. Static checks (types, tests, lint) and browser checks (core, verify, visual-diff) run only with the
-# "full-checks" label or from "Run workflow". A push to main: deploy builds and runs scripts/deploy.mjs (smoke check
-# at the new version's address, then live, rollback on failure). Drawings are checked locally, not here.
+# "full-checks" label. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke
+# check at the new version's address, then live, rollback on failure). Drawings are checked locally, not here.
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
 # CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID.
 name: site
@@ -13,7 +13,7 @@ on:
     paths-ignore: ['*.md', 'docs/**', '.claude/**', '**/README.md']
   pull_request: # always runs, so the required `build` check reports; a docs-only one passes in seconds
     types: [opened, synchronize, reopened, labeled] # labeled: "full-checks"
-  workflow_dispatch: # "Run workflow": every check
+  workflow_dispatch: # "Run workflow" on main: deploy again (when a push's run was lost)
 
 permissions:
   contents: read
@@ -29,7 +29,7 @@ concurrency:
 jobs:
   # the build, once, and the scope: docs-only (skip the build), full (run every check), visual (screenshot diff)
   dist:
-    if: github.event_name != 'push'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     outputs:
@@ -45,7 +45,7 @@ jobs:
         run: |
           docs=false; full=false; visual=false
           if [ "$EVENT" = pull_request ] && ! git diff --name-only "$BASE...$HEAD" | grep -qvE '^([^/]+\.md|docs/.*)$'; then docs=true; fi
-          if [ "$EVENT" = workflow_dispatch ] || [ "$LABELLED" = true ]; then full=true; fi
+          if [ "$LABELLED" = true ]; then full=true; fi
           if [ "$LABELLED" = true ]; then visual=true; fi
           if [ "$docs" = true ]; then full=false; visual=false; fi
           printf 'docs=%s\nfull=%s\nvisual=%s\n' "$docs" "$full" "$visual" >> "$GITHUB_OUTPUT"
@@ -244,7 +244,7 @@ jobs:
   # the gate the ruleset on main requires. always(), so a failed check fails it rather than skipping it
   build:
     needs: [dist, static, core, verify, visual-diff]
-    if: always() && github.event_name != 'push'
+    if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -264,11 +264,11 @@ jobs:
           VERIFY: ${{ needs.verify.result }}
           VISUAL: ${{ needs.visual-diff.result }}
 
-  # a push to main: build here, then scripts/deploy.mjs (upload a version, smoke it at its own address, put it live,
+  # a push to main, or "Run workflow" on main: build here, then scripts/deploy.mjs (upload a version, smoke it at its own address, put it live,
   # smoke the live site, roll back on failure). Missing secrets fail it. One deploy at a time
   deploy:
     needs: workflows # a high zizmor finding stops the deploy
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     timeout-minutes: 30 # about 1 minute; up to 25 when smoke runs retry
     environment: cloudflare
