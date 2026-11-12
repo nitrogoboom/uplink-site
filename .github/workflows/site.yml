@@ -55,9 +55,9 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+          key: node-modules-prod-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
       - if: steps.s.outputs.docs != 'true' && steps.nm.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --omit=dev # the build and deploy packages; lint and type tools stay on the owner's machine
       - if: steps.s.outputs.docs != 'true'
         run: npm run build
 
@@ -93,9 +93,9 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+          key: node-modules-prod-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
       - if: steps.nm.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --omit=dev # the build and deploy packages; lint and type tools stay on the owner's machine
       - run: npm run build
       - name: Upload, check, deploy (rolled back if the live site then fails its smoke check)
         run: |
@@ -140,9 +140,9 @@ jobs:
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
+          key: node-modules-prod-${{ runner.os }}-${{ hashFiles('.node-version', 'package-lock.json') }}
       - if: steps.go.outputs.go == 'true' && steps.nm.outputs.cache-hit != 'true'
-        run: npm ci
+        run: npm ci --omit=dev # the build and deploy packages; lint and type tools stay on the owner's machine
       - if: steps.go.outputs.go == 'true'
         run: npm run build
       # Worker Preview named pr-N; the JSON starts at the first line that is "{"
