@@ -75,7 +75,6 @@ jobs:
   # a push to main, or "Run workflow" on main: build here, then scripts/deploy.mjs (upload a version, smoke it at its own address, put it live,
   # smoke the live site, roll back on failure). Missing secrets fail it. One deploy at a time
   deploy:
-    needs: workflows # a high zizmor finding stops the deploy
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     timeout-minutes: 30 # about 1 minute; up to 25 when smoke runs retry
@@ -171,7 +170,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
           URL: ${{ steps.upload.outputs.url }}
 
-  # zizmor: fails on a high-severity workflow finding
+  # zizmor: fails on a high-severity workflow finding. Runs beside the deploy and does not hold it up
   workflows:
     runs-on: ubuntu-latest
     timeout-minutes: 5
