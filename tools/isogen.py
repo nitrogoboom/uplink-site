@@ -17,7 +17,7 @@ FONT = "Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
 def box(w, b, cols=FACES, edge=EDGE, classes=('', '', ''), tail='', log=None):
     """A box as its (left, right, top) face triple, the order painter.py expects. b = (x0, x1, y0, y1, z0, z1).
     classes: a class per face ('' for none); tail: attributes after the edge's; log: a list b is appended to (a
-    generator's BOXES, which its rules_NAME.py and tools/tests read). Every generator draws its boxes through this,
+    generator's BOXES, which its rules_NAME.py reads). Every generator draws its boxes through this,
     except gen_campus.py, whose faces carry classes only (footer.css colours them)."""
     if log is not None:
         log.append(b)

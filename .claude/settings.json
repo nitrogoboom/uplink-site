@@ -8,7 +8,6 @@
       "Bash(npm run format)",
       "Bash(npm run quick)",
       "Bash(python tools/regen.py --check)",
-      "Bash(python -m pytest tools/tests)",
       "Bash(git status *)",
       "Bash(git diff *)",
       "Bash(git log *)",

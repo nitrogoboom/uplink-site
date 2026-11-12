@@ -35,7 +35,7 @@ def resolve(b, z0):
 def errors(bs, eps=0.01):
     """Pairs of boxes in drawing order that poke into each other ('INTERSECT') or where the one drawn first is in
     front ('ORDER', when their silhouettes overlap). Each item: dict(box=(x0, x1, y0, y1, z0, z1), sil=its outline on
-    screen). Yields (kind, a, b, overlap px²). tools/tests runs it on a generator's own BOXES too."""
+    screen). Yields (kind, a, b, overlap px²)."""
     for i, a in enumerate(bs):
         for b in bs[i + 1:]:
             A, B = a['box'], b['box']

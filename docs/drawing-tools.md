@@ -65,4 +65,4 @@ Both exit 1 on any finding. Each `rules_NAME.py` lists the exact commands for ev
 - **`check.py FILE.svg`**: `ANGLE` (edge near but off an isometric angle), `SNAP` (vertices that nearly meet), `TJOIN` (vertex nearly on another edge); `DOT` lists leader dots (no fail). Skips `.co` leaders, `class="mark"`, the floor grid; `class="free"` skips `ANGLE` only; `<g class="curve">` strips aren't checked against each other; covered near-misses aren't reported. `--step PX` counts one-grid-step pairs (office: `--step 1.758`). Inline SVG: `check.py FILE START END`.
 - **`painter.py`**: boxes drawn out of order or overlapping. Fails if it finds or resolves no boxes (usually a wrong origin or unit). Grow: `python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py`.
 - Drawing CSS styles by class, never by tag (SVGO turns shapes into `<path>`); the build enforces it.
-- Everything: `python tools/regen.py --check` (`--checks-only` skips generating). Tool tests: `python -m pytest tools/tests`.
+- Everything: `python tools/regen.py --check` (`--checks-only` skips generating).

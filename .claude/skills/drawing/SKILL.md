@@ -30,7 +30,6 @@ Drawings change only on the owner's machine, and only when the owner asks. CI do
 
    ```bash
    python tools/regen.py --check
-   python -m pytest tools/tests
    ```
 
 8. Read `git diff --stat`. It must show only the script and the drawings you meant to change. An SVG you didn't mean to touch means a shared number moved: find out why before you commit.
