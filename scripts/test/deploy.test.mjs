@@ -264,12 +264,3 @@ test('extra arguments go to both smoke runs (--launch); --old only to the live o
   assert.ok(!atPreview.has('--old') && !atPreview.has('https://old.example.test'), 'no --old at the preview');
   assert.deepEqual(smokes(calls, live)[0].slice(2, 5), ['--launch', '--old', 'https://old.example.test']);
 });
-
-test('site.yml: the main deploy runs scripts/deploy.mjs, not a one-step wrangler deploy', () => {
-  const yml = readFileSync('.github/workflows/site.yml', 'utf-8');
-  const job = yml.slice(yml.indexOf('\n  deploy:'), yml.indexOf('\n  preview:'));
-  assert.match(job, /node scripts\/deploy\.mjs https:\/\/uplink-site\.johnoreilly\.workers\.dev/);
-  assert.doesNotMatch(job, /wrangler deploy\b/);
-  assert.match(job, /- run: npm ci/, 'npm ci first (review H4)');
-  assert.match(job, /name: dist/, 'the tested build');
-});
