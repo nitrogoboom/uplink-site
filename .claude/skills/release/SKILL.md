@@ -5,25 +5,22 @@ description: Ship a release of the Uplink site, or get ready for launch day. Use
 
 # Release the site
 
-A release is a merge with the full checks, a filled-in checklist as proof, and a tag. `docs/release.md` owns every detail; this file is the order to do them in. Read only the section a step names.
+A release is a merge with every look done, a filled-in checklist as proof, and a tag. `docs/release.md` owns every detail; this file is the order to do them in. Read only the section a step names.
 
 The owner doesn't run commands. You run each step, and hand over only the parts that need their eyes or their devices.
 
 ## Before the merge
 
-1. Run the full local checks, once:
+1. Run, once:
 
    ```bash
-   npm run ci
-   RELEASE=1 npm run verify -- --all
-   npm run release-audit
+   npm run quick
    python tools/regen.py --check
    ```
 
-   `RELEASE=1` turns on the checks that expect today's exact copy. `python tools/regen.py --check` needs the Python tools (docs/drawing-tools.md, "Install the Python drawing tools"). `git diff` must be empty after it.
+   `python tools/regen.py --check` needs the Python tools (docs/drawing-tools.md, "Install the Python drawing tools"). `git diff` must be empty after it.
 
-2. Add the `full-checks` label to the pull request. CI then runs the browser checks and the screenshot comparison.
-3. Read the run summary's "Screenshot changes". Make sure each one is meant; the pictures are in the `visual-diff` artifact. Tell the owner which pages changed, in plain words.
+2. Do the looks in the `check` skill on the pull request's preview, every page. "Before and after" against the live site comes first: tell the owner which pages changed, in plain words, and make sure each change is meant.
 
 ## Merge and tag
 

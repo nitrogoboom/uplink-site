@@ -6,7 +6,7 @@ Standards: WCAG 2.2 AA (Ontario requires 2.0 AA at 50+ employees, O. Reg. 191/11
 
 ## Ship a release
 
-1. Add the `full-checks` label to the PR. Read the run summary's "Screenshot changes" and confirm each one was meant.
+1. Do the looks in the `check` skill on the PR preview, every page: before and after (against the live site), browser compatibility, accessibility, large text, print, links. Confirm each change you see was meant.
 2. Merge. Read the deploy summary: it names the live version or says why not. Rollback: [ops.md](ops.md#roll-back-a-bad-deploy).
 3. Run the checklist below; save it as `docs/history/releases/YYYY-MM-DD.md`.
 4. Tag: `git tag -a vYYYY.MM.DD COMMIT -m "SUMMARY"`, `git push origin vYYYY.MM.DD`, `gh release create vYYYY.MM.DD` (a few lines and a link to the record).
@@ -22,13 +22,13 @@ On the PR preview or the live site. About 25 minutes. Proof: one line per failur
 - [ ] `curl -sI ADDRESS` shows HSTS, CSP, `X-Content-Type-Options`; `npm run smoke -- ADDRESS` passes; a made-up address gives the 404 page with status 404.
 - [ ] Workers logs since the last release (search `report`): each real error or CSP block is fixed or in `notes.md`.
 
-**B. Machine audit** — `npm run build`, `npm run serve`, then `RELEASE=1 npm run verify -- --all` and `npm run release-audit`. Paste `out/audit/report.md` and the passed-test count. It covers: every page in Chromium, Firefox and WebKit and two phones; keyboard; a virtual screen reader; axe; zoom; motion; forms; the W3C validator on Home (`--html-all` when other pages' markup changed). The validator rate-limits: while fixing, use `--only browsers,keyboard,reader,motion,forms`.
+**B. The looks** — every look in the `check` skill, on every page: Chromium, Firefox and WebKit, phone and desktop; keyboard; the accessibility tree; zoom; motion; forms. Paste the findings, one line each.
 
 **C. By hand**
 - [ ] WCAG 2.1/2.2 items the machine misses, phone and desktop: rotation, `autocomplete` on name and email, 3:1 control contrast, text spacing, hover content (dismissable, hoverable), no single-key shortcuts or path gestures, targets 24px, focus never hidden, consistent help, no repeated entry, status messages announced.
 - [ ] Zoom to 200% once in Firefox and Safari.
 - [ ] Real iPhone Safari and Android Chrome: Home, one service, Contact (bottom bar, notch, Grow, footer). Firefox ESR footer.
-- [ ] Listen to one changed page (NVDA, Narrator or VoiceOver), by heading too; it matches `out/audit/reader/`.
+- [ ] Listen to one changed page (NVDA, Narrator or VoiceOver), by heading too.
 - [ ] Judge: link text says where it goes; headings, labels and tab titles are clear; colour isn't the only signal; new colour pairs pass contrast; no words in pictures; header, bar and footer are the same on every page.
 
 **D. Content and legal**
@@ -51,7 +51,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 - [ ] **(content)** Social links and the ~20 `/soon` links per page get real targets; `Français` back with a real French page.
 - [ ] **(you)** A lawyer reads `/privacy` and the terms; the two Ontario lines for `/accessibility` (`notes.md`).
 - [ ] Redirects from the old site's addresses, if there is one.
-- [ ] **(you)** PageSpeed on every page (`npm run pagespeed -- ADDRESS --strict`, needs `PSI_API_KEY`); one WebPageTest run from Toronto; decide on Lighthouse CI.
+- [ ] **(you)** PageSpeed on every page (pagespeed.web.dev); one WebPageTest run from Toronto; decide on Lighthouse CI.
 - [ ] **(you)** Practise a rollback (below); alerts for `/api/report` and uptime; a proofread by someone else; extra real phones; the owner's sign-off.
 - [ ] `curl -sI` a version preview address: if Cloudflare adds `X-Robots-Tag: noindex` there, the deploy's `--preview --launch` smoke fails every deploy (review H3); then leave that check to the live run.
 
@@ -59,7 +59,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 
 `DOMAIN` is the real domain (placeholder `uplinkit.ca`; confirm it). The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
 
-**Retire `workers.dev`:** **A.** turn it off (old links break; visual-diff must stop using it), or **B.** 301 it to `DOMAIN` (`run_worker_first: true`, every request counts against the free plan, and `worker/index.js` needs a host redirect). Either way keep preview URLs on.
+**Retire `workers.dev`:** **A.** turn it off (old links break), or **B.** 301 it to `DOMAIN` (`run_worker_first: true`, every request counts against the free plan, and `worker/index.js` needs a host redirect). Either way keep preview URLs on.
 
 ### The day before
 
@@ -67,7 +67,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 2. **Claude:** on a `launch` branch, don't merge yet:
    - `public/_headers`: drop `X-Robots-Tag: noindex`. `src/pages/robots.txt.ts`: add the `Sitemap:` line back.
    - `SITE_URL` = `https://DOMAIN`; `wrangler.jsonc`: `routes` with the custom domain.
-   - `site.yml`: visual-diff's live address and `node scripts/deploy.mjs https://DOMAIN --launch`; the example in `scripts/ci.mjs`; `SECURITY.md`'s `security.txt` link.
+   - `site.yml`: `node scripts/deploy.mjs https://DOMAIN --launch`; `SECURITY.md`'s `security.txt` link.
    - If Bot Fight Mode goes on: let user agents `uplink-deploy` and `uplink-smoke-test` through (or deploys roll back), and fix "sets no cookies" in `src/data/privacy.md` (`__cf_bm`).
    - Option B: 301 exactly the host `uplink-site.johnoreilly.workers.dev`, never all of `workers.dev` (previews live there; redirecting them breaks every deploy).
 3. Open the PR, let CI pass, both read the preview once.
@@ -83,7 +83,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 7. Retire the old address. A: turn `workers.dev` off, leave Preview URLs on, check a PR preview still works. B: `npm run smoke -- https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev`.
 8. **Owner:** no-mail DNS: CAA, SPF `v=spf1 -all`, DMARC `p=reject`, null MX.
 9. **Owner:** Web Analytics for `DOMAIN` (token for `core.js`); drop the "old pages.dev host" remarks in `core.js` and `security.md`.
-10. **Claude:** `npm run verify -- --base https://DOMAIN`; open three pages and watch the console.
+10. **Claude:** `npm run smoke -- https://DOMAIN --launch`; open three pages and watch the console.
 
 ### After launch
 

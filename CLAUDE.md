@@ -6,6 +6,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 
 ## Work fast
 
+- A check is a look you do when the owner asks, reported in your reply. The repo holds no tests, and gets none: no test files, specs or CI checks (owner, November 12, 2026). The deploy's smoke check is the one script.
 - Do the job yourself. No worker agents, review passes, reports or history files.
 - Read only the doc the job needs (table below). Never read `docs/history/`.
 - `notes.md` is the to-do list: add or remove a line. Never reword the owner's lines without asking.
@@ -19,6 +20,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 | A drawing | the `drawing` skill |
 | CI, deploys, the Worker | `docs/ops.md` |
 | Security | `docs/security.md` |
+| A site check the owner asks for (browsers, phones, accessibility, print, speed) | the `check` skill |
 | Launch or release | the `release` skill |
 
 `.claude/rules/` load by themselves. Two rules everywhere: no words typed into markup or scripts (they live in `src/content/` and `src/data/`), and never hand-edit an output SVG.
@@ -39,7 +41,7 @@ Each change:
 | Copy, CSS, markup | look in `npm run dev`, then `npm run build` | build, preview |
 | Scripts, Worker, config, deps | `npm run quick` | build, preview |
 | A drawing | `python tools/regen.py --check` | build, preview |
-| Launch or release | the `release` skill | add the `full-checks` label: static and browser checks |
+| Launch or release | the `release` skill | build, preview |
 
 When the owner says push:
 

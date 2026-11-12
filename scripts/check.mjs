@@ -1,7 +1,6 @@
-// Runs one site check (Playwright Test, checks/*.spec.mjs) with its own arguments:
-//   node scripts/check.mjs CHECK [ARGUMENTS ...] [-- PLAYWRIGHT_OPTIONS ...]
-//   e.g. node scripts/check.mjs links --external        node scripts/check.mjs site --all -- --headed
-// The npm scripts call this (npm run verify, verify:links, smoke ...); docs/site-checks.md lists every check and argument.
+// Runs the smoke check (Playwright Test, checks/smoke.spec.mjs) with its arguments:
+//   node scripts/check.mjs smoke ADDRESS [ARGUMENTS ...] [-- PLAYWRIGHT_OPTIONS ...]
+// npm run smoke and scripts/deploy.mjs call this; docs/site-checks.md lists the arguments.
 // Playwright Test takes no arguments of its own for a test, so they travel in CHECK_ARGS (checks/lib.mjs reads it).
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';

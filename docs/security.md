@@ -65,7 +65,6 @@ Keep secrets in GitHub environments, Worker secrets, or `.dev.vars` (ignored by 
 | --- | --- | --- | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Deploys the Worker and uploads previews. Needs "Workers Scripts: Edit". | GitHub > Settings > Environments > `cloudflare` | `site.yml` (deploy, preview) | Make a new token in Cloudflare (My Profile > API Tokens), paste it in, delete the old one. |
 | `CLOUDFLARE_ACCOUNT_ID` | Which Cloudflare account. Not secret. | The same environment | The same jobs | Only if the site moves account. |
-| `PSI_API_KEY` | Calls PageSpeed Insights. | `.dev.vars` or the environment. The key is `pagespeed-gate` in the Google Cloud project `uplink-site`. | `checks/pagespeed.spec.mjs` | Google Cloud > Credentials: a new key restricted to the PageSpeed Insights API. |
 | Web Analytics token | Which site the beacon reports for. Public by design. | `BEACON_TOKEN` in `src/scripts/core.js` | Every page | Cloudflare > Web Analytics > the site > Manage site. Registered for the old `pages.dev` host. |
 | Your sign-ins | The GitHub and Cloudflare accounts that own the repository and Worker. | Your password manager, with 2FA | Everything | Move to a company account with 2FA (`notes.md`). |
 

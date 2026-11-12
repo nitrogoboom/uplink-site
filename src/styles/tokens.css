@@ -81,8 +81,8 @@
      tall inside) still gets one section a screen (owner, November 10, 2026). Never under 100%, so a bigger font
      setting wins.
      Zoom narrows the window, so it gives some of that growth back: text never gets smaller on screen as zoom goes
-     up, is at least 150% at 200% zoom and 200% by 250% zoom. The 125% cap is what keeps that (zoom.spec.mjs holds
-     it): don't raise it. The rem here is the browser's default size, not this one */
+     up, is at least 150% at 200% zoom and 200% by 250% zoom. The 125% cap is what keeps that:
+     don't raise it. The rem here is the browser's default size, not this one */
   --fs-root: clamp(100%, min(100% + 0.625vw - 0.5625rem, 100% + 1.3333vh - 0.8333rem), 125%);
 
   /* 8-step scale: pixels at a 16px root */

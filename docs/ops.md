@@ -27,10 +27,9 @@ Also:
 
 `.github/workflows/site.yml`. A pull request runs:
 
-- `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build; the `full-checks` label turns on every check.
+- `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build.
 - `preview`: builds the commit itself and posts `https://pr-N-uplink-site.johnoreilly.workers.dev`. Waits for no job.
-- `build`: the gate the ruleset on `main` requires. Passes when `dist` passes, plus every full check when they ran.
-- With `full-checks` only: `static` (types, lint), `core` (`npm run verify:core`), `verify` (the site check in three shards, plus links and the header smoke), `visual-diff` (screenshots beside the live site).
+- `build`: the gate the ruleset on `main` requires. Passes when `dist` passes.
 - Always: `workflows` (zizmor) and `dependency-review`.
 
 A push to `main` (not docs-only) runs `deploy`; so does "Run workflow" on `main` (`gh workflow run site.yml --ref main`), for when a push's run was lost. It builds, then `node scripts/deploy.mjs LIVE_ADDRESS`:

@@ -10,20 +10,10 @@
     "check": "astro check",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
-    "verify": "node scripts/check.mjs site",
-    "verify:core": "node scripts/check.mjs core",
-    "verify:zoom": "node scripts/check.mjs zoom",
-    "verify:links": "node scripts/check.mjs links",
-    "verify:spacing": "node scripts/check.mjs spacing",
-    "verify:styles": "node scripts/check.mjs styles",
-    "visual-diff": "node scripts/check.mjs visual",
-    "ci": "node scripts/ci.mjs",
     "quick": "npm run check && npm run lint && npm run build",
-    "release-audit": "node scripts/check.mjs audit",
     "smoke": "node scripts/check.mjs smoke",
-    "pagespeed": "node scripts/check.mjs pagespeed",
     "serve": "wrangler dev",
-    "deploy": "npm run ci && wrangler deploy"
+    "deploy": "npm run quick && wrangler deploy"
   },
   "engines": {
     "node": ">=24"
@@ -31,9 +21,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@astrojs/markdown-satteri": "^0.4.6",
-    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
-    "@guidepup/virtual-screen-reader": "^0.33.0",
     "@playwright/test": "^1.64.1",
     "@types/node": "^24.19.2",
     "astro": "^7.4.7",
@@ -41,7 +29,6 @@
     "eslint": "^10.14.0",
     "eslint-plugin-astro": "^3.2.1",
     "globals": "^17.14.0",
-    "pngjs": "^7.0.0",
     "postcss-custom-media": "^12.0.3",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.2",

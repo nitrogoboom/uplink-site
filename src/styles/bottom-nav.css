@@ -103,7 +103,7 @@
   }
 }
 /* tablets and narrow desktops: the desktop header (tagline, 24px tab padding) needs 1230px at a 16px root, so it
-   starts at 1240px (77.5em); under that it keeps this one. The header-fit check is parked (checks/parked/layout.mjs); nothing runs it now */
+   starts at 1240px (77.5em); under that it keeps this one. */
 @media (43.75em <= width < 77.5em) {
   .brand-sub {
     display: none;
@@ -117,8 +117,7 @@
 }
 /* Tablet header, measured (16px root): logo 99px, five tabs 419px at 12px padding, three icon buttons 154px (318px
    with their words), gutters and gaps 48px. The room each side of the tabs is (width - 720) / 2 with icon buttons and
-   (width - 884) / 2 with words. The parked header-fit check (checks/parked/layout.mjs) measured it at every 10px and failed under 8px; nothing runs
-   it now.
+   (width - 884) / 2 with words. Keep at least 8px a side.
    Under 780px: tabs at 8px padding (40px narrower) and 8px header gaps, so 700px still leaves 10px a side (12px
    padding would overlap). */
 @media (43.75em <= width < 48.75em) {
