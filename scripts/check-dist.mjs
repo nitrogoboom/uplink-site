@@ -7,7 +7,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DIST = process.env.DIST || 'dist'; // another folder only for the tests (scripts/test/)
+const DIST = process.env.DIST || 'dist';
 const headers = join(DIST, '_headers');
 const problems = [];
 if (!existsSync(headers)) problems.push(`${headers} is missing`);

@@ -45,7 +45,7 @@ The CSP reports to `/api/report` (`report-to` and `report-uri`, with `Reporting-
 - stops reading a body at 8 KB, even with no `Content-Length`
 - parses strict JSON, keeps a short list of known fields, cuts each to a fixed length, strips query strings from addresses, and logs line and column only when they're whole numbers
 
-Tests: `scripts/test/worker.test.mjs`. Each report becomes one line in the Workers logs, kept 3 days.
+Each report becomes one line in the Workers logs, kept 3 days.
 
 ### Supply chain
 

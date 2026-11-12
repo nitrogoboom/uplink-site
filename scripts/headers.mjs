@@ -158,6 +158,6 @@ export function headers(DIST) {
   );
 }
 
-// Run on its own (node scripts/headers.mjs) only by the tests in scripts/test/, on the folder DIST names. The build
+// Run on its own (node scripts/headers.mjs) on the folder DIST names. The build
 // calls headers() from the integration in astro.config.mjs.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) headers(process.env.DIST || 'dist');

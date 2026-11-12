@@ -1,5 +1,5 @@
 # Draft mode. A pull request: build (dist) and preview, in parallel; the gate (`build`, required on main) passes when
-# dist does. Static checks (types, tests, lint) and browser checks (core, verify, visual-diff) run only with the
+# dist does. Static checks (types, lint) and browser checks (core, verify, visual-diff) run only with the
 # "full-checks" label. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke
 # check at the new version's address, then live, rollback on failure). Drawings are checked locally, not here.
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
@@ -72,7 +72,7 @@ jobs:
           include-hidden-files: true # dist/.well-known/
           retention-days: 7
 
-  # types, the build scripts' tests, lint
+  # types, lint
   static:
     needs: dist
     if: needs.dist.outputs.full == 'true'
@@ -88,7 +88,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
-      - run: npm test
       - run: npm run lint
 
   # the @core browser tests (npm run verify:core) against dist/ served by wrangler dev

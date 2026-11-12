@@ -18,7 +18,7 @@ Also:
 - The Worker fetches the 404 page afresh and sends it without an `ETag`. Any method other than `GET` and `HEAD` to `/404` or a missing address gets a `405`.
 - For the requests it sees, it redirects `http://` to `https://` with a `308`, except for a local server (`localhost`, `*.localhost`, `*.local`, `0.0.0.0`, and private addresses). At launch, Always Use HTTPS on the zone redirects every request first.
 - `_headers` doesn't reach the Worker's own responses, so each carries `X-Content-Type-Options: nosniff`, `Cache-Control: no-store`, and a CSP that loads nothing. The 404 page keeps the headers it has as a file.
-- A report it can't read gets a `400`. Anything else that goes wrong sends the request on to the static files; an `/api/` request, or one whose body was already read, gets a `503`. Tests: `scripts/test/worker.test.mjs`.
+- A report it can't read gets a `400`. Anything else that goes wrong sends the request on to the static files; an `/api/` request, or one whose body was already read, gets a `503`.
 - The Workers logs keep one line per report for 3 days (free plan). The invocation log is off (`observability.logs.invocation_logs`).
 
 > **Note:** Before `wrangler dev`, `deploy`, `versions upload`, and `preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command`). It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, or `dist/_redirects` is missing. Run `npm run build` again and fix what it reports.
@@ -30,7 +30,7 @@ Also:
 - `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build; the `full-checks` label turns on every check.
 - `preview`: builds the commit itself and posts `https://pr-N-uplink-site.johnoreilly.workers.dev`. Waits for no job.
 - `build`: the gate the ruleset on `main` requires. Passes when `dist` passes, plus every full check when they ran.
-- With `full-checks` only: `static` (types, tests, lint), `core` (`npm run verify:core`), `verify` (the site check in three shards, plus links and the header smoke), `visual-diff` (screenshots beside the live site).
+- With `full-checks` only: `static` (types, lint), `core` (`npm run verify:core`), `verify` (the site check in three shards, plus links and the header smoke), `visual-diff` (screenshots beside the live site).
 - Always: `workflows` (zizmor) and `dependency-review`.
 
 A push to `main` (not docs-only) runs `deploy`; so does "Run workflow" on `main` (`gh workflow run site.yml --ref main`), for when a push's run was lost. It builds, then `node scripts/deploy.mjs LIVE_ADDRESS`:
@@ -39,7 +39,7 @@ A push to `main` (not docs-only) runs `deploy`; so does "Run workflow" on `main`
 2. Puts it live, waits for the live address to serve that build (`X-Build` marker), and smoke-checks it.
 3. Rolls back to the previous version if the live check fails.
 
-The run summary names both versions. Timings: `DEPLOY_POLL`, `DEPLOY_WAIT`, `DEPLOY_SETTLE`, `DEPLOY_RETRY`. Tests: `scripts/test/deploy.test.mjs`.
+The run summary names both versions. Timings: `DEPLOY_POLL`, `DEPLOY_WAIT`, `DEPLOY_SETTLE`, `DEPLOY_RETRY`.
 
 Secrets, in the `cloudflare` environment: `CLOUDFLARE_API_TOKEN` ("Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them the preview skips and a deploy fails.
 

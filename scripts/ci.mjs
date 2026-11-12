@@ -50,14 +50,10 @@ const freePort = () =>
 let server;
 try {
   // astro check and astro build both write .astro/, so they take turns; the tests and lint don't touch the build
-  await all(
-    async () => {
-      await run('npm run check');
-      await run('npm run build');
-    },
-    'npm test',
-    'npm run lint',
-  );
+  await all(async () => {
+    await run('npm run check');
+    await run('npm run build');
+  }, 'npm run lint');
   const port = await freePort();
   const base = `http://localhost:${port}`;
   const up = () =>

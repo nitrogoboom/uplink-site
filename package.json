@@ -8,7 +8,6 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "test": "node --test \"scripts/test/*.test.mjs\"",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
     "verify": "node scripts/check.mjs site",

@@ -62,10 +62,9 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). |
 | `npm run preview` | Astro's own preview server. No headers or redirects: use `npm run serve`. |
 | `npm run check` | Type check and Astro's diagnostics for `src/`. The site checks, the build scripts, and the Worker aren't type-checked. |
-| `npm test` | Tests the build's last steps and the Worker (`scripts/test/`). |
 | `npm run lint` | ESLint, Stylelint, and Prettier. |
 | `npm run format` | Fixes what the linters can, then formats with Prettier. `astroCompressHTML` in `.prettierrc.json` matches `compressHTML` in `astro.config.mjs`: change the two together. A commit that only reformats goes in `.git-blame-ignore-revs`. |
-| `npm run ci` | What CI's full run runs: check, tests, lint, build, the site check, the link check, and the smoke check. It starts its own `wrangler dev` on a free port. No screenshot comparison, workflow lint, preview, or deploy. |
+| `npm run ci` | What CI's full run runs: check, lint, build, the site check, the link check, and the smoke check. It starts its own `wrangler dev` on a free port. No screenshot comparison, workflow lint, preview, or deploy. |
 | `npm run quick` | Type check, lint, build (about 20 seconds). |
 | `npm run verify`, `verify:zoom`, `verify:links`, `verify:spacing`, `verify:styles`, `visual-diff`, `release-audit` | The site checks: [`docs/site-checks.md`](docs/site-checks.md). |
 | `npm run smoke`, `npm run pagespeed` | Check a deployed site: [`docs/site-checks.md`](docs/site-checks.md#live-site-checks). |
@@ -77,7 +76,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: the `_headers` template, `speculation-rules.json`, fonts, the drawings in `assets/img/`, `og.png`, and the favicons. `favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes. |
-| `scripts/` | The build's last steps, in this order: `svgo.mjs` shrinks the drawings (settings in `svgo-config.mjs`, whose `shipped()` hash is the `?v=` on each drawing a page inserts), and stops the build if a drawing's `<style>` names a tag. `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` and writes `dist/_redirects`. Also: `deploy.mjs`, CI's deploy ([Deploys](docs/ops.md#deploys)); `check-dist.mjs`, wrangler's build step, which refuses an unfinished `dist/`; `ci.mjs`, `npm run ci`; `check.mjs`, which runs one site check. Tests are in `scripts/test/`. |
+| `scripts/` | The build's last steps, in this order: `svgo.mjs` shrinks the drawings (settings in `svgo-config.mjs`, whose `shipped()` hash is the `?v=` on each drawing a page inserts), and stops the build if a drawing's `<style>` names a tag. `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` and writes `dist/_redirects`. Also: `deploy.mjs`, CI's deploy ([Deploys](docs/ops.md#deploys)); `check-dist.mjs`, wrangler's build step, which refuses an unfinished `dist/`; `ci.mjs`, `npm run ci`; `check.mjs`, which runs one site check. |
 | `tools/` | The drawing generators and their checks, in Python. [`docs/drawing-tools.md`](docs/drawing-tools.md). |
 | `checks/` | The site checks (`NAME.spec.mjs`), their page list and sizes (`lib.mjs`), and `playwright.config.mjs`. [`docs/site-checks.md`](docs/site-checks.md). |
 | `worker/index.js` | The Worker script ([`docs/ops.md`](docs/ops.md#the-worker)). |
