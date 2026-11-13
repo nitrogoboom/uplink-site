@@ -40,8 +40,8 @@ const ld = {
       ),
     },
     breadcrumbs([
-      [PAGES.home.name, Astro.site!.href],
-      [PAGES.work.name, new URL(PAGES.work.path, Astro.site).href],
+      [ui.pages.home, Astro.site!.href],
+      [ui.pages.work, new URL(PAGES.work.path, Astro.site).href],
       [p.name, url],
     ]),
     businessNode(Astro.site!),
@@ -61,7 +61,7 @@ const ld = {
     <div class="container proj-page-grid">
       <nav class="crumbs" aria-label={ui.breadcrumb}>
         <ol>
-          <li><a href="/work">{PAGES.work.name}</a></li>
+          <li><a href="/work">{ui.pages.work}</a></li>
           <li aria-current="page">{p.name}</li>
         </ol>
       </nav>

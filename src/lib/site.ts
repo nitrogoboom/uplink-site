@@ -36,17 +36,23 @@ export const HERO = {
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
 export const CAMPUS = fresh('/assets/img/campus.svg');
 
-// The static pages (five in the menu, plus privacy and accessibility): address and name. Each page's <title> and
-// description are words, in its copy file (pageMeta() below).
+// The static pages (five in the menu, plus privacy and accessibility): their addresses. Their names are words, in
+// ui.yaml's pages (pageName() below), and each page's <title> and description in its copy file (pageMeta() below).
 export const PAGES = {
-  home: { path: '/', name: 'Home' },
-  services: { path: '/services', name: 'Services' },
-  work: { path: '/work', name: 'Our work' },
-  about: { path: '/about', name: 'About' },
-  contact: { path: '/contact', name: 'Contact' },
-  privacy: { path: '/privacy', name: 'Privacy' },
-  accessibility: { path: '/accessibility', name: 'Accessibility' },
+  home: { path: '/' },
+  services: { path: '/services' },
+  work: { path: '/work' },
+  about: { path: '/about' },
+  contact: { path: '/contact' },
+  privacy: { path: '/privacy' },
+  accessibility: { path: '/accessibility' },
 } as const;
+
+// A static page's name (ui.yaml, pages); short: the phone tab bar's word where there is one (ui.yaml, tabs)
+export const pageName = async (page: keyof typeof PAGES, short = false) => {
+  const t = await copy('ui');
+  return String(short && page in t.tabs ? t.tabs[page] : t.pages[page]);
+};
 
 // A static page's <title> and description, from src/data/copy/en/: NAME.yaml's top for the five in the menu,
 // text-pages.yaml for privacy and accessibility. The page and the sitemap read them here.
@@ -55,12 +61,12 @@ export const pageMeta = async (page: keyof typeof PAGES) => {
   return { title: t.title, description: t.description };
 };
 
-// Name and address come from PAGES. short: the phone tab bar's word, where it differs.
-type Tab = { page: keyof typeof PAGES; icon: IconName; short?: string };
+// Address from PAGES, name from pageName().
+type Tab = { page: keyof typeof PAGES; icon: IconName };
 export const NAV: readonly Tab[] = [
   { page: 'home', icon: 'home' },
   { page: 'services', icon: 'grid' },
-  { page: 'work', icon: 'layers', short: 'Work' },
+  { page: 'work', icon: 'layers' },
   { page: 'about', icon: 'building' },
   { page: 'contact', icon: 'bubble' },
 ];
@@ -137,6 +143,7 @@ export async function allPages(): Promise<SitePage[]> {
     ...(await Promise.all(
       (Object.keys(PAGES) as (keyof typeof PAGES)[]).map(async (k) => ({
         ...PAGES[k],
+        name: await pageName(k),
         description: (await pageMeta(k)).description,
       })),
     )),

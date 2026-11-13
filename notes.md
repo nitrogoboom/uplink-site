@@ -25,10 +25,6 @@ Content:
 
 ## Now: setup and code
 
-The agent can do alone:
-
-- [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
-
 Drawing generators (the owner directs drawing work):
 
 - [ ] `gen_office.py` and `gen_grow.py` write role classes, as `gen_campus.py` does; `theme-drawings.css` then goes.

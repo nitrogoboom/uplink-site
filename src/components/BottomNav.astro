@@ -3,7 +3,7 @@
 // `current` lights the page's tab, as in the header. Styles: src/styles/bottom-nav.css.
 import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
-import { NAV, PAGES, tabCurrent } from '../lib/site';
+import { NAV, PAGES, pageName, tabCurrent } from '../lib/site';
 import { copy } from '../lib/copy';
 interface Props {
   current: Page;
@@ -11,13 +11,14 @@ interface Props {
 const { current } = Astro.props;
 const here = Astro.url.pathname;
 const ui = await copy('ui');
+const tabs = await Promise.all(NAV.map(async (n) => ({ ...n, name: await pageName(n.page, true) })));
 ---
 
 <nav class="botnav" aria-label={ui.bottomNav}>
   <ul>
-    {NAV.map(({ page, icon, short }) => <li>
+    {tabs.map(({ page, icon, name }) => <li>
       <a class="bn" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
-        ><Icon name={icon} /><span class="bn-t">{short ?? PAGES[page].name}</span></a
+        ><Icon name={icon} /><span class="bn-t">{name}</span></a
       >
     </li>)}
   </ul>

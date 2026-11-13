@@ -14,7 +14,7 @@ interface Props {
 }
 const { current } = Astro.props;
 const here = Astro.url.pathname;
-const { site, header: t } = await copy('ui');
+const { site, header: t, pages } = await copy('ui');
 ---
 
 <header class="site-header">
@@ -31,7 +31,7 @@ const { site, header: t } = await copy('ui');
       <ul>
         {NAV.map(({ page }) => <li>
           <a class="tab" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
-            >{PAGES[page].name}</a
+            >{pages[page]}</a
           >
         </li>)}
       </ul>

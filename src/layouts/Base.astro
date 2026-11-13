@@ -9,7 +9,7 @@ import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
-import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
+import { breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
@@ -63,7 +63,7 @@ const jsonld = type &&
         ...ldPage,
       },
       breadcrumbs([
-        [PAGES.home.name, Astro.site!.href],
+        [(await copy('ui')).pages.home, Astro.site!.href],
         [name, canonical],
       ]),
       businessNode(Astro.site!),

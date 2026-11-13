@@ -1,6 +1,20 @@
 # Shared UI and screen-reader text, on every page: the head, header, phone tab bar, footer chrome, both pop-ups, the
 # pause buttons, form fields both forms share, and the toasts core.js and footer.js show.
-# Page names in the menus are PAGES in src/lib/site.ts; the footer's lists and contact details are src/data/footer.json.
+# The footer's lists and contact details are src/data/footer.json.
+
+# The static pages' names: the menus, the breadcrumb trails, the privacy and accessibility headings, the sitemap.
+# Their addresses are PAGES in src/lib/site.ts, with the same keys.
+pages:
+  home: Home
+  services: Services
+  work: Our work
+  about: About
+  contact: Contact
+  privacy: Privacy
+  accessibility: Accessibility
+# the phone tab bar's word, where it's shorter than the page's name
+tabs:
+  work: Work
 
 site:
   name: Uplink Technology # og:site_name, the print contact line, About's card
