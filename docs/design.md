@@ -114,7 +114,7 @@ Spacing `--sp-1`–`--sp-9`, type `--fs-1`–`--fs-8`; pixels at a 16px root (`-
 
 ### R0. Stay on the scale
 
-Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size tokens. Exceptions need a `stylelint-disable` comment saying why.
+Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size tokens. An exception (a 1px clip, an optical nudge) gets a short comment saying why.
 
 ### R1. Section padding
 

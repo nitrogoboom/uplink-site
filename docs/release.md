@@ -61,6 +61,8 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Dependabot mont
 
 `DOMAIN` is the real domain (placeholder `uplinkit.ca`; confirm it). The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
 
+Launch day is the one planned use of a pull request: the `launch` branch gets a PR so its preview can be read before it goes live. Every other change still goes straight to `main` (`CLAUDE.md`).
+
 **Retire `workers.dev`:** **A.** turn it off (old links break), or **B.** 301 it to `DOMAIN` (`run_worker_first: true`, every request counts against the free plan, and `worker/index.js` needs a host redirect). Either way keep preview URLs on.
 
 ### The day before

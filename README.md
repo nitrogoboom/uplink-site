@@ -64,7 +64,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | `npm run format` | Fixes what the linters can, then formats with Prettier. `astroCompressHTML` in `.prettierrc.json` matches `compressHTML` in `astro.config.mjs`: change the two together. A commit that only reformats goes in `.git-blame-ignore-revs`. |
 | `npm run quick` | Type check, lint, build (about 20 seconds). |
 | `npm run smoke -- ADDRESS` | Checks a deployed site over plain HTTP: [`docs/site-checks.md`](docs/site-checks.md). The deploy runs it. |
-| `npm run deploy` | Deploys the checked-out branch to the live Worker by hand, after `npm run quick` passes. One step (`wrangler deploy`): no check of the new version first, and no rollback ([Deploys](docs/ops.md#deploys)). CI deploys on a merge to `main`, so you rarely need it; run it from `main`. |
+| `npm run deploy` | Deploys the checked-out branch to the live Worker by hand: builds, then deploys. One step (`wrangler deploy`): no check of the new version first, and no rollback ([Deploys](docs/ops.md#deploys)). CI deploys on a merge to `main`, so you rarely need it; run it from `main`. |
 
 ## How the repository is organized
 

@@ -26,7 +26,7 @@ Content:
 
 ## Now: setup and code
 
-The agent can do alone (each is its own pull request):
+The agent can do alone:
 
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 

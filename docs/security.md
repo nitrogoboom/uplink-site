@@ -34,7 +34,7 @@ The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTM
 `public/_headers` sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`, `Cross-Origin-Opener-Policy: same-origin`, and `Cross-Origin-Resource-Policy: same-origin` (`og.png` is `cross-origin`).
 
 - The Worker's own responses don't get `_headers` ([`ops.md`](ops.md#the-worker)).
-- Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (the smoke check fails if it comes back) and `Cross-Origin-Embedder-Policy` (it could block an outside script added later, such as analytics).
+- Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (only Flash and Acrobat read it) and `Cross-Origin-Embedder-Policy` (it could block an outside script added later, such as analytics).
 
 ### Reports from browsers
 
@@ -54,7 +54,7 @@ Actions pinned to commits, zizmor on every run, Dependabot monthly (`.github/dep
 ## Privacy
 
 - **No cookies, no tracking.** Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
-- **What a report holds:** the page address without its query string, the error message, the script address and line, and the user agent cut to 200 characters; a CSP report also the blocked address (no query) and the directive. Never anything a visitor typed. Cloudflare keeps its own request log, IP included, for up to three days; the privacy page says so.
+- **What a report holds:** the page address without its query string, the error message, the script address and line, and the user agent cut to 200 characters; a CSP report also the blocked address (no query) and the directive. Never anything a visitor typed. The Workers logs keep reports 3 days; the privacy page says "up to 7 days" for the site's logs, to be safe.
 - **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same commit.
 
 ## Secrets

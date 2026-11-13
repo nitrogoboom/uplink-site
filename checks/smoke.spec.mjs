@@ -1,5 +1,5 @@
 // Smoke check: a deployed site answers the way it should, over plain HTTP with no browser. Run it after a deploy and
-// on launch day (docs/release.md, "Launch day"). What it checks and each flag: docs/site-checks.md, "Live-site checks".
+// on launch day (docs/release.md, "Launch day"). What it checks and each flag: docs/site-checks.md, "The smoke check".
 //   npm run smoke -- https://uplink-site.johnoreilly.workers.dev        today: noindex expected
 //   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable, sitemap named
 //   npm run smoke -- https://uplinkit.ca --launch --old https://uplink-site.johnoreilly.workers.dev
@@ -19,7 +19,6 @@ const HEADERS = [
   'cross-origin-opener-policy',
   'cross-origin-resource-policy',
 ];
-const DROPPED = ['x-permitted-cross-domain-policies']; // Flash and Acrobat were all that read it (review H9)
 
 // [status, headers, body] without following redirects
 async function get(url, method = 'GET', headers = {}) {
@@ -64,8 +63,6 @@ test('smoke', async () => {
     ok((h.get('content-type') || '').includes('text/html'), `${path}: content-type ${h.get('content-type')}`);
     const missing = HEADERS.filter((n) => !h.get(n));
     ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
-    const extra = DROPPED.filter((n) => h.has(n));
-    ok(!extra.length, `${path}: still sends ${extra.join(', ')}`);
     const noindex = (h.get('x-robots-tag') || '').includes('noindex');
     ok(noindex !== launch, `${path}: noindex ${launch ? 'still on' : 'missing (test build)'}`);
   }

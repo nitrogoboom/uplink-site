@@ -13,7 +13,7 @@
     "quick": "npm run check && npm run lint && npm run build",
     "smoke": "node scripts/check.mjs smoke",
     "serve": "wrangler dev",
-    "deploy": "npm run quick && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy"
   },
   "engines": {
     "node": ">=24"

@@ -30,7 +30,8 @@ Also:
 - `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build.
 - `preview`: builds the commit itself and posts `https://pr-N-uplink-site.johnoreilly.workers.dev`. Waits for no job.
 - `build`: the gate the ruleset on `main` requires. Passes when `dist` passes.
-- Always: `workflows` (zizmor; it runs beside the deploy and fails the run on a high finding, without holding the deploy) and `dependency-review`.
+- `dependency-review`: a new dependency with a known high vulnerability fails the pull request. Pull requests only: a push to `main` skips it.
+- Always: `workflows` (zizmor; it runs beside the deploy and fails the run on a high finding, without holding the deploy).
 
 A push to `main` (not docs-only) runs `deploy`; so does "Run workflow" on `main` (`gh workflow run site.yml --ref main`), for when a push's run was lost. It builds, then `node scripts/deploy.mjs LIVE_ADDRESS`:
 

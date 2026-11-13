@@ -35,7 +35,7 @@ Follow `docs/release.md`, "Ship a release", steps 1 to 4. Read the deploy job's 
 
 ## Launch day only
 
-`docs/release.md`, "Before launch" lists what's still open, and "Launch day" is the runbook: the day before, the launch, straight after, and how to back out. Read those two sections in full before you start, and settle "Choose how to retire `workers.dev`" with the owner first.
+`docs/release.md`, "Before launch" lists what's still open, and "Launch day" is the runbook: the day before, the launch, straight after, and how to back out. Read those two sections in full before you start, and settle "Retire `workers.dev`" (A or B) with the owner first.
 
 ## When something here is wrong
 
