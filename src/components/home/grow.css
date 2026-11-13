@@ -135,6 +135,16 @@
   stroke-dasharray: 311.02;
   stroke-dashoffset: 311.02;
 }
+/* while a step plays, the ring runs on from where it stands to the step's end, over the time the step has left
+   (grow.js sets both, once a step; paused or off screen it stands where it is) */
+.grow-ring circle.is-timing {
+  animation: grow-ring var(--ring-left) linear forwards;
+}
+@keyframes grow-ring {
+  to {
+    stroke-dashoffset: var(--ring-to);
+  }
+}
 
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
    the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */
@@ -307,6 +317,66 @@
 .grow-stage .dome-rim {
   animation: grow-rim var(--loop-grow-rim) ease-in-out infinite;
 }
+/* the light round the dome's two rings (grow.js copies each ring's line in three times): a dash a quarter of the
+   ring long, a shorter brighter one and a short bright head over it, all ending together, so the band fades behind
+   its head. Lengths are shares of the ring (pathLength 100). The ring's line starts at the right and runs round
+   the near (lower) half first: the band dims as it passes behind. Each starts part way round, as it always has. */
+@keyframes grow-orbit {
+  from {
+    stroke-dashoffset: var(--len);
+  }
+  to {
+    stroke-dashoffset: calc(var(--len) - 100px);
+  }
+}
+@keyframes grow-orbit-side {
+  0%,
+  5%,
+  68%,
+  100% {
+    opacity: 0.37;
+  }
+  18%,
+  55% {
+    opacity: 1;
+  }
+}
+.grow-stage .dome-run {
+  fill: none;
+  stroke-dasharray: var(--len) calc(100px - var(--len));
+  stroke-dashoffset: calc(var(--len) - var(--still)); /* the still frame: reduced motion */
+  opacity: var(--still-o);
+  animation:
+    grow-orbit var(--orbit-loop) linear var(--orbit-at) infinite,
+    grow-orbit-side var(--orbit-loop) linear var(--orbit-at) infinite;
+}
+.grow-stage .dome-run.is-lower {
+  --orbit-loop: var(--loop-grow-orbit);
+  --orbit-at: -2.5s;
+  --still: 31px;
+  --still-o: 1;
+}
+.grow-stage .dome-run.is-upper {
+  --orbit-loop: var(--loop-grow-orbit-2);
+  --orbit-at: -7.1s;
+  --still: 64px;
+  --still-o: 0.37;
+}
+.grow-stage .dome-run.is-tail {
+  --len: 25px;
+  stroke-width: 1.6;
+  stroke-opacity: 0.3;
+}
+.grow-stage .dome-run.is-mid {
+  --len: 15px;
+  stroke-width: 2.1;
+  stroke-opacity: 0.45;
+}
+.grow-stage .dome-run.is-head {
+  --len: 6px;
+  stroke-width: 2.6;
+  stroke-opacity: 0.8;
+}
 .grow-stage.is-paused * {
   animation-play-state: paused;
 } /* as specific as the rules above and after them, so it wins */
@@ -317,7 +387,8 @@
     transition: none;
   }
   .grow-stage [stroke-dasharray],
-  .grow-stage .dome-rim {
+  .grow-stage .dome-rim,
+  .grow-stage .dome-run {
     animation: none;
   }
 }

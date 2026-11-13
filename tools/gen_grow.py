@@ -310,7 +310,8 @@ def dome(s, R, o):
     for k in LAT:
         h = R * k
         s.raw(ellipse(w, (R * R - h * h) ** 0.5, 0, 0, h, f'class="dome-lat" fill="none" stroke="{pal.SKY}" stroke-width="1.2" stroke-opacity="0.35"'))
-    # light running round those rings, so they look like they turn: drawn and moved by the page (it knows the sums)
+    # light running round those rings, so they look like they turn: the page copies the rings' lines in here and runs
+    # dashes round them (grow.js, grow.css); the data- numbers are no longer read
     s.raw(f'<g class="dome-orbit" data-r="{R}" data-lat="{",".join(f"{k:.4f}" for k in LAT)}" data-u="{w.u}" data-ox="{w.ox}" data-oy="{w.oy}" '
           f'fill="none" stroke="{pal.SKY}" stroke-linecap="round"></g>')
     s.raw(f'<path class="dome-rim" d="{top}" fill="none" stroke="{pal.SKY}" stroke-width="2" stroke-opacity="0.85"/>')

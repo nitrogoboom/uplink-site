@@ -17,7 +17,6 @@ const GLOW = 3400; // ms the new parts glow
 const PAUSE = 'M2 1h3v10H2zM7 1h3v10H7z',
   PLAY = 'M2 1l9 5-9 5z',
   REPLAY = 'M6 1a5 5 0 1 0 5 5h-2a3 3 0 1 1-3-3v2l3-3-3-3z';
-const C30 = Math.cos(Math.PI / 6);
 
 const section = $('#grow');
 const grow = section && $('.grow', section);
@@ -158,25 +157,20 @@ if (grow && svg) {
     runSince = 0;
   };
 
-  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), read from the clock. Its frame
-  // loop runs only while a step plays: it stops at the step's end, on a pause and off screen ----
-  let ringRaf = 0;
+  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), read from the clock. Set once a
+  // change, not a frame: it stands where the clock is, and while a step plays a CSS animation (grow.css,
+  // .is-timing) runs it on to the step's end over the time the step has left ----
   const RING = 311.02; // the play ring's length in its own units (2π × 49.5, as its stroke-dasharray in grow.css)
-  const drawRing = (/** @type {number} */ k) => {
-    ring.style.strokeDashoffset = String(RING * (1 - Math.min(1, Math.max(0, k))));
-  };
-  const ringAt = () => (cur < 0 ? 0 : (cur + Math.min(1, played() / DWELL)) / N);
-  const ringTick = () => {
-    drawRing(ringAt());
-    ringRaf = runSince && played() < DWELL ? window.requestAnimationFrame(ringTick) : 0;
-  };
-  const ringGo = () => {
-    if (!ringRaf) ringRaf = window.requestAnimationFrame(ringTick);
-  };
-  const ringStop = () => {
-    window.cancelAnimationFrame(ringRaf);
-    ringRaf = 0;
-    drawRing(ringAt());
+  const ringOff = (/** @type {number} */ k) => `${RING * (1 - Math.min(1, Math.max(0, k)))}`;
+  const ringSync = () => {
+    const k = played();
+    ring.classList.remove('is-timing');
+    ring.style.strokeDashoffset = ringOff(cur < 0 ? 0 : (cur + Math.min(1, k / DWELL)) / N);
+    if (!runSince || cur < 0 || k >= DWELL) return;
+    ring.style.setProperty('--ring-to', ringOff((cur + 1) / N));
+    ring.style.setProperty('--ring-left', `${Math.round(DWELL - k)}ms`);
+    void ring.getBoundingClientRect(); // restart the animation from where the clock is
+    ring.classList.add('is-timing');
   };
 
   // ---- the open step's stretch of the growth line (desktop list), from the same clock: it fills while the step
@@ -272,7 +266,7 @@ if (grow && svg) {
       playedAt = i < 0 ? 0 : DWELL;
       runSince = 0;
     }
-    ringStop();
+    ringSync();
     bar();
   };
 
@@ -298,7 +292,7 @@ if (grow && svg) {
     playing = false;
     window.clearTimeout(timer);
     hold();
-    ringStop();
+    ringSync();
     bar();
     icon();
   };
@@ -307,7 +301,7 @@ if (grow && svg) {
     window.clearTimeout(timer);
     if (!playing || !visible) {
       hold();
-      ringStop();
+      ringSync();
       bar();
       return;
     }
@@ -316,7 +310,6 @@ if (grow && svg) {
       () => {
         if (cur >= LAST) {
           stop();
-          orbitsRun();
           return;
         } // the end: it stands still
         go(cur + 1, true);
@@ -324,7 +317,7 @@ if (grow && svg) {
       },
       cur < 0 ? 0 : Math.max(0, DWELL - played()),
     );
-    ringGo();
+    ringSync();
     bar();
   };
   const start = () => {
@@ -383,85 +376,27 @@ if (grow && svg) {
   window.requestAnimationFrame(placeTags);
   if (document.fonts) void document.fonts.ready.then(placeTags);
   window.addEventListener('resize', placeTags);
-  // ---- the dome's horizontal rings turn: a band of light runs round each (bright near side, faint far side) ----
-  // Their frame loop runs only while the section is on screen and not paused.
-  const orbits = $$('.dome-orbit', svg).map((g) => {
-    const R = Number(g.dataset.r),
-      u = Number(g.dataset.u),
-      ox = Number(g.dataset.ox),
-      oy = Number(g.dataset.oy);
-    const NS = 'http://www.w3.org/2000/svg',
-      TAIL = 1.6,
-      PIECES = 14;
-    const P = (/** @type {number} */ x, /** @type {number} */ y, /** @type {number} */ z) =>
-      `${(ox + (x - y) * C30 * u).toFixed(1)},${(oy + ((x + y) * u) / 2 - z * u).toFixed(1)}`;
-    const rings = /** @type {string} */ (g.dataset.lat)
-      .split(',')
-      .map(Number)
-      .map((k, n) => {
-        const h = R * k,
-          r = Math.sqrt(R * R - h * h);
-        const pieces = Array.from({ length: PIECES }, () => {
-          const p = document.createElementNS(NS, 'path');
-          g.append(p);
-          return p;
-        });
-        return { h, r, pieces, period: n ? 11000 : 8000, phase: n * 2.4 };
-      });
-    const draw = (/** @type {number} */ t) =>
-      rings.forEach((ringR) => {
-        const head = ringR.phase + (t / ringR.period) * Math.PI * 2;
-        ringR.pieces.forEach((p, i) => {
-          const a1 = head - (TAIL * i) / PIECES,
-            a0 = a1 - TAIL / PIECES,
-            mid = (a0 + a1) / 2;
-          const near = Math.cos(mid) + Math.sin(mid) > 0,
-            fade = 1 - i / PIECES;
-          let d = '';
-          for (let k = 0; k <= 4; k++) {
-            const a = a0 + ((a1 - a0) * k) / 4;
-            d += (k ? 'L' : 'M') + P(ringR.r * Math.cos(a), ringR.r * Math.sin(a), ringR.h);
-          }
-          p.setAttribute('d', d);
-          p.setAttribute('stroke-width', ((near ? 2.6 : 1.6) * (0.5 + fade / 2)).toFixed(2));
-          p.setAttribute('stroke-opacity', ((near ? 0.95 : 0.35) * fade).toFixed(2));
-        });
-      });
-    let t = 0,
-      last = 0,
-      raf = 0;
-    const orbit = (/** @type {number} */ now) => {
-      const dt = last ? Math.min(64, now - last) : 0;
-      last = now;
-      t += dt;
-      draw(t);
-      raf = window.requestAnimationFrame(orbit);
-    };
-    draw(1500);
-    return (/** @type {boolean} */ run) => {
-      if (run && !raf && !reduceMotion.matches) {
-        last = 0;
-        raf = window.requestAnimationFrame(orbit);
-      }
-      if (!run && raf) {
-        window.cancelAnimationFrame(raf);
-        raf = 0;
-      }
-    };
-  });
-  const orbitsRun = () =>
-    orbits.forEach((o) =>
-      o(visible && !reduceMotion.matches && !stage.classList.contains('is-paused') && !(held.on && !playing)),
+  // ---- the dome's horizontal rings turn: a band of light runs round each (bright near side, faint far side). Set
+  // up once: each ring's line, copied three times into the drawing's empty .dome-orbit (a faint tail, a middle, a
+  // bright head), as dashes grow.css runs round it. CSS holds them with the rest of the drawing: paused, at the end,
+  // off screen (.is-idle), on the site's pause (.is-held); with reduced motion they stand still. ----
+  const orbit = $('.dome-orbit', svg);
+  if (orbit)
+    $$('.dome-lat', svg).forEach((lat, n) =>
+      ['is-tail', 'is-mid', 'is-head'].forEach((layer) => {
+        const p = /** @type {Element} */ (lat.cloneNode(false));
+        ['class', 'stroke', 'stroke-width', 'stroke-opacity'].forEach((a) => p.removeAttribute(a));
+        p.setAttribute('pathLength', '100'); // the dashes in grow.css are shares of the ring
+        p.classList.add('dome-run', layer, n ? 'is-upper' : 'is-lower');
+        orbit.append(p);
+      }),
     );
-  play.addEventListener('click', orbitsRun);
-  [...dots, ...items, prev, next].forEach((b) => b.addEventListener('click', orbitsRun));
 
   // starts as the section's first pixel arrives, so it's already moving when you see it; off screen it waits
   whenOnScreen(section, (on) => {
     visible = on;
     if (on && !started && !reduceMotion.matches && !held.on) start();
     else if (playing) tick(); // tick holds the clock off screen
-    orbitsRun();
   });
 
   // the site-wide pause: hold it where it is; on release, go on only if the hold is what stopped it
@@ -477,7 +412,6 @@ if (grow && svg) {
       heldStopped = false;
       start();
     }
-    orbitsRun();
   });
 
   // reduced motion switched on mid-visit: it pauses where it is (before it has started, the finished world, as on
@@ -492,6 +426,5 @@ if (grow && svg) {
         icon();
       }
     }
-    orbitsRun();
   });
 }

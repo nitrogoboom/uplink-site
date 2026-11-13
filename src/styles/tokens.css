@@ -191,13 +191,16 @@
   --loop-fc-ring: 2.4s;
   --loop-fc-sig: 2.8s;
   /* Home "We grow with you" (grow.css): a part fading and dropping in (grow.js staggers them 500ms a step), the data
-     running along the cables (one dash period a loop: office links, cloud cables, the ring) and the dome's rim */
+     running along the cables (one dash period a loop: office links, cloud cables, the ring), the dome's rim, and the
+     light round the dome's lower and upper rings (one turn) */
   --dur-grow-fade: 500ms;
   --dur-grow-drop: 700ms;
   --loop-grow-link: 0.9s;
   --loop-grow-cable: 0.7s;
   --loop-grow-ring: 3s;
   --loop-grow-rim: 2.4s;
+  --loop-grow-orbit: 8s;
+  --loop-grow-orbit-2: 11s;
 
   /* ---- home hero captions on phones (hero.css, .hero-cap) -- */
   /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
