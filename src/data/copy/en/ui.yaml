@@ -102,7 +102,7 @@ toast:
   motionOn: Motion on
   booked:
     title: Check-up requested
-    text: We will email you within one business day to pick a time.
+    text: 'Prototype form: nothing is sent yet.'
   subscribed:
     title: Subscribed
     text: 'Prototype form: nothing is sent yet.'

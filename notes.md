@@ -7,7 +7,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 Needs the owner's eyes on a preview:
 
 - [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
-- [ ] Delete the extra height thresholds now that a fold may grow (about 30 lines; decided, not yet done).
 - [ ] Phone hero captions (HTML since #141): look with larger text set on a phone; the two captions grow and could come close.
 - [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Live since #172; look on the live site: tabs feel instant, nothing flashes.
 - [ ] Grow: the ring as the CSS animation the progress bar uses; the dome orbits as CSS dashes, not 14 paths rewritten every frame.
@@ -78,9 +77,9 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 - [ ] PR #38 conflicts with `main`: keep both routes in `worker/index.js`, both `ratelimits`, and `main`'s `run_worker_first` (`["/api/*", "/404"]`) with `not_found_handling: "none"`.
 - [ ] With the endpoint: give the contact and newsletter fields their `name` back (without script they go to `/soon`); CSP and the Trusted Types policy allow Turnstile (`docs/security.md`).
 - [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`, link privacy beside each Send.
+- [ ] When forms send: the booking and newsletter toasts (`toast.booked`, `toast.subscribed` in `ui.yaml`) say "Prototype form: nothing is sent yet"; give them the real reply time.
 - [ ] Newsletter: a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."), what sends it (a processor to name), where consent records live.
 - [ ] Decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).
-- [ ] The booking toast says "We will email you within one business day" (`src/data/copy/en/ui.yaml`), but nothing is sent. PR #38 fixes it.
 
 ### Content
 
