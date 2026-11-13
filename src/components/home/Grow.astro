@@ -34,7 +34,7 @@ const t = (await copy('home')).grow;
         <p class="lead">{t.lead}</p>
       </div>
       <div class="grow-player">
-        <div class="grow-stage" data-md-skip>
+        <div class="grow-stage">
           <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
           <Fragment set:html={world} />
           {steps.map((s, i) =>
@@ -54,7 +54,7 @@ const t = (await copy('home')).grow;
             <svg class="grow-ring" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="49.5" /></svg>
           </button>
         </div>
-        <div class="grow-nav" role="group" aria-label={t.steps} data-md-skip>
+        <div class="grow-nav" role="group" aria-label={t.steps}>
           <button type="button" class="iconbtn grow-step-btn" data-dir="-1" aria-label={t.previous}>
             <Icon name="chevronL" />
           </button>

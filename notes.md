@@ -52,7 +52,6 @@ Code and tools:
 
 Not Home, not setup. Leave these alone unless the owner asks.
 
-- [ ] Markdown copies written from the data, not from the built HTML; `turndown` and `data-md-skip` then go. Parked November 10, 2026: it needs a second template per page (about 250 lines for the 162 it replaces), and every page change would then need two edits.
 - [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (#146); a `fr/` folder, the French words and the `/fr/` addresses are left.
 
 ### Owner and accounts

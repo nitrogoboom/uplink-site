@@ -19,7 +19,7 @@ const t = (await copy('work')).projects;
       <p class="eyebrow">{t.eyebrow}</p>
       <h1 id="work-title">{t.title}</h1>
       <p class="lead">{t.lead}</p>
-      <fieldset class="filters" data-md-skip>
+      <fieldset class="filters">
         <legend class="sr-only">{t.filter}</legend>
         {filters.map((f) => <label class="filter"
           ><input class="sr-only" type="radio" name={WORK_FILTER} value={f.key} checked={f.key === 'all'} />{f.label ??

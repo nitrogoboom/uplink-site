@@ -14,7 +14,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | `about.astro`, `contact.astro` | `/about`, `/contact` | Profile, Process, Team; Message, Support |
 | `privacy.astro`, `accessibility.astro` | | `data/*.md` through `components/TextPage.astro` |
 | `soon.astro`, `404.astro` | `/soon`, missing addresses | inline |
-| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `index.md.ts`, `agents.md.ts`, `.well-known/security.txt.ts` | those files | from `lib/site.ts`, the collections, `data/*.md` |
+| `sitemap.xml.ts`, `robots.txt.ts`, `.well-known/security.txt.ts` | those files | from `lib/site.ts`, the collections, `data/*.md` |
 
 `layouts/Base.astro` is the shared head, header, footer, phone tab bar, pop-ups and toasts. Props: `title`, `description`, `page` (current tab), `path`, `robots`, `ogType`, `type` (schema.org), `ldPage`, `ldGraph`, `footer` (`false` on the 404). `PAGES` in `lib/site.ts` lists each static page's address and menu name; titles and descriptions come from `pageMeta('NAME')`.
 
@@ -37,7 +37,6 @@ Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a 
 
 - Collections: `content.config.ts` (strict). Lists: `data/faq.json`, `team.json`, `grow.json`, `reviews.json`, `footer.json`.
 - Words in components and scripts: `data/copy/en/*.yaml` (`ui.yaml` shared, one per page, `text-pages.yaml`), with no schema: to add a string, add it to the YAML and read it. Read with `await copy('home')` (a key the YAML lacks stops the build); templates with `fill()`. Scripts get words via `<Words>` and `words()`.
-- `data/index.md`, `data/agents.md`: hand-written Markdown for agents. Other pages' `.md` copies are generated from `<main>` (`scripts/markdown.mjs`; `data-md-skip` leaves a part out).
 
 ## Styles
 

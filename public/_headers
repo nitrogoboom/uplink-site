@@ -3,7 +3,6 @@
 #   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (the classList.add('js') line)
 #   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
 #   the Early Hints block   one rule per page
-#   the Markdown copies block   one rule per .md copy: noindex and a canonical Link to its page (kept at launch)
 #   the build placeholder   X-Build, the build's ID: a hash of dist/, these headers and the Worker. The deploy reads
 #                           it to tell which build the live address serves (scripts/deploy.mjs). Only a hash.
 # style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
@@ -20,10 +19,10 @@
 # At launch, delete the line and put the Sitemap line back in robots.txt (docs/release.md, "Launch day").
 # Speculation-Rules: Chrome and Edge fetch a page in the background when a pointer rests on a link to it (on phones,
 # when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json: our
-# own pages only, not /api/ or the .md and .txt copies. A header, not an inline <script>, so the CSP needs nothing
+# own pages only, not /api/ or the .txt files. A header, not an inline <script>, so the CSP needs nothing
 # new. Other browsers ignore it, and so does any response that isn't a page.
 # A missing address isn't served from this file's path rules: the Worker answers it with the 404 page and /404's
-# headers, so the rules below for a path (/*.md, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
+# headers, so the rules below for a path (/*.txt, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
 /*
   X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000
@@ -43,19 +42,11 @@
 # @early-hints (written by scripts/headers.mjs; it copies the font preloads in Base.astro; edit those, not these lines)
 # @end early-hints
 
-# Cloudflare sends .md and .txt as text/markdown and text/plain with no charset, and browsers then read them as
-# windows-1252 ("doesnâ€™t"). The files are UTF-8: say so.
-/*.md
-  ! Content-Type
-  Content-Type: text/markdown; charset=utf-8
+# Cloudflare sends .txt as text/plain with no charset, and browsers then read it as windows-1252 ("doesnâ€™t").
+# The files are UTF-8: say so.
 /*.txt
   ! Content-Type
   Content-Type: text/plain; charset=utf-8
-# Each Markdown copy names its page as the canonical address and stays out of search results, after launch too:
-# the copies are for AI agents, and the page is what a search should show (review M4). This noindex is not the
-# test build's one above: keep it at launch.
-# @markdown-copies (written by scripts/headers.mjs, one rule per .md file)
-# @end markdown-copies
 # Chrome reads speculation rules only under their own type (Cloudflare would send application/json).
 /speculation-rules.json
   ! Content-Type

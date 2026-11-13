@@ -32,7 +32,7 @@ const services = defineCollection({
     featured: z.boolean().optional(), // one of the three tall cards on the home page; the rest are short tiles
     alt: z.string(),
     lead: z.string(),
-    card: z.string(), // the short line on every card and menu entry, and in llms.txt
+    card: z.string(), // the short line on every card and menu entry
     features: z.array(z.strictObject({ title: z.string(), detail: z.string() })).length(3),
     bestFor: z.string(),
     footerLabel: z.string().optional(), // when the footer link says it differently

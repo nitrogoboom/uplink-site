@@ -56,7 +56,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Starts the development server at http://localhost:4321. |
-| `npm run build` | Builds the site into `dist/`. Its last step (`astro:build:done` in `astro.config.mjs`) shrinks the drawings, writes a Markdown copy of every page, and writes `dist/_headers` and `dist/_redirects`. |
+| `npm run build` | Builds the site into `dist/`. Its last step (`astro:build:done` in `astro.config.mjs`) shrinks the drawings and writes `dist/_headers` and `dist/_redirects`. |
 | `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). |
 | `npm run preview` | Astro's own preview server. No headers or redirects: use `npm run serve`. |
 | `npm run check` | Type check and Astro's diagnostics for `src/`. The build scripts and the Worker aren't type-checked. |
@@ -72,7 +72,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: the `_headers` template, `speculation-rules.json`, fonts, the drawings in `assets/img/`, `og.png`, and the favicons. `favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes. |
-| `scripts/` | The build's last steps, in this order: `svgo.mjs` shrinks the drawings (settings in `svgo-config.mjs`, whose `shipped()` hash is the `?v=` on each drawing a page inserts), and stops the build if a drawing's `<style>` names a tag. `markdown.mjs` writes each page's Markdown copy. `headers.mjs` finishes `dist/_headers` and writes `dist/_redirects`. Also: `deploy.mjs`, CI's deploy ([Deploys](docs/ops.md#deploys)); `check-dist.mjs`, wrangler's build step, which refuses an unfinished `dist/`; `check.mjs`, which runs the smoke check. |
+| `scripts/` | The build's last steps, in this order: `svgo.mjs` shrinks the drawings (settings in `svgo-config.mjs`, whose `shipped()` hash is the `?v=` on each drawing a page inserts), and stops the build if a drawing's `<style>` names a tag. `headers.mjs` finishes `dist/_headers` and writes `dist/_redirects`. Also: `deploy.mjs`, CI's deploy ([Deploys](docs/ops.md#deploys)); `check-dist.mjs`, wrangler's build step, which refuses an unfinished `dist/`; `check.mjs`, which runs the smoke check. |
 | `tools/` | The drawing generators and their checks, in Python. [`docs/drawing-tools.md`](docs/drawing-tools.md). |
 | `checks/` | The smoke check (`smoke.spec.mjs`), its arguments (`lib.mjs`), and `playwright.config.mjs`. [`docs/site-checks.md`](docs/site-checks.md). |
 | `worker/index.js` | The Worker script ([`docs/ops.md`](docs/ops.md#the-worker)). |

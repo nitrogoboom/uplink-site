@@ -6,7 +6,6 @@
         "and": [
           { "href_matches": "/*" },
           { "not": { "href_matches": "/api/*" } },
-          { "not": { "href_matches": "/*.md" } },
           { "not": { "href_matches": "/*.txt" } },
           { "not": { "selector_matches": "[download], [rel~=nofollow]" } }
         ]

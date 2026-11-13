@@ -1,7 +1,7 @@
 ---
 // The words a page script shows (toasts, button names), from src/data/copy/en/*.yaml, as JSON for the script to read
 // with words() from core.js. A data block, not a script: the browser runs nothing from it, so the CSP needs no hash
-// (scripts/headers.mjs hashes only the inline scripts that run). It sits outside <main>, so the Markdown copy skips it.
+// (scripts/headers.mjs hashes only the inline scripts that run).
 //   <Words id="words-page" words={{ … }} />
 import { wordsJson } from '../lib/copy';
 interface Props {

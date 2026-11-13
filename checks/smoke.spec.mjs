@@ -102,13 +102,7 @@ test('smoke', async () => {
   }
   ok((await get(`${base}/404`, 'POST'))[0] === 405, '/404 POST is not 405');
   // a missing file under a _headers path rule (review B8): the 404 page, as a page
-  for (const path of [
-    '/no-such.md',
-    '/no-such.txt',
-    '/_astro/no-such.js',
-    '/assets/fonts/no-such.woff2',
-    '/assets/img/no-such.svg',
-  ]) {
+  for (const path of ['/no-such.txt', '/_astro/no-such.js', '/assets/fonts/no-such.woff2', '/assets/img/no-such.svg']) {
     [status, h, body] = await get(base + path);
     const type = h.get('content-type') || '',
       cache = h.get('cache-control') || '',
@@ -161,27 +155,11 @@ test('smoke', async () => {
       rules?.prefetch?.length && rules.prefetch.every((r) => r.eagerness === 'moderate'),
       `${rulesPath}: no moderate prefetch rules`,
     );
-    for (const left of ['/api/*', '/*.md'])
+    for (const left of ['/api/*', '/*.txt'])
       ok(text.includes(`{"not":{"href_matches":"${left}"}}`), `${rulesPath}: ${left} not left out`);
   }
   ok((await get(`${base}/api/report`))[0] === 405, '/api/report GET is not 405');
-  for (const path of ['/robots.txt', '/llms.txt', '/services.md'])
-    ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
-  // the Markdown copies (review M4): out of search results for good, not only while it's a test build, and each
-  // names its page. The canonical is the build's address (site), as in the page's own <link rel="canonical">
-  for (const [copy, page] of [
-    ['/services.md', '/services'],
-    ['/index.md', '/'],
-  ]) {
-    [status, h] = await get(base + copy);
-    ok(status === 200, `${copy}: ${status}`);
-    ok(
-      (h.get('x-robots-tag') || '').includes('noindex'),
-      `${copy}: no X-Robots-Tag: noindex (${h.get('x-robots-tag')})`,
-    );
-    const want = `<${site}${page}>; rel="canonical"`;
-    ok((h.get('link') || '').split(/,\s*(?=<)/).includes(want), `${copy}: Link ${h.get('link')}, not ${want}`);
-  }
+  for (const path of ['/robots.txt']) ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
   const robots = (await get(`${base}/robots.txt`))[2];
   if (launch) ok(robots.includes(`Sitemap: ${site}/sitemap.xml`), `robots.txt has no Sitemap line for ${site}`);
 

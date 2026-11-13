@@ -5,17 +5,15 @@ import { placeholders } from './src/lib/placeholders.mjs';
 import { PLACEHOLDERS } from './src/lib/footer.ts';
 import { fileURLToPath } from 'node:url';
 import { svgo } from './scripts/svgo.mjs';
-import { markdown } from './scripts/markdown.mjs';
 import { headers } from './scripts/headers.mjs';
 
 // The live address: the Worker's workers.dev name until it has a domain. Set the real domain here (or SITE_URL
-// in the environment) at launch. It goes into canonicals, Open Graph, the sitemap, llms.txt and JSON-LD.
+// in the environment) at launch. It goes into canonicals, Open Graph, the sitemap and JSON-LD.
 const site = (process.env.SITE_URL || 'https://uplink-site.johnoreilly.workers.dev').replace(/\/$/, '');
 
 // Finishes dist/ once Astro has written it, so `astro build` alone gives the site as it ships: the drawings shrunk,
-// a Markdown copy of each page, then dist/_headers (CSP hashes, X-Build, Early Hints, Markdown rules) and
-// dist/_redirects. The order matters: headers() hashes the drawings' <style> blocks after svgo() and gives the copies
-// markdown() wrote their rules. A step that throws fails the build. docs/ops.md, "Response headers".
+// then dist/_headers (CSP hashes, X-Build, Early Hints) and dist/_redirects. The order matters: headers() hashes the
+// drawings' <style> blocks after svgo(). A step that throws fails the build. docs/ops.md, "Response headers".
 /** @type {import('astro').AstroIntegration} */
 const finish = {
   name: 'uplink-finish',
@@ -23,7 +21,6 @@ const finish = {
     'astro:build:done': ({ dir }) => {
       const dist = fileURLToPath(dir);
       svgo(dist);
-      markdown(dist);
       headers(dist);
     },
   },

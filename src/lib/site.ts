@@ -1,5 +1,5 @@
-// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml, robots.txt,
-// llms.txt, index.md, agents.md) share. src/README.md, "The shared layout"; each export is described where it's defined.
+// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml, robots.txt)
+// share. src/README.md, "The shared layout"; each export is described where it's defined.
 import type { IconName } from '../components/Icon.astro';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -49,7 +49,7 @@ export const PAGES = {
 } as const;
 
 // A static page's <title> and description, from src/data/copy/en/: NAME.yaml's top for the five in the menu,
-// text-pages.yaml for privacy and accessibility. The page, the sitemap and llms.txt all read them here.
+// text-pages.yaml for privacy and accessibility. The page and the sitemap read them here.
 export const pageMeta = async (page: keyof typeof PAGES) => {
   const t = page === 'privacy' || page === 'accessibility' ? (await copy('text-pages'))[page] : await copy(page);
   return { title: t.title, description: t.description };
