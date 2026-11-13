@@ -76,7 +76,6 @@ Planned, with the forms in [PR #38](https://github.com/nitrogoboom/uplink-site/p
 | `FORM_TO` | The inbox the forms send to. | Worker secret |
 | `FORM_FROM` | The sending address, on a domain on Cloudflare. | Worker variable |
 | `EMAIL` binding | Cloudflare Email Service. Not a secret. | `wrangler.jsonc` |
-| `SITE_PASSWORD` | The optional site-wide lock, which is off ([`ops.md`](ops.md#password-lock)). | Worker secret |
 
 Not secrets: `GH_TOKEN` in CI is GitHub's short-lived token for the run. The placeholder inboxes (`privacy@`, `accessibility@`, `security@uplinkit.ca`) are under `inboxes` in `src/data/footer.json`.
 

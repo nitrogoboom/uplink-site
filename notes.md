@@ -2,8 +2,6 @@
 
 One line each. Remove a line when it's done; add new ones as they come up. Launch-only work is in `docs/release.md`, "Before launch".
 
-From `docs/history/recommendations-fable-5.2-2026-11-09.md`; its "Status" section says what's done. Decisions: `docs/history/decisions-2026-11-09.md`.
-
 ## Now: Home
 
 Needs the owner's eyes on a preview:
@@ -40,7 +38,6 @@ Drawing generators (the owner directs drawing work):
 - [ ] The generators write the link paths and camera boxes into the drawings; the footer map camera becomes generated CSS with `:has()`.
 - [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
 - [ ] On Windows a generator writes CRLF line ends (found November 9, 2026): git puts them right on commit, but `prettier --check` fails on the working copy of `theme-drawings.css` until it's checked out again.
-- [ ] Decide: delete `tools/site-lock/` if the password lock isn't coming back.
 
 Code and tools:
 
@@ -64,14 +61,12 @@ Not Home, not setup. Leave these alone unless the owner asks.
 - [ ] Cloudflare: a company account with 2FA. (Done November 13, 2026: the deploy token is an account token with only "Workers Scripts: Edit"; sign-in is Google, which has 2FA.)
 - [ ] Secrets: give each one an owner and a rotation date (`docs/security.md`, "Secrets").
 - [ ] The repository is public "for now" (November 6, 2026); making it private turns the rulesets off unless the plan is GitHub Pro.
-- [ ] Finish the baseline in `docs/history/releases/2026-11-03.md`: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
+- [ ] Finish the baseline: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
 - [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.
 
 For launch (the owner): the split environments are under "Owner and accounts"; the paid Workers plan, Always Use HTTPS, and an alert on the error reports belong in `docs/release.md`, "Before launch".
 
 ### Privacy and accessibility pages
-
-Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 
 - [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`; its `uplinkit.ca` addresses are placeholders), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
@@ -100,7 +95,7 @@ Sources: `docs/history/privacy-and-accessibility-2026-11-03.md`.
 - [ ] Light theme: signed off November 9, 2026, still open to change. Optional: a quieter amber tower on the footer map; ghost-button edges to `--c-edge` (colour rule 6).
 - [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
 - [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).
-- [ ] Idea, not planned: the office fire drill (`docs/history/creative.md`).
+- [ ] Idea, not planned: the office fire drill.
 - [ ] Small, left as they are: Home-only hero rules in `compact-cuts.css`; the services observer runs at 700px and up; JSON-LD is pretty-printed.
 
 ### Real devices

@@ -19,7 +19,6 @@ The website for Uplink Technology, a made-up IT company, with placeholder conten
 | [`docs/design.md`](docs/design.md) | Colour, spacing, line height, corners, and layout. |
 | [`docs/release.md`](docs/release.md) | The release checklist and launch day. |
 | [`docs/security.md`](docs/security.md), [`SECURITY.md`](SECURITY.md) | Security controls and secrets; how to report a problem. |
-| [`docs/history/`](docs/history/) | Records. Not instructions. |
 
 ## Before you begin
 

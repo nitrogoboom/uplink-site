@@ -85,28 +85,3 @@ Every control and how to check it: [`security.md`](security.md).
 The Markdown copies stay out of search results after launch too. `scripts/headers.mjs` gives each `.md` file its own rule in `dist/_headers`, with `X-Robots-Tag: noindex` and a `Link: <PAGE>; rel="canonical"` header taken from the page's own canonical link. `/agents.md` has no page, so it gets the `noindex` only. Keep this `noindex` at launch.
 
 > **Note:** Each page takes two of Cloudflare's 100 `_headers` rules. `headers.mjs` stops the build past 100.
-
-## Password lock
-
-The password lock is off. `tools/site-lock/worker.js` holds `lock()`, which puts the whole site behind a browser password prompt.
-
-To turn the lock on:
-
-1. In `wrangler.jsonc`, set `assets.run_worker_first` to `true`.
-2. Copy `lock()` and `passwordOk()` from `tools/site-lock/worker.js` into `worker/index.js`.
-3. In `route()` in `worker/index.js`, add this line after the `/api/report` line (and so after the http-to-https redirect):
-
-   ```js
-   const denied = await lock(request, env); if (denied) return denied;
-   ```
-
-4. Set the password and deploy:
-
-   ```sh
-   npx wrangler secret put SITE_PASSWORD
-   npx wrangler deploy
-   ```
-
-Any username works; the password must match `SITE_PASSWORD`. With no secret set, the site stays locked. To test locally: `npx wrangler dev --var SITE_PASSWORD:SOME_TEST_VALUE`.
-
-To turn the lock off, undo steps 1 to 3, deploy, and run `npx wrangler secret delete SITE_PASSWORD`.

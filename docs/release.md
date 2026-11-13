@@ -8,8 +8,8 @@ Standards: WCAG 2.2 AA (Ontario requires 2.0 AA at 50+ employees, O. Reg. 191/11
 
 1. Do the looks in the `check` skill on the PR preview, every page: before and after (against the live site), browser compatibility, accessibility, large text, print, links. Confirm each change you see was meant.
 2. Merge. Read the deploy summary: it names the live version or says why not. Rollback: [ops.md](ops.md#roll-back-a-bad-deploy).
-3. Run the checklist below; save it as `docs/history/releases/YYYY-MM-DD.md`.
-4. Tag: `git tag -a vYYYY.MM.DD COMMIT -m "SUMMARY"`, `git push origin vYYYY.MM.DD`, `gh release create vYYYY.MM.DD` (a few lines and a link to the record).
+3. Run the checklist below; the filled-in result goes in the release report to the owner, not a saved file.
+4. Tag: `git tag -a vYYYY.MM.DD COMMIT -m "SUMMARY"`, `git push origin vYYYY.MM.DD`, `gh release create vYYYY.MM.DD` (a few lines).
 
 ## Release checklist
 

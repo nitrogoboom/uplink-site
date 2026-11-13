@@ -15,7 +15,6 @@
 // build.command runs before every wrangler dev, deploy and versions upload. It builds nothing: it refuses dist/ if
 // the build's last step (scripts/headers.mjs, called from astro.config.mjs) didn't finish, as after a build that
 // stopped part way, so _headers never ships with its placeholders in the CSP (scripts/check-dist.mjs).
-// To put the password lock back, see tools/site-lock/worker.js.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uplink-site",

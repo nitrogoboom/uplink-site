@@ -28,7 +28,7 @@ Follow `docs/release.md`, "Ship a release", steps 1 to 4. Read the deploy job's 
 
 ## The checklist
 
-1. Copy `docs/release.md`, "Release checklist", to `docs/history/releases/YYYY-MM-DD.md`.
+1. Work from `docs/release.md`, "Release checklist". The filled-in result goes in your report to the owner; save no file.
 2. Do parts A, B and D yourself and paste the proof each line asks for.
 3. Part C is by hand, about 15 minutes: real phones, a screen reader listen, judgement calls. Give the owner the preview link and the list, one line each, and write down what they report.
 4. Part E is the owner's sign-off. Don't tick it for them.

@@ -1,4 +1,2 @@
-# Searches (ripgrep, and the agent search tools built on it) skip these. The records stay in git; to search one,
-# name its folder: rg WORD docs/history
-docs/history/
+# Searches (ripgrep, and the agent search tools built on it) skip these.
 .claude/worktrees/

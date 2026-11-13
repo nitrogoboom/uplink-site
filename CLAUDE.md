@@ -8,7 +8,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 
 - No tests until launch: see "Tests" below.
 - Do the job yourself. No worker agents, review passes, reports or history files.
-- Read only the doc the job needs (table below). Never read `docs/history/`.
+- Read only the doc the job needs (table below).
 - `notes.md` is the to-do list: add or remove a line. Never reword the owner's lines without asking.
 - Docs can lag the code; the code wins. Fix a doc only when what it states is now wrong. Keep docs short.
 
