@@ -4,10 +4,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 
 ## Now: Home
 
-Needs the owner's eyes on a preview:
-
-- [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Live since #172; look on the live site: tabs feel instant, nothing flashes.
-
 Layout and look:
 
 - [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
