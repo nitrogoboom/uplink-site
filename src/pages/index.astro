@@ -12,7 +12,6 @@ import Proof from '../components/home/Proof.astro';
 import { phone, email, office } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
-import type { HomeWords } from '../lib/copy-schema';
 const { cloud, grow, business: about } = await copy('home');
 const meta = await pageMeta('home');
 
@@ -60,7 +59,7 @@ const business = {
   <Work />
   <Reviews><Proof /></Reviews>
   <Fragment slot="scripts">
-    <Words id="words-page" words={{ cloud, grow: { play: grow.play } } satisfies HomeWords} />
+    <Words id="words-page" words={{ cloud, grow: { play: grow.play } }} />
     <script>
       import '../scripts/home.js';
     </script>

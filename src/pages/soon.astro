@@ -4,7 +4,6 @@
 import Base from '../layouts/Base.astro';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
-import type { SoonWords } from '../lib/copy-schema';
 const t = await copy('soon');
 ---
 
@@ -21,7 +20,7 @@ const t = await copy('soon');
     </div>
   </section>
   <Fragment slot="scripts">
-    <Words id="words-page" words={{ pageTitle: t.pageTitle, names: t.names } satisfies SoonWords} />
+    <Words id="words-page" words={{ pageTitle: t.pageTitle, names: t.names }} />
     <script>
       import '../scripts/soon.js';
     </script>

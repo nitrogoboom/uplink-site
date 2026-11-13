@@ -44,14 +44,14 @@ const reduceMotion = new MotionChoice();
 /* ---------- words ------------------------------------------------------ */
 // What a script shows (toasts, button names) comes from src/data/copy/en/*.yaml, carried by the page as JSON
 // (components/Words.astro): #words-ui on every page (Base.astro), #words-page for the page's own script. Cast what
-// it gives to the shape in src/lib/copy-schema.ts: /** @type {HomeWords} */ (words('words-page')).
+// it gives to the shape in src/lib/copy.ts: /** @type {HomeWords} */ (words('words-page')).
 /** @param {'words-ui' | 'words-page'} id @returns {unknown} */
 const words = (id) => {
   const el = document.getElementById(id);
   if (!el) throw new Error(`no #${id} on this page: its script's words are missing (components/Words.astro)`);
   return JSON.parse(el.textContent || '');
 };
-/** @typedef {import('../lib/copy-schema').UiWords} UiWords */
+/** @typedef {import('../lib/copy').UiWords} UiWords */
 const UI = /** @type {UiWords} */ (words('words-ui'));
 
 /* ---------- error reports ---------------------------------------------- */

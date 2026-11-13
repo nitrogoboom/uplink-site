@@ -5,7 +5,7 @@
 
 import { $, $$, toast, words } from './core.js';
 
-/** @typedef {import('../lib/copy-schema').ContactWords} ContactWords */
+/** @typedef {import('../lib/copy').ContactWords} ContactWords */
 const T = /** @type {ContactWords} */ (words('words-page')); // src/data/copy/en/contact.yaml, toast
 
 /* ======================================================================

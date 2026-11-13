@@ -1,6 +1,5 @@
 # Coming soon (/soon): the one page every link to a page that isn't built yet goes to. `names` and `pageTitle` are
-# read by soon.js in the browser: it names the page from the address (/soon#client-portal). Schema:
-# src/lib/copy-schema.ts.
+# read by soon.js in the browser: it names the page from the address (/soon#client-portal).
 
 title: Coming soon · Uplink Technology # <title>
 description: This part of the Uplink Technology site is not built yet.
