@@ -3,7 +3,8 @@ out/
 __pycache__/
 *.pyc
 .wrangler/
-.dev.vars
+.dev.vars*
+.env*
 RAW Screenshots/
 dist/
 .astro/
