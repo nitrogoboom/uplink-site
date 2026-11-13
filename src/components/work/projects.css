@@ -160,16 +160,7 @@
   .work-grid > li,
   .work-grid .card {
     min-height: 0;
-  }
-  .work-grid .card-media img {
-    position: absolute;
-    inset: 0;
-  }
-  .work-grid .card-media {
-    aspect-ratio: auto;
-    flex: 1;
-    min-height: 8rem;
-  }
+  } /* the pictures: fold.css */
   .page-intro .work-layout {
     display: grid;
     grid-template-rows: minmax(0, 1fr);

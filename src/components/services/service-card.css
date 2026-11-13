@@ -90,15 +90,10 @@ html:not(.js) .picker-prev {
   color: var(--c-muted);
 }
 
-/* desktop (>= 1100 wide and >= 700 tall): the drawing takes the height it is given */
+/* desktop (>= 1100 wide and >= 700 tall): the drawing takes the height it is given (fold.css) */
 @media (--fold) {
   .picker-prev {
     min-height: 0;
     height: 100%;
-  }
-  .picker-art {
-    aspect-ratio: auto;
-    flex: 1;
-    min-height: 0;
   }
 }

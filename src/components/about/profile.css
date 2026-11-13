@@ -65,7 +65,7 @@
   text-transform: none;
 }
 /* desktop (>= 1100 wide and >= 700 tall): one screen tall, as a floor: words that need more room make it taller.
-   The picture takes what the words leave, down to its own floor, and asks for no room of its own (absolute) */
+   The picture takes what the words leave, down to its own floor (fold.css) */
 @media (--fold) {
   .profile {
     min-height: var(--fold-inner);
@@ -73,15 +73,6 @@
   }
   .profile-card {
     min-height: 0;
-  }
-  .profile-art {
-    aspect-ratio: auto;
-    flex: 1;
-    min-height: 12rem;
-  }
-  .profile-art img {
-    position: absolute;
-    inset: 0;
   }
   .profile-text {
     justify-content: center;

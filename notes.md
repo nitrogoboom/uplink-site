@@ -6,7 +6,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 
 Needs the owner's eyes on a preview:
 
-- [ ] One "fold with art" block for the pattern written five times; card grids that fit themselves (`repeat(auto-fit, minmax(min(100%, Nrem), 1fr))`).
 - [ ] Page changes: no crossfade, and Home fetches the other menu pages at once. Live since #172; look on the live site: tabs feel instant, nothing flashes.
 
 Layout and look:

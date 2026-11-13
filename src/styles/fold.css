@@ -38,6 +38,23 @@
   .split > .section-head {
     margin-bottom: 0;
   }
+  /* a picture that takes the room its section's words leave, down to a floor (--art-floor), and asks for none of its
+     own (the drawing is absolute): About's profile, Our work's cards, a service page's drawing */
+  :is(.profile-art, .work-grid .card-media, .picker-art) {
+    aspect-ratio: auto;
+    flex: 1;
+    min-height: var(--art-floor, 0);
+  }
+  :is(.profile-art, .work-grid .card-media, .picker-art) img {
+    position: absolute;
+    inset: 0;
+  }
+  .profile-art {
+    --art-floor: 12rem;
+  }
+  .work-grid {
+    --art-floor: 8rem;
+  }
 }
 
 /* ---------- shared: content after a section's main block ------------- */
