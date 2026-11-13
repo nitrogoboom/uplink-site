@@ -170,7 +170,7 @@ Controls sit on the 4px scale: `--tap` 44px, `--control-h` 48px, `--header-h` 64
 
 ### Checks
 
-`npm run lint` refuses raw lengths. After a spacing change, compare before and after by eye (the `check` skill).
+Nothing refuses a raw length; use the tokens. After a spacing change, compare before and after by eye (the `check` skill).
 
 ## Corners, boxes, and layout
 

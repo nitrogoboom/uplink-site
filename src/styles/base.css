@@ -154,7 +154,6 @@ a:hover {
   width: 1px;
   height: 1px;
   padding: 0;
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- the standard 1px clip, not spacing */
   margin: -1px;
   overflow: hidden;
   clip: rect(0 0 0 0);

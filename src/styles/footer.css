@@ -290,7 +290,6 @@ a.fc-cl:hover {
   padding-block: var(--sp-1);
 }
 .fc-cl--two svg {
-  /* stylelint-disable-next-line declaration-property-value-disallowed-list -- optical nudge: icon onto the first text line */
   margin-top: 0.15rem;
 }
 .fc-follow {
