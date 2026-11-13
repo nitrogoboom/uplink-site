@@ -64,7 +64,6 @@ Not Home, not setup. Leave these alone unless the owner asks.
 - [ ] GitHub environments (review H5): put the Cloudflare secrets in `production` and a preview token in `preview`, switch `site.yml` to them, delete `cloudflare`. See `docs/security.md`, "Secrets".
 - [ ] Cloudflare: a company account with 2FA. (Done November 13, 2026: the deploy token is an account token with only "Workers Scripts: Edit"; sign-in is Google, which has 2FA.)
 - [ ] Secrets: give each one an owner and a rotation date (`docs/security.md`, "Secrets").
-- [ ] Uptime check from outside Cloudflare, on the `workers.dev` address for now.
 - [ ] The repository is public "for now" (November 6, 2026); making it private turns the rulesets off unless the plan is GitHub Pro.
 - [ ] Finish the baseline in `docs/history/releases/2026-11-03.md`: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
 - [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.
