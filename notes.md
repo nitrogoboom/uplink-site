@@ -31,7 +31,6 @@ Content:
 
 The agent can do alone (each is its own pull request):
 
-- [ ] `site.yml`: the build fetches the whole git history only to date the sitemap (`src/lib/git-dates.mjs`).
 - [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 

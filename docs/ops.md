@@ -86,10 +86,6 @@ The Markdown copies stay out of search results after launch too. `scripts/header
 
 > **Note:** Each page takes two of Cloudflare's 100 `_headers` rules. `headers.mjs` stops the build past 100.
 
-The sitemap's `<lastmod>` dates and a case study's `datePublished` and `dateModified` come from git history (`src/lib/git-dates.mjs`). A static page dates from the files listed in `SOURCES` in `src/lib/site.ts`; a service or project page dates from its own JSON file.
-
-> **Note:** On a shallow clone, the build stops when `CI` is set; elsewhere it warns once and leaves the dates out. Run `git fetch --unshallow`. CI checks out with `fetch-depth: 0`.
-
 ## Password lock
 
 The password lock is off. `tools/site-lock/worker.js` holds `lock()`, which puts the whole site behind a browser password prompt.

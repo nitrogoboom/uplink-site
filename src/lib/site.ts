@@ -7,7 +7,6 @@ import { shipped } from '../../scripts/svgo-config.mjs';
 import { getCollection } from 'astro:content';
 import { MEDIA } from './media.js';
 import { byOrder } from '../content.config';
-import { entryFile, lastmod } from './git-dates.mjs';
 import { copy } from './copy';
 
 // Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
@@ -128,44 +127,9 @@ export const workFilterCss = async () =>
     )
     .join('\n');
 
-// The source files behind each static page, for lastmod (its copy file in src/data/copy/en/ included). Shared parts
-// (layout, header, footer, ui.yaml) are left out on purpose: a footer tweak is not a reason for a crawler to refetch
-// every page. A service or project page dates
-// from its own entry file alone (entryFile()), the date its JSON-LD carries too: editing one changes one URL.
-const SOURCES: Record<keyof typeof PAGES, string[]> = {
-  home: [
-    'src/pages/index.astro',
-    'src/components/home',
-    'src/data/copy/en/home.yaml',
-    'src/data/grow.json',
-    'src/content/services',
-    'src/content/projects',
-  ],
-  services: [
-    'src/pages/services.astro',
-    'src/components/services',
-    'src/data/copy/en/services.yaml',
-    'src/content/services',
-    'src/data/faq.json',
-  ],
-  work: ['src/pages/work.astro', 'src/components/work', 'src/data/copy/en/work.yaml', 'src/content/projects'],
-  about: ['src/pages/about.astro', 'src/components/about', 'src/data/copy/en/about.yaml', 'src/data/team.json'],
-  contact: [
-    'src/pages/contact.astro',
-    'src/components/contact',
-    'src/data/copy/en/contact.yaml',
-    'src/content/services',
-    'src/components/ServiceOptions.astro',
-  ],
-  privacy: ['src/pages/privacy.astro', 'src/data/privacy.md', 'src/data/copy/en/text-pages.yaml'],
-  accessibility: ['src/pages/accessibility.astro', 'src/data/accessibility.md', 'src/data/copy/en/text-pages.yaml'],
-};
+export type SitePage = { path: string; name: string; description: string };
 
-export type SitePage = { path: string; name: string; description: string; lastmod?: string };
-
-// Every indexable page: the seven in PAGES plus one per service and project, with a lastmod. A static page dates from
-// its SOURCES above; a service or project from its own entry file (lastmod() and entryFile() in git-dates.mjs, which
-// also refuses a shallow clone in CI).
+// Every indexable page: the seven in PAGES plus one per service and project.
 export async function allPages(): Promise<SitePage[]> {
   const services = await getServices();
   const projects = await getProjects();
@@ -174,20 +138,17 @@ export async function allPages(): Promise<SitePage[]> {
       (Object.keys(PAGES) as (keyof typeof PAGES)[]).map(async (k) => ({
         ...PAGES[k],
         description: (await pageMeta(k)).description,
-        lastmod: lastmod(SOURCES[k]),
       })),
     )),
     ...services.map(({ id, data: s }) => ({
       path: `/services/${id}`,
       name: s.title,
       description: s.card,
-      lastmod: lastmod([entryFile('services', id)]),
     })),
     ...projects.map(({ id, data: p }) => ({
       path: `/work/${id}`,
       name: p.name,
       description: `${p.client}. ${p.result}.`,
-      lastmod: lastmod([entryFile('projects', id)]),
     })),
   ];
 }
