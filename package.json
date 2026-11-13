@@ -18,6 +18,14 @@
   "engines": {
     "node": ">=24"
   },
+  "browserslist": [
+    "last 1 year and chrome > 0",
+    "last 1 year and edge > 0",
+    "last 1 year and firefox > 0",
+    "last 1 year and safari > 0",
+    "last 1 year and ios_saf > 0",
+    "firefox esr"
+  ],
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.6",
     "@playwright/test": "^1.64.1",

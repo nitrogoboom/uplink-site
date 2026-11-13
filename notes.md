@@ -32,10 +32,6 @@ Drawing generators (the owner directs drawing work):
 - [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
 - [ ] On Windows a generator writes CRLF line ends (found November 9, 2026): git puts them right on commit, but `prettier --check` fails on the working copy of `theme-drawings.css` until it's checked out again.
 
-Code and tools:
-
-- [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
-
 ## Parked until the owner says
 
 Not Home, not setup. Leave these alone unless the owner asks.
