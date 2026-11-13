@@ -67,9 +67,9 @@ The deploy job rolls back on its own when the live site fails the smoke check. R
 
 `public/_headers` sets the security headers on every static file, the cache rules, and the `Speculation-Rules` header. The Worker sets its own (see [The Worker](#the-worker)).
 
-The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `/api/` and to the `.md` and `.txt` copies are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
+The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `/api/` and to `.txt` files are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
 
-`public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert, `X-Build`, an Early Hints `Link` rule for each page, and a rule for each Markdown copy. Don't paste a hash in by hand.
+`public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert, `X-Build`, and an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
 
 - **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
 - **Trusted Types.** A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`.
@@ -82,9 +82,7 @@ Every control and how to check it: [`security.md`](security.md).
 
 `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
 
-The Markdown copies stay out of search results after launch too. `scripts/headers.mjs` gives each `.md` file its own rule in `dist/_headers`, with `X-Robots-Tag: noindex` and a `Link: <PAGE>; rel="canonical"` header taken from the page's own canonical link. `/agents.md` has no page, so it gets the `noindex` only. Keep this `noindex` at launch.
-
-> **Note:** Each page takes two of Cloudflare's 100 `_headers` rules. `headers.mjs` stops the build past 100.
+> **Note:** Each page takes one of Cloudflare's 100 `_headers` rules. `headers.mjs` stops the build past 100.
 
 ## Password lock
 

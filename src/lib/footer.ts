@@ -3,8 +3,8 @@
 // doesn't name, an icon <Icon> doesn't have or a panel pointing at a spot that isn't there stops the build, with
 // the field's path in the message.
 //   footer        the whole file, typed
-//   PLACEHOLDERS  the values for {privacy} {accessibility} {phone} {tel} {email} {street} {city} {hours} in the
-//                 Markdown copy (src/data/*.md; placeholders.mjs fills them)
+//   PLACEHOLDERS  the values for {privacy} {accessibility} {phone} {tel} {email} {street} {city} {hours} in
+//                 src/data/*.md (placeholders.mjs fills them)
 // A heading is `title` plus an `accent` word, shown as "title <em>accent</em>", so the JSON holds no HTML.
 import { z } from 'astro/zod';
 import raw from '../data/footer.json';

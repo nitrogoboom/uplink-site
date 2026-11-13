@@ -25,7 +25,6 @@
     "esbuild": "^0.28.2",
     "postcss-custom-media": "^12.0.3",
     "svgo": "^4.1.0",
-    "turndown": "^7.2.5",
     "wrangler": "^4.158.0"
   },
   "devDependencies": {

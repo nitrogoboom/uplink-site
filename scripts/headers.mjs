@@ -1,6 +1,6 @@
 // Finishes dist/_headers from the public/_headers template, the build's last step (astro.config.mjs runs it): the script
-// and style hashes, the Early Hints and Markdown-copy rules, X-Build, and dist/_redirects (308s). docs/ops.md,
-// "Response headers", "Search engines" and "Deploys". Each part's details sit beside its code below.
+// and style hashes, the Early Hints rules, X-Build, and dist/_redirects (308s). docs/ops.md, "Response headers"
+// and "Deploys". Each part's details sit beside its code below.
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -24,13 +24,11 @@ export function headers(DIST) {
   const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
   const pages = [];
-  const copies = [];
   const walk = (dir) => {
     for (const name of readdirSync(dir)) {
       const p = join(dir, name);
       if (statSync(p).isDirectory()) walk(p);
       else if (name.endsWith('.html')) pages.push(p);
-      else if (name.endsWith('.md')) copies.push(p);
     }
   };
   walk(DIST);
@@ -77,26 +75,6 @@ export function headers(DIST) {
     .sort();
   const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
 
-  // A copy is never what a search should show, so its noindex stays after launch, when the site-wide one comes off
-  // (review M4). A .md with no page beside it (agents.md) gets the noindex only; a page with no canonical stops the build.
-  // each Markdown copy: services.md names services.html's canonical, index.md names index.html's (home, /)
-  const markdown = copies
-    .map((f) => {
-      const md = relative(DIST, f).split(sep).join('/');
-      const page = md.replace(/\.md$/, '.html');
-      let canonical = null; // no page beside it (agents.md): noindex only
-      try {
-        canonical = readFileSync(join(DIST, page), 'utf-8').match(/<link rel="canonical" href="([^"]+)"/)?.[1];
-      } catch {
-        /* stays null */
-      }
-      if (canonical === undefined)
-        throw new Error(`${md}: its page ${page} has no <link rel="canonical">, so the copy can't name it`);
-      return `/${md}\n  X-Robots-Tag: noindex\n${canonical ? `  Link: <${canonical}>; rel="canonical"\n` : ''}`;
-    })
-    .sort()
-    .join('');
-
   // Cloudflare's own html_handling sends most of these spellings as 307 (temporary), which caches and crawlers don't
   // keep; a _redirects line wins over it.
   // every page, plus /404 (served at its own name too, by the Worker): its trailing-slash, .html and index spellings
@@ -115,18 +93,16 @@ export function headers(DIST) {
     !src.includes('{script-hashes}') ||
     !src.includes('{style-hashes}') ||
     !src.includes('{build}') ||
-    !block('early-hints').test(src) ||
-    !block('markdown-copies').test(src)
+    !block('early-hints').test(src)
   ) {
     throw new Error(
-      'public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} placeholder, and the @early-hints and @markdown-copies blocks',
+      'public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} placeholder, and the @early-hints block',
     );
   }
   const filled = src
     .replaceAll('{script-hashes}', [...hashes].join(' '))
     .replaceAll('{style-hashes}', [...styles].join(' '))
-    .replace(block('early-hints'), (_, start, end) => start + hints + end)
-    .replace(block('markdown-copies'), (_, start, end) => start + markdown + end);
+    .replace(block('early-hints'), (_, start, end) => start + hints + end);
 
   // the build's ID (X-Build): every file in dist/ but _headers, the headers as they ship, and the Worker. A change to
   // any of them, a header or the Worker alone included, gives a new ID; scripts/deploy.mjs reads it to tell which build
@@ -154,7 +130,7 @@ export function headers(DIST) {
   if (rules > 100 || longest > 2000)
     throw new Error(`_headers over Cloudflare's limits: ${rules} rules (max 100), longest line ${longest} (max 2000)`);
   console.log(
-    `_headers: build ${build}, ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${copies.length} Markdown copies, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`,
+    `_headers: build ${build}, ${hashes.size} script hash(es), ${styles.size} style hash(es), Early Hints for ${paths.length} pages, ${rules} rules, longest line ${longest}; _redirects: ${redirects.length} lines`,
   );
 }
 

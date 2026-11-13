@@ -45,8 +45,6 @@ const {
   footer = true,
 } = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
-// the page's Markdown copy, for AI agents (scripts/markdown.mjs writes it; Home's is src/data/index.md)
-const markdown = path === undefined ? null : new URL(path === '/' ? '/index.md' : `${path}.md`, Astro.site).href;
 const ogImage = new URL('/assets/img/og.png', Astro.site).href;
 const business = { '@id': `${Astro.site!.href}#business` };
 const name = title.split(' · ')[0];
@@ -90,7 +88,6 @@ const ui = await copy('ui');
     <meta name="description" content={description} />
     {robots && <meta name="robots" content={robots} />}
     {canonical && <link rel="canonical" href={canonical} />}
-    {markdown && <link rel="alternate" type="text/markdown" href={markdown} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

@@ -27,7 +27,11 @@
   .copy-btn,
   .btn[data-open],
   button[data-open],
-  [data-md-skip] {
+  .lobby-queue > .row,
+  .queue-ring,
+  .grow-nav,
+  .svc-hint,
+  .work-layout .filters {
     display: none !important;
   }
   /* nothing is a screen tall. A page printed scaled down is laid out wide enough for the desktop rules, where

@@ -76,7 +76,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 ### Launch (about an hour)
 
 1. **Owner:** add `DOMAIN` as a Cloudflare zone, change nameservers, wait for Active.
-2. **Owner:** Full (strict), Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints on; Auto Minify and Rocket Loader off (they break CSP hashes); Browser Integrity Check mustn't block `llms.txt` and `.md` readers; DNSSEC on with the DS record.
+2. **Owner:** Full (strict), Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints on; Auto Minify and Rocket Loader off (they break CSP hashes); DNSSEC on with the DS record.
 3. **Owner:** from the `launch` branch, `npx wrangler triggers deploy` (CI doesn't apply routes). `curl -sI` the PR preview for a Cloudflare `X-Robots-Tag`.
 4. **Owner:** custom domain Active with a certificate.
 5. **Claude:** merge; read the deploy summary.
