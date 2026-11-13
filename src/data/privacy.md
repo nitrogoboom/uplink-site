@@ -3,7 +3,6 @@
 - This page is about this website only: what it collects, who handles it, and how long it's kept.
 - The site sets no cookies. It doesn't follow you around the web, show ads, or sell anything about you.
 - Our host, Cloudflare, sees each visit (your IP address, your browser, and the page you asked for) so it can deliver the page and keep the site safe.
-- We count visits and page speed with Cloudflare Web Analytics, which also uses no cookies.
 - Our forms don't send anything yet. When they do, what you type will reach us by email and nowhere else.
 - Questions? Write to [{privacy}](mailto:{privacy}).
 
@@ -28,14 +27,6 @@ Every visit goes through Cloudflare, the company that hosts our site. To send yo
 - the address you asked for, and the page that sent you here, if your browser shares it
 
 We use this to deliver the site, keep it running, and protect it from attacks. We don't use it to find out who you are.
-
-### Visits and page speed
-
-Once a page has loaded, it runs Cloudflare Web Analytics. It tells us which pages people read, roughly which country they're in, what browsers and devices they use, which sites sent them, and how quickly the page loaded.
-
-It uses no cookies and stores nothing on your device. Cloudflare says it doesn't use your IP address or any other detail to follow you over time or across sites. We only ever see totals, never individual visitors.
-
-If an ad blocker or content blocker stops it, that's fine. The site works the same either way.
 
 ### Error reports
 
@@ -103,7 +94,7 @@ Every issue will say who it's from, include our contact details, and have an uns
 
 ## Who handles your data, and where
 
-Cloudflare, Inc. hosts this site and runs our analytics. Once the forms work, it will also run the bot check and send our form emails. Cloudflare works for us, under its own privacy and security terms.
+Cloudflare, Inc. hosts this site. Once the forms work, it will also run the bot check and send our form emails. Cloudflare works for us, under its own privacy and security terms.
 
 Cloudflare is a US company with servers in many countries. That means a visit may be handled outside Canada, and Cloudflare stores data mainly in the United States and the European Union. While your data is in another country, that country's laws apply, and its courts, police, or security agencies may be able to get it. We stay responsible for your personal information while Cloudflare handles it for us.
 
@@ -114,7 +105,6 @@ We don't share personal information with anyone else, unless the law requires it
 | What | Who holds it | How long |
 | --- | --- | --- |
 | Visit details (IP address, browser, page) | Cloudflare | As long as Cloudflare needs them to run and protect its network |
-| Visits and page speed | Cloudflare Web Analytics | Full detail for 7 days, then only as totals |
 | Error reports and our site's logs | Cloudflare, for us | Up to 7 days |
 | Form messages, once forms send | Our email | Until we no longer need them to help you |
 | Newsletter address and sign-up record, once it starts | Us | Until you unsubscribe, plus the record that you agreed |
@@ -122,7 +112,7 @@ We don't share personal information with anyone else, unless the law requires it
 
 ## How we protect it
 
-The site only works over a secure, encrypted connection (HTTPS). The only code it runs from another company is Cloudflare's analytics, plus its bot check once the forms work. Once the forms send, only a few people at Uplink will be able to open the inbox where form messages arrive.
+The site only works over a secure, encrypted connection (HTTPS). It runs no code from another company, except Cloudflare's bot check once the forms work. Once the forms send, only a few people at Uplink will be able to open the inbox where form messages arrive.
 
 ## Your choices and rights
 
@@ -131,7 +121,7 @@ The site only works over a secure, encrypted connection (HTTPS). The only code i
 - **Change your mind.** You can take back your consent at any time, for example by unsubscribing from the newsletter. If that means we can't do something you asked for, we'll tell you.
 - **Ask a question or make a complaint.** Write to our Privacy Officer at [{privacy}](mailto:{privacy}). We'll look into it and tell you what we found.
 
-You can also block our analytics with your browser or a content blocker, and clear your saved settings at any time. The site still works.
+You can also clear your saved settings at any time. The site still works.
 
 If you're not happy with our answer, you can complain to the Office of the Privacy Commissioner of Canada:
 

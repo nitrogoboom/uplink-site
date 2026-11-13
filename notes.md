@@ -28,7 +28,6 @@ Content:
 
 The agent can do alone (each is its own pull request):
 
-- [ ] Check that Dependabot's Actions group (a wildcard) still waits out its cooldown.
 - [ ] Menu names ("Home", "Our work" …) are still in `PAGES` in `src/lib/site.ts`; they move to the YAML copy files before French.
 
 Drawing generators (the owner directs drawing work):
@@ -41,11 +40,6 @@ Drawing generators (the owner directs drawing work):
 Code and tools:
 
 - [ ] Browsers: write the support list (`browserslist`) and check `:has()`, `@view-transition` and `text-wrap` fall back cleanly.
-- [ ] After a Dependabot bump of `wrangler` or `esbuild`: set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns, and npm 12 won't run their install scripts.
-- [ ] TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
-- [ ] `wrangler dev` kept serving the `_headers` it started with after a rebuild (November 9, 2026: stale X-Build and CSP hashes, so new inline styles were blocked); restart it after a build, or find why, and say so in README.
-- [ ] Smoke from a cloud session needs the site's host allowed and `NODE_USE_ENV_PROXY=1`; the `http://` redirect check runs only from a normal machine.
-- [ ] Small, left as they are: `gen_campus.py` keeps its own `box()`; `ServiceCard`'s `on`/`first`/`heading` props have one caller.
 
 ## Parked until the owner says
 
@@ -94,7 +88,6 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 - [ ] Logo: the header's wordmark has no light-ground file in this repository (`docs/design.md`, "Logo").
 - [ ] Optional: on service pages "What's included" and "Best for" are h2s; they could be h3s or a label (`ServiceCard.astro` says h2 is on purpose).
 - [ ] Idea, not planned: the office fire drill.
-- [ ] Small, left as they are: Home-only hero rules in `compact-cuts.css`; the services observer runs at 700px and up; JSON-LD is pretty-printed.
 
 ### Real devices
 

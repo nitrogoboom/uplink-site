@@ -20,9 +20,9 @@ The owner doesn't run commands. You run each step, and hand over only the parts 
 
    `python tools/regen.py --check` needs the Python tools (docs/drawing-tools.md, "Install the Python drawing tools"). `git diff` must be empty after it.
 
-2. Do the looks in the `check` skill on the pull request's preview, every page. "Before and after" against the live site comes first: tell the owner which pages changed, in plain words, and make sure each change is meant.
+2. Do the looks in the `check` skill on the local site, every page. "Before and after" against the live site comes first: tell the owner which pages changed, in plain words, and make sure each change is meant.
 
-## Merge and tag
+## Push and tag
 
 Follow `docs/release.md`, "Ship a release", steps 1 to 4. Read the deploy job's summary before you tag: it names the version that went live, or says why nothing did. A failed live check rolls back by itself; anything else is in `docs/ops.md`, "Roll back a bad deploy".
 
@@ -39,4 +39,4 @@ Follow `docs/release.md`, "Ship a release", steps 1 to 4. Read the deploy job's 
 
 ## When something here is wrong
 
-`docs/release.md` and the code win over this file. Fix this file in the same pull request.
+`docs/release.md` and the code win over this file. Fix this file in the same commit.

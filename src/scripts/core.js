@@ -99,15 +99,9 @@ const store = {
 /* ---------- Trusted Types ---------------------------------------------- */
 // The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like).
 // Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
-// The one script it may load from elsewhere is the analytics beacon (BEACON, below).
-const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
 const ttPolicy = window.trustedTypes
   ? window.trustedTypes.createPolicy('uplink', {
       createHTML: (/** @type {string} */ s) => s,
-      createScriptURL: (/** @type {string} */ u) => {
-        if (u === BEACON) return u;
-        throw new TypeError('script not allowed: ' + u);
-      },
     })
   : null;
 /** @type {(s: string) => string} */
@@ -565,30 +559,6 @@ document.addEventListener(
 /** @type {HTMLImageElement[]} */ ($$('img')).forEach((img) => {
   if (img.complete && !img.naturalWidth) img.decode().catch(() => broken(img));
 });
-
-/* ---------- Cloudflare Web Analytics ----------------------------------- */
-// Real visitors' load speed (LCP, CLS, INP), no cookies. The beacon goes in after the page has loaded and
-// the browser is idle, so it never competes with the first screen (Cloudflare's own injection put it in the
-// HTML, which cost the phone score). It still reads the timings the browser kept from the start.
-// Only the live address reports: Cloudflare refuses others, so the beacon loads only where the page's
-// canonical host is the one it is served from (not on previews or localhost; soon and 404 have no canonical).
-// Not in a browser driven by a test (navigator.webdriver): our own checks after each deploy were about 140 of a
-// page's visits a week in Web Analytics.
-const BEACON_TOKEN = '70d8bac3e0604a3cb29757cef206b053'; // public site token: Cloudflare Web Analytics > Manage site (registered for the old pages.dev host; docs/release.md, "Launch day")
-const startBeacon = () => {
-  if (navigator.webdriver) return;
-  const canon = /** @type {HTMLLinkElement | null} */ ($('link[rel="canonical"]'));
-  if (!canon || new URL(canon.href).hostname !== window.location.hostname) return;
-  const s = document.createElement('script');
-  s.defer = true;
-  s.setAttribute('data-cf-beacon', JSON.stringify({ token: BEACON_TOKEN }));
-  s.src = ttPolicy ? ttPolicy.createScriptURL(BEACON) : BEACON;
-  document.body.append(s);
-};
-const whenIdle = (/** @type {() => void} */ fn) =>
-  'requestIdleCallback' in window ? window.requestIdleCallback(fn, { timeout: 4000 }) : setTimeout(fn, 1500);
-if (document.readyState === 'complete') whenIdle(startBeacon);
-else window.addEventListener('load', () => whenIdle(startBeacon), { once: true });
 
 /* ---------- shared with the page scripts ------------------------------ */
 export { $, $$, UI, held, html, reduceMotion, replay, settle, theme, toast, whenOnScreen, words };

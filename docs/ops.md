@@ -46,6 +46,11 @@ Secrets, in the `cloudflare` environment: `CLOUDFLARE_API_TOKEN` ("Workers Scrip
 
 > **Note:** With no live version to roll back to, or when `wrangler deployments status` fails, the script stops. Deploy by hand: `npm run build`, then `npx wrangler deploy`.
 
+## Dependency notes
+
+- After Dependabot bumps `wrangler` or `esbuild`, set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns and npm 12 won't run their install scripts.
+- TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
+
 ## Repository rules
 
 Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):

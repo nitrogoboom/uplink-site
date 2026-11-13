@@ -1,19 +1,19 @@
 # Release and launch
 
-Only for a release or the launch. A release is the first launch, or later a change to layout, navigation, forms, or a new page; run the checklist at least every three months anyway.
+Only for the launch, or a release the owner asks for.
 
 Standards: WCAG 2.2 AA (Ontario requires 2.0 AA at 50+ employees, O. Reg. 191/11 s. 14), PIPEDA and CASL, the headers in [`security.md`](security.md), current Chrome, Edge, Firefox and Safari (older browsers get a working page), PageSpeed 100 on Home, `lang="en-CA"`.
 
 ## Ship a release
 
-1. Do the looks in the `check` skill on the PR preview, every page: before and after (against the live site), browser compatibility, accessibility, large text, print, links. Confirm each change you see was meant.
-2. Merge. Read the deploy summary: it names the live version or says why not. Rollback: [ops.md](ops.md#roll-back-a-bad-deploy).
+1. Do the looks in the `check` skill on the local site (`astro` dev server, or `npm run build` and `npm run serve`), every page: before and after (against the live site), browser compatibility, accessibility, large text, print, links. Confirm each change you see was meant.
+2. When the owner says push: push to `main` (`CLAUDE.md`, "Check, ship"). Read the deploy summary: it names the live version or says why not. Rollback: [ops.md](ops.md#roll-back-a-bad-deploy).
 3. Run the checklist below; the filled-in result goes in the release report to the owner, not a saved file.
 4. Tag: `git tag -a vYYYY.MM.DD COMMIT -m "SUMMARY"`, `git push origin vYYYY.MM.DD`, `gh release create vYYYY.MM.DD` (a few lines).
 
 ## Release checklist
 
-On the PR preview or the live site. About 25 minutes. Proof: one line per failure (page, problem, WCAG number).
+On the live site. About 25 minutes. Proof: one line per failure (page, problem, WCAG number).
 
 **Release:** date `____` · commit `____` · checked by `____`
 
@@ -38,12 +38,13 @@ On the PR preview or the live site. About 25 minutes. Proof: one line per failur
 
 ## Watch the live site
 
-Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web Analytics; an uptime check (to set up); Dependabot monthly, merge on green.
+Workers logs (3 days) for `/api/report` lines after each deploy; Dependabot monthly, merge on green.
 
 ## Before launch
 
 **(you)** needs a person or sign-in, **(domain)** the domain, **(content)** real copy. Tick with date and proof.
 
+- [ ] **(you)** Add Cloudflare Web Analytics for `DOMAIN`: the beacon in `core.js` (a Trusted Types `createScriptURL` for it), its two hosts in the CSP (`public/_headers`), and the analytics lines on the privacy page. All three were removed November 13, 2026; `git log -S BEACON_TOKEN` finds the old code.
 - [ ] **(you)** Decide what gets a test: the "Set in stone" list in `CLAUDE.md`. Until then the repo has none but the deploy's smoke check.
 - [ ] Narrow the Trusted Types policy: `html()` in `core.js` accepts only the site's own drawings and icons (review J6).
 - [ ] One cached stylesheet instead of inlined CSS per page (review L4); hashed drawing file names (L5).
@@ -83,8 +84,7 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Cloudflare Web 
 6. **Claude:** `npm run smoke -- https://DOMAIN --launch`; Early Hints 103 with `curl -I --http2`.
 7. Retire the old address. A: turn `workers.dev` off, leave Preview URLs on, check a PR preview still works. B: `npm run smoke -- https://DOMAIN --launch --old https://uplink-site.johnoreilly.workers.dev`.
 8. **Owner:** no-mail DNS: CAA, SPF `v=spf1 -all`, DMARC `p=reject`, null MX.
-9. **Owner:** Web Analytics for `DOMAIN` (token for `core.js`); drop the "old pages.dev host" remarks in `core.js` and `security.md`.
-10. **Claude:** `npm run smoke -- https://DOMAIN --launch`; open three pages and watch the console.
+9. **Claude:** `npm run smoke -- https://DOMAIN --launch`; open three pages and watch the console.
 
 ### After launch
 

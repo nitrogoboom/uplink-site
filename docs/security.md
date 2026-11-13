@@ -1,6 +1,6 @@
 # Security, privacy, and secrets
 
-Controls, and every secret (names and places, never values). Reporting: [`SECURITY.md`](../SECURITY.md). The site is static; the Worker runs only for `/api/*`, `/404` and missing addresses. No accounts, no database, no third-party script but Cloudflare Web Analytics. Targets: PIPEDA and CASL, OWASP headers (Observatory A+), RFC 9116 `security.txt` (expires a year after the build: rebuild yearly).
+Controls, and every secret (names and places, never values). Reporting: [`SECURITY.md`](../SECURITY.md). The site is static; the Worker runs only for `/api/*`, `/404` and missing addresses. No accounts, no database, no third-party script (analytics come back at launch: `release.md`, "Before launch"). Targets: PIPEDA and CASL, OWASP headers (Observatory A+), RFC 9116 `security.txt` (expires a year after the build: rebuild yearly).
 
 ## Security controls
 
@@ -14,8 +14,8 @@ Controls, and every secret (names and places, never values). Reporting: [`SECURI
 No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. `public/_headers` is the template; `scripts/headers.mjs` fills in the hashes at build. Its shape:
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-…';
-  style-src 'self' 'sha256-…'; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com;
+Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-…';
+  style-src 'self' 'sha256-…'; font-src 'self' data:; img-src 'self' data:; connect-src 'self';
   form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';
   require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
 ```
@@ -27,14 +27,14 @@ Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cl
 
 ### Trusted Types
 
-The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own text and drawings. Its `createScriptURL` allows only the analytics beacon.
+The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own text and drawings. It allows no script URLs.
 
 ### Other headers
 
 `public/_headers` sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`, `Cross-Origin-Opener-Policy: same-origin`, and `Cross-Origin-Resource-Policy: same-origin` (`og.png` is `cross-origin`).
 
 - The Worker's own responses don't get `_headers` ([`ops.md`](ops.md#the-worker)).
-- Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (the smoke check fails if it comes back) and `Cross-Origin-Embedder-Policy` (it could block the analytics script).
+- Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (the smoke check fails if it comes back) and `Cross-Origin-Embedder-Policy` (it could block an outside script added later, such as analytics).
 
 ### Reports from browsers
 
@@ -53,19 +53,18 @@ Actions pinned to commits, zizmor on every run, Dependabot monthly (`.github/dep
 
 ## Privacy
 
-- **No cookies, no tracking.** Cloudflare Web Analytics uses no cookies. Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
+- **No cookies, no tracking.** Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
 - **What a report holds:** the page address without its query string, the error message, the script address and line, and the user agent cut to 200 characters; a CSP report also the blocked address (no query) and the directive. Never anything a visitor typed. Cloudflare keeps its own request log, IP included, for up to three days; the privacy page says so.
-- **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same pull request.
+- **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same commit.
 
 ## Secrets
 
-Keep secrets in GitHub environments, Worker secrets, or `.dev.vars` (ignored by git). Never put one in the repository, a page, a pull request, or a chat. When you add or move a secret, update this table in the same pull request.
+Keep secrets in GitHub environments, Worker secrets, or `.dev.vars` (ignored by git). Never put one in the repository, a page, a pull request, or a chat. When you add or move a secret, update this table in the same commit.
 
 | Name | What it does | Where it's kept | Used by | How to change it |
 | --- | --- | --- | --- | --- |
 | `CLOUDFLARE_API_TOKEN` | Deploys the Worker and uploads previews. An account token, "uplink-site deploy (GitHub)", with only "Workers Scripts: Edit" (made November 13, 2026; a copy in the owner's 1Password). | GitHub > Settings > Environments > `cloudflare` | `site.yml` (deploy, preview) | Cloudflare > Manage account > Account API tokens: make a new one, save it in 1Password, paste it in, run a deploy, then delete the old one. |
 | `CLOUDFLARE_ACCOUNT_ID` | Which Cloudflare account. Not secret. | The same environment | The same jobs | Only if the site moves account. |
-| Web Analytics token | Which site the beacon reports for. Public by design. | `BEACON_TOKEN` in `src/scripts/core.js` | Every page | Cloudflare > Web Analytics > the site > Manage site. Registered for the old `pages.dev` host. |
 | Your sign-ins | The GitHub and Cloudflare accounts that own the repository and Worker. | Your password manager, with 2FA | Everything | Move to a company account with 2FA (`notes.md`). |
 
 Planned, with the forms in [PR #38](https://github.com/nitrogoboom/uplink-site/pull/38) (open, paused):

@@ -57,7 +57,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | --- | --- |
 | `npm run dev` | Starts the development server at http://localhost:4321. |
 | `npm run build` | Builds the site into `dist/`. Its last step (`astro:build:done` in `astro.config.mjs`) shrinks the drawings and writes `dist/_headers` and `dist/_redirects`. |
-| `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). |
+| `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). Restart it after a rebuild: it keeps serving the `_headers` it started with. |
 | `npm run preview` | Astro's own preview server. No headers or redirects: use `npm run serve`. |
 | `npm run check` | Type check and Astro's diagnostics for `src/`. The build scripts and the Worker aren't type-checked. |
 | `npm run lint` | ESLint, Stylelint, and Prettier. |
@@ -78,7 +78,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | `worker/index.js` | The Worker script ([`docs/ops.md`](docs/ops.md#the-worker)). |
 | `wrangler.jsonc` | The Cloudflare Worker configuration. |
 | `.github/workflows/site.yml` | CI and deploys. |
-| `docs/` | The docs above, and `history/` (records). |
+| `docs/` | The docs above. |
 
 ### Links and addresses
 

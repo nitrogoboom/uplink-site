@@ -8,8 +8,7 @@
 # style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
 # writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
 # font-src allows data: because each SVG carries its own letters as a data: font.
-# static.cloudflareinsights.com (script) and cloudflareinsights.com (connect): Cloudflare Web Analytics. core.js
-# loads the beacon after the page has loaded (Cloudflare's own injection, uplink-site > Metrics, stays off). No cookies.
+# No outside script or connection: the site loads nothing from another host.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (its html() helper). A new innerHTML elsewhere fails until it goes through it.
 # Reporting-Endpoints / report-to csp (and report-uri for browsers without the Reporting API): every CSP block a
@@ -35,7 +34,7 @@
   Reporting-Endpoints: csp="/api/report"
   Speculation-Rules: "/speculation-rules.json"
   X-Build: {build}
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
+  Content-Security-Policy: default-src 'self'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
 # first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
