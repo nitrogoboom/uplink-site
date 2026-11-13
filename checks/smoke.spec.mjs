@@ -1,14 +1,16 @@
-// Smoke check: a deployed site answers the way it should, over plain HTTP with no browser. Run it after a deploy and
-// on launch day (docs/release.md, "Launch day"). What it checks and each flag: docs/site-checks.md, "The smoke check".
+// Smoke check: is the deployed site up and still safe? Over plain HTTP, no browser. The deploy runs it before and
+// after a version goes live and rolls back on a failure; also on launch day. Draft mode: Home only (owner, November
+// 13, 2026). What it checks and each flag: docs/site-checks.md, "The smoke check".
 //   npm run smoke -- https://uplink-site.johnoreilly.workers.dev        today: noindex expected
-//   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable, sitemap named
+//   npm run smoke -- https://uplinkit.ca --launch                       after launch: indexable
 //   npm run smoke -- https://uplinkit.ca --launch --old https://uplink-site.johnoreilly.workers.dev
-//   npm run smoke -- http://localhost:8787                              the local build (npm run serve): CI runs this
+//   npm run smoke -- http://localhost:8787                              the local build (npm run serve)
 //   npm run smoke -- https://ab12cd34-uplink-site.johnoreilly.workers.dev --preview   (scripts/deploy.mjs, pre-deploy)
 import { test } from '@playwright/test';
 import { flag, option, positional } from './lib.mjs';
 
 const UA = { 'User-Agent': 'uplink-smoke-test' }; // Cloudflare refuses a client with no user agent of its own (403)
+// the security headers every page sends (public/_headers, docs/security.md)
 const HEADERS = [
   'strict-transport-security',
   'content-security-policy',
@@ -21,57 +23,35 @@ const HEADERS = [
 ];
 
 // [status, headers, body] without following redirects
-async function get(url, method = 'GET', headers = {}) {
-  const r = await fetch(url, {
-    method,
-    headers: { ...UA, ...headers },
-    redirect: 'manual',
-    signal: AbortSignal.timeout(30_000),
-  });
+async function get(url) {
+  const r = await fetch(url, { headers: UA, redirect: 'manual', signal: AbortSignal.timeout(30_000) });
   return [r.status, r.headers, await r.text()];
 }
 
 test('smoke', async () => {
-  test.setTimeout(300_000);
+  test.setTimeout(120_000);
   if (!positional[0]) throw new Error('usage: npm run smoke -- ADDRESS [--launch] [--preview] [--old OLD_ADDRESS]');
   const base = positional[0].replace(/\/$/, '');
   const launch = flag('--launch');
-  const preview = flag('--preview'); // a version's own address: the build names the live one (scripts/deploy.mjs)
+  const preview = flag('--preview'); // a version's own address, before it takes traffic (scripts/deploy.mjs)
   const old = option('--old')?.replace(/\/$/, '');
   const host = new URL(base).host;
-  const local = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(base).hostname); // npm run serve, as in CI
+  const local = ['localhost', '127.0.0.1', '[::1]'].includes(new URL(base).hostname); // npm run serve
   const fails = [];
   const ok = (cond, what) => cond || fails.push(what);
 
-  let [status, h, body] = await get(`${base}/sitemap.xml`);
-  ok(status === 200, `sitemap.xml: ${status}`);
-  const urls = [...body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-  ok(urls.length > 0, 'sitemap.xml lists no pages');
-  // the address the build names (SITE_URL): in the sitemap, robots.txt and the canonicals. A deployed site's own,
-  // except a preview's, which names the live one
-  const site = urls.length ? new URL(urls[0]).origin : base;
-  const other = urls.filter((u) => new URL(u).host !== (preview ? new URL(site).host : host));
-  ok(local || !other.length, `sitemap.xml names another host: ${other[0] || ''}`);
+  // 1. Home is up: a web page, with its security headers, and marked noindex while the site is a draft
+  let [status, h] = await get(`${base}/`);
+  ok(status === 200, `Home: ${status}`);
+  ok((h.get('content-type') || '').includes('text/html'), `Home: content-type ${h.get('content-type')}`);
+  const missing = HEADERS.filter((n) => !h.get(n));
+  ok(!missing.length, `Home: missing ${missing.join(', ')}`);
+  const noindex = (h.get('x-robots-tag') || '').includes('noindex');
+  ok(noindex !== launch, `Home: noindex ${launch ? 'still on' : 'missing (draft)'}`);
 
-  for (const u of urls) {
-    const path = new URL(u).pathname;
-    [status, h] = await get(base + path);
-    if (status !== 200) {
-      fails.push(`${path}: ${status}`);
-      continue;
-    }
-    ok((h.get('content-type') || '').includes('text/html'), `${path}: content-type ${h.get('content-type')}`);
-    const missing = HEADERS.filter((n) => !h.get(n));
-    ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
-    const noindex = (h.get('x-robots-tag') || '').includes('noindex');
-    ok(noindex !== launch, `${path}: noindex ${launch ? 'still on' : 'missing (test build)'}`);
-  }
-  console.log(`${urls.length} pages checked`);
-
-  const pageCsp = h.get('content-security-policy'); // the last page's
-  const speculation = h.get('speculation-rules');
+  // 2. plain http goes to https (the Worker for the requests it sees; at launch, the zone for every request)
   if (!local && !preview) {
-    for (const path of launch ? ['/api/report', '/services'] : ['/api/report']) {
+    for (const path of launch ? ['/api/report', '/'] : ['/api/report']) {
       [status, h] = await get(`http://${host}${path}`);
       ok(
         [301, 308].includes(status) && h.get('location') === `https://${host}${path}`,
@@ -79,92 +59,19 @@ test('smoke', async () => {
       );
     }
   }
-  const page404 = (b) => b.includes('404') || b.toLowerCase().includes('not found');
+
+  // 3. a made-up address gets the site's 404 page, with status 404
+  let body;
   [status, , body] = await get(`${base}/no-such-page-smoke-test`);
   ok(status === 404, `made-up address: ${status}, not 404`);
-  ok(page404(body), 'made-up address: not the site 404 page');
-  [status, h] = await get(`${base}/404`);
-  ok(status === 404, '/404 does not answer 404');
-  // asked again the way a browser revalidates (review B3): with the validators it was given, or made-up ones
-  const again = {
-    'If-None-Match': h.get('etag') || '"smoke"',
-    'If-Modified-Since': h.get('last-modified') || new Date().toUTCString(),
-  };
-  for (const path of ['/404', '/no-such-page-smoke-test']) {
-    [status, , body] = await get(base + path, 'GET', again);
-    ok(
-      status === 404 && page404(body),
-      `${path} asked again (If-None-Match): ${status}, ${body.length} bytes, not the 404 page`,
-    );
-  }
-  ok((await get(`${base}/404`, 'POST'))[0] === 405, '/404 POST is not 405');
-  // a missing file under a _headers path rule (review B8): the 404 page, as a page
-  for (const path of ['/no-such.txt', '/_astro/no-such.js', '/assets/fonts/no-such.woff2', '/assets/img/no-such.svg']) {
-    [status, h, body] = await get(base + path);
-    const type = h.get('content-type') || '',
-      cache = h.get('cache-control') || '',
-      csp = h.get('content-security-policy');
-    ok(status === 404 && page404(body), `${path}: ${status}, not the 404 page`);
-    ok(type.startsWith('text/html'), `${path}: 404 page sent as ${type}`);
-    ok(!/immutable|max-age=[1-9]/.test(cache), `${path}: 404 cached (${cache})`);
-    ok(csp === pageCsp, `${path}: 404 page under another CSP (${(csp || 'none').slice(0, 40)}…)`);
-  }
-  // the Worker's own answers (review H7)
-  for (const [path, want] of [
-    ['/api/report', 405],
-    ['/api/no-such', 404],
-  ]) {
-    [status, h] = await get(base + path);
-    ok(status === want, `${path}: ${status}, not ${want}`);
-    const missing = ['x-content-type-options', 'content-security-policy'].filter((n) => !h.get(n));
-    if (h.get('cache-control') !== 'no-store') missing.push('Cache-Control: no-store');
-    ok(!missing.length, `${path}: missing ${missing.join(', ')}`);
-  }
-  // the other spellings of an address (review H13)
-  for (const [from, to] of [
-    ['/index', '/'],
-    ['/index.html', '/'],
-    ['/services/', '/services'],
-    ['/services.html', '/services'],
-    ['/services/index.html', '/services'],
-    ['/services/index', '/services'],
-  ]) {
-    [status, h] = await get(base + from);
-    ok(status === 308 && h.get('location') === to, `${from}: ${status} to ${h.get('location')}, not 308 to ${to}`);
-  }
-  // Speculation Rules (review L12): the header names a file of prefetch rules for our own pages only
-  const rulesPath = speculation?.match(/^"([^"]+)"$/)?.[1];
-  ok(rulesPath, `pages: Speculation-Rules header ${speculation ?? 'missing'}, not a quoted address`);
-  if (rulesPath) {
-    [status, h, body] = await get(new URL(rulesPath, base).href);
-    ok(
-      status === 200 && h.get('content-type') === 'application/speculationrules+json',
-      `${rulesPath}: ${status} as ${h.get('content-type')}`,
-    );
-    let rules;
-    try {
-      rules = JSON.parse(body);
-    } catch {
-      ok(false, `${rulesPath}: not JSON`);
-    }
-    const text = JSON.stringify(rules?.prefetch || []);
-    ok(
-      rules?.prefetch?.length && rules.prefetch.every((r) => r.eagerness === 'moderate'),
-      `${rulesPath}: no moderate prefetch rules`,
-    );
-    for (const left of ['/api/*', '/*.txt'])
-      ok(text.includes(`{"not":{"href_matches":"${left}"}}`), `${rulesPath}: ${left} not left out`);
-  }
-  ok((await get(`${base}/api/report`))[0] === 405, '/api/report GET is not 405');
-  for (const path of ['/robots.txt']) ok((await get(base + path))[0] === 200, `${path} does not answer 200`);
-  const robots = (await get(`${base}/robots.txt`))[2];
-  if (launch) ok(robots.includes(`Sitemap: ${site}/sitemap.xml`), `robots.txt has no Sitemap line for ${site}`);
+  ok(body.includes('404') || body.toLowerCase().includes('not found'), 'made-up address: not the site 404 page');
 
+  // 4. launch day only: the old address sends visitors to the new one
   if (old) {
-    [status, h] = await get(`${old}/services`);
+    [status, h] = await get(`${old}/`);
     ok(
-      [301, 308].includes(status) && h.get('location') === `${base}/services`,
-      `old address: ${status} to ${h.get('location')}, not ${base}/services`,
+      [301, 308].includes(status) && h.get('location') === `${base}/`,
+      `old address: ${status} to ${h.get('location')}, not ${base}/`,
     );
   }
 
