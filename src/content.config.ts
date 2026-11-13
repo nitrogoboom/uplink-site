@@ -10,7 +10,6 @@ import { z } from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 import { existsSync, readdirSync } from 'node:fs';
 import { ICON_NAMES } from './components/icons';
-import { COPY, type CopyName } from './lib/copy-schema';
 
 // A drawing's name, with the cuts the pages show (NAME.svg, NAME-compact.svg …) checked in public/assets/img/.
 const drawing = (...cuts: string[]) =>
@@ -116,15 +115,17 @@ const reviews = defineCollection({
   }),
 });
 
-// The site's words: one YAML file a page or area in src/data/copy/en/, each its own collection checked against its schema
-// in src/lib/copy-schema.ts (a missing or unknown key stops the build). Read them with copy() from src/lib/copy.ts.
-// A YAML file there with no schema stops the build too, so no file is read by nothing.
+// The site's words: one YAML file a page or area in src/data/copy/en/, each its own collection, with no schema: the
+// YAML is the only place a key is written. Read them with copy() from src/lib/copy.ts (a key the YAML lacks throws).
 const COPY_DIR = './src/data/copy/en';
-const unknown = readdirSync(COPY_DIR).filter((f) => !(f.replace(/\.yaml$/, '') in COPY));
-if (unknown.length)
-  throw new Error(`src/data/copy/en/: ${unknown.join(', ')} has no schema (COPY in src/lib/copy-schema.ts)`);
-const copy = <N extends CopyName>(name: N) =>
-  defineCollection({ loader: glob({ pattern: `${name}.yaml`, base: COPY_DIR }), schema: COPY[name] });
+const copy = Object.fromEntries(
+  readdirSync(COPY_DIR)
+    .filter((f) => f.endsWith('.yaml'))
+    .map((f) => {
+      const name = f.replace(/\.yaml$/, '');
+      return [`copy-${name}`, defineCollection({ loader: glob({ pattern: f, base: COPY_DIR }) })];
+    }),
+);
 
 export const collections = {
   services,
@@ -133,13 +134,5 @@ export const collections = {
   team,
   grow,
   reviews,
-  'copy-ui': copy('ui'),
-  'copy-home': copy('home'),
-  'copy-about': copy('about'),
-  'copy-services': copy('services'),
-  'copy-work': copy('work'),
-  'copy-contact': copy('contact'),
-  'copy-soon': copy('soon'),
-  'copy-not-found': copy('not-found'),
-  'copy-text-pages': copy('text-pages'),
+  ...copy,
 };

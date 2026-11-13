@@ -13,7 +13,6 @@ import { PAGES, breadcrumbs, businessNode, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
-import type { UiWords } from '../lib/copy-schema';
 
 export type Page =
   'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -163,7 +162,7 @@ const ui = await copy('ui');
 
     <div class="toasts" aria-live="polite"></div>
 
-    <Words id="words-ui" words={{ toast: ui.toast, emailError: ui.form.email.error } satisfies UiWords} />
+    <Words id="words-ui" words={{ toast: ui.toast, emailError: ui.form.email.error }} />
     <script>
       import '../scripts/core.js';
       import '../scripts/footer.js';

@@ -1,6 +1,6 @@
 # Home (/): every section's own words, in page order. The services, projects and Grow's six steps are data
 # (src/content/, src/data/grow.json). `cloud` and the Grow button's names are read by home.js and grow.js in the
-# browser. Schema: src/lib/copy-schema.ts.
+# browser.
 
 title: Uplink Technology · Managed IT for Ontario businesses # <title>
 description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'

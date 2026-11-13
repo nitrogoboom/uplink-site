@@ -36,7 +36,7 @@ Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a 
 ## Content and copy
 
 - Collections: `content.config.ts` (strict). Lists: `data/faq.json`, `team.json`, `grow.json`, `reviews.json`, `footer.json`.
-- Words in components and scripts: `data/copy/en/*.yaml` (`ui.yaml` shared, one per page, `text-pages.yaml`), schemas in `lib/copy-schema.ts`. Read with `await copy('home')`; templates with `fill()`. Scripts get words via `<Words>` and `words()`.
+- Words in components and scripts: `data/copy/en/*.yaml` (`ui.yaml` shared, one per page, `text-pages.yaml`), with no schema: to add a string, add it to the YAML and read it. Read with `await copy('home')` (a key the YAML lacks stops the build); templates with `fill()`. Scripts get words via `<Words>` and `words()`.
 - `data/index.md`, `data/agents.md`: hand-written Markdown for agents. Other pages' `.md` copies are generated from `<main>` (`scripts/markdown.mjs`; `data-md-skip` leaves a part out).
 
 ## Styles

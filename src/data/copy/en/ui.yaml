@@ -1,5 +1,5 @@
 # Shared UI and screen-reader text, on every page: the head, header, phone tab bar, footer chrome, both pop-ups, the
-# pause buttons, form fields both forms share, and the toasts core.js and footer.js show. Schema: src/lib/copy-schema.ts.
+# pause buttons, form fields both forms share, and the toasts core.js and footer.js show.
 # Page names in the menus are PAGES in src/lib/site.ts; the footer's lists and contact details are src/data/footer.json.
 
 site:

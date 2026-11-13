@@ -6,7 +6,6 @@ import Message from '../components/contact/Message.astro';
 import Support from '../components/contact/Support.astro';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
-import type { ContactWords } from '../lib/copy-schema';
 const { toast } = await copy('contact');
 const meta = await pageMeta('contact');
 ---
@@ -15,7 +14,7 @@ const meta = await pageMeta('contact');
   <Message />
   <Support />
   <Fragment slot="scripts">
-    <Words id="words-page" words={toast satisfies ContactWords} />
+    <Words id="words-page" words={toast} />
     <script>
       import '../scripts/contact.js';
     </script>

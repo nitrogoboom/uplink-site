@@ -1,7 +1,6 @@
 # Privacy (/privacy) and Accessibility (/accessibility): the words over each page's Markdown. The pages themselves
 # are src/data/privacy.md and src/data/accessibility.md; each page's <title> and description are
 # here too.
-# Schema: src/lib/copy-schema.ts.
 
 privacy:
   title: Privacy · Uplink Technology # <title>

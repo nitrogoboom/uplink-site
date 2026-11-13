@@ -14,8 +14,8 @@ const cards = [
     href: phone.href,
     text: fill(t.cards.call.text, { phone: phone.display }),
   },
-  { icon: 'ticket', href: '/soon#client-portal', ...t.cards.ticket },
-  { icon: 'screen', href: '/soon#remote-support', ...t.cards.remote },
+  { icon: 'ticket', href: '/soon#client-portal', title: t.cards.ticket.title, text: t.cards.ticket.text },
+  { icon: 'screen', href: '/soon#remote-support', title: t.cards.remote.title, text: t.cards.remote.text },
 ] as const;
 ---
 

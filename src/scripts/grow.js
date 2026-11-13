@@ -25,7 +25,7 @@ const grow = section && $('.grow', section);
 const svg = grow && $('.grow-stage svg', grow);
 if (grow && svg) {
   // the play button's names: src/data/copy/en/home.yaml, grow (index.astro carries them)
-  const T = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).grow;
+  const T = /** @type {import('../lib/copy').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
   const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));
   const steps = $$('.grow-card', grow);

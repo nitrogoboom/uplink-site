@@ -27,7 +27,7 @@ const stage = $('.hero-art .stage[data-hero]');
 // Pause buttons (HoldButton.astro, wired in core.js): while held, the cloud and the phone captions stop their timers.
 // The cloud's apps, in the order they show; each id is its tile in the drawing (data-tile, tools/gen_office.py) and
 // its words come from src/data/copy/en/home.yaml, cloud (index.astro carries them).
-const WORDS = /** @type {import('../lib/copy-schema').HomeWords} */ (words('words-page')).cloud;
+const WORDS = /** @type {import('../lib/copy').HomeWords} */ (words('words-page')).cloud;
 const APPS = /** @type {const} */ (['mail', 'files', 'meet', 'chat', 'cal', 'secure']).map((id) => ({
   id,
   ...WORDS.apps[id],

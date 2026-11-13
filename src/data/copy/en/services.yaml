@@ -1,6 +1,6 @@
 # Services: the /services page's own words (Overview, Faq), and the words every service page (/services/SLUG) shares
 # around its own copy. Each service's words are data (src/content/services/SLUG.json), the questions on /services
-# too (src/data/faq.json). Schema: src/lib/copy-schema.ts.
+# too (src/data/faq.json).
 
 title: Services · Uplink Technology # <title>
 description: Managed help desk, cybersecurity, Microsoft 365 and Google Workspace, networks, backup and IT planning for Ontario businesses.
