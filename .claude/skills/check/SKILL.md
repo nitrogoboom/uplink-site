@@ -1,6 +1,6 @@
 ---
 name: check
-description: Look over the Uplink site by hand and report, when the owner asks for a check - browser compatibility, phones and screen sizes, accessibility, large text and zoom, high contrast, print, links, speed, no script, before and after a change, or a deployed address.
+description: Look over the Uplink site by hand and report, when the owner asks for a check - browser compatibility, phones and screen sizes, accessibility, large text and zoom, high contrast, print, links, speed, no script, modern web patterns, before and after a change, or a deployed address.
 ---
 
 # Check the site
@@ -25,6 +25,7 @@ A helper script for one look (a link crawl, say) goes in the scratchpad and is t
 | Accessibility | A Lighthouse accessibility audit if you have one. Then by hand: Tab through the page (focus always visible, order sensible, nothing trapped, Esc closes pop-ups); the accessibility tree (every button and link named, one h1, headings in order, landmarks); contrast in both themes; the page with motion paused. Standard: WCAG 2.2 AA. |
 | Large text, zoom | Browser zoom at 200% and 400% (or a 320px-wide window), and a 24px default font. Text grows, nothing is clipped or overlaps, no sideways scroll. |
 | High contrast | Emulate forced colours, light and dark. Every control is visible and its on, off and current states can be told apart. |
+| Modern web patterns | `npx -y modern-web-guidance@latest legacy-scan src --json`. Judge each finding by its `keepWhen` / `dropWhen` notes and the code's own comments, and drop the deliberate ones (today: the pop-up click handler in `core.js`, the motion toggle's `role="switch"`). Report the rest with the guide's id; `npx -y modern-web-guidance@latest retrieve ID` gives the fix. The scan covers about a fifth of the guides. |
 | Print | Emulate print, or `npx playwright pdf URL FILE.pdf` and read it. Content is all there, nothing is cut mid-card, no screen-only controls. |
 | Links | On the built site: every link, picture and script on each sitemap page answers, and every `#section` has its id. |
 | Speed | A Lighthouse performance run on the built site at phone size. Report the LCP element and time, layout shift, and page weight. |

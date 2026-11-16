@@ -17,13 +17,17 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 | Next task | `notes.md` |
 | Setup, commands, layout | `README.md`, `src/README.md` |
 | Styling | `docs/design.md` |
+| HTML, CSS or a page script | the `modern-web-guidance` skill: search it before writing |
+| An Astro question | the Astro Docs server (`.mcp.json`) |
 | A drawing | the `drawing` skill |
-| CI, deploys, the Worker | `docs/ops.md` |
+| CI, deploys, the Worker | `docs/ops.md`; Worker code: the `cloudflare:workers-best-practices` skill |
 | Security | `docs/security.md` |
 | A site check the owner asks for (browsers, phones, accessibility, print, speed) | the `check` skill |
 | Launch or release | the `release` skill |
 
 `.claude/rules/` load by themselves. Two rules everywhere: no words typed into markup or scripts (they live in `src/content/` and `src/data/`), and never hand-edit an output SVG.
+
+**Browser Support:** Chrome, Edge, Firefox and Safari (Mac and iPhone) from the last year, plus Firefox ESR (`README.md`, "Browsers"). A newer feature is fine when a browser without it still shows a working page. No polyfills.
 
 ## Tests
 
