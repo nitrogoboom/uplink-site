@@ -76,14 +76,21 @@ const store = {
 
 /* ---------- Trusted Types ---------------------------------------------- */
 // The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like).
-// Every string it passes is markup built in these files from the page's own text, never from a URL or a form.
-const ttPolicy = window.trustedTypes
-  ? window.trustedTypes.createPolicy('uplink', {
-      createHTML: (/** @type {string} */ s) => s,
-    })
-  : null;
+// Every string it passes is the site's own: the icons below, and the drawings home.js and footer.js fetch from
+// /assets/img/. It refuses what none of them hold: a script, frame, embed or <base>/<meta>/<link>, an inline event
+// handler (onload=…) or a javascript: address. The CSP would stop those running anyway; the refusal keeps them out of
+// the page, so the policy checks something rather than passing everything through. A refused drawing fails like one
+// that didn't load (home.js shows the still picture).
+// Browsers without Trusted Types get the same refusal from html().
+const REFUSED = /<(script|iframe|object|embed|base|meta|link|foreignObject)\b|\son[a-z]+\s*=|javascript:/i;
 /** @type {(s: string) => string} */
-const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
+const checked = (s) => {
+  if (REFUSED.test(s)) throw new TypeError('uplink policy: refused markup');
+  return s;
+};
+const ttPolicy = window.trustedTypes ? window.trustedTypes.createPolicy('uplink', { createHTML: checked }) : null;
+/** @type {(s: string) => string} */
+const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : checked(s));
 
 /* ---------- icons used by script-built UI ------------------------------ */
 const ICON = {
