@@ -899,6 +899,34 @@ def phone_still():
     return '\n'.join([head, f'<title>{esc(TITLES["office"])}</title>', '<style>.ob-flow{stroke-dasharray:3 6}</style>', body, '</svg>'])
 
 
+def slab_css():
+    """The phone cut's floor slab as CSS shapes in % of its box (PHONE_CROP, which the stage matches on phones), from
+    the same FLOOR, SLAB and projection that draw it: hero.css shows it while home.js fetches that drawing, so the build
+    starts on a floor that is already there, and it can't drift from the drawing's own."""
+    cx, cy, cw, ch = PHONE_CROP
+    X, Y = FLOOR
+
+    def pct(v):
+        return f'{round(v, 2):g}%'
+
+    def at(x, y, z):
+        px, py = w.p(x, y, z)
+        return f'{pct((px - cx) / cw * 100)} {pct((py - cy) / ch * 100)}'
+
+    # back (0, 0), right (X, 0), front (X, Y) and left (0, Y), on top (z 0) and underneath (z -SLAB)
+    sides = [at(0, 0, 0), at(X, 0, 0), at(X, 0, -SLAB), at(X, Y, -SLAB), at(0, Y, -SLAB), at(0, Y, 0)]
+    top = [at(0, 0, 0), at(X, 0, 0), at(X, Y, 0), at(0, Y, 0)]
+    front = pct((w.p(X, Y, 0)[0] - cx) / cw * 100)
+    return ('/* Written by tools/gen_office.py: do not edit by hand. The phone cut\'s floor slab\n'
+            '   (office-compact-build.svg) in % of the stage: its outline with both sides, the front corner where the\n'
+            '   sides meet, and its top. hero.css draws them while the drawing loads. */\n'
+            '.hero-art {\n'
+            f'  --slab-sides: polygon({", ".join(sides)});\n'
+            f'  --slab-front: {front};\n'
+            f'  --slab-top-face: polygon({", ".join(top)});\n'
+            '}\n')
+
+
 if __name__ == '__main__':
     # The outputs:
     # public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
@@ -913,6 +941,7 @@ if __name__ == '__main__':
     #   it stands still (hero.css) and the captions come at once.
     # public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
     # public/assets/img/hero-office-phone.svg  the phone cut as a still, dashes in, nothing moving: Home's no-script hero on phones
+    # src/components/home/hero-slab.css  the phone cut's floor slab as CSS shapes, for hero.css's placeholder (slab_css)
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
     # the card cut: the compact one without its labels or their letters (isogen.card). The compact cut itself is
@@ -924,3 +953,4 @@ if __name__ == '__main__':
     (root / 'src/components/home/hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
     (site / 'assets/img/office-compact-flows.svg').write_text('\n'.join(PHONE_FLOWS) + '\n', encoding='utf-8', newline='\n')
     (site / 'assets/img/hero-office-phone.svg').write_text(phone_still() + '\n', encoding='utf-8', newline='\n')
+    (root / 'src/components/home/hero-slab.css').write_text(slab_css(), encoding='utf-8', newline='\n')

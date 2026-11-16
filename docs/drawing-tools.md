@@ -35,7 +35,7 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 | Tool | What it writes |
 | --- | --- |
 | `gen_NAME.py public/assets/img/NAME.svg` | One scene: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, or `voip`. Also the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
-| `gen_office.py public` | `office.svg`, `office-card.svg`, and the hero: `hero-office.svg`, `hero-office-tablet.svg`, `office-compact-build.svg` (animated phone cut), `office-compact-flows.svg`, `hero-office-phone.svg` (phone still), and `src/components/home/hero-flows.svg`. The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
+| `gen_office.py public` | `office.svg`, `office-card.svg`, and the hero: `hero-office.svg`, `hero-office-tablet.svg`, `office-compact-build.svg` (animated phone cut), `office-compact-flows.svg`, `hero-office-phone.svg` (phone still), `src/components/home/hero-flows.svg`, and `src/components/home/hero-slab.css` (the phone floor slab's shapes for the placeholder in `hero.css`). The animation CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | `src/components/home/grow-world.svg`. Every part carries the step it arrives on (`data-s`); `src/scripts/grow.js` plays them. |
 | `gen_campus.py` | `public/assets/img/campus.svg`, the footer map. No phone cut. `src/styles/footer.css` styles its parts by class. It's decoration: `aria-hidden="true"`, no role or label. |
 | `gen_light.py` | The light drawings: `NAME-light.svg` beside each `NAME.svg`, and `src/styles/theme-drawings.css` for the drawings inside the page. `regen.py` runs it last. `--check` fails if an output is out of date. |

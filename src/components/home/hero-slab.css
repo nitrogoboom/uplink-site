@@ -1,0 +1,8 @@
+/* Written by tools/gen_office.py: do not edit by hand. The phone cut's floor slab
+   (office-compact-build.svg) in % of the stage: its outline with both sides, the front corner where the
+   sides meet, and its top. hero.css draws them while the drawing loads. */
+.hero-art {
+  --slab-sides: polygon(39.13% 39.8%, 94.83% 74.18%, 94.83% 75.58%, 56.85% 99.02%, 1.15% 64.65%, 1.15% 63.24%);
+  --slab-front: 56.85%;
+  --slab-top-face: polygon(39.13% 39.8%, 94.83% 74.18%, 56.85% 97.62%, 1.15% 63.24%);
+}

@@ -31,7 +31,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | `Icon.astro`, `icons.ts` | Icons by name; add to `ICONS` |
 | `ServiceOptions.astro`, `Words.astro` | Service `<option>`s; a page script's words as JSON |
 
-Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a list is `<div class="card">` with `<h2 class="card-title {fit(title)}"><a class="card-link">`; the link's `::after` covers the card. `components/home/hero-flows.svg` and `grow-world.svg` are generated: don't edit.
+Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a list is `<div class="card">` with `<h2 class="card-title {fit(title)}"><a class="card-link">`; the link's `::after` covers the card. `components/home/hero-flows.svg`, `hero-slab.css` and `grow-world.svg` are generated: don't edit.
 
 ## Content and copy
 

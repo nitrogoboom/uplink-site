@@ -291,9 +291,8 @@
   /* While home.js fetches the phone cut (about 0.6 s on a slow phone), the stage shows the cut's floor slab, where the
      drawing will put it: the build then starts from a floor that is already there, and the drawing's own floor fades
      in over this one. It stays underneath (covered), and goes when the still picture stands in (home.js, failed()).
-     The corners are the slab's in office-compact-build.svg (tools/gen_office.py; viewBox 240 -118 962 900, the stage's
-     own ratio), as % of the stage; change them with the slab. ::before is the two sides, split at the front corner;
-     ::after the top. */
+     Its shapes come from the generator that draws the slab (hero-slab.css, written by tools/gen_office.py), so they
+     move with it. ::before is the two sides, split at the front corner; ::after the top. */
   .js .hero-art .stage {
     /* the slab top's light colour is gen_light.py's OFFICE colour, which has no token */
     --slab-top: var(--iso-window);
@@ -311,12 +310,12 @@
     pointer-events: none;
   }
   .js .hero-art .stage::before {
-    background: linear-gradient(to right, var(--iso-left) 56.85%, var(--iso-right) 56.85%);
-    clip-path: polygon(39.13% 39.8%, 94.83% 74.18%, 94.83% 75.59%, 56.85% 99.02%, 1.14% 64.64%, 1.14% 63.24%);
+    background: linear-gradient(to right, var(--iso-left) var(--slab-front), var(--iso-right) var(--slab-front));
+    clip-path: var(--slab-sides);
   }
   .js .hero-art .stage::after {
     background: var(--slab-top);
-    clip-path: polygon(39.13% 39.8%, 94.83% 74.18%, 56.85% 97.61%, 1.14% 63.24%);
+    clip-path: var(--slab-top-face);
   }
   .hero-art .stage:has(.hero-nojs)::before,
   .hero-art .stage:has(.hero-nojs)::after {
