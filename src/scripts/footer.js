@@ -124,8 +124,12 @@ if (fc) {
      ====================================================================== */
   const rows = window.matchMedia(MEDIA.phone);
   const NAME = sections[0].getAttribute('name') ?? '';
-  const token = (/** @type {string} */ k) => parseFloat(window.getComputedStyle(fc).getPropertyValue(k));
-  const ROW = { open: token('--dur-fc-row-open'), shut: token('--dur-fc-row-shut') };
+  // a time token in ms: the build writes 320ms as .32s, so mind the unit
+  const ms = (/** @type {string} */ k) => {
+    const v = window.getComputedStyle(fc).getPropertyValue(k).trim();
+    return parseFloat(v) * (v.endsWith('ms') ? 1 : 1000);
+  };
+  const ROW = { open: ms('--dur-fc-row-open'), shut: ms('--dur-fc-row-shut') };
   // the rows on the move: which way each is going, and its landing
   /** @type {Map<HTMLDetailsElement, { open: boolean, timer: number }>} */
   const sliding = new Map();
