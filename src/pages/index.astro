@@ -2,7 +2,7 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
-import { HERO, jsonLd, pageMeta } from '../lib/site';
+import { HERO, businessNode, jsonLd, pageMeta } from '../lib/site';
 import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
@@ -15,13 +15,9 @@ import { copy } from '../lib/copy';
 const { cloud, grow, business: about } = await copy('home');
 const meta = await pageMeta('home');
 
-const site = Astro.site!.href;
 const business = {
   '@context': 'https://schema.org',
-  '@type': 'ProfessionalService',
-  '@id': `${site}#business`,
-  name: 'Uplink Technology',
-  url: site,
+  ...(await businessNode(Astro.site!)),
   description: about,
   telephone: `+${phone.display}`,
   email,

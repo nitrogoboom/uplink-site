@@ -7,7 +7,15 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = new URL('..', import.meta.url);
-const WORKER_DIR = process.env.WORKER_DIR || fileURLToPath(new URL('worker', ROOT)); // likewise
+const WORKER_DIR = fileURLToPath(new URL('worker', ROOT));
+// every file under dir, in name order, but those skip() names
+const files = (dir, skip = () => false) =>
+  readdirSync(dir)
+    .sort()
+    .flatMap((name) => {
+      const p = join(dir, name);
+      return statSync(p).isDirectory() ? files(p, skip) : skip(p) ? [] : [p];
+    });
 // DIST: the built site's folder (dist/)
 export function headers(DIST) {
   // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
@@ -23,15 +31,7 @@ export function headers(DIST) {
     throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
   const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
-  const pages = [];
-  const walk = (dir) => {
-    for (const name of readdirSync(dir)) {
-      const p = join(dir, name);
-      if (statSync(p).isDirectory()) walk(p);
-      else if (name.endsWith('.html')) pages.push(p);
-    }
-  };
-  walk(DIST);
+  const pages = files(DIST).filter((p) => p.endsWith('.html'));
 
   const sha = (text) => "'sha256-" + createHash('sha256').update(text).digest('base64') + "'";
   const hashes = new Set();
@@ -48,8 +48,8 @@ export function headers(DIST) {
   };
   for (const file of pages) {
     const html = readFileSync(file, 'utf-8');
-    // {script-hashes}: today the one line in every head that adds html.js; change that line and the hash follows.
-    // every inline script the browser runs: no src, and no type or a script type (JSON-LD and the like run nothing)
+    // {script-hashes}: today the head script in Base.astro (html.js, the theme, Reduce motion); change it and the hash
+    // follows. Every inline script the browser runs: no src, and no type or a script type (JSON-LD and the like run nothing)
     for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\b[^>]*>/gi)) {
       const type = m[1].match(/\stype=["']?([^"'\s>]+)/)?.[1];
       if (!/\ssrc=/.test(m[1]) && (!type || /^(module|text\/javascript)$/i.test(type))) hashes.add(sha(m[2]));
@@ -107,13 +107,6 @@ export function headers(DIST) {
   // the build's ID (X-Build): every file in dist/ but _headers, the headers as they ship, and the Worker. A change to
   // any of them, a header or the Worker alone included, gives a new ID; scripts/deploy.mjs reads it to tell which build
   // the live address serves. It is a hash of public files and code in a public repository, so it gives nothing away.
-  const files = (dir, skip = () => false) =>
-    readdirSync(dir)
-      .sort()
-      .flatMap((name) => {
-        const p = join(dir, name);
-        return statSync(p).isDirectory() ? files(p, skip) : skip(p) ? [] : [p];
-      });
   const id = createHash('sha256');
   const add = (label, bytes) => id.update(`${label}\0${bytes.length}\0`).update(bytes);
   for (const f of files(DIST, (p) => relative(DIST, p) === '_headers'))

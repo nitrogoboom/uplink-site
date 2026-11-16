@@ -8,7 +8,7 @@ import ServiceCard from '../../components/services/ServiceCard.astro';
 import Icon from '../../components/Icon.astro';
 import ProjectCard from '../../components/work/ProjectCard.astro';
 import '../../components/services/service-page.css';
-import { PAGES, getServices, getProjects, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
+import { PAGES, getServices, getProjects, breadcrumbs, businessNode, businessRef, jsonLd } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import { copy, fill } from '../../lib/copy';
 
@@ -31,7 +31,7 @@ const ui = await copy('ui');
 const t = (await copy('services')).page;
 const questions = fill(t.questions.title, { service: s.title });
 const url = new URL(`/services/${id}`, Astro.site).href;
-const business = { '@id': `${Astro.site!.href}#business` };
+const business = businessRef(Astro.site!);
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -61,7 +61,7 @@ const ld = {
       [ui.pages.services, new URL(PAGES.services.path, Astro.site).href],
       [s.title, url],
     ]),
-    businessNode(Astro.site!),
+    await businessNode(Astro.site!),
   ],
 };
 ---

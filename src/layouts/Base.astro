@@ -1,6 +1,6 @@
 ---
 // The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it. Its props, and how a
-// page adds its own script (inside <Fragment slot="scripts">): src/README.md, "The shared layout". Anything else a
+// page adds its own script (inside <Fragment slot="scripts">): src/README.md, "Pages". Anything else a
 // page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
 // the shared CSS; the build inlines it in a <style> block in every page (astro.config.mjs)
 import '../styles/global.css';
@@ -9,7 +9,7 @@ import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
 import BookDialog from '../components/BookDialog.astro';
 import SettingsDialog from '../components/SettingsDialog.astro';
-import { breadcrumbs, businessNode, jsonLd } from '../lib/site';
+import { breadcrumbs, businessNode, businessRef, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
@@ -45,7 +45,7 @@ const {
 } = Astro.props;
 const canonical = path === undefined ? null : new URL(path, Astro.site).href;
 const ogImage = new URL('/assets/img/og.png', Astro.site).href;
-const business = { '@id': `${Astro.site!.href}#business` };
+const business = businessRef(Astro.site!);
 const name = title.split(' · ')[0];
 const jsonld = type &&
   canonical && {
@@ -66,7 +66,7 @@ const jsonld = type &&
         [(await copy('ui')).pages.home, Astro.site!.href],
         [name, canonical],
       ]),
-      businessNode(Astro.site!),
+      await businessNode(Astro.site!),
       ...ldGraph,
     ],
   };

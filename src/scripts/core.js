@@ -217,7 +217,7 @@ const openers = new WeakMap(); // dialog -> what opened it, which gets focus bac
 /** @param {string} id @param {HTMLElement | null} [opener] */
 function openDialog(id, opener) {
   const dlg = /** @type {HTMLDialogElement | null} */ (document.getElementById(id));
-  if (!dlg || dlg.open || typeof dlg.showModal !== 'function') return false;
+  if (!dlg || dlg.open) return false;
   openers.set(dlg, opener || /** @type {HTMLElement | null} */ (document.activeElement));
   dlg.showModal();
   openedAt.set(dlg, performance.now());
@@ -506,20 +506,6 @@ if (botnav) {
   botnav.addEventListener('focusin', () => show(true));
 }
 
-/* ---------- replay ----------------------------------------------------- */
-// Plays a CSS animation from the start: the first time by adding its class, then by restarting it. No layout is
-// read, so it costs no forced layout (offsetWidth would). While the pause is on it shows the animation's end
-// instead (settle): held on its first frame, a line that draws in would never show.
-const replay = (/** @type {Element} */ el, /** @type {string} */ cls) => {
-  if (el.classList.contains(cls))
-    el.getAnimations().forEach((a) => {
-      a.cancel();
-      a.play();
-    });
-  else el.classList.add(cls);
-  if (held.on) settle(el);
-};
-
 /* ---------- settle ----------------------------------------------------- */
 // While the pause is on, jumps every animation in el (and inside it) that ends to its end, so a drawing that builds
 // in shows built; the loops stay held (html.is-held, base.css). Nothing happens when the pause is off.
@@ -561,4 +547,4 @@ document.addEventListener(
 });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, UI, held, html, reduceMotion, replay, settle, theme, toast, whenOnScreen, words };
+export { $, $$, UI, held, html, reduceMotion, settle, theme, toast, whenOnScreen, words };

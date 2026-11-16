@@ -121,7 +121,7 @@ async function capped(request) {
 // WebKit's refusal of its own style for each <select> (style-src-attr, "inline", no script named: it does it on a bare
 // page with nothing of ours, checked November 6, 2026), two on every page. Each visitor address may have 30 posts a
 // minute logged (the REPORTS rate limit in wrangler.jsonc, counted by Cloudflare and not kept); past that, 429. A post
-// with nothing to log isn't counted. Without the binding (the tests) there is no limit.
+// with nothing to log isn't counted. Without the binding there is no limit.
 async function report(request, env) {
   if (request.method !== 'POST') return reply(405, 'Method not allowed', { Allow: 'POST' });
   const site = new URL(request.url).origin;
@@ -199,7 +199,7 @@ async function route(request, env) {
   if (request.method !== 'GET' && request.method !== 'HEAD')
     return reply(405, 'Method not allowed', { Allow: 'GET, HEAD' });
   if (url.pathname === '/404') return notFound(request, env);
-  // a miss (or, with run_worker_first true, any address): the file if there is one, else the 404 page
+  // any other address comes here only when it has no file (wrangler.jsonc): the file if there is one, else the 404 page
   const res = await env.ASSETS.fetch(request);
   if (res.status !== 404) return res;
   await res.body?.cancel();

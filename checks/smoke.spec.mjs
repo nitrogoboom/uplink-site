@@ -29,7 +29,6 @@ async function get(url) {
 }
 
 test('smoke', async () => {
-  test.setTimeout(120_000);
   if (!positional[0]) throw new Error('usage: npm run smoke -- ADDRESS [--launch] [--preview] [--old OLD_ADDRESS]');
   const base = positional[0].replace(/\/$/, '');
   const launch = flag('--launch');

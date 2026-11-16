@@ -9,8 +9,7 @@
 // Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
 // with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
 import raw from './grow-world.svg?raw';
-import { optimize } from 'svgo';
-import { SVGO } from '../../../scripts/svgo-config.mjs';
+import { shrink } from '../../../scripts/svgo-config.mjs';
 import Icon from '../Icon.astro';
 import { getGrow } from '../../lib/site';
 import { copy, fill } from '../../lib/copy';
@@ -18,8 +17,8 @@ import './grow.css';
 
 const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
 
-const world = optimize(raw, SVGO)
-  .data.replace(/<style>[\s\S]*?<\/style>/g, '')
+const world = shrink(raw, 'grow-world.svg')
+  .replace(/<style>[\s\S]*?<\/style>/g, '')
   .replace(' id="plain"', '');
 const last = steps.length - 1;
 const t = (await copy('home')).grow;

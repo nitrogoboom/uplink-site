@@ -1,5 +1,5 @@
-// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml, robots.txt)
-// share. src/README.md, "The shared layout"; each export is described where it's defined.
+// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml,
+// speculation-rules-home.json) share. src/README.md, "Pages"; each export is described where it's defined.
 import type { IconName } from '../components/Icon.astro';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -90,12 +90,14 @@ export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 // JSON-LD for a <script type="application/ld+json">: one space per level, and </ escaped so the text can never
 // close the script early.
 export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/<\//g, '<\\/');
-// The business in short, for every page's graph but Home's (whose own block, index.astro, has the rest): a reader
-// of one page alone can still name the provider and publisher the page points at by @id.
-export const businessNode = (site: URL) => ({
+// The business, pointed at by @id from every page's JSON-LD (provider, publisher, author).
+export const businessRef = (site: URL) => ({ '@id': `${site.href}#business` });
+// The business in short, for every page's graph (Home's block, index.astro, adds the rest): a reader of one page
+// alone can still name the provider and publisher the page points at by @id. Its name is ui.yaml's site.name.
+export const businessNode = async (site: URL) => ({
   '@type': 'ProfessionalService',
-  '@id': `${site.href}#business`,
-  name: 'Uplink Technology',
+  ...businessRef(site),
+  name: (await copy('ui')).site.name,
   url: site.href,
 });
 // A BreadcrumbList from [name, address] pairs, Home first.

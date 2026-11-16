@@ -1,6 +1,6 @@
 # Response headers for every file, read by Cloudflare (Workers static assets and Pages alike). Not served as a page.
 # This is the template: `npm run build` copies it to dist/_headers and scripts/headers.mjs fills in
-#   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (the classList.add('js') line)
+#   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (Base.astro's head script)
 #   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
 #   the Early Hints block   one rule per page
 #   the build placeholder   X-Build, the build's ID: a hash of dist/, these headers and the Worker. The deploy reads

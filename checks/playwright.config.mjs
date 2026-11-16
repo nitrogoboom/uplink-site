@@ -7,7 +7,6 @@ export const CHECKS = ['smoke'];
 export default defineConfig({
   testDir: '.',
   outputDir: '../out/test-results',
-  retries: 0,
   timeout: 120_000,
   forbidOnly: !!process.env.CI,
   reporter: [['list', { printSteps: false }]],

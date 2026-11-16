@@ -4,15 +4,15 @@
    phones. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, held, html, reduceMotion, replay, settle, theme, whenOnScreen, words } from './core.js';
+import { $, $$, held, html, reduceMotion, settle, theme, whenOnScreen, words } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
 /* ------------------------------------------------------------------
-   Hero cloud: shows one cloud app at a time, big and readable. A curved
-   line runs from the cloud to that app's tile in the floating tray.
-   It steps through the apps on a timer; hovering a tile or a bar
-   segment picks one. Reduced motion: no timer, no line animation.
+   Hero cloud: shows one cloud app at a time, big and readable, and
+   lights that app's tile in the floating tray. It steps through the
+   apps on a timer; hovering a tile or a bar segment picks one.
+   Reduced motion: no timer.
    The drawing comes in three cuts, each its own file named on the stage
    (HERO in src/lib/site.ts, preloaded for the same screens), so a screen
    downloads only its own: the full hero; the tablet cut (fewer, bigger
@@ -76,19 +76,6 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
   const appText = /** @type {SVGElement} */ (svg.querySelector('.ob-app'));
   const stateText = /** @type {SVGElement} */ (svg.querySelector('.ob-state'));
   const detailText = /** @type {SVGElement} */ (svg.querySelector('.ob-detail'));
-  const base = /** @type {SVGPathElement} */ (cloud.querySelector('.ob-link-base'));
-  const flow = /** @type {SVGPathElement} */ (cloud.querySelector('.ob-link'));
-  const end = /** @type {SVGElement} */ (svg.querySelector('.ob-link-end'));
-  const START = { x: +(cloud.dataset.sx || 878), y: +(cloud.dataset.sy || 46) };
-  const LINK = cloud.dataset.link || 'curve';
-  const tile = (/** @type {string} */ id) => svg.querySelector('.ob-tile[data-tile="' + id + '"]');
-  const topCentre = (/** @type {Element} */ t) => {
-    const pts = /** @type {string} */ (/** @type {Element} */ (t.querySelector('.f-t')).getAttribute('points'))
-      .trim()
-      .split(/\s+/)
-      .map((p) => p.split(',').map(Number));
-    return { x: pts.reduce((a, p) => a + p[0], 0) / pts.length, y: pts.reduce((a, p) => a + p[1], 0) / pts.length };
-  };
   // The state word is right-aligned, so the dot before it moves with the word's width.
   // The browser reports the new size after its own layout pass (ResizeObserver), so
   // nothing is measured straight after the text changes (that would force a layout).
@@ -116,37 +103,6 @@ const startCloud = (/** @type {SVGGElement} */ cloud) => {
     /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg, .ob-pip')).forEach((s) =>
       s.classList.toggle('is-on', s.dataset.app === app.id),
     );
-    const t = tile(app.id);
-    if (t && LINK !== 'none') {
-      const p = topCentre(t);
-      const dPath =
-        LINK === 'elbow'
-          ? 'M' + START.x + ',' + START.y + ' H' + p.x + ' V' + p.y
-          : 'M' +
-            START.x +
-            ',' +
-            START.y +
-            ' C' +
-            (START.x + 70) +
-            ',' +
-            START.y +
-            ' ' +
-            p.x +
-            ',' +
-            (p.y - 110) +
-            ' ' +
-            p.x +
-            ',' +
-            p.y;
-      base.setAttribute('d', dPath);
-      flow.setAttribute('d', dPath);
-      end.setAttribute('cx', String(p.x));
-      end.setAttribute('cy', String(p.y));
-      const len = base.getTotalLength();
-      base.style.strokeDasharray = String(len);
-      base.style.setProperty('--len', String(len));
-      replay(base, 'is-draw');
-    }
     const write = () => {
       appText.textContent = app.name.toUpperCase();
       stateText.textContent = app.state.toUpperCase();
@@ -564,16 +520,9 @@ if (svcRow && svcDots.length) {
     });
     go(near.indexOf(Math.min(...near)));
   });
-  // keyboard focus only (above); a browser without :focus-visible slides on any focus, as before
-  const byKeyboard = (/** @type {Element} */ el) => {
-    try {
-      return el.matches(':focus-visible');
-    } catch {
-      return true;
-    }
-  };
+  // keyboard focus only (above)
   svcRow.addEventListener('focusin', (e) => {
-    if (row.matches && byKeyboard(/** @type {Element} */ (e.target)))
+    if (row.matches && /** @type {Element} */ (e.target).matches(':focus-visible'))
       go(cards.indexOf(/** @type {Element} */ (/** @type {Element} */ (e.target).closest('li'))));
   });
   svcRow.addEventListener('keydown', (e) => {

@@ -5,7 +5,7 @@
 import { getCollection, getEntries } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import ProjectCase from '../../components/work/ProjectCase.astro';
-import { PAGES, breadcrumbs, businessNode, jsonLd } from '../../lib/site';
+import { PAGES, breadcrumbs, businessNode, businessRef, jsonLd } from '../../lib/site';
 import '../../components/work/project-page.css';
 import { copy, fill } from '../../lib/copy';
 
@@ -20,7 +20,7 @@ const t = (await copy('work')).case.story;
 const url = new URL(`/work/${id}`, Astro.site).href;
 const description = `${p.client}. ${p.result}.`; // as the sitemap list says it (allPages in src/lib/site.ts)
 const services = await getEntries(p.services);
-const business = { '@id': `${Astro.site!.href}#business` };
+const business = businessRef(Astro.site!);
 const ld = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -44,7 +44,7 @@ const ld = {
       [ui.pages.work, new URL(PAGES.work.path, Astro.site).href],
       [p.name, url],
     ]),
-    businessNode(Astro.site!),
+    await businessNode(Astro.site!),
   ],
 };
 ---
