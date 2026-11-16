@@ -50,7 +50,7 @@ test('smoke', async () => {
 
   // 2. plain http goes to https (the Worker for the requests it sees; at launch, the zone for every request)
   if (!local && !preview) {
-    for (const path of launch ? ['/api/report', '/'] : ['/api/report']) {
+    for (const path of launch ? ['/404', '/'] : ['/404']) {
       [status, h] = await get(`http://${host}${path}`);
       ok(
         [301, 308].includes(status) && h.get('location') === `https://${host}${path}`,

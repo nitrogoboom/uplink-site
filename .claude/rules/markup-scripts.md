@@ -18,4 +18,4 @@ paths:
 - Styles from script: `el.style.x = …`. Markup carries classes only; the CSP has no `'unsafe-inline'` and the build fails on a `style=""` attribute.
 - `public/_headers` is a template; `scripts/headers.mjs` fills in the hashes and Early Hints at build. Never paste a hash.
 - A link whose visible parts sit in separate boxes gets `<Pause />` between them. Inside a sideways-scrolling row, a `<Pause />`'s box needs `position: relative`.
-- The Worker (`worker/index.js`) runs only for `/api/*`, `/404` and addresses with no file; every other request is a static file (`docs/ops.md`, "The Worker").
+- The Worker (`worker/index.js`) runs only for `/404` and addresses with no file; every other request is a static file (`docs/ops.md`, "The Worker"). The site has no `/api/` address and sends nothing from a visitor's browser: a new endpoint or beacon is the owner's decision.

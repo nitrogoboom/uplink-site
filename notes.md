@@ -41,7 +41,7 @@ Not Home, not setup. Leave these alone unless the owner asks.
 - [ ] Finish the baseline: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
 - [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.
 
-For launch (the owner): the split environments are under "Owner and accounts"; the paid Workers plan, Always Use HTTPS, and an alert on the error reports belong in `docs/release.md`, "Before launch".
+For launch (the owner): the split environments are under "Owner and accounts"; the paid Workers plan, Always Use HTTPS, and Cloudflare's client-side security belong in `docs/release.md`, "Before launch".
 
 ### Privacy and accessibility pages
 
@@ -53,7 +53,7 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 ### Forms
 
 - [ ] Forms are paused. PR #38 (`claude/sweet-chaum-b12ca0`) has the Worker endpoint, Turnstile, honeypot and rate limit, email a stub; leave it open. Needs `TURNSTILE_SECRET`, `FORM_TO`, a sending domain.
-- [ ] PR #38 conflicts with `main`: keep both routes in `worker/index.js`, both `ratelimits`, and `main`'s `run_worker_first` (`["/api/*", "/404"]`) with `not_found_handling: "none"`.
+- [ ] PR #38 conflicts with `main`: `main` has no `/api/` address since November 16, 2026 (`/api/report` and its `REPORTS` limit are gone). Its form routes bring `/api/*` back to `run_worker_first` (`["/api/*", "/404"]`, with `not_found_handling: "none"`) and its own `ratelimits`; adding them is the owner's decision.
 - [ ] With the endpoint: give the contact and newsletter fields their `name` back (without script they go to `/soon`); CSP and the Trusted Types policy allow Turnstile (`docs/security.md`).
 - [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`, link privacy beside each Send.
 - [ ] When forms send: the booking and newsletter toasts (`toast.booked`, `toast.subscribed` in `ui.yaml`) say "Prototype form: nothing is sent yet"; give them the real reply time.

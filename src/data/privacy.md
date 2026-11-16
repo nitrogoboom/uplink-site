@@ -28,20 +28,6 @@ Every visit goes through Cloudflare, the company that hosts our site. To send yo
 
 We use this to deliver the site, keep it running, and protect it from attacks. We don't use it to find out who you are.
 
-### Error reports
-
-Sometimes a page hits a bug, or your browser blocks something because of our security rules. When that happens, your browser sends a short report back to our site so we can fix it.
-
-A report includes:
-
-- the page you were on
-- your browser's name and version
-- either the error message, with the script and line it came from, or the address that was blocked, with the rule that blocked it
-
-Web addresses are saved without the part after a "?", because that part can hold personal details. A report never includes anything you typed. Like any visit, it also reaches Cloudflare with your IP address.
-
-To stop floods, our site counts how many reports come from one IP address in a short time. That count isn't kept. We read reports only to fix problems.
-
 ### Settings saved on your device
 
 If you change a setting, the site remembers it in your browser, so it's the same next time you visit. It saves up to three settings:
@@ -105,7 +91,7 @@ We don't share personal information with anyone else, unless the law requires it
 | What | Who holds it | How long |
 | --- | --- | --- |
 | Visit details (IP address, browser, page) | Cloudflare | As long as Cloudflare needs them to run and protect its network |
-| Error reports and our site's logs | Cloudflare, for us | Up to 7 days |
+| Our site's error log (the page address when our site fails, never your IP address) | Cloudflare, for us | Up to 7 days |
 | Form messages, once forms send | Our email | Until we no longer need them to help you |
 | Newsletter address and sign-up record, once it starts | Us | Until you unsubscribe, plus the record that you agreed |
 | Settings on your device | Your browser | Until you clear them |
@@ -133,4 +119,4 @@ If you're not happy with our answer, you can complain to the Office of the Priva
 
 If the site starts collecting something new, we'll update this page first and change the date below. If a change affects how we use information you've already given us, we'll ask you again.
 
-Last updated: 7 November 2026
+Last updated: 16 November 2026

@@ -1,6 +1,6 @@
 # Security, privacy, and secrets
 
-Controls, and every secret (names and places, never values). Reporting: [`SECURITY.md`](../SECURITY.md). The site is static; the Worker runs only for `/api/*`, `/404` and missing addresses. No accounts, no database, no third-party script (analytics come back at launch: `release.md`, "Before launch"). Targets: PIPEDA and CASL, OWASP headers (Observatory A+), RFC 9116 `security.txt` (expires a year after the build: rebuild yearly).
+Controls, and every secret (names and places, never values). Reporting: [`SECURITY.md`](../SECURITY.md). The site is static; the Worker runs only for `/404` and missing addresses, and nothing on the site takes input. No accounts, no database, no third-party script (analytics come back at launch: `release.md`, "Before launch"). Targets: PIPEDA and CASL, OWASP headers (Observatory A+), RFC 9116 `security.txt` (expires a year after the build: rebuild yearly).
 
 ## Security controls
 
@@ -17,7 +17,7 @@ No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. `public/_header
 Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-…';
   style-src 'self' 'sha256-…'; font-src 'self' data:; img-src 'self' data:; connect-src 'self';
   form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';
-  require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
+  require-trusted-types-for 'script'; trusted-types uplink
 ```
 
 - The one inline script marks the page as script-enabled and applies the saved theme and motion choice before paint.
@@ -36,16 +36,9 @@ The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTM
 - The Worker's own responses don't get `_headers` ([`ops.md`](ops.md#the-worker)).
 - Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (only Flash and Acrobat read it) and `Cross-Origin-Embedder-Policy` (it could block an outside script added later, such as analytics).
 
-### Reports from browsers
+### No reports from browsers
 
-The CSP reports to `/api/report` (`report-to` and `report-uri`, with `Reporting-Endpoints: csp="/api/report"`). `core.js` also sends uncaught script errors there, at most five per page view. The endpoint, the only part of the site that takes input:
-
-- accepts only `POST`, and only from the site's own `Origin`; drops reports about other sites' pages
-- rate-limits each visitor (`REPORTS` in `wrangler.jsonc`)
-- stops reading a body at 8 KB, even with no `Content-Length`
-- parses strict JSON, keeps a short list of known fields, cuts each to a fixed length, strips query strings from addresses, and logs line and column only when they're whole numbers
-
-Each report becomes one line in the Workers logs, kept 3 days.
+The site has no address that takes input, and no script of ours reports from a visitor's browser (removed November 16, 2026). The CSP has no `report-to` or `report-uri`: a block still happens, it just isn't sent anywhere. Script errors and CSP blocks are found by looking, in browsers on our own machines (the `check` skill). At launch, Cloudflare's client-side security watches which scripts the pages run, with its own report-only header and Cloudflare's endpoint (`release.md`, "Before launch").
 
 ### Supply chain
 
@@ -54,7 +47,7 @@ Actions pinned to commits, zizmor on every run, Dependabot monthly (`.github/dep
 ## Privacy
 
 - **No cookies, no tracking.** Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
-- **What a report holds:** the page address without its query string, the error message, the script address and line, and the user agent cut to 200 characters; a CSP report also the blocked address (no query) and the directive. Never anything a visitor typed. The Workers logs keep reports 3 days; the privacy page says "up to 7 days" for the site's logs, to be safe.
+- **What the site logs:** only the Worker's own failures, as the error message and the path. No IP address, nothing a visitor typed. The Workers logs keep them 3 days; the privacy page says "up to 7 days", to be safe.
 - **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same commit.
 
 ## Secrets

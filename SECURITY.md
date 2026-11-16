@@ -20,7 +20,7 @@ We reply within two business days and tell you when it's fixed.
 
 - The site's pages.
 - Its response headers, such as the CSP and HSTS.
-- The `/api/*` endpoints in `worker/index.js`.
+- The Worker in `worker/index.js` (the `http://` redirect and the 404 page).
 
 **Out of scope:**
 

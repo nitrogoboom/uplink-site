@@ -38,7 +38,7 @@ On the live site. About 25 minutes. Proof: one line per failure (page, problem, 
 
 ## Watch the live site
 
-Workers logs (3 days) for `/api/report` lines after each deploy; Dependabot monthly, merge on green.
+Workers logs (3 days) for `worker_error` lines after each deploy; after launch, the client-side security dashboard for scripts the site doesn't load itself; Dependabot monthly, merge on green.
 
 ## Before launch
 
@@ -48,13 +48,14 @@ Workers logs (3 days) for `/api/report` lines after each deploy; Dependabot mont
 - [ ] **(you)** Decide what gets a test: the "Set in stone" list in `CLAUDE.md`. Until then the repo has none but the deploy's smoke check.
 - [ ] Narrow the Trusted Types policy: `html()` in `core.js` accepts only the site's own drawings and icons (review J6).
 - [ ] One cached stylesheet instead of inlined CSS per page (review L4); hashed drawing file names (L5).
-- [ ] Review PR #38's form routes like `/api/report`: Turnstile, honeypot, rate limit, header injection.
+- [ ] **(domain)** Turn on Cloudflare client-side security (formerly Page Shield; Free plan): dashboard > the zone > Security > Settings > Client-side abuse > Continuous script monitoring. It needs the site on a Cloudflare zone, so not on workers.dev. Cloudflare adds its own report-only CSP header to some pages and collects the reports at its own endpoint: nothing to add to `public/_headers` and no endpoint of ours. Free shows the scripts in the dashboard (Security > Web assets > Client-side resources); email alerts for new scripts need Business. Check the list once after launch: only the site's own `/_astro/` scripts should be there.
+- [ ] If the forms come back (PR #38): review its `/api/` routes first (Turnstile, honeypot, rate limit, header injection); the site has none until then.
 - [ ] **(domain)** SSL Labs A+, securityheaders.com, Mozilla Observatory; registrar lock, auto-renew, 2FA.
 - [ ] **(content)** Social links and the ~20 `/soon` links per page get real targets; `Français` back with a real French page.
 - [ ] **(you)** A lawyer reads `/privacy` and the terms; the two Ontario lines for `/accessibility` (`notes.md`).
 - [ ] Redirects from the old site's addresses, if there is one.
 - [ ] **(you)** PageSpeed on every page (pagespeed.web.dev); one WebPageTest run from Toronto; decide on Lighthouse CI.
-- [ ] **(you)** Practise a rollback (below); alerts for `/api/report` and uptime; a proofread by someone else; extra real phones; the owner's sign-off.
+- [ ] **(you)** Practise a rollback (below); an uptime alert; a proofread by someone else; extra real phones; the owner's sign-off.
 - [ ] `curl -sI` a version preview address: if Cloudflare adds `X-Robots-Tag: noindex` there, the deploy's `--preview --launch` smoke fails every deploy (review H3); then leave that check to the live run.
 
 ## Launch day

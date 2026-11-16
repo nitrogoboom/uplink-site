@@ -7,7 +7,7 @@
 //                         preview_urls must stay true: the deploy checks each version at its preview address.
 // The one script, worker/index.js, runs only where the files can't answer well on their own; everything else never
 // starts it (no Worker time, no log line, nothing counted against the free plan's 100,000 requests a day):
-//   run_worker_first   /api/* (the reports from visitors' browsers) and /404 by name (a file, so it would be 200)
+//   run_worker_first   /404 by name (a file, so it would be 200). The site has no /api/ address.
 //   not_found_handling "none": an address with no file goes to the Worker, which answers with dist/404.html, a 404
 //                      status and /404's headers. "404-page" would serve that page from the assets without the Worker,
 //                      but with the _headers rules of the missing path (a missing .txt as text/plain, a missing
@@ -25,17 +25,14 @@
     "directory": "./dist",
     "not_found_handling": "none",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/404"],
+    "run_worker_first": ["/404"],
   },
-  // /api/report: 30 posts a minute per visitor address (worker/index.js). PR #38 (open, paused) adds a FORMS limit, namespace 1001.
-  "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
   "preview_urls": true,
-  // Worker Previews (CI's preview job runs `wrangler preview`): the block must be here. A preview takes the assets
-  // and the settings above, but not the bindings: REPORTS is named again so /api/report is limited there too
-  "previews": {
-    "ratelimits": [{ "name": "REPORTS", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }],
-  },
-  // The script's own console.log lines (one per report, worker/index.js) are kept, 3 days on the free plan. Cloudflare's
-  // own record of each run (the invocation log: the request and response, headers included) is off: we don't need it.
+  // Worker Previews (CI's preview job runs `wrangler preview`): the block must be here, even empty. A preview takes the
+  // assets and the settings above, but not bindings (there are none)
+  "previews": {},
+  // The script's own console lines (worker/index.js logs only an unexpected error: its message and the path) are kept,
+  // 3 days on the free plan. Cloudflare's own record of each run (the invocation log: the request and response, headers
+  // included) is off: we don't need it.
   "observability": { "enabled": true, "logs": { "invocation_logs": false } },
 }

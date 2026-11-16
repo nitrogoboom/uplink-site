@@ -54,28 +54,6 @@ const words = (id) => {
 /** @typedef {import('../lib/copy').UiWords} UiWords */
 const UI = /** @type {UiWords} */ (words('words-ui'));
 
-/* ---------- error reports ---------------------------------------------- */
-// A script error on a visitor's screen is posted to /api/report (worker/index.js logs it), so we hear about it.
-// What goes: the page's path, the message, the script's address and line. Never form contents or anything typed.
-// Left out: "Script error." (an outside script's error, which the browser hides) and "ResizeObserver loop" (a
-// browser notice that a resize took two frames, not a fault). Five reports a page at most.
-// CSP blocks are reported by the browser itself (public/_headers).
-let reportsLeft = 5;
-/** @type {(message: string, source?: string, line?: number, column?: number) => void} */
-const reportError = (message, source, line, column) => {
-  if (!message || message === 'Script error.' || /ResizeObserver loop/.test(message)) return;
-  if (reportsLeft-- <= 0 || !navigator.sendBeacon) return;
-  const body = { kind: 'error', page: location.pathname, message: String(message).slice(0, 300), source, line, column };
-  navigator.sendBeacon('/api/report', new Blob([JSON.stringify(body)], { type: 'application/json' }));
-};
-window.addEventListener('error', (e) => reportError(e.message, e.filename, e.lineno, e.colno));
-// a rejection's reason is whatever was thrown (typed any), and lint can't see a JSDoc cast, so its any-rules are off here
-/* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-window.addEventListener('unhandledrejection', (e) =>
-  reportError(e.reason?.message || String(e.reason), e.reason?.stack?.split('\n')[1]?.trim()),
-);
-/* eslint-enable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-
 /* ---------- storage (can be unavailable) ------------------------------ */
 const store = {
   /** @param {string} key */

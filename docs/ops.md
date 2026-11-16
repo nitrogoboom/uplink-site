@@ -7,9 +7,8 @@ How the site is hosted and run. Secrets and security controls are in [`security.
 
 ## The Worker
 
-`worker/index.js` is the site's only server code. The static files answer most requests, with `_headers` and `_redirects` applied. `wrangler.jsonc` sends the Worker three kinds of request:
+`worker/index.js` is the site's only server code. It takes no input: there is no `/api/` address, and it reads no request body. The static files answer most requests, with `_headers` and `_redirects` applied. `wrangler.jsonc` sends the Worker two kinds of request:
 
-- **`/api/*`** (`run_worker_first`). The Worker answers `POST /api/report`, where browsers send script errors and CSP blocks. Each report becomes one line in the Workers logs. Any other `/api/*` address gets a 404.
 - **`/404`** (`run_worker_first`). The Worker gives the 404 page a `404` status.
 - **An address with no file** (`not_found_handling: "none"`). The Worker answers with the same 404 page and headers as `/404`. Don't use `"404-page"`: the static files would answer with the `_headers` rules of the missing path.
 
@@ -18,8 +17,7 @@ Also:
 - The Worker fetches the 404 page afresh and sends it without an `ETag`. Any method other than `GET` and `HEAD` to `/404` or a missing address gets a `405`.
 - For the requests it sees, it redirects `http://` to `https://` with a `308`, except for a local server (`localhost`, `*.localhost`, `*.local`, `0.0.0.0`, and private addresses). At launch, Always Use HTTPS on the zone redirects every request first.
 - `_headers` doesn't reach the Worker's own responses, so each carries `X-Content-Type-Options: nosniff`, `Cache-Control: no-store`, and a CSP that loads nothing. The 404 page keeps the headers it has as a file.
-- A report it can't read gets a `400`. Anything else that goes wrong sends the request on to the static files; an `/api/` request, or one whose body was already read, gets a `503`.
-- The Workers logs keep one line per report for 3 days (free plan). The invocation log is off (`observability.logs.invocation_logs`).
+- Anything that goes wrong is logged (the message and the path) and the request goes on to the static files. The Workers logs keep those lines 3 days (free plan). The invocation log is off (`observability.logs.invocation_logs`).
 
 > **Note:** Before `wrangler dev`, `deploy`, `versions upload`, and `preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command`). It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, or `dist/_redirects` is missing. Run `npm run build` again and fix what it reports.
 
@@ -73,7 +71,7 @@ The deploy job rolls back on its own when the live site fails the smoke check. R
 
 `public/_headers` sets the security headers on every static file, the cache rules, and the `Speculation-Rules` header. The Worker sets its own (see [The Worker](#the-worker)).
 
-The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `/api/` and to `.txt` files are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
+The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `.txt` files are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
 
 `public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert, `X-Build`, and an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
 

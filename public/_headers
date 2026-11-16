@@ -11,14 +11,14 @@
 # No outside script or connection: the site loads nothing from another host.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (its html() helper). A new innerHTML elsewhere fails until it goes through it.
-# Reporting-Endpoints / report-to csp (and report-uri for browsers without the Reporting API): every CSP block a
-# visitor's browser hits is posted to /api/report (worker/index.js), which logs it. Same origin, so nothing new to allow.
+# No report-to or report-uri: the site has no address that takes reports. At launch, Cloudflare's client-side
+# security watches the scripts pages run, with its own header and endpoint (docs/release.md, "Before launch").
 # X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
 # robots.txt still allows crawling, so search engines can read this, and names no sitemap (src/pages/robots.txt.ts).
 # At launch, delete the line and put the Sitemap line back in robots.txt (docs/release.md, "Launch day").
 # Speculation-Rules: Chrome and Edge fetch a page in the background when a pointer rests on a link to it (on phones,
 # when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json: our
-# own pages only, not /api/ or the .txt files. A header, not an inline <script>, so the CSP needs nothing
+# own pages only, not the .txt files. A header, not an inline <script>, so the CSP needs nothing
 # new. Other browsers ignore it, and so does any response that isn't a page.
 # A missing address isn't served from this file's path rules: the Worker answers it with the 404 page and /404's
 # headers, so the rules below for a path (/*.txt, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
@@ -31,10 +31,9 @@
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Resource-Policy: same-origin
   X-Frame-Options: DENY
-  Reporting-Endpoints: csp="/api/report"
   Speculation-Rules: "/speculation-rules.json"
   X-Build: {build}
-  Content-Security-Policy: default-src 'self'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink; report-uri /api/report; report-to csp
+  Content-Security-Policy: default-src 'self'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
 # first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
