@@ -199,7 +199,8 @@ async function route(request, env) {
   if (request.method !== 'GET' && request.method !== 'HEAD')
     return reply(405, 'Method not allowed', { Allow: 'GET, HEAD' });
   if (url.pathname === '/404') return notFound(request, env);
-  // any other address comes here only when it has no file (wrangler.jsonc): the file if there is one, else the 404 page
+  // any other address comes here only when the assets had no file for it (wrangler.jsonc): pass on whatever they
+  // answer now but a 404, which gets the 404 page
   const res = await env.ASSETS.fetch(request);
   if (res.status !== 404) return res;
   await res.body?.cancel();
