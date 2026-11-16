@@ -43,7 +43,7 @@
     --c-glow-accent: rgb(255 173 81 / 0.12);
     --c-glow-sky: rgb(0 93 138 / 0.07);
     --c-glow-sky-2: rgb(0 93 138 / 0.08);
-    --grain-opacity: 0.5; /* overlay is weaker near white: the same texture as dark's 0.35 */
+    --grain-opacity: 0.375; /* overlay is weaker near white: the same texture as dark's 0.26 */
     --c-cool-surface: rgb(216 239 255 / 0.4);
     --c-cool-surface-2: rgb(216 239 255 / 0.7);
     --c-cool-muted: #455a69;

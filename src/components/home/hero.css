@@ -4,6 +4,10 @@
    The .hero section itself (colour, glow, padding) is src/styles/hero-section.css, shared with the service pages
    and the case-study pages. ---*/
 /* ---------- HOME ----------------------------------------------------- */
+/* Home's glows at the strength the footer's take (tokens.css); the service and case-study pages keep theirs */
+.hero.fold::before {
+  opacity: var(--glow-strength);
+}
 /* 1. stacked: headline and lead, the button, the office, the news cards. At least one screen tall: the office
    takes the height the words leave, never under its floor (.stage, below), so on a tall screen the news cards
    come up into view and on a phone the drawing stays full width. */

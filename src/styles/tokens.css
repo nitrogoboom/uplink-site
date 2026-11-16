@@ -41,11 +41,12 @@
   --c-glow-accent: rgb(255 173 81 / 0.07); /* warm key light behind the hero call to action */
   --c-glow-sky: rgb(151 200 234 / 0.09); /* cool fill light behind the hero office */
   --c-glow-sky-2: rgb(151 200 234 / 0.11); /* glow behind the footer map */
+  --glow-strength: 0.75; /* Home's hero and the footer show their glows at 75% (owner, November 16, 2026) */
   /* film grain over the glowing grounds (grain.css): a 160px tile of grey noise centred on mid-grey. The filter works
      in sRGB (in linear RGB the noise averages 0.73 and lightens the ground) and its contrast is tripled, so the
      texture shows on very dark and very light grounds alike */
   --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n' x='0' y='0' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='3' intercept='-1'/%3E%3CfeFuncG type='linear' slope='3' intercept='-1'/%3E%3CfeFuncB type='linear' slope='3' intercept='-1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --grain-opacity: 0.35; /* its strength: 0.2 subtle, 0.35 (dark), 0.5 strong */
+  --grain-opacity: 0.26; /* its strength: 75% of the first 0.35 (owner, November 16, 2026) */
 
   /* hero: surfaces pick up a slight blue tint to match the cool light */
   --c-cool-surface: rgb(216 239 255 / 0.05);
