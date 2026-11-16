@@ -59,10 +59,11 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | `npm run build` | Builds the site into `dist/`. Its last step (`astro:build:done` in `astro.config.mjs`) shrinks the drawings and writes `dist/_headers` and `dist/_redirects`. |
 | `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). Restart it after a rebuild: it keeps serving the `_headers` it started with. |
 | `npm run preview` | Astro's own preview server. No headers or redirects: use `npm run serve`. |
-| `npm run check` | Type check and Astro's diagnostics for `src/`. The build scripts and the Worker aren't type-checked. |
+| `npm run check` | Type check and Astro's diagnostics for `src/`, then a type check of the Worker (`worker/tsconfig.json`) and the build scripts (`scripts/tsconfig.json`). |
+| `npm run types` | Writes the Worker's types (`Env`, the runtime) from `wrangler.jsonc` into `worker/worker-configuration.d.ts`. Run it after changing `wrangler.jsonc`; `npm run quick` fails until you do. |
 | `npm run lint` | ESLint, Stylelint, and Prettier. |
 | `npm run format` | Fixes what the linters can, then formats with Prettier. `astroCompressHTML` in `.prettierrc.json` matches `compressHTML` in `astro.config.mjs`: change the two together. A commit that only reformats goes in `.git-blame-ignore-revs`. |
-| `npm run quick` | Type check, lint, build (about 20 seconds). |
+| `npm run quick` | Type check, lint, build, and a check that the Worker's types match `wrangler.jsonc` (about 30 seconds). |
 | `npm run smoke -- ADDRESS` | Checks a deployed site over plain HTTP: [`docs/site-checks.md`](docs/site-checks.md). The deploy runs it. |
 | `npm run deploy` | Deploys the checked-out branch to the live Worker by hand: builds, then deploys. One step (`wrangler deploy`): no check of the new version first, and no rollback ([Deploys](docs/ops.md#deploys)). CI deploys on a merge to `main`, so you rarely need it; run it from `main`. |
 

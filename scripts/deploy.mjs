@@ -29,6 +29,7 @@ const LIVE_ONLY = ['--old'];
 const previewArgs = smokeArgs.filter((a, i) => !LIVE_ONLY.includes(a) && !LIVE_ONLY.includes(smokeArgs[i - 1]));
 
 // runs a command with its output in the log; capture: stdout comes back as well; strip: variables it doesn't get
+/** @type {(command: string[], args: string[], opts?: { capture?: boolean, env?: Record<string, string>, strip?: string[] }) => { ok: boolean, stdout: string }} */
 const run = ([cmd, ...pre], args, { capture = false, env = {}, strip = [] } = {}) => {
   console.log(`\n> ${[cmd, ...pre, ...args].map((a) => a.replace(ROOT, '')).join(' ')}`);
   const childEnv = { ...process.env, ...env };

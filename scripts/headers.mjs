@@ -9,6 +9,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const ROOT = new URL('..', import.meta.url);
 const WORKER_DIR = fileURLToPath(new URL('worker', ROOT));
 // every file under dir, in name order, but those skip() names
+/** @type {(dir: string, skip?: (path: string) => boolean) => string[]} */
 const files = (dir, skip = () => false) =>
   readdirSync(dir)
     .sort()

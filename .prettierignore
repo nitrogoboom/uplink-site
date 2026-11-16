@@ -2,11 +2,12 @@
 # writes it, `npm run lint` checks it. ESLint and Stylelint check everything else (neither has a formatting rule
 # switched on). Markdown, HTML and SVG stay out: the Markdown is hand-wrapped prose, the HTML and SVG are written by
 # scripts (tools/gen_*.py, the build). tools/office_parts/ is a generator's input: a {{pal:NAME}} template pasted into
-# the drawings as it is, so its bytes are the drawing's (python tools/regen.py --check).
+# the drawings as it is, so its bytes are the drawing's (python tools/regen.py --check). worker/worker-configuration.d.ts is written by `npm run types`.
 *.md
 *.html
 *.svg
 tools/office_parts/
+worker/worker-configuration.d.ts
 dist/
 out/
 node_modules/

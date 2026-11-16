@@ -9,7 +9,18 @@ import globals from 'globals';
 
 export default defineConfig(
   // .claude/ holds the app's git worktrees (whole copies of the repo), which would be linted twice
-  { ignores: ['dist/', 'out/', '.astro/', '.wrangler/', 'node_modules/', '.claude/'] },
+  // worker-configuration.d.ts is generated (npm run types)
+  {
+    ignores: [
+      'dist/',
+      'out/',
+      '.astro/',
+      '.wrangler/',
+      'node_modules/',
+      '.claude/',
+      'worker/worker-configuration.d.ts',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { languageOptions: { parserOptions: { tsconfigRootDir: import.meta.dirname } } },
@@ -24,7 +35,8 @@ export default defineConfig(
   // the Worker runs on Cloudflare: the web platform's globals (fetch, Request, Response, URL), no DOM
   { files: ['worker/**/*.js'], languageOptions: { globals: globals.serviceworker } },
   // the rules that need types (a promise left floating, a promise handed to a listener), for the code the type check
-  // covers (tsconfig.json: checkJs, which leaves out checks/, scripts/ and worker/)
+  // covers (tsconfig.json: checkJs, which leaves out checks/, scripts/ and worker/; the last two have their own type
+  // check, worker/tsconfig.json and scripts/tsconfig.json, without these rules)
   {
     files: ['src/scripts/**/*.js', 'src/lib/**/*.{js,mjs,ts}'],
     extends: [tseslint.configs.recommendedTypeCheckedOnly],
