@@ -235,6 +235,10 @@
 :root[data-theme='light'] .hero-art .p-670f39 {
   stroke: #37424e;
 }
+:root[data-theme='light'] .hero-art .p-6d9350 {
+  fill: #222e3a;
+  stroke: #1f75a6;
+}
 :root[data-theme='light'] .hero-art .p-795a7c {
   fill: #f3f8fd;
   stroke: #f3f8fd;
@@ -246,10 +250,6 @@
 :root[data-theme='light'] .hero-art .p-851679 {
   fill: #e8edf3;
   stroke: #e8edf3;
-}
-:root[data-theme='light'] .hero-art .p-86bdbe {
-  fill: #222e3a;
-  stroke: #1f75a6;
 }
 :root[data-theme='light'] .hero-art .p-8c06d2 {
   fill: #f4f9fe;

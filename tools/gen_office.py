@@ -368,10 +368,10 @@ def desk(cx, cy):
     out = box(desk_box(cx, cy))
     for _n, b in mon:
         out += box(b)
-    out.append(screen_glass(w, scr, screen_ui(scr)))
+    out.append(screen_glass(w, scr, screen_ui(scr), edge=HERO_MIN_LINE))   # its edge scales with the drawing
     for _n, b in ph:
         out += box(b)
-    out.append(phone_face(w, ph_top))
+    out.append(phone_face(w, ph_top, keys=False))   # no keypad: each key would be about a pixel of grain
     out += box(kb)
     for _n, b in ch:
         out += box(b)
@@ -630,7 +630,7 @@ def reception():
     ph, ph_top = desk_phone(*RECEPTION_PHONE, top, '-y', s=PROP_S)
     for _n, b in ph:
         out += box(b)
-    return out + [phone_face(w, ph_top)]
+    return out + [phone_face(w, ph_top, keys=False)]
 
 
 def card(v):

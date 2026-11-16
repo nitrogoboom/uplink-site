@@ -8,6 +8,7 @@ order for that facing, ready for isogen.faces() and isogen.silhouette(). Sizes a
 The viewer looks at the +x and +y faces, so a part with larger x + y is nearer. On the grid, any two corners sit
 exactly together or at least about 2.9px apart at 23px a unit, however a prop is turned or placed.
 """
+import math
 from iso import C30
 import palette as pal
 
@@ -115,11 +116,17 @@ def screen_transform(w, screen):
     return on_front(w, x, y, z) if facing == '+y' else on_side(w, x, y, z)
 
 
-def screen_glass(w, screen, content='', glow=pal.SKY):
-    """Dark glass with a faint edge, plus whatever content (local units) the drawing puts on it."""
+def screen_glass(w, screen, content='', glow=pal.SKY, edge=None):
+    """Dark glass with a faint edge, plus whatever content (local units) the drawing puts on it.
+    edge=None: the edge is 1 screen px at any size (non-scaling). edge=N: N drawing units wide, scaling with the
+    drawing like its other lines (the office hero: gen_office.HERO_MIN_LINE), at the same weight (opacity / N)."""
     _f, _xyz, wd, ht = screen
+    if edge is None:
+        line = ' stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"'
+    else:   # the face matrix maps a local unit to about w.u * sqrt(C30) drawing units (its area scale)
+        line = f' stroke-opacity="{0.35 / edge:.3g}" stroke-width="{edge / (w.u * math.sqrt(C30)):.3g}"'
     return (f'<g transform="{screen_transform(w, screen)}">'
-            + rect(0, 0, wd, ht, pal.SCREEN, 0.08 * min(wd, ht) / 2.4, f' stroke="{glow}" stroke-opacity="0.35" stroke-width="1" vector-effect="non-scaling-stroke"')
+            + rect(0, 0, wd, ht, pal.SCREEN, 0.08 * min(wd, ht) / 2.4, f' stroke="{glow}"{line}')
             + content + '</g>')
 
 
@@ -161,8 +168,9 @@ def desk_phone(x, y, top, facing='-y', s=1.0, cradle=False):
     return order, (bx0, by0, bz1, bx1 - bx0, by1 - by0, facing, s)
 
 
-def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
-    """Little lit screen and a 3 x 3 keypad on the phone's top, clear of the handset."""
+def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE, keys=True):
+    """Little lit screen and a 3 x 3 keypad on the phone's top, clear of the handset. keys=False: the screen only
+    (the office drawings, where each key is about a pixel and reads as grain)."""
     x0, y0, z, wx, dy, facing, s = top_face
     # lay out in the phone's own frame (u across its width, v front to back) then map with on_top
     if facing in ('-y', '+y'):
@@ -170,7 +178,7 @@ def phone_face(w, top_face, glow=pal.SKY, key=pal.EDGE):
     else:
         u_len, v_len = dy, wx
     out = [rect(0.36 * s, 0.08 * s, 0.54 * s, 0.2 * s, glow, 0.03 * s, ' fill-opacity="0.85"')]
-    for r in range(3):
+    for r in range(3 if keys else 0):
         for c in range(3):
             out.append(f'<circle cx="{(0.47 + c * 0.16) * s:.4g}" cy="{(0.4 + r * 0.11) * s:.4g}" r="{0.032 * s:.3g}" fill="{key}" fill-opacity="0.5"/>')
     content = ''.join(out)
