@@ -77,6 +77,15 @@
     --shadow-card:
       inset 0 1px 0 rgb(255 255 255 / 0.9), 0 1px 1px hsl(215deg 40% 30% / 0.05), 0 2px 4px hsl(215deg 40% 30% / 0.05),
       0 6px 14px -4px hsl(215deg 40% 30% / 0.08);
+    /* the card in front (Home services, phone): the dark theme's falloff was a grey ring here, darkest along the
+       card's top, washing over the cards beside it, and banded, its long faint edge fading in steps (owner, November
+       16, 2026). Here it is light from above: five faint navy layers, each about twice the last, all pulled in
+       (negative spread) so they fall below the card, not around it, and short, so the fade is too steep to step.
+       Reach: about 30px down, none up */
+    --shadow-front:
+      0 1px 2px hsl(var(--shadow-ink) / 0.06), 0 2px 4px -1px hsl(var(--shadow-ink) / 0.06),
+      0 6px 12px -4px hsl(var(--shadow-ink) / 0.08), 0 14px 28px -10px hsl(var(--shadow-ink) / 0.12),
+      0 28px 48px -20px hsl(var(--shadow-ink) / 0.14);
   }
 }
 
