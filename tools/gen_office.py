@@ -7,7 +7,7 @@ as the page's JS and CSS expect; its animation CSS and the cloud's frame are inp
 import html, json, math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, card as card_cut, box as draw_box
+from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, cull_hidden, share_paint, tidy_numbers, card as card_cut, box as draw_box
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -71,14 +71,15 @@ RING_PULSE = [[-1800, -1300, -800], [-2100, -1600, -1100], [-2400, -1900, -1400]
 TRAY_Z = 10                            # tray floats above rack 1; the uplink runs straight up to it
 TRAY_T, TILE_T, TILE, TILE_GAP, TRAY_M = 0.4, 0.2, 1.7, 0.35, 0.4
 ICON = 1.25                            # icon size on a tile (24-unit icon grid)
+ICON_LINE = 1.6                        # icon line width in drawing units: scales with the drawing like every other line (was 2 screen px at any size)
 TILES = ['mail', 'files', 'meet', 'chat', 'cal', 'secure']   # 3 x 2, back row first; mail is lit
 ICONS = {
-    'mail': '<rect x="3" y="5" width="18" height="14" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M4 7l8 6 8-6" vector-effect="non-scaling-stroke"/>',
-    'files': '<path d="M6 3h8l4 4v14H6z" vector-effect="non-scaling-stroke"/><path d="M14 3v4h4M9 13h6M9 17h4" vector-effect="non-scaling-stroke"/>',
-    'meet': '<rect x="3" y="7" width="12" height="10" rx="2" vector-effect="non-scaling-stroke"/><path d="M15 11l6-3v8l-6-3z" vector-effect="non-scaling-stroke"/>',
-    'chat': '<path d="M4 5h16v11H10l-6 4z" vector-effect="non-scaling-stroke"/><path d="M8 10h8" vector-effect="non-scaling-stroke"/>',
-    'cal': '<rect x="3" y="5" width="18" height="16" rx="2.5" vector-effect="non-scaling-stroke"/><path d="M3 10h18M8 3v4M16 3v4" vector-effect="non-scaling-stroke"/>',
-    'secure': '<path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" vector-effect="non-scaling-stroke"/><path d="M9 12l2 2 4-4" vector-effect="non-scaling-stroke"/>',
+    'mail': '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M4 7l8 6 8-6"/>',
+    'files': '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h4"/>',
+    'meet': '<rect x="3" y="7" width="12" height="10" rx="2"/><path d="M15 11l6-3v8l-6-3z"/>',
+    'chat': '<path d="M4 5h16v11H10l-6 4z"/><path d="M8 10h8"/>',
+    'cal': '<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    'secure': '<path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/><path d="M9 12l2 2 4-4"/>',
 }
 CARD_LINK = (851.6, 86.4, 878.0)       # office/build: dashed line from the card (start, bend x) to the tray's top-left corner
 
@@ -208,6 +209,33 @@ ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
 # what screen readers say for the drawing: plain words, as a person would describe it
 TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace',
           'hero': 'Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
+
+
+# ---- line weight (hero cuts) -------------------------------------------------------
+# The hero shows at about 0.82 of its 1200 units on a 1080p screen, so a 1-unit line is 0.8 device px and a 0.7 one
+# 0.57: thinner than a pixel, a slanted line is smoothed into beads. crisp() widens every line under HERO_MIN_LINE to
+# it and lowers its opacity by the same ratio, so it keeps its weight but covers whole pixels. Left alone: the floor
+# grid (class "floor", meant to stay light), seam strokes (stroke = an opaque fill's colour, they close gaps), lines inside a transform
+# (their width is in its units) and non-scaling ones.
+HERO_MIN_LINE = 1.25
+_TAG = re.compile(r'<(?:polygon|polyline|path|rect|circle|ellipse|line|g)\b[^>]*>')
+
+
+def crisp(text, least=HERO_MIN_LINE):
+    def fix(m):
+        tag = m.group(0)
+        sw = re.search(r' stroke-width="([\d.]+)"', tag)
+        if not sw or float(sw.group(1)) >= least or 'class="floor"' in tag or 'transform=' in tag or 'vector-effect' in tag:
+            return tag
+        stroke, fill = re.search(r' stroke="([^"]*)"', tag), re.search(r' fill="([^"]*)"', tag)
+        if stroke and fill and stroke.group(1).lower() == fill.group(1).lower() and 'fill-opacity' not in tag:
+            return tag
+        op = re.search(r' stroke-opacity="([\d.]+)"', tag)
+        k = float(sw.group(1)) / least
+        new_op = f' stroke-opacity="{(float(op.group(1)) if op else 1.0) * k:.3g}"'
+        tag = tag.replace(sw.group(0), f' stroke-width="{least:g}"' + ('' if op else new_op))
+        return tag.replace(op.group(0), new_op) if op else tag
+    return _TAG.sub(fix, text)
 
 
 # ---- small builders -------------------------------------------------------------
@@ -478,8 +506,9 @@ def tile(i, v):
     s = ICON / 24
     a, b = math.cos(math.radians(30)) * w.u * s, w.u / 2 * s
     cls = 'class="f-ic" ' if v in HERO_CUTS else ''
+    iw = ICON_LINE / math.sqrt(2 * a * b)      # the matrix's area scale is 2ab: a line ICON_LINE wide on screen
     out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{pal.ON_AMBER if lit else pal.WHITE}" '
-               f'stroke-width="2.0" {ROUND}>{ICONS[TILES[i]]}</g>')   # vector-effect sits on each icon shape (it isn't inherited)
+               f'stroke-width="{iw:.3g}" {ROUND}>{ICONS[TILES[i]]}</g>')
     return out
 
 
@@ -796,6 +825,8 @@ def render(v):
     BOXES.clear()
     out = []
     for attrs, shapes in groups(v):
+        if v in HERO_CUTS:
+            shapes = cull_hidden(shapes)        # nothing that would show nowhere (a chair tucked under a table, a face behind a chair back)
         if attrs is None:                       # hero cloud: already wrapped
             out += shapes; continue
         if v in ('office', 'compact'):
@@ -806,6 +837,8 @@ def render(v):
             open_, close = f'<g {attrs}>', '</g>'
         out += [open_, *shapes, close]
     body = number_badges('\n'.join(out))
+    if v in HERO_CUTS:
+        body = crisp(body)
     title = esc(TITLES['office' if v == 'compact' else 'hero' if v in ('phone', 'tablet') else v])
     crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
     phone_crop = ' '.join(f'{c:g}' for c in PHONE_CROP)
@@ -843,6 +876,9 @@ def render(v):
         elif v == 'tablet':                 # the page inlines one flow layer for both hero cuts, so they must agree
             assert flows == HERO_FLOWS, 'tablet and hero dashes differ: render hero first and keep the scene the same'
     body, css = hoist_styles(body)
+    if v in HERO_CUTS:                      # after hoist_styles: a shape that had a style="" now has a class, and is left alone
+        body, paint_css = share_paint(tidy_numbers(body))
+        css += paint_css
     if css:
         style += f'\n<style>{css}</style>'
     if v in HERO_CUTS:
@@ -860,7 +896,7 @@ def phone_still():
     body = re.sub(r' style="[^"]*"', '', body + '\n' + over)
     head = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{" ".join(f"{c:g}" for c in PHONE_CROP)}" '
             f'width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" role="img" aria-label="{esc(TITLES["office"])}">')
-    return '\n'.join([head, f'<title>{esc(TITLES["office"])}</title>', '<style>.ob-flow{stroke-dasharray:2 7}</style>', body, '</svg>'])
+    return '\n'.join([head, f'<title>{esc(TITLES["office"])}</title>', '<style>.ob-flow{stroke-dasharray:3 6}</style>', body, '</svg>'])
 
 
 if __name__ == '__main__':

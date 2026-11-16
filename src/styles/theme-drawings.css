@@ -6,26 +6,14 @@
 :where(:root[data-theme='light'] .hero-art) [fill='#0e1a27' i] {
   fill: #e8eff7;
 }
-:where(:root[data-theme='light'] .hero-art) [fill='#182430' i] {
-  fill: #222e3a;
-}
 :where(:root[data-theme='light'] .hero-art) [fill='#182431' i] {
   fill: #dce2e8;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#198152' i] {
-  fill: #00683f;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#222e3a' i] {
   fill: #bbc2c9;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#25313d' i] {
   fill: #c0c6cd;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#28333f' i] {
-  fill: #c3cad1;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#283440' i] {
-  fill: #c5cbd2;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#293440' i] {
   fill: #c5cbd2;
@@ -60,17 +48,8 @@
 :where(:root[data-theme='light'] .hero-art) [fill='#343f4b' i] {
   fill: #d6dce2;
 }
-:where(:root[data-theme='light'] .hero-art) [fill='#353f4b' i] {
-  fill: #d6dce2;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#37414d' i] {
-  fill: #d9dfe5;
-}
 :where(:root[data-theme='light'] .hero-art) [fill='#37424e' i] {
   fill: #d2d8de;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#39434f' i] {
-  fill: #dce2e8;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#3a4450' i] {
   fill: #dee3e9;
@@ -78,56 +57,17 @@
 :where(:root[data-theme='light'] .hero-art) [fill='#3a4551' i] {
   fill: #dfe4eb;
 }
-:where(:root[data-theme='light'] .hero-art) [fill='#3c4753' i] {
-  fill: #e2e7ee;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#3e4955' i] {
-  fill: #e5eaf0;
-}
 :where(:root[data-theme='light'] .hero-art) [fill='#3f4a56' i] {
   fill: #e6ecf2;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#404b57' i] {
-  fill: #e8edf3;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#414b57' i] {
   fill: #e8eef4;
 }
-:where(:root[data-theme='light'] .hero-art) [fill='#424d59' i] {
-  fill: #ebf0f6;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#444e5a' i] {
-  fill: #edf2f7;
-}
 :where(:root[data-theme='light'] .hero-art) [fill='#444f5b' i] {
   fill: #eef3f8;
 }
-:where(:root[data-theme='light'] .hero-art) [fill='#46505c' i] {
-  fill: #f0f5fa;
-}
 :where(:root[data-theme='light'] .hero-art) [fill='#46515d' i] {
   fill: #f1f6fb;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#47515d' i] {
-  fill: #f1f6fb;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#48525e' i] {
-  fill: #f3f8fd;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#49535f' i] {
-  fill: #f4f9fe;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#4a5460' i] {
-  fill: #f6fbff;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#4b5561' i] {
-  fill: #f7fcff;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#4c5662' i] {
-  fill: #f8fcff;
-}
-:where(:root[data-theme='light'] .hero-art) [fill='#4d5763' i] {
-  fill: #f8fcff;
 }
 :where(:root[data-theme='light'] .hero-art) [fill='#4d5863' i] {
   fill: #fff;
@@ -149,9 +89,6 @@
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#0e1a27' i] {
   stroke: #e8eff7;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#28333f' i] {
-  stroke: #c3cad1;
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#293440' i] {
   stroke: #c5cbd2;
@@ -186,65 +123,14 @@
 :where(:root[data-theme='light'] .hero-art) [stroke='#343f4b' i] {
   stroke: #d6dce2;
 }
-:where(:root[data-theme='light'] .hero-art) [stroke='#353f4b' i] {
-  stroke: #d6dce2;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#37414d' i] {
-  stroke: #d9dfe5;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#39434f' i] {
-  stroke: #dce2e8;
-}
 :where(:root[data-theme='light'] .hero-art) [stroke='#3a4450' i] {
   stroke: #dee3e9;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#3a4551' i] {
-  stroke: #dfe4eb;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#3c4753' i] {
-  stroke: #e2e7ee;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#3e4955' i] {
-  stroke: #e5eaf0;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#404b57' i] {
-  stroke: #e8edf3;
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#414b57' i] {
   stroke: #e8eef4;
 }
-:where(:root[data-theme='light'] .hero-art) [stroke='#424d59' i] {
-  stroke: #ebf0f6;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#444e5a' i] {
-  stroke: #edf2f7;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#46505c' i] {
-  stroke: #f0f5fa;
-}
 :where(:root[data-theme='light'] .hero-art) [stroke='#46515d' i] {
   stroke: #f1f6fb;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#47515d' i] {
-  stroke: #f1f6fb;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#48525e' i] {
-  stroke: #f3f8fd;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#49535f' i] {
-  stroke: #f4f9fe;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#4a5460' i] {
-  stroke: #f6fbff;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#4b5561' i] {
-  stroke: #f7fcff;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#4c5662' i] {
-  stroke: #f8fcff;
-}
-:where(:root[data-theme='light'] .hero-art) [stroke='#4d5763' i] {
-  stroke: #f8fcff;
 }
 :where(:root[data-theme='light'] .hero-art) [stroke='#97c8ea' i] {
   stroke: #1f75a6;
@@ -300,6 +186,183 @@
 }
 :root[data-theme='light'] .hero-art .ob-seg {
   fill: #198152;
+}
+:root[data-theme='light'] .hero-art .p-071416 {
+  stroke: #7c4900;
+}
+:root[data-theme='light'] .hero-art .p-3567f7 {
+  fill: #f6fbff;
+}
+:root[data-theme='light'] .hero-art .p-3567f7 {
+  stroke: #f6fbff;
+}
+:root[data-theme='light'] .hero-art .p-36360a {
+  fill: #bbc2c9;
+}
+:root[data-theme='light'] .hero-art .p-36360a {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-393c0b {
+  fill: #f0f5fa;
+}
+:root[data-theme='light'] .hero-art .p-393c0b {
+  stroke: #f0f5fa;
+}
+:root[data-theme='light'] .hero-art .p-3a7af4 {
+  fill: #f8fcff;
+}
+:root[data-theme='light'] .hero-art .p-3a7af4 {
+  stroke: #f8fcff;
+}
+:root[data-theme='light'] .hero-art .p-3c8844 {
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-470dd8 {
+  fill: #edf2f7;
+}
+:root[data-theme='light'] .hero-art .p-470dd8 {
+  stroke: #edf2f7;
+}
+:root[data-theme='light'] .hero-art .p-476f13 {
+  fill: #d6dce2;
+}
+:root[data-theme='light'] .hero-art .p-476f13 {
+  stroke: #d6dce2;
+}
+:root[data-theme='light'] .hero-art .p-4aab33 {
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-4b1704 {
+  fill: #4a93c1;
+}
+:root[data-theme='light'] .hero-art .p-4b1704 {
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-4d56b8 {
+  fill: #f7fcff;
+}
+:root[data-theme='light'] .hero-art .p-4d56b8 {
+  stroke: #f7fcff;
+}
+:root[data-theme='light'] .hero-art .p-658465 {
+  fill: #dfe4eb;
+}
+:root[data-theme='light'] .hero-art .p-658465 {
+  stroke: #dfe4eb;
+}
+:root[data-theme='light'] .hero-art .p-670f39 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-795a7c {
+  fill: #f3f8fd;
+}
+:root[data-theme='light'] .hero-art .p-795a7c {
+  stroke: #f3f8fd;
+}
+:root[data-theme='light'] .hero-art .p-80bbca {
+  fill: #d2d8de;
+}
+:root[data-theme='light'] .hero-art .p-80bbca {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-851679 {
+  fill: #e8edf3;
+}
+:root[data-theme='light'] .hero-art .p-851679 {
+  stroke: #e8edf3;
+}
+:root[data-theme='light'] .hero-art .p-86bdbe {
+  fill: #222e3a;
+}
+:root[data-theme='light'] .hero-art .p-86bdbe {
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-8c06d2 {
+  fill: #f4f9fe;
+}
+:root[data-theme='light'] .hero-art .p-8c06d2 {
+  stroke: #f4f9fe;
+}
+:root[data-theme='light'] .hero-art .p-8e0d27 {
+  fill: #00683f;
+}
+:root[data-theme='light'] .hero-art .p-8e0d27 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-940b5b {
+  fill: #dce2e8;
+}
+:root[data-theme='light'] .hero-art .p-940b5b {
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-a45284 {
+  fill: #4a93c1;
+}
+:root[data-theme='light'] .hero-art .p-a90b74 {
+  fill: #ebf0f6;
+}
+:root[data-theme='light'] .hero-art .p-a90b74 {
+  stroke: #ebf0f6;
+}
+:root[data-theme='light'] .hero-art .p-ab9a5c {
+  fill: #f1f6fb;
+}
+:root[data-theme='light'] .hero-art .p-ab9a5c {
+  stroke: #f1f6fb;
+}
+:root[data-theme='light'] .hero-art .p-ba2d77 {
+  fill: #fff;
+}
+:root[data-theme='light'] .hero-art .p-ba2d77 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-c16267 {
+  fill: #e2e7ee;
+}
+:root[data-theme='light'] .hero-art .p-c16267 {
+  stroke: #e2e7ee;
+}
+:root[data-theme='light'] .hero-art .p-c19b82 {
+  fill: #f8fcff;
+}
+:root[data-theme='light'] .hero-art .p-c19b82 {
+  stroke: #f8fcff;
+}
+:root[data-theme='light'] .hero-art .p-c1d9a3 {
+  fill: #dce2e8;
+}
+:root[data-theme='light'] .hero-art .p-c1d9a3 {
+  stroke: #dce2e8;
+}
+:root[data-theme='light'] .hero-art .p-c90dcb {
+  fill: #d9dfe5;
+}
+:root[data-theme='light'] .hero-art .p-c90dcb {
+  stroke: #d9dfe5;
+}
+:root[data-theme='light'] .hero-art .p-cd66c6 {
+  fill: #c5cbd2;
+}
+:root[data-theme='light'] .hero-art .p-d06893 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-e5df56 {
+  fill: #4a93c1;
+}
+:root[data-theme='light'] .hero-art .p-e89fbe {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-f2fed1 {
+  fill: #c3cad1;
+}
+:root[data-theme='light'] .hero-art .p-f2fed1 {
+  stroke: #c3cad1;
+}
+:root[data-theme='light'] .hero-art .p-fc11b5 {
+  fill: #e5eaf0;
+}
+:root[data-theme='light'] .hero-art .p-fc11b5 {
+  stroke: #e5eaf0;
 }
 
 /* .grow-stage: grow-world.svg */

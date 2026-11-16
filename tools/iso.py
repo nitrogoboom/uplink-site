@@ -71,10 +71,14 @@ def path_subpaths(d):
     if cur: subs.append(cur)
     return subs, curved
 
+PAINT_RULES = {}                       # class -> paint attributes, from the file load() is reading
+
 class Shape:
     def __init__(self, el, m, line):
         self.el = el; self.tag = etree.QName(el).localname; self.m = m; self.line = line
         self.a = dict(el.attrib); self.subs = []; self.closed = False; self.curved = False
+        for c in self.a.get('class', '').split():     # isogen.share_paint's classes: their paint, read as the attributes they were
+            self.a = {**PAINT_RULES.get(c, {}), **self.a}
         t = self.tag
         if t in ('polygon', 'polyline'):
             v = nums(self.a.get('points', ''))
@@ -110,6 +114,10 @@ def load(text):
     """text = full svg markup. returns (root, shapes)."""
     parser = etree.XMLParser(remove_comments=False, huge_tree=True)
     root = etree.fromstring(text.encode(), parser)
+    PAINT_RULES.clear()
+    for css in re.findall(r'<style[^>]*>(.*?)</style>', text, re.S):
+        for name, body in re.findall(r'\.(p-[0-9a-f]{6})\{([^{}]*)\}', css):
+            PAINT_RULES[name] = dict(d.split(':', 1) for d in body.split(';') if ':' in d)
     shapes = []
     def walk(el, m):
         if not isinstance(el.tag, str): return

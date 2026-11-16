@@ -1,7 +1,7 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match docs/drawing-tools.md "Drawing rules" and the drawing palette in src/styles/tokens.css."""
 import hashlib, html, math, re
-from shapely.geometry import LineString, MultiPoint, Point, box as box_shape
+from shapely.geometry import LineString, MultiPoint, Point, Polygon, box as box_shape
 from iso import fmt
 from svgfont import font_style
 import palette as pal
@@ -28,6 +28,51 @@ def box(w, b, cols=FACES, edge=EDGE, classes=('', '', ''), tail='', log=None):
 def faces(w, x0, x1, y0, y1, z0, z1, cols=FACES, extra=''):
     """box() with the standard edge and extra attributes, for generators that don't keep a BOXES list."""
     return box(w, (x0, x1, y0, y1, z0, z1), cols, EDGE, tail=extra)
+
+
+_ATTR = re.compile(r'([\w:-]+)="([^"]*)"')
+_HEX = re.compile(r'#[0-9A-Fa-f]{3,8}')
+_FLAT_D = re.compile(r'M[-\d.,\sL]+Z')
+
+
+def _flat(s):
+    """(screen polygon, edge width, opaque) for one flat <polygon/> or straight-edged closed <path/>; else None."""
+    m = re.fullmatch(r'<(polygon|path)\b([^>]*)/>', s.strip())
+    if not m:
+        return None
+    a = dict(_ATTR.findall(m.group(2)))
+    if m.group(1) == 'polygon':
+        nums = re.findall(r'-?\d+(?:\.\d+)?', a.get('points', ''))
+    else:
+        d = a.get('d', '').strip()
+        if not _FLAT_D.fullmatch(d) or d.count('M') != 1:
+            return None
+        nums = re.findall(r'-?\d+(?:\.\d+)?', d)
+    pts = list(zip(map(float, nums[0::2]), map(float, nums[1::2])))
+    if len(pts) < 3:
+        return None
+    poly = Polygon(pts).buffer(0)
+    stroked = a.get('stroke', 'none') != 'none'
+    sw = float(a.get('stroke-width', 1)) if stroked else 0.0
+    opaque = (bool(_HEX.fullmatch(a.get('fill', ''))) and not {'class', 'style', 'opacity', 'fill-opacity'} & a.keys())
+    return poly, sw, opaque
+
+
+def cull_hidden(shapes, margin=0.5):
+    """shapes without the ones nothing would show: a flat polygon (or straight-edged closed path) whose fill and edge
+    lie wholly under opaque fills drawn after it in the same list. A list is one build group, so the build looks the
+    same: a part covered only by a later group still shows while that group drops in, and is kept."""
+    keep, cover = [], None
+    for s in reversed(shapes):
+        p = _flat(s) if isinstance(s, str) else None
+        if p is not None:
+            poly, sw, opaque = p
+            if cover is not None and cover.contains(poly.buffer(sw / 2 + margin)):
+                continue
+            if opaque:
+                cover = poly if cover is None else cover.union(poly)
+        keep.append(s)
+    return keep[::-1]
 
 
 def esc(text):
@@ -232,6 +277,46 @@ def hoist_styles(text):
         return re.sub(r'^(<[\w:-]+)', rf'\1 class="{name}"', t)
     out = re.sub(r'<[A-Za-z][^>]*>', tag, text)
     return out, ''.join(f'.{n}.{n}{{{d}}}' for n, d in sorted(rules.items()))
+
+
+PAINT = ('fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linejoin', 'stroke-linecap')
+_SHAPE = re.compile(r'<(polygon|polyline|path|rect|circle|ellipse|line)\b([^>]*?)(/?)>')
+
+
+def share_paint(text, min_uses=3):
+    """The paint attributes (PAINT) that min_uses or more shapes repeat word for word become one CSS class (p-<hash>
+    of the declarations, so the same paint gets the same class in every file). Same pixels: a class rule sits where
+    the attributes did, under any page rule that styled them. Shapes with a class are left as they are, so rules like
+    .ob-tile .f-l keep their footing; text too (gen_light swaps a text fill differently from a shape's). About a third
+    off the file; the download barely moves, compression already caught the repeats, but it is less text to parse."""
+    def paint(attrs):
+        a = _ATTR.findall(attrs)
+        return a, tuple((k, v) for k, v in a if k in PAINT)
+    count = {}
+    for m in _SHAPE.finditer(text):
+        a, p = paint(m.group(2))
+        if p and not {'class', 'style'} & dict(a).keys():
+            count[p] = count.get(p, 0) + 1
+    names = {p: 'p-' + hashlib.sha1(';'.join(f'{k}:{v}' for k, v in p).encode()).hexdigest()[:6]
+             for p, n in count.items() if n >= min_uses}
+
+    def sub(m):
+        a, p = paint(m.group(2))
+        if p not in names or {'class', 'style'} & dict(a).keys():
+            return m.group(0)
+        rest = ''.join(f' {k}="{v}"' for k, v in a if k not in PAINT)
+        return f'<{m.group(1)} class="{names[p]}"{rest}{m.group(3)}>'
+    out = _SHAPE.sub(sub, text)
+    return out, ''.join(f'.{n}{{{";".join(f"{k}:{v}" for k, v in p)}}}' for p, n in sorted(names.items(), key=lambda x: x[1]))
+
+
+def tidy_numbers(text):
+    """Shorter numbers in points="" and d="", same values: 796.0 -> 796, 0.5 -> .5, -0.5 -> -.5."""
+    def nums(m):
+        v = re.sub(r'(\d)\.0+(?!\d)', r'\1', m.group(2))
+        v = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', v)
+        return f'{m.group(1)}="{v}"'
+    return re.sub(r'\b(points|d)="([^"]*)"', nums, text)
 
 
 def write(path, text, card_cut=True):

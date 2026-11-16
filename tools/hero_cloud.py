@@ -7,6 +7,7 @@ from shapely.geometry import Point, Polygon, box
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
 import palette as pal
+from isogen import cull_hidden
 
 C30 = math.cos(math.pi / 6)
 # The face is a union of circles on a plane that runs along the room's x axis (u across, v up). Screen = origin +
@@ -127,6 +128,8 @@ def cloud_shapes():
     top, bot = min(ys), max(ys)
     defs = (f'<defs><linearGradient id="{GID}-f" gradientUnits="userSpaceOnUse" x1="0" y1="{top:.1f}" x2="0" y2="{bot:.1f}">'
             f'<stop offset="0" stop-color="{FACE_TOP}"/><stop offset="1" stop-color="{FACE_BOT}"/></linearGradient></defs>')
+    face_path = f'<path d="{path(face_s.exterior.coords)}" fill="#000000"/>'   # stands in for the gradient face: opaque, drawn after the wall
+    out = cull_hidden(out + [face_path])[:-1]          # wall slivers wholly behind the face show nowhere
     rim = f'fill="none" stroke="{RIM}" stroke-width="{RIM_W}" stroke-opacity="{RIM_OP}" stroke-linejoin="round"'
     return '\n'.join([
         defs, '<g class="curve">', *out, '</g>',
