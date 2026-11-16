@@ -1,9 +1,10 @@
 /* ==========================================================================
    Uplink Technology · footer (every page)
-   The campus map, and the newsletter mockup. The sections themselves are
-   <details name="footer"> (Footer.astro): the browser opens and shuts them,
-   and footer.css lays them out. Nothing here moves them; on tablet and up
-   it only keeps one open (Contact when none is picked).
+   The campus map, the rows sliding open and shut (phones), and the
+   newsletter mockup. The sections themselves are <details name="footer">
+   (Footer.astro): the browser opens and shuts them, and footer.css lays
+   them out. Nothing here moves them; on tablet and up it only keeps one
+   open (Contact when none is picked).
    ========================================================================== */
 
 import { $, $$, UI, html, reduceMotion, toast, whenOnScreen } from './core.js';
@@ -106,12 +107,94 @@ if (fc) {
   };
   keepOne();
   tiles.addEventListener('change', keepOne);
+
+  /* ======================================================================
+     Rows (phones, in a browser that can place a details' panel): a tapped
+     row slides open, and the open row slides shut. A browser shuts a
+     details at once, panel and all, so the tap is taken over here: the
+     row's content box (::details-content) gets a height in --fc-row-h,
+     0 and the panel's height, and footer.css slides between the two; a
+     shutting row stays open, marked data-shut (footer.css shows it shut),
+     until it's down. (Not element.animate() on the content box: Safari
+     won't move the box of a details that has none of its own, as these
+     rows.) The rows' name is set aside while they slide, or opening one
+     would shut the other at once; one row open at a time is then kept
+     here. Without script, with reduced motion, and in the tiles the
+     browser does it all, at once.
+     ====================================================================== */
+  const rows = window.matchMedia(MEDIA.phone);
+  const NAME = sections[0].getAttribute('name') ?? '';
+  const token = (/** @type {string} */ k) => parseFloat(window.getComputedStyle(fc).getPropertyValue(k));
+  const ROW = { open: token('--dur-fc-row-open'), shut: token('--dur-fc-row-shut') };
+  // the rows on the move: which way each is going, and its landing
+  /** @type {Map<HTMLDetailsElement, { open: boolean, timer: number }>} */
+  const sliding = new Map();
+  const slides = () => Boolean(placed) && rows.matches && !reduceMotion.matches;
+  // the panel's full height (reading it also brings the row's style up to date: a height set just before is then the
+  // one it slides from)
+  const panelH = (/** @type {HTMLDetailsElement} */ d) =>
+    `${/** @type {HTMLElement} */ ($('.fc-panel', d)).offsetHeight}px`;
+  // down: the row lets go of its height (auto again), and one that slid shut shuts
+  const land = (/** @type {HTMLDetailsElement} */ d) => {
+    const run = sliding.get(d);
+    if (!run) return;
+    window.clearTimeout(run.timer);
+    sliding.delete(d);
+    d.style.removeProperty('--fc-row-h');
+    d.removeAttribute('data-shut');
+    if (!run.open) d.open = false;
+  };
+  // slide a row open or shut; one already on the move turns round from where it is (the CSS transition does that)
+  const slide = (/** @type {HTMLDetailsElement} */ d, /** @type {boolean} */ open) => {
+    const run = sliding.get(d);
+    if (run ? run.open === open : d.open === open) return;
+    if (!run) {
+      // from rest: open from 0, or shut from its full height
+      d.open = true;
+      const full = panelH(d);
+      d.style.setProperty('--fc-row-h', open ? '0px' : full);
+      void panelH(d);
+    }
+    const to = open ? panelH(d) : '0px';
+    d.toggleAttribute('data-shut', !open);
+    d.style.setProperty('--fc-row-h', to);
+    window.clearTimeout(run?.timer);
+    sliding.set(d, { open, timer: window.setTimeout(() => land(d), open ? ROW.open : ROW.shut) });
+  };
+  // a tap on a row's summary, while the rows slide: a shut row opens as the open one shuts, both at once; a row on its
+  // way down turns round and opens again; an open row shuts
+  const rowTap = (/** @type {HTMLDetailsElement} */ d) => {
+    const open = !d.open || sliding.get(d)?.open === false;
+    if (open) sections.forEach((o) => o !== d && o.open && slide(o, false));
+    slide(d, open);
+  };
+  // rows slide, or not: the rows give up their name while they slide and get it back when they stop (a row still on
+  // the move lands first, so at most one is open when the name returns)
+  const setSlides = () => {
+    sliding.forEach((_, d) => land(d));
+    const on = slides();
+    sections.forEach((d) => (on ? d.removeAttribute('name') : d.setAttribute('name', NAME)));
+  };
+  setSlides();
+  rows.addEventListener('change', setSlides);
+  reduceMotion.addEventListener('change', setSlides);
+  // Enter and Space on a summary are clicks too
+  fc.addEventListener('click', (e) => {
+    const tile = /** @type {Element} */ (e.target).closest('.fc-tile');
+    if (!tile || !slides()) return;
+    e.preventDefault(); // the browser would open or shut it at once
+    rowTap(/** @type {HTMLDetailsElement} */ (tile.parentElement));
+  });
+
   // toggle doesn't bubble: listen on the way down. Opening one section shuts the open one, so two events can come
-  // in a row; both see the new one open. Shutting the open one leaves none: Contact opens again.
+  // in a row; both see the new one open. Shutting the open one leaves none: Contact opens again. While the rows
+  // slide, a row opened without a tap (find in page, a link to it) opens at once and the open one slides shut.
   fc.addEventListener(
     'toggle',
     (e) => {
-      if (!(/** @type {Element} */ (e.target).matches('.fc-sec'))) return;
+      const d = /** @type {HTMLDetailsElement} */ (e.target);
+      if (!d.matches('.fc-sec')) return;
+      if (slides() && d.open && !sliding.has(d)) sections.forEach((o) => o !== d && o.open && slide(o, false));
       keepOne();
       focusMap(false);
     },

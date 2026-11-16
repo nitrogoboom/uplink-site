@@ -120,7 +120,7 @@ The drawing tools (Python, `tools/`) are in [`docs/drawing-tools.md`](docs/drawi
 
 ## Browsers
 
-Chrome, Edge, Firefox and Safari (Mac and iPhone), every version from the last year, plus Firefox ESR (owner, November 13, 2026; in that order of priority). `browserslist` in `package.json` says the same for any tool that reads it. A newer feature is fine when those browsers have it, or when one without it still shows a working page (`text-wrap: pretty` wraps normally; the footer's rows open at once without `interpolate-size`; Settings opens by script without `commandfor`).
+Chrome, Edge, Firefox and Safari (Mac and iPhone), every version from the last year, plus Firefox ESR (owner, November 13, 2026; in that order of priority). `browserslist` in `package.json` says the same for any tool that reads it. A newer feature is fine when those browsers have it, or when one without it still shows a working page (`text-wrap: pretty` wraps normally; the footer's rows open at once without `::details-content`; Settings opens by script without `commandfor`).
 
 ## Hosting
 

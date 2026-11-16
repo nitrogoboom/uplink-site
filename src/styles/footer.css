@@ -91,15 +91,17 @@
   width: var(--sp-4);
   height: var(--sp-4);
 }
-/* the open row. Forced colours (B4, phase 9) keep only the chevron's turn: the icon's and name's colours go */
-.fc-sec[open] > .fc-tile .icon-tile {
+/* the open row. Forced colours (B4, phase 9) keep only the chevron's turn: the icon's and name's colours go. A row
+   sliding shut (data-shut, footer.js) is still open until it's down, but looks shut from the tap; :where() keeps the
+   tiles' own rules (below) as strong as before */
+.fc-sec[open]:where(:not([data-shut])) > .fc-tile .icon-tile {
   background: var(--c-accent);
   color: var(--c-on-accent);
 }
-.fc-sec[open] > .fc-tile .fc-tile-n {
+.fc-sec[open]:where(:not([data-shut])) > .fc-tile .fc-tile-n {
   color: var(--c-accent-text);
 }
-.fc-sec[open] > .fc-tile .fc-tile-chev {
+.fc-sec[open]:where(:not([data-shut])) > .fc-tile .fc-tile-chev {
   transform: rotate(90deg);
   color: var(--c-accent-text);
 }
@@ -148,26 +150,23 @@
     overflow-anchor: none;
   }
 }
-/* a row's panel grows open and shrinks shut: the details' content box animates its height to and from auto
-   (interpolate-size: Chrome; elsewhere it opens at once), as the links fade and settle in; shutting is a little
-   quicker. Only the height is clipped, so a link's hover box still reaches past its text. With reduced motion a row
-   opens and shuts at once (no transition at all, not the near-zero one in motion.css). Phones only: tiles (below) place
-   the same box in the stage. */
+/* a row's panel grows open and shrinks shut, in every browser that can place a details' panel: footer.js gives the
+   details' content box (::details-content) a height in --fc-row-h, 0 or the panel's, slides it there, lets go once
+   it's down (auto again), and keeps a shutting row open until then (no browser's CSS can: Safari hides the panel at
+   once, and only Chrome slides to auto). The links fade and settle in, and fade out as the row shuts (data-shut);
+   shutting is a little quicker. Only the height is clipped, so a link's hover box still reaches past its text.
+   Without script a row opens and shuts at once, its links still fading in. With reduced motion it all happens at
+   once (no transition at all, not the near-zero one in motion.css). Phones only: tiles (below) place the same box in
+   the stage. */
 @media (--phone) and (prefers-reduced-motion: no-preference) {
   @supports selector(::details-content) {
-    .fc {
-      interpolate-size: allow-keywords;
-    }
     .fc-sec::details-content {
-      height: 0;
+      height: var(--fc-row-h, auto);
       overflow-y: clip;
-      transition:
-        height var(--dur-fc-row-shut) var(--ease-soft),
-        content-visibility var(--dur-fc-row-shut) allow-discrete;
+      transition: height var(--dur-fc-row-open) var(--ease-soft);
     }
-    .fc-sec[open]::details-content {
-      height: auto;
-      transition-duration: var(--dur-fc-row-open);
+    .fc-sec[data-shut]::details-content {
+      transition-duration: var(--dur-fc-row-shut);
     }
     .fc-panel {
       opacity: 0;
@@ -186,6 +185,11 @@
         opacity: 0;
         transform: translateY(calc(var(--sp-2) * -1));
       }
+    }
+    .fc-sec[open][data-shut] .fc-panel {
+      opacity: 0;
+      transform: translateY(calc(var(--sp-2) * -1));
+      transition-duration: var(--dur-fc-row-shut);
     }
   }
 }
