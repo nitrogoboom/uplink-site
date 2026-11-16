@@ -19,7 +19,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uplink-site",
   "main": "worker/index.js",
-  "compatibility_date": "2026-10-30",
+  // Monthly: the newest date the installed wrangler's runtime supports (npm run serve refuses a later one), checked
+  // against Cloudflare's compatibility flags first; then npm run types. A later date waits for a wrangler update.
+  "compatibility_date": "2026-11-11",
   "build": { "command": "node scripts/check-dist.mjs" },
   "assets": {
     "directory": "./dist",
