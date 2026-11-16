@@ -129,8 +129,10 @@ select.input:hover {
 }
 
 /* toggle switch */
-/* The knob is centred in the track and sits the same 3px in from each end, off or on. The track is 48 wide:
-   3 + knob 20 + travel 20 + knob's other side + 3, inside a 1px border. */
+/* The track is 48 wide inside a 1px border. The knob's box is 24px, scaled: 16px off, 20px with a tick on, 24px
+   while pressed, with a small spring as it settles. Its middle sits 13px in from either end and travels 20, so on, it
+   is 3px from the end, as off at 20px. The tick is cut out of the knob and shows the amber track, so the on state is
+   more than colour and position, with no ink colour of its own (light mode's amber ink wouldn't show on navy). */
 .switch {
   display: flex;
   align-items: center;
@@ -159,15 +161,18 @@ select.input:hover {
   content: '';
   position: absolute;
   inset-block: 0;
-  left: 3px;
-  width: calc(var(--sp-5) - var(--sp-1));
-  height: calc(var(--sp-5) - var(--sp-1));
+  left: 1px; /* the 24px box's middle 13px in, where the 20px knob's was at 3px */
+  width: var(--sp-5);
+  height: var(--sp-5);
   margin-block: auto;
   border-radius: 50%;
   background: var(--c-muted);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  translate: 0; /* stated, so the transition starts from a value */
+  scale: var(--knob, 0.667); /* 16px off */
   transition:
-    transform var(--dur-2) var(--ease),
+    translate var(--dur-2) var(--ease-spring),
+    scale var(--dur-2) var(--ease-spring),
     background-color var(--dur-2) var(--ease);
 }
 .switch:hover input:not(:checked) {
@@ -181,9 +186,15 @@ select.input:hover {
   border-color: var(--c-accent);
 }
 .switch input:checked::after {
-  transform: translateX(calc(var(--sp-5) - var(--sp-1)));
+  --knob: 0.833; /* 20px on */
+  translate: calc(var(--sp-5) - var(--sp-1)) 0;
   background: var(--c-on-accent);
   box-shadow: none;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cmask id='m'%3E%3Crect width='24' height='24' fill='white'/%3E%3Cpath d='M7 12.5l3.2 3.2L17 9' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/mask%3E%3Ccircle cx='12' cy='12' r='12' mask='url(%23m)'/%3E%3C/svg%3E")
+    center / 100% no-repeat; /* the tick, a hole in the knob: forced colours show Highlight through HighlightText */
+}
+.switch:active input::after {
+  --knob: 1; /* 24px while pressed, on or off */
 }
 .switch input:focus-visible {
   border-radius: var(--r-pill);

@@ -1,0 +1,24 @@
+/*--- Film grain over the glowing grounds: the noise tile (tokens.css, --grain) laid over each ground with overlay.
+   Overlay against noise centred on mid-grey moves each pixel up or down by the same amount, so a ground keeps its
+   average colour in both themes; the texture breaks up the banding the faint glows (7-11%) show on many screens.
+   A ground that takes it needs position: relative and isolation: isolate (the grain then blends with that ground
+   only, under its content), an opaque background to blend with (on a see-through one it shows as grey haze) and a
+   free ::after. Cards stay flat; panels inside the hero are see-through, so they show it as they show the glow. ---*/
+
+/* Home's hero (the one hero with .fold) and the footer. The service and case-study pages share .hero but keep their
+   look while they are placeholders: to add them, write .hero for .hero.fold in both rules. */
+.hero.fold {
+  background-color: var(--c-bg); /* the colour it already shows, so the grain has a ground to blend with */
+}
+.hero.fold::after,
+.fc::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1; /* over the glow (::before), under the content: the ground is isolated */
+  pointer-events: none;
+  overflow-anchor: none; /* never the scroll anchor, as .fc::before (footer.css) */
+  background: var(--grain);
+  opacity: var(--grain-opacity);
+  mix-blend-mode: overlay;
+}

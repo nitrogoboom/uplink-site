@@ -21,6 +21,7 @@
 @import './fold.css';
 @import './compact-cuts.css';
 @import './hero-section.css';
+@import './grain.css'; /* after hero-section.css: it gives the hero a ground of its own */
 @import './facts.css';
 @import './detail-pages.css';
 @import './motion.css';

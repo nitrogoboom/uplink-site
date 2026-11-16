@@ -13,6 +13,30 @@
 .site-header.is-hidden {
   transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
 }
+/* At the top of the page the bottom line is clear, so the header and the first section read as one ground; it fades
+   in over the first header-height of scroll. Only a from keyframe: the end is the line above, which is also what a
+   browser without scroll-driven animations shows (the animation-range test leaves out ones with partial support). A
+   colour, nothing moves, so less motion leaves it be: motion.css's short duration is spread over the scroll range.
+   Not with more contrast or forced colours, where the line is an edge the visitor asked for (tokens.css, L8). */
+@supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
+  @media (prefers-contrast: no-preference) {
+    /* longhands: the build's minifier folds a shorthand and animation-timeline into one animation, which browsers
+       refuse (a timeline can't be set in the shorthand), and the line would never fade */
+    .site-header {
+      animation-name: header-line;
+      animation-duration: auto;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 var(--header-h);
+    }
+  }
+}
+@keyframes header-line {
+  from {
+    border-bottom-color: transparent;
+  }
+}
 .site-header .container {
   max-width: none; /* pinned to the screen edges, even on ultrawide */
   display: flex;
