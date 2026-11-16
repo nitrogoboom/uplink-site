@@ -73,7 +73,7 @@ The deploy job rolls back on its own when the live site fails the smoke check. R
 
 The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `.txt` files are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
 
-`public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert, `X-Build`, and an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
+`public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` in the built pages and in the drawings that scripts insert, `X-Build`, `X-Commit` (the git commit the build was made from, so one request shows whether the live address serves a push), and an Early Hints `Link` rule for each page. Don't paste a hash in by hand.
 
 - **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
 - **Trusted Types.** A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`.

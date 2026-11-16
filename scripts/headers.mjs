@@ -1,6 +1,7 @@
 // Finishes dist/_headers from the public/_headers template, the build's last step (astro.config.mjs runs it): the script
 // and style hashes, the Early Hints rules, X-Build, and dist/_redirects (308s). docs/ops.md, "Response headers"
 // and "Deploys". Each part's details sit beside its code below.
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
@@ -8,6 +9,21 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = new URL('..', import.meta.url);
 const WORKER_DIR = fileURLToPath(new URL('worker', ROOT));
+// the commit a build is made from, 7 characters as git log --oneline shows it: CI's own (GITHUB_SHA), or this
+// checkout's, marked -dirty when tracked files differ from it, so a local build never claims a commit it isn't;
+// "unknown" without git
+const commit = () => {
+  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);
+  try {
+    const git = (/** @type {string[]} */ ...args) =>
+      execFileSync('git', args, { cwd: fileURLToPath(ROOT), encoding: 'utf-8' }).trim();
+    return (
+      git('rev-parse', '--short=7', 'HEAD') + (git('status', '--porcelain', '--untracked-files=no') ? '-dirty' : '')
+    );
+  } catch {
+    return 'unknown';
+  }
+};
 // every file under dir, in name order, but those skip() names
 /** @type {(dir: string, skip?: (path: string) => boolean) => string[]} */
 const files = (dir, skip = () => false) =>
@@ -96,10 +112,11 @@ export function headers(DIST) {
     !src.includes('{script-hashes}') ||
     !src.includes('{style-hashes}') ||
     !src.includes('{build}') ||
+    !src.includes('{commit}') ||
     !block('early-hints').test(src)
   ) {
     throw new Error(
-      'public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} placeholder, and the @early-hints block',
+      'public/_headers needs the {script-hashes} and {style-hashes} placeholders, the {build} and {commit} placeholders, and the @early-hints block',
     );
   }
   const filled = src
@@ -118,7 +135,9 @@ export function headers(DIST) {
   for (const f of files(WORKER_DIR)) add(`worker/${relative(WORKER_DIR, f).split(sep).join('/')}`, readFileSync(f));
   add('wrangler.jsonc', readFileSync(new URL('wrangler.jsonc', ROOT)));
   const build = id.digest('hex').slice(0, 16);
-  const out = filled.replaceAll('{build}', build);
+  // X-Commit, after the ID so the ID stays a hash of what ships: the commit the build was made from, so one request
+  // tells whether the live address serves a given push (CLAUDE.md, "Check, ship")
+  const out = filled.replaceAll('{build}', build).replaceAll('{commit}', commit());
   writeFileSync(join(DIST, '_headers'), out);
 
   const rules = out.split('\n').filter((l) => /^\S/.test(l) && !l.startsWith('#')).length;
