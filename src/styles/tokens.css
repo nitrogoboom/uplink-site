@@ -70,10 +70,9 @@
   --iso-shadow: #000; /* drop shadow, used at 0.35 opacity */
 
   /* ---- type ------------------------------------------------------------ */
-  --font-display:
-    'Barlow Condensed', 'Barlow Condensed Fallback', 'Barlow Condensed Fallback Roboto', 'Roboto Condensed',
-    'Arial Narrow', sans-serif;
-  --font-body: 'Barlow', 'Barlow Fallback', 'Barlow Fallback Roboto', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Barlow Condensed and Barlow, then their measured fallbacks: Astro sets both lists (astro.config.mjs, fonts.css) */
+  --font-display: var(--font-barlow-condensed);
+  --font-body: var(--font-barlow);
 
   /* the root size (base.css sets it on html): the visitor's own font size up to a 1440 x 720 window, then it grows
      with the window's width or height, whichever is smaller, to 125% (16px at 1920 x 945, 20px at 2560 x 1305 and

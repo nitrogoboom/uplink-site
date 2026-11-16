@@ -108,6 +108,11 @@
 .hero-art .stage .hero-nojs {
   object-fit: contain;
 }
+/* the drawing's words ask for Barlow by name (gen_office.py); the page's Barlow has an Astro-made name
+   (astro.config.mjs, "fonts"), so they take it from the token, which carries that name and the measured fallbacks */
+.hero-art .stage svg [font-family] {
+  font-family: var(--font-body);
+}
 /* pause button (HoldButton.astro; its look is .hold in buttons.css), bottom right on the drawing. Its icon is
    drawn in CSS, so the stage's svg rules can't reach it. */
 .hero-pause {

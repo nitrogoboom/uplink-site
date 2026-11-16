@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import { placeholders } from './src/lib/placeholders.mjs';
 import { PLACEHOLDERS } from './src/lib/footer.ts';
@@ -42,4 +42,57 @@ export default defineConfig({
   // Astro's own Markdown processor, plus the plugin that fills {phone}, {privacy} … in src/data/*.md from
   // footer.json (src/lib/placeholders.mjs). Restart `npm run dev` after changing footer.json to see it there.
   markdown: { processor: satteri({ mdastPlugins: [placeholders(PLACEHOLDERS)] }) },
+  // Barlow and Barlow Condensed, the five faces in src/assets/fonts/ (Latin, SIL Open Font License: public/assets/fonts/
+  // OFL.txt). Astro writes their @font-face rules and gives each file a hashed name under /_astro/fonts/, so a changed
+  // font is a new address (cached a year, public/_headers). Base.astro's <Font> tags put them in each page and preload
+  // the two faces every first screen uses. The fallbacks are the measured ones in src/styles/fonts.css (Arial or
+  // Liberation Sans resized to Barlow, and Roboto for Android), so Astro's own fallback guess is off.
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: 'Barlow',
+      cssVariable: '--font-barlow',
+      fallbacks: [
+        'Barlow Fallback',
+        'Barlow Fallback Roboto',
+        'Segoe UI',
+        'Roboto',
+        'Helvetica',
+        'Arial',
+        'sans-serif',
+      ],
+      optimizedFallbacks: false,
+      options: {
+        variants: [
+          { weight: 400, style: 'normal', display: 'swap', src: ['./src/assets/fonts/barlow-400.woff2'] },
+          { weight: 600, style: 'normal', display: 'swap', src: ['./src/assets/fonts/barlow-600.woff2'] },
+        ],
+      },
+    },
+    {
+      provider: fontProviders.local(),
+      name: 'Barlow Condensed',
+      cssVariable: '--font-barlow-condensed',
+      fallbacks: [
+        'Barlow Condensed Fallback',
+        'Barlow Condensed Fallback Roboto',
+        'Roboto Condensed',
+        'Arial Narrow',
+        'sans-serif',
+      ],
+      optimizedFallbacks: false,
+      options: {
+        variants: [
+          { weight: 600, style: 'normal', display: 'swap', src: ['./src/assets/fonts/barlow-condensed-600.woff2'] },
+          { weight: 700, style: 'normal', display: 'swap', src: ['./src/assets/fonts/barlow-condensed-700.woff2'] },
+          {
+            weight: 700,
+            style: 'italic',
+            display: 'swap',
+            src: ['./src/assets/fonts/barlow-condensed-700-italic.woff2'],
+          },
+        ],
+      },
+    },
+  ],
 });

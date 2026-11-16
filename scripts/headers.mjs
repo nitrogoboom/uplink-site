@@ -21,13 +21,15 @@ const files = (dir, skip = () => false) =>
 export function headers(DIST) {
   // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
   // into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included), the one
-  // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's preloads with
-  // no media).
+  // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's <Font> tags
+  // write them, at Astro's hashed /_astro/fonts/ addresses; any with a media query aren't every screen's).
   const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
   const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
-  const FIRST_FONTS = [...home.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+)"[^>]*>/g)]
-    .filter((m) => !/\smedia=/.test(m[0]))
-    .map((m) => m[1]);
+  const FIRST_FONTS = [...home.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
+    .map((m) => m[0])
+    .filter((tag) => /\sas="font"/.test(tag) && !/\smedia=/.test(tag))
+    .map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1])
+    .filter((href) => href !== undefined);
   if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !FIRST_FONTS.length)
     throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
   const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');

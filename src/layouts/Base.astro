@@ -4,6 +4,7 @@
 // page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
 // the shared CSS; the build inlines it in a <style> block in every page (astro.config.mjs)
 import '../styles/global.css';
+import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BottomNav from '../components/BottomNav.astro';
@@ -70,11 +71,6 @@ const jsonld = type &&
       ...ldGraph,
     ],
   };
-// Preload only the two faces that carry the first screen: the page title (Condensed 700 italic) and body text
-// (Barlow 400, the most letters on every first screen). The other faces start at the first layout, since the CSS is
-// inline, and their fallbacks take the same room, so nothing moves when they arrive. Preloading all of them split
-// the bandwidth and made the title and body faces arrive later (review L2, November 7, 2026).
-const fonts = ['barlow-condensed-700-italic', 'barlow-400'];
 const ui = await copy('ui');
 ---
 
@@ -133,9 +129,13 @@ const ui = await copy('ui');
         if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#E8EFF7');
       })(document.documentElement);
     </script>
-    {fonts.map((f) => (
-      <link rel="preload" href={`/assets/fonts/${f}.woff2`} as="font" type="font/woff2" crossorigin />
-    ))}
+    <!-- The fonts (astro.config.mjs, "fonts"). Preload only the two faces that carry the first screen: the page title
+         (Condensed 700 italic) and body text (Barlow 400, the most letters on every first screen). The other faces start
+         at the first layout, since the CSS is inline, and their fallbacks take the same room, so nothing moves when they
+         arrive. Preloading all of them split the bandwidth and made the title and body faces arrive later (review L2,
+         November 7, 2026). scripts/headers.mjs sends these two as Early Hints too. -->
+    <Font cssVariable="--font-barlow-condensed" preload={[{ weight: 700, style: 'italic' }]} />
+    <Font cssVariable="--font-barlow" preload={[{ weight: 400, style: 'normal' }]} />
     <slot name="head" />
     {jsonld && <script is:inline type="application/ld+json" set:html={jsonLd(jsonld)} />}
   </head>

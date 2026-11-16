@@ -57,11 +57,9 @@
 /
   Speculation-Rules: "/speculation-rules-home.json"
 
-# Astro names every bundled CSS and JS file by its content hash (/_astro/x.ab12cd34.css), so a year is safe.
+# Astro names every bundled CSS and JS file, and every font (/_astro/fonts/), by its content hash
+# (/_astro/x.ab12cd34.css), so a year is safe.
 /_astro/*
-  Cache-Control: public, max-age=31536000, immutable
-# Fonts are never edited in place: a new version gets a new file name.
-/assets/fonts/*
   Cache-Control: public, max-age=31536000, immutable
 # Drawings keep their names when they change (the generators overwrite them), so a day, then revalidate.
 # Opened on their own, the drawings would get the pages' CSP, which blocks their <style> blocks (the embedded

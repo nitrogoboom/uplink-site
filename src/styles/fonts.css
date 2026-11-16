@@ -1,47 +1,13 @@
-/*--- Fonts: Barlow and Barlow Condensed, served from public/assets/fonts/ (Latin set, which covers French).
-   SIL Open Font License, copy in public/assets/fonts/OFL.txt. The two faces that carry every first screen
-   (Condensed 700 italic titles, 400 body) are preloaded in each page's <head> and sent as Early Hints (Base.astro).
+/*--- Fonts: the fallbacks. Barlow and Barlow Condensed themselves (src/assets/fonts/, Latin set, which covers French;
+   SIL Open Font License, copy in public/assets/fonts/OFL.txt) are Astro's: astro.config.mjs lists the five faces and
+   Base.astro's <Font> tags write their @font-face rules, preload the two that carry every first screen (Condensed 700
+   italic titles, 400 body) and set --font-barlow and --font-barlow-condensed, which tokens.css uses.
    Condensed 700 italic is for page and section titles and big numbers; 700 upright for buttons, card titles and
-   sub-headings; 600 upright for tabs, links and small labels. The "Fallback" faces are a system font resized to Barlow's
-   width and line height, so text set in the fallback takes the same room and nothing moves when Barlow arrives: Arial,
-   or Liberation Sans where Arial isn't installed (Linux; the same metrics as Arial, so the same numbers), and Roboto
-   on Android, which has neither (its own numbers, in the "Fallback Roboto" faces, listed next in tokens.css). ---*/
-@font-face {
-  font-family: 'Barlow';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/assets/fonts/barlow-400.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Barlow';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/assets/fonts/barlow-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Barlow Condensed';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/assets/fonts/barlow-condensed-600.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Barlow Condensed';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/assets/fonts/barlow-condensed-700.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Barlow Condensed';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/assets/fonts/barlow-condensed-700-italic.woff2') format('woff2');
-}
-
+   sub-headings; 600 upright for tabs, links and small labels. The "Fallback" faces below are a system font resized to
+   Barlow's width and line height, so text set in the fallback takes the same room and nothing moves when Barlow
+   arrives: Arial, or Liberation Sans where Arial isn't installed (Linux; the same metrics as Arial, so the same
+   numbers), and Roboto on Android, which has neither (its own numbers, in the "Fallback Roboto" faces). Astro lists
+   them after Barlow ("fallbacks" in astro.config.mjs). ---*/
 /* sizes measured with fontTools on a line of the site's own copy (Arial regular and bold, Windows) */
 @font-face {
   font-family: 'Barlow Fallback';

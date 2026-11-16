@@ -78,7 +78,7 @@ The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rul
 - **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
 - **Trusted Types.** A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`.
 - **No `style=""` attributes.** The build fails on one. Scripts set styles with `el.style.x = …`.
-- **Font files keep their names.** `/assets/fonts/` is cached immutable for a year with no hash in its file names: if a font file changes, give it a new name.
+- **Fonts are Astro's.** The five Barlow files live in `src/assets/fonts/`; Astro serves them from `/_astro/fonts/` under hashed names (cached a year), so a changed font is a new address. `astro.config.mjs` lists them; `Base.astro` preloads two.
 
 Every control and how to check it: [`security.md`](security.md).
 
