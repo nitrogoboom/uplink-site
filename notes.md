@@ -26,7 +26,6 @@ Drawing generators (the owner directs drawing work):
 - [ ] `gen_office.py` and `gen_grow.py` write role classes, as `gen_campus.py` does; `theme-drawings.css` then goes.
 - [ ] The generators write the camera boxes into the drawings; the footer map camera becomes generated CSS with `:has()`.
 - [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
-- [ ] On Windows a generator writes CRLF line ends (found November 9, 2026): git puts them right on commit, but `prettier --check` fails on the working copy of `theme-drawings.css` until it's checked out again.
 
 ## Parked until the owner says
 

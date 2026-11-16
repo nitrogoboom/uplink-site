@@ -195,14 +195,18 @@ def inline_css():
             sels = ',\n'.join(f"{root} {tag}[{attr}='{f}' i]" for f in _forms(col))
             out.append(f'{sels} {{\n  {attr}: {_css(new)};\n}}')
         seen = set()
+        props = {}        # selector -> [(property, light colour)]: one rule a selector (a p- class swaps fill and stroke)
         for sel, prop, col in rules:
             new = swap(col, 'stroke' if prop == 'stroke' else 'fill', office)
             key = (sel, prop)
             if new.upper() == col or key in seen or key in KEEP_RULES:
                 continue
             seen.add(key)
+            props.setdefault(sel, []).append((prop, new))
+        for sel, decls in props.items():
             scoped = ',\n'.join(f":root[data-theme='light'] {scope} {s.strip()}" for s in sel.split(','))
-            out.append(f'{scoped} {{\n  {prop}: {_css(new)};\n}}')
+            body = ''.join(f'\n  {prop}: {_css(new)};' for prop, new in decls)
+            out.append(f'{scoped} {{{body}\n}}')
     return '\n'.join(out) + '\n'
 
 
@@ -215,7 +219,7 @@ def main(check=False):
             if not dst.exists() or dst.read_text(encoding='utf-8') != out:
                 bad.append(str(dst.relative_to(ROOT)))
         else:
-            dst.write_text(out, encoding='utf-8')
+            dst.write_text(out, encoding='utf-8', newline='\n')   # LF on Windows too, as git and Prettier keep them
             print('wrote', dst.relative_to(ROOT))
     if bad:
         sys.exit('out of date (run python tools/gen_light.py): ' + ', '.join(bad))
