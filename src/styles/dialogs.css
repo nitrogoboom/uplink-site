@@ -13,6 +13,9 @@
   overflow: auto;
 }
 .dialog::backdrop {
+  /* a scroll on the backdrop doesn't scroll the page behind: overscroll-behavior needs a scroll container */
+  overflow: hidden;
+  overscroll-behavior: contain;
   background: var(--c-backdrop);
   -webkit-backdrop-filter: blur(var(--blur-backdrop));
   backdrop-filter: blur(var(--blur-backdrop));
