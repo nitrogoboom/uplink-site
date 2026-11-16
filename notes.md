@@ -7,6 +7,7 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 Layout and look:
 
 - [ ] Phone hero: on a slow phone the stage is empty about 0.5s before the drawing arrives; inlining the phone cut costs about 14 KB a load. Check on a real phone first.
+- [ ] Phone hero, for the owner to judge on a real phone (November 16, 2026): the stage now shows the drawing's floor slab while it loads (CSS, `hero.css`, no download), and the build starts on it. Measured on Slow 4G: the largest paint is the lead text at first paint; the drawing waits about 0.6 s, mostly for scripts sharing the line with the fonts. If the slab is enough, the line above can go.
 
 Content:
 
