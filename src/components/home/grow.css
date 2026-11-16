@@ -223,7 +223,9 @@
 .grow-row {
   display: grid;
   gap: var(--sp-1);
-  transition: opacity var(--dur-2) var(--ease);
+}
+.grow-row :is(.grow-lbl, p) {
+  transition: color var(--dur-2) var(--ease);
 }
 .grow-lbl {
   display: flex;
@@ -255,14 +257,15 @@
 .grow.is-live .grow-card:not(.is-on) {
   display: none;
 }
-.grow-card[data-beat='build'] .grow-row {
-  opacity: 0.35;
-}
-.grow-card[data-beat='risk'] .grow-handle {
-  opacity: 0.3;
-}
-.grow-card[data-beat='fix'] .grow-watch {
-  opacity: 0.45;
+/* the beat's other row steps back: its label, the label's dot and its words turn --c-muted, which keeps 4.5:1 in both
+   themes (WCAG 1.4.3). A fade did this before and took the words to about 3:1, and to 2.99:1 in the state a step rests
+   in (paused, picked by hand, reduced motion: the "fix" beat). Print shows every row in its own colours. */
+@media screen {
+  .grow-card[data-beat='build'] .grow-row :is(.grow-lbl, p),
+  .grow-card[data-beat='risk'] .grow-handle :is(.grow-lbl, p),
+  .grow-card[data-beat='fix'] .grow-watch :is(.grow-lbl, p) {
+    color: var(--c-muted);
+  }
 }
 :root:not(.js) :is(.grow-nav, .grow-play, .grow-tag) {
   display: none;
@@ -383,7 +386,7 @@
 @media (prefers-reduced-motion: reduce) {
   .grow-stage .pc,
   .grow-tag,
-  .grow-row {
+  .grow-row :is(.grow-lbl, p) {
     transition: none;
   }
   .grow-stage [stroke-dasharray],

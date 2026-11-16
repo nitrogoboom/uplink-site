@@ -51,12 +51,10 @@
     min-height: 0 !important;
     height: auto !important;
   }
-  /* every Grow step's card, each row at full strength (on screen only the open step's card shows) */
+  /* every Grow step's card (on screen only the open step's card shows); each row at full strength, as the dimming
+     is screen only (grow.css) */
   .grow.is-live .grow-card {
     display: grid !important;
-  }
-  .grow-row {
-    opacity: 1 !important;
   }
   .grow-step::before {
     display: none !important;

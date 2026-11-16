@@ -7,7 +7,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 Layout and look:
 
 - [ ] Phone hero, for the owner to judge on a real phone (November 16, 2026): the stage now shows the drawing's floor slab while it loads (CSS, `hero.css`, no download), and the build starts on it. Measured on Slow 4G: the largest paint is the lead text at first paint; the drawing waits about 0.6 s, mostly for scripts sharing the line with the fonts.
-- [ ] Grow fails WCAG 1.4.3 at rest (found November 16, 2026): paused, picked by hand or with reduced motion, a step stays on its "fix" beat, where "Watch for" is at 0.45 opacity (0.65 light): 2.99:1 dark, 2.92:1 light, under 4.5:1 (`grow.css`, `[data-beat='fix'] .grow-watch`). While it plays, each beat dims a part below 4.5:1 for a second or two.
 - [ ] At 400% zoom (a 1280-wide window, 320 x 200 CSS px) the sticky header keeps 64 px, a third of the screen, while reading; the bottom bar hides on scroll as it should. Not a WCAG failure (it reflows with no sideways scroll); consider letting the header scroll away on a short window.
 
 Content:

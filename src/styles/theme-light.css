@@ -142,12 +142,6 @@
     }
   }
 
-  /* Grow, a step's "Watch for" row once it turns to fixes: a fade costs more on a light page, so 0.65 here matches the
-     dark theme's 0.45 (3:1, was 2.1) */
-  :root[data-theme='light'] .grow-card[data-beat='fix'] .grow-watch {
-    opacity: 0.65;
-  }
-
   /* Home's news cards: their border was the cool fill's own colour (1:1); the card line gives them an edge */
   :root[data-theme='light'] .news {
     border-color: var(--c-line);
