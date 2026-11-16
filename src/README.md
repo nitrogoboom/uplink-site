@@ -56,6 +56,7 @@ Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`, scripts `MEDIA`), 
 | `tablet` | `43.75em <= width < 68.75em` | 700–1099 |
 | `desktop` | `width >= 68.75em` | 1100+ |
 | `fold` | desktop and `height >= 43.75em` | one section per screen |
+| `shortWindow` | `height < 33.5em` | under 536 tall: the header slides away while reading (`core.js`) |
 
 ## Scripts
 

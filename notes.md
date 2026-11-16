@@ -6,7 +6,6 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 
 Layout and look:
 
-- [ ] At 400% zoom (a 1280-wide window, 320 x 200 CSS px) the sticky header keeps 64 px, a third of the screen, while reading; the bottom bar hides on scroll as it should. Not a WCAG failure (it reflows with no sideways scroll); consider letting the header scroll away on a short window.
 
 Content:
 

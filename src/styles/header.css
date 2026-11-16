@@ -6,6 +6,12 @@
   z-index: var(--z-header);
   background: var(--c-glass);
   border-bottom: 1px solid var(--c-line);
+  transition: transform var(--dur-2) var(--ease);
+}
+/* a short window, scrolling down (core.js, MEDIA.shortWindow): slides up out of view, past the notch's inset; the
+   reduced-motion rule (motion.css) makes it instant */
+.site-header.is-hidden {
+  transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
 }
 .site-header .container {
   max-width: none; /* pinned to the screen edges, even on ultrawide */

@@ -449,23 +449,25 @@ applyMotion();
   });
 });
 
-/* ---------- phone tab bar: out of the way while reading ----------------- */
-// Scrolling down slides the bar off the bottom (.is-hidden, bottom-nav.css); scrolling up brings it back. It always
-// shows at the top and end of the page and while one of its links has focus. Phones only: the bar is hidden elsewhere.
-const botnav = $('.botnav');
-if (botnav) {
+/* ---------- bars out of the way while reading -------------------------- */
+// Scrolling down slides a bar out of view (.is-hidden: bottom-nav.css, header.css); scrolling up brings it back. It
+// always shows at the top and end of the page and while one of its controls has focus, and only reacts while its
+// query holds: the phone tab bar on phones (it is hidden elsewhere), and the header on a short window, where its 4rem
+// would be over 12% of the height (MEDIA.shortWindow: 200% and 400% zoom, a phone on its side). Elsewhere the header
+// stays put. modern-web-guidance, content-first-noise-reduction: "Keep every fixed or sticky bar under 12%".
+const hideOnScroll = (/** @type {HTMLElement | null} */ bar, /** @type {MediaQueryList} */ when) => {
+  if (!bar) return;
   const STEP = 12; // px of travel before the bar reacts, so small jitters don't flicker it
-  const phone = window.matchMedia(MEDIA.phone);
   /** @type {number | null} */
   let lastY = null; // set on the first scroll: reading scrollY as the page loads would force an early layout
   let queued = false;
-  const show = (/** @type {boolean} */ on) => botnav.classList.toggle('is-hidden', !on);
+  const show = (/** @type {boolean} */ on) => bar.classList.toggle('is-hidden', !on);
   const update = () => {
     queued = false;
     const y = window.scrollY;
     if (lastY === null) lastY = y;
     const end = root.scrollHeight - window.innerHeight - STEP;
-    if (y <= 0 || y >= end || botnav.contains(document.activeElement)) {
+    if (y <= 0 || y >= end || bar.contains(document.activeElement)) {
       show(true);
       lastY = y;
       return;
@@ -477,19 +479,21 @@ if (botnav) {
   window.addEventListener(
     'scroll',
     () => {
-      if (!queued && phone.matches) {
+      if (!queued && when.matches) {
         queued = true;
         window.requestAnimationFrame(update);
       }
     },
     { passive: true },
   );
-  phone.addEventListener('change', () => {
+  when.addEventListener('change', () => {
     lastY = null;
     show(true);
   });
-  botnav.addEventListener('focusin', () => show(true));
-}
+  bar.addEventListener('focusin', () => show(true));
+};
+hideOnScroll($('.botnav'), window.matchMedia(MEDIA.phone));
+hideOnScroll($('.site-header'), window.matchMedia(MEDIA.shortWindow));
 
 /* ---------- settle ----------------------------------------------------- */
 // While the pause is on, jumps every animation in el (and inside it) that ends to its end, so a drawing that builds

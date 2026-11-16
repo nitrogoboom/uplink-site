@@ -11,4 +11,7 @@ export const MEDIA = {
   belowDesktop: '(width < 68.75em)',
   desktop: '(width >= 68.75em)',
   fold: '(width >= 68.75em) and (height >= 43.75em)',
+  // a window too short for a header that stays put: its 4rem would be over 12% of the height (200% and 400% zoom, a
+  // phone on its side), so core.js lets it slide away while reading
+  shortWindow: '(height < 33.5em)',
 };
