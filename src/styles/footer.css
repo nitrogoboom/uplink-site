@@ -943,26 +943,27 @@ a.fc-cl:hover {
   }
 }
 
-/* tablet: the tile row on top (five even columns, no sideways scroll), then the map, then the panel */
+/* tablet: as desktop, stacked: the map, then the panel, then the tile row along the bottom (five even columns, no
+   sideways scroll). The panels differ in height, so the tile row moves when another is picked (owner, November 16,
+   2026) */
 @media (--tablet) {
   @supports selector(::details-content) {
     .fc-deck {
       grid-template-columns:
         [t1] minmax(0, 1fr) [t2] minmax(0, 1fr) [t3] minmax(0, 1fr) [t4] minmax(0, 1fr)
         [t5] minmax(0, 1fr);
-      grid-template-rows: [dock] auto [line] auto [map] auto [panel] auto;
-      padding-bottom: var(--sp-5);
+      grid-template-rows: [map] auto [panel] auto [line] auto [dock] auto;
+      padding-top: var(--sp-6);
     }
     .fc-tile {
       min-width: 0;
     }
     .fc-map {
       grid-row: map;
-      margin-top: var(--sp-6);
     }
     .fc-sec::details-content {
       grid-row: panel;
-      margin-top: var(--sp-5);
+      margin-block: var(--sp-5);
     }
   }
 }
