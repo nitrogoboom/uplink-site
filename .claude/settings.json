@@ -20,7 +20,11 @@
       "Bash(gh run watch *)",
       "Bash(gh pr create *)",
       "Bash(gh pr merge *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(npx -y modern-web-guidance@latest *)",
+      "PowerShell(npx.cmd -y modern-web-guidance@latest *)",
+      "mcp__astro-docs__search_astro_docs",
+      "mcp__plugin_cloudflare_cloudflare__docs"
     ]
   }
 }
