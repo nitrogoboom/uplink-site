@@ -12,6 +12,8 @@
 # writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
 # font-src allows data: because each SVG carries its own letters as a data: font.
 # No outside script or connection: the site loads nothing from another host.
+# default-src 'none': a kind of file the policy doesn't name (a frame, video, worker, web manifest) is refused, even
+# from the site itself. A new kind needs its own directive here.
 # require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
 # the 'uplink' policy in core.js (its html() helper). A new innerHTML elsewhere fails until it goes through it.
 # No report-to or report-uri: the site has no address that takes reports. At launch, Cloudflare's client-side
@@ -37,7 +39,7 @@
   Speculation-Rules: "/speculation-rules.json"
   X-Build: {build}
   X-Commit: {commit}
-  Content-Security-Policy: default-src 'self'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
+  Content-Security-Policy: default-src 'none'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
 
 # Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
 # first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)

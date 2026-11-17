@@ -7,19 +7,20 @@ Controls, and every secret (names and places, never values). Reporting: [`SECURI
 ### HTTPS and HSTS
 
 - Every page and file sends `Strict-Transport-Security: max-age=31536000`. Add `includeSubDomains; preload` only once every subdomain is HTTPS for good: preloading is hard to undo.
-- The Worker redirects `http://` to `https://` with a `308` for the requests it sees. At launch, Always Use HTTPS on the zone redirects everything first.
+- The Worker redirects `http://` to `https://` with a `308` for the requests it sees: `/404` and missing addresses. Until launch an existing page still answers on plain `http://` with a `200` (seen November 17, 2026). At launch, Always Use HTTPS on the zone redirects everything first.
 
 ### Content Security Policy
 
 No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. `public/_headers` is the template; `scripts/headers.mjs` fills in the hashes at build. Its shape:
 
 ```http
-Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-…';
+Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-…';
   style-src 'self' 'sha256-…'; font-src 'self' data:; img-src 'self' data:; connect-src 'self';
   form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';
   require-trusted-types-for 'script'; trusted-types uplink
 ```
 
+- `default-src 'none'`: a kind of file the policy doesn't name (a frame, video, worker, web manifest) is refused, even from the site itself. A new kind needs its own directive.
 - The one inline script marks the page as script-enabled and applies the saved theme and motion choice before paint.
 - No element carries `style=""`; the build fails on one. Scripts set styles with `el.style.x = …`.
 - `font-src data:` is there because each SVG carries its own letters as a data font.
@@ -27,7 +28,7 @@ Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-…';
 
 ### Trusted Types
 
-The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own text and drawings. It allows no script URLs.
+The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own icons and drawings, and words a visitor typed are set with `textContent`. The drawings are checked at build instead (owner, November 17, 2026): it stops on one that holds anything but drawing tags, an `on…=` handler or an address (`vet()` in `scripts/svgo-config.mjs`). The policy allows no script URLs.
 
 ### Other headers
 
@@ -42,7 +43,7 @@ The site has no address that takes input, and no script of ours reports from a v
 
 ### Supply chain
 
-Actions pinned to commits, zizmor on every run, Dependabot monthly (`.github/dependabot.yml`), `requirements.txt` pins the drawing tools, fonts self-hosted. A new third-party script is a security and privacy decision.
+Actions pinned to commits, and GitHub refuses one that isn't pinned or isn't GitHub's own (repository settings, November 17, 2026). zizmor on every run. Dependabot monthly (`.github/dependabot.yml`), with its alerts and security fixes on. `requirements.txt` pins the drawing tools, fonts self-hosted. A new third-party script is a security and privacy decision.
 
 ## Privacy
 
@@ -77,4 +78,4 @@ If a secret may have leaked: make a new one, delete the old one, note it in the 
 
 ## Review checklist
 
-`curl -sI` for the `308` to HTTPS and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console; `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.
+`curl -sI` for the `308` to HTTPS (before launch, only at a missing address) and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console; `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.

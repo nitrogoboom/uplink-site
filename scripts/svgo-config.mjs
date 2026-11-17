@@ -80,6 +80,33 @@ export function styledTags(svg) {
   return [...tags];
 }
 
+// What a shipped drawing may hold: drawing tags, and nothing that runs or leads anywhere. home.js and footer.js put
+// drawings into the page as HTML (core.js's html() passes them on unchecked), so they are checked here, where they are
+// made, on the bytes that ship (owner, November 17, 2026). A drawing with a tag outside TAGS, an on…= handler or an
+// address (href) stops the build: look at the drawing, then add the tag here if it belongs. No <use>, <image>, <a>,
+// <script> or <foreignObject>: none is needed, and each can load or run something.
+const TAGS = new Set(
+  'svg g defs title desc style path rect circle ellipse line polyline polygon text tspan linearGradient radialGradient stop clipPath mask filter feGaussianBlur feDropShadow'.split(
+    ' ',
+  ),
+);
+/** @param {string} svg @param {string} name */
+export function vet(svg, name) {
+  // tags only: a <style> block's CSS (the embedded fonts, > in a selector) isn't markup
+  const markup = svg.replace(/(<style[^>]*>)[\s\S]*?(<\/style>)/g, '$1$2');
+  const bad = new Set();
+  for (const [, tag, attrs] of markup.matchAll(/<([a-zA-Z][\w:.-]*)((?:"[^"]*"|'[^']*'|[^>"'])*)>/g)) {
+    if (!TAGS.has(tag)) bad.add(`<${tag}>`);
+    for (const [, attr] of attrs.matchAll(/(?:^|[\s"'/])(on[a-z]+|(?:xlink:)?href)\s*=/gi)) bad.add(`${attr}=`);
+  }
+  if (/javascript:/i.test(markup)) bad.add('javascript:');
+  if (bad.size)
+    throw new Error(
+      `${name}: holds ${[...bad].join(', ')}. A drawing ships only drawing tags, with no handlers or addresses (TAGS in scripts/svgo-config.mjs)`,
+    );
+  return svg;
+}
+
 // SVGO with the site's settings; throws if a tag the drawing's <style> names is gone from the output. A big drawing
 // takes SVGO seconds and the build shrinks each one twice (site.ts for its ?v=, then svgo.mjs), so the output is kept
 // in node_modules/.cache, under a hash of the drawing, these settings and SVGO's version.
@@ -88,8 +115,8 @@ const SALT = createHash('sha1').update(JSON.stringify(SVGO)).update(VERSION).dig
 /** @param {string} svg */
 export function shrink(svg, name = 'drawing') {
   const file = join(CACHE, `${createHash('sha1').update(SALT).update(svg).digest('hex')}.svg`);
-  if (existsSync(file)) return readFileSync(file, 'utf-8');
-  const out = optimize(svg, SVGO).data;
+  if (existsSync(file)) return vet(readFileSync(file, 'utf-8'), name); // a kept output is checked again: it's cheap
+  const out = vet(optimize(svg, SVGO).data, name);
   const lost = styledTags(svg).filter((t) => has(svg, t) && !has(out, t));
   if (lost.length)
     throw new Error(

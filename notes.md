@@ -35,6 +35,7 @@ Not Home, not setup. Leave these alone unless the owner asks.
 - [ ] GitHub environments (review H5): put the Cloudflare secrets in `production` and a preview token in `preview`, switch `site.yml` to them, delete `cloudflare`. See `docs/security.md`, "Secrets".
 - [ ] Cloudflare: a company account with 2FA. (Done November 13, 2026: the deploy token is an account token with only "Workers Scripts: Edit"; sign-in is Google, which has 2FA.)
 - [ ] Secrets: give each one an owner and a rotation date (`docs/security.md`, "Secrets").
+- [ ] `uplinkit.ca` is not registered (seen November 17, 2026): anyone could buy it and get the mail sent to the site's addresses (`hello@`, `privacy@`, `accessibility@`, `security@`). Register it, or settle the real domain, before launch (owner, November 17, 2026: leave until then).
 - [ ] The repository is public "for now" (November 6, 2026); making it private turns the rulesets off unless the plan is GitHub Pro.
 - [ ] Finish the baseline: the 15-minute hand part (iPhone, Android, a 5-minute NVDA listen, the judgement checks).
 - [ ] Decide, on hold: who edits copy (today Claude, in git); a CMS only if staff will edit the site themselves.

@@ -87,9 +87,9 @@ export const svgSize = (file: string) => {
 };
 export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 
-// JSON-LD for a <script type="application/ld+json">: one space per level, and </ escaped so the text can never
-// close the script early.
-export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/<\//g, '<\\/');
+// JSON-LD for a <script type="application/ld+json">: one space per level, and every < escaped (as wordsJson does,
+// src/lib/copy.ts), so the text can never close the script early or open a comment inside it.
+export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/</g, '\\u003c');
 // The business, pointed at by @id from every page's JSON-LD (provider, publisher, author).
 export const businessRef = (site: URL) => ({ '@id': `${site.href}#business` });
 // The business in short, for every page's graph (Home's block, index.astro, adds the rest): a reader of one page
