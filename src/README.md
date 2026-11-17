@@ -14,7 +14,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | `about.astro`, `contact.astro` | `/about`, `/contact` | Profile, Process, Team; Message, Support |
 | `privacy.astro`, `accessibility.astro` | | `data/*.md` through `components/TextPage.astro` |
 | `soon.astro`, `404.astro` | `/soon`, missing addresses | inline |
-| `sitemap.xml.ts`, `robots.txt.ts`, `.well-known/security.txt.ts` | those files | from `lib/site.ts`, the collections, `data/*.md` |
+| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `.well-known/security.txt.ts` | those files | from `lib/site.ts`, the collections, `data/*.md`; `llms.txt` tells AI tools what the site is and lists its pages |
 
 `layouts/Base.astro` is the shared head, header, footer, phone tab bar, pop-ups and toasts. Props: `title`, `description`, `page` (current tab), `path`, `robots`, `ogType`, `type` (schema.org), `ldPage`, `ldGraph`, `footer` (`false` on the 404). `PAGES` in `lib/site.ts` lists each static page's address; its name is `pages` in `ui.yaml` (`pageName('NAME')`), its title and description come from `pageMeta('NAME')`.
 

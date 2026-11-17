@@ -15,6 +15,9 @@ pages:
 # the phone tab bar's word, where it's shorter than the page's name
 tabs:
   work: Work
+# /llms.txt (src/pages/llms.txt.ts): the heading over the menu's pages; its other headings are the pages' names
+llms:
+  pages: Pages
 
 site:
   name: Uplink Technology # og:site_name, the print contact line, About's card
