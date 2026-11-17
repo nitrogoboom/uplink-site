@@ -7,17 +7,19 @@
 //             addresses
 //   class     the <img>'s class (the theme's class goes on the <picture> when there is one)
 //   anything else goes on the <img> as written (alt, width, height, loading, fetchpriority)
+// Each address goes out with its ?v= (fresh(), src/lib/site.ts), so the browser can keep the file for a year.
 import type { HTMLAttributes } from 'astro/types';
+import { fresh } from '../lib/site';
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
   src: string;
   sources?: { media: string; srcset: string; width?: number; height?: number }[];
 }
 const { src, sources, class: cls, ...img } = Astro.props;
-const light = (path: string) => path.replace(/\.svg$/, '-light.svg');
+const bare = (path: string) => path.replace(/\?.*$/, ''); // an address that already has its ?v= (HERO.still)
 const themes = [
-  { theme: 'th-dark', at: (p: string) => p },
-  { theme: 'th-light', at: light },
+  { theme: 'th-dark', at: (p: string) => fresh(bare(p)) },
+  { theme: 'th-light', at: (p: string) => fresh(bare(p).replace(/\.svg$/, '-light.svg')) },
 ];
 ---
 

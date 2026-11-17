@@ -124,12 +124,12 @@ if (fc) {
      ====================================================================== */
   const rows = window.matchMedia(MEDIA.phone);
   const NAME = sections[0].getAttribute('name') ?? '';
-  // a time token in ms: the build writes 320ms as .32s, so mind the unit
+  // a time token in ms: the build writes 320ms as .32s, so mind the unit. Read at a tap, never at load: asking for a
+  // computed style before the first paint makes the browser style the whole page for it (PageSpeed, "Forced reflow")
   const ms = (/** @type {string} */ k) => {
     const v = window.getComputedStyle(fc).getPropertyValue(k).trim();
     return parseFloat(v) * (v.endsWith('ms') ? 1 : 1000);
   };
-  const ROW = { open: ms('--dur-fc-row-open'), shut: ms('--dur-fc-row-shut') };
   // the rows on the move: which way each is going, and its landing
   /** @type {Map<HTMLDetailsElement, { open: boolean, timer: number }>} */
   const sliding = new Map();
@@ -163,7 +163,8 @@ if (fc) {
     d.toggleAttribute('data-shut', !open);
     d.style.setProperty('--fc-row-h', to);
     window.clearTimeout(run?.timer);
-    sliding.set(d, { open, timer: window.setTimeout(() => land(d), open ? ROW.open : ROW.shut) });
+    const landing = ms(open ? '--dur-fc-row-open' : '--dur-fc-row-shut');
+    sliding.set(d, { open, timer: window.setTimeout(() => land(d), landing) });
   };
   // a tap on a row's summary, while the rows slide: a shut row opens as the open one shuts, both at once; a row on its
   // way down turns round and opens again; an open row shuts

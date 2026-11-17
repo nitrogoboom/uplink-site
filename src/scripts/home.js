@@ -218,20 +218,28 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     const ex = level ? Math.max(sx + CAP_TAIL * k, x - 50) : sx + CAP_TAIL * k;
     sp.lead.setAttribute('d', `M${x},${y}L${ex.toFixed(1)},${sy.toFixed(1)}H${sx.toFixed(1)}`);
   };
+  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes.
+  // Handed to hero.css as --cap-c, which darkens it for the light theme so the words pass 4.5:1
+  const match = () => {
+    if (at.office >= 0)
+      spots.office.el.style.setProperty('--cap-c', window.getComputedStyle(spots.office.pin[1]).stroke);
+  };
+  // The lines and the title's colour are read from the page, so they wait for the browser's own layout pass
+  // (ResizeObserver) and never ask for one straight after the words change (PageSpeed, "Forced reflow"). It reports:
+  // the stage's size changing (a turned phone), and a caption watched afresh (pinAt, once a change of words).
+  const sized = new ResizeObserver(() => {
+    aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
+    match();
+  });
+  sized.observe(box);
   /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
   const pinAt = (sp, x, y, level) => {
     sp.pin.forEach((p) => p.setAttribute('d', `M${x},${y}h0.01`));
     const aim = aims.find((a) => a.sp === sp);
     if (aim) Object.assign(aim, { x, y });
     else aims.push({ sp, x, y, level });
-    lineTo(sp, x, y, level);
-  };
-  const redraw = () => aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
-  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes.
-  // Handed to hero.css as --cap-c, which darkens it for the light theme so the words pass 4.5:1
-  const match = () => {
-    if (at.office >= 0)
-      spots.office.el.style.setProperty('--cap-c', window.getComputedStyle(spots.office.pin[1]).stroke);
+    sized.unobserve(sp.el); // watched afresh: it reports after the next layout, whether or not the size changed
+    sized.observe(sp.el);
   };
   const write = {
     cloud: () => {
@@ -255,7 +263,6 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
       sp.pin[1].setAttribute('stroke', it.c);
       sp.lead.setAttribute('stroke', it.c);
       pinAt(sp, it.x, it.y, false);
-      match();
     },
   };
   // each caption's pending swap: its timeout, then its frame (a new step on the same caption cancels both first)
@@ -304,10 +311,8 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   svg.addEventListener('click', tap);
   theme.ev.addEventListener('change', match);
-  // the stage's size changes (a turned phone), or the web font arrives and the titles change width: the lines again
-  const sized = new ResizeObserver(redraw);
-  sized.observe(box);
-  void document.fonts.ready.then(redraw);
+  // the web font arrives and the titles change width: the lines again
+  void document.fonts.ready.then(() => aims.forEach((a) => pinAt(a.sp, a.x, a.y, a.level)));
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;

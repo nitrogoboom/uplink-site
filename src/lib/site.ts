@@ -9,23 +9,28 @@ import { MEDIA } from './media.js';
 import { byOrder } from '../content.config';
 import { copy } from './copy';
 
-// Drawings keep their names when they change and are cached for a day (_headers), but home.js inserts these into the
-// page, so a stale one would meet new CSS, script and style hashes. Each address carries a hash of the file as the
-// site serves it, after SVGO (?v=; shipped() in scripts/svgo-config.mjs), so a changed drawing is a new address,
-// even when only SVGO's output changed.
-const fresh = (path: string) => `${path}?v=${createHash('sha1').update(shipped(path)).digest('hex').slice(0, 8)}`;
+// Drawings keep their names when they change, so every address a page writes carries a hash of the file as the site
+// serves it, after SVGO (?v=; shipped() in scripts/svgo-config.mjs): a changed drawing is a new address, even when
+// only SVGO's output changed, and the browser may keep each one for a year (_headers, /assets/img/*). Drawing.astro
+// does it for every picture; a new <img> of a drawing goes through it or through fresh().
+const stamps = new Map<string, string>();
+export const fresh = (path: string) => {
+  if (!stamps.has(path))
+    stamps.set(path, `${path}?v=${createHash('sha1').update(shipped(path)).digest('hex').slice(0, 8)}`);
+  return stamps.get(path)!;
+};
 
 // The home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it), written
 // by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
 // 440-680px wide there). phone: the hero scene framed closer for phones, no words (home.js writes its captions),
 // with its dashes in their own file; with reduced motion it stands still. still: the phone cut as a picture, for
-// phones without script (an <img>, so no ?v=).
+// phones without script.
 export const HERO = {
   full: fresh('/assets/img/hero-office.svg'),
   tablet: fresh('/assets/img/hero-office-tablet.svg'),
   phone: fresh('/assets/img/office-compact-build.svg'),
   phoneFlows: fresh('/assets/img/office-compact-flows.svg'),
-  still: '/assets/img/hero-office-phone.svg',
+  still: fresh('/assets/img/hero-office-phone.svg'),
   media: {
     phone: MEDIA.smallPhone,
     tablet: '(37.5em <= width < 81.25em) and (height < 68.75em)',

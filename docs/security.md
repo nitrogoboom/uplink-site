@@ -6,7 +6,7 @@ Controls, and every secret (names and places, never values). Reporting: [`SECURI
 
 ### HTTPS and HSTS
 
-- Every page and file sends `Strict-Transport-Security: max-age=31536000`. Add `includeSubDomains; preload` only once every subdomain is HTTPS for good: preloading is hard to undo.
+- Every page and file sends `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` (owner, November 17, 2026: PageSpeed's HSTS check). On `workers.dev` the two extra words change nothing. On the real domain they cover every subdomain, mail included: before launch, confirm each one is HTTPS for good, or take the two words out of `public/_headers` until it is (`docs/release.md`, "Before launch"). Joining the browsers' lists at hstspreload.org is hard to undo.
 - The Worker redirects `http://` to `https://` with a `308` for the requests it sees: `/404` and missing addresses. Until launch an existing page still answers on plain `http://` with a `200` (seen November 17, 2026). At launch, Always Use HTTPS on the zone redirects everything first.
 
 ### Content Security Policy

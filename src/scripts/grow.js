@@ -58,14 +58,18 @@ if (grow && svg) {
     started = false,
     visible = false,
     timer = 0,
-    glowT = 0;
+    glowT = 0,
+    preRaf = 0;
   /** @type {number[]} */
   let beats = [];
 
   // ---- tags: placed on the drawing's anchors, kept inside the picture, and never on top of each other: when a
   // step's two tags would overlap (a close camera brings anchors together), the upper one moves up clear of the
   // lower one, or, with no room above, the lower one moves down ----
+  // Only while the section is on screen: measuring it at load, far below the first screen, made the browser lay the
+  // whole page out early (PageSpeed, "Forced reflow"). Coming on screen places them (whenOnScreen, below).
   const placeTags = () => {
+    if (!visible) return;
     const m = svg.getScreenCTM();
     if (!m) return;
     const r = stage.getBoundingClientRect(),
@@ -133,6 +137,7 @@ if (grow && svg) {
   };
   const camTo = (/** @type {number[]} */ to, /** @type {boolean} */ animate) => {
     window.cancelAnimationFrame(camRaf);
+    if (to.every((v, n) => v === vb[n])) return; // already there (the first draw, a pause): nothing to write
     const from = vb.slice(),
       t0 = performance.now(),
       dur = animate && !reduceMotion.matches ? 1400 : 0;
@@ -217,8 +222,11 @@ if (grow && svg) {
     window.clearTimeout(glowT);
     pcs.forEach(({ g }) => g.classList.remove('glow'));
     const fresh = pcs.filter((p) => p.s <= i && (p.s > from || (animate && p.s === i && from === i)));
-    fresh.forEach(({ g }) => g.classList.add('pre', 'hide'));
-    void svg.getBoundingClientRect(); // commit the start of the drop before it begins
+    window.cancelAnimationFrame(preRaf);
+    if (fresh.length) {
+      fresh.forEach(({ g }) => g.classList.add('pre', 'hide'));
+      void svg.getBoundingClientRect(); // commit the start of the drop before it begins
+    }
     pcs.forEach(({ g, s, o }) => {
       const isNew = fresh.some((p) => p.g === g);
       // not animating (first draw, pause, reduced motion): parts appear or go at once, never a flash of the end
@@ -228,10 +236,12 @@ if (grow && svg) {
       g.classList.toggle('hide', s > i);
       if (animate && isNew) g.classList.add('glow');
     });
-    if (!animate) {
-      void svg.getBoundingClientRect();
-      pcs.forEach(({ g }) => g.classList.remove('pre'));
-    }
+    // .pre (no transition) stays until the browser has drawn the parts where they now are: two frames on, with no
+    // layout asked for here. A show() before then cancels this and sets .pre itself (above).
+    if (!animate)
+      preRaf = window.requestAnimationFrame(() => {
+        preRaf = window.requestAnimationFrame(() => pcs.forEach(({ g }) => g.classList.remove('pre')));
+      });
     if (animate) glowT = window.setTimeout(() => pcs.forEach(({ g }) => g.classList.remove('glow')), GLOW);
     camTo(target(i), animate);
     tags.forEach((t) => t.el.classList.remove('is-on', 'is-fixed', 'is-flip'));
@@ -373,7 +383,6 @@ if (grow && svg) {
     go(LAST, false);
   } else go(-1, false);
   icon();
-  window.requestAnimationFrame(placeTags);
   if (document.fonts) void document.fonts.ready.then(placeTags);
   window.addEventListener('resize', placeTags);
   // ---- the dome's horizontal rings turn: a band of light runs round each (bright near side, faint far side). Set
@@ -395,6 +404,7 @@ if (grow && svg) {
   // starts as the section's first pixel arrives, so it's already moving when you see it; off screen it waits
   whenOnScreen(section, (on) => {
     visible = on;
+    if (on) placeTags();
     if (on && !started && !reduceMotion.matches && !held.on) start();
     else if (playing) tick(); // tick holds the clock off screen
   });

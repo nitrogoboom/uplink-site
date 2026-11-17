@@ -15,7 +15,7 @@ import './hero-slab.css'; // the phone floor slab's shapes, written by tools/gen
 import './hero.css';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
-import { HERO, getServices } from '../../lib/site';
+import { HERO, fresh, getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
@@ -95,10 +95,10 @@ const still = t.alt;
         <noscript
           ><picture
             ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
-            <img class="hero-nojs" src="/assets/img/office.svg" alt={still} width="1200" height="800"
+            <img class="hero-nojs" src={fresh('/assets/img/office.svg')} alt={still} width="1200" height="800"
           /></picture></noscript
         >
-        <!-- the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) -->
+        {/* the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) */}
         <template class="hero-still"
           ><Drawing
             src="/assets/img/office.svg"
@@ -109,7 +109,7 @@ const still = t.alt;
             height="800"
         /></template>
         <Fragment set:html={flows} />
-        <!-- stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion -->
+        {/* stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion */}
         <HoldButton class="hero-pause" />
       </div>
       <div class="hero-dock">

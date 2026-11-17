@@ -35,20 +35,24 @@ const files = (dir, skip = () => false) =>
     });
 // DIST: the built site's folder (dist/)
 export function headers(DIST) {
-  // Both lists are read from the built home page, so they can't drift from their sources: the drawings home.js puts
-  // into the page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included), the one
-  // footer.js puts in (the footer's data-fc-map, CAMPUS) and the fonts every screen preloads (Base.astro's <Font> tags
-  // write them, at Astro's hashed /_astro/fonts/ addresses; any with a media query aren't every screen's).
+  // Both lists are read from the built pages, so they can't drift from their sources: the drawings home.js puts into
+  // the home page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included) and the
+  // one footer.js puts in (the footer's data-fc-map, CAMPUS); and, page by page, the fonts every screen preloads
+  // (Base.astro's <Font> tags write them, at Astro's hashed /_astro/fonts/ addresses; any with a media query aren't
+  // every screen's).
   const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
   const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
-  const FIRST_FONTS = [...home.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
-    .map((m) => m[0])
-    .filter((tag) => /\sas="font"/.test(tag) && !/\smedia=/.test(tag))
-    .map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1])
-    .filter((href) => href !== undefined);
-  if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !FIRST_FONTS.length)
+  // a built page's Early Hints line
+  const fontHint = (/** @type {string} */ html) =>
+    [...html.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
+      .map((m) => m[0])
+      .filter((tag) => /\sas="font"/.test(tag) && !/\smedia=/.test(tag))
+      .map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1])
+      .filter((href) => href !== undefined)
+      .map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`)
+      .join(', ');
+  if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !fontHint(home))
     throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
-  const HINT = FIRST_FONTS.map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`).join(', ');
 
   const pages = files(DIST).filter((p) => p.endsWith('.html'));
 
@@ -80,19 +84,21 @@ export function headers(DIST) {
 
   // pages that are served at a path: index.html → /, services/help-desk.html → /services/help-desk (format 'file').
   // 404.html is served at any missing address, so no rule can name it; soon is noindex but still a page people see.
-  const paths = pages
+  const served = pages
     .filter((f) => !f.endsWith(`${sep}404.html`))
-    .map(
-      (f) =>
+    .map((f) => ({
+      path:
         '/' +
         relative(DIST, f)
           .split(sep)
           .join('/')
           .replace(/index\.html$/, '')
           .replace(/\.html$/, ''),
-    )
-    .sort();
-  const hints = paths.map((p) => `${p}\n  Link: ${HINT}\n`).join('');
+      hint: fontHint(readFileSync(f, 'utf-8')),
+    }))
+    .sort((a, b) => (a.path < b.path ? -1 : 1));
+  const paths = served.map((p) => p.path);
+  const hints = served.map((p) => `${p.path}\n  Link: ${p.hint}\n`).join('');
 
   // Cloudflare's own html_handling sends most of these spellings as 307 (temporary), which caches and crawlers don't
   // keep; a _redirects line wins over it.

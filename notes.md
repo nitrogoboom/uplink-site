@@ -24,6 +24,12 @@ Drawing generators (the owner directs drawing work):
 - [ ] The generators write the camera boxes into the drawings; the footer map camera becomes generated CSS with `:has()`.
 - [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
 
+PageSpeed (November 17, 2026: fonts 113 KB to 51 KB; forced reflow, network dependency tree, cache lifetimes and HSTS turned green):
+
+- [ ] "Reduce unused CSS" stays orange: Home's one stylesheet holds every screen size, print, hover, high contrast and both themes, so a phone uses about 38% of it at load (10.5 KiB unused, against PageSpeed's 10 KiB line). Only splitting the sheet to please the checker would turn it. Owner to decide.
+- [ ] "Avoid non-composited animations" stays grey: the hero's moving dashes are `stroke-dashoffset`, which the graphics chip can't take over. Turning it means redrawing how the dashes move (`tools/gen_office.py`). Owner to decide.
+- [ ] Source comments don't ship (the build strips them). A sweep to shorten them in `src/` is tidiness, not speed. Owner to decide how far.
+
 ## Parked until the owner says
 
 Not Home, not setup. Leave these alone unless the owner asks.
@@ -79,4 +85,4 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 - [ ] Android: do the "Fallback Roboto" faces in `src/styles/fonts.css` find `local('Roboto')`? Load the 404 on a slow connection and watch for a jump (review B5).
 - [ ] Firefox 144+ and Safari 26.2+ (review J8, J15): with page scripts blocked, the gear opens Settings, Esc and close shut it, focus returns; does a backdrop click shut it (`closedby`)?
 - [ ] Safari before 26.2 (no `scrollend`): Home's phone services row, Next, swipe mid-slide, Next again: it steps from the card showing.
-- [ ] PageSpeed mobile: confirm LCP is the hero text (about 1.1s locally).
+- [ ] Windows at 100% screen scale: the fonts lost their Windows-only sharpening (hinting) on November 17, 2026. Small text should look the same; if it looks soft, cut the fonts again without `--no-hinting` (`docs/ops.md`, "Fonts are Astro's"; about 86 KB in all, not 51).

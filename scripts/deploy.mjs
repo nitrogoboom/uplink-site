@@ -1,8 +1,7 @@
 // CI's deploy on main: uploads dist/ as a version that takes no traffic, smoke-checks it, puts it live, and rolls back
 // on its own if the live address then fails (review H3). The steps, timings and marker: docs/ops.md, "Deploys".
-//   node scripts/deploy.mjs LIVE_ADDRESS [SMOKE_ARGUMENTS ...]
+//   node scripts/deploy.mjs LIVE_ADDRESS
 //   e.g. node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev
-//        node scripts/deploy.mjs https://uplinkit.ca --launch            (after launch: both smoke runs get --launch)
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -12,9 +11,9 @@ import { fileURLToPath } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const [live, ...smokeArgs] = process.argv.slice(2);
+const [live] = process.argv.slice(2);
 if (!/^https?:\/\/[^/]+\/?$/.test(live || '')) {
-  console.error('usage: node scripts/deploy.mjs LIVE_ADDRESS [SMOKE_ARGUMENTS ...]');
+  console.error('usage: node scripts/deploy.mjs LIVE_ADDRESS');
   process.exit(2);
 }
 const POLL = Number(process.env.DEPLOY_POLL ?? 5);
@@ -24,9 +23,6 @@ const RETRY = Number(process.env.DEPLOY_RETRY ?? 30);
 const WRANGLER = [process.execPath, join(ROOT, 'node_modules/wrangler/bin/wrangler.js')];
 const SMOKE = [process.execPath, join(ROOT, 'scripts/check.mjs'), 'smoke'];
 const CLOUDFLARE = ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID']; // wrangler's; the smoke runs never need them
-// smoke arguments with a value that only fit the live address
-const LIVE_ONLY = ['--old'];
-const previewArgs = smokeArgs.filter((a, i) => !LIVE_ONLY.includes(a) && !LIVE_ONLY.includes(smokeArgs[i - 1]));
 
 // runs a command with its output in the log; capture: stdout comes back as well; strip: variables it doesn't get
 /** @type {(command: string[], args: string[], opts?: { capture?: boolean, env?: Record<string, string>, strip?: string[] }) => { ok: boolean, stdout: string }} */
@@ -45,7 +41,7 @@ const run = ([cmd, ...pre], args, { capture = false, env = {}, strip = [] } = {}
   return { ok: r.status === 0, stdout: r.stdout || '' };
 };
 const wrangler = (args, opts) => run(WRANGLER, args, opts);
-const smoke = (address, args) => run(SMOKE, [address, ...args], { strip: CLOUDFLARE }).ok;
+const smoke = (address, args = []) => run(SMOKE, [address, ...args], { strip: CLOUDFLARE }).ok;
 const note = (line) => {
   console.log(`\n${line}`);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${line}\n\n`);
@@ -125,7 +121,7 @@ if (!upload.ok || !id || !preview)
 note(`Uploaded version \`${id}\` for ${sha}: ${preview}`);
 
 // 3. smoke the new version at its own address, and note its marker
-if (!smoke(preview, ['--preview', ...previewArgs]))
+if (!smoke(preview, ['--preview']))
   stop(`version \`${id}\` failed the smoke check at ${preview}. It takes no traffic; the live site is unchanged.`);
 const want = await marker(preview);
 if (!want)
@@ -171,11 +167,11 @@ let why;
 if (seen !== want) {
   why = `${live} still served another build after ${WAIT} s (build marker \`${seen || 'none'}\`, not \`${want}\`)`;
 } else {
-  let passed = smoke(live, smokeArgs);
+  let passed = smoke(live);
   if (!passed) {
     console.log(`\nThe live smoke check failed; trying again in ${RETRY} s.`);
     await sleep(RETRY * 1000);
-    passed = smoke(live, smokeArgs);
+    passed = smoke(live);
   }
   if (passed) {
     note(`**Deployed:** version \`${id}\` is live and passed the smoke check at ${live}.`);

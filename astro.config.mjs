@@ -5,6 +5,7 @@ import { placeholders } from './src/lib/placeholders.mjs';
 import { PLACEHOLDERS } from './src/lib/footer.ts';
 import { fileURLToPath } from 'node:url';
 import { svgo } from './scripts/svgo.mjs';
+import { preload } from './scripts/preload.mjs';
 import { headers } from './scripts/headers.mjs';
 
 // The live address: the Worker's workers.dev name until it has a domain. Set the real domain here (or SITE_URL
@@ -12,8 +13,8 @@ import { headers } from './scripts/headers.mjs';
 const site = (process.env.SITE_URL || 'https://uplink-site.johnoreilly.workers.dev').replace(/\/$/, '');
 
 // Finishes dist/ once Astro has written it, so `astro build` alone gives the site as it ships: the drawings shrunk,
-// then dist/_headers (CSP hashes, X-Build, Early Hints) and dist/_redirects. The order matters: headers() hashes the
-// drawings' <style> blocks after svgo(). A step that throws fails the build. docs/ops.md, "Response headers".
+// each page's script preloads, then dist/_headers (CSP hashes, X-Build, Early Hints) and dist/_redirects. The order
+// matters: headers() hashes the drawings' <style> blocks after svgo(), and the pages as preload() leaves them. A step that throws fails the build. docs/ops.md, "Response headers".
 /** @type {import('astro').AstroIntegration} */
 const finish = {
   name: 'uplink-finish',
@@ -21,6 +22,7 @@ const finish = {
     'astro:build:done': ({ dir }) => {
       const dist = fileURLToPath(dir);
       svgo(dist);
+      preload(dist);
       headers(dist);
     },
   },
@@ -42,8 +44,8 @@ export default defineConfig({
   // Astro's own Markdown processor, plus the plugin that fills {phone}, {privacy} … in src/data/*.md from
   // footer.json (src/lib/placeholders.mjs). Restart `npm run dev` after changing footer.json to see it there.
   markdown: { processor: satteri({ mdastPlugins: [placeholders(PLACEHOLDERS)] }) },
-  // Barlow and Barlow Condensed, the five faces in src/assets/fonts/ (Latin, SIL Open Font License: public/assets/fonts/
-  // OFL.txt). Astro writes their @font-face rules and gives each file a hashed name under /_astro/fonts/, so a changed
+  // Barlow and Barlow Condensed, the five faces in src/assets/fonts/ (English and French letters only, no hinting:
+  // docs/ops.md, "Fonts are Astro's"; SIL Open Font License: public/assets/fonts/OFL.txt). Astro writes their @font-face rules and gives each file a hashed name under /_astro/fonts/, so a changed
   // font is a new address (cached a year, public/_headers). Base.astro's <Font> tags put them in each page and preload
   // the two faces every first screen uses. The fallbacks are the measured ones in src/styles/fonts.css (Arial or
   // Liberation Sans resized to Barlow, and Roboto for Android), so Astro's own fallback guess is off.

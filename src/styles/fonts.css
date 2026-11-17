@@ -1,4 +1,4 @@
-/*--- Fonts: the fallbacks. Barlow and Barlow Condensed themselves (src/assets/fonts/, Latin set, which covers French;
+/*--- Fonts: the fallbacks. Barlow and Barlow Condensed themselves (src/assets/fonts/, cut to English and French letters;
    SIL Open Font License, copy in public/assets/fonts/OFL.txt) are Astro's: astro.config.mjs lists the five faces and
    Base.astro's <Font> tags write their @font-face rules, preload the two that carry every first screen (Condensed 700
    italic titles, 400 body) and set --font-barlow and --font-barlow-condensed, which tokens.css uses.

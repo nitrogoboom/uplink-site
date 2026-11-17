@@ -18,6 +18,9 @@
 # the 'uplink' policy in core.js (its html() helper). A new innerHTML elsewhere fails until it goes through it.
 # No report-to or report-uri: the site has no address that takes reports. At launch, Cloudflare's client-side
 # security watches the scripts pages run, with its own header and endpoint (docs/release.md, "Before launch").
+# Strict-Transport-Security: a year, every subdomain, and "preload": the browser asks for https only. On the real
+# domain that covers mail and any other subdomain too, and "preload" lets the domain join the browsers' built-in
+# https-only lists (docs/release.md, "Before launch").
 # X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
 # robots.txt still allows crawling, so search engines can read this, and names no sitemap (src/pages/robots.txt.ts).
 # At launch, delete the line and put the Sitemap line back in robots.txt (docs/release.md, "Launch day").
@@ -29,7 +32,7 @@
 # headers, so the rules below for a path (/*.txt, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
 /*
   X-Robots-Tag: noindex
-  Strict-Transport-Security: max-age=31536000
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
@@ -67,12 +70,13 @@
 # (/_astro/x.ab12cd34.css), so a year is safe.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
-# Drawings keep their names when they change (the generators overwrite them), so a day, then revalidate.
+# Drawings keep their names when they change (the generators overwrite them), but every address a page writes
+# carries a hash of the file (?v=, fresh() in src/lib/site.ts), so a changed drawing is a new address: a year.
 # Opened on their own, the drawings would get the pages' CSP, which blocks their <style> blocks (the embedded
 # letters, the hero's timings). A drawing runs no script, so its own policy allows inline styles and nothing else.
 # (In the page, <img> drawings are not held to the page's CSP, and the drawings home.js and footer.js insert are hashed above.)
 /assets/img/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=31536000, immutable
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; font-src data:; img-src data:
 # The share picture is fetched by social sites by its plain name: a day only. Some apps show it straight from here

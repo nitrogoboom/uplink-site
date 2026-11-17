@@ -7,7 +7,6 @@ export const ICONS = {
   chevronL: { d: '<path d="M15 6l-6 6 6 6"/>', sw: 2.2 },
   chevronR: { d: '<path d="M9 6l6 6-6 6"/>', sw: 2.2 },
   check: { d: '<path d="M5 12l5 5 9-10"/>', sw: 3 },
-  minus: { d: '<path d="M6 12h12"/>', sw: 2, join: false },
   plus: { d: '<path d="M12 5v14M5 12h14"/>', sw: 2, join: false },
   close: { d: '<path d="M3 3l10 10M13 3L3 13"/>', box: '0 0 16 16', sw: 2, join: false },
   mark: { d: '<path d="M5 14l7-7 7 7"/><path d="M8.5 19l3.5-3.5 3.5 3.5"/>', sw: 2.6 },

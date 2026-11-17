@@ -181,7 +181,6 @@
   --dur-1: 150ms;
   --dur-2: 250ms;
   --dur-3: 600ms;
-  --dur-pulse: 1.8s; /* a dot's ring, looping */
   /* footer (footer.css): a panel sliding in, a phone row's links growing open and shut (shutting a little quicker),
      the map's colour and route fades, and the map's loops (each loop's steps() count is its frames, so change the
      two together) */

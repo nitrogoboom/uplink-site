@@ -48,7 +48,8 @@ Workers logs (3 days) for `worker_error` lines after each deploy; after launch, 
 - [ ] **(you)** Decide what gets a test: the "Set in stone" list in `CLAUDE.md`. Until then the repo has none but the deploy's smoke check.
 - [x] Narrow the Trusted Types policy: `html()` in `core.js` accepts only the site's own drawings and icons (review J6). (November 17, 2026, the owner's way: the check left `core.js` for the build, which stops on a drawing that holds anything but drawing tags, `vet()` in `scripts/svgo-config.mjs`; `html()` passes the site's own files on as they are.)
 - [ ] **(you)** Workers traces: kept off (owner, November 16, 2026). Cloudflare recommends Logs and Traces for production, but a trace records each request, and the privacy page says the site keeps only the Worker's own errors (`docs/security.md`, "What the site logs"). To turn them on at launch: `observability.traces.enabled: true` with a sampling rate in `wrangler.jsonc`, and the same commit updates `src/data/privacy.md`. Leave unticked if they stay off.
-- [ ] One cached stylesheet instead of inlined CSS per page (review L4); hashed drawing file names (L5).
+- [ ] One cached stylesheet instead of inlined CSS per page (review L4).
+- [ ] **(domain)** HSTS already sends `includeSubDomains; preload` (owner, November 17, 2026). Before the real domain goes live, confirm every subdomain of it (mail, anything old) is HTTPS for good; if one isn't, take the two words out of `public/_headers` until it is.
 - [ ] **(domain)** Turn on Cloudflare client-side security (formerly Page Shield; Free plan): dashboard > the zone > Security > Settings > Client-side abuse > Continuous script monitoring. It needs the site on a Cloudflare zone, so not on workers.dev. Cloudflare adds its own report-only CSP header to some pages and collects the reports at its own endpoint: nothing to add to `public/_headers` and no endpoint of ours. Free shows the scripts in the dashboard (Security > Web assets > Client-side resources); email alerts for new scripts need Business. Check the list once after launch: only the site's own `/_astro/` scripts should be there.
 - [ ] If the forms come back (PR #38): review its `/api/` routes first (Turnstile, honeypot, rate limit, header injection); the site has none until then.
 - [ ] **(domain)** SSL Labs A+, securityheaders.com, Mozilla Observatory; registrar lock, auto-renew, 2FA.
@@ -57,7 +58,17 @@ Workers logs (3 days) for `worker_error` lines after each deploy; after launch, 
 - [ ] Redirects from the old site's addresses, if there is one.
 - [ ] **(you)** PageSpeed on every page (pagespeed.web.dev); one WebPageTest run from Toronto; decide on Lighthouse CI.
 - [ ] **(you)** Practise a rollback (below); an uptime alert; a proofread by someone else; extra real phones; the owner's sign-off.
-- [ ] `curl -sI` a version preview address: if Cloudflare adds `X-Robots-Tag: noindex` there, the deploy's `--preview --launch` smoke fails every deploy (review H3); then leave that check to the live run.
+- [ ] Write the launch checks (below) into the smoke check and the deploy, on the `launch` branch.
+
+### Launch checks to write
+
+The smoke check and the deploy carried these until November 17, 2026, when they left the code (owner: no launch tests in the scripts until launch). Write them back on the `launch` branch; `git log -S"--launch" -- checks/smoke.spec.mjs scripts/deploy.mjs checks/lib.mjs` finds the old code.
+
+- [ ] `npm run smoke -- ADDRESS --launch`: Home sends no `X-Robots-Tag: noindex` (today the check expects it there).
+- [ ] With `--launch`, plain `http://` redirects to `https://` (301 or 308, same path) on Home too, not only at `/404`: the zone's Always Use HTTPS answers every request.
+- [ ] `--old OLD_ADDRESS`: the old address answers 301 or 308 to the new Home (launch day, option B). It takes a value, so `checks/lib.mjs` skips that value when it reads the address.
+- [ ] `node scripts/deploy.mjs LIVE_ADDRESS --launch`: the deploy hands its extra arguments to both smoke runs, the version's own address and the live one; `--old` goes to the live run only.
+- [ ] `curl -sI` a version preview address first: if Cloudflare adds `X-Robots-Tag: noindex` there, a `--preview --launch` smoke would fail every deploy (review H3); then leave the `noindex` check to the live run.
 
 ## Launch day
 
@@ -73,7 +84,7 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 2. **Claude:** on a `launch` branch, don't merge yet:
    - `public/_headers`: drop `X-Robots-Tag: noindex`. `src/pages/robots.txt.ts`: add the `Sitemap:` line back.
    - `SITE_URL` = `https://DOMAIN`; `wrangler.jsonc`: `routes` with the custom domain.
-   - `site.yml`: `node scripts/deploy.mjs https://DOMAIN --launch`; `SECURITY.md`'s `security.txt` link.
+   - The launch checks, written back (Before launch, "Launch checks to write"); `site.yml`: `node scripts/deploy.mjs https://DOMAIN --launch`; `SECURITY.md`'s `security.txt` link.
    - If Bot Fight Mode goes on: let user agents `uplink-deploy` and `uplink-smoke-test` through (or deploys roll back), and fix "sets no cookies" in `src/data/privacy.md` (`__cf_bm`).
    - Option B: 301 exactly the host `uplink-site.johnoreilly.workers.dev`, never all of `workers.dev` (previews live there; redirecting them breaks every deploy).
 3. Open the PR, let CI pass, both read the preview once.
@@ -95,7 +106,7 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 - **Owner:** Search Console and Bing by DNS, submit the sitemap; uptime check to `DOMAIN`; TTL back to Auto.
 - **Both:** SSL Labs, Observatory, Rich Results Test, share previews.
 - **Claude:** tick this page and `notes.md`; tag the release.
-- **Owner, after a clean week:** HSTS `includeSubDomains; preload` and hstspreload.org (hard to undo).
+- **Owner, after a clean week:** submit the domain at hstspreload.org (hard to undo). The header already says `includeSubDomains; preload`.
 
 ### Back out
 
