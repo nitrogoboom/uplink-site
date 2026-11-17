@@ -85,8 +85,8 @@ const tiles = [
         <Icon name="chevronL" />
       </button>
       <span class="svc-dots" aria-hidden="true"
-        >{[...tiles, null].map(() => (
-          <i class="pip" />
+        >{[...tiles, null].map((_, i) => (
+          <i class:list={['pip', { on: i === 0 }]} />
         ))}</span
       >
       <button class="iconbtn svc-step" type="button" data-step="1" aria-controls="services-row" aria-label={t.next}>

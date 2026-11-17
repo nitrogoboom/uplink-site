@@ -14,15 +14,27 @@
   transform: translateY(calc(-100% - env(safe-area-inset-top, 0px)));
 }
 /* At the top of the page the bottom line is clear, so the header and the first section read as one ground; it fades
-   in over the first header-height of scroll. Only a from keyframe: the end is the line above, which is also what a
-   browser without scroll-driven animations shows (the animation-range test leaves out ones with partial support). A
-   colour, nothing moves, so less motion leaves it be: motion.css's short duration is spread over the scroll range.
-   Not with more contrast or forced colours, where the line is an edge the visitor asked for (tokens.css, L8). */
+   in over the first header-height of scroll. The fading line is a 1px ::after laid over the border, which goes clear:
+   its opacity is something the graphics chip can run on its own, where a border's colour repaints the header on every
+   scroll frame (PageSpeed, "Avoid non-composited animations"). Only a from keyframe: the end is the line as drawn. A
+   browser without scroll-driven animations keeps the plain border (the animation-range test leaves out ones with
+   partial support). Nothing moves, so less motion leaves it be: motion.css's short duration is spread over the
+   scroll range. Not with more contrast or forced colours, where the line is an edge the visitor asked for
+   (tokens.css, L8): they keep the border too. */
 @supports (animation-timeline: scroll()) and (animation-range: 0% 100%) {
   @media (prefers-contrast: no-preference) {
+    .site-header {
+      border-bottom-color: transparent;
+    }
     /* longhands: the build's minifier folds a shorthand and animation-timeline into one animation, which browsers
        refuse (a timeline can't be set in the shorthand), and the line would never fade */
-    .site-header {
+    .site-header::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 -1px;
+      height: 1px;
+      background: var(--c-line);
+      pointer-events: none;
       animation-name: header-line;
       animation-duration: auto;
       animation-timing-function: linear;
@@ -34,7 +46,7 @@
 }
 @keyframes header-line {
   from {
-    border-bottom-color: transparent;
+    opacity: 0;
   }
 }
 .site-header .container {
@@ -139,6 +151,9 @@
   left: 0;
   right: 0;
   bottom: -1px; /* on the header's bottom line */
+  /* and over it: the line is the header's last box (its ::after, above). Raising this, not sinking the line under the
+     tabs, keeps the tabs' words out of the line's own layer, where Windows would draw them without ClearType */
+  z-index: 1;
   height: var(--sp-1);
   background: var(--c-accent);
 }

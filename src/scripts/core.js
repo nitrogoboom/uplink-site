@@ -505,6 +505,7 @@ const settle = (/** @type {Element} */ el) => {
 /** @param {Element | null | undefined} el @param {(onScreen: boolean) => void} [onChange] */
 function whenOnScreen(el, onChange) {
   if (!el) return null;
+  el.classList.add('is-idle'); // until the first report, a moment on: a loop far down the page never starts
   const io = new IntersectionObserver(([en]) => {
     el.classList.toggle('is-idle', !en.isIntersecting);
     if (onChange) onChange(en.isIntersecting);
