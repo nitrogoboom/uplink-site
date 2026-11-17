@@ -2,7 +2,7 @@
 // The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it. Its props, and how a
 // page adds its own script (inside <Fragment slot="scripts">): src/README.md, "Pages". Anything else a
 // page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
-// the shared CSS; the build inlines it in a <style> block in every page (astro.config.mjs)
+// the shared CSS: one file every page links, and Home carries inside itself (astro.config.mjs, scripts/head.mjs)
 import '../styles/global.css';
 import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';

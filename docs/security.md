@@ -78,4 +78,4 @@ If a secret may have leaked: make a new one, delete the old one, note it in the 
 
 ## Review checklist
 
-`curl -sI` for the `308` to HTTPS (before launch, only at a missing address) and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console; `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.
+`curl -sI` for the `308` to HTTPS (before launch, only at a missing address) and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console (one that isn't the site's: when Playwright takes a screenshot in WebKit it adds a `<style>` of its own, and the console says "Refused to apply a stylesheet", `style-src-elem` on the document; it comes only with the screenshot, seen November 17, 2026); `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.

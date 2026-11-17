@@ -42,16 +42,19 @@ export function headers(DIST) {
   // every screen's).
   const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
   const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
-  // a built page's Early Hints line
-  const fontHint = (/** @type {string} */ html) =>
-    [...html.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
-      .map((m) => m[0])
-      .filter((tag) => /\sas="font"/.test(tag) && !/\smedia=/.test(tag))
-      .map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1])
-      .filter((href) => href !== undefined)
-      .map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`)
-      .join(', ');
-  if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !fontHint(home))
+  // a built page's Early Hints line: the CSS files it links first (Home has none: scripts/head.mjs put them inside
+  // the page), then its fonts. Sent with the page too, so the browser has the CSS file's name before it reads a tag.
+  const pageHint = (/** @type {string} */ html) =>
+    [
+      ...[...html.matchAll(/<link rel="stylesheet" href="([^"]+)">/g)].map((m) => `<${m[1]}>; rel=preload; as=style`),
+      ...[...html.matchAll(/<link\b[^>]*\brel="preload"[^>]*>/g)]
+        .map((m) => m[0])
+        .filter((tag) => /\sas="font"/.test(tag) && !/\smedia=/.test(tag))
+        .map((tag) => /\shref="([^"]+)"/.exec(tag)?.[1])
+        .filter((href) => href !== undefined)
+        .map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`),
+    ].join(', ');
+  if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !pageHint(home))
     throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
 
   const pages = files(DIST).filter((p) => p.endsWith('.html'));
@@ -60,7 +63,7 @@ export function headers(DIST) {
   const hashes = new Set();
   const styles = new Set();
   const attrs = [];
-  // {style-hashes} covers every inline <style>: Astro's inlined CSS, the drawings inlined in the home page, and the
+  // {style-hashes} covers every inline <style>: Home's CSS and a small page's own, the drawings inlined in the home page, and the
   // <style> blocks in the hero drawings and the footer's campus map (home.js and footer.js insert those SVGs into the
   // page, so their styles count as the page's). A style="" attribute stops the build: no hash covers one, so the CSP
   // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
@@ -94,7 +97,7 @@ export function headers(DIST) {
           .join('/')
           .replace(/index\.html$/, '')
           .replace(/\.html$/, ''),
-      hint: fontHint(readFileSync(f, 'utf-8')),
+      hint: pageHint(readFileSync(f, 'utf-8')),
     }))
     .sort((a, b) => (a.path < b.path ? -1 : 1));
   const paths = served.map((p) => p.path);
