@@ -64,7 +64,7 @@ ES modules in `scripts/`; each page script imports `core.js` first. Type-checked
 
 | Script | Runs on | Does |
 | --- | --- | --- |
-| `core.js` | every page | helpers, toasts, pop-ups, forms, theme, pause state, phone tab bar hide-on-scroll, `html()` (Trusted Types), keyboard map |
+| `core.js` | every page | helpers, toasts, pop-ups, forms, theme, pause state, phone tab bar hide-on-scroll, `html()` (Trusted Types), keyboard map, the dash clock (the drawings' moving dashes) |
 | `footer.js` | every page | footer map and open section, rows sliding open and shut (phones), newsletter mockup |
 | `home.js`, `grow.js` | Home | hero cut, cloud, captions, phone Services row; the Grow world |
 | `contact.js`, `soon.js` | Contact, Soon | copy buttons and queue card; names the missing page |

@@ -7,7 +7,7 @@
    open (Contact when none is picked).
    ========================================================================== */
 
-import { $, $$, UI, html, reduceMotion, toast, whenOnScreen } from './core.js';
+import { $, $$, UI, dashes, html, reduceMotion, toast, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 
 /* ======================================================================
@@ -56,6 +56,8 @@ if (fc) {
         whenOnScreen(map, (on) => {
           if (on) map.classList.add('is-seen');
         });
+        // the routes' dashes keep the site's beat while the map is on screen (core.js, the dash clock)
+        dashes($$('.flow', map), () => !map.classList.contains('is-idle'));
       })
       .catch(() => {
         /* no map: the sections and the label still work */

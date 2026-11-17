@@ -514,6 +514,47 @@ function whenOnScreen(el, onChange) {
   return io;
 }
 
+/* ---------- the dash clock --------------------------------------------- */
+// The drawings' moving dashes (data along a cable, the footer map's routes). A CSS animation of stroke-dashoffset
+// can't be handed to the graphics chip, and while one runs the browser does a full frame of page work 60 times a
+// second, steps() or not: the hero's seven took 28% of a slowed phone's main thread, a timer moving them at the same
+// pace 6% (measured November 17, 2026). So one timer keeps the beat for every drawing: it counts up, and writes the
+// count to --dash on each line registered here; the drawing's own CSS turns the count into that line's offset
+// (stroke-dashoffset: calc(var(--dash, 0) * -2px)). The count wraps at 360, so a step times 360 must be a whole
+// number of the line's dash periods, or the dashes jump once a minute.
+// Lines move only while running() says so, the tab shows, motion is allowed and the pause is off.
+const DASH_BEAT = 180; // ms between steps: under six a second
+const DASH_WRAP = 360;
+/** @type {Set<{ lines: (HTMLElement | SVGElement)[], running: () => boolean, each?: () => void }>} */
+const dashSets = new Set();
+let dashBeat = 0;
+let dashTimer = 0;
+const dashTick = () => {
+  if (document.hidden || held.on || reduceMotion.matches) return;
+  dashBeat = (dashBeat + 1) % DASH_WRAP;
+  const beat = String(dashBeat);
+  dashSets.forEach((set) => {
+    if (!set.running()) return;
+    set.lines.forEach((line) => line.style.setProperty('--dash', beat));
+    set.each?.();
+  });
+};
+// Registers a drawing's dashed lines; returns the way to take them off again (a drawing that leaves the page).
+// each: something else of the drawing's to move on the same beat (Grow's play ring).
+/** @param {(HTMLElement | SVGElement)[]} lines @param {() => boolean} [running] @param {() => void} [each] */
+function dashes(lines, running = () => true, each) {
+  const set = { lines, running, each };
+  dashSets.add(set);
+  if (!dashTimer) dashTimer = window.setInterval(dashTick, DASH_BEAT);
+  return () => {
+    dashSets.delete(set);
+    if (!dashSets.size) {
+      window.clearInterval(dashTimer);
+      dashTimer = 0;
+    }
+  };
+}
+
 /* ---------- pictures that can't load ------------------------------------ */
 // A picture that fails (offline, blocked) gets .is-broken (base.css: see-through, so no broken-image box; its alt
 // text still reaches screen readers). An error doesn't bubble, so it's caught on the way down; one that came before
@@ -531,4 +572,4 @@ document.addEventListener(
 });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, UI, held, html, reduceMotion, settle, theme, toast, whenOnScreen, words };
+export { $, $$, UI, dashes, held, html, reduceMotion, settle, theme, toast, whenOnScreen, words };

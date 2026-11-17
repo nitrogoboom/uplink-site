@@ -49,18 +49,22 @@ export function head(DIST) {
     const links = [...new Set([...own, ...own.flatMap(imports)])].map(
       (src) => `<link rel="modulepreload" href="${src}">`,
     );
-    if (page.name === HOME) {
-      const mine = sheets(html);
+    const mine = page.name === HOME ? sheets(html) : [];
+    for (const href of mine) if (shared.has(href)) links.push(`<meta name="later-css" content="${href}">`);
+    // The names go in ahead of the page's CSS: its <link>, or on Home the two <style> blocks that take its place.
+    // A browser reads a page as it arrives, and after Home's 100 KB of CSS the names came too late to count on a
+    // real connection: the <script> tags at the end of the page had asked first (seen on the live site, November
+    // 17, 2026). Ahead of the CSS they leave in the page's first bytes, with the fonts.
+    const css = html.indexOf('<link rel="stylesheet"');
+    const names = links.join('');
+    html = css < 0 ? html.replace('</head>', names + '</head>') : html.slice(0, css) + names + html.slice(css);
+    if (mine.length) {
       // a function, so a $ in the CSS is never read as a replacement pattern
       html = html.replace(SHEET, (_, href) => `<style>${readFileSync(join(DIST, href), 'utf-8')}</style>`);
-      for (const href of mine) {
-        if (shared.has(href)) links.push(`<meta name="later-css" content="${href}">`);
-        else rmSync(join(DIST, href));
-      }
+      for (const href of mine) if (!shared.has(href)) rmSync(join(DIST, href)); // a file only Home used
       inlined = mine.length;
     }
-    if (html !== page.html || links.length)
-      writeFileSync(join(DIST, page.name), html.replace('</head>', links.join('') + '</head>'));
+    if (html !== page.html) writeFileSync(join(DIST, page.name), html);
   }
   if (!inlined) throw new Error(`dist/${HOME}: no linked CSS file found to put back into the page (scripts/head.mjs)`);
   console.log(

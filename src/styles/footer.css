@@ -719,12 +719,10 @@ a.fc-cl:hover {
   stroke-width: 1.6;
 }
 @media (prefers-reduced-motion: no-preference) {
-  /* SVG parts animate on the main thread and repaint the map, so every loop steps at about 12 frames a second
-     (like the hero's dashes and pulses) instead of 60. The dashes start only once the map has been on screen.
+  /* The loops step (about 12 frames a second, like the hero's pulses) and change only what the graphics chip can
+     run by itself: opacity and transform. The routes' dashes are not among them: they move to the site's beat
+     (.flow, below; core.js, the dash clock).
      --d: each shape's own delay (gen_campus.py), so the windows, lights and pulses run out of step */
-  .fc-w.is-seen .flow {
-    animation: fc-flow var(--loop-fc-flow) steps(14) infinite;
-  }
   .fc-w .lit.blink,
   .fc-w .led {
     animation: fc-blink var(--loop-fc-blink) step-end var(--d, 0s) infinite;
@@ -751,10 +749,9 @@ a.fc-cl:hover {
     animation: fc-ping var(--loop-fc-sig) steps(34) var(--d, 0s) infinite;
   }
 }
-@keyframes fc-flow {
-  to {
-    stroke-dashoffset: -24;
-  }
+/* the routes' dashes, once the map has been on screen: three units a beat, a quarter of the 2 10 pattern */
+.fc-w.is-seen .flow {
+  stroke-dashoffset: calc(var(--dash, 0) * -3px);
 }
 @keyframes fc-blink {
   0%,

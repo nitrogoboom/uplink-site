@@ -484,7 +484,7 @@ def uplink(v, rack_h=RACK[3]):
     _x0, _x1, y0, y1, _z0, _z1 = tray_box()
     top = TRAY_Z - (y1 - y0) / 2 if v in HERO_CUTS else TRAY_Z
     return cable_pair([(x, y, z), (x, y, top)], v, 'animation-duration:350ms',
-                      'animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse', join=False)
+                      'animation-delay:calc(var(--d,0ms) + 380ms);--dash-dir:-1', join=False)
 
 
 def tray_box():

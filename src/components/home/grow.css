@@ -135,16 +135,7 @@
   stroke-dasharray: 311.02;
   stroke-dashoffset: 311.02;
 }
-/* while a step plays, the ring runs on from where it stands to the step's end, over the time the step has left
-   (grow.js sets both, once a step; paused or off screen it stands where it is) */
-.grow-ring circle.is-timing {
-  animation: grow-ring var(--ring-left) linear forwards;
-}
-@keyframes grow-ring {
-  to {
-    stroke-dashoffset: var(--ring-to);
-  }
-}
+/* grow.js moves the ring on while a step plays, a few times a second; paused or off screen it stands where it is */
 
 /* the step controls, as the Services carousel's: an arrow, a dot a step, an arrow. The open step is the long amber dot,
    the ones already built a dimmer amber, the ones to come grey. Each dot is a button at least 32px wide and --tap tall, room to tap. */
@@ -287,35 +278,24 @@
 .grow-stage .pc.glow {
   filter: url('#grow-glow');
 }
-/* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes (one dash period a loop) */
-@keyframes grow-flow8 {
-  to {
-    stroke-dashoffset: -16;
-  }
-}
-@keyframes grow-flow10 {
-  to {
-    stroke-dashoffset: -20;
-  }
-}
-@keyframes grow-flow12 {
-  to {
-    stroke-dashoffset: -24;
-  }
-}
+/* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes. The dashes move to
+   the site's beat, --dash (core.js, the dash clock: a CSS animation of them costs a frame of page work 60 times a
+   second). Each step times 360 is a whole number of that line's dash periods. */
+/* opacity, which the graphics chip runs by itself; the rim has no fill, so it dims the line alone (0.41 of its
+   0.85 is the 0.35 it dimmed to as stroke-opacity) */
 @keyframes grow-rim {
   50% {
-    stroke-opacity: 0.35;
+    opacity: 0.41;
   }
 }
 .grow-stage [stroke-dasharray='5 5'] {
-  animation: grow-flow10 var(--loop-grow-link) linear infinite;
+  stroke-dashoffset: calc(var(--dash, 0) * -2.5px);
 }
 .grow-stage [stroke-dasharray='4 4'] {
-  animation: grow-flow8 var(--loop-grow-cable) linear infinite;
+  stroke-dashoffset: calc(var(--dash, 0) * -2px);
 }
 .grow-stage [stroke-dasharray='6 6'] {
-  animation: grow-flow12 var(--loop-grow-ring) linear infinite;
+  stroke-dashoffset: calc(var(--dash, 0) * -1.5px);
 }
 .grow-stage .dome-rim {
   animation: grow-rim var(--loop-grow-rim) ease-in-out infinite;
@@ -323,47 +303,25 @@
 /* the light round the dome's two rings (grow.js copies each ring's line in three times): a dash a quarter of the
    ring long, a shorter brighter one and a short bright head over it, all ending together, so the band fades behind
    its head. Lengths are shares of the ring (pathLength 100). The ring's line starts at the right and runs round
-   the near (lower) half first: the band dims as it passes behind. Each starts part way round, as it always has. */
-@keyframes grow-orbit {
-  from {
-    stroke-dashoffset: var(--len);
-  }
-  to {
-    stroke-dashoffset: calc(var(--len) - 100px);
-  }
-}
-@keyframes grow-orbit-side {
-  0%,
-  5%,
-  68%,
-  100% {
-    opacity: 0.37;
-  }
-  18%,
-  55% {
-    opacity: 1;
-  }
-}
+   the near (lower) half first: the band dims as it passes behind. Each starts part way round, as it always has.
+   --at is where the band is on its ring, 0 to 1: the site's beat (--dash; core.js, the dash clock) times the ring's
+   pace, on from where it starts (--from, also the still frame with reduced motion or no script). A pace times 360
+   beats is a whole number of turns (9 and 6: a turn in 7.2s and 10.8s). The band is bright from 18% to 55% of the
+   way round and dim from 68% to 5%, fading between. */
 .grow-stage .dome-run {
+  --at: mod(calc(var(--dash, 0) * var(--pace) + var(--from)), 1);
   fill: none;
   stroke-dasharray: var(--len) calc(100px - var(--len));
-  stroke-dashoffset: calc(var(--len) - var(--still)); /* the still frame: reduced motion */
-  opacity: var(--still-o);
-  animation:
-    grow-orbit var(--orbit-loop) linear var(--orbit-at) infinite,
-    grow-orbit-side var(--orbit-loop) linear var(--orbit-at) infinite;
+  stroke-dashoffset: calc(var(--len) - var(--at) * 100px);
+  opacity: calc(0.37 + 0.63 * clamp(0, min((var(--at) - 0.05) / 0.13, (0.68 - var(--at)) / 0.13), 1));
 }
 .grow-stage .dome-run.is-lower {
-  --orbit-loop: var(--loop-grow-orbit);
-  --orbit-at: -2.5s;
-  --still: 31px;
-  --still-o: 1;
+  --pace: 0.025;
+  --from: 0.31;
 }
 .grow-stage .dome-run.is-upper {
-  --orbit-loop: var(--loop-grow-orbit-2);
-  --orbit-at: -7.1s;
-  --still: 64px;
-  --still-o: 0.37;
+  --pace: calc(1 / 60);
+  --from: 0.68;
 }
 .grow-stage .dome-run.is-tail {
   --len: 25px;
@@ -389,9 +347,7 @@
   .grow-row :is(.grow-lbl, p) {
     transition: none;
   }
-  .grow-stage [stroke-dasharray],
-  .grow-stage .dome-rim,
-  .grow-stage .dome-run {
+  .grow-stage .dome-rim {
     animation: none;
   }
 }

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="220 114 992 744" width="1200" height="900" role="img" aria-label="Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace">
 <title>Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace</title>
 
-<style>.s-140ce2.s-140ce2{animation-duration:2800ms;animation-delay:-760ms}.s-4a6890.s-4a6890{animation-duration:3320ms;animation-delay:-3180ms}.s-608f41.s-608f41{animation-delay:calc(var(--d,0ms) + 380ms),0s;animation-direction:normal,reverse}.s-800090.s-800090{animation-duration:3840ms;animation-delay:-1060ms}.s-a28275.s-a28275{animation-duration:2800ms;animation-delay:0ms}.s-ae093e.s-ae093e{animation-duration:3060ms;animation-delay:-2500ms}.s-b98143.s-b98143{animation-duration:3840ms;animation-delay:-780ms}.s-c31dcd.s-c31dcd{animation-duration:3060ms;animation-delay:-1180ms}.s-c64517.s-c64517{animation-duration:3320ms;animation-delay:-1440ms}.s-d2a7b6.s-d2a7b6{animation-duration:350ms}.s-d925ab.s-d925ab{animation-duration:3580ms;animation-delay:-2100ms}.s-e12697.s-e12697{animation-duration:3580ms;animation-delay:-2120ms}</style>
+<style>.s-140ce2.s-140ce2{animation-duration:2800ms;animation-delay:-760ms}.s-4a6890.s-4a6890{animation-duration:3320ms;animation-delay:-3180ms}.s-800090.s-800090{animation-duration:3840ms;animation-delay:-1060ms}.s-93745e.s-93745e{animation-delay:calc(var(--d,0ms) + 380ms);--dash-dir:-1}.s-a28275.s-a28275{animation-duration:2800ms;animation-delay:0ms}.s-ae093e.s-ae093e{animation-duration:3060ms;animation-delay:-2500ms}.s-b98143.s-b98143{animation-duration:3840ms;animation-delay:-780ms}.s-c31dcd.s-c31dcd{animation-duration:3060ms;animation-delay:-1180ms}.s-c64517.s-c64517{animation-duration:3320ms;animation-delay:-1440ms}.s-d2a7b6.s-d2a7b6{animation-duration:350ms}.s-d925ab.s-d925ab{animation-duration:3580ms;animation-delay:-2100ms}.s-e12697.s-e12697{animation-duration:3580ms;animation-delay:-2120ms}</style>
 <g>
 <polygon points="251.0,463.8 786.9,773.2 786.9,760.5 251.0,451.2" fill="#D2D8DE" stroke="#37424E" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
 <polygon points="1152.3,562.3 786.9,773.2 786.9,760.5 1152.3,549.6" fill="#BBC2C9" stroke="#37424E" stroke-width="1" stroke-opacity="0.3" stroke-linejoin="round"/>
@@ -539,7 +539,7 @@
 </g>
 <g>
 <path class="s-d2a7b6 ob-cable" pathLength="100" d="M1040.2,430.1 L1040.2,250.0" fill="none" stroke="#C37600" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"/>
-<polyline class="s-608f41 ob-flow" points="1040.2,430.1 1040.2,250.0" fill="none" stroke="#C37600" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"/>
+<polyline class="s-93745e ob-flow" points="1040.2,430.1 1040.2,250.0" fill="none" stroke="#C37600" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"/>
 </g>
 <g>
 <polygon points="904.4,235.6 1065.2,328.4 1065.2,317.2 904.4,224.4" fill="#CFD5DC" stroke="#1F75A6" stroke-width="1.4" stroke-opacity="0.75" stroke-linejoin="round"/>

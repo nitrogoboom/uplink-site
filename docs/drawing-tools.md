@@ -20,6 +20,15 @@ Only `gen_og.py` needs Chromium. After changing a pinned version, run `python to
 - **Floor discs** are true isometric circles (height ÷ width = 0.577), with gaps cut around labels.
 - **Wi-Fi access points** hang at ceiling height. Their rings are halos at the access point's height, not on the floor.
 
+### Motion in a drawing
+
+What moves in a drawing costs the visitor's processor for as long as it is on screen, so each kind of motion uses the cheapest way that looks the same (measured on Home, November 17, 2026: the hero went from 29% of a slowed phone's main thread to 8%).
+
+- **Fades, pulses and things that grow or slide** animate `opacity` or `transform` in CSS, in steps. The graphics chip runs those by itself.
+- **Moving dashes** (data along a cable, a route on the footer map, the band round Grow's dome) do not get a CSS animation. Animating `stroke-dashoffset` makes the browser do a full frame of page work 60 times a second while it runs, however few steps it has. They follow the site's beat: `core.js` counts up about six times a second and writes the count to `--dash` on each line a script registers (`dashes()`), and the drawing's CSS turns it into an offset, `stroke-dashoffset: calc(var(--dash, 0) * -2px)`. The count wraps at 360, so a step times 360 must be a whole number of the line's dash periods. A line that runs the other way sets `--dash-dir: -1` (the hero's `.ob-flow`).
+- **Anything else that animates a colour, a stroke or a size** is a per-frame cost of the same kind: do it once (a build, a transition on a tap), never as a loop.
+- A drawing shown as an `<img>` has no script, so its dashes stand still.
+
 ## Tools
 
 ### The projection

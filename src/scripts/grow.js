@@ -8,7 +8,7 @@
    orbits too) until you play it again. Builds no HTML: this only sets classes, attributes and text.
    ========================================================================== */
 
-import { $, $$, held, reduceMotion, whenOnScreen, words } from './core.js';
+import { $, $$, dashes, held, reduceMotion, whenOnScreen, words } from './core.js';
 
 const DWELL = 4500; // ms a step
 const RISK_AT = 900; // ms into a step: its risks show (the parts have dropped in by then)
@@ -162,20 +162,13 @@ if (grow && svg) {
     runSince = 0;
   };
 
-  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), read from the clock. Set once a
-  // change, not a frame: it stands where the clock is, and while a step plays a CSS animation (grow.css,
-  // .is-timing) runs it on to the step's end over the time the step has left ----
+  // ---- the timer on the play button's edge: 0 (nothing) to 1 (all six steps), read from the clock. It stands
+  // where the clock is; while a step plays, the site's beat moves it on a few times a second (core.js, the dash
+  // clock; registered below). Not a CSS animation of the dash: that costs a frame of page work 60 times a second ----
   const RING = 311.02; // the play ring's length in its own units (2π × 49.5, as its stroke-dasharray in grow.css)
   const ringOff = (/** @type {number} */ k) => `${RING * (1 - Math.min(1, Math.max(0, k)))}`;
   const ringSync = () => {
-    const k = played();
-    ring.classList.remove('is-timing');
-    ring.style.strokeDashoffset = ringOff(cur < 0 ? 0 : (cur + Math.min(1, k / DWELL)) / N);
-    if (!runSince || cur < 0 || k >= DWELL) return;
-    ring.style.setProperty('--ring-to', ringOff((cur + 1) / N));
-    ring.style.setProperty('--ring-left', `${Math.round(DWELL - k)}ms`);
-    void ring.getBoundingClientRect(); // restart the animation from where the clock is
-    ring.classList.add('is-timing');
+    ring.style.strokeDashoffset = ringOff(cur < 0 ? 0 : (cur + Math.min(1, played() / DWELL)) / N);
   };
 
   // ---- the open step's stretch of the growth line (desktop list), from the same clock: it fills while the step
@@ -383,7 +376,9 @@ if (grow && svg) {
     go(LAST, false);
   } else go(-1, false);
   icon();
-  if (document.fonts) void document.fonts.ready.then(placeTags);
+  // the web font arrives and the tags change width. The fonts' own "done" event, not document.fonts.ready: asking
+  // for that makes the browser lay the whole page out on the spot (PageSpeed, "Forced reflow")
+  document.fonts.addEventListener('loadingdone', placeTags);
   window.addEventListener('resize', placeTags);
   // ---- the dome's horizontal rings turn: a band of light runs round each (bright near side, faint far side). Set
   // up once: each ring's line, copied three times into the drawing's empty .dome-orbit (a faint tail, a middle, a
@@ -400,6 +395,14 @@ if (grow && svg) {
         orbit.append(p);
       }),
     );
+
+  // the cables' dashes and the dome's bands keep the site's beat (core.js, the dash clock) while the world is on
+  // screen and not standing still (paused, or at the story's end); the play ring moves on with them
+  dashes(
+    $$('[stroke-dasharray="5 5"], [stroke-dasharray="4 4"], [stroke-dasharray="6 6"], .dome-run', svg),
+    () => visible && !stage.classList.contains('is-paused'),
+    ringSync,
+  );
 
   // starts as the section's first pixel arrives, so it's already moving when you see it; off screen it waits
   whenOnScreen(section, (on) => {

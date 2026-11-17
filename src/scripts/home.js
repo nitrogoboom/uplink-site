@@ -4,7 +4,7 @@
    phones. The "We grow with you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, held, html, reduceMotion, settle, theme, whenOnScreen, words } from './core.js';
+import { $, $$, dashes, held, html, reduceMotion, settle, theme, whenOnScreen, words } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
@@ -311,8 +311,11 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   };
   svg.addEventListener('click', tap);
   theme.ev.addEventListener('change', match);
-  // the web font arrives and the titles change width: the lines again
-  void document.fonts.ready.then(() => aims.forEach((a) => pinAt(a.sp, a.x, a.y, a.level)));
+  // the web font arrives and the titles change width: the lines again. The fonts' own "done" event, not
+  // document.fonts.ready: asking for that makes the browser lay the whole page out on the spot (PageSpeed, "Forced
+  // reflow", seen on the live site November 17, 2026)
+  const refit = () => aims.forEach((a) => pinAt(a.sp, a.x, a.y, a.level));
+  document.fonts.addEventListener('loadingdone', refit);
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
@@ -343,6 +346,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
     svg.removeEventListener('click', tap);
     theme.ev.removeEventListener('change', match);
     sized.disconnect();
+    document.fonts.removeEventListener('loadingdone', refit);
     spots.cloud.el.remove();
     spots.office.el.remove();
   };
@@ -362,6 +366,8 @@ if (stage) {
   let added = [];
   /** @type {(IntersectionObserver | null)[]} */
   let observers = [];
+  /** @type {(() => void)[]} */
+  let stopDashes = [];
   /** @type {(() => void) | null} */
   let stopCloud = null;
   let ticket = 0; // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
@@ -370,6 +376,8 @@ if (stage) {
     stopCloud = null;
     observers.forEach((io) => io && io.disconnect());
     observers = [];
+    stopDashes.forEach((stop) => stop());
+    stopDashes = [];
     added.forEach((n) => n.remove());
     added = [];
   };
@@ -413,6 +421,10 @@ if (stage) {
         // looping animations pause off screen: the drawing, and the dashes' layer (the cut's own on phones)
         const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
         observers = layers.map((el) => whenOnScreen(el));
+        // each layer's dashes keep the site's beat while that layer is on screen (core.js, the dash clock)
+        stopDashes = layers
+          .filter((el) => el !== null)
+          .map((el) => dashes($$('.ob-flow, .ob-link', el), () => !el.classList.contains('is-idle')));
         /** @type {SVGGElement | null} */
         const cloud = $('svg.ob .ob-cloud', stage);
         const first = /** @type {SVGSVGElement} */ (added[0]);

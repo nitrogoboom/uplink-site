@@ -189,7 +189,6 @@
   --dur-fc-row-shut: 240ms;
   --dur-fc-fill: 450ms;
   --dur-fc-route: 400ms;
-  --loop-fc-flow: 1.2s;
   --loop-fc-blink: 4s;
   --loop-fc-bob: 3s;
   --loop-fc-mk-bob: 2.2s;
@@ -200,12 +199,7 @@
      light round the dome's lower and upper rings (one turn) */
   --dur-grow-fade: 500ms;
   --dur-grow-drop: 700ms;
-  --loop-grow-link: 0.9s;
-  --loop-grow-cable: 0.7s;
-  --loop-grow-ring: 3s;
   --loop-grow-rim: 2.4s;
-  --loop-grow-orbit: 8s;
-  --loop-grow-orbit-2: 11s;
 
   /* ---- home hero captions on phones (hero.css, .hero-cap) -- */
   /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
