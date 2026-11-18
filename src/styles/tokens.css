@@ -153,7 +153,10 @@
   --container: 80rem;
   --grow-stage-max: 44rem; /* the Home Grow picture's tallest on a desktop under 700px tall (grow.css); taller: below */
   --grow-stage-min: 18rem; /* the Home Grow picture's least on phones and tablets, where it is capped at the screen's height */
-  --gutter: 1rem; /* 1.5rem tablet, 3rem desktop */
+  /* the page's side margin: 16px up to a 567px window, then growing evenly through 24px at 700px (as the tablet
+     header was measured for, header.css) to 48px at 1100px, then 48px (3rem, so it grows with the root size on big
+     screens). No steps, so a block's own width only grows as the window does, which is what container queries measure */
+  --gutter: clamp(1rem, 6vw - 1.125rem, 3rem);
   --section-y: var(--sp-8); /* 96 desktop */
   --fold-h: calc(
     100svh - var(--header-h) - env(safe-area-inset-top, 0px)
@@ -230,14 +233,8 @@
     );
   }
 }
-@media (--tablet-up) {
-  :root {
-    --gutter: 1.5rem;
-  }
-}
 @media (--desktop) {
   :root {
-    --gutter: 3rem;
     --section-y: var(--sp-9);
   }
 }
