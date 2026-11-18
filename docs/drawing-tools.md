@@ -75,3 +75,12 @@ Both exit 1 on any finding. Each `rules_NAME.py` lists the exact commands for ev
 - **`painter.py`**: boxes drawn out of order or overlapping. Fails if it finds or resolves no boxes (usually a wrong origin or unit). Grow: `python tools/painter.py src/components/home/grow-world.svg 0 0 20 tools/rules_grow.py`.
 - Drawing CSS styles by class, never by tag (SVGO turns shapes into `<path>`); the build enforces it.
 - Everything: `python tools/regen.py --check` (`--checks-only` skips generating).
+
+### Before it ships
+
+The site's scripts trust the drawings and words we make; nothing checks them live. Look once before shipping a change to:
+
+- **The footer map or `footer.json`**: every section's `map` key has a `.dist[data-k]` spot in the map.
+- **Grow**: every tag's `data-at` has a `.tg-a[data-a]` anchor in `grow-world.svg`.
+- **The phone hero**: its `<svg>` carries `data-words` (`gen_office.py` writes it).
+- **A service's name**: its Book button's `data-service` matches its option's value (both are the title).

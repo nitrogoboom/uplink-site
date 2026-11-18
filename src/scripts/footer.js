@@ -72,8 +72,7 @@ if (fc) {
   const focusMap = (/** @type {boolean} */ instant) => {
     if (!svg) return; // not in yet: build() shows the spot when it is
     const k = shown().dataset.map;
-    /** @type {SVGElement} */
-    const spot = $(`.dist[data-k="${k}"]`, svg) || /** @type {SVGElement} */ ($('.dist[data-k="hq"]', svg));
+    const spot = /** @type {SVGElement} */ ($(`.dist[data-k="${k}"]`, svg));
     $$('[data-k]', svg).forEach((el) => el.classList.toggle('on', el.dataset.k === spot.dataset.k));
     const to = nums(/** @type {string} */ (spot.dataset.vb)),
       toMk = nums(/** @type {string} */ (spot.dataset.mk));

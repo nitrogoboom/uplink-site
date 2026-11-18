@@ -46,11 +46,8 @@ const reduceMotion = new MotionChoice();
 // (components/Words.astro): #words-ui on every page (Base.astro), #words-page for the page's own script. Cast what
 // it gives to the shape in src/lib/copy.ts: /** @type {HomeWords} */ (words('words-page')).
 /** @param {'words-ui' | 'words-page'} id @returns {unknown} */
-const words = (id) => {
-  const el = document.getElementById(id);
-  if (!el) throw new Error(`no #${id} on this page: its script's words are missing (components/Words.astro)`);
-  return JSON.parse(el.textContent || '');
-};
+const words = (id) =>
+  JSON.parse(/** @type {string} */ (/** @type {HTMLElement} */ (document.getElementById(id)).textContent));
 /** @typedef {import('../lib/copy').UiWords} UiWords */
 const UI = /** @type {UiWords} */ (words('words-ui'));
 
@@ -264,7 +261,7 @@ document.addEventListener('click', (e) => {
 function presetService(name) {
   const sel = /** @type {HTMLSelectElement | null} */ (document.getElementById('book-service'));
   if (!sel) return;
-  const opt = name && Array.from(sel.options).find((o) => o.value === name || o.textContent === name);
+  const opt = Array.from(sel.options).find((o) => o.value === name);
   sel.selectedIndex = opt ? opt.index : 0;
 }
 

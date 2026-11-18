@@ -39,7 +39,7 @@ if (grow && svg) {
     el,
     step: Number(el.dataset.step),
     k: Number(el.dataset.k),
-    at: $(`.tg-a[data-a="${el.dataset.at}"]`, svg),
+    at: /** @type {SVGElement} */ ($(`.tg-a[data-a="${el.dataset.at}"]`, svg)),
     icon: /** @type {HTMLElement} */ ($('.grow-tag-i', el)),
     text: /** @type {HTMLElement} */ ($('.grow-tag-t', el)),
   }));
@@ -77,7 +77,6 @@ if (grow && svg) {
       gap = 4;
     const top = Math.max(pad, place.offsetHeight ? place.offsetTop + place.offsetHeight + gap : 0); // below the place
     const spots = tags.map((t) => {
-      if (!t.at) return null;
       const p = new DOMPoint(Number(t.at.getAttribute('cx')), Number(t.at.getAttribute('cy'))).matrixTransform(m);
       const w = t.el.offsetWidth,
         h = t.el.offsetHeight;
@@ -90,9 +89,7 @@ if (grow && svg) {
       };
     });
     for (let s = 0; s < steps.length; s++) {
-      const pair = /** @type {NonNullable<typeof spots[number]>[]} */ (spots.filter((q) => q && q.t.step === s)).sort(
-        (a, b) => b.y - a.y,
-      ); // lower one first
+      const pair = spots.filter((q) => q.t.step === s).sort((a, b) => b.y - a.y); // lower one first
       for (let k = 1; k < pair.length; k++) {
         const lo = pair[k - 1],
           hi = pair[k];
@@ -105,10 +102,8 @@ if (grow && svg) {
       }
     }
     spots.forEach((q) => {
-      if (q) {
-        q.t.el.style.left = `${q.x}px`;
-        q.t.el.style.top = `${q.y}px`;
-      }
+      q.t.el.style.left = `${q.x}px`;
+      q.t.el.style.top = `${q.y}px`;
     });
   };
 

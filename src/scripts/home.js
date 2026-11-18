@@ -319,7 +319,7 @@ const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
   // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
   // about 1.1s; at once with reduced motion), the office's 1.1s after
   const quick = reduceMotion.matches;
-  const capFirst = Number(svg.dataset.words) || 0;
+  const capFirst = Number(svg.dataset.words);
   let second = 0;
   const first = window.setTimeout(
     () => {
