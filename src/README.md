@@ -51,12 +51,16 @@ Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`, scripts `MEDIA`), 
 
 | Name | Query | px at 16 |
 | --- | --- | --- |
+| `tiny` / `notTiny` | `width < 20em` / `>= 20em` | < 320: a phone at 200% text |
 | `smallPhone` | `width < 37.5em` | < 600 |
 | `phone` | `width < 43.75em` | < 700 |
 | `tablet` | `43.75em <= width < 68.75em` | 700–1099 |
+| `wide` | `width >= 56.25em` | 900+: text and picture side by side |
 | `desktop` | `width >= 68.75em` | 1100+ |
 | `fold` | desktop and `height >= 43.75em` | one section per screen |
 | `shortWindow` | `height < 33.5em` | under 536 tall: the header slides away while reading (`core.js`) |
+
+A few sizes stay written out where they are, each measured for one thing: the header's 48.75em, 58.75em and 77.5em (`bottom-nav.css`), Grow's dots at 22.5em, project cards' title at 30em, and the height rules that keep a section on one screen.
 
 ## Scripts
 

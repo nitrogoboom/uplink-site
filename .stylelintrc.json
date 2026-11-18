@@ -17,6 +17,31 @@
     "property-no-vendor-prefix": null,
     "property-no-deprecated": null,
     "font-family-name-quotes": null,
+    "declaration-property-unit-disallowed-list": [
+      {
+        "font-size": ["px", "vw", "vh", "svh", "dvh", "lvh", "vmin", "vmax"],
+        "/^(margin|padding|gap|row-gap|column-gap)/": ["px"]
+      },
+      {
+        "severity": "warning",
+        "message": "Off the design system: use a --fs-* or --sp-* token (docs/design.md), or mark a one-off with a stylelint-disable comment saying why"
+      }
+    ],
+    "media-feature-name-unit-allowed-list": [
+      { "width": ["em"], "height": ["em"] },
+      { "severity": "warning", "message": "Breakpoints are in em, by the names in src/lib/media.js" }
+    ],
+    "property-disallowed-list": [
+      [
+        "border-left",
+        "border-left-width",
+        "border-left-color",
+        "border-inline-start",
+        "border-inline-start-width",
+        "border-inline-start-color"
+      ],
+      { "severity": "warning", "message": "No left-side accent borders (docs/design.md, colour rule 11)" }
+    ],
     "length-zero-no-unit": [
       true,
       {

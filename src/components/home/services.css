@@ -92,8 +92,8 @@
   align-self: center;
 }
 /* the title fits its column as a heading does (base.css): class fit (lib/fit.js) for a long word ("Cybersecurity" at
-   200% zoom), --fit-short for the rest; :where() so the fit classes win. A word still too long breaks rather than being cut */
-:where(.svc-title) {
+   200% zoom), --fit-short for the rest. A word still too long breaks rather than being cut */
+.svc-title:not(.fit, .fit-loose) {
   --fit: var(--fit-short);
 }
 .svc-title {

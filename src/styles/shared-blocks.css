@@ -43,7 +43,7 @@
 }
 /* under 20em (390px at 200% text) a 32px inset left "Book a check-up" 97px for its 147px: half the inset, and the
    large button's own (buttons.css), so it fits */
-@media (width < 20em) {
+@media (--tiny) {
   .cta-band {
     padding: var(--sp-3);
   }

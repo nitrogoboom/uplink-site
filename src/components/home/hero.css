@@ -475,7 +475,7 @@
    at the height the news cards leave it, so the spare width falls at the two edges, not as a hole between the
    text and the office, and the news cards run exactly as wide as the office (owner, November 10, 2026). On a
    tall, near-square window the hero stops at --hero-max (tokens.css) and centres in the screen. */
-@media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
+@media (--wide) and (height >= 35em) and (orientation: landscape) {
   .hero.fold {
     --hero-pad-bottom: var(--sp-5);
   }

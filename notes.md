@@ -6,6 +6,8 @@ One line each. Remove a line when it's done; add new ones as they come up. Launc
 
 Layout and look:
 
+- [ ] Services and Work: the gap under the page intro's heading block is 16px (`--sp-4`), where docs/design.md R2 says 32px (`--sp-6`). Each section asked for 32px, but a longer shared selector won; layers (November 18, 2026) would have let 32px through, so it's now written as 16px with a comment (`overview.css`, `projects.css`). 32px is a one-word change in each. Owner to decide.
+
 
 Content:
 

@@ -170,7 +170,15 @@ Controls sit on the 4px scale: `--tap` 44px, `--control-h` 48px, `--header-h` 64
 
 ### Checks
 
-Nothing refuses a raw length; use the tokens. After a spacing change, compare before and after by eye (the `check` skill).
+`npm run lint` warns on a raw `px` margin, padding, gap or text size (it never stops the build); other raw lengths it doesn't see, so use the tokens. After a spacing change, compare before and after by eye (the `check` skill).
+
+## Layers
+
+Every stylesheet sits in a cascade layer, and a later layer wins whatever the selectors' weight. In order: `tokens` (values), `base` (elements), `layout` (page grid, type), `blocks` (`src/styles/`: shared parts), `sections` (`src/components/`: a page's own), `theme` (`theme-light.css`), `motion`, `print`. The order is written in `src/styles/global.css`; `postcss.config.mjs` puts each component's file in `sections`.
+
+- A section changes a shared block in its own file, with a plain selector. A longer selector in `src/styles/` won't beat it.
+- `!important` runs the other way: an earlier layer's wins. The few there are (`motion.css`, `print.css`, the pause in `base.css`) don't meet.
+- Outside the layers, so above them all: a drawing's own `<style>`, the drawings' light colours (`theme-drawings.css`, which beats those by selector) and the Work page's filter rules.
 
 ## Corners, boxes, and layout
 

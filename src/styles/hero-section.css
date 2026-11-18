@@ -34,7 +34,7 @@
     radial-gradient(45% 55% at 8% 92%, var(--c-glow-accent), transparent 70%);
 }
 /* landscape tablets and up: less room above (the home hero's two columns also take less below: home/hero.css) */
-@media (width >= 56.25em) and (height >= 35em) and (orientation: landscape) {
+@media (--wide) and (height >= 35em) and (orientation: landscape) {
   .hero {
     --hero-pad-top: var(--sp-5);
   }

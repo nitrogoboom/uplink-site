@@ -4,11 +4,16 @@
 // A one-part name can take more conditions ((--desktop) and (hover: hover)); a two-part one (fold) can't:
 // the plugin turns that into a tangle of stand-in rules, so write such a query out in full.
 export const MEDIA = {
+  // under 320px: a 390px phone at 200% text, or a 24px default font; the header, buttons and bands slim to fit
+  tiny: '(width < 20em)',
+  notTiny: '(width >= 20em)',
   smallPhone: '(width < 37.5em)',
   phone: '(width < 43.75em)',
   tabletUp: '(width >= 43.75em)',
   tablet: '(43.75em <= width < 68.75em)',
   belowDesktop: '(width < 68.75em)',
+  // from 900px: room for a page's text and its picture side by side (service and project pages, the landscape hero)
+  wide: '(width >= 56.25em)',
   desktop: '(width >= 68.75em)',
   fold: '(width >= 68.75em) and (height >= 43.75em)',
   // a window too short for a header that stays put: its 4rem would be over 12% of the height (200% and 400% zoom, a

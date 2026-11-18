@@ -140,7 +140,7 @@
    Under 20em (a phone with a big default font or zoom) a row leaves the words no room: the card stacks as on wider
    screens. The name is a step smaller only under 30em: wider (a desktop window at 200% zoom) it keeps the tablet's
    size, so zooming in never makes it smaller on screen (review C1) */
-@media (--phone) and (width >= 20em) {
+@media (--phone) and (--not-tiny) {
   .card--project {
     display: grid;
     grid-template: 'media .' 1fr 'media chip' auto 'media body' auto 'media .' 1fr / var(--card-thumb) minmax(0, 1fr);

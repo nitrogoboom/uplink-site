@@ -79,4 +79,23 @@ const motion = {
   },
 };
 
-export default { plugins: [names, motion, customMedia()] };
+// Cascade layers (docs/design.md, "Layers"): src/styles/global.css puts the shared files in theirs and writes the
+// order. A file a component imports (src/components/**) goes in `sections` here, with the whole order on top, so the
+// order holds whichever stylesheet the browser meets first. The drawings' light colours (theme-drawings.css, from
+// Hero.astro) stay outside the layers, beside the drawings' own <style> blocks, which they override by selector.
+const LAYERS = ['tokens', 'base', 'layout', 'blocks', 'sections', 'theme', 'motion', 'print'];
+const layerOf = (file) => (/\/src\/components\//.test(file.replace(/\\/g, '/')) ? 'sections' : null);
+const layers = {
+  postcssPlugin: 'cascade-layers',
+  Once(root, { AtRule }) {
+    const file = root.source?.input.file;
+    const layer = file && layerOf(file);
+    if (!layer) return;
+    const block = new AtRule({ name: 'layer', params: layer });
+    block.append(root.nodes);
+    root.removeAll();
+    root.append(new AtRule({ name: 'layer', params: LAYERS.join(', ') }), block);
+  },
+};
+
+export default { plugins: [names, motion, customMedia(), layers] };

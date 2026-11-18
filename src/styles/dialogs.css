@@ -67,6 +67,7 @@
     margin: auto 0 0;
     border-radius: var(--r-3) var(--r-3) 0 0;
     border-bottom: 0;
+    /* stylelint-disable-next-line declaration-property-unit-disallowed-list -- env()'s fallback must be a length */
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .dlg-head {
