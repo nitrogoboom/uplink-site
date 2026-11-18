@@ -25,7 +25,7 @@ Drawings change only on the owner's machine, and only when the owner asks. CI do
    `check.py` reports edges off the isometric angles and near-miss joins. `painter.py` reports boxes drawn in the wrong order. Use them as help while you work and say what they report; they don't decide. The owner judges the drawing by eye and by its file size.
 
 5. If the drawing has a light copy, or you changed a colour, run `python tools/gen_light.py`. It rewrites each `NAME-light.svg` and `src/styles/theme-drawings.css`.
-6. Look at the result, including the phone cut `NAME-compact.svg`. Open the page in `npm run dev` in both themes and take a screenshot for the owner, and give each changed SVG's file size before and after (`git diff --stat` and `ls -l`). The checks can't tell you whether it looks right.
+6. Look at the result, including the phone cut `NAME-compact.svg`. Open the page in `npm run dev` in both themes and take a screenshot for the owner, and give each changed SVG's file size before and after (`git diff --stat` and `ls -l`). The checks can't tell you whether it looks right. For the hero, Grow or the footer map, also go through "Before it ships" in `docs/drawing-tools.md`.
 7. Run everything once:
 
    ```bash

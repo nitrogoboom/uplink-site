@@ -83,4 +83,3 @@ The site's scripts trust the drawings and words we make; nothing checks them liv
 - **The footer map or `footer.json`**: every section's `map` key has a `.dist[data-k]` spot in the map.
 - **Grow**: every tag's `data-at` has a `.tg-a[data-a]` anchor in `grow-world.svg`.
 - **The phone hero**: its `<svg>` carries `data-words` (`gen_office.py` writes it).
-- **A service's name**: its Book button's `data-service` matches its option's value (both are the title).

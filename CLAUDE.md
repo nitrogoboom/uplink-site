@@ -41,7 +41,7 @@ None until launch (owner, November 12, 2026). The site changes daily, so a test 
 
 Set in stone: nothing yet.
 
-What runs today: the deploy's smoke check (`docs/site-checks.md`), lint and types on this machine (`npm run quick`), and the drawing tools' own checks (the `drawing` skill).
+What runs today: the deploy's smoke check (`docs/site-checks.md`), lint, types and the build on this machine (`npm run quick`; the build stops on a missing copy key, a drawing with anything but drawing tags, or a `style=""` attribute), and the drawing tools' own checks (the `drawing` skill). The site's own scripts check nothing live: they trust what we build.
 
 ## Check, ship
 
