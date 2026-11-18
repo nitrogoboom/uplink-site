@@ -309,8 +309,8 @@
     --fold-gap: max(var(--sp-8), 3vw);
     --fold-stack: max(var(--sp-6), 3svh); /* the space between a fold's text blocks, top to bottom */
     /* top and bottom of a one-screen section (fold.css): grows smoothly with the screen's height, so short laptops
-       keep room for the content and big screens keep their air: 24px up to 720 tall, 48px at 900, the old --sp-8
-       from about 1030 (1080 on a big screen, whose rem is larger), then 4.5% of the height past 1422 */
-    --fold-pad: clamp(var(--sp-5), 13.333svh - 4.5rem, max(var(--sp-8), 4.5svh));
+       keep room for the content and big screens keep their air: 21px at 700 tall, 24px at 720, 48px at 900, the old
+       --sp-8 from about 1030 (1080 on a big screen, whose rem is larger), then 4.5% of the height past 1422 */
+    --fold-pad: clamp(var(--sp-4), 13.333svh - 4.5rem, max(var(--sp-8), 4.5svh));
   }
 }

@@ -168,4 +168,24 @@
     padding-top: 0;
     border-top: 0;
   }
+  /* a narrow column (windows about 1100 to 1250 wide): the stars, the note and the link stack in a block beside the
+     heading instead of wrapping to a row of their own, and the check-up card's buttons stack so its title keeps one
+     line, so the section still fits one screen (owner, November 18, 2026: fix 1100px windows) */
+  @container column (width < 72rem) {
+    #reviews .section-head--split {
+      flex-wrap: nowrap;
+      align-items: center;
+    }
+    #reviews .rev-score {
+      flex-direction: column;
+      flex: none;
+      align-items: flex-end;
+      gap: var(--sp-1);
+      text-align: end;
+    }
+    #reviews .cta-band .row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
 }

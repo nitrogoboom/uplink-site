@@ -407,6 +407,12 @@
     grid-row: 2;
     grid-column: 1;
   }
+  /* on a short one-screen window the heading's gap to the step list eases from 12px at 700 tall to its usual 32px
+     (--sp-6) at 800, so the section fits one screen down to 1100 x 700 (owner, November 18, 2026: fix 1100px
+     windows) */
+  #grow .grow-head {
+    margin-bottom: clamp(var(--sp-3), 20svh - 8rem, var(--sp-6));
+  }
   .grow-list {
     grid-row: 3;
     grid-column: 1;
