@@ -29,6 +29,7 @@
   display: block;
   width: 96%;
   height: 95%;
+  transform-origin: 0 0; /* the camera's moves scale from here (grow.js, camTo) */
 } /* the drawing only, not the button's icons */
 /* the picture's corner label (the open step's place), the tags and the card's row labels: the site's label and
    chip type (.label, .chip). The label wraps at zoom. */

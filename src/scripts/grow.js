@@ -62,6 +62,7 @@ if (grow && svg) {
     preRaf = 0;
   /** @type {number[]} */
   let beats = [];
+  let at = { left: 0, top: 0 }; // the drawing's box in the stage (placeTags)
 
   // ---- tags: placed on the drawing's anchors, kept inside the picture, and never on top of each other: when a
   // step's two tags would overlap (a close camera brings anchors together), the upper one moves up clear of the
@@ -70,22 +71,30 @@ if (grow && svg) {
   // whole page out early (PageSpeed, "Forced reflow"). Coming on screen places them (whenOnScreen, below).
   const placeTags = () => {
     if (!visible) return;
-    const m = svg.getScreenCTM();
-    if (!m) return;
-    const r = stage.getBoundingClientRect(),
+    // the drawing's box in the stage, from the stage's outer edge: measured while no move transforms it
+    if (!camAnim) {
+      const s = stage.getBoundingClientRect(),
+        d = svg.getBoundingClientRect();
+      at = { left: d.left - s.left, top: d.top - s.top };
+    }
+    const v = view(),
+      left = at.left,
+      top0 = at.top,
+      width = stage.offsetWidth,
       pad = 6,
       gap = 4;
     const top = Math.max(pad, place.offsetHeight ? place.offsetTop + place.offsetHeight + gap : 0); // below the place
     const spots = tags.map((t) => {
-      const p = new DOMPoint(Number(t.at.getAttribute('cx')), Number(t.at.getAttribute('cy'))).matrixTransform(m);
+      const px = left + v.x + v.k * Number(t.at.getAttribute('cx')),
+        py = top0 + v.y + v.k * Number(t.at.getAttribute('cy'));
       const w = t.el.offsetWidth,
         h = t.el.offsetHeight;
       return {
         t,
         w,
         h,
-        x: Math.min(r.width - w / 2 - pad, Math.max(w / 2 + pad, p.x - r.left)),
-        y: Math.max(h + top, p.y - r.top - 3),
+        x: Math.min(width - w / 2 - pad, Math.max(w / 2 + pad, px)),
+        y: Math.max(h + top, py - 3),
       };
     });
     for (let s = 0; s < steps.length; s++) {
@@ -108,8 +117,41 @@ if (grow && svg) {
   };
 
   // ---- the camera: close on what's built, pulling back as the world grows ----
+  // The camera moves by sliding and scaling the drawing (a transform, which the graphics chip runs), not by rewriting
+  // its viewBox every frame, which redrew the whole picture 60 times a second (70 to 100% of a slowed phone's main
+  // thread for each step's first second and a half). A move sets the new viewBox once and starts the drawing where the
+  // old view had it. The path is the old one's: the same 1.4 s and ease, scale and offset moving together.
+  // `vb` is the view on screen, as a viewBox, mid-move too, so a new move starts from where the camera is.
   let vb = full.slice(),
     camRaf = 0;
+  /** @type {Animation | null} */
+  let camAnim = null;
+  let move = { r: 1, tx: 0, ty: 0, t0: 0, dur: 0 }; // the running move: where it set off, as a transform of the new view
+  const CAM_MS = 1400;
+  const ease = (/** @type {number} */ k) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
+  // the same ease for the browser: linear() through 21 points of it (Chrome 113, Firefox 112, Safari 17.2)
+  const EASE = `linear(${Array.from({ length: 21 }, (_, n) => ease(n / 20).toFixed(4)).join(', ')})`;
+  // a square viewBox in the drawing's box, centred as the browser fits it: a point p sits at k * p + (x, y)
+  const fit = (/** @type {number[]} */ b) => {
+    const W = svg.clientWidth,
+      H = svg.clientHeight,
+      k = Math.min(W, H) / b[2];
+    return { k, x: (W - b[2] * k) / 2 - b[0] * k, y: (H - b[3] * k) / 2 - b[1] * k };
+  };
+  // the view on screen now: the set viewBox, carried by what is left of the running move
+  const view = () => {
+    const f = fit(/** @type {string} */ (svg.getAttribute('viewBox')).split(' ').map(Number));
+    if (!camAnim) return f;
+    const e = ease(Math.min(1, (performance.now() - move.t0) / move.dur)),
+      r = move.r + (1 - move.r) * e;
+    return { k: r * f.k, x: r * f.x + move.tx * (1 - e), y: r * f.y + move.ty * (1 - e) };
+  };
+  const asViewBox = (/** @type {{ k: number, x: number, y: number }} */ v) => {
+    const W = svg.clientWidth,
+      H = svg.clientHeight,
+      s = Math.min(W, H) / v.k;
+    return [((W - s * v.k) / 2 - v.x) / v.k, ((H - s * v.k) / 2 - v.y) / v.k, s, s];
+  };
   const target = (/** @type {number} */ i) => {
     if (i < 0) return full;
     let x0 = Infinity,
@@ -132,19 +174,47 @@ if (grow && svg) {
   };
   const camTo = (/** @type {number[]} */ to, /** @type {boolean} */ animate) => {
     window.cancelAnimationFrame(camRaf);
+    if (camAnim) vb = asViewBox(view()); // stopped mid-move: go on from where the camera is
+    camAnim?.cancel();
+    camAnim = null;
+    svg.style.willChange = '';
     if (to.every((v, n) => v === vb[n])) return; // already there (the first draw, a pause): nothing to write
-    const from = vb.slice(),
-      t0 = performance.now(),
-      dur = animate && !reduceMotion.matches ? 1400 : 0;
-    const step = (/** @type {number} */ now) => {
-      const k = dur ? Math.min(1, (now - t0) / dur) : 1,
-        e = k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
-      vb = from.map((v, n) => v + (to[n] - v) * e);
-      svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+    const a = fit(vb);
+    vb = to.slice();
+    svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+    const dur = animate && !reduceMotion.matches ? CAM_MS : 0;
+    if (!dur) {
       placeTags();
-      if (k < 1) camRaf = window.requestAnimationFrame(step);
+      return;
+    }
+    // where the old view had the drawing, as a transform of the new one
+    const b = fit(to),
+      r = a.k / b.k;
+    move = { r, tx: a.x - r * b.x, ty: a.y - r * b.y, t0: performance.now(), dur };
+    // its own layer for the move only: the parts dropping in then repaint just themselves, not the whole picture at
+    // each new scale; at rest the drawing stays sharp under a phone's pinch zoom
+    svg.style.willChange = 'transform';
+    camAnim = svg.animate([{ transform: `translate(${move.tx}px, ${move.ty}px) scale(${r})` }, { transform: 'none' }], {
+      duration: dur,
+      easing: EASE,
+    });
+    const done = camAnim;
+    void camAnim.finished.then(
+      () => {
+        if (camAnim !== done) return;
+        camAnim = null;
+        svg.style.willChange = '';
+        placeTags();
+      },
+      () => {},
+    );
+    // the tags ride along while any is showing (the risks come up at RISK_AT, before the move ends)
+    const follow = () => {
+      if (camAnim !== done) return;
+      if (tags.some((t) => t.el.classList.contains('is-on'))) placeTags();
+      camRaf = window.requestAnimationFrame(follow);
     };
-    camRaf = window.requestAnimationFrame(step);
+    camRaf = window.requestAnimationFrame(follow);
   };
 
   // ---- the open step's clock: how long it has played. It holds while the story waits (paused, off screen, the

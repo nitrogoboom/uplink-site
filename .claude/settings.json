@@ -26,5 +26,19 @@
       "mcp__astro-docs__search_astro_docs",
       "mcp__plugin_cloudflare_cloudflare__docs"
     ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/format.mjs",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
   }
 }

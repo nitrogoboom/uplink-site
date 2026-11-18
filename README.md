@@ -10,8 +10,9 @@ The website for Uplink Technology, a made-up IT company, with placeholder conten
 | Document | What it covers |
 | --- | --- |
 | [`CLAUDE.md`](CLAUDE.md) | The rules for every change, and which checks to run. |
-| [`.claude/skills/`](.claude/skills), [`.claude/rules/`](.claude/rules) | Step lists for a release and a drawing change; the rules for each kind of file. |
+| [`.claude/skills/`](.claude/skills), [`.claude/rules/`](.claude/rules) | Step lists for a release and a drawing change; the rules for each kind of file. Claude's edits are formatted by Prettier as they're made (`.claude/hooks/format.mjs`). |
 | [`notes.md`](notes.md) | Open items. Start here. |
+| [`parked.md`](parked.md) | Open items on hold until the owner asks. |
 | [`src/README.md`](src/README.md) | A map of the source code. |
 | [`docs/drawing-tools.md`](docs/drawing-tools.md) | The drawing rules, generators, and checks. |
 | [`docs/site-checks.md`](docs/site-checks.md) | The smoke check the deploy runs. Every other check is a look done by hand: the `check` skill. |
