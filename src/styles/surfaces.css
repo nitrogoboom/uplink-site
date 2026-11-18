@@ -65,11 +65,11 @@
   gap: var(--sp-2);
   padding: 0 var(--sp-3) var(--sp-3);
 }
-/* phones: the body is the title's column (container-type, as in layout.css), so its --fit measures the words' width,
-   not the card's, which the card's and the body's padding make 3rem wider: with a big default font a long word
-   ("Cybersecurity") would split. Wider screens measure the card, as before: a narrow desktop column at zoom would
-   otherwise shrink the title on screen (review C1) */
-@media (--phone) {
+/* a narrow column (one card a row): the body is the title's column (container-type, as in layout.css), so its --fit
+   measures the words' width, not the card's, which the card's and the body's padding make 3rem wider: with a big
+   default font a long word ("Cybersecurity") would split. Wider columns measure the card, as before: a narrow desktop
+   column at zoom would otherwise shrink the title on screen (review C1) */
+@container column (--col-narrow) {
   .card-body {
     container-type: inline-size;
   }
@@ -114,7 +114,7 @@
 .card.pad {
   padding: var(--sp-5);
 }
-@media (--tablet-up) {
+@container column (--col-medium) {
   .card.pad {
     padding: var(--sp-6);
   }
@@ -134,13 +134,13 @@
 .card-meta .keep {
   white-space: nowrap;
 } /* "40 staff" on one line: the client line breaks at its dot */
-/* phones: a row, so more projects fit on a screen. The drawing on the left at a fixed width, as tall as the row; the
+/* a narrow column (one card a row): a row, so more projects fit on a screen. The drawing on the left at a fixed width, as tall as the row; the
    chip, name and client beside it as one block, centred on the drawing (the empty rows above and below share what
    is left). Chip, name and client share one left edge; the client sits close under the name (docs/design.md R4).
-   Under 20em (a phone with a big default font or zoom) a row leaves the words no room: the card stacks as on wider
-   screens. The name is a step smaller only under 30em: wider (a desktop window at 200% zoom) it keeps the tablet's
+   Under 18rem (a phone with a big default font or zoom) a row leaves the words no room: the card stacks as in wider
+   columns. The name is a step smaller only under 28rem: wider (a desktop window at 200% zoom) it keeps the tablet's
    size, so zooming in never makes it smaller on screen (review C1) */
-@media (--phone) and (--not-tiny) {
+@container column (--col-narrow) and (--col-not-tiny) {
   .card--project {
     display: grid;
     grid-template: 'media .' 1fr 'media chip' auto 'media body' auto 'media .' 1fr / var(--card-thumb) minmax(0, 1fr);
@@ -173,7 +173,7 @@
     line-height: var(--lh-snug);
   }
 }
-@media (20em <= width < 30em) {
+@container column (18rem <= width < 28rem) {
   .card--project .card-title {
     font-size: min(var(--fs-4), var(--fit, var(--fs-4)));
   }

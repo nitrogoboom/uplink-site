@@ -10,6 +10,12 @@
   /* stylelint-enable declaration-property-unit-disallowed-list */
 }
 
+/* the page's column, as a query container: the blocks in it (cards, card rows, steps, call-to-action bands, stats)
+   lay themselves out by its width, @container column (--col-…) (COLUMN in src/lib/media.js) */
+main .container {
+  container: column / inline-size;
+}
+
 .section {
   padding-block: var(--section-y);
 }

@@ -2,14 +2,23 @@
 // src/lib/media.js as @custom-media rules on top, and postcss-custom-media writes the query in wherever the file uses
 // one (@media (--desktop)) and drops the rules, so the CSS that ships has plain media queries.
 import customMedia from 'postcss-custom-media';
-import { MEDIA } from './src/lib/media.js';
+import { COLUMN, MEDIA } from './src/lib/media.js';
 
 const kebab = (name) => name.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase());
+const COLUMN_BY_NAME = Object.fromEntries(Object.entries(COLUMN).map(([k, v]) => [kebab(k), v]));
 const names = {
   postcssPlugin: 'media-names',
   Once(root, { AtRule }) {
     for (const [name, query] of Object.entries(MEDIA))
       root.prepend(new AtRule({ name: 'custom-media', params: `--${kebab(name)} ${query}` }));
+    // container sizes by name (@container column (--col-medium)): written in here, as postcss-custom-media does for
+    // @media; a name not in COLUMN stops the build
+    root.walkAtRules('container', (at) => {
+      at.params = at.params.replace(/\(--([a-z-]+)\)/g, (m, n) => {
+        if (!COLUMN_BY_NAME[n]) throw at.error(`no container size named --${n} (COLUMN in src/lib/media.js)`);
+        return COLUMN_BY_NAME[n];
+      });
+    });
   },
 };
 

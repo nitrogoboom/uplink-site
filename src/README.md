@@ -60,6 +60,8 @@ Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`, scripts `MEDIA`), 
 | `fold` | desktop and `height >= 43.75em` | one section per screen |
 | `shortWindow` | `height < 33.5em` | under 536 tall: the header slides away while reading (`core.js`) |
 
+Blocks inside the page's column (`main .container`, a query container named `column`) follow its width instead: `@container column (--col-tiny | --col-not-tiny | --col-narrow | --col-medium | --col-wide)`, `COLUMN` in `lib/media.js`. Each switches at the same window width as `tiny`, `phone`, `tabletUp` and `desktop`, because the side margin (`--gutter`) grows evenly with the window. Converted so far: cards, card rows, steps, call-to-action bands, stats (`surfaces.css`, `shared-blocks.css`).
+
 A few sizes stay written out where they are, each measured for one thing: the header's 48.75em, 58.75em and 77.5em (`bottom-nav.css`), Grow's dots at 22.5em, project cards' title at 30em, and the height rules that keep a section on one screen.
 
 ## Scripts

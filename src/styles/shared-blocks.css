@@ -19,7 +19,7 @@
   margin-top: var(--sp-6);
 }
 
-/* call-to-action band */
+/* call-to-action band. Its layout follows the page's column (@container column, layout.css), not the window */
 .cta-band {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -27,7 +27,7 @@
   gap: var(--sp-5);
   padding: var(--sp-6);
 }
-@media (--desktop) {
+@container column (--col-wide) {
   .cta-band {
     grid-template-columns: minmax(0, 1fr) auto;
     padding: var(--sp-7);
@@ -36,20 +36,20 @@
 .cta-band .row > .btn {
   flex: 1 1 12rem;
 } /* stacked on phones: same width; side by side: same height, shared evenly */
-@media (--desktop) {
+@container column (--col-wide) {
   .cta-band .row > .btn {
     flex: 0 0 auto;
   }
 }
-/* under 20em (390px at 200% text) a 32px inset left "Book a check-up" 97px for its 147px: half the inset, and the
-   large button's own (buttons.css), so it fits */
-@media (--tiny) {
+/* a column under 18rem (390px at 200% text) left "Book a check-up" 97px for its 147px with a 32px inset: half the
+   inset, and the large button's own (buttons.css), so it fits */
+@container column (--col-tiny) {
   .cta-band {
     padding: var(--sp-3);
   }
 }
 
-/* numbered steps (real sequence) */
+/* numbered steps (real sequence): 1, 2 or 4 a row by the column's width */
 .steps {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -57,12 +57,12 @@
   list-style: none;
   counter-reset: step;
 }
-@media (--tablet-up) {
+@container column (--col-medium) {
   .steps {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-@media (--desktop) {
+@container column (--col-wide) {
   .steps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--sp-5);
@@ -105,7 +105,7 @@
   color: var(--c-on-accent);
 }
 
-/* a row of up to three project cards: a service's page and Home */
+/* a row of up to three project cards: a service's page and Home. One a row in a narrow column, three in a wider one */
 .card-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -119,23 +119,23 @@
   flex: 1;
   width: 100%;
 }
-@media (--tablet-up) {
+@container column (--col-medium) {
   .card-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
-/* phones: the project cards are rows (surfaces.css); each as tall as the tallest, so the drawings and words sit at
+/* one a row: the project cards are rows (surfaces.css); each as tall as the tallest, so the drawings and words sit at
    the same place in every card */
-@media (--phone) {
+@container column (--col-narrow) {
   .card-row {
     grid-auto-rows: 1fr;
   }
 }
-@media (--desktop) {
+@container column (--col-wide) {
   .card-row {
     gap: var(--sp-5);
   }
-} /* every card grid: --sp-4, --sp-5 from 1100 (docs/design.md R6) */
+} /* every card grid: --sp-4, --sp-5 in a wide column (docs/design.md R6) */
 
 /* dot strip: where you are in a row of slides (Home: Services on phones, Grow). One <i class="pip"> per slide; the
    current one is a wide amber pill: .on (set by script), or the dot inside the current step's button (aria-current).
@@ -184,7 +184,7 @@
   gap: var(--sp-4);
   list-style: none;
 }
-@media (--desktop) {
+@container column (--col-wide) {
   .stats {
     gap: var(--sp-5);
   }
