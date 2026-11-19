@@ -34,12 +34,12 @@ export default defineConfig({
   integrations: [finish],
   // services.html served at /services: the URLs, canonicals and sitemap the site has always had.
   // Astro's default ('directory') would make every address /services/.
-  // inlineStylesheets 'auto' (Astro's default): a page links its CSS as files, one every page shares and one of
-  // Home's own, and carries only a small page's own rules (under 4 KB) in a <style> block. A linked file is fetched
-  // once and kept a year, and a page fetched ahead is its HTML alone (it was about 18 KB of the same CSS in every
-  // page). scripts/head.mjs then puts Home's two files back inside Home, so the page a visitor lands on still waits
-  // on nothing before its first paint (owner, November 17, 2026). headers.mjs hashes every <style> block for the CSP.
-  build: { format: 'file', inlineStylesheets: 'auto' },
+  // inlineStylesheets 'never': every page links its CSS as files, a small page's own rules too, so a new page adds no
+  // <style> block and no hash to the CSP line (Cloudflare caps a _headers line at 2,000 characters). A linked file is
+  // fetched once and kept a year, and each page's Early Hints name it. scripts/head.mjs then puts Home's files back
+  // inside Home, so the page a visitor lands on waits on nothing before its first paint. headers.mjs hashes every
+  // <style> block that is left.
+  build: { format: 'file', inlineStylesheets: 'never' },
   trailingSlash: 'never',
   // Astro 7's default ('jsx') drops the space between inline tags on separate lines, e.g. the hero title's
   // "<span>Your IT team,</span> <em>always online</em>". true keeps whitespace as written.
