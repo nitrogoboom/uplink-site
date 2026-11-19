@@ -310,9 +310,8 @@
        near-square window; never under 50rem, the room its menu needs */
     --hero-max: max(62vw, 50rem);
     --grow-stage-max: min(49vw, 78svh);
-    /* past 2560 the text stops growing (the 125% cap), so the space round it does: the gap beside a picture and
-       between text blocks take a share of the screen, with a rem floor. Unchanged up to 2560 x 1305. Never text:
-       text sizes stay --fs-* in rem */
+    /* past 2560 the text stops growing (the 125% cap), so the gap beside a picture takes a share of the screen, with
+       a rem floor. Never text: text sizes stay --fs-* in rem */
     --fold-gap: max(var(--sp-8), 3vw);
     --fold-stack: var(--fold-space-2); /* the space between a fold's text blocks, top to bottom: fold scale step 2 */
     /* the other pages' fold padding (About, Work, Services, Contact), not part of the fold scale: grows smoothly with

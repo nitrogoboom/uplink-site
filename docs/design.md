@@ -112,6 +112,18 @@ Spacing `--sp-1`–`--sp-9`, type `--fs-1`–`--fs-8`; pixels at a 16px root (`-
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Pixels | 4 | 8 | 12 | 16 | 24 | 32 | 48 | 64 | 96 |
 
+### Fold scale
+
+Home's vertical space on a fold (`GLOSSARY.md`), in `tokens.css`. One curve of the window's height, `--fold-curve`: 12px at 720 tall to 64px at 1080, in rem (so it grows with the root past 1440 wide). Each step holds the curve between its own floor and ceiling:
+
+| Step | Floor–ceiling | Role |
+| --- | --- | --- |
+| `--fold-space-1` | 12–16px | inside a block: Reviews' card gaps and padding |
+| `--fold-space-2` | 12–32px | between blocks: under a heading, `--fold-stack`, the hero menu's gaps, Reviews' big cards' padding |
+| `--fold-space-3` | 16–64px | around a fold: Home's `--fold-pad` |
+
+The check-up card sits step 2 plus step 1 below the reviews. The scale never sizes text.
+
 ### R0. Stay on the scale
 
 Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size tokens. An exception (a 1px clip, an optical nudge) gets a short comment saying why.
@@ -119,7 +131,7 @@ Every margin, padding and gap is a `--sp-*` token, `0`, or a `calc()` of size to
 ### R1. Section padding
 
 - **Flow section** (`.section`): `--section-y` top and bottom: `--sp-8` on phone and tablet, `--sp-9` on desktop.
-- **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad`, which follows the screen's height: `--sp-5` up to 760px tall, `--sp-7` up to 1080px, `--sp-8` from 1080px. The content is centred. A fold must fit one screen from 1080px tall; on shorter screens it may run past (owner, November 10, 2026).
+- **Fold section** (desktop, one screen tall, `fold.css`): `--fold-pad` top and bottom, content centred. On Home it is fold scale step 3 (below); the other pages keep `--pages-fold-pad`, about 24px at 720 tall to `--sp-8` near 1030, not part of the scale. The fit is promised from 1280×720 up; below that a fold may scroll (owner, November 19, 2026).
 - **The first section under the header:** `--sp-6` at the top; a fold hero can drop to `--sp-5`. A text-only page's top (`.page-intro`): `--sp-7`, or `--sp-8` on desktop.
 - Alternate banded and plain sections so gaps don't double.
 

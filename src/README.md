@@ -57,13 +57,13 @@ Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`, scripts `MEDIA`), 
 | `tablet` | `43.75em <= width < 68.75em` | 700–1099 |
 | `wide` | `width >= 56.25em` | 900+: text and picture side by side |
 | `desktop` | `width >= 68.75em` | 1100+ |
-| `fold` | desktop and `height >= 43.75em` | one section per screen |
+| `fold` | desktop and `height >= 43.75em` | 700+ tall: one section per screen (a fold); Home's space on the fold scale (`docs/design.md`), fit promised from 1280×720 |
 | `foldMenu` / `foldMenuShort` | desktop and `height >= 50em` / `50em <= height < 56.5em` | 800+ tall: the Home hero's menu; 800–903: without its sublines |
 | `shortWindow` | `height < 33.5em` | under 536 tall: the header slides away while reading (`core.js`) |
 
 Blocks inside the page's column (`main .container`, a query container named `column`) follow its width instead: `@container column (--col-tiny | --col-not-tiny | --col-narrow | --col-medium | --col-wide)`, `COLUMN` in `lib/media.js`. Each switches at the same window width as `tiny`, `phone`, `tabletUp` and `desktop`, because the side margin (`--gutter`) grows evenly with the window. Converted so far: cards, card rows, steps, call-to-action bands, stats (`surfaces.css`, `shared-blocks.css`).
 
-A few sizes stay written out where they are, each measured for one thing: the header's 48.75em, 58.75em and 77.5em (`bottom-nav.css`), Grow's dots at 22.5em, project cards' title at 30em, and the height rules that keep a section on one screen.
+A few sizes stay written out where they are, each measured for one thing: the header's 48.75em, 58.75em and 77.5em (`bottom-nav.css`), Grow's dots at 22.5em, project cards' title at 30em, the footer's 51.25em and the FAQ's 47.5em tall.
 
 ## Scripts
 

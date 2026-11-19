@@ -2,8 +2,9 @@
    tie against .page-intro's, as it always has. Each section's own desktop layout sits at the end of its CSS.
    At the end, .fold-foot: content after a section's main block. ---*/
 /* desktop (>= 1100 wide and >= 700 tall): one section per screen. Text keeps the visitor's size (tokens.css); the space
-   round each section (--fold-pad) and the pictures follow the screen, so a 1280 x 720 laptop and a 3440 x 1440
-   ultrawide both show one section a screen. A section whose words need more room grows past one screen. */
+   round each section (--fold-pad; on Home, fold scale step 3) and the pictures follow the screen, so a 1280 x 720
+   laptop and a 3440 x 1440 ultrawide both show one section a screen. A section whose words need more room grows
+   past one screen. */
 @media (--fold) {
   html {
     scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--header-h));
