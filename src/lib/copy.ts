@@ -23,10 +23,26 @@ const strict = (value: unknown, where: string): unknown => {
   });
 };
 
+// A key named like a text or list method (sub, join, filter, length…) takes that method's type, so a typo in it would
+// pass the type check: such a key stops the build here instead.
+const BUILT_IN = new Set([
+  ...Object.getOwnPropertyNames(String.prototype),
+  ...Object.getOwnPropertyNames(Array.prototype),
+]);
+const noBuiltInKeys = (value: unknown, where: string): void => {
+  if (typeof value !== 'object' || value === null) return;
+  for (const [key, inner] of Object.entries(value)) {
+    if (!Array.isArray(value) && BUILT_IN.has(key))
+      throw new Error(`copy: ${where} has a key named "${key}", like a built-in method; rename it`);
+    noBuiltInKeys(inner, `${where}.${key}`);
+  }
+};
+
 const entry = getEntry as (collection: string, id: string) => Promise<{ data: unknown } | undefined>;
 export async function copy(name: string): Promise<Words> {
   const e = await entry(`copy-${name}`, name);
   if (!e) throw new Error(`src/data/copy/en/${name}.yaml is missing`);
+  noBuiltInKeys(e.data, `${name}.yaml`);
   return strict(e.data, `${name}.yaml`) as Words;
 }
 

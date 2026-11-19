@@ -8,7 +8,7 @@ projects:
   eyebrow: Our work
   title: Setups we built and still run
   lead: Every project here is a client we still look after today. Open one to see what we found, what we did and how it turned out.
-  filter: Filter projects # the filters' hidden legend
+  filterLegend: Filter projects # the filters' hidden legend
   all: All # the first filter; the others are the projects' tags
 
 # a project's own page, /work/SLUG

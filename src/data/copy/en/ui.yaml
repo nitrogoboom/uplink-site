@@ -29,7 +29,7 @@ skipLink: Skip to content
 
 header:
   home: Uplink Technology management, home page # the logo link's name
-  sub: Technology management # the line under the logo's word
+  tagline: Technology management # the line under the logo's word
   nav: Main
   support:
     label: Get support, for existing clients
