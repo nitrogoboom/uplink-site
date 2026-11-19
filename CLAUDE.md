@@ -71,3 +71,17 @@ When the owner says push, it goes straight to `main`, with no pull request (owne
 A pull request, with its preview at `https://pr-N-uplink-site.johnoreilly.workers.dev`, only when the owner says "open a PR".
 
 The owner directs and doesn't run commands. Report in a few plain lines: what changed, where to look (localhost, or the link once shipped), anything they must do.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on nitrogoboom/uplink-site (public), for the specs and tickets the engineering skills write; notes.md stays the owner's to-do list. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default labels, named as the skills name them. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `GLOSSARY.md` and `docs/adr/` at the root, made when first needed. See `docs/agents/domain.md`.
