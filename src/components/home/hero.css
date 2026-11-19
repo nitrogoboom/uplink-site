@@ -535,7 +535,7 @@
   /* With the menu, the column's gaps grow with the screen's height: 24px where the sublines come in (884 tall), 32px
      (--fold-stack) from about 950, so each switch has room to spare (owner, November 18, 2026: fit screens, done
      right). They were the full --fold-stack at once, and the hero ran 2 to 4px past one screen from 884 to 886 tall. */
-  @media (width >= 68.75em) and (height >= 50em) {
+  @media (--fold-menu) {
     .hero-grid {
       --hero-text: min(34rem, 50%);
     }
@@ -548,7 +548,7 @@
     }
   }
   /* 800 to 884 tall: no sublines, and 16px gaps (they were 24px, and the hero ran 2 to 3px over at 800 and 801) */
-  @media (width >= 68.75em) and (50em <= height < 55.25em) {
+  @media (--fold-menu-short) {
     .hero-menu {
       gap: var(--sp-4);
     }

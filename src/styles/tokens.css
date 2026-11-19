@@ -133,6 +133,13 @@
   --sp-8: 4rem;
   --sp-9: 6rem;
 
+  /* ---- fold scale: Home's vertical space on a fold (GLOSSARY.md, "Fold scale"). One curve of the window's height,
+     12px at 720 tall and 64px at 1080, held by each step between its own floor and ceiling */
+  --fold-curve: calc(14.4444svh - 5.75rem); /* 12px at 720 tall, 64px at 1080 */
+  --fold-space-1: clamp(0.75rem, var(--fold-curve), 1rem); /* inside a block: 12 to 16px */
+  --fold-space-2: clamp(0.75rem, var(--fold-curve), 2rem); /* between blocks: 12 to 32px */
+  --fold-space-3: clamp(1rem, var(--fold-curve), 4rem); /* around a fold: 16 to 64px */
+
   /* ---- shape ----------------------------------------------------------- */
   --r-1: 0.125rem; /* key caps, tiny tags */
   --r-2: 0.25rem; /* buttons, inputs, tiles, image wells */
@@ -308,9 +315,11 @@
        text sizes stay --fs-* in rem */
     --fold-gap: max(var(--sp-8), 3vw);
     --fold-stack: max(var(--sp-6), 3svh); /* the space between a fold's text blocks, top to bottom */
-    /* top and bottom of a one-screen section (fold.css): grows smoothly with the screen's height, so short laptops
-       keep room for the content and big screens keep their air: 21px at 700 tall, 24px at 720, 48px at 900, the old
-       --sp-8 from about 1030 (1080 on a big screen, whose rem is larger), then 4.5% of the height past 1422 */
-    --fold-pad: clamp(var(--sp-4), 13.333svh - 4.5rem, max(var(--sp-8), 4.5svh));
+    /* the other pages' fold padding (About, Work, Services, Contact), not part of the fold scale: grows smoothly with
+       the screen's height, 21px at 700 tall, 24px at 720, 48px at 900, --sp-8 from about 1030 (1080 on a big
+       screen, whose rem is larger), then 4.5% of the height past 1422 */
+    --pages-fold-pad: clamp(var(--sp-4), 13.333svh - 4.5rem, max(var(--sp-8), 4.5svh));
+    /* top and bottom of a one-screen section (fold.css); a section may set its own */
+    --fold-pad: var(--pages-fold-pad);
   }
 }
