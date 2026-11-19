@@ -1,7 +1,7 @@
 # Response headers for every file, read by Cloudflare (Workers static assets and Pages alike). Not served as a page.
 # This is the template: `npm run build` copies it to dist/_headers and scripts/headers.mjs fills in
 #   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (Base.astro's head script)
-#   the style-hashes placeholder   a hash for each inline <style> in the built pages and in the drawings home.js and footer.js insert
+#   the style-hashes placeholder   a hash for each inline <style> left in the built pages
 #   the Early Hints block   one rule per page
 #   the build placeholder   X-Build, the build's ID: a hash of dist/, these headers and the Worker. The deploy reads
 #                           it to tell which build the live address serves (scripts/deploy.mjs). Only a hash.
@@ -74,7 +74,8 @@
 # carries a hash of the file (?v=, fresh() in src/lib/site.ts), so a changed drawing is a new address: a year.
 # Opened on their own, the drawings would get the pages' CSP, which blocks their <style> blocks (the embedded
 # letters, the hero's timings). A drawing runs no script, so its own policy allows inline styles and nothing else.
-# (In the page, <img> drawings are not held to the page's CSP, and the drawings home.js and footer.js insert are hashed above.)
+# (In the page, <img> drawings are not held to the page's CSP; the drawings home.js and footer.js insert ship without
+# their <style>, which the build links as a CSS file instead: scripts/drawcss.mjs.)
 /assets/img/*
   Cache-Control: public, max-age=31536000, immutable
   ! Content-Security-Policy

@@ -63,9 +63,8 @@ export function headers(DIST) {
   const hashes = new Set();
   const styles = new Set();
   const attrs = [];
-  // {style-hashes} covers every inline <style>: Home's CSS and a small page's own, the drawings inlined in the home page, and the
-  // <style> blocks in the hero drawings and the footer's campus map (home.js and footer.js insert those SVGs into the
-  // page, so their styles count as the page's). A style="" attribute stops the build: no hash covers one, so the CSP
+  // {style-hashes} covers every inline <style> left in the pages (Home's CSS, the font rules) and, as a safety net, any
+  // left in the drawings home.js and footer.js insert (drawcss.mjs has moved theirs into linked CSS). A style="" attribute stops the build: no hash covers one, so the CSP
   // would block it. Scripts set styles through the CSSOM (el.style.x = …) instead, which the CSP allows.
   const styleBlocks = (file, text) => {
     for (const m of text.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) styles.add(sha(m[1]));

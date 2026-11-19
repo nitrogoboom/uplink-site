@@ -12,11 +12,20 @@ import { copy } from './copy';
 // Drawings keep their names when they change, so every address a page writes carries a hash of the file as the site
 // serves it, after SVGO (?v=; shipped() in scripts/svgo-config.mjs): a changed drawing is a new address, even when
 // only SVGO's output changed, and the browser may keep each one for a year (_headers, /assets/img/*). Drawing.astro
-// does it for every picture; a new <img> of a drawing goes through it or through fresh().
+// does it for every picture; a new <img> of a drawing goes through it or through fresh(). SERVED changes when the
+// build changes what it does to a drawing after SVGO (scripts/drawcss.mjs takes the inserted drawings' <style> out),
+// so no browser keeps a copy made the old way.
+const SERVED = 'drawcss-1';
 const stamps = new Map<string, string>();
 export const fresh = (path: string) => {
   if (!stamps.has(path))
-    stamps.set(path, `${path}?v=${createHash('sha1').update(shipped(path)).digest('hex').slice(0, 8)}`);
+    stamps.set(
+      path,
+      `${path}?v=${createHash('sha1')
+        .update(SERVED + shipped(path))
+        .digest('hex')
+        .slice(0, 8)}`,
+    );
   return stamps.get(path)!;
 };
 

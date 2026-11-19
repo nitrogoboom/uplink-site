@@ -5,6 +5,7 @@ import { placeholders } from './src/lib/placeholders.mjs';
 import { PLACEHOLDERS } from './src/lib/footer.ts';
 import { fileURLToPath } from 'node:url';
 import { svgo } from './scripts/svgo.mjs';
+import { drawcss } from './scripts/drawcss.mjs';
 import { head } from './scripts/head.mjs';
 import { headers } from './scripts/headers.mjs';
 
@@ -13,9 +14,10 @@ import { headers } from './scripts/headers.mjs';
 const site = (process.env.SITE_URL || 'https://uplink-site.johnoreilly.workers.dev').replace(/\/$/, '');
 
 // Finishes dist/ once Astro has written it, so `astro build` alone gives the site as it ships: the drawings shrunk,
-// each page's <head> (its script preloads, and Home's CSS back inside the page), then dist/_headers (CSP hashes,
-// X-Build, Early Hints) and dist/_redirects. The order matters: headers() hashes the drawings' <style> blocks after
-// svgo(), and the pages as head() leaves them. A step that throws fails the build. docs/ops.md, "Response headers".
+// the drawings' <style> blocks moved into linked CSS (drawcss), each page's <head> (its script preloads, and Home's
+// CSS back inside the page), then dist/_headers (CSP hashes, X-Build, Early Hints) and dist/_redirects. The order
+// matters: drawcss() reads the drawings as svgo() leaves them, head() inlines Home's links, drawcss's included, and
+// headers() hashes the pages as head() leaves them. A step that throws fails the build. docs/ops.md, "Response headers".
 /** @type {import('astro').AstroIntegration} */
 const finish = {
   name: 'uplink-finish',
@@ -23,6 +25,7 @@ const finish = {
     'astro:build:done': ({ dir }) => {
       const dist = fileURLToPath(dir);
       svgo(dist);
+      drawcss(dist);
       head(dist);
       headers(dist);
     },
