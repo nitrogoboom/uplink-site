@@ -36,7 +36,7 @@ If you change a setting, the site remembers it in your browser, so it's the same
 | --- | --- |
 | uplink.theme | the theme you picked: system, light or dark |
 | uplink.motion | whether you turned Reduce motion on or off |
-| uplink-held | whether you paused the animations |
+| uplink.held | whether you paused the animations |
 
 These stay on your device and are never sent to us or anyone else. To remove them, clear this site's data in your browser.
 

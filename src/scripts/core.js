@@ -270,7 +270,7 @@ function presetService(name) {
 // on the page. html.is-held pauses the drawings' CSS animations, nothing else (base.css); page scripts stop their
 // timers on held.ev's 'change' (home.js, grow.js). A drawing that builds in while held shows built (settle, below).
 // One choice for the whole site, kept for next time. Nothing moves with reduced motion, so the buttons hide then.
-const HOLD_KEY = 'uplink-held';
+const HOLD_KEY = 'uplink.held';
 const held = { on: false, ev: new EventTarget() };
 const holdBtns = $$('[data-hold]');
 const setHeld = (/** @type {boolean} */ on) => {
