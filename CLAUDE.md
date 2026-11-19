@@ -8,6 +8,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, a Cloudfla
 
 - No tests until launch: see "Tests" below.
 - No worker agents, review passes, reports or history files.
+- Commit messages: one short line, what and why. Code comments say why the code is as it is: no dates, review IDs or the owner's words (git holds the history). Tidy old comments in a file you're already changing.
 - Read only the doc the job needs (table below).
 - `notes.md` is the to-do list: add or remove a line. Never reword the owner's lines without asking.
 - Docs can lag the code; the code wins. Fix a doc only when what it states is now wrong. Keep docs short.
