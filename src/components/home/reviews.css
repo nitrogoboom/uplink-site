@@ -125,32 +125,26 @@
   }
 }
 
-/* desktop, one screen: the reviews and the check-up card (Proof.astro) fit one screen from a 1280 x 800 window up
-   (owner, November 18, 2026: make it fit). The section's spacing follows the screen's height smoothly (--rev-space:
-   12px up to 750 tall, 16px at 800, 32px at 1000, 48px from 1200; the reviews' own gap and padding, --rev-gap, 16px
-   to 24px), and the check-up card sits twice the reviews' gap from them, so it reads as its own block (owner,
-   November 10, 2026). */
+/* desktop, one screen: the reviews and the check-up card (Proof.astro) fit one screen from the fit floor (1280 x 720)
+   up, on the fold scale (tokens.css; spec #183): the fold's top and bottom are step 3 (Home's --fold-pad), the heading
+   gap and the two big cards' padding step 2, the reviews' gaps and padding step 1. The check-up card sits step 2 plus
+   step 1 from the reviews, so it reads as its own block (owner, November 10, 2026). Below the fit floor it may
+   scroll. */
 @media (--fold) {
-  #reviews {
-    --rev-space: clamp(var(--sp-3), 8svh - 3rem, var(--sp-7));
-    --rev-gap: clamp(var(--sp-4), var(--rev-space), var(--sp-5));
-    --fold-pad: var(--rev-space);
-    --fold-inner: calc(var(--fold-h) - 2 * var(--fold-pad));
-  }
   #reviews .section-head {
-    margin-bottom: var(--rev-space);
+    margin-bottom: var(--fold-space-2);
   }
   #reviews .rev-grid {
-    gap: var(--rev-gap);
+    gap: var(--fold-space-1);
   }
   #reviews .rev {
-    padding: var(--rev-gap);
+    padding: var(--fold-space-1);
   }
   #reviews :is(.rev--big, .cta-band) {
-    padding: var(--rev-space);
+    padding: var(--fold-space-2);
   }
   #reviews .fold-foot {
-    margin-top: calc(2 * var(--rev-gap));
+    margin-top: calc(var(--fold-space-2) + var(--fold-space-1));
   }
   /* the big review in one row: the quote mark, the quote, then who said it, so the reviews and the check-up card fit
      one laptop screen (owner, November 18, 2026: make it fit). Stacked, it was 304px tall at 1440 x 900 */
@@ -167,25 +161,5 @@
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
-  }
-  /* a narrow column (windows about 1100 to 1250 wide): the stars, the note and the link stack in a block beside the
-     heading instead of wrapping to a row of their own, and the check-up card's buttons stack so its title keeps one
-     line, so the section still fits one screen (owner, November 18, 2026: fix 1100px windows) */
-  @container column (width < 72rem) {
-    #reviews .section-head--split {
-      flex-wrap: nowrap;
-      align-items: center;
-    }
-    #reviews .rev-score {
-      flex-direction: column;
-      flex: none;
-      align-items: flex-end;
-      gap: var(--sp-1);
-      text-align: end;
-    }
-    #reviews .cta-band .row {
-      flex-direction: column;
-      align-items: stretch;
-    }
   }
 }
