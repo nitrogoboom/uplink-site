@@ -43,8 +43,22 @@ const schema = z.strictObject({
   phone: z.strictObject({ display: text, href: z.string().regex(/^tel:\+\d+$/) }),
   email: z.email(),
   inboxes: z.strictObject({ privacy: z.email(), accessibility: z.email(), security: z.email() }),
-  office: z.strictObject({ city: text, street: text }),
-  hours: z.strictObject({ line: text, days: text }),
+  // region and country: two-letter codes (search engines read them); area: where the business works
+  office: z.strictObject({
+    city: text,
+    street: text,
+    region: z.string().length(2),
+    country: z.string().length(2),
+    area: text,
+  }),
+  // line and days: the words shown; weekdays, opens and closes (24-hour, ET): for search engines
+  hours: z.strictObject({
+    line: text,
+    days: text,
+    weekdays: z.array(text).min(1),
+    opens: z.string().regex(/^\d\d:\d\d$/),
+    closes: z.string().regex(/^\d\d:\d\d$/),
+  }),
   legal: z.array(link).min(1),
   copyright: text,
   status: text,

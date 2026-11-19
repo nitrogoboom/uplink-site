@@ -154,11 +154,17 @@
   },
   "office": {
     "city": "Toronto",
-    "street": "100 King St W, Suite 4200"
+    "street": "100 King St W, Suite 4200",
+    "region": "ON",
+    "country": "CA",
+    "area": "Ontario"
   },
   "hours": {
     "line": "7 am to 7 pm ET",
-    "days": "Monday to Friday"
+    "days": "Monday to Friday",
+    "weekdays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    "opens": "07:00",
+    "closes": "19:00"
   },
   "legal": [
     {
