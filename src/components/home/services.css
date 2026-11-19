@@ -521,14 +521,6 @@
   .svc-small .svc-text {
     padding-bottom: 0;
   }
-  /* a short screen (1280 x 800, 1366 x 768): a short tile's icon is --sp-6. From 60em tall (1920 x 1080 and up)
-     there is room for the full icon. */
-  @media (height < 60em) {
-    .svc-small .svc-icon svg {
-      width: var(--sp-6);
-      height: var(--sp-6);
-    }
-  }
   /* with a pointer: a slimmer bar (2.25rem, --sp-7 less --sp-3, not --control-h; it is part of the tile's link, not
      a target of its own), so less room is kept under a tall card's words. A short tile's icon and name slide up out
      of the bar's way while it shows (WCAG 1.4.13). */

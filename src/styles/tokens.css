@@ -314,12 +314,16 @@
        between text blocks take a share of the screen, with a rem floor. Unchanged up to 2560 x 1305. Never text:
        text sizes stay --fs-* in rem */
     --fold-gap: max(var(--sp-8), 3vw);
-    --fold-stack: max(var(--sp-6), 3svh); /* the space between a fold's text blocks, top to bottom */
+    --fold-stack: var(--fold-space-2); /* the space between a fold's text blocks, top to bottom: fold scale step 2 */
     /* the other pages' fold padding (About, Work, Services, Contact), not part of the fold scale: grows smoothly with
        the screen's height, 21px at 700 tall, 24px at 720, 48px at 900, --sp-8 from about 1030 (1080 on a big
        screen, whose rem is larger), then 4.5% of the height past 1422 */
     --pages-fold-pad: clamp(var(--sp-4), 13.333svh - 4.5rem, max(var(--sp-8), 4.5svh));
     /* top and bottom of a one-screen section (fold.css); a section may set its own */
     --fold-pad: var(--pages-fold-pad);
+  }
+  /* Home: the top and bottom of each fold on fold scale step 3. On :root, so --fold-inner (fold.css) follows */
+  :root:has(body[data-page='home']) {
+    --fold-pad: var(--fold-space-3);
   }
 }
