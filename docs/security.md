@@ -11,14 +11,17 @@ Controls, and every secret (names and places, never values). Reporting: [`SECURI
 
 ### Content Security Policy
 
-No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. It comes in two parts, and nothing fills in either after the build:
+One header on every response, written by hand in `public/_headers` and shipped as written: nothing fills it in at build.
 
-- **A `<meta>` in each page, written by Astro** (`security.csp` in `astro.config.mjs`): `default-src 'none'`, `script-src 'self'` and `style-src 'self'` with a hash for every script and style Astro bundles, `font-src 'self'`, `img-src 'self' data:`, `connect-src 'self'`, `form-action 'self'`, `base-uri 'self'`, `object-src 'none'`. The two inline blocks Astro doesn't bundle add their own hash (`src/lib/csp.ts`): the theme script in `Base.astro` and the filter CSS on `/work`.
-- **A header, in `public/_headers`**, for what a `<meta>` can't carry: `frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types uplink`.
+- `default-src 'none'`, `font-src 'self'`, `img-src 'self' data:`, `connect-src 'self' https://cloudflareinsights.com`, `form-action 'self'`, `base-uri 'self'`, `object-src 'none'`, `frame-ancestors 'none'`, and Trusted Types (below).
+- **Scripts:** `script-src 'self' https://static.cloudflareinsights.com` and one hash, the theme script's (`src/scripts/theme-init.js`, written into every page by `Base.astro`). No `'unsafe-inline'`: an inline script runs only by its hash. The header is the only place the hash is written, so `Base.astro` passes the script through `inlineScript()` (`src/lib/csp.ts`): when the file and the header part ways the build stops and prints the hash to put in.
+- **Styles:** `style-src-elem 'self' 'unsafe-inline'` (and the same in `style-src`, for a browser without `-elem`), `style-src-attr 'none'`. An inline `<style>` is allowed, because each page carries its CSS inside it and a hash for that would change with every page and edit; a `style=""` attribute is still refused.
+- **Why a header, and not Astro's `security.csp`:** Astro writes its policy into each page as a `<meta>`, and with a `<meta>` policy Chrome read and laid out the whole page before painting any of it (Home's first paint on a 4x slowed CPU: about 260 ms with the `<meta>`, 180 ms with the header; November 22, 2026). Astro sends its policy as a header only through the Vercel and Netlify adapters (`staticHeaders`). What that cost: Astro's per-page style hashes. If the Cloudflare adapter gains `staticHeaders`, the hashes can come back.
 
 - `default-src 'none'`: a kind of file the policy doesn't name (a frame, video, worker, web manifest) is refused, even from the site itself. A new kind needs its own directive.
 - The one inline script marks the page as script-enabled and applies the saved theme and motion choice before paint.
-- No element carries `style=""`: the policy would ignore it. Scripts set styles with `el.style.x = …`.
+- No element carries `style=""`: the policy refuses it. Scripts set styles with `el.style.x = …`.
+- A small bundled `<script>` is one Astro writes into the page by itself, and the header would refuse it: page scripts stay in the one file (`src/scripts/site.js`).
 - The policy is off in `npm run dev`. To check it: `npm run build`, `npm run serve`, and read the console.
 - A new outside host (fonts, analytics, a form service) means a CSP change. Forms with Turnstile will need `challenges.cloudflare.com` in `script-src` and `frame-src`.
 

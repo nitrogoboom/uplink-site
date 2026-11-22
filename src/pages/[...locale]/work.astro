@@ -3,13 +3,11 @@
 // radios, and the CSS that hides the other cards (workFilterCss(Astro.currentLocale) in lib/site.ts) goes in the <head>.
 import Base from '../../layouts/Base.astro';
 import { pageMeta, workFilterCss } from '../../lib/site';
-import { sha256 } from '../../lib/csp';
 import Projects from '../../components/work/Projects.astro';
 import { localePaths } from '../../lib/i18n';
 
 export const getStaticPaths = localePaths;
 const filterCss = await workFilterCss(Astro.currentLocale);
-Astro.csp?.insertStyleHash(sha256(filterCss));
 const meta = await pageMeta('work', Astro.currentLocale);
 ---
 

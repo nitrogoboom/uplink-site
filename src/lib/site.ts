@@ -129,8 +129,8 @@ export const getReviews = (locale: string | undefined) => listOf('reviews', loca
 
 // The /work filters (components/work/Projects.astro): "All" (label null: its word is the copy's, work.yaml), then one radio per project tag, in the order the projects
 // first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
-// tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head> and
-// adds its hash to the page's CSP (src/lib/csp.ts). A browser without :has() ignores the rules and
+// tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head>.
+// A browser without :has() ignores the rules and
 // shows every project (projects.css then hides the filters).
 export const WORK_FILTER = 'work-filter'; // the radios' name
 export const workFilters = async (locale: string | undefined) => {

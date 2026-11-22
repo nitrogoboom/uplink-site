@@ -12,9 +12,8 @@ How the site is hosted and run. Secrets and security controls are in [`security.
 | --- | --- | --- |
 | Pages, one set per language | Astro | `src/pages/`, `i18n` in `astro.config.mjs` |
 | CSS inside each page (nothing blocks the first paint) | Astro | `build.inlineStylesheets: 'always'` |
-| The script and style hashes of the Content Security Policy, as a `<meta>` in each page | Astro | `security.csp` |
+| The Content Security Policy and every other response header, caching | Cloudflare | `public/_headers`, shipped as written |
 | Fonts, with hashed names | Astro | `fonts` |
-| Every other response header, caching | Cloudflare | `public/_headers`, shipped as written |
 | `/services` for `services.html`; `/services/` and `/services.html` redirect there (a 307, Cloudflare's own; each page's canonical tag names the clean address for search engines) | Cloudflare | its default `html_handling` |
 | The 404 page for a missing address | Cloudflare | `not_found_handling: "404-page"` |
 

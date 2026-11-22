@@ -72,7 +72,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
 | `public/` | Files served as they are: `_headers`, `speculation-rules.json`, the fonts' licence (the fonts are in `src/assets/fonts/`), `og.png`, and the favicons. The drawings are in `src/assets/img/` (Astro gives each a hashed address). `favicon.ico` is made from `favicon.svg` by `node tools/favicon-ico.mjs`; rerun it when the icon changes. |
 | `tools/` | The drawing generators and their checks, in Python. [`docs/drawing-tools.md`](docs/drawing-tools.md). |
-| `astro.config.mjs` | The site's settings: address, languages, CSS inlining, Content Security Policy, fonts. |
+| `astro.config.mjs` | The site's settings: address, languages, CSS inlining, fonts. |
 | `wrangler.jsonc` | The Cloudflare configuration: serve `dist/` as static files. |
 | `.github/workflows/site.yml` | CI and deploys. |
 | `docs/` | The docs above. |

@@ -13,23 +13,9 @@ export default defineConfig({
   // Languages (src/lib/i18n.ts): English at /, any other at /<language>/. To add French: add 'fr' here, then
   // src/content/fr/ beside en/.
   i18n: { locales: ['en'], defaultLocale: 'en' },
-  // Content Security Policy, written by Astro into each page as a <meta>: a hash for every script and style it
-  // bundles (and the two a page adds itself: src/lib/csp.ts), plus the lines below. One other host: Cloudflare Web
-  // Analytics, its script from static.cloudflareinsights.com and its reports to cloudflareinsights.com (src/scripts/analytics.js).
-  // What a <meta> can't carry (frame-ancestors, Trusted Types) is in public/_headers. Not active in `npm run dev`.
-  security: {
-    csp: {
-      scriptDirective: { resources: ["'self'", 'https://static.cloudflareinsights.com'] },
-      directives: [
-        "default-src 'none'",
-        "img-src 'self' data:",
-        "connect-src 'self' https://cloudflareinsights.com",
-        "form-action 'self'",
-        "base-uri 'self'",
-        "object-src 'none'",
-      ],
-    },
-  },
+  // No security.csp here: the Content Security Policy is one header in public/_headers. Astro would write it into
+  // each page as a <meta>, and with that Chrome read and laid out the whole page before painting any of it; Astro
+  // writes it as a header only for Vercel and Netlify (their adapters' staticHeaders).
   // format 'file': services.html, served at /services (Astro's default, 'directory', would make every address
   // /services/). inlineStylesheets 'always': each page carries its CSS inside it, so nothing waits on a second
   // request before the first paint.

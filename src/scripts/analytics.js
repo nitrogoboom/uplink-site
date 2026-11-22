@@ -7,7 +7,7 @@
    phone's connection with the page, and PageSpeed (which sees "load" land at
    the first paint) counts it against the first paint, 0.2 to 0.45 s. It still
    reports the whole load, from the browser's own timings. No cookies or
-   storage. The CSP allows its two hosts (astro.config.mjs); Trusted Types lets
+   storage. The CSP allows its two hosts (public/_headers); Trusted Types lets
    in only this address (core.js). The token is public: it names the
    jodesign.ca site in Cloudflare.
    ========================================================================== */

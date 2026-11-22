@@ -15,8 +15,8 @@ paths:
 - Icons: `<Icon name="…" />`.
 - HTML written by a script goes through `html()` from `core.js` (Trusted Types).
 - JavaScript in `src/` is type-checked (`checkJs`): JSDoc types on parameters and lookups (`src/README.md`, "Scripts"). Mark a promise you don't wait for with `void`.
-- Styles from script: `el.style.x = …`. Markup carries classes only: the CSP has no `'unsafe-inline'`, so a `style=""` attribute does nothing in the built site.
-- The Content Security Policy's script and style hashes are Astro's (`security.csp` in `astro.config.mjs`): it writes them into each page as a `<meta>`. An inline `<script is:inline>` or `<style is:inline>` isn't bundled, so the page adds its hash itself (`src/lib/csp.ts`). Never paste a hash. `public/_headers` ships as written and holds the other headers. The CSP is off in `npm run dev`: check it with `npm run build`, `npm run serve`.
+- Styles from script: `el.style.x = …`. Markup carries classes only: the CSP refuses a `style=""` attribute (`style-src-attr 'none'`), so it does nothing in the built site.
+- The Content Security Policy is one header in `public/_headers`, written by hand and shipped as written (`docs/security.md`); Astro's `security.csp` is off. An inline `<style>` is allowed. An inline `<script is:inline>` runs only by its hash in that header: pass its text through `inlineScript()` (`src/lib/csp.ts`), and the build stops with the hash to put in when the header lacks it. A new outside host goes in the header too. The CSP is off in `npm run dev`: check it with `npm run build`, `npm run serve`.
 - A link whose visible parts sit in separate boxes gets `<Pause />` between them. Inside a sideways-scrolling row, a `<Pause />`'s box needs `position: relative`.
 - The site is static files only: no Worker script, no `/api/` address, and nothing sent from a visitor's browser except Cloudflare Web Analytics (`src/scripts/analytics.js`). Another endpoint or beacon is the owner's decision (`docs/ops.md`, "When the forms send").
 - Nothing changes `dist/` after `astro build`. A new need there is an Astro or Cloudflare setting first (`docs/ops.md`).
