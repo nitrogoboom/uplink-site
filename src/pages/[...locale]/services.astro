@@ -1,23 +1,26 @@
 ---
 // SERVICES. Sections in page order; each is one component in src/components/services/. The JSON-LD lists the
 // FAQ and every Service (each pointing at its own page) from the collections.
-import { getCollection } from 'astro:content';
-import { byOrder } from '../content.config';
-import Base from '../layouts/Base.astro';
-import { businessRef, pageMeta, getServices } from '../lib/site';
-import Overview from '../components/services/Overview.astro';
-import Faq from '../components/services/Faq.astro';
+import { linker } from '../../lib/i18n';
+import Base from '../../layouts/Base.astro';
+import { businessRef, getFaq, pageMeta, getServices } from '../../lib/site';
+import Overview from '../../components/services/Overview.astro';
+import Faq from '../../components/services/Faq.astro';
+import { localePaths } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
 
-const services = await getServices();
-const faq = (await getCollection('faq')).sort(byOrder);
+export const getStaticPaths = localePaths;
+
+const services = await getServices(Astro.currentLocale);
+const faq = await getFaq(Astro.currentLocale);
 const business = businessRef(Astro.site!);
-const mainEntity = faq.map(({ data: f }) => ({
+const mainEntity = faq.map((f) => ({
   '@type': 'Question',
   name: f.q,
   acceptedAnswer: { '@type': 'Answer', text: f.a },
 }));
 const serviceNodes = services.map(({ id, data: s }) => {
-  const url = new URL(`/services/${id}`, Astro.site).href;
+  const url = new URL(to(`/services/${id}`), Astro.site).href;
   return {
     '@type': 'Service',
     '@id': url,
@@ -28,7 +31,7 @@ const serviceNodes = services.map(({ id, data: s }) => {
     areaServed: 'Ontario',
   };
 });
-const meta = await pageMeta('services');
+const meta = await pageMeta('services', Astro.currentLocale);
 ---
 
 <Base

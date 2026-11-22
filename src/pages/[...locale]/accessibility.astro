@@ -1,0 +1,18 @@
+---
+// ACCESSIBILITY: how the site meets WCAG 2.2 AA (which includes Ontario's WCAG 2.0 AA, O. Reg. 191/11), its aids and limits, and how to give
+// feedback. The words are src/content/<language>/accessibility.md.
+import TextPage from '../../components/TextPage.astro';
+import { byLocale, localePaths } from '../../lib/i18n';
+import { copy } from '../../lib/copy';
+
+export const getStaticPaths = localePaths;
+const t = await copy('text-pages', Astro.currentLocale);
+const md = byLocale(
+  import.meta.glob<{ compiledContent: () => string | Promise<string> }>('../../content/*/accessibility.md', {
+    eager: true,
+  }),
+  Astro.currentLocale,
+);
+---
+
+<TextPage page="accessibility" md={md} eyebrow={t.accessibility.eyebrow} lead={t.accessibility.lead} />

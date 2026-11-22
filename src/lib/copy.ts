@@ -1,9 +1,11 @@
-// Reads the site's words: src/data/copy/en/NAME.yaml, each its own collection (content.config.ts). In a component:
-// const t = await copy('home');  then  {t.hero.title}. The YAML is the only place a key is written: to add a string,
-// add it there and read it. What copy() gives back throws on a key the file doesn't have (t.hero.titel), so a typo
-// in a component stops the build, with the file and the key's path, instead of leaving the words out.
+// Reads the site's words: src/content/<language>/copy/NAME.yaml. In a component:
+// const t = await copy('home', Astro.currentLocale);  then  {t.hero.title}. The YAML is the only place a key is
+// written: to add a string, add it there and read it. What copy() gives back throws on a key the file doesn't have
+// (t.hero.titel), so a typo in a component stops the build, with the file and the key's path, instead of leaving the
+// words out. Another language's file is laid over the default's, so a key it hasn't translated yet shows in English.
 // fill() fills a template's {names}.
-import { getEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import { DEFAULT_LOCALE, localeOf } from './i18n';
 export { fill } from './fill.js';
 
 // Any key, any depth: the YAML declares the keys, and strict() below catches one it doesn't have. A value is typed
@@ -17,7 +19,7 @@ const strict = (value: unknown, where: string): unknown => {
   return new Proxy(value, {
     get(target, key, receiver) {
       if (typeof key === 'string' && !(key in target) && !PASS.has(key))
-        throw new Error(`copy: ${where} has no "${key}" (check the key's spelling, or add it to src/data/copy/en/)`);
+        throw new Error(`copy: ${where} has no "${key}" (check the key's spelling, or add it to src/content/en/copy/)`);
       return strict(Reflect.get(target, key, receiver), `${where}.${String(key)}`);
     },
   });
@@ -38,12 +40,28 @@ const noBuiltInKeys = (value: unknown, where: string): void => {
   }
 };
 
-const entry = getEntry as (collection: string, id: string) => Promise<{ data: unknown } | undefined>;
-export async function copy(name: string): Promise<Words> {
-  const e = await entry(`copy-${name}`, name);
-  if (!e) throw new Error(`src/data/copy/en/${name}.yaml is missing`);
-  noBuiltInKeys(e.data, `${name}.yaml`);
-  return strict(e.data, `${name}.yaml`) as Words;
+// one language's words over another's: groups merge key by key, anything else (a text, a list) is replaced whole
+const over = (base: unknown, own: unknown): unknown =>
+  base && own && typeof base === 'object' && typeof own === 'object' && !Array.isArray(base) && !Array.isArray(own)
+    ? Object.fromEntries(
+        [...new Set([...Object.keys(base), ...Object.keys(own)])].map((k) => [
+          k,
+          k in own
+            ? over((base as Record<string, unknown>)[k], (own as Record<string, unknown>)[k])
+            : (base as Record<string, unknown>)[k],
+        ]),
+      )
+    : own;
+
+export async function copy(name: string, current: string | undefined): Promise<Words> {
+  const locale = localeOf(current);
+  const files = await getCollection('copy'); // looked up in the list: a file a language doesn't have is no warning
+  const base = files.find((f) => f.id === `${DEFAULT_LOCALE}/${name}`);
+  if (!base) throw new Error(`src/content/${DEFAULT_LOCALE}/copy/${name}.yaml is missing`);
+  const own = locale === DEFAULT_LOCALE ? undefined : files.find((f) => f.id === `${locale}/${name}`);
+  const data: unknown = own ? over(base.data, own.data) : base.data;
+  noBuiltInKeys(data, `${name}.yaml`);
+  return strict(data, `${name}.yaml`) as Words;
 }
 
 // Words a page script reads in the browser go in a <script type="application/json"> (components/Words.astro): no

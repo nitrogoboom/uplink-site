@@ -1,13 +1,14 @@
-// src/data/footer.json, checked against its schema when the build first imports it: the footer's lists, the contact
+// src/content/<language>/footer.json, checked against its schema when the build first imports it: the footer's lists, the contact
 // details every page shows, and the spots on the campus map. Import from here, not from the JSON. A key the schema
 // doesn't name, an icon <Icon> doesn't have or a panel pointing at a spot that isn't there stops the build, with
 // the field's path in the message.
-//   footer        the whole file, typed
+//   footer        the whole file, typed (the default language's: the contact details are the same in every one)
+//   footerFor()   the file in a page's language, for the footer's words
 //   PLACEHOLDERS  the values for {privacy} {accessibility} {phone} {tel} {email} {street} {city} {hours} in
-//                 src/data/*.md (placeholders.mjs fills them)
+//                 the privacy and accessibility Markdown (placeholders.mjs fills them)
 // A heading is `title` plus an `accent` word, shown as "title <em>accent</em>", so the JSON holds no HTML.
 import { z } from 'astro/zod';
-import raw from '../data/footer.json';
+import en from '../content/en/footer.json';
 import { ICON_NAMES } from '../components/icons';
 
 const text = z.string().min(1);
@@ -65,12 +66,18 @@ const schema = z.strictObject({
   spots: z.strictObject(Object.fromEntries(SPOTS.map((k) => [k, spot])) as Record<(typeof SPOTS)[number], typeof spot>),
 });
 
-const parsed = schema.safeParse(raw);
-if (!parsed.success)
-  throw new Error(
-    `src/data/footer.json doesn't match its schema (src/lib/footer.ts):\n${z.prettifyError(parsed.error)}`,
-  );
-export const footer = parsed.data;
+const parse = (raw: unknown, locale: string) => {
+  const parsed = schema.safeParse(raw);
+  if (!parsed.success)
+    throw new Error(
+      `src/content/${locale}/footer.json doesn't match its schema (src/lib/footer.ts):\n${z.prettifyError(parsed.error)}`,
+    );
+  return parsed.data;
+};
+// one line a language: import its footer.json above and add it here
+const FOOTERS: Record<string, z.infer<typeof schema>> = { en: parse(en, 'en') };
+export const footer = FOOTERS.en;
+export const footerFor = (locale: string | undefined) => FOOTERS[locale ?? 'en'] ?? footer;
 export const { phone, email, inboxes, office, hours } = footer;
 
 export const PLACEHOLDERS: Record<string, string> = {

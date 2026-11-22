@@ -5,7 +5,7 @@
 import ServiceOptions from './ServiceOptions.astro';
 import Icon from './Icon.astro';
 import { copy } from '../lib/copy';
-const { book: t, form, dialog } = await copy('ui');
+const { book: t, form, dialog } = await copy('ui', Astro.currentLocale);
 ---
 
 <dialog class="dialog" id="book-dialog" aria-labelledby="book-title">

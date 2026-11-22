@@ -6,7 +6,7 @@
 import { $, $$, toast, words } from './core.js';
 
 /** @typedef {import('../lib/copy').ContactWords} ContactWords */
-const T = /** @type {ContactWords} */ (words('words-page')); // src/data/copy/en/contact.yaml, toast
+const T = /** @type {ContactWords} */ (words('words-page')); // src/content/en/copy/contact.yaml, toast
 
 /* ======================================================================
    Copy buttons (phone number, email)

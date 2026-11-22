@@ -1,5 +1,5 @@
 # Privacy (/privacy) and Accessibility (/accessibility): the words over each page's Markdown. The pages themselves
-# are src/data/privacy.md and src/data/accessibility.md; each page's <title> and description are
+# are privacy.md and accessibility.md beside this folder; each page's <title> and description are
 # here too.
 
 privacy:

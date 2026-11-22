@@ -26,7 +26,7 @@ const world = grow && $('.grow-world', grow);
 if (grow && world) {
   const layers = /** @type {SVGSVGElement[]} */ ($$('svg.gw', world));
   const ground = layers[0];
-  // the play button's names: src/data/copy/en/home.yaml, grow (index.astro carries them)
+  // the play button's names: src/content/en/copy/home.yaml, grow (index.astro carries them)
   const T = /** @type {import('../lib/copy').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
   const stage = /** @type {HTMLElement} */ ($('.grow-stage', grow));

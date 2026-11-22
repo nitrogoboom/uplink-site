@@ -1,19 +1,22 @@
 ---
-// One project in full: the whole of a project's own page (/work/<slug>). Content: src/content/projects/<slug>.json.
+// One project in full: the whole of a project's own page (/work/<slug>). Content: src/content/<language>/projects/<slug>.json.
 import Drawing from '../Drawing.astro';
-import { getEntries, type CollectionEntry } from 'astro:content';
-import { svgSize } from '../../lib/site';
+import type { CollectionEntry } from 'astro:content';
+import { getServices, svgSize } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import './project-case.css';
 import { copy } from '../../lib/copy';
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 const { project } = Astro.props;
 const { id, data: p } = project;
-const services = await getEntries(p.services); // each links to the service's own page
+const all = await getServices(Astro.currentLocale);
+const services = p.services.flatMap((slug) => all.filter((s) => s.id === slug)); // each links to the service's own page
 const size = svgSize(`${p.image}.svg`);
-const t = (await copy('work')).case;
+const t = (await copy('work', Astro.currentLocale)).case;
 ---
 
 <article class="case-src" id={`case-${id}`} aria-labelledby={`case-${id}-t`}>
@@ -42,7 +45,7 @@ const t = (await copy('work')).case;
           <dt>{t.services}</dt>
           <dd data-case-field="services">
             {services.map(({ id: sid, data: s }, i) => (
-              <>{i > 0 && ', '}<a href={`/services/${sid}`}>{s.title}</a></>
+              <>{i > 0 && ', '}<a href={to(`/services/${sid}`)}>{s.title}</a></>
             ))}
           </dd>
         </div>

@@ -1,6 +1,6 @@
 ---
 // WORK · 1. Projects (first screen): intro, the filters and one card per project from the collection, each linking to
-// the project's own page. The filters are a radio group (workFilters() in lib/site.ts), "All" checked: each label
+// the project's own page. The filters are a radio group (workFilters(Astro.currentLocale) in lib/site.ts), "All" checked: each label
 // holds its count, so a screen reader hears "Build, 2". Choosing one hides the other cards with CSS alone (the
 // :has() rules work.astro puts in the <head>), so they work without script. Styles: projects.css. Desktop layout: at
 // the end of its CSS.
@@ -8,9 +8,9 @@ import './projects.css';
 import ProjectCard from './ProjectCard.astro';
 import { WORK_FILTER, getProjects, workFilters } from '../../lib/site';
 import { copy } from '../../lib/copy';
-const projects = await getProjects();
-const filters = await workFilters();
-const t = (await copy('work')).projects;
+const projects = await getProjects(Astro.currentLocale);
+const filters = await workFilters(Astro.currentLocale);
+const t = (await copy('work', Astro.currentLocale)).projects;
 ---
 
 <section class="page-intro fold fold-always" id="projects" aria-labelledby="work-title">

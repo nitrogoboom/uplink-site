@@ -5,19 +5,27 @@ import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, pageName, tabCurrent } from '../lib/site';
 import { copy } from '../lib/copy';
+import { linker } from '../lib/i18n';
+const to = linker(Astro.currentLocale);
 interface Props {
   current: Page;
 }
 const { current } = Astro.props;
 const here = Astro.url.pathname;
-const ui = await copy('ui');
-const tabs = await Promise.all(NAV.map(async (n) => ({ ...n, name: await pageName(n.page, true) })));
+const ui = await copy('ui', Astro.currentLocale);
+const tabs = await Promise.all(
+  NAV.map(async (n) => ({ ...n, name: await pageName(n.page, Astro.currentLocale, true) })),
+);
 ---
 
 <nav class="botnav" aria-label={ui.bottomNav}>
   <ul>
     {tabs.map(({ page, icon, name }) => <li>
-      <a class="bn" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
+      <a
+        class="bn"
+        href={to(PAGES[page].path)}
+        data-page={page}
+        aria-current={tabCurrent(page, current, here, Astro.currentLocale)}
         ><Icon name={icon} /><span class="bn-t">{name}</span></a
       >
     </li>)}

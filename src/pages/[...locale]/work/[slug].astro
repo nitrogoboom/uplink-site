@@ -2,24 +2,31 @@
 // One page per project (/work/office-move …), from src/content/projects/<slug>.json: ProjectCase laid out as a
 // page (project-page.css): breadcrumb and title beside the drawing, the story and facts (its services link to
 // their pages), then the full case study (the project's `page` fields).
-import { getCollection, getEntries } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import ProjectCase from '../../components/work/ProjectCase.astro';
-import { PAGES, breadcrumbs, businessNode, businessRef, jsonLd } from '../../lib/site';
-import '../../components/work/project-page.css';
-import { copy, fill } from '../../lib/copy';
+import Base from '../../../layouts/Base.astro';
+import ProjectCase from '../../../components/work/ProjectCase.astro';
+import { PAGES, breadcrumbs, businessNode, businessRef, getProjects, getServices, jsonLd } from '../../../lib/site';
+import '../../../components/work/project-page.css';
+import { copy, fill } from '../../../lib/copy';
+import { LOCALES, linker, localeParam } from '../../../lib/i18n';
+const to = linker(Astro.currentLocale);
 
 export async function getStaticPaths() {
-  const projects = await getCollection('projects');
-  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+  const paths = LOCALES.map(async (locale) =>
+    (await getProjects(locale)).map((project) => ({
+      params: { locale: localeParam(locale), slug: project.id },
+      props: { project },
+    })),
+  );
+  return (await Promise.all(paths)).flat();
 }
 const { project } = Astro.props;
 const { id, data: p } = project;
-const ui = await copy('ui');
-const t = (await copy('work')).case.story;
-const url = new URL(`/work/${id}`, Astro.site).href;
+const ui = await copy('ui', Astro.currentLocale);
+const t = (await copy('work', Astro.currentLocale)).case.story;
+const url = new URL(to(`/work/${id}`), Astro.site).href;
 const description = `${p.client}. ${p.result}.`; // as the sitemap list says it (allPages in src/lib/site.ts)
-const services = await getEntries(p.services);
+const all = await getServices(Astro.currentLocale);
+const services = p.services.flatMap((slug) => all.filter((s) => s.id === slug)); // in the project's order
 const business = businessRef(Astro.site!);
 const ld = {
   '@context': 'https://schema.org',
@@ -34,17 +41,17 @@ const ld = {
       author: business,
       publisher: business,
       image: new URL('/assets/img/og.png', Astro.site).href,
-      about: services.map((s) => ({ '@id': new URL(`/services/${s.id}`, Astro.site).href })),
+      about: services.map((s) => ({ '@id': new URL(to(`/services/${s.id}`), Astro.site).href })),
       articleBody: [...p.page.challenge, ...p.page.steps.map((t) => `${t.title}. ${t.detail}`), ...p.page.results].join(
         '\n\n',
       ),
     },
     breadcrumbs([
       [ui.pages.home, Astro.site!.href],
-      [ui.pages.work, new URL(PAGES.work.path, Astro.site).href],
+      [ui.pages.work, new URL(to(PAGES.work.path), Astro.site).href],
       [p.name, url],
     ]),
-    await businessNode(Astro.site!),
+    await businessNode(Astro.site!, Astro.currentLocale),
   ],
 };
 ---
@@ -61,7 +68,7 @@ const ld = {
     <div class="container proj-page-grid">
       <nav class="crumbs" aria-label={ui.breadcrumb}>
         <ol>
-          <li><a href="/work">{ui.pages.work}</a></li>
+          <li><a href={to('/work')}>{ui.pages.work}</a></li>
           <li aria-current="page">{p.name}</li>
         </ol>
       </nav>

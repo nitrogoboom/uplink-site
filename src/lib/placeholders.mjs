@@ -2,7 +2,7 @@
 // src/lib/footer.ts), so a changed phone number or inbox changes everywhere at once.
 //   fill(text, values, where)   fills a string; a name with no value throws, naming the file (where)
 //   placeholders(values)        a Sätteri mdast plugin (astro.config.mjs) for the Markdown Astro renders
-//                               (src/data/privacy.md, accessibility.md). It fills text and link addresses in the
+//                               (privacy.md, accessibility.md in src/content/<language>/). It fills text and link addresses in the
 //                               syntax tree, so each value is escaped like any other text when the page is written.
 // A placeholder inside a link's address is {name} in the tree; %7Bname%7D, its encoded spelling, is filled too.
 // TextPage.astro then refuses a page with either spelling left (one in raw HTML, which the plugin doesn't read).

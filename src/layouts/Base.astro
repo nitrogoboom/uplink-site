@@ -16,6 +16,7 @@ import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
 import { sha256 } from '../lib/csp';
 import themeInit from '../scripts/theme-init.js?raw';
+import { LOCALES, langTag, linker } from '../lib/i18n';
 
 export type Page =
   'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -46,7 +47,12 @@ const {
   ldGraph = [],
   footer = true,
 } = Astro.props;
-const canonical = path === undefined ? null : new URL(path, Astro.site).href;
+const lang = langTag(Astro.currentLocale);
+const at = (p: string, locale = Astro.currentLocale) => new URL(linker(locale)(p), Astro.site).href;
+const canonical = path === undefined ? null : at(path);
+// the same page in each language, for search engines (only once there is more than one)
+const alternates =
+  path === undefined || LOCALES.length < 2 ? [] : LOCALES.map((l) => ({ lang: langTag(l), href: at(path, l) }));
 const ogImage = new URL('/assets/img/og.png', Astro.site).href;
 const business = businessRef(Astro.site!);
 const name = title.split(' · ')[0];
@@ -60,25 +66,25 @@ const jsonld = type &&
         url: canonical,
         name,
         description,
-        inLanguage: 'en-CA',
+        inLanguage: lang,
         publisher: business,
         ...(type === 'AboutPage' ? { about: business } : {}),
         ...ldPage,
       },
       breadcrumbs([
-        [(await copy('ui')).pages.home, Astro.site!.href],
+        [(await copy('ui', Astro.currentLocale)).pages.home, at('/')],
         [name, canonical],
       ]),
-      await businessNode(Astro.site!),
+      await businessNode(Astro.site!, Astro.currentLocale),
       ...ldGraph,
     ],
   };
-const ui = await copy('ui');
+const ui = await copy('ui', Astro.currentLocale);
 Astro.csp?.insertScriptHash(sha256(themeInit));
 ---
 
 <!doctype html>
-<html lang="en-CA">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -86,6 +92,9 @@ Astro.csp?.insertScriptHash(sha256(themeInit));
     <meta name="description" content={description} />
     {robots && <meta name="robots" content={robots} />}
     {canonical && <link rel="canonical" href={canonical} />}
+    {alternates.map((a) => (
+      <link rel="alternate" hreflang={a.lang} href={a.href} />
+    ))}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -95,7 +104,7 @@ Astro.csp?.insertScriptHash(sha256(themeInit));
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:url" content={canonical} />
-      <meta property="og:locale" content="en_CA" />
+      <meta property="og:locale" content={lang.replace('-', '_')} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />

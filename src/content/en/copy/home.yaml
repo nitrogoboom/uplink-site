@@ -1,5 +1,5 @@
 # Home (/): every section's own words, in page order. The services, projects and Grow's six steps are data
-# (src/content/, src/data/grow.json). The Grow button's names are read by grow.js in the browser.
+# (src/content/, grow.json (src/content/<language>/)). The Grow button's names are read by grow.js in the browser.
 
 title: Uplink Technology · Managed IT for Ontario businesses # <title>
 description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'
@@ -107,7 +107,7 @@ work:
   title: Setups we built and still run
   seeAll: See all work
 
-reviews: # sample reviews (src/data/reviews.json) until the real ones come from Google
+reviews: # sample reviews (reviews.json (src/content/<language>/)) until the real ones come from Google
   eyebrow: What clients say
   title: Offices that stopped
   accent: worrying # second line, emphasized

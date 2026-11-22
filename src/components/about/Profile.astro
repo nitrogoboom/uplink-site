@@ -5,8 +5,8 @@
 import Drawing from '../Drawing.astro';
 import './profile.css';
 import { copy } from '../../lib/copy';
-const t = (await copy('about')).profile;
-const { site } = await copy('ui');
+const t = (await copy('about', Astro.currentLocale)).profile;
+const { site } = await copy('ui', Astro.currentLocale);
 ---
 
 <section class="page-intro fold fold-always" id="profile" aria-labelledby="about-title">

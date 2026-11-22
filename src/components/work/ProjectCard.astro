@@ -12,6 +12,8 @@ import type { CollectionEntry } from 'astro:content';
 import Sep from '../Sep.astro';
 import { cardSize } from '../../lib/site';
 import { fit } from '../../lib/fit';
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
 interface Props {
   project: CollectionEntry<'projects'>;
   level?: 2 | 3;
@@ -35,7 +37,7 @@ const H = level === 2 ? 'h2' : 'h3';
       loading="lazy"
   /></span>
   <div class="card-body">
-    <H class:list={['card-title', fit(p.name)]}><a class="card-link" href={`/work/${id}`}>{p.name}</a></H
+    <H class:list={['card-title', fit(p.name)]}><a class="card-link" href={to(`/work/${id}`)}>{p.name}</a></H
     ><span class="card-meta muted small"
       >{p.clientShort
         .split(' · ')

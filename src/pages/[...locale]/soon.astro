@@ -1,10 +1,14 @@
 ---
 // COMING SOON: one page for every link that has no page yet. soon.js reads the #address and fills in which
 // page it is. No canonical or Open Graph (no `path`); kept out of search results. Styles: shared (.page-intro).
-import Base from '../layouts/Base.astro';
-import Words from '../components/Words.astro';
-import { copy } from '../lib/copy';
-const t = await copy('soon');
+import Base from '../../layouts/Base.astro';
+import Words from '../../components/Words.astro';
+import { copy } from '../../lib/copy';
+import { linker, localePaths } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+
+export const getStaticPaths = localePaths;
+const t = await copy('soon', Astro.currentLocale);
 ---
 
 <Base title={t.title} description={t.description} page="soon" robots="noindex, follow">
@@ -14,15 +18,15 @@ const t = await copy('soon');
       <h1 id="soon-title"><span data-soon-name>{t.heading.page}</span> {t.heading.rest}</h1>
       <p class="lead">{t.lead}</p>
       <div class="row">
-        <a class="btn btn--primary" href="/">{t.home}</a>
-        <a class="btn btn--secondary" href="/contact">{t.contact}</a>
+        <a class="btn btn--primary" href={to('/')}>{t.home}</a>
+        <a class="btn btn--secondary" href={to('/contact')}>{t.contact}</a>
       </div>
     </div>
   </section>
   <Fragment slot="scripts">
     <Words id="words-page" words={{ pageTitle: t.pageTitle, names: t.names }} />
     <script>
-      import '../scripts/soon.js';
+      import '../../scripts/soon.js';
     </script>
   </Fragment>
 </Base>

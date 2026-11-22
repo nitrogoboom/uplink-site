@@ -1,0 +1,11 @@
+---
+// PAGE NOT FOUND in a language other than the default (/fr/404.html, which Cloudflare serves for a missing address
+// under /fr/). The page is src/components/NotFound.astro. With one language this builds nothing.
+import NotFound from '../../components/NotFound.astro';
+import { DEFAULT_LOCALE, LOCALES } from '../../lib/i18n';
+
+export const getStaticPaths = () =>
+  LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((locale) => ({ params: { locale } }));
+---
+
+<NotFound />

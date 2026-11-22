@@ -2,7 +2,7 @@
 // The service <option>s for a "What do you need?" list, from the collection. The contact form and the booking
 // pop-up each wrap these in their own first and last options.
 import { getServices } from '../lib/site';
-const services = await getServices();
+const services = await getServices(Astro.currentLocale);
 ---
 
 {services.map(({ data: s }) =>

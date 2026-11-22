@@ -7,9 +7,11 @@ import './overview.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import { copy } from '../../lib/copy';
-const services = await getServices();
-const t = (await copy('services')).overview;
-const ui = await copy('ui');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const services = await getServices(Astro.currentLocale);
+const t = (await copy('services', Astro.currentLocale)).overview;
+const ui = await copy('ui', Astro.currentLocale);
 ---
 
 <section class="page-intro" id="overview" aria-labelledby="svc-page-title">
@@ -19,7 +21,7 @@ const ui = await copy('ui');
       <h1 id="svc-page-title">{t.title}</h1>
       <p class="lead">{t.lead}</p>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
+        <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog">{ui.cta.book}</a>
       </div>
     </div>
     <ul class="svc-grid" aria-label={t.list}>
@@ -33,7 +35,7 @@ const ui = await copy('ui');
           >
           <div class="card-body">
             <h2 class:list={['card-title', fit(s.title)]}>
-              <a class="card-link" href={`/services/${id}`}>{s.title}</a>
+              <a class="card-link" href={to(`/services/${id}`)}>{s.title}</a>
             </h2>
             <span class="muted small">{s.card}</span>
           </div>

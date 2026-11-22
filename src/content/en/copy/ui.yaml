@@ -1,6 +1,6 @@
 # Shared UI and screen-reader text, on every page: the head, header, phone tab bar, footer chrome, both pop-ups, the
 # pause buttons, form fields both forms share, and the toasts core.js and footer.js show.
-# The footer's lists and contact details are src/data/footer.json.
+# The footer's lists and contact details are footer.json (src/content/<language>/).
 
 # The static pages' names: the menus, the breadcrumb trails, the privacy and accessibility headings, the sitemap.
 # Their addresses are PAGES in src/lib/site.ts, with the same keys.

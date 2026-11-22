@@ -1,14 +1,15 @@
 ---
-// SERVICES · 3. Questions: the FAQ from src/data/faq.json, then the call-to-action band.
+// SERVICES · 3. Questions: the FAQ from faq.json (src/content/<language>/), then the call-to-action band.
 // Styles: shared (.faq, .cta-band in src/styles/shared-blocks.css).
-import { getCollection } from 'astro:content';
-import { byOrder } from '../../content.config';
 import Icon from '../Icon.astro';
 import { phone } from '../../lib/footer';
+import { getFaq } from '../../lib/site';
 import { copy } from '../../lib/copy';
-const faq = (await getCollection('faq')).sort(byOrder);
-const t = (await copy('services')).faq;
-const ui = await copy('ui');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const faq = await getFaq(Astro.currentLocale);
+const t = (await copy('services', Astro.currentLocale)).faq;
+const ui = await copy('ui', Astro.currentLocale);
 ---
 
 <section class="section fold" id="faq" aria-labelledby="faq-title">
@@ -18,7 +19,7 @@ const ui = await copy('ui');
       <h2 id="faq-title">{t.title}</h2>
     </div>
     <div class="faq">
-      {faq.map(({ data: f }) => <details>
+      {faq.map((f) => <details>
         <summary>{f.q}<Icon name="plus" /></summary>
         <div><p>{f.a}</p></div>
       </details>)}
@@ -29,7 +30,7 @@ const ui = await copy('ui');
         <p class="lead">{t.cta.lead}</p>
       </div>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
+        <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog">{ui.cta.book}</a>
         <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
       </div>
     </div>

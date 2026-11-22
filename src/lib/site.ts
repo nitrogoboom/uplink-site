@@ -3,9 +3,9 @@
 import type { IconName } from '../components/Icon.astro';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { getCollection } from 'astro:content';
-import { byOrder } from '../content.config';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import { copy } from './copy';
+import { DEFAULT_LOCALE, linker, localeOf } from './i18n';
 
 // Drawings keep their names when they change, so every address a page writes carries a hash of the file (?v=): a
 // changed drawing is a new address, and the browser may keep each one for a year (public/_headers, /assets/img/*).
@@ -26,8 +26,10 @@ export const fresh = (path: string) => {
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
 export const CAMPUS = fresh('/assets/img/campus.svg');
 
-// The static pages (five in the menu, plus privacy and accessibility): their addresses. Their names are words, in
-// ui.yaml's pages (pageName() below), and each page's <title> and description in its copy file (pageMeta() below).
+// The static pages (five in the menu, plus privacy and accessibility): their addresses, as in the default language
+// (linker() in i18n.ts gives another language's). Their names are words, in ui.yaml's pages (pageName() below), and
+// each page's <title> and description in its copy file (pageMeta() below).
+// Every helper below that reads words or content takes the page's language: Astro.currentLocale.
 export const PAGES = {
   home: { path: '/' },
   services: { path: '/services' },
@@ -39,15 +41,18 @@ export const PAGES = {
 } as const;
 
 // A static page's name (ui.yaml, pages); short: the phone tab bar's word where there is one (ui.yaml, tabs)
-export const pageName = async (page: keyof typeof PAGES, short = false) => {
-  const t = await copy('ui');
+export const pageName = async (page: keyof typeof PAGES, locale: string | undefined, short = false) => {
+  const t = await copy('ui', locale);
   return String(short && page in t.tabs ? t.tabs[page] : t.pages[page]);
 };
 
-// A static page's <title> and description, from src/data/copy/en/: NAME.yaml's top for the five in the menu,
+// A static page's <title> and description, from the copy files: NAME.yaml's top for the five in the menu,
 // text-pages.yaml for privacy and accessibility. The page and the sitemap read them here.
-export const pageMeta = async (page: keyof typeof PAGES) => {
-  const t = page === 'privacy' || page === 'accessibility' ? (await copy('text-pages'))[page] : await copy(page);
+export const pageMeta = async (page: keyof typeof PAGES, locale: string | undefined) => {
+  const t =
+    page === 'privacy' || page === 'accessibility'
+      ? (await copy('text-pages', locale))[page]
+      : await copy(page, locale);
   return { title: t.title, description: t.description };
 };
 
@@ -62,10 +67,10 @@ export const NAV: readonly Tab[] = [
 ];
 
 // A service page or case study keeps its section's tab lit, but only the section page itself is "the current page".
-export const tabCurrent = (tab: keyof typeof PAGES, current: string, pathname: string) => {
+export const tabCurrent = (tab: keyof typeof PAGES, current: string, pathname: string, locale: string | undefined) => {
   if (tab !== current) return undefined;
   const bare = (p: string) => p.replace(/(\/index)?(\.html)?\/?$/, ''); // the build sees /index.html, /services.html
-  return bare(pathname) === bare(PAGES[tab].path) ? 'page' : 'true';
+  return bare(pathname) === bare(linker(locale)(PAGES[tab].path)) ? 'page' : 'true';
 };
 
 // A drawing's size from its own <svg> tag (written by the generators), so an <img> never guesses it from the
@@ -84,10 +89,10 @@ export const jsonLd = (data: unknown) => JSON.stringify(data, null, 1).replace(/
 export const businessRef = (site: URL) => ({ '@id': `${site.href}#business` });
 // The business in short, for every page's graph (Home's block, index.astro, adds the rest): a reader of one page
 // alone can still name the provider and publisher the page points at by @id. Its name is ui.yaml's site.name.
-export const businessNode = async (site: URL) => ({
+export const businessNode = async (site: URL, locale: string | undefined) => ({
   '@type': 'ProfessionalService',
   ...businessRef(site),
-  name: (await copy('ui')).site.name,
+  name: (await copy('ui', locale)).site.name,
   url: site.href,
 });
 // A BreadcrumbList from [name, address] pairs, Home first.
@@ -96,11 +101,42 @@ export const breadcrumbs = (trail: [string, string][]) => ({
   itemListElement: trail.map(([name, item], i) => ({ '@type': 'ListItem', position: i + 1, name, item })),
 });
 
+// A collection's entries in a page's language, by slug (the id "en/help-desk" becomes "help-desk"): the default
+// language's, with the page's own laid over them, so one not translated yet still shows.
+const inLocale = <E extends { id: string }>(all: E[], locale: string | undefined) => {
+  const bySlug = new Map<string, E>();
+  for (const l of new Set([DEFAULT_LOCALE, localeOf(locale)]))
+    for (const e of all) {
+      const [lang, slug] = e.id.split('/');
+      if (lang === l) bySlug.set(slug, { ...e, id: slug });
+    }
+  return [...bySlug.values()];
+};
 // The services and the projects in their own order (each entry's `order`), as every list shows them.
-export const getServices = async () => (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
-export const getProjects = async () => (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-export const getGrow = async () => (await getCollection('grow')).sort(byOrder).map((e) => e.data); // in file order
-export const getReviews = async () => (await getCollection('reviews')).sort(byOrder).map((e) => e.data); // in file order
+export const getServices = async (locale: string | undefined) =>
+  inLocale(await getCollection('services'), locale).sort((a, b) => a.data.order - b.data.order);
+export const getProjects = async (locale: string | undefined) => {
+  const slugs = new Set((await getServices(locale)).map((s) => s.id));
+  const projects = inLocale(await getCollection('projects'), locale).sort((a, b) => a.data.order - b.data.order);
+  for (const p of projects)
+    for (const s of p.data.services)
+      if (!slugs.has(s)) throw new Error(`projects/${p.id}.json: no service "${s}" (its services list)`);
+  return projects;
+};
+// The smaller lists, in file order: the page's language, or the default's
+const listOf = async <C extends 'faq' | 'team' | 'grow' | 'reviews'>(
+  name: C,
+  locale: string | undefined,
+): Promise<CollectionEntry<C>['data']['items']> => {
+  const files = (await getCollection(name)) as CollectionEntry<C>[];
+  const entry = files.find((f) => f.id === localeOf(locale)) ?? files.find((f) => f.id === DEFAULT_LOCALE);
+  if (!entry) throw new Error(`src/content/${DEFAULT_LOCALE}/${name}.json is missing`);
+  return entry.data.items;
+};
+export const getFaq = (locale: string | undefined) => listOf('faq', locale);
+export const getTeam = (locale: string | undefined) => listOf('team', locale);
+export const getGrow = (locale: string | undefined) => listOf('grow', locale);
+export const getReviews = (locale: string | undefined) => listOf('reviews', locale);
 
 // The /work filters (components/work/Projects.astro): "All" (label null: its word is the copy's, work.yaml), then one radio per project tag, in the order the projects
 // first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
@@ -108,16 +144,16 @@ export const getReviews = async () => (await getCollection('reviews')).sort(byOr
 // adds its hash to the page's CSP (src/lib/csp.ts). A browser without :has() ignores the rules and
 // shows every project (projects.css then hides the filters).
 export const WORK_FILTER = 'work-filter'; // the radios' name
-export const workFilters = async () => {
-  const projects = await getProjects();
+export const workFilters = async (locale: string | undefined) => {
+  const projects = await getProjects(locale);
   const tags = [...new Set(projects.map((p) => p.data.tag))];
   return [
     { key: 'all', label: null, count: projects.length },
     ...tags.map((t) => ({ key: t.toLowerCase(), label: t, count: projects.filter((p) => p.data.tag === t).length })),
   ];
 };
-export const workFilterCss = async () =>
-  (await workFilters())
+export const workFilterCss = async (locale: string | undefined) =>
+  (await workFilters(locale))
     .filter((f) => f.key !== 'all')
     .map(
       ({ key }) =>
@@ -127,25 +163,26 @@ export const workFilterCss = async () =>
 
 export type SitePage = { path: string; name: string; description: string };
 
-// Every indexable page: the seven in PAGES plus one per service and project.
-export async function allPages(): Promise<SitePage[]> {
-  const services = await getServices();
-  const projects = await getProjects();
+// Every indexable page in one language: the seven in PAGES plus one per service and project.
+export async function allPages(locale: string | undefined): Promise<SitePage[]> {
+  const services = await getServices(locale);
+  const projects = await getProjects(locale);
+  const to = linker(locale);
   return [
     ...(await Promise.all(
       (Object.keys(PAGES) as (keyof typeof PAGES)[]).map(async (k) => ({
-        ...PAGES[k],
-        name: await pageName(k),
-        description: (await pageMeta(k)).description,
+        path: to(PAGES[k].path),
+        name: await pageName(k, locale),
+        description: (await pageMeta(k, locale)).description,
       })),
     )),
     ...services.map(({ id, data: s }) => ({
-      path: `/services/${id}`,
+      path: to(`/services/${id}`),
       name: s.title,
       description: s.card,
     })),
     ...projects.map(({ id, data: p }) => ({
-      path: `/work/${id}`,
+      path: to(`/work/${id}`),
       name: p.name,
       description: `${p.client}. ${p.result}.`,
     })),

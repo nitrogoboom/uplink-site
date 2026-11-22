@@ -1,15 +1,29 @@
-// The site's content, typed. Services and projects are one JSON file each (the file name is the slug and the
-// page address: src/content/services/help-desk.json → /services/help-desk). Smaller lists are one file each
-// in src/data/. Every page, card, footer link and JSON-LD block reads from here, so a service or project is
-// added in one place.
+// The site's content, typed. Everything a visitor reads is in src/content/<language>/ (en today; a fr/ folder beside
+// it is French): services and projects one JSON file each (the file name is the slug and the page address:
+// en/services/help-desk.json → /services/help-desk), the smaller lists one file each, and the pages' own words in
+// copy/*.yaml. Every page, card, footer link and JSON-LD block reads from here, so a service or project is added in
+// one place. Read them through src/lib/site.ts and src/lib/copy.ts, which take the page's language.
 // Every object is strict: a key the schema doesn't name (a typo, a field left from a rename) stops the build
 // instead of being dropped. Icon names come from src/components/icons.ts; a drawing name must have its files in
 // public/assets/img/.
-import { defineCollection, reference } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
-import { glob, file } from 'astro/loaders';
-import { existsSync, readdirSync } from 'node:fs';
+import { glob } from 'astro/loaders';
+import { existsSync } from 'node:fs';
 import { ICON_NAMES } from './components/icons';
+
+const BASE = './src/content';
+// one file an entry, in a folder per language: en/services/help-desk.json is "en/help-desk"
+const entries = (folder: string, ext = 'json') =>
+  glob({
+    pattern: `*/${folder}/*.${ext}`,
+    base: BASE,
+    generateId: ({ entry }) => entry.replace(`/${folder}/`, '/').replace(/\.\w+$/, ''),
+  });
+// one file a language, holding a list in its own order: en/faq.json is "en"
+const list = (name: string) =>
+  glob({ pattern: `*/${name}.json`, base: BASE, generateId: ({ entry }) => entry.split('/')[0] });
+const items = <T extends z.ZodRawShape>(shape: T) => z.strictObject({ items: z.array(z.strictObject(shape)).min(1) });
 
 // A drawing's name, with the cuts the pages show (NAME.svg, NAME-compact.svg …) checked in public/assets/img/.
 const drawing = (...cuts: string[]) =>
@@ -21,7 +35,7 @@ const drawing = (...cuts: string[]) =>
 export const icon = z.enum(ICON_NAMES);
 
 const services = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/services' }),
+  loader: entries('services'),
   schema: z.strictObject({
     order: z.number(),
     title: z.string(), // "Managed help desk"
@@ -47,14 +61,14 @@ const services = defineCollection({
 });
 
 const projects = defineCollection({
-  loader: glob({ pattern: '*.json', base: './src/content/projects' }),
+  loader: entries('projects'),
   schema: z.strictObject({
     order: z.number(),
     name: z.string(),
     tag: z.enum(['Build', 'Protect', 'Plan']), // the filter on the Work page is its lower-case form
     client: z.string(), // "Law office, 18 staff"
     clientShort: z.string(), // "Law office · 18 staff" (card)
-    services: z.array(reference('services')).min(1), // service slugs: ["network", "help-desk"]; the case study links them, the service page lists the project
+    services: z.array(z.string()).min(1), // service slugs: ["network", "help-desk"] (getProjects() checks each exists); the case study links them, the service page lists the project
     result: z.string(),
     image: drawing('', '-card'), // NAME.svg (the case study), NAME-card.svg (the card)
     alt: z.string(),
@@ -69,28 +83,21 @@ const projects = defineCollection({
   }),
 });
 
-// A plain JSON list: the entry's id is its place in the file ("1", "2" …), so the page keeps the file's order
-// (the store sorts by id otherwise). Read with byOrder() below.
-const numbered = (t: string) => JSON.parse(t).map((e: object, i: number) => ({ id: String(i + 1), ...e }));
-export const byOrder = <T extends { id: string }>(a: T, b: T) => Number(a.id) - Number(b.id);
-// a list entry's schema: its own fields, plus the id numbered() gave it (the loader keeps it in the entry's data)
-const item = <T extends z.ZodRawShape>(shape: T) => z.strictObject({ id: z.string(), ...shape });
-
 const faq = defineCollection({
-  loader: file('./src/data/faq.json', { parser: numbered }),
-  schema: item({ q: z.string(), a: z.string() }),
+  loader: list('faq'),
+  schema: items({ q: z.string(), a: z.string() }),
 });
 
 const team = defineCollection({
-  loader: file('./src/data/team.json', { parser: numbered }),
-  schema: item({ initials: z.string(), name: z.string(), role: z.string() }),
+  loader: list('team'),
+  schema: items({ initials: z.string(), name: z.string(), role: z.string() }),
 });
 
 // Home "We grow with you": one entry a step, in the order they play. `at` names the drawing's anchor a tag sits on
 // (a .tg-a circle in grow-world.svg, tools/gen_grow.py).
 const grow = defineCollection({
-  loader: file('./src/data/grow.json', { parser: numbered }),
-  schema: item({
+  loader: list('grow'),
+  schema: items({
     place: z.string(), // "Your office" (top left of the picture, and the dot's label)
     title: z.string(), // the card's heading
     watch: z.string(), // "Watch for"
@@ -102,8 +109,8 @@ const grow = defineCollection({
 // Home "What clients say": sample reviews until the real ones come from Google (notes.md). One entry may be `featured`
 // (the big card); the rest are the small cards, in file order.
 const reviews = defineCollection({
-  loader: file('./src/data/reviews.json', { parser: numbered }),
-  schema: item({
+  loader: list('reviews'),
+  schema: items({
     featured: z.boolean().optional(),
     quote: z.string(),
     name: z.string(),
@@ -115,24 +122,8 @@ const reviews = defineCollection({
   }),
 });
 
-// The site's words: one YAML file a page or area in src/data/copy/en/, each its own collection, with no schema: the
-// YAML is the only place a key is written. Read them with copy() from src/lib/copy.ts (a key the YAML lacks throws).
-const COPY_DIR = './src/data/copy/en';
-const copy = Object.fromEntries(
-  readdirSync(COPY_DIR)
-    .filter((f) => f.endsWith('.yaml'))
-    .map((f) => {
-      const name = f.replace(/\.yaml$/, '');
-      return [`copy-${name}`, defineCollection({ loader: glob({ pattern: f, base: COPY_DIR }) })];
-    }),
-);
+// The pages' own words: one YAML file a page or area (en/copy/home.yaml is "en/home"), with no schema: the YAML is
+// the only place a key is written. Read them with copy() from src/lib/copy.ts (a key the YAML lacks throws).
+const copy = defineCollection({ loader: entries('copy', 'yaml') });
 
-export const collections = {
-  services,
-  projects,
-  faq,
-  team,
-  grow,
-  reviews,
-  ...copy,
-};
+export const collections = { services, projects, faq, team, grow, reviews, copy };

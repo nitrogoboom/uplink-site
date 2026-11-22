@@ -6,7 +6,9 @@ import { phone } from '../../lib/footer';
 import Icon from '../Icon.astro';
 import { fit } from '../../lib/fit';
 import { copy, fill } from '../../lib/copy';
-const t = (await copy('contact')).support;
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const t = (await copy('contact', Astro.currentLocale)).support;
 const cards = [
   {
     icon: 'headset',
@@ -14,8 +16,8 @@ const cards = [
     href: phone.href,
     text: fill(t.cards.call.text, { phone: phone.display }),
   },
-  { icon: 'ticket', href: '/soon#client-portal', title: t.cards.ticket.title, text: t.cards.ticket.text },
-  { icon: 'screen', href: '/soon#remote-support', title: t.cards.remote.title, text: t.cards.remote.text },
+  { icon: 'ticket', href: to('/soon#client-portal'), title: t.cards.ticket.title, text: t.cards.ticket.text },
+  { icon: 'screen', href: to('/soon#remote-support'), title: t.cards.remote.title, text: t.cards.remote.text },
 ] as const;
 ---
 

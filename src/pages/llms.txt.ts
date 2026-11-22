@@ -10,17 +10,17 @@ import { copy } from '../lib/copy';
 import { email, hours, office, phone } from '../lib/footer';
 
 export const GET: APIRoute = async ({ site }) => {
-  const ui = await copy('ui');
+  const ui = await copy('ui', undefined);
   const at = (path: string) => new URL(path, site).href;
   const line = (name: string, path: string, about: string) => `- [${name}](${at(path)}): ${about}`;
   const page = async (key: keyof typeof PAGES) =>
-    line(await pageName(key), PAGES[key].path, (await pageMeta(key)).description);
+    line(await pageName(key, undefined), PAGES[key].path, (await pageMeta(key, undefined)).description);
   const pages = (keys: readonly (keyof typeof PAGES)[]) => Promise.all(keys.map(page));
 
   const body = [
     `# ${ui.site.name}`,
     '',
-    `> ${(await copy('home')).business}`,
+    `> ${(await copy('home', undefined)).business}`,
     '',
     `${phone.display} · ${email} · ${office.street}, ${office.city} · ${hours.line}, ${hours.days}`,
     '',
@@ -28,13 +28,15 @@ export const GET: APIRoute = async ({ site }) => {
     '',
     ...(await pages(NAV.map((tab) => tab.page))),
     '',
-    `## ${await pageName('services')}`,
+    `## ${await pageName('services', undefined)}`,
     '',
-    ...(await getServices()).map(({ id, data: s }) => line(s.title, `/services/${id}`, s.card)),
+    ...(await getServices(undefined)).map(({ id, data: s }) => line(s.title, `/services/${id}`, s.card)),
     '',
-    `## ${await pageName('work')}`,
+    `## ${await pageName('work', undefined)}`,
     '',
-    ...(await getProjects()).map(({ id, data: p }) => line(p.name, `/work/${id}`, `${p.client}. ${p.result}.`)),
+    ...(await getProjects(undefined)).map(({ id, data: p }) =>
+      line(p.name, `/work/${id}`, `${p.client}. ${p.result}.`),
+    ),
     '',
     '## Optional',
     '',

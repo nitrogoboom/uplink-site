@@ -1,13 +1,14 @@
 ---
-// ABOUT · 3. Team: one card per person from src/data/team.json, then the call-to-action band. Styles: team.css.
+// ABOUT · 3. Team: one card per person from team.json (src/content/<language>/), then the call-to-action band. Styles: team.css.
 // The hidden ", " between name and role: a screen reader says "Maya Roy, Founder and CEO".
-import { getCollection } from 'astro:content';
-import { byOrder } from '../../content.config';
+import { getTeam } from '../../lib/site';
 import './team.css';
 import { copy } from '../../lib/copy';
-const team = (await getCollection('team')).sort(byOrder);
-const t = (await copy('about')).team;
-const ui = await copy('ui');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const team = await getTeam(Astro.currentLocale);
+const t = (await copy('about', Astro.currentLocale)).team;
+const ui = await copy('ui', Astro.currentLocale);
 ---
 
 <section class="section fold" id="team" aria-labelledby="team-title">
@@ -17,7 +18,7 @@ const ui = await copy('ui');
       <h2 id="team-title">{t.title}</h2>
     </div>
     <ul class="team">
-      {team.map(({ data: t }) => <li class="person panel">
+      {team.map((t) => <li class="person panel">
         <span class="avatar" aria-hidden="true">{t.initials}</span
         ><span class="stack-2"
           ><span class="person-name">{t.name}</span><span class="sr-only">, </span
@@ -31,8 +32,8 @@ const ui = await copy('ui');
         <p class="lead">{t.cta.lead}</p>
       </div>
       <div class="row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
-        <a class="btn btn--secondary btn--lg" href="/soon#careers">{t.cta.careers}</a>
+        <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog">{ui.cta.book}</a>
+        <a class="btn btn--secondary btn--lg" href={to('/soon#careers')}>{t.cta.careers}</a>
       </div>
     </div>
   </div>

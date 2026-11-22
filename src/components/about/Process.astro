@@ -2,7 +2,7 @@
 // ABOUT · 2. How we work: four numbered steps.
 // Styles: shared (.steps in src/styles/shared-blocks.css).
 import { copy } from '../../lib/copy';
-const t = (await copy('about')).process;
+const t = (await copy('about', Astro.currentLocale)).process;
 ---
 
 <section class="section section--band" id="process" aria-labelledby="process-title">

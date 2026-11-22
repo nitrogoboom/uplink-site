@@ -1,0 +1,25 @@
+---
+// CONTACT. Sections in page order; each is one component in src/components/contact/.
+import Base from '../../layouts/Base.astro';
+import { pageMeta } from '../../lib/site';
+import Message from '../../components/contact/Message.astro';
+import Support from '../../components/contact/Support.astro';
+import Words from '../../components/Words.astro';
+import { copy } from '../../lib/copy';
+import { localePaths } from '../../lib/i18n';
+
+export const getStaticPaths = localePaths;
+const { toast } = await copy('contact', Astro.currentLocale);
+const meta = await pageMeta('contact', Astro.currentLocale);
+---
+
+<Base title={meta.title} description={meta.description} page="contact" path="/contact" type="ContactPage">
+  <Message />
+  <Support />
+  <Fragment slot="scripts">
+    <Words id="words-page" words={toast} />
+    <script>
+      import '../../scripts/contact.js';
+    </script>
+  </Fragment>
+</Base>

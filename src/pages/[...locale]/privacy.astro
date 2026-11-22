@@ -1,0 +1,16 @@
+---
+// PRIVACY: what this website collects and how it's moved and used (PIPEDA, CASL for the newsletter). The words are
+// src/content/<language>/privacy.md.
+import TextPage from '../../components/TextPage.astro';
+import { byLocale, localePaths } from '../../lib/i18n';
+import { copy } from '../../lib/copy';
+
+export const getStaticPaths = localePaths;
+const t = await copy('text-pages', Astro.currentLocale);
+const md = byLocale(
+  import.meta.glob<{ compiledContent: () => string | Promise<string> }>('../../content/*/privacy.md', { eager: true }),
+  Astro.currentLocale,
+);
+---
+
+<TextPage page="privacy" md={md} eyebrow={t.privacy.eyebrow} lead={t.privacy.lead} />

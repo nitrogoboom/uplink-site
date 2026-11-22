@@ -6,16 +6,22 @@
 import Icon, { type IconName } from './Icon.astro';
 import Sep from './Sep.astro';
 import HoldButton from './HoldButton.astro';
-import { footer as f } from '../lib/footer';
+import { footerFor } from '../lib/footer';
 import '../styles/campus-drawing.css'; // the map's own rules, written by tools/gen_campus.py
 import { CAMPUS, getServices } from '../lib/site';
 import { fit } from '../lib/fit';
 import { copy, fill } from '../lib/copy';
-const services = await getServices();
-const { site, footer: t, form } = await copy('ui');
+import { linker } from '../lib/i18n';
+const to = linker(Astro.currentLocale);
+const f = footerFor(Astro.currentLocale);
+const services = await getServices(Astro.currentLocale);
+const { site, footer: t, form } = await copy('ui', Astro.currentLocale);
 type Spot = keyof typeof f.spots;
 const spot = (k: Spot) => f.spots[k];
-const serviceLinks = services.map(({ id, data: s }) => ({ label: s.footerLabel ?? s.title, href: `/services/${id}` }));
+const serviceLinks = services.map(({ id, data: s }) => ({
+  label: s.footerLabel ?? s.title,
+  href: to(`/services/${id}`),
+}));
 const panels = f.panels.map((p) => ({ ...p, links: p.id === 'services' ? serviceLinks : (p.links ?? []) }));
 // the five sections in reading order: Contact, then the link panels. footer.css places the tiles by this order.
 const sections: {
@@ -77,7 +83,7 @@ const sections: {
                 <span class="label">{t.follow}</span>
                 <ul class="fc-socials">
                   {f.follow.socials.map((x) => <li>
-                    <a class="fc-soc" href={x.href} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a>
+                    <a class="fc-soc" href={to(x.href)} aria-label={x.name} title={x.name}><Icon name={x.icon} /></a>
                   </li>)}
                 </ul>
               </div>
@@ -111,10 +117,10 @@ const sections: {
             <div class="fc-body">
               <ul class="fc-rows fc-rows--two">
                 {s.panel.links.map((l) => <li>
-                  <a class="fc-link" href={l.href}>{l.label}<Icon name="arrow" /></a>
+                  <a class="fc-link" href={to(l.href)}>{l.label}<Icon name="arrow" /></a>
                 </li>)}
               </ul>
-              <a class="link-arrow" href={s.panel.more.href}>{s.panel.more.label}<Icon name="arrow" /></a>
+              <a class="link-arrow" href={to(s.panel.more.href)}>{s.panel.more.label}<Icon name="arrow" /></a>
             </div>
           </Fragment>}
         </div>
@@ -135,7 +141,7 @@ const sections: {
           ><span>{f.copyright}</span></span
         >
         <ul class="fc-legal" aria-label={t.legal}>
-          {f.legal.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+          {f.legal.map((l) => <li><a href={to(l.href)}>{l.label}</a></li>)}
         </ul>
         <span class="fc-base-end">
           <span class="status"

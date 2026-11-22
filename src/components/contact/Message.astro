@@ -10,8 +10,10 @@ import Pause from '../Pause.astro';
 import { phone, email } from '../../lib/footer';
 import { fit } from '../../lib/fit';
 import { copy } from '../../lib/copy';
-const t = (await copy('contact')).message;
-const { form, cta } = await copy('ui');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const t = (await copy('contact', Astro.currentLocale)).message;
+const { form, cta } = await copy('ui', Astro.currentLocale);
 const TITLE = t.title;
 ---
 
@@ -59,7 +61,7 @@ const TITLE = t.title;
             <Icon name="copy" />
           </button>
         </div>
-        <a class="chan panel card" href="/contact#message" data-open="book-dialog">
+        <a class="chan panel card" href={to('/contact#message')} data-open="book-dialog">
           <span class="icon-tile" aria-hidden="true"><Icon name="calendar" /></span>
           <span class="chan-text"
             ><span class="chan-title">{cta.book}</span><Pause /><span class="chan-value">{t.book}</span></span

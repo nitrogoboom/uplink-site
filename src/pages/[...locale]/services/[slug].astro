@@ -3,34 +3,39 @@
 // page (service-page.css): breadcrumb and title beside the drawing, what's included, then how it works and its
 // questions (the service's `page` fields), then the projects that used it (their `services` list). Its JSON-LD is
 // the Service block the Services page also lists, its questions as a FAQPage, and a three-step breadcrumb.
-import Base from '../../layouts/Base.astro';
-import ServiceCard from '../../components/services/ServiceCard.astro';
-import Icon from '../../components/Icon.astro';
-import ProjectCard from '../../components/work/ProjectCard.astro';
-import '../../components/services/service-page.css';
-import { PAGES, getServices, getProjects, breadcrumbs, businessNode, businessRef, jsonLd } from '../../lib/site';
-import { fit } from '../../lib/fit';
-import { copy, fill } from '../../lib/copy';
+import Base from '../../../layouts/Base.astro';
+import ServiceCard from '../../../components/services/ServiceCard.astro';
+import Icon from '../../../components/Icon.astro';
+import ProjectCard from '../../../components/work/ProjectCard.astro';
+import '../../../components/services/service-page.css';
+import { PAGES, getServices, getProjects, breadcrumbs, businessNode, businessRef, jsonLd } from '../../../lib/site';
+import { fit } from '../../../lib/fit';
+import { copy, fill } from '../../../lib/copy';
+import { LOCALES, linker, localeParam } from '../../../lib/i18n';
+const to = linker(Astro.currentLocale);
 
 export async function getStaticPaths() {
-  const services = await getServices();
-  const projects = await getProjects();
-  return services.map((service, i) => ({
-    params: { slug: service.id },
-    props: {
-      service,
-      n: i + 1,
-      total: services.length,
-      projects: projects.filter((p) => p.data.services.some((r) => r.id === service.id)).slice(0, 3),
-    },
-  }));
+  const paths = LOCALES.map(async (locale) => {
+    const services = await getServices(locale);
+    const projects = await getProjects(locale);
+    return services.map((service, i) => ({
+      params: { locale: localeParam(locale), slug: service.id },
+      props: {
+        service,
+        n: i + 1,
+        total: services.length,
+        projects: projects.filter((p) => p.data.services.includes(service.id)).slice(0, 3),
+      },
+    }));
+  });
+  return (await Promise.all(paths)).flat();
 }
 const { service, n, total, projects } = Astro.props;
 const { id, data: s } = service;
-const ui = await copy('ui');
-const t = (await copy('services')).page;
+const ui = await copy('ui', Astro.currentLocale);
+const t = (await copy('services', Astro.currentLocale)).page;
 const questions = fill(t.questions.title, { service: s.title });
-const url = new URL(`/services/${id}`, Astro.site).href;
+const url = new URL(to(`/services/${id}`), Astro.site).href;
 const business = businessRef(Astro.site!);
 const ld = {
   '@context': 'https://schema.org',
@@ -58,10 +63,10 @@ const ld = {
     },
     breadcrumbs([
       [ui.pages.home, Astro.site!.href],
-      [ui.pages.services, new URL(PAGES.services.path, Astro.site).href],
+      [ui.pages.services, new URL(to(PAGES.services.path), Astro.site).href],
       [s.title, url],
     ]),
-    await businessNode(Astro.site!),
+    await businessNode(Astro.site!, Astro.currentLocale),
   ],
 };
 ---
@@ -72,13 +77,13 @@ const ld = {
     <div class="container svc-page-grid">
       <nav class="crumbs" aria-label={ui.breadcrumb}>
         <ol>
-          <li><a href="/services">{ui.pages.services}</a></li>
+          <li><a href={to('/services')}>{ui.pages.services}</a></li>
           <li aria-current="page">{s.title}</li>
         </ol>
       </nav>
       <ServiceCard service={service} n={n} total={total} on first heading="h1" />
       <div class="svc-page-cta row">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog" data-service={s.title}
+        <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog" data-service={s.title}
           >{t.cta}</a
         >
       </div>

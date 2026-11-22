@@ -16,11 +16,13 @@ import './services.css';
 import { getServices } from '../../lib/site';
 import { fit } from '../../lib/fit';
 import { copy } from '../../lib/copy';
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
 const SLOTS = 3;
-const t = (await copy('home')).services;
+const t = (await copy('home', Astro.currentLocale)).services;
 const TITLE = t.title;
 const MORE = t.more;
-const services = await getServices();
+const services = await getServices(Astro.currentLocale);
 // services.css lays out exactly three tall cards and three short tiles (a row of three each on tablet, three columns
 // beside a column of three on desktop), so a different count stops the build here instead of leaving a broken grid
 const featured = services.filter((s) => s.data.featured);
@@ -44,7 +46,7 @@ const tiles = [
         <p class="eyebrow">{t.eyebrow}</p>
         <h2 id="services-title" class={fit(TITLE)}>{TITLE}</h2>
       </div>
-      <a class="link-arrow" href="/services">{t.seeAll}<Icon name="arrow" /></a>
+      <a class="link-arrow" href={to('/services')}>{t.seeAll}<Icon name="arrow" /></a>
     </div>
     <ul class="svc-menu" id="services-row" aria-label={t.list}>
       {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
@@ -54,7 +56,7 @@ const tiles = [
           /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <div class="svc-text">
-            <a class="svc-link" href={`/services/${id}`}
+            <a class="svc-link" href={to(`/services/${id}`)}
               ><span class="chip">{s.chip}<Pause /></span><span class:list={['svc-title', fit(s.title)]}>{s.title}</span
               ><Pause /><span class="svc-line">{s.card}</span><span class="sr-only"> {t.view}</span></a
             >
@@ -66,7 +68,7 @@ const tiles = [
         <div class="svc-tile">
           <span class="svc-icon"><Icon name="grid" /></span>
           <div class="svc-text">
-            <a class="svc-link" href="/services"
+            <a class="svc-link" href={to('/services')}
               ><span class:list={['svc-title', fit(MORE)]}>{MORE}</span><span class="sr-only"> {t.viewAll}</span></a
             >
           </div>

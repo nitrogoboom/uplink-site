@@ -1,5 +1,5 @@
 // /.well-known/security.txt (RFC 9116): where to report a security problem with this site. The inbox is in
-// src/data/footer.json (inboxes.security, a placeholder until it's a real, watched inbox). Expires is a year from
+// footer.json (src/content/<language>/) (inboxes.security, a placeholder until it's a real, watched inbox). Expires is a year from
 // the build, so a site that stops being built stops advertising an inbox nobody reads. SECURITY.md says the same
 // for the repository.
 import type { APIRoute } from 'astro';

@@ -1,23 +1,26 @@
 ---
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
-import Base from '../layouts/Base.astro';
-import { businessNode, jsonLd, pageMeta } from '../lib/site';
-import Hero from '../components/home/Hero.astro';
-import Services from '../components/home/Services.astro';
-import Grow from '../components/home/Grow.astro';
-import Work from '../components/home/Work.astro';
-import Reviews from '../components/home/Reviews.astro';
-import Proof from '../components/home/Proof.astro';
-import { phone, email, office, hours } from '../lib/footer';
-import Words from '../components/Words.astro';
-import { copy } from '../lib/copy';
-const { grow, business: about } = await copy('home');
-const meta = await pageMeta('home');
+import Base from '../../layouts/Base.astro';
+import { businessNode, jsonLd, pageMeta } from '../../lib/site';
+import Hero from '../../components/home/Hero.astro';
+import Services from '../../components/home/Services.astro';
+import Grow from '../../components/home/Grow.astro';
+import Work from '../../components/home/Work.astro';
+import Reviews from '../../components/home/Reviews.astro';
+import Proof from '../../components/home/Proof.astro';
+import { phone, email, office, hours } from '../../lib/footer';
+import Words from '../../components/Words.astro';
+import { copy } from '../../lib/copy';
+import { localePaths } from '../../lib/i18n';
+
+export const getStaticPaths = localePaths;
+const { grow, business: about } = await copy('home', Astro.currentLocale);
+const meta = await pageMeta('home', Astro.currentLocale);
 
 const business = {
   '@context': 'https://schema.org',
-  ...(await businessNode(Astro.site!)),
+  ...(await businessNode(Astro.site!, Astro.currentLocale)),
   description: about,
   telephone: `+${phone.display}`,
   email,
@@ -51,7 +54,7 @@ const business = {
   <Fragment slot="scripts">
     <Words id="words-page" words={{ grow: { play: grow.play } }} />
     <script>
-      import '../scripts/home.js';
+      import '../../scripts/home.js';
     </script>
   </Fragment>
 </Base>

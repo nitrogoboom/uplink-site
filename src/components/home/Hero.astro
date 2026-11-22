@@ -19,7 +19,9 @@ import { getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
-const { hero: t, cloud } = await copy('home');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const { hero: t, cloud } = await copy('home', Astro.currentLocale);
 // the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist
 const layers = Object.entries(
   import.meta.glob<string>('./hero/*.svg', { query: '?raw', import: 'default', eager: true }),
@@ -31,7 +33,7 @@ const apps = Object.entries(cloud.apps);
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
   {
-    href: '/contact#message',
+    href: to('/contact#message'),
     book: true,
     img: 'security',
     tone: 'accent',
@@ -40,7 +42,7 @@ const news = [
     line: t.news.checkup.line,
   },
   {
-    href: '/soon#windows-10-guide',
+    href: to('/soon#windows-10-guide'),
     book: false,
     img: 'cloud',
     tone: 'sky',
@@ -51,9 +53,9 @@ const news = [
 ];
 // the menu under the button: the featured services, then the first of the rest (Cloud workspace, by order), each its
 // own page. Services.astro starts its short tiles after that one. A list, not a <nav>: the header holds the one main menu.
-const services = await getServices();
+const services = await getServices(Astro.currentLocale);
 const menu = [...services.filter((s) => s.data.featured), services.filter((s) => !s.data.featured)[0]].map(
-  ({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card }),
+  ({ id, data: s }) => ({ href: to(`/services/${id}`), icon: s.icon, title: s.title, sub: s.card }),
 );
 ---
 
@@ -68,7 +70,7 @@ const menu = [...services.filter((s) => s.data.featured), services.filter((s) =>
         <p class="lead">{t.lead}</p>
       </div>
       <div class="hero-cta">
-        <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog"
+        <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog"
           >{t.cta}<Icon name="arrow"
         /></a>
         <span class="small muted">{t.ctaNote}</span>

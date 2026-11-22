@@ -23,7 +23,7 @@ const { service, n, total, on = false, first = false, heading: Heading = 'h2' } 
 const Sub = Heading === 'h1' ? 'h2' : 'h3';
 const { id, data: s } = service;
 const two = (k: number) => String(k).padStart(2, '0');
-const t = (await copy('services')).page;
+const t = (await copy('services', Astro.currentLocale)).page;
 ---
 
 <article class:list={['svc', { 'is-on': on }]} id={id} aria-labelledby={`svc-${id}`}>

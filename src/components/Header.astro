@@ -9,17 +9,19 @@ import type { Page } from '../layouts/Base.astro';
 import Icon from './Icon.astro';
 import { NAV, PAGES, tabCurrent } from '../lib/site';
 import { copy } from '../lib/copy';
+import { linker } from '../lib/i18n';
+const to = linker(Astro.currentLocale);
 interface Props {
   current: Page;
 }
 const { current } = Astro.props;
 const here = Astro.url.pathname;
-const { site, header: t, pages } = await copy('ui');
+const { site, header: t, pages } = await copy('ui', Astro.currentLocale);
 ---
 
 <header class="site-header">
   <div class="container">
-    <a class="brand" href="/" aria-label={t.home}>
+    <a class="brand" href={to('/')} aria-label={t.home}>
       <span class="brand-mark" aria-hidden="true"><Icon name="mark" /></span>
       <span class="brand-text">
         <span class="brand-name">{site.short}</span>
@@ -30,7 +32,11 @@ const { site, header: t, pages } = await copy('ui');
     <nav class="tabs" aria-label={t.nav}>
       <ul>
         {NAV.map(({ page }) => <li>
-          <a class="tab" href={PAGES[page].path} data-page={page} aria-current={tabCurrent(page, current, here)}
+          <a
+            class="tab"
+            href={to(PAGES[page].path)}
+            data-page={page}
+            aria-current={tabCurrent(page, current, here, Astro.currentLocale)}
             >{pages[page]}</a
           >
         </li>)}
@@ -38,10 +44,10 @@ const { site, header: t, pages } = await copy('ui');
     </nav>
 
     <div class="hdr-actions">
-      <a class="hbtn" href="/contact#support" aria-label={t.support.label}>
+      <a class="hbtn" href={to('/contact#support')} aria-label={t.support.label}>
         <Icon name="headset" /><span class="hbtn-text">{t.support.text}</span>
       </a>
-      <a class="hbtn" href="/soon#client-portal" aria-label={t.portal.label}>
+      <a class="hbtn" href={to('/soon#client-portal')} aria-label={t.portal.label}>
         <Icon name="person" /><span class="hbtn-text">{t.portal.text}</span>
       </a>
       <button

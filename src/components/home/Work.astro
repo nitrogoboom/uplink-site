@@ -7,8 +7,10 @@ import './work.css';
 import ProjectCard from '../work/ProjectCard.astro';
 import { getProjects } from '../../lib/site';
 import { copy } from '../../lib/copy';
-const projects = (await getProjects()).slice(0, 3);
-const t = (await copy('home')).work;
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const projects = (await getProjects(Astro.currentLocale)).slice(0, 3);
+const t = (await copy('home', Astro.currentLocale)).work;
 ---
 
 <section class="section section--band fold" id="work" aria-labelledby="work-title">
@@ -18,7 +20,7 @@ const t = (await copy('home')).work;
         <p class="eyebrow">{t.eyebrow}</p>
         <h2 id="work-title">{t.title}</h2>
       </div>
-      <a class="link-arrow" href="/work">{t.seeAll}<Icon name="arrow" /></a>
+      <a class="link-arrow" href={to('/work')}>{t.seeAll}<Icon name="arrow" /></a>
     </div>
     <ul class="card-row">
       {projects.map((project) => <li><ProjectCard project={project} /></li>)}

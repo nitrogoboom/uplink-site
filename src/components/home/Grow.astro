@@ -1,6 +1,6 @@
 ---
 // HOME · 3. We grow with you: the six-step world and its controls, played by src/scripts/grow.js (which describes how
-// it plays). Copy: src/data/grow.json. Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
+// it plays). Copy: grow.json (src/content/<language>/). Styles: grow.css (imported here). Desktop layout: at the end of its CSS.
 // The steps are one list (.grow-list): each row holds its step's button and its card. On desktop the buttons are a
 // growth line in the left column, in place of the dots and arrows under the picture, and the open step's card opens
 // under its button; on phones and tablets the buttons hide and the open card sits under the picture. CSS shows the
@@ -18,7 +18,7 @@ import { getGrow } from '../../lib/site';
 import { copy, fill } from '../../lib/copy';
 import './grow.css';
 
-const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
+const steps = await getGrow(Astro.currentLocale); // grow.json (src/content/<language>/), typed in content.config.ts
 
 const world = raw.replace(/<style>[\s\S]*?<\/style>/g, '');
 const viewBox = /viewBox="([^"]+)"/.exec(world)?.[1];
@@ -62,7 +62,7 @@ for (let at = 0; at < body.length;) {
 }
 const layer = (inner: string) => `${outer}${inner}</g>`;
 const last = steps.length - 1;
-const t = (await copy('home')).grow;
+const t = (await copy('home', Astro.currentLocale)).grow;
 ---
 
 <section class="section fold grow-section" id="grow" aria-labelledby="grow-title">

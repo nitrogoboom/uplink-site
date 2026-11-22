@@ -9,7 +9,7 @@ interface Props {
   class?: string;
 }
 const { class: cls } = Astro.props;
-const ui = await copy('ui');
+const ui = await copy('ui', Astro.currentLocale);
 ---
 
 <button class:list={['hold', cls]} type="button" hidden data-hold aria-pressed="false" aria-label={ui.hold}>

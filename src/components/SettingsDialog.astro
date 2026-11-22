@@ -7,7 +7,7 @@
 // core.js applies a choice at once and keeps it on this device (localStorage uplink.theme, uplink.motion). Styles: dialogs.css, forms.css.
 import Icon from './Icon.astro';
 import { copy } from '../lib/copy';
-const { settings: t, dialog } = await copy('ui');
+const { settings: t, dialog } = await copy('ui', Astro.currentLocale);
 const THEMES = [
   ['system', t.theme.system, 'screen'],
   ['light', t.theme.light, 'sun'],

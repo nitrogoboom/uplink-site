@@ -4,8 +4,10 @@
 // Styles: shared (.cta-band in src/styles/shared-blocks.css, .fold-foot in src/styles/fold.css).
 import { phone } from '../../lib/footer';
 import { copy } from '../../lib/copy';
-const t = (await copy('home')).proof;
-const ui = await copy('ui');
+import { linker } from '../../lib/i18n';
+const to = linker(Astro.currentLocale);
+const t = (await copy('home', Astro.currentLocale)).proof;
+const ui = await copy('ui', Astro.currentLocale);
 ---
 
 <div class="panel cta-band fold-foot" id="start">
@@ -14,7 +16,7 @@ const ui = await copy('ui');
     <p class="lead">{t.lead}</p>
   </div>
   <div class="row">
-    <a class="btn btn--primary btn--lg" href="/contact#message" data-open="book-dialog">{ui.cta.book}</a>
+    <a class="btn btn--primary btn--lg" href={to('/contact#message')} data-open="book-dialog">{ui.cta.book}</a>
     <a class="btn btn--secondary btn--lg" href={phone.href}>{phone.display}</a>
   </div>
 </div>

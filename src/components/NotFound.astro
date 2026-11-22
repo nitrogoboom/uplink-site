@@ -1,0 +1,26 @@
+---
+// PAGE NOT FOUND, the whole page: src/pages/404.astro shows it for the default language (Astro wants that file
+// there) and src/pages/[locale]/404.astro for every other. Cloudflare serves the nearest 404.html for a missing address. No canonical or Open Graph (no `path`). Styles: shared (.page-intro).
+// One full screen on every size and no footer (footer={false}): .fold-always holds the section to the screen under
+// the header (and above the phone tab bar); it grows past that only when its content needs more (zoom).
+import Base from '../layouts/Base.astro';
+import { copy } from '../lib/copy';
+import { linker } from '../lib/i18n';
+const to = linker(Astro.currentLocale);
+const t = await copy('not-found', Astro.currentLocale);
+---
+
+<Base title={t.title} description={t.description} page="notfound" robots="noindex" footer={false}>
+  <section class="page-intro fold fold-always" aria-labelledby="nf-title">
+    <div class="container">
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 id="nf-title">{t.heading}</h1>
+      <p class="lead">{t.lead}</p>
+      <div class="row">
+        <a class="btn btn--primary" href={to('/')}>{t.home}</a>
+        <a class="btn btn--secondary" href={to('/services')}>{t.services}</a>
+        <a class="btn btn--secondary" href={to('/contact')}>{t.contact}</a>
+      </div>
+    </div>
+  </section>
+</Base>
