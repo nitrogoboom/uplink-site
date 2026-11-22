@@ -8,6 +8,10 @@
 // Without script the whole world shows, finished, with every step's card in the list.
 // Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
 // with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
+// It goes in as layers, one <svg> each in its drawing order: the ground (with the shared defs and the tags'
+// anchors), then each part (.pc) on its own. A part dropping in then moves as one box, which the browser moves
+// without drawing the rest again; one drawing, its parts would be redrawn every frame. Parts from different steps
+// sit in one another's depth order, so the layers follow the parts, not the steps.
 import raw from './grow-world.svg?raw';
 import { shrink } from '../../../scripts/svgo-config.mjs';
 import Icon from '../Icon.astro';
@@ -17,9 +21,47 @@ import './grow.css';
 
 const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
 
-const world = shrink(raw, 'grow-world.svg')
-  .replace(/<style>[\s\S]*?<\/style>/g, '')
-  .replace(' id="plain"', '');
+const world = shrink(raw, 'grow-world.svg').replace(/<style>[\s\S]*?<\/style>/g, '');
+const viewBox = /viewBox="([^"]+)"/.exec(world)?.[1];
+const label = /aria-label="([^"]+)"/.exec(world)?.[1];
+// the drawing's one outer group: its paint settings go on each layer's own
+const outer = /<title>[\s\S]*?<\/title>(<g\b[^>]*>)/.exec(world)?.[1];
+if (!viewBox || !label || !outer) throw new Error('grow-world.svg: no viewBox, aria-label or outer <g> to split by');
+const body = world.slice(world.indexOf(outer) + outer.length, world.lastIndexOf('</g>'));
+// a <g> that starts at i: where it ends (its matching </g>). An empty one is written <g …/> and opens nothing.
+const close = (i: number) => {
+  const tags = /<g\b[^>]*>|<\/g>/g;
+  tags.lastIndex = i;
+  let depth = 0;
+  for (let m = tags.exec(body); m; m = tags.exec(body)) {
+    if (m[0].endsWith('/>')) continue;
+    depth += m[0] === '</g>' ? -1 : 1;
+    if (!depth) return m.index + 4;
+  }
+  throw new Error("grow-world.svg: a part's <g> never closes");
+};
+const parts: { s: string; o: string; inner: string }[] = [];
+let ground = '';
+for (let at = 0; at < body.length;) {
+  const next = body.indexOf('<g class="pc"', at);
+  if (next < 0) {
+    ground += body.slice(at);
+    break;
+  }
+  if (parts.length && body.slice(at, next).trim())
+    throw new Error('grow-world.svg: something is drawn between two parts, so it would lose its depth');
+  if (!parts.length) ground += body.slice(at, next);
+  const end = close(next);
+  const g = body.slice(next, end);
+  const head = g.slice(0, g.indexOf('>') + 1);
+  parts.push({
+    s: /data-s="(\d+)"/.exec(head)?.[1] ?? '',
+    o: /data-o="(\d+)"/.exec(head)?.[1] ?? '',
+    inner: g.slice(head.length, -4),
+  });
+  at = end;
+}
+const layer = (inner: string) => `${outer}${inner}</g>`;
 const last = steps.length - 1;
 const t = (await copy('home')).grow;
 ---
@@ -35,7 +77,20 @@ const t = (await copy('home')).grow;
       <div class="grow-player">
         <div class="grow-stage">
           <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
-          <Fragment set:html={world} />
+          <div class="grow-world" role="img" aria-label={label}>
+            <svg class="gw" viewBox={viewBox} aria-hidden="true" focusable="false" set:html={layer(ground)} />
+            {parts.map((pc) => (
+              <svg
+                class="gw pc"
+                data-s={pc.s}
+                data-o={pc.o}
+                viewBox={viewBox}
+                aria-hidden="true"
+                focusable="false"
+                set:html={layer(pc.inner)}
+              />
+            ))}
+          </div>
           {steps.map((s, i) =>
             s.tags.map((t, k) => <span
               class="grow-tag"

@@ -20,9 +20,12 @@ const PAUSE = 'M2 1h3v10H2zM7 1h3v10H7z',
 
 const section = $('#grow');
 const grow = section && $('.grow', section);
-/** @type {SVGSVGElement | null} */
-const svg = grow && $('.grow-stage svg', grow);
-if (grow && svg) {
+// the drawing: a stack of layers, one <svg> each (Grow.astro): the ground first, then each part in drawing order
+/** @type {HTMLElement | null} */
+const world = grow && $('.grow-world', grow);
+if (grow && world) {
+  const layers = /** @type {SVGSVGElement[]} */ ($$('svg.gw', world));
+  const ground = layers[0];
   // the play button's names: src/data/copy/en/home.yaml, grow (index.astro carries them)
   const T = /** @type {import('../lib/copy').HomeWords} */ (words('words-page')).grow;
   // the section's parts are all in Grow.astro and its drawing (tools/gen_grow.py)
@@ -30,8 +33,10 @@ if (grow && svg) {
   const steps = $$('.grow-card', grow);
   const N = steps.length,
     LAST = N - 1;
-  const pcs = /** @type {SVGGElement[]} */ ($$('.pc', svg)).map((g) => ({
+  // each part's layer (g, which drops in) and its shapes (box, measured for the camera)
+  const pcs = /** @type {SVGSVGElement[]} */ ($$('svg.pc', world)).map((g) => ({
     g,
+    box: /** @type {SVGGElement} */ (g.firstElementChild),
     s: Number(g.dataset.s) - 1,
     o: Number(g.dataset.o),
   }));
@@ -39,7 +44,7 @@ if (grow && svg) {
     el,
     step: Number(el.dataset.step),
     k: Number(el.dataset.k),
-    at: /** @type {SVGElement} */ ($(`.tg-a[data-a="${el.dataset.at}"]`, svg)),
+    at: /** @type {SVGElement} */ ($(`.tg-a[data-a="${el.dataset.at}"]`, world)),
     icon: /** @type {HTMLElement} */ ($('.grow-tag-i', el)),
     text: /** @type {HTMLElement} */ ($('.grow-tag-t', el)),
   }));
@@ -51,7 +56,7 @@ if (grow && svg) {
     ring = /** @type {SVGCircleElement} */ ($('.grow-ring circle', grow));
   const place = /** @type {HTMLElement} */ ($('.grow-place', grow));
   const places = steps.map((c) => c.dataset.place);
-  const full = /** @type {string} */ (svg.getAttribute('viewBox')).split(' ').map(Number);
+  const full = /** @type {string} */ (ground.getAttribute('viewBox')).split(' ').map(Number);
   let built = -1,
     cur = -1,
     playing = false,
@@ -74,7 +79,7 @@ if (grow && svg) {
     // the drawing's box in the stage, from the stage's outer edge: measured while no move transforms it
     if (!camAnim) {
       const s = stage.getBoundingClientRect(),
-        d = svg.getBoundingClientRect();
+        d = world.getBoundingClientRect();
       at = { left: d.left - s.left, top: d.top - s.top };
     }
     const v = view(),
@@ -133,22 +138,22 @@ if (grow && svg) {
   const EASE = `linear(${Array.from({ length: 21 }, (_, n) => ease(n / 20).toFixed(4)).join(', ')})`;
   // a square viewBox in the drawing's box, centred as the browser fits it: a point p sits at k * p + (x, y)
   const fit = (/** @type {number[]} */ b) => {
-    const W = svg.clientWidth,
-      H = svg.clientHeight,
+    const W = world.clientWidth,
+      H = world.clientHeight,
       k = Math.min(W, H) / b[2];
     return { k, x: (W - b[2] * k) / 2 - b[0] * k, y: (H - b[3] * k) / 2 - b[1] * k };
   };
   // the view on screen now: the set viewBox, carried by what is left of the running move
   const view = () => {
-    const f = fit(/** @type {string} */ (svg.getAttribute('viewBox')).split(' ').map(Number));
+    const f = fit(/** @type {string} */ (ground.getAttribute('viewBox')).split(' ').map(Number));
     if (!camAnim) return f;
     const e = ease(Math.min(1, (performance.now() - move.t0) / move.dur)),
       r = move.r + (1 - move.r) * e;
     return { k: r * f.k, x: r * f.x + move.tx * (1 - e), y: r * f.y + move.ty * (1 - e) };
   };
   const asViewBox = (/** @type {{ k: number, x: number, y: number }} */ v) => {
-    const W = svg.clientWidth,
-      H = svg.clientHeight,
+    const W = world.clientWidth,
+      H = world.clientHeight,
       s = Math.min(W, H) / v.k;
     return [((W - s * v.k) / 2 - v.x) / v.k, ((H - s * v.k) / 2 - v.y) / v.k, s, s];
   };
@@ -158,9 +163,9 @@ if (grow && svg) {
       y0 = Infinity,
       x1 = -Infinity,
       y1 = -Infinity;
-    pcs.forEach(({ g, s }) => {
+    pcs.forEach(({ box, s }) => {
       if (s > i) return;
-      const b = g.getBBox();
+      const b = box.getBBox();
       x0 = Math.min(x0, b.x);
       y0 = Math.min(y0, b.y);
       x1 = Math.max(x1, b.x + b.width);
@@ -177,11 +182,12 @@ if (grow && svg) {
     if (camAnim) vb = asViewBox(view()); // stopped mid-move: go on from where the camera is
     camAnim?.cancel();
     camAnim = null;
-    svg.style.willChange = '';
+    world.style.willChange = '';
     if (to.every((v, n) => v === vb[n])) return; // already there (the first draw, a pause): nothing to write
     const a = fit(vb);
     vb = to.slice();
-    svg.setAttribute('viewBox', vb.map((v) => v.toFixed(1)).join(' '));
+    const box = vb.map((v) => v.toFixed(1)).join(' ');
+    layers.forEach((l) => l.setAttribute('viewBox', box));
     const dur = animate && !reduceMotion.matches ? CAM_MS : 0;
     if (!dur) {
       placeTags();
@@ -193,17 +199,20 @@ if (grow && svg) {
     move = { r, tx: a.x - r * b.x, ty: a.y - r * b.y, t0: performance.now(), dur };
     // its own layer for the move only: the parts dropping in then repaint just themselves, not the whole picture at
     // each new scale; at rest the drawing stays sharp under a phone's pinch zoom
-    svg.style.willChange = 'transform';
-    camAnim = svg.animate([{ transform: `translate(${move.tx}px, ${move.ty}px) scale(${r})` }, { transform: 'none' }], {
-      duration: dur,
-      easing: EASE,
-    });
+    world.style.willChange = 'transform';
+    camAnim = world.animate(
+      [{ transform: `translate(${move.tx}px, ${move.ty}px) scale(${r})` }, { transform: 'none' }],
+      {
+        duration: dur,
+        easing: EASE,
+      },
+    );
     const done = camAnim;
     void camAnim.finished.then(
       () => {
         if (camAnim !== done) return;
         camAnim = null;
-        svg.style.willChange = '';
+        world.style.willChange = '';
         placeTags();
       },
       () => {},
@@ -283,7 +292,7 @@ if (grow && svg) {
     window.cancelAnimationFrame(preRaf);
     if (fresh.length) {
       fresh.forEach(({ g }) => g.classList.add('pre', 'hide'));
-      void svg.getBoundingClientRect(); // commit the start of the drop before it begins
+      void world.getBoundingClientRect(); // commit the start of the drop before it begins
     }
     pcs.forEach(({ g, s, o }) => {
       const isNew = fresh.some((p) => p.g === g);
@@ -449,9 +458,9 @@ if (grow && svg) {
   // up once: each ring's line, copied three times into the drawing's empty .dome-orbit (a faint tail, a middle, a
   // bright head), as dashes grow.css runs round it. CSS holds them with the rest of the drawing: paused, at the end,
   // off screen (.is-idle), on the site's pause (.is-held); with reduced motion they stand still. ----
-  const orbit = $('.dome-orbit', svg);
+  const orbit = $('.dome-orbit', world);
   if (orbit)
-    $$('.dome-lat', svg).forEach((lat, n) =>
+    $$('.dome-lat', world).forEach((lat, n) =>
       ['is-tail', 'is-mid', 'is-head'].forEach((layer) => {
         const p = /** @type {Element} */ (lat.cloneNode(false));
         ['class', 'stroke', 'stroke-width', 'stroke-opacity'].forEach((a) => p.removeAttribute(a));
@@ -464,7 +473,7 @@ if (grow && svg) {
   // the cables' dashes and the dome's bands keep the site's beat (core.js, the dash clock) while the world is on
   // screen and not standing still (paused, or at the story's end); the play ring moves on with them
   dashes(
-    $$('[stroke-dasharray="5 5"], [stroke-dasharray="4 4"], [stroke-dasharray="6 6"], .dome-run', svg),
+    $$('[stroke-dasharray="5 5"], [stroke-dasharray="4 4"], [stroke-dasharray="6 6"], .dome-run', world),
     () => visible && !stage.classList.contains('is-paused'),
     ringSync,
   );

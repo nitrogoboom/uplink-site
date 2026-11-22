@@ -23,14 +23,21 @@
   border-radius: var(--r-3);
   background: radial-gradient(60% 55% at 50% 58%, var(--c-glow-sky), transparent 72%), var(--c-bg-band);
 }
-.grow-stage > svg {
+.grow-world {
   position: absolute;
   inset: 2% 2% 3%;
-  display: block;
   width: 96%;
   height: 95%;
   transform-origin: 0 0; /* the camera's moves scale from here (grow.js, camTo) */
-} /* the drawing only, not the button's icons */
+}
+/* the drawing's layers (Grow.astro), stacked, each the whole drawing's box */
+.grow-world > svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* the picture's corner label (the open step's place), the tags and the card's row labels: the site's label and
    chip type (.label, .chip). The label wraps at zoom. */
 .grow-place {
@@ -263,7 +270,9 @@
   display: none;
 }
 
-/* the drawing's parts: a step's parts drop in and glow; .pre places them at once (first draw, pause) */
+/* the drawing's parts, each its own layer: a step's parts drop in and glow; .pre places them at once (first draw,
+   pause). The glow is a CSS shadow, which the graphics chip draws with the moving layer (the drawing's own SVG
+   filter, #grow-glow, made the browser redraw the part every frame) */
 .grow-stage .pc {
   transition:
     opacity var(--dur-grow-fade) var(--ease),
@@ -277,7 +286,7 @@
   transition: none;
 }
 .grow-stage .pc.glow {
-  filter: url('#grow-glow');
+  filter: drop-shadow(0 0 var(--sp-3) var(--c-accent));
 }
 /* always some life in it: data runs along the cables, the ring creeps, the dome's rim breathes. The dashes move to
    the site's beat, --dash (core.js, the dash clock: a CSS animation of them costs a frame of page work 60 times a
