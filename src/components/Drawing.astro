@@ -16,7 +16,7 @@ interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
   sources?: { media: string; srcset: string; width?: number; height?: number }[];
 }
 const { src, sources, class: cls, ...img } = Astro.props;
-const bare = (path: string) => path.replace(/\?.*$/, ''); // an address that already has its ?v= (HERO.still)
+const bare = (path: string) => path.replace(/\?.*$/, ''); // an address that already has its ?v=
 const themes = [
   { theme: 'th-dark', at: (p: string) => fresh(bare(p)) },
   { theme: 'th-light', at: (p: string) => fresh(bare(p).replace(/\.svg$/, '-light.svg')) },

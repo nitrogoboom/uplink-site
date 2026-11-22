@@ -6,17 +6,3 @@
 picture {
   display: contents;
 }
-/* Home hero: phones show the phone cut (svg.ob-phone, from home.js; it stands still with reduced motion) and hide
-   the wider cuts' dash layer. Wider screens never show the phone cut, even for the moment after a turn to landscape
-   before home.js swaps it out. */
-.hero-art .stage svg.ob-phone {
-  display: none;
-}
-@media (--small-phone) {
-  .hero-art .stage svg:not(.ob-phone) {
-    display: none;
-  }
-  .hero-art .stage svg.ob-phone {
-    display: block;
-  }
-}

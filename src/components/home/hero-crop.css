@@ -1,0 +1,10 @@
+/* Written by tools/gen_office.py: do not edit by hand. The hero's phone framing (PHONE_CROP): the
+   layers' box in % of the stage, and the stage's shape. hero.css uses it on phones. */
+.hero-art {
+  --crop-ratio: 962 / 900;
+  --crop-tall: calc(900 / 962);
+  --crop-x: -24.948%;
+  --crop-y: -1.333%;
+  --crop-w: 124.74%;
+  --crop-h: 103.333%;
+}

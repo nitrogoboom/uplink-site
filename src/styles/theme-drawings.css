@@ -2,10 +2,7 @@
    the page (the Home hero and the Grow world); Hero.astro imports it, so only Home carries it. Attribute rules sit in
    :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
 
-/* .hero-art: hero-office.svg, hero-office-tablet.svg, office-compact-build.svg, office-compact-flows.svg, hero-flows.svg */
-:where(:root[data-theme='light'] .hero-art) [fill='#0e1a27' i] {
-  fill: #e8eff7;
-}
+/* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-labels.svg, 9-labels-tablet.svg */
 :where(:root[data-theme='light'] .hero-art) [fill='#182431' i] {
   fill: #dce2e8;
 }
@@ -162,41 +159,63 @@
 :where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#ffad51' i] {
   fill: #88520a;
 }
-:root[data-theme='light'] .hero-art .ob-tile .f-l {
-  fill: #d2d8de;
+:root[data-theme='light'] .hero-art .p-4aab33 {
+  stroke: #1f75a6;
 }
-:root[data-theme='light'] .hero-art .ob-tile .f-r {
+:root[data-theme='light'] .hero-art .p-940b5b {
+  fill: #dce2e8;
+  stroke: #1f75a6;
+}
+:root[data-theme='light'] .hero-art .p-a45284 {
+  fill: #4a93c1;
+}
+:root[data-theme='light'] .hero-art .p-cd66c6 {
+  fill: #c5cbd2;
+}
+:root[data-theme='light'] .hero-art .p-36360a {
   fill: #bbc2c9;
-}
-:root[data-theme='light'] .hero-art .ob-tile .f-t {
-  fill: #fff;
-}
-:root[data-theme='light'] .hero-art .ob-tile .f-l,
-:root[data-theme='light'] .hero-art .ob-tile .f-r,
-:root[data-theme='light'] .hero-art .ob-tile .f-t {
   stroke: #37424e;
 }
-:root[data-theme='light'] .hero-art .ob-tile .f-ic {
-  stroke: #0e1a27;
+:root[data-theme='light'] .hero-art .p-670f39 {
+  stroke: #37424e;
 }
-:root[data-theme='light'] .hero-art .ob-tile.is-on .f-l,
-:root[data-theme='light'] .hero-art .ob-tile.is-on .f-r,
-:root[data-theme='light'] .hero-art .ob-tile.is-on .f-t {
-  stroke: #7c4900;
+:root[data-theme='light'] .hero-art .p-6d9350 {
+  fill: #222e3a;
+  stroke: #1f75a6;
 }
-:root[data-theme='light'] .hero-art .ob-seg {
-  fill: #198152;
+:root[data-theme='light'] .hero-art .p-80bbca {
+  fill: #d2d8de;
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-8e0d27 {
+  fill: #00683f;
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-ba2d77 {
+  fill: #fff;
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-d06893 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-e5df56 {
+  fill: #4a93c1;
+}
+:root[data-theme='light'] .hero-art .p-e89fbe {
+  stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-071416 {
+  stroke: #7c4900;
+}
+:root[data-theme='light'] .hero-art .p-ba6258 {
+  stroke: #7c4900;
+}
+:root[data-theme='light'] .hero-art .p-f5841d {
   stroke: #7c4900;
 }
 :root[data-theme='light'] .hero-art .p-3567f7 {
   fill: #f6fbff;
   stroke: #f6fbff;
-}
-:root[data-theme='light'] .hero-art .p-36360a {
-  fill: #bbc2c9;
-  stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-393c0b {
   fill: #f0f5fa;
@@ -217,13 +236,6 @@
   fill: #d6dce2;
   stroke: #d6dce2;
 }
-:root[data-theme='light'] .hero-art .p-4aab33 {
-  stroke: #1f75a6;
-}
-:root[data-theme='light'] .hero-art .p-4b1704 {
-  fill: #4a93c1;
-  stroke: #1f75a6;
-}
 :root[data-theme='light'] .hero-art .p-4d56b8 {
   fill: #f7fcff;
   stroke: #f7fcff;
@@ -232,20 +244,9 @@
   fill: #dfe4eb;
   stroke: #dfe4eb;
 }
-:root[data-theme='light'] .hero-art .p-670f39 {
-  stroke: #37424e;
-}
-:root[data-theme='light'] .hero-art .p-6d9350 {
-  fill: #222e3a;
-  stroke: #1f75a6;
-}
 :root[data-theme='light'] .hero-art .p-795a7c {
   fill: #f3f8fd;
   stroke: #f3f8fd;
-}
-:root[data-theme='light'] .hero-art .p-80bbca {
-  fill: #d2d8de;
-  stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-851679 {
   fill: #e8edf3;
@@ -255,17 +256,6 @@
   fill: #f4f9fe;
   stroke: #f4f9fe;
 }
-:root[data-theme='light'] .hero-art .p-8e0d27 {
-  fill: #00683f;
-  stroke: #37424e;
-}
-:root[data-theme='light'] .hero-art .p-940b5b {
-  fill: #dce2e8;
-  stroke: #1f75a6;
-}
-:root[data-theme='light'] .hero-art .p-a45284 {
-  fill: #4a93c1;
-}
 :root[data-theme='light'] .hero-art .p-a90b74 {
   fill: #ebf0f6;
   stroke: #ebf0f6;
@@ -273,10 +263,6 @@
 :root[data-theme='light'] .hero-art .p-ab9a5c {
   fill: #f1f6fb;
   stroke: #f1f6fb;
-}
-:root[data-theme='light'] .hero-art .p-ba2d77 {
-  fill: #fff;
-  stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-c16267 {
   fill: #e2e7ee;
@@ -294,18 +280,6 @@
   fill: #d9dfe5;
   stroke: #d9dfe5;
 }
-:root[data-theme='light'] .hero-art .p-cd66c6 {
-  fill: #c5cbd2;
-}
-:root[data-theme='light'] .hero-art .p-d06893 {
-  stroke: #37424e;
-}
-:root[data-theme='light'] .hero-art .p-e5df56 {
-  fill: #4a93c1;
-}
-:root[data-theme='light'] .hero-art .p-e89fbe {
-  stroke: #37424e;
-}
 :root[data-theme='light'] .hero-art .p-f2fed1 {
   fill: #c3cad1;
   stroke: #c3cad1;
@@ -313,6 +287,9 @@
 :root[data-theme='light'] .hero-art .p-fc11b5 {
   fill: #e5eaf0;
   stroke: #e5eaf0;
+}
+:root[data-theme='light'] .hero-art .p-fa6c34 {
+  fill: #198152;
 }
 
 /* .grow-stage: grow-world.svg */

@@ -31,7 +31,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | `Icon.astro`, `icons.ts` | Icons by name; add to `ICONS` |
 | `ServiceOptions.astro`, `Words.astro` | Service `<option>`s; a page script's words as JSON |
 
-Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a list is `<div class="card">` with `<h2 class="card-title {fit(title)}"><a class="card-link">`; the link's `::after` covers the card. `components/home/hero-flows.svg`, `hero-slab.css` and `grow-world.svg` are generated: don't edit.
+Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a list is `<div class="card">` with `<h2 class="card-title {fit(title)}"><a class="card-link">`; the link's `::after` covers the card. `components/home/hero/*.svg` (the hero's layers), `hero-crop.css` and `grow-world.svg` are generated: don't edit.
 
 ## Content and copy
 
@@ -73,5 +73,5 @@ ES modules in `scripts/`; each page script imports `core.js` first. Type-checked
 | --- | --- | --- |
 | `core.js` | every page | helpers, toasts, pop-ups, forms, theme, pause state, phone tab bar hide-on-scroll, `html()` (Trusted Types), keyboard map, the dash clock (the drawings' moving dashes) |
 | `footer.js` | every page | footer map and open section, rows sliding open and shut (phones), newsletter mockup |
-| `home.js`, `grow.js` | Home | hero cut, cloud, captions, phone Services row; the Grow world |
+| `home.js`, `grow.js` | Home | the hero's cloud apps and dashes, phone Services row; the Grow world |
 | `contact.js`, `soon.js` | Contact, Soon | copy buttons and queue card; names the missing page |

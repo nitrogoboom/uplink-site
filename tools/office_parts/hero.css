@@ -1,30 +1,7 @@
-.ob-i{animation:ob-drop 450ms cubic-bezier(.2,.7,.2,1) var(--d,0ms) both}
-.ob-fade{animation-name:ob-fade;animation-duration:400ms;animation-timing-function:ease-out}
-.ob-lab{animation-name:ob-fade;animation-duration:220ms;animation-timing-function:ease-out}
-.ob-grow{animation-name:ob-grow;animation-duration:480ms;animation-timing-function:cubic-bezier(.3,.6,.2,1)}
-.ob-ring{animation-name:ob-ring;animation-duration:520ms;animation-timing-function:cubic-bezier(.2,.7,.2,1);transform-box:fill-box;transform-origin:50% 50%}
-.ob-n{animation:none}
-.ob-cable{stroke-dasharray:100;animation:ob-draw 450ms ease-out var(--d,0ms) both}
-.ob-flow{stroke-dasharray:3 6;stroke-dashoffset:calc(var(--dash,0)*var(--dash-dir,1)*-2px);animation:ob-fade 300ms ease-out calc(var(--d,0ms) + 480ms) both}
+.ob-flow{stroke-dasharray:3 6;stroke-dashoffset:calc(var(--dash,0)*var(--dash-dir,1)*-2px)}
 .ob-pulse{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 2.4s steps(13) infinite}
 .ob-led{animation:ob-led 3.2s step-end infinite}
-@keyframes ob-drop{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes ob-fade{from{opacity:0}to{opacity:1}}
-@keyframes ob-grow{from{opacity:.2;clip-path:inset(100% -8px -8px -8px)}to{opacity:1;clip-path:inset(-8px)}}
-@keyframes ob-ring{from{opacity:0;transform:scale(.2)}to{opacity:1;transform:scale(1)}}
-@keyframes ob-draw{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
 @keyframes ob-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
 @keyframes ob-led{0%,62%{opacity:1}68%,80%{opacity:.25}86%,100%{opacity:1}}
-@media (prefers-reduced-motion:reduce){:root:not([data-motion=full]) .ob-i,:root:not([data-motion=full]) .ob-i *{animation:none!important}}
-.ob-tile .f-l,.ob-tile .f-r,.ob-tile .f-t,.ob-tile .f-ic{transition:fill .35s ease,stroke .35s ease}
-.ob-tile .f-l{fill:{{pal:LEFT}}}.ob-tile .f-r{fill:{{pal:RIGHT}}}.ob-tile .f-t{fill:{{pal:TOP}}}.ob-tile .f-l,.ob-tile .f-r,.ob-tile .f-t{stroke:{{pal:EDGE}};stroke-opacity:.3}.ob-tile .f-ic{stroke:{{pal:WHITE}}}
-.ob-tile.is-on .f-l{fill:{{pal:HI_LEFT}}}.ob-tile.is-on .f-r{fill:{{pal:HI_RIGHT}}}.ob-tile.is-on .f-t{fill:{{pal:HI_TOP}}}.ob-tile.is-on .f-l,.ob-tile.is-on .f-r,.ob-tile.is-on .f-t{stroke:{{pal:HI_EDGE}};stroke-opacity:.55}.ob-tile.is-on .f-ic{stroke:{{pal:ON_AMBER}}}
-.ob-seg{fill:{{pal:GREEN}};fill-opacity:.4;transition:fill .3s ease,fill-opacity .3s ease}.ob-seg.is-on{fill:{{pal:AMBER}};fill-opacity:1}
-.ob-seg-hit,.ob-tile{cursor:pointer}
-.ob-focus{transition:opacity .18s ease}.ob-focus.is-out{opacity:0}
-.ob-link{stroke-dasharray:3 12;stroke-dashoffset:calc(var(--dash,0)*-3.5px)}
-.ob-link-base.is-draw{animation:ob-link-draw .55s cubic-bezier(.3,.6,.2,1) both}
-@keyframes ob-link-draw{from{stroke-dashoffset:var(--len,400)}to{stroke-dashoffset:0}}
-.ob-link-end{transform-box:fill-box;transform-origin:50% 50%;animation:ob-pulse 1.8s steps(10) infinite}
-@media (prefers-reduced-motion:reduce){:root:not([data-motion=full]) .ob-link-end,:root:not([data-motion=full]) .ob-link-base.is-draw{animation:none!important}}
-.ob-over{pointer-events:none;will-change:transform}
+@media (prefers-reduced-motion:reduce){:root:not([data-motion=full]) .ob-pulse,:root:not([data-motion=full]) .ob-led{animation:none!important}}
+.hl-app,.hl-lit{opacity:0;transition:opacity .3s ease}.hl-app.is-on,.hl-lit.is-on{opacity:1}

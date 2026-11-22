@@ -1,6 +1,6 @@
 # Home (/): every section's own words, in page order. The services, projects and Grow's six steps are data
-# (src/content/, src/data/grow.json). `cloud` and the Grow button's names are read by home.js and grow.js in the
-# browser.
+# (src/content/, src/data/grow.json). The Grow button's names are read by grow.js in the browser. `cloud` is drawn
+# into the hero by tools/gen_office.py: after changing it, run that again.
 
 title: Uplink Technology · Managed IT for Ontario businesses # <title>
 description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'
@@ -28,7 +28,8 @@ hero:
       title: Windows 10 support has ended
       line: Your upgrade plan, step by step
 
-# the phone captions and the cloud panel in the hero drawing (home.js), one entry per app, in the order they show
+# the hero's cloud label (drawn by tools/gen_office.py) and its phone caption (Hero.astro), one entry per app, in the
+# order they show; the keys are the tiles' names in the drawing (TILES)
 cloud:
   title: Cloud workspace
   apps:

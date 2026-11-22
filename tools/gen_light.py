@@ -20,8 +20,7 @@ CSS_OUT = ROOT / 'src' / 'styles' / 'theme-drawings.css'
 
 # drawings that live inside the page, by the box that holds them (the CSS's scope); office: a gen_office.py drawing
 INLINE = [
-    ('.hero-art', True, [IMG / 'hero-office.svg', IMG / 'hero-office-tablet.svg', IMG / 'office-compact-build.svg',
-                         IMG / 'office-compact-flows.svg', HOME / 'hero-flows.svg']),
+    ('.hero-art', True, sorted((HOME / 'hero').glob('*.svg'))),   # the hero's layers
     ('.grow-stage', False, [HOME / 'grow-world.svg']),
 ]
 _INLINE_NAMES = {p.name for _, _, files in INLINE for p in files}
@@ -133,9 +132,6 @@ def lighten(svg, office=False):
         tag = m.group(1)
         return ATTR.sub(lambda a: f'{a.group(1)}="{swap(a.group(2), kind_of(a.group(1), tag), office)}"', m.group(0))
     out = TAG.sub(tag_sub, svg)
-    # the phone cut's caption list (data-items, JSON): home.js writes each title in its "c" colour, as words
-    out = re.sub(r'(&quot;c&quot;:&quot;)(#[0-9A-Fa-f]{6})(&quot;)',
-                 lambda m: m.group(1) + swap(m.group(2), 'text', office) + m.group(3), out)
     def rule_sub(r):   # one CSS rule: swap its colours unless (selector, property) is kept
         sel = r.group(1).strip()
         return r.group(1) + '{' + CSS.sub(lambda c: c.group(0) if (sel, c.group(1)) in KEEP_RULES
@@ -150,7 +146,7 @@ def target(src):
 
 
 def is_office(src):
-    return src.name.startswith(('office', 'hero-office'))
+    return src.name.startswith('office')
 
 
 def _css(hex_):
@@ -178,9 +174,6 @@ def inline_css():
             for m in TAG.finditer(svg):
                 for a in ATTR.finditer(m.group(0)):
                     uses.add((a.group(1), a.group(2).upper(), kind_of(a.group(1), m.group(1))))
-            # home.js writes the phone captions' colours (data-items) as a title's fill and its line's stroke
-            for c in re.findall(r'&quot;c&quot;:&quot;(#[0-9A-Fa-f]{6})&quot;', svg):
-                uses |= {('fill', c.upper(), 'text'), ('fill', c.upper(), 'fill'), ('stroke', c.upper(), 'stroke')}
             for s in re.findall(r'<style[^>]*>(.*?)</style>', svg, flags=re.S):
                 for sel, body in re.findall(r'([^{}@]+)\{([^{}]*)\}', s):
                     for prop, col in CSS.findall(body):

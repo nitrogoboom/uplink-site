@@ -1,10 +1,13 @@
 """Draws the office floor plan and the Home hero from one world-space description, in cuts that share every shape
 (docs/drawing-tools.md, "Generators" and "Which cut shows where"; each output is listed where it's written, at the end).
 usage: python tools/gen_office.py public
-Edit the numbers below and run again; don't hand-edit any of them. Keep the hero's classes, --d delays and data-tile
-as the page's JS and CSS expect; its animation CSS and the cloud's frame are input parts in tools/office_parts/.
+Edit the numbers below and run again; don't hand-edit any of them. The hero is a stack of layers (HERO_LAYERS), each
+its own <svg> that the page builds in; keep the classes and data-app the page's JS and CSS expect. Its loop CSS and
+the cloud's frame are input parts in tools/office_parts/.
 """
-import html, json, math, pathlib, re, sys
+import math, pathlib, re, sys
+import yaml
+from fontTools.ttLib import TTFont
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, cull_hidden, share_paint, tidy_numbers, card as card_cut, box as draw_box
@@ -113,8 +116,8 @@ HERO_WIN = ((2.875, 15.5), 2.0, 0, 1.5, 3.75)  # back wall window starts, width,
                                                 # between desk A3 and the closet, none behind a monitor (was one over each desk: 6.75, 9.75, 12.75)
 HERO_LEFT_WIN = ((5.625,), 1.5, 0, 2.0, 3.75)   # left wall: one window over the coffee counter, sill above the machine. The meeting
                                                 # room's TV wall has none (was 12.25, sill 1.5: beside the TV)
-HERO_DESKS = {(6.5, 0.25): 1000, (9.5, 0.25): 1100, (12.5, 0.25): 1200}    # row A, flush to the back wall
-HERO_DESKS_B = {(9.5, 4.25): 1400, (12.5, 4.25): 1500}   # row B: two desks (a walkway by the meeting room); aisle y 2.5..4.25
+HERO_DESKS = [(6.5, 0.25), (9.5, 0.25), (12.5, 0.25)]   # row A, flush to the back wall
+HERO_DESKS_B = [(9.5, 4.25), (12.5, 4.25)]               # row B: two desks (a walkway by the meeting room); aisle y 2.5..4.25
 PRINTER = [(0.375, 1.375, 4.25, 5.25, 0, 0.875), (0.5, 1.25, 4.375, 5.125, 0.875, 1.0)]   # body, lid: print nook, below the cabinet
 PAPER = (0.625, 1.125, 4.5, 5.0)                # a sheet on the printer lid (x0 x1 y0 y1)
 CAB_PLANT = (0.75, 1.5)                         # small planter on the filing cabinet's top (centre), at its back-wall end (right on screen)
@@ -183,20 +186,16 @@ TABLET_LABELS = [(HERO_LABELS[0][0], (1052.0, 728.0), *HERO_LABELS[0][2:]),
                  (HERO_LABELS[2][0], _along(HERO_LABELS[2][0], 640.0), *HERO_LABELS[2][2:])]
 TABLET_CLOUD = (842.7, -82.0)          # the cloud label's text scales about this point (its right edge, at the tail)
 
-# phone cut ('phone'): the whole hero scene, cloud full size, framed close (PHONE_CROP), with no words drawn in it.
-# home.js writes two captions over it at a fixed on-screen size: CLOUD top left (its line to the cloud, the app it
-# names lit on the tray) and OFFICE bottom left (its line to each item in PHONE_ITEMS in turn). Their data rides on
-# the <svg> as data-cloud and data-items (data- attributes survive SVGO; empty <text> would not).
-PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab, room for a caption in each free corner
-PHONE_CLOUD_DOT = (950.1, -36.0)       # the cloud label's dot in office_parts/hero_cloud.svg
-PHONE_ITEMS = [HERO_LABELS[i] for i in (1, 2, 3, 4, 0)]   # Wi-Fi, workstations, Teams room, guest Wi-Fi, firewall rack
-# The phone cut starts its build this far in (ms), so it opens on the furnished room (the last of it, the lounge,
-# lands at 1750 + 450) and only the network and the cloud build in, over about 1.3 s. Started at 0, it opened on a
-# bare floor slab for a second or more. The captions come as the cloud settles (3300 on the build's own clock); the
-# <svg> carries that time as data-words for home.js.
-PHONE_AHEAD = 2200
-PHONE_WORDS = 3300 - PHONE_AHEAD
-HERO_CUTS = ('hero', 'tablet', 'phone')   # the animated hero layout's three cuts
+# The hero's layers, back to front: each a slice of the scene in draw order, its own <svg> in the page, so the page
+# can build the office in by moving whole layers (hero.css). One drawing for every screen: on phones the page frames
+# it closer (PHONE_CROP, hero-crop.css) and hides the drawn labels; labels-tablet is the labels at TABLET_K, which
+# hero.css shows where the drawing is small.
+HERO_VIEW = (0, -130, 1200, 930)       # x, y, width, height
+HERO_LAYERS = ('floor', 'walls', 'back', 'front', 'net', 'cloud', 'flows', 'labels', 'labels-tablet')
+PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab
+# The cloud label names one app at a time (the page steps through them), in the words from Home's copy
+COPY = pathlib.Path(__file__).resolve().parent.parent / 'src/data/copy/en/home.yaml'
+APP_RIGHT = 842.7                      # the app lines' right edge, under the cloud label's title (office_parts/hero_cloud.svg)
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
@@ -206,12 +205,11 @@ HIGH_EDGE = f'stroke="{pal.HI_EDGE}" stroke-width="1" stroke-opacity="0.55"'
 TRAY_FACES = (pal.TRAY_LEFT, pal.TRAY_RIGHT, pal.TRAY_TOP)
 TRAY_EDGE = f'stroke="{pal.SKY}" stroke-width="1.4" stroke-opacity="0.75"'
 ROUND = 'stroke-linecap="round" stroke-linejoin="round"'
-# what screen readers say for the drawing: plain words, as a person would describe it
-TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace',
-          'hero': 'Drawing of an office being set up: desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
+# what screen readers say for the static drawing: plain words, as a person would describe it (the hero's are Home's copy)
+TITLES = {'office': 'Drawing of an office with desks, a server rack, Wi-Fi and a cloud workspace for Microsoft 365 and Google Workspace'}
 
 
-# ---- line weight (hero cuts) -------------------------------------------------------
+# ---- line weight (hero) -------------------------------------------------------------
 # The hero shows at about 0.82 of its 1200 units on a 1080p screen, so a 1-unit line is 0.8 device px and a 0.7 one
 # 0.57: thinner than a pixel, a slanted line is smoothed into beads. crisp() widens every line under HERO_MIN_LINE to
 # it and lowers its opacity by the same ratio, so it keeps its weight but covers whole pixels. Left alone: the floor
@@ -435,15 +433,15 @@ def rack_top(i=0, h=RACK[3]):
     return (x0 + RACK[0] / 2, (RACK[1] + RACK[2]) / 2, h)
 
 
-def cable_pair(pts, v, base_style='', flow_style='', join=True, colour=pal.AMBER):
+def cable_pair(pts, v, flow_style='', join=True, colour=pal.AMBER):
+    """The cable, and over it its data: still dashes in the static drawings, moving ones (.ob-flow) in the hero."""
     j = ' stroke-linejoin="round"' if join else ''
     base = f'stroke="{colour}" stroke-width="1.4" stroke-opacity="0.5" stroke-linecap="round"{j}'
     flow = f'stroke="{colour}" stroke-width="2" stroke-opacity="0.95" stroke-linecap="round"{j}'
     if v == 'office':
         return [line(pts, base), line(pts, flow + ' stroke-dasharray="2 7"')]
-    bs = f'style="{base_style}" ' if base_style else ''
     fs = f'style="{flow_style}" ' if flow_style else ''
-    return [line(pts, base, f'class="ob-cable" {bs}pathLength="100" '), line(pts, flow, f'class="ob-flow" {fs}')]
+    return [line(pts, base), line(pts, flow, f'class="ob-flow" {fs}')]
 
 
 def cable(ap, v, rack_h=RACK[3], colour=pal.AMBER):
@@ -482,9 +480,8 @@ def uplink(v, rack_h=RACK[3]):
     reads as plugged in, and nothing runs across the tray or its tiles."""
     x, y, z = rack_top(0, rack_h)
     _x0, _x1, y0, y1, _z0, _z1 = tray_box()
-    top = TRAY_Z - (y1 - y0) / 2 if v in HERO_CUTS else TRAY_Z
-    return cable_pair([(x, y, z), (x, y, top)], v, 'animation-duration:350ms',
-                      'animation-delay:calc(var(--d,0ms) + 380ms);--dash-dir:-1', join=False)
+    top = TRAY_Z - (y1 - y0) / 2 if v == 'hero' else TRAY_Z
+    return cable_pair([(x, y, z), (x, y, top)], v, '--dash-dir:-1', join=False)
 
 
 def tray_box():
@@ -494,20 +491,19 @@ def tray_box():
     return (x - tw / 2, x + tw / 2, y - td / 2, y + td / 2, TRAY_Z, TRAY_Z + TRAY_T)
 
 
-def tile(i, v):
+def tile(i, lit=None):
+    """Tile i on the tray, lit (amber) or not; lit defaults to the static drawings' choice, mail."""
     tx0, _, ty0, _, _, tz1 = tray_box()
     col, row = i % 3, i // 3
     x0, y0 = tx0 + TRAY_M + col * (TILE + TILE_GAP), ty0 + TRAY_M + row * (TILE + TILE_GAP)
-    lit = TILES[i] == 'mail'
-    out = box((x0, x0 + TILE, y0, y0 + TILE, tz1, tz1 + TILE_T), HIGH if lit else FACES, HIGH_EDGE if lit else EDGE,
-              ('f-l', 'f-r', 'f-t') if v in HERO_CUTS else ('', '', ''))
+    lit = TILES[i] == 'mail' if lit is None else lit
+    out = box((x0, x0 + TILE, y0, y0 + TILE, tz1, tz1 + TILE_T), HIGH if lit else FACES, HIGH_EDGE if lit else EDGE)
     m = (TILE - ICON) / 2
     ox, oy = w.p(x0 + m, y0 + m, tz1 + TILE_T)
     s = ICON / 24
     a, b = math.cos(math.radians(30)) * w.u * s, w.u / 2 * s
-    cls = 'class="f-ic" ' if v in HERO_CUTS else ''
     iw = ICON_LINE / math.sqrt(2 * a * b)      # the matrix's area scale is 2ab: a line ICON_LINE wide on screen
-    out.append(f'<g {cls}transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{pal.ON_AMBER if lit else pal.WHITE}" '
+    out.append(f'<g transform="matrix({a:.4f} {b:.4f} {-a:.4f} {b:.4f} {fmt(ox)} {fmt(oy)})" fill="none" stroke="{pal.ON_AMBER if lit else pal.WHITE}" '
                f'stroke-width="{iw:.3g}" {ROUND}>{ICONS[TILES[i]]}</g>')
     return out
 
@@ -693,52 +689,9 @@ def label(dot, elbow, colour, title, sub, side='left', k=1.0):
 
 
 # ---- assembly -------------------------------------------------------------------
-def hero_groups(v):
-    """The hero's own layout (see 'hero layout' above), back to front; the air above it is shared with groups()."""
-    G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v, None) + entrance()),
-         ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall(0, HERO_WIN)),
-         ('class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms"', left_wall(0, HERO_LEFT_WIN, MEET_TV, call=True)),
-         ('class="ob-i" style="--d:775ms"', nook()),
-         ('class="ob-i" style="--d:850ms"', coffee())]
-    for (cx, cy), d in HERO_DESKS.items():
-        G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
-    G += [('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_back(HERO_GLASS)),
-          ('class="ob-i ob-grow" style="--d:1500ms;animation-duration:520ms"', rack(RACKS[0], v, *HERO_RACK)),
-          ('class="ob-i" style="--d:1580ms"', ups())]
-    for (cx, cy), d in HERO_DESKS_B.items():
-        G.append((f'class="ob-i" style="--d:{d}ms"', desk(cx, cy)))
-    G += [('class="ob-i ob-fade" style="--d:1700ms;animation-duration:450ms"', glass_front(HERO_GLASS)),
-          ('class="ob-i ob-fade" style="--d:650ms;animation-duration:450ms"', meeting_glass_back()),   # rows A, B are behind the room
-          ('class="ob-i" style="--d:700ms"', hero_meeting()),
-          ('class="ob-i ob-fade" style="--d:950ms;animation-duration:450ms"', meeting_glass_front()),
-          ('class="ob-i" style="--d:1700ms"', reception()),
-          ('class="ob-i" style="--d:1750ms"', lounge()),
-          ('class="ob-i" style="--d:1650ms"', plant(PLANT_AT)),   # in front of the waiting area now, so drawn after it
-          ('class="ob-i ob-fade" style="--d:1800ms;animation-duration:450ms"', front_door())]   # on the front edge: in front of everything
-    if v == 'tablet':
-        return air(v, G, HERO_APS, TABLET_LABELS, HERO_RACK[0], GUEST_AP, TABLET_K)
-    if v == 'phone':
-        return air(v, G, HERO_APS, [], HERO_RACK[0], GUEST_AP)
-    return air(v, G, HERO_APS, HERO_LABELS, HERO_RACK[0], GUEST_AP)
-
-
-def phone_data():
-    """The phone captions' data, for the <svg>'s data-cloud and data-items: screen points and words."""
-    items = [dict(t=title, s=sub, c=colour, x=round(w.p(*dot)[0], 1), y=round(w.p(*dot)[1], 1))
-             for dot, _elbow, colour, title, sub, *_rest in PHONE_ITEMS]
-    return f'{PHONE_CLOUD_DOT[0]:g},{PHONE_CLOUD_DOT[1]:g}', html.escape(json.dumps(items, separators=(',', ':')))
-
-
-def phone_cloud(cloud):
-    """The hero cloud part for the phone cut: the cloud and its sync lines as they are, without its label (home.js
-    writes the phone's cloud caption)."""
-    return cloud[:cloud.index('<g class="ob-i ob-lab co lbl" data-t="CLOUD WORKSPACE"')]
-
-
 def groups(v):
-    """(wrapper attrs for the animated versions, shapes) in draw order, back to front."""
-    if v in HERO_CUTS:
-        return hero_groups(v)
+    """The static drawings' (office, compact) parts in draw order, back to front: (attrs, shapes). The attrs are the
+    build's, from when these drawings were animated; render() keeps only the label groups' class and words."""
     G = [('class="ob-i ob-fade" style="--d:0ms"', floor(v)),
          ('class="ob-i ob-grow" style="--d:300ms;animation-duration:480ms"', back_wall()),
          ('class="ob-i ob-grow" style="--d:420ms;animation-duration:480ms"', left_wall()),
@@ -758,199 +711,199 @@ def groups(v):
     return air(v, G, APS, LABELS)
 
 
-def air(v, G, aps, labels, rack_h=RACK[3], guest=None, scale=1.0):
-    """Everything above the floor plan, appended to G: a cable to each AP, Wi-Fi (aps[guest] in blue, smaller rings),
-    uplink, tray and tiles, the cloud or card, labels (at size scale)."""
+def air(v, G, aps, labels):
+    """Everything above the floor plan, appended to G: a cable to each AP, Wi-Fi, uplink, tray and tiles, the card or
+    (compact) the labels."""
     for i, ap in enumerate(aps):
-        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v, rack_h, GUEST[2] if i == guest else pal.AMBER)))
+        G.append((f'class="ob-i ob-n" style="--d:{1900 + 80 * i}ms"', cable(ap, v)))
     for k, (r, op) in enumerate(RINGS):
         for i, ap in enumerate(aps):
             G.append(((f'class="ob-i ob-ring" style="--d:{RING_D[k][i]}ms"', f'class="ob-pulse" style="animation-delay:{RING_PULSE[k][i]}ms"'),
-                      ring(ap, r * GUEST_RINGS, op, GUEST[2]) if i == guest else ring(ap, r, op)))
+                      ring(ap, r, op)))
     for i, ap in enumerate(aps):
-        G.append((f'class="ob-i" style="--d:{2250 + 70 * i}ms"', access_point(ap, GUEST if i == guest else HIGH)))
-    G.append(('class="ob-i ob-n" style="--d:2450ms"', uplink(v, rack_h)))
+        G.append((f'class="ob-i" style="--d:{2250 + 70 * i}ms"', access_point(ap)))
+    G.append(('class="ob-i ob-n" style="--d:2450ms"', uplink(v)))
     G.append(('class="ob-i" style="--d:2500ms"', box(tray_box(), TRAY_FACES, TRAY_EDGE)))
-    for i, name in enumerate(TILES):
-        attrs = f'class="ob-i ob-tile" data-tile="{name}" style="--d:{2620 + 70 * i}ms"' if v in HERO_CUTS else f'class="ob-i" style="--d:{2620 + 70 * i}ms"'
-        G.append((attrs, tile(i, v)))
-    if v in HERO_CUTS:
-        hero_cloud = part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes())
-        if v == 'phone':
-            hero_cloud = phone_cloud(hero_cloud)
-        elif scale != 1.0:                   # the cloud label's words grow about their tail end; leader and dot stay
-            a = hero_cloud.index('<text class="lt"', hero_cloud.index('data-t="CLOUD WORKSPACE"'))
-            b = hero_cloud.index('<g class="num">', a)
-            cx, cy = TABLET_CLOUD
-            hero_cloud = (hero_cloud[:a] + f'<g transform="matrix({scale:g} 0 0 {scale:g} {fmt(cx * (1 - scale))} {fmt(cy * (1 - scale))})">\n'
-                          + hero_cloud[a:b] + '</g>\n' + hero_cloud[b:])
-        G.append((None, [hero_cloud]))
-    elif v == 'compact':                     # no cloud card: the tray and its tiles read on their own
+    for i in range(len(TILES)):
+        G.append((f'class="ob-i" style="--d:{2620 + 70 * i}ms"', tile(i)))
+    if v == 'compact':                       # no cloud card: the tray and its tiles read on their own
         for (dot, elbow, colour, title, sub, side), d in zip(COMPACT_LABELS, (2800, 2960)):
             G.append((f'class="ob-i ob-lab co lbl" data-t="{esc(title)}" data-s="{esc(sub)}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, side, COMPACT_K)))
         return G
-    else:
-        G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
+    G.append(('class="ob-i ob-lab" style="--d:3020ms"', card(v)))
     for dot, elbow, colour, title, sub, d, *side in labels:
-        G.append((f'class="ob-i ob-lab co lbl" data-t="{esc(title)}" data-s="{esc(sub)}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side, k=scale)))
+        G.append((f'class="ob-i ob-lab co lbl" data-t="{esc(title)}" data-s="{esc(sub)}" style="--d:{d}ms"', label(dot, elbow, colour, title, sub, *side)))
     return G
 
 
-HERO_FLOWS = []                          # the hero's flow layer, filled by render('hero'); written to hero-flows.svg
-PHONE_FLOWS = []                         # the animated phone cut's, filled by render('phone'); office-compact-flows.svg
-PHONE_STILL = []                         # the phone cut's drawing and dashes as render('phone') draws them; phone_still()
-
-
-def ahead(text, ms):
-    """Every build delay (--d) moved ms earlier: a part whose delay goes negative starts part way through its
-    animation, or already finished."""
-    return re.sub(r'--d:(\d+)ms', lambda m: f'--d:{int(m.group(1)) - ms}ms', text)
-
-
-def split_flows(body):
-    """The marching dashes (stroke-dashoffset) can't be composited, so each frame repaints the whole drawing under
-    them. Move them to a second svg on its own layer: same box and viewBox, drawn last. Each keeps its group's class
-    and --d, so its delay is unchanged."""
-    over, out, last = [], [], 0
-    for m in re.finditer(r'<polyline\b[^>]*class="ob-flow"[^>]*/>', body):
-        cls, d = re.findall(r'<g class="(ob-i[^"]*)"[^>]*?style="(--d:\d+ms)"[^>]*>', body[:m.start()])[-1]
-        out.append(body[last:m.start()])
-        last = m.end()
-        over.append(f'<g class="{cls}" style="{d}">{m.group(0)}</g>')
-    out.append(body[last:])
-    return ''.join(out), '\n'.join(over)
-
-
 def render(v):
+    """office.svg ('office') or the compact cut ('compact')."""
     BOXES.clear()
     out = []
     for attrs, shapes in groups(v):
-        if v in HERO_CUTS:
-            shapes = cull_hidden(shapes)        # nothing that would show nowhere (a chair tucked under a table, a face behind a chair back)
-        if attrs is None:                       # hero cloud: already wrapped
-            out += shapes; continue
-        if v in ('office', 'compact'):
-            open_, close = (('<g class="co lbl"' + attrs.split('lbl"')[1].split(' style=')[0] + '>') if 'lbl"' in attrs else '<g>'), '</g>'
-        elif isinstance(attrs, tuple):
-            open_, close = f'<g {attrs[0]}>\n<g {attrs[1]}>', '</g>\n</g>'
-        else:
-            open_, close = f'<g {attrs}>', '</g>'
-        out += [open_, *shapes, close]
+        open_ = ('<g class="co lbl"' + attrs.split('lbl"')[1].split(' style=')[0] + '>') if 'lbl"' in attrs else '<g>'
+        out += [open_, *shapes, '</g>']
     body = number_badges('\n'.join(out))
-    if v in HERO_CUTS:
-        body = crisp(body)
-    title = esc(TITLES['office' if v == 'compact' else 'hero' if v in ('phone', 'tablet') else v])
-    crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
-    phone_crop = ' '.join(f'{c:g}' for c in PHONE_CROP)
+    title = esc(TITLES['office'])
     if v == 'compact':
+        crop = ' '.join(f'{c:g}' for c in COMPACT_CROP)
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="{crop}" width="1200" height="900" role="img" aria-label="{title}">'
         style = font_style(body) + '\n<style>svg:target .lbl{display:none}</style>'
-    elif v == 'phone':                      # inlined in the page like the hero: page fonts, hero.css for the motion and the tiles
-        cloud_at, items = phone_data()
-        head = (f'<svg xmlns="http://www.w3.org/2000/svg" class="ob ob-phone" viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" '
-                f'role="img" aria-label="{title}" data-cloud="{cloud_at}" data-items="{items}" data-words="{PHONE_WORDS}">')
-        style = '<style>' + part('hero.css') + '</style>'
-    elif v == 'office':
+    else:
         head = f'<svg xmlns="http://www.w3.org/2000/svg" id="plain" viewBox="0 0 1200 800" width="1200" height="800" role="img" aria-label="{title}">'
         style = font_style(body) + '\n' + key_css()
-    else:
-        head = f'<svg xmlns="http://www.w3.org/2000/svg" class="ob" viewBox="0 -130 1200 930" width="1200" height="930" role="img" aria-label="{title}">'
-        style = '<style>' + part('hero.css') + '</style>'
-        # hidden like its two paths: the link is off (data-link="none"), so it was showing parked at -99,-99 on wide screens
-        body += f'\n<circle class="ob-link-end" r="6.5" fill="{pal.ON_AMBER}" stroke="{pal.AMBER}" stroke-width="3" cx="-99" cy="-99" display="none"/>'
-    flows = []
-    if v in HERO_CUTS + ('phone',):
-        body, over = split_flows(body)
-        if v == 'phone':
-            body, over = ahead(body, PHONE_AHEAD), ahead(over, PHONE_AHEAD)
-            PHONE_STILL[:] = [body, over]
-        over, over_css = hoist_styles(over)
-        size = f'viewBox="{phone_crop}" width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}"' if v == 'phone' else 'viewBox="0 -130 1200 930" width="1200" height="930"'
-        cls = 'ob-over ob-phone' if v == 'phone' else 'ob-over'   # ob-phone: compact-cuts.css shows these on phones only
-        flows = [f'<svg xmlns="http://www.w3.org/2000/svg" class="{cls}" {size} aria-hidden="true" focusable="false">',
-                 f'<style>{over_css}</style>', over, '</svg>']
-        if v == 'hero':
-            HERO_FLOWS[:] = flows
-        elif v == 'phone':
-            PHONE_FLOWS[:] = flows
-        elif v == 'tablet':                 # the page inlines one flow layer for both hero cuts, so they must agree
-            assert flows == HERO_FLOWS, 'tablet and hero dashes differ: render hero first and keep the scene the same'
     body, css = hoist_styles(body)
-    if v in HERO_CUTS:                      # after hoist_styles: a shape that had a style="" now has a class, and is left alone
-        body, paint_css = share_paint(tidy_numbers(body))
-        css += paint_css
     if css:
         style += f'\n<style>{css}</style>'
-    if v in HERO_CUTS:
-        # home.js inlines these in the page, so the drawing's parts would join the accessibility tree and its labels
-        # be read after the image's name. Hide them: the <svg>'s role="img" and aria-label are what a screen reader gets.
-        body = f'<g aria-hidden="true">\n{body}\n</g>'
     return '\n'.join([head, f'<title>{title}</title>', style, body, '</svg>'])
 
 
-def phone_still():
-    """The phone cut as a still (render('phone') first): the same scene and framing with its dashes, the build
-    finished and nothing moving. Phones without script show it in an <img>, so it needs none of home.js's hooks or
-    the animation CSS: its style="" attributes held timings only. No words, like the phone cut."""
-    body, over = PHONE_STILL
-    body = re.sub(r' style="[^"]*"', '', body + '\n' + over)
-    head = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{" ".join(f"{c:g}" for c in PHONE_CROP)}" '
-            f'width="{PHONE_CROP[2]:g}" height="{PHONE_CROP[3]:g}" role="img" aria-label="{esc(TITLES["office"])}">')
-    return '\n'.join([head, f'<title>{esc(TITLES["office"])}</title>', '<style>.ob-flow{stroke-dasharray:3 6}</style>', body, '</svg>'])
+# ---- the hero: layers -------------------------------------------------------------
+def text_width(text, size, spacing):
+    """Width of text in Barlow SemiBold at size, with letter-spacing in em (kerning left out: under a pixel here)."""
+    font = TTFont(pathlib.Path(__file__).parent / 'fonts' / 'Barlow-SemiBold.ttf')
+    cmap, hmtx = font.getBestCmap(), font['hmtx']
+    return sum(hmtx[cmap[ord(c)]][0] for c in text) * size / font['head'].unitsPerEm + spacing * size * len(text)
 
 
-def slab_css():
-    """The phone cut's floor slab as CSS shapes in % of its box (PHONE_CROP, which the stage matches on phones), from
-    the same FLOOR, SLAB and projection that draw it: hero.css shows it while home.js fetches that drawing, so the build
-    starts on a floor that is already there, and it can't drift from the drawing's own."""
+def cloud_apps():
+    """The cloud label's app lines, one group per app in Home's copy; the first shows until the page steps on. The
+    green dot sits 10 left of the state word, so its place is worked out from the word's width."""
+    apps = yaml.safe_load(COPY.read_text(encoding='utf-8'))['cloud']['apps']
+    assert list(apps) == TILES, 'the copy\'s cloud apps and TILES must name the same apps in the same order'
+    out = []
+    for i, (key, a) in enumerate(apps.items()):
+        state = a['state'].upper()
+        dot = APP_RIGHT - text_width(state, 17, 0.08) - 10
+        out.append(f'<g class="hl-app{" is-on" if i == 0 else ""}" data-app="{key}">\n'
+                   f'<text x="{APP_RIGHT}" y="-46" font-family="{FONT}" font-size="21" font-weight="400" fill="{pal.GREY}" text-anchor="end">'
+                   f'<tspan font-weight="600" fill="{pal.WHITE}">{esc(a["name"].upper())}</tspan> · {esc(a["detail"])}</text>\n'
+                   f'<text x="{APP_RIGHT}" y="-18" font-family="{FONT}" font-size="17" font-weight="600" letter-spacing="0.08em" fill="{pal.GREEN}" text-anchor="end">{esc(state)}</text>\n'
+                   f'<circle cx="{fmt(dot)}" cy="-23" r="4.5" fill="{pal.GREEN}"/>\n</g>')
+    return '\n'.join(out)
+
+
+def hero_cloud(scale=1.0):
+    """The cloud part, split: (the cloud and its sync lines, its label). At scale, the label's words grow about
+    TABLET_CLOUD, its tail end; the leader and dot stay."""
+    text = part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes()).replace('{{APPS}}', cloud_apps())
+    at = text.index('<g class="co lbl" data-t="CLOUD WORKSPACE"')
+    cloud, lab = text[:at], text[at:]
+    if scale != 1.0:
+        a = lab.index('<text class="lt"')
+        b = lab.index('<g class="num">', a)
+        cx, cy = TABLET_CLOUD
+        lab = (lab[:a] + f'<g transform="matrix({scale:g} 0 0 {scale:g} {fmt(cx * (1 - scale))} {fmt(cy * (1 - scale))})">\n'
+               + lab[a:b] + '</g>\n' + lab[b:])
+    return cloud, lab
+
+
+def labels(items, k=1.0):
+    out = []
+    for dot, elbow, colour, title, sub, _d, *side in items:
+        out += [f'<g class="co lbl" data-t="{esc(title)}">', *label(dot, elbow, colour, title, sub, *side, k=k), '</g>']
+    return out
+
+
+def lit(i, name):
+    """Tile i lit, over its plain self: the page shows it while its app is named (hero.css, office_parts/hero.css)."""
+    return [f'<g class="hl-lit{" is-on" if i == 0 else ""}" data-app="{name}">', *cull_hidden(tile(i, True)), '</g>']
+
+
+def hero_layers():
+    """{layer name: its shapes as SVG text}, in HERO_LAYERS order. Each part is culled on its own (cull_hidden): a
+    shape covered only by a later part is kept."""
+    v = 'hero'
+    room = {
+        'floor': [floor(v, None) + entrance()],
+        'walls': [back_wall(0, HERO_WIN), left_wall(0, HERO_LEFT_WIN, MEET_TV, call=True)],
+        'back': [nook(), coffee(), *(desk(*d) for d in HERO_DESKS), glass_back(HERO_GLASS), rack(RACKS[0], v, *HERO_RACK),
+                 ups(), *(desk(*d) for d in HERO_DESKS_B), glass_front(HERO_GLASS)],
+        'front': [meeting_glass_back(), hero_meeting(), meeting_glass_front(), reception(), lounge(), plant(PLANT_AT),
+                  front_door()],
+    }
+    out = {name: [s for p in parts for s in cull_hidden(p)] for name, parts in room.items()}
+    net = []
+    for i, ap in enumerate(HERO_APS):
+        net += cable(ap, v, HERO_RACK[0], GUEST[2] if i == GUEST_AP else pal.AMBER)
+    for k, (r, op) in enumerate(RINGS):
+        for i, ap in enumerate(HERO_APS):
+            net += [f'<g class="ob-pulse" style="animation-delay:{RING_PULSE[k][i]}ms">',
+                    *(ring(ap, r * GUEST_RINGS, op, GUEST[2]) if i == GUEST_AP else ring(ap, r, op)), '</g>']
+    for i, ap in enumerate(HERO_APS):
+        net += access_point(ap, GUEST if i == GUEST_AP else HIGH)
+    net += uplink(v, HERO_RACK[0]) + cull_hidden(box(tray_box(), TRAY_FACES, TRAY_EDGE))
+    for i, name in enumerate(TILES):
+        net += cull_hidden(tile(i, False)) + lit(i, name)
+    out['net'] = net
+    cloud, cloud_label = hero_cloud()
+    out['cloud'] = [cloud]
+    out['labels'] = labels(HERO_LABELS) + [cloud_label]
+    out['labels-tablet'] = labels(TABLET_LABELS, TABLET_K) + [hero_cloud(TABLET_K)[1]]
+    text = {name: crisp(number_badges('\n'.join(shapes))) for name, shapes in out.items()}
+    # the moving dashes on a layer of their own over the rest: while they move, only that layer is drawn again
+    flows = []
+    for name in ('net', 'cloud'):
+        flows += re.findall(r'<polyline\b[^>]*class="ob-flow"[^>]*/>', text[name])
+        text[name] = re.sub(r'<polyline\b[^>]*class="ob-flow"[^>]*/>\n?', '', text[name])
+    text['flows'] = '\n'.join(flows)
+    return {name: text[name] for name in HERO_LAYERS}
+
+
+def hero_svgs():
+    """{file name: SVG} for the hero's layers. One <style> for all of them, in the first: the loops' CSS and the
+    classes hoist_styles and share_paint make (the same rules get the same name in every layer)."""
+    x, y, wd, ht = HERO_VIEW
+    bodies, rules = {}, []
+    for name, body in hero_layers().items():
+        body, css = hoist_styles(body)
+        body, paint_css = share_paint(tidy_numbers(body))
+        bodies[name] = body
+        rules += [r for r in re.findall(r'[^{}]+\{[^{}]*\}', css + paint_css) if r not in rules]
+    out = {}
+    for i, (name, body) in enumerate(bodies.items(), 1):
+        style = f'\n<style>{part("hero.css")}\n{"".join(rules)}</style>' if i == 1 else ''
+        out[f'{i}-{name}.svg'] = (f'<svg xmlns="http://www.w3.org/2000/svg" class="hl-{name}" viewBox="{x} {y} {wd} {ht}" '
+                                  f'aria-hidden="true" focusable="false">{style}\n{body}\n</svg>\n')
+    return out
+
+
+def crop_css():
+    """The phone framing as CSS: where the hero's layers sit, in % of a stage cut to PHONE_CROP, so the page shows
+    that part of the drawing. hero.css uses it on phones."""
+    x, y, wd, ht = HERO_VIEW
     cx, cy, cw, ch = PHONE_CROP
-    X, Y = FLOOR
 
     def pct(v):
-        return f'{round(v, 2):g}%'
-
-    def at(x, y, z):
-        px, py = w.p(x, y, z)
-        return f'{pct((px - cx) / cw * 100)} {pct((py - cy) / ch * 100)}'
-
-    # back (0, 0), right (X, 0), front (X, Y) and left (0, Y), on top (z 0) and underneath (z -SLAB)
-    sides = [at(0, 0, 0), at(X, 0, 0), at(X, 0, -SLAB), at(X, Y, -SLAB), at(0, Y, -SLAB), at(0, Y, 0)]
-    top = [at(0, 0, 0), at(X, 0, 0), at(X, Y, 0), at(0, Y, 0)]
-    front = pct((w.p(X, Y, 0)[0] - cx) / cw * 100)
-    return ('/* Written by tools/gen_office.py: do not edit by hand. The phone cut\'s floor slab\n'
-            '   (office-compact-build.svg) in % of the stage: its outline with both sides, the front corner where the\n'
-            '   sides meet, and its top. hero.css draws them while the drawing loads. */\n'
+        return f'{round(v * 100, 3):g}%'
+    return ('/* Written by tools/gen_office.py: do not edit by hand. The hero\'s phone framing (PHONE_CROP): the\n'
+            '   layers\' box in % of the stage, and the stage\'s shape. hero.css uses it on phones. */\n'
             '.hero-art {\n'
-            f'  --slab-sides: polygon({", ".join(sides)});\n'
-            f'  --slab-front: {front};\n'
-            f'  --slab-top-face: polygon({", ".join(top)});\n'
+            f'  --crop-ratio: {cw:g} / {ch:g};\n'
+            f'  --crop-tall: calc({ch:g} / {cw:g});\n'
+            f'  --crop-x: {pct((x - cx) / cw)};\n'
+            f'  --crop-y: {pct((y - cy) / ch)};\n'
+            f'  --crop-w: {pct(wd / cw)};\n'
+            f'  --crop-h: {pct(ht / ch)};\n'
             '}\n')
 
 
 if __name__ == '__main__':
     # The outputs:
-    # public/assets/img/office.svg        static, loaded with <img> on the Work page and as Home's no-script hero on wider screens (carries its Barlow letters)
+    # public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
     # public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
     #   badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
-    # public/assets/img/hero-office.svg  the hero, fetched by home.js on wide screens (page fonts apply)
-    # public/assets/img/hero-office-tablet.svg  tablet cut of the hero: same scene and dashes, three labels at TABLET_K
-    # src/components/home/hero-flows.svg  the hero's moving dashes, inlined by Hero.astro (shared by the two hero cuts)
-    # public/assets/img/office-compact-build.svg  the hero's phone cut, animated: the hero scene framed closer, no words;
-    #   home.js writes its two captions (PHONE_*); fetched on phones (page fonts apply).
-    #   Its build starts PHONE_AHEAD in, on the furnished room. With reduced motion
-    #   it stands still (hero.css) and the captions come at once.
-    # public/assets/img/office-compact-flows.svg  its moving dashes, fetched with it and laid on top (like hero-flows.svg)
-    # public/assets/img/hero-office-phone.svg  the phone cut as a still, dashes in, nothing moving: Home's no-script hero on phones
-    # src/components/home/hero-slab.css  the phone cut's floor slab as CSS shapes, for hero.css's placeholder (slab_css)
+    # src/components/home/hero/N-NAME.svg  the hero's layers (HERO_LAYERS), inlined by Hero.astro (page fonts apply)
+    # src/components/home/hero-crop.css   the hero's phone framing (crop_css)
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
-    # the card cut: the compact one without its labels or their letters (isogen.card). The compact cut itself is
-    # no longer a file: the phone hero's still is hero-office-phone.svg, below.
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
-    root = pathlib.Path(__file__).resolve().parent.parent
-    for v, name in (('hero', 'hero-office.svg'), ('tablet', 'hero-office-tablet.svg'), ('phone', 'office-compact-build.svg')):
-        (site / 'assets/img' / name).write_text(render(v) + '\n', encoding='utf-8', newline='\n')
-    (root / 'src/components/home/hero-flows.svg').write_text('\n'.join(HERO_FLOWS) + '\n', encoding='utf-8', newline='\n')
-    (site / 'assets/img/office-compact-flows.svg').write_text('\n'.join(PHONE_FLOWS) + '\n', encoding='utf-8', newline='\n')
-    (site / 'assets/img/hero-office-phone.svg').write_text(phone_still() + '\n', encoding='utf-8', newline='\n')
-    (root / 'src/components/home/hero-slab.css').write_text(slab_css(), encoding='utf-8', newline='\n')
+    home = pathlib.Path(__file__).resolve().parent.parent / 'src/components/home'
+    (home / 'hero').mkdir(exist_ok=True)
+    svgs = hero_svgs()
+    for old in (home / 'hero').glob('*.svg'):
+        if old.name not in svgs:
+            old.unlink()
+    for name, text in svgs.items():
+        (home / 'hero' / name).write_text(text, encoding='utf-8', newline='\n')
+    (home / 'hero-crop.css').write_text(crop_css(), encoding='utf-8', newline='\n')

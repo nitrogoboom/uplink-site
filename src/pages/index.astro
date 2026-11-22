@@ -2,7 +2,7 @@
 // HOME. Sections in page order; each is one component in src/components/home/.
 // The business block (JSON-LD) is the one every other page's JSON-LD points at by its @id.
 import Base from '../layouts/Base.astro';
-import { HERO, businessNode, jsonLd, pageMeta } from '../lib/site';
+import { businessNode, jsonLd, pageMeta } from '../lib/site';
 import Hero from '../components/home/Hero.astro';
 import Services from '../components/home/Services.astro';
 import Grow from '../components/home/Grow.astro';
@@ -12,7 +12,7 @@ import Proof from '../components/home/Proof.astro';
 import { phone, email, office, hours } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
-const { cloud, grow, business: about } = await copy('home');
+const { grow, business: about } = await copy('home');
 const meta = await pageMeta('home');
 
 const business = {
@@ -42,20 +42,14 @@ const business = {
 ---
 
 <Base title={meta.title} description={meta.description} page="home" path="/">
-  <Fragment slot="head">
-    <script is:inline type="application/ld+json" set:html={jsonLd(business)} />
-    <link rel="preload" href={HERO.phone} as="fetch" crossorigin media={HERO.media.phone} />
-    <link rel="preload" href={HERO.phoneFlows} as="fetch" crossorigin media={HERO.media.phone} />
-    <link rel="preload" href={HERO.tablet} as="fetch" crossorigin media={HERO.media.tablet} />
-    <link rel="preload" href={HERO.full} as="fetch" crossorigin media={HERO.media.full} />
-  </Fragment>
+  <Fragment slot="head"> <script is:inline type="application/ld+json" set:html={jsonLd(business)} /></Fragment>
   <Hero />
   <Services />
   <Grow />
   <Work />
   <Reviews><Proof /></Reviews>
   <Fragment slot="scripts">
-    <Words id="words-page" words={{ cloud, grow: { play: grow.play } }} />
+    <Words id="words-page" words={{ grow: { play: grow.play } }} />
     <script>
       import '../scripts/home.js';
     </script>

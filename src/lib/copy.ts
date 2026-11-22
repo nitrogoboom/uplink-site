@@ -56,9 +56,7 @@ export type UiWords = {
   toast: { dismiss: string; motionReduced: string; motionOn: string; booked: Toast; subscribed: Toast };
   emailError: string;
 };
-type App = { name: string; state: string; detail: string };
 export type HomeWords = {
-  cloud: { title: string; apps: Record<'mail' | 'files' | 'meet' | 'chat' | 'cal' | 'secure', App> };
   grow: { play: { pause: string; play: string; again: string } };
 };
 export type ContactWords = { copied: string; selected: Toast; received: Toast };

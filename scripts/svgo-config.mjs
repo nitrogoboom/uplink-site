@@ -11,7 +11,7 @@ import { VERSION, optimize } from 'svgo';
 //   <style> as written     the embedded fonts, and rules for classes the scripts add later, like .is-on
 //                          (minifyStyles would drop those as unused; inlineStyles would write style="" attributes,
 //                          which the CSP blocks)
-//   hidden parts           display="none" paths the hero shows from script, the Grow world's r="0" anchor circles
+//   hidden parts           display="none" parts, the Grow world's r="0" anchor circles
 //                          (removeHiddenElems)
 //   role="img"             with the aria-label, so screen readers read a drawing as one picture (removeUnknownsAndDefaults)
 //   empty groups           ones a script fills, like the Grow dome's <g class="dome-orbit"> (removeEmptyContainers)

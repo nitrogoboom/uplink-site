@@ -1,5 +1,5 @@
-// Takes the <style> blocks out of the drawings that scripts insert into a page (the hero cuts, the footer's campus
-// map: the data-hero* and data-fc-map addresses) and out of the drawings written inside a page, and links them as one
+// Takes the <style> blocks out of the drawing a script inserts into a page (the footer's campus map: the
+// data-fc-map address) and out of the drawings written inside a page (the Home hero's layers, Grow), and links them as one
 // CSS file per set of pages instead. A <style> block needs its own hash in the CSP, and Cloudflare caps that
 // _headers line at 2,000 characters, so a new drawing would grow it; a linked file needs none ('self').
 // Runs after svgo() and before head(), which puts Home's linked files back inside Home. The drawings in public/ keep
@@ -12,7 +12,7 @@ import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const STYLE = /<style[^>]*>([\s\S]*?)<\/style>/g;
-const INSERTED = /\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g;
+const INSERTED = /\sdata-fc-map="\/([^"?]+)/g;
 
 /** the top-level blocks of a stylesheet: `sel{…}` and `@media …{…}` */
 const blocks = (/** @type {string} */ css) => {

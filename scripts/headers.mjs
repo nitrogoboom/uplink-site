@@ -35,13 +35,12 @@ const files = (dir, skip = () => false) =>
     });
 // DIST: the built site's folder (dist/)
 export function headers(DIST) {
-  // Both lists are read from the built pages, so they can't drift from their sources: the drawings home.js puts into
-  // the home page (the stage's data-hero* addresses, HERO in src/lib/site.ts, the phone cut's dashes included) and the
-  // one footer.js puts in (the footer's data-fc-map, CAMPUS); and, page by page, the fonts every screen preloads
+  // Both lists are read from the built pages, so they can't drift from their sources: the drawing footer.js puts in
+  // (the footer's data-fc-map, CAMPUS); and, page by page, the fonts every screen preloads
   // (Base.astro's <Font> tags write them, at Astro's hashed /_astro/fonts/ addresses; any with a media query aren't
   // every screen's).
   const home = readFileSync(join(DIST, 'index.html'), 'utf-8');
-  const INSERTED = [...home.matchAll(/\sdata-(?:hero[a-z-]*|fc-map)="\/([^"?]+)/g)].map((m) => m[1]);
+  const INSERTED = [...home.matchAll(/\sdata-fc-map="\/([^"?]+)/g)].map((m) => m[1]);
   // a built page's Early Hints line: the CSS files it links first (Home has none: scripts/head.mjs put them inside
   // the page), then its fonts. Sent with the page too, so the browser has the CSS file's name before it reads a tag.
   const pageHint = (/** @type {string} */ html) =>
@@ -54,8 +53,8 @@ export function headers(DIST) {
         .filter((href) => href !== undefined)
         .map((f) => `<${f}>; rel=preload; as=font; type="font/woff2"; crossorigin`),
     ].join(', ');
-  if (!INSERTED.some((f) => f.includes('hero')) || !INSERTED.some((f) => f.includes('campus')) || !pageHint(home))
-    throw new Error('dist/index.html: no data-hero* / data-fc-map drawings or font preloads found');
+  if (!INSERTED.some((f) => f.includes('campus')) || !pageHint(home))
+    throw new Error('dist/index.html: no data-fc-map drawing or font preloads found');
 
   const pages = files(DIST).filter((p) => p.endsWith('.html'));
 

@@ -210,6 +210,10 @@
   --dur-grow-fade: 500ms;
   --dur-grow-drop: 700ms;
   --loop-grow-rim: 2.4s;
+  /* Home hero (hero.css): the office builds in a layer at a time, each fading and dropping in, the next one a step
+     after it */
+  --dur-hero-in: 550ms;
+  --hero-in-step: 300ms;
 
   /* ---- home hero captions on phones (hero.css, .hero-cap) -- */
   /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
@@ -219,10 +223,7 @@
   --cap-title: var(--fs-4);
   --cap-sub: var(--fs-2);
   --cap-edge: var(--sp-3); /* words to the drawing's edge */
-  --cap-gap: var(--sp-1); /* title to subline; line to words */
-  --cap-line: 1.25px; /* as thin on screen as the desktop labels' lines */
-  --cap-dot: 3.25px; /* the dot's radius on the drawing */
-  --cap-ring: 1.5px; /* the page-colour ring round it */
+  --cap-gap: var(--sp-1); /* title to subline */
   --cap-halo: 4px; /* page-colour edge round the words, so lines under them break cleanly */
   --cap-tracking: 0.06em; /* as the drawings' own labels (tools/gen_*.py) */
 

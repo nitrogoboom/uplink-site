@@ -72,8 +72,8 @@
   text-wrap: pretty;
 }
 
-/* the office's shape: the full and tablet cuts are 40 / 31; the phone cut is 962 / 900 (office-compact-build.svg,
-   its PHONE_CROP), which its still for no script (hero-office-phone.svg) shares. --art-tall is height per width. */
+/* the office's shape: the drawing is 40 / 31 (HERO_VIEW in tools/gen_office.py); phones show the part of it in
+   PHONE_CROP (hero-crop.css). --art-tall is height per width. */
 .hero-art {
   --art-ratio: 40 / 31;
   --art-tall: calc(31 / 40);
@@ -87,8 +87,8 @@
 }
 @media (--small-phone) {
   .hero-art {
-    --art-ratio: 962 / 900;
-    --art-tall: calc(900 / 962);
+    --art-ratio: var(--crop-ratio);
+    --art-tall: var(--crop-tall);
   }
 }
 /* the office takes the column's leftover height and is as wide as that makes it. Floor: the full width, or 28rem
@@ -102,20 +102,92 @@
   min-height: calc(min(100cqi, 28rem) * var(--art-tall));
   max-height: calc(100cqi * var(--art-tall));
 }
-.hero-art .stage svg,
-.hero-art .stage .hero-nojs {
+/* The drawing: its layers (Hero.astro) stacked, each filling the stage. The drawn labels come in two sizes, and
+   where the drawing shows small the bigger ones stand in. */
+.hl {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  container: hero-drawing / inline-size;
+}
+.hl > svg {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
 }
-.hero-art .stage .hero-nojs {
-  object-fit: contain;
+.hl > .hl-labels-tablet {
+  display: none;
+}
+@container hero-drawing (width < 45rem) {
+  .hl > .hl-labels {
+    display: none;
+  }
+  .hl > .hl-labels-tablet {
+    display: block;
+  }
 }
 /* the drawing's words ask for Barlow by name (gen_office.py); the page's Barlow has an Astro-made name
    (astro.config.mjs, "fonts"), so they take it from the token, which carries that name and the measured fallbacks */
-.hero-art .stage svg [font-family] {
+.hl [font-family] {
   font-family: var(--font-body);
+}
+/* phones: the drawing framed closer (its box larger than the stage, which cuts it), no drawn labels: the cloud's
+   words come as a caption instead (below) */
+@media (--small-phone) {
+  .hl > svg {
+    inset: auto;
+    top: var(--crop-y);
+    left: var(--crop-x);
+    width: var(--crop-w);
+    height: var(--crop-h);
+  }
+  .hl > .hl-labels,
+  .hl > .hl-labels-tablet {
+    display: none;
+  }
+}
+/* The build: one layer after another fades and drops into place (the floor and the moving dashes only fade). Each
+   layer is its own box, so the browser moves it whole, without drawing it again. With the pause on, home.js shows
+   it built at once (settle). */
+@media (prefers-reduced-motion: no-preference) {
+  .hl > svg,
+  .hero-cap {
+    animation: hero-in var(--dur-hero-in) var(--ease) calc(var(--hero-in-step) * var(--step, 0)) both;
+  }
+  .hl-walls {
+    --step: 1;
+  }
+  .hl-back {
+    --step: 2;
+  }
+  .hl-front {
+    --step: 3;
+  }
+  .hl-net {
+    --step: 4;
+  }
+  .hl-cloud {
+    --step: 5;
+  }
+  .hl-flows,
+  .hl-labels,
+  .hl-labels-tablet,
+  .hero-cap {
+    --step: 6;
+  }
+  .hl-floor,
+  .hl-flows,
+  .hl-labels,
+  .hl-labels-tablet {
+    --drop: 0;
+  }
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--drop, -3%));
+  }
 }
 /* pause button (HoldButton.astro; its look is .hold in buttons.css), bottom right on the drawing. Its icon is
    drawn in CSS, so the stage's svg rules can't reach it. */
@@ -285,54 +357,6 @@
   text-transform: uppercase;
 }
 
-/* phones show the phone cut, which a tap steps through */
-@media (--small-phone) {
-  .hero-art .stage svg.ob-phone {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* While home.js fetches the phone cut (about 0.6 s on a slow phone), the stage shows the cut's floor slab, where the
-     drawing will put it: the build then starts from a floor that is already there, and the drawing's own floor fades
-     in over this one. It stays underneath (covered), and goes when the still picture stands in (home.js, failed()).
-     Its shapes come from the generator that draws the slab (hero-slab.css, written by tools/gen_office.py), so they
-     move with it. ::before is the two sides, split at the front corner; ::after the top. */
-  .js .hero-art .stage {
-    /* the slab top's light colour is gen_light.py's OFFICE colour, which has no token */
-    --slab-top: var(--iso-window);
-    isolation: isolate; /* the slab (z-index -1) stays under the drawing, inside the stage */
-  }
-  :root[data-theme='light'] .hero-art .stage {
-    --slab-top: #dce2e8;
-  }
-  .js .hero-art .stage::before,
-  .js .hero-art .stage::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-  }
-  .js .hero-art .stage::before {
-    background: linear-gradient(to right, var(--iso-left) var(--slab-front), var(--iso-right) var(--slab-front));
-    clip-path: var(--slab-sides);
-  }
-  .js .hero-art .stage::after {
-    background: var(--slab-top);
-    clip-path: var(--slab-top-face);
-  }
-  .hero-art .stage:has(.hero-nojs)::before,
-  .hero-art .stage:has(.hero-nojs)::after {
-    content: none;
-  }
-}
-@media (--small-phone) and (forced-colors: active) {
-  .hero-art .stage::before,
-  .hero-art .stage::after {
-    content: none;
-  }
-}
-
 /* phones (under the bottom bar's 700px), still the stacked layout: tighter gaps and no eyebrow, so the button
    is on the first screen on every phone (a 667px-tall one too); the lead is the same line as on a big screen. */
 @media (--phone) {
@@ -350,123 +374,53 @@
   }
 }
 
-/* phone captions, written by home.js over the phone cut: plain boxes in the drawing's free corners, in the
-   drawings' own label look (caps title, grey subline) at the sizes in tokens.css (--cap-*). Their words wrap and
-   grow with the visitor's text size. Words fade out and up, then in from below. A tap goes through them to the
-   drawing. The halo is the page's colour, so a line of the drawing under the words doesn't cut through them. */
+/* the phone caption (Hero.astro): the cloud's title and the app it names, top left over the drawing, in the drawings'
+   own label look at the sizes in tokens.css (--cap-*). Its words wrap and grow with the visitor's text size. The
+   apps sit in one grid cell and take turns (home.js); a tap goes through to the drawing. The halo is the page's
+   colour, so a line of the drawing under the words doesn't cut through them. */
 .hero-cap {
-  position: absolute;
-  left: var(--cap-edge);
-  display: flex;
-  flex-direction: column;
-  gap: var(--cap-gap);
-  max-width: calc(100% - 2 * var(--cap-edge));
-  opacity: 0;
-  pointer-events: none;
-  text-shadow:
-    0 0 var(--cap-halo) var(--c-bg),
-    0 0 var(--cap-halo) var(--c-bg),
-    0 0 var(--cap-halo) var(--c-bg);
-  transition:
-    opacity var(--dur-2) var(--ease),
-    transform var(--dur-2) var(--ease);
+  display: none;
 }
-.hero-cap--cloud {
-  top: var(--cap-edge);
-}
-/* clear of the pause button, bottom right */
-.hero-cap--office {
-  bottom: var(--cap-edge);
-  max-width: calc(100% - 2 * var(--cap-edge) - var(--sp-7));
-}
-.hero-cap.is-on {
-  opacity: 1;
-}
-.hero-cap.is-out {
-  opacity: 0;
-  transform: translateY(calc(-1 * var(--sp-4)));
-  transition-duration: var(--dur-1);
-}
-.hero-cap.is-pre {
-  opacity: 0;
-  transform: translateY(var(--sp-4));
-  transition: none;
+@media (--small-phone) {
+  .hero-cap {
+    position: absolute;
+    top: var(--cap-edge);
+    left: var(--cap-edge);
+    display: grid;
+    gap: var(--cap-gap);
+    max-width: calc(100% - 2 * var(--cap-edge));
+    margin: 0;
+    pointer-events: none;
+    text-shadow:
+      0 0 var(--cap-halo) var(--c-bg),
+      0 0 var(--cap-halo) var(--c-bg),
+      0 0 var(--cap-halo) var(--c-bg);
+  }
 }
 .hero-cap-t {
-  display: flex;
   font-size: var(--cap-title);
   font-weight: 600;
   letter-spacing: var(--cap-tracking);
   line-height: var(--lh-title);
   text-transform: uppercase;
-  color: var(--c-text);
-}
-/* the cloud's title in the cloud's colour; the office's takes its item's (--cap-c, from home.js). On the light page
-   the drawing's amber and blue are too pale for words (3.1:1 and 4.4:1), so the title takes 70% of the colour and
-   30% of the text colour: about 5:1 and 6.4:1, and still the item's hue. The line and dot keep the full colour */
-.hero-cap--cloud .hero-cap-t {
   color: var(--c-sky);
 }
-.hero-cap--office .hero-cap-t {
-  color: var(--cap-c, var(--c-text));
-}
-:root[data-theme='light'] .hero-cap--office .hero-cap-t {
-  color: color-mix(in sRGB, var(--cap-c, var(--c-text)) 70%, var(--c-text));
-}
 .hero-cap-s {
+  grid-area: 2 / 1;
   font-size: var(--cap-sub);
   line-height: var(--lh-snug);
   color: var(--c-muted);
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease);
+}
+.hero-cap-s.is-on {
+  opacity: 1;
 }
 .hero-cap-app {
   font-weight: 600;
   letter-spacing: var(--cap-tracking);
   text-transform: uppercase;
   color: var(--c-text);
-}
-/* a caption's line and dot on the drawing, at the weights the desktop labels have on screen (label() in
-   tools/gen_office.py). The dot: a line of no length with round ends and a stroke that doesn't scale, so it is the
-   same size on every phone; under it, a wider one in the page's colour as its ring. The line: from that dot a
-   diagonal, then a level tail to the caption's title (home.js) */
-.ob-mark {
-  opacity: 0;
-  transition: opacity var(--dur-2) var(--ease);
-}
-.ob-mark.is-on {
-  opacity: 1;
-}
-.ob-mark.is-out {
-  opacity: 0;
-  transition-duration: var(--dur-1);
-}
-.ob-mark path {
-  fill: none;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-}
-.ob-mark-lead {
-  stroke-linejoin: round;
-  stroke-width: var(--cap-line);
-  stroke-opacity: 0.6;
-}
-.ob-mark-cloud .ob-mark-lead {
-  stroke: var(--c-sky);
-}
-.ob-mark-edge {
-  stroke: var(--c-bg);
-  stroke-width: calc(var(--cap-dot) * 2 + var(--cap-ring) * 2);
-}
-.ob-mark-pin {
-  stroke-width: calc(var(--cap-dot) * 2);
-}
-.ob-mark-cloud .ob-mark-pin {
-  stroke: var(--c-sky);
-}
-@media (prefers-reduced-motion: reduce) {
-  .hero-cap,
-  .ob-mark {
-    transition: none;
-  }
 }
 
 /* ---- 2. two columns: every landscape window from 900 x 560 up -----------

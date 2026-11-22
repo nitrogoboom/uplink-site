@@ -5,7 +5,6 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { shipped } from '../../scripts/svgo-config.mjs';
 import { getCollection } from 'astro:content';
-import { MEDIA } from './media.js';
 import { byOrder } from '../content.config';
 import { copy } from './copy';
 
@@ -27,24 +26,6 @@ export const fresh = (path: string) => {
         .slice(0, 8)}`,
     );
   return stamps.get(path)!;
-};
-
-// The home hero drawing's cuts and the screens each is for (home.js fetches one; index.astro preloads it), written
-// by tools/gen_office.py. tablet: where the full cut's 21-unit sublines measure under 12px (the hero is
-// 440-680px wide there). phone: the hero scene framed closer for phones, no words (home.js writes its captions),
-// with its dashes in their own file; with reduced motion it stands still. still: the phone cut as a picture, for
-// phones without script.
-export const HERO = {
-  full: fresh('/assets/img/hero-office.svg'),
-  tablet: fresh('/assets/img/hero-office-tablet.svg'),
-  phone: fresh('/assets/img/office-compact-build.svg'),
-  phoneFlows: fresh('/assets/img/office-compact-flows.svg'),
-  still: fresh('/assets/img/hero-office-phone.svg'),
-  media: {
-    phone: MEDIA.smallPhone,
-    tablet: '(37.5em <= width < 81.25em) and (height < 68.75em)',
-    full: '(width >= 81.25em), (width >= 37.5em) and (height >= 68.75em)',
-  },
 };
 
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)

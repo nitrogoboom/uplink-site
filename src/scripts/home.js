@@ -1,448 +1,53 @@
 /* ==========================================================================
    Uplink Technology · Home page
-   The hero (the drawing cut for the screen, the cloud, the phone captions), the Services row on
-   phones. The "We grow with you" section runs from grow.js (imported here).
+   The hero (the cloud's apps, the drawing's dashes), the Services row on phones. The "We grow with
+   you" section runs from grow.js (imported here).
    ========================================================================== */
 
-import { $, $$, dashes, held, html, reduceMotion, settle, theme, whenOnScreen, words } from './core.js';
+import { $, $$, dashes, held, reduceMotion, settle, whenOnScreen } from './core.js';
 import { MEDIA } from '../lib/media.js';
 import './grow.js';
 
 /* ------------------------------------------------------------------
-   Hero cloud: shows one cloud app at a time, big and readable, and
-   lights that app's tile in the floating tray. It steps through the
-   apps on a timer; hovering a tile or a bar segment picks one.
-   Reduced motion: no timer.
-   The drawing comes in three cuts, each its own file named on the stage
-   (HERO in src/lib/site.ts, preloaded for the same screens), so a screen
-   downloads only its own: the full hero; the tablet cut (fewer, bigger
-   labels) where the hero shows narrow (data-tablet); and on phones the
-   phone cut, animated, with its dashes in a second file. With reduced
-   motion every cut stands still (its own CSS) and the phone captions
-   come at once, without their timer.
-   The hero cuts go in ahead of the dashes' layer (svg.ob-over), then the
-   cloud starts. A turn or resize that changes the cut swaps the file.
+   Hero: the office drawing is in the page already (Hero.astro) and
+   builds in by its own CSS. Here: its dashes keep the site's beat, its
+   loops rest off screen, a load with the pause on shows it built, and
+   the cloud names one app at a time, lighting that app's tile (and, on
+   phones, its caption). Every part of an app carries data-app; the
+   first shows until the timer starts. Reduced motion: no timer.
    ------------------------------------------------------------------ */
-const stage = $('.hero-art .stage[data-hero]');
-// Pause buttons (HoldButton.astro, wired in core.js): while held, the cloud and the phone captions stop their timers.
-// The cloud's apps, in the order they show; each id is its tile in the drawing (data-tile, tools/gen_office.py) and
-// its words come from src/data/copy/en/home.yaml, cloud (index.astro carries them).
-const WORDS = /** @type {import('../lib/copy').HomeWords} */ (words('words-page')).cloud;
-const APPS = /** @type {const} */ (['mail', 'files', 'meet', 'chat', 'cal', 'secure']).map((id) => ({
-  id,
-  ...WORDS.apps[id],
-}));
-// A timer that runs tick every `every` ms only while it may: el on screen, the tab showing, motion allowed, the
-// pause button off, and ready() (default: always). It stops and starts itself as those change. start() restarts
-// the count (after a hover or a tap); off() lets go of the timer and every listener, when the cut is swapped out.
-/** @param {Element} el @param {() => void} tick @param {number} every @param {() => boolean} [ready] */
-const loopWhileSeen = (el, tick, every, ready = () => true) => {
-  let timer = 0,
-    onScreen = true;
-  const stop = () => {
+const CLOUD_EVERY = 3200; // ms each app shows before the next
+/** @type {HTMLElement | null} */
+const stage = $('.hero-art .stage');
+if (stage) {
+  const parts = /** @type {HTMLElement[]} */ ($$('[data-app]', stage));
+  const apps = [...new Set(parts.map((el) => el.dataset.app))];
+  let at = 0;
+  let timer = 0;
+  let onScreen = false;
+  const step = () => {
+    at = (at + 1) % apps.length;
+    parts.forEach((el) => el.classList.toggle('is-on', el.dataset.app === apps[at]));
+  };
+  // the timer runs only while it may: the drawing on screen, the tab showing, motion allowed and the pause off
+  const run = () => {
     window.clearInterval(timer);
     timer = 0;
+    if (onScreen && !document.hidden && !reduceMotion.matches && !held.on)
+      timer = window.setInterval(step, CLOUD_EVERY);
   };
-  const start = () => {
-    stop();
-    if (!ready() || reduceMotion.matches || document.hidden || !onScreen || held.on) return;
-    timer = window.setInterval(tick, every);
-  };
-  const onVisible = () => (document.hidden ? stop() : start());
-  document.addEventListener('visibilitychange', onVisible);
-  reduceMotion.addEventListener('change', start);
-  held.ev.addEventListener('change', start);
-  // off screen: no timer, and the looping animations pause
-  const seen = whenOnScreen(el, (on) => {
+  whenOnScreen(stage, (on) => {
     onScreen = on;
-    if (on) start();
-    else stop();
+    run();
   });
-  const off = () => {
-    stop();
-    document.removeEventListener('visibilitychange', onVisible);
-    reduceMotion.removeEventListener('change', start);
-    held.ev.removeEventListener('change', start);
-    if (seen) seen.disconnect();
-  };
-  return { start, stop, off };
-};
-const CLOUD_EVERY = 3200; // ms each app shows before the next
-const WORDS_SWAP = 180; // ms the old words take to fade out (the drawing's own .18s, tools/office_parts/hero.css)
-// the hero drawing's parts (tools/gen_office.py) are all there
-const startCloud = (/** @type {SVGGElement} */ cloud) => {
-  const svg = /** @type {SVGSVGElement} */ (cloud.ownerSVGElement);
-  const focus = /** @type {SVGElement} */ (svg.querySelector('.ob-focus'));
-  const appText = /** @type {SVGElement} */ (svg.querySelector('.ob-app'));
-  const stateText = /** @type {SVGElement} */ (svg.querySelector('.ob-state'));
-  const detailText = /** @type {SVGElement} */ (svg.querySelector('.ob-detail'));
-  // The state word is right-aligned, so the dot before it moves with the word's width.
-  // The browser reports the new size after its own layout pass (ResizeObserver), so
-  // nothing is measured straight after the text changes (that would force a layout).
-  // For SVG it reports only the size, so: the word's right edge (its x) minus its width.
-  const dot = svg.querySelector('.ob-state-dot');
-  /** @type {ResizeObserver | null} */
-  let dotSized = null;
-  if (dot) {
-    const words = /** @type {Element} */ (stateText.parentNode);
-    const right = +(/** @type {string} */ (words.getAttribute('x')));
-    dotSized = new ResizeObserver(([en]) => dot.setAttribute('cx', (right - en.contentRect.width - 10).toFixed(1)));
-    dotSized.observe(words);
-  }
-  let index = -1;
-  let swap = 0;
-  const show = (/** @type {number} */ i) => {
-    i = (i + APPS.length) % APPS.length;
-    if (i === index) return;
-    const first = index < 0;
-    index = i;
-    const app = APPS[i];
-    /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) =>
-      t.classList.toggle('is-on', t.dataset.tile === app.id),
-    );
-    /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg, .ob-pip')).forEach((s) =>
-      s.classList.toggle('is-on', s.dataset.app === app.id),
-    );
-    const write = () => {
-      appText.textContent = app.name.toUpperCase();
-      stateText.textContent = app.state.toUpperCase();
-      detailText.textContent = app.detail;
-      focus.classList.remove('is-out');
-    };
-    window.clearTimeout(swap);
-    if (first || reduceMotion.matches) {
-      write();
-      return;
-    }
-    focus.classList.add('is-out');
-    swap = window.setTimeout(write, WORDS_SWAP);
-  };
-  const loop = loopWhileSeen(svg, () => show(index + 1), CLOUD_EVERY);
-  const pick = (/** @type {string | undefined} */ id) => {
-    loop.stop();
-    show(APPS.findIndex((a) => a.id === id));
-  };
-  /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) => {
-    t.addEventListener('pointerenter', () => pick(t.dataset.tile));
-    t.addEventListener('pointerleave', loop.start);
+  document.addEventListener('visibilitychange', run);
+  reduceMotion.addEventListener('change', run);
+  held.ev.addEventListener('change', () => {
+    settle(stage);
+    run();
   });
-  /** @type {NodeListOf<SVGElement>} */ (cloud.querySelectorAll('.ob-seg-hit')).forEach((h) => {
-    h.addEventListener('pointerenter', () => pick(h.dataset.app));
-    h.addEventListener('pointerleave', loop.start);
-  });
-  show(0);
-  loop.start();
-  return () => {
-    // the cut is swapped out: let go of the timers and listeners
-    loop.off();
-    window.clearTimeout(swap);
-    if (dotSized) dotSized.disconnect();
-  };
-};
-
-/* ------------------------------------------------------------------
-   Hero captions on phones. The phone cut has no words of its own; two
-   captions sit over its free corners: the cloud's (top left; the app it
-   names is lit on the tray) and the office's (bottom left; one item at a
-   time). They are plain HTML boxes (hero.css, .hero-cap), so their words
-   wrap and grow with the visitor's text size. Each is tied to what it
-   names as the desktop drawing's labels are (label() in
-   tools/gen_office.py): a dot on the item, a diagonal, then a short
-   level tail that stops beside the title, which takes the item's
-   colour. The one thing read from the page is where the title ends,
-   once a change. Each changes every 4.4s, 2.2s after the other.
-   Tapping the drawing moves the office one on. Words and points come
-   from the drawing (data-cloud, data-items: tools/gen_office.py).
-   ------------------------------------------------------------------ */
-const SVG_NS = 'http://www.w3.org/2000/svg';
-const CAP_EVERY = 2200; // ms between caption changes, the two captions taking turns (each one every 4.4s)
-const CAP_SWAP = 170; // ms a caption takes to fade out before its new words go in (hero.css: --dur-1, plus a frame)
-const CAP_SECOND = 1100; // ms from the first caption to the second
-const CAP_GAP = 8; // px from the end of a caption's title to its line
-const CAP_TAIL = 18; // px the line runs level beside the title before it turns to its item
-const CLOUD_TITLE = WORDS.title;
-/** @param {string} cls @param {Element} parent */
-const span = (cls, parent) => {
-  const el = document.createElement('span');
-  el.className = cls;
-  parent.append(el);
-  return el;
-};
-const startCaptions = (/** @type {SVGSVGElement} */ svg) => {
-  const box = /** @type {HTMLElement} */ (svg.parentElement); // the stage
-  const vb = svg.viewBox.baseVal;
-  const [cloudX, cloudY] = /** @type {string} */ (svg.dataset.cloud).split(',').map(Number);
-  // the drawing's own list (tools/gen_office.py); lint can't see a JSDoc cast, so it would call this an any
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const items = /** @type {{ t: string, s: string, c: string, x: number, y: number }[]} */ (
-    JSON.parse(/** @type {string} */ (svg.dataset.items))
-  );
-  // a caption: its box over the drawing, and on the drawing its line and its dot (a line of no length with round
-  // ends, so the dot keeps its size on screen whatever the drawing's scale: hero.css, .ob-mark)
-  const spot = (/** @type {'cloud' | 'office'} */ name) => {
-    const el = document.createElement('div');
-    el.className = 'hero-cap hero-cap--' + name;
-    el.setAttribute('aria-hidden', 'true'); // the drawing's own label says what it shows
-    const head = span('hero-cap-t', el);
-    const t = span('', head);
-    const s = span('hero-cap-s', el);
-    box.append(el);
-    const mark = document.createElementNS(SVG_NS, 'g');
-    mark.setAttribute('class', 'ob-mark ob-mark-' + name);
-    const [lead, ...pin] = ['ob-mark-lead', 'ob-mark-edge', 'ob-mark-pin'].map((cls) => {
-      const p = document.createElementNS(SVG_NS, 'path');
-      p.setAttribute('class', cls);
-      mark.append(p);
-      return p;
-    });
-    svg.append(mark);
-    return { el, t, s, mark, lead, pin };
-  };
-  const spots = { cloud: spot('cloud'), office: spot('office') };
-  const at = { cloud: -1, office: -1 };
-  /** @typedef {ReturnType<typeof spot>} Spot */
-  // where each caption points now, so its line can be drawn again when the drawing's size changes
-  /** @type {{ sp: Spot, x: number, y: number, level: boolean }[]} */
-  const aims = [];
-  // a caption's line, as the desktop labels draw theirs: from the item's dot a diagonal to an elbow level with the
-  // middle of the title, then a level tail that stops CAP_GAP short of the title's end. Where the title ends comes
-  // from the boxes' offsets (a transform on the way in doesn't move those), turned into the drawing's units: the
-  // drawing fills the stage. level: the tail runs on until it is near the point (the cloud's, beside its caption)
-  /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
-  const lineTo = (sp, x, y, level) => {
-    if (!box.clientWidth) return;
-    const k = vb.width / box.clientWidth;
-    const head = /** @type {HTMLElement} */ (sp.t.parentElement);
-    const sx = vb.x + (sp.el.offsetLeft + head.offsetLeft + sp.t.offsetWidth + CAP_GAP) * k;
-    const sy = vb.y + (sp.el.offsetTop + head.offsetTop + head.offsetHeight / 2) * k;
-    const ex = level ? Math.max(sx + CAP_TAIL * k, x - 50) : sx + CAP_TAIL * k;
-    sp.lead.setAttribute('d', `M${x},${y}L${ex.toFixed(1)},${sy.toFixed(1)}H${sx.toFixed(1)}`);
-  };
-  // the office's title in its item's colour: the colour its dot on the drawing shows, which the light theme changes.
-  // Handed to hero.css as --cap-c, which darkens it for the light theme so the words pass 4.5:1
-  const match = () => {
-    if (at.office >= 0)
-      spots.office.el.style.setProperty('--cap-c', window.getComputedStyle(spots.office.pin[1]).stroke);
-  };
-  // The lines and the title's colour are read from the page, so they wait for the browser's own layout pass
-  // (ResizeObserver) and never ask for one straight after the words change (PageSpeed, "Forced reflow"). It reports:
-  // the stage's size changing (a turned phone), and a caption watched afresh (pinAt, once a change of words).
-  const sized = new ResizeObserver(() => {
-    aims.forEach((a) => lineTo(a.sp, a.x, a.y, a.level));
-    match();
-  });
-  sized.observe(box);
-  /** @param {Spot} sp @param {number} x @param {number} y @param {boolean} level */
-  const pinAt = (sp, x, y, level) => {
-    sp.pin.forEach((p) => p.setAttribute('d', `M${x},${y}h0.01`));
-    const aim = aims.find((a) => a.sp === sp);
-    if (aim) Object.assign(aim, { x, y });
-    else aims.push({ sp, x, y, level });
-    sized.unobserve(sp.el); // watched afresh: it reports after the next layout, whether or not the size changed
-    sized.observe(sp.el);
-  };
-  const write = {
-    cloud: () => {
-      const sp = spots.cloud,
-        app = APPS[at.cloud];
-      sp.t.textContent = CLOUD_TITLE;
-      const name = document.createElement('b');
-      name.className = 'hero-cap-app';
-      name.textContent = app.name;
-      sp.s.replaceChildren(name, ' · ' + app.detail);
-      pinAt(sp, cloudX, cloudY, true);
-      /** @type {NodeListOf<SVGElement>} */ (svg.querySelectorAll('.ob-tile')).forEach((t) =>
-        t.classList.toggle('is-on', t.dataset.tile === app.id),
-      );
-    },
-    office: () => {
-      const sp = spots.office,
-        it = items[at.office];
-      sp.t.textContent = it.t;
-      sp.s.textContent = it.s;
-      sp.pin[1].setAttribute('stroke', it.c);
-      sp.lead.setAttribute('stroke', it.c);
-      pinAt(sp, it.x, it.y, false);
-    },
-  };
-  // each caption's pending swap: its timeout, then its frame (a new step on the same caption cancels both first)
-  const swaps = { cloud: { t: 0, f: 0 }, office: { t: 0, f: 0 } };
-  const cancel = (/** @type {{ t: number, f: number }} */ sw) => {
-    window.clearTimeout(sw.t);
-    window.cancelAnimationFrame(sw.f);
-  };
-  const step = (/** @type {'cloud' | 'office'} */ name, /** @type {boolean} */ animate) => {
-    at[name] = (at[name] + 1) % (name === 'cloud' ? APPS.length : items.length);
-    const sp = spots[name],
-      sw = swaps[name];
-    const both = [sp.el, sp.mark];
-    cancel(sw);
-    sp.el.classList.remove('is-pre');
-    if (!animate || reduceMotion.matches) {
-      both.forEach((x) => x.classList.remove('is-out'));
-      write[name]();
-      both.forEach((x) => x.classList.add('is-on'));
-      return;
-    }
-    both.forEach((x) => x.classList.add('is-out'));
-    sw.t = window.setTimeout(() => {
-      sp.el.classList.add('is-pre');
-      both.forEach((x) => x.classList.remove('is-out'));
-      write[name](); // written once below their place (is-pre), the words rise in from the frame after
-      both.forEach((x) => x.classList.add('is-on'));
-      sw.f = window.requestAnimationFrame(() => {
-        sw.f = window.requestAnimationFrame(() => sp.el.classList.remove('is-pre'));
-      });
-    }, CAP_SWAP);
-  };
-  let turn = 0,
-    begun = false;
-  const loop = loopWhileSeen(
-    svg,
-    () => step(turn++ % 2 ? 'office' : 'cloud', true),
-    CAP_EVERY,
-    () => begun,
-  );
-  const tap = () => {
-    if (!begun) return;
-    step('office', true);
-    turn = 0;
-    loop.start();
-  };
-  svg.addEventListener('click', tap);
-  theme.ev.addEventListener('change', match);
-  // the web font arrives and the titles change width: the lines again. The fonts' own "done" event, not
-  // document.fonts.ready: asking for that makes the browser lay the whole page out on the spot (PageSpeed, "Forced
-  // reflow", seen on the live site November 17, 2026)
-  const refit = () => aims.forEach((a) => pinAt(a.sp, a.x, a.y, a.level));
-  document.fonts.addEventListener('loadingdone', refit);
-  // first words as the drawing's build ends, which the drawing gives (data-words, PHONE_WORDS in tools/gen_office.py:
-  // about 1.1s; at once with reduced motion), the office's 1.1s after
-  const quick = reduceMotion.matches;
-  const capFirst = Number(svg.dataset.words);
-  let second = 0;
-  const first = window.setTimeout(
-    () => {
-      begun = true;
-      step('cloud', !quick);
-      second = window.setTimeout(
-        () => {
-          step('office', !quick);
-          loop.start();
-        },
-        quick ? 0 : CAP_SECOND,
-      );
-    },
-    quick ? 0 : capFirst,
-  );
-  return () => {
-    // the cut is swapped out: let go of the timers and listeners, and take the caption boxes with it (their dots
-    // leave with the drawing)
-    loop.off();
-    window.clearTimeout(first);
-    window.clearTimeout(second);
-    cancel(swaps.cloud);
-    cancel(swaps.office);
-    svg.removeEventListener('click', tap);
-    theme.ev.removeEventListener('change', match);
-    sized.disconnect();
-    document.fonts.removeEventListener('loadingdone', refit);
-    spots.cloud.el.remove();
-    spots.office.el.remove();
-  };
-};
-if (stage) {
-  const phone = window.matchMedia(MEDIA.smallPhone); // HERO.media.phone
-  // Hero.astro writes every one of these data- attributes
-  const tablet = window.matchMedia(/** @type {string} */ (stage.dataset.tablet));
-  const files = /** @type {Record<'full' | 'tablet' | 'phone', string[]>} */ ({
-    full: [stage.dataset.hero],
-    tablet: [stage.dataset.heroTablet],
-    phone: [stage.dataset.heroPhone, stage.dataset.heroPhoneFlows],
-  });
-  /** @type {string | null} */
-  let shown = null;
-  /** @type {Element[]} */
-  let added = [];
-  /** @type {(IntersectionObserver | null)[]} */
-  let observers = [];
-  /** @type {(() => void)[]} */
-  let stopDashes = [];
-  /** @type {(() => void) | null} */
-  let stopCloud = null;
-  let ticket = 0; // counts loads: only the latest one may insert (a screen that flips and back mid-download asks twice)
-  const clear = () => {
-    if (stopCloud) stopCloud();
-    stopCloud = null;
-    observers.forEach((io) => io && io.disconnect());
-    observers = [];
-    stopDashes.forEach((stop) => stop());
-    stopDashes = [];
-    added.forEach((n) => n.remove());
-    added = [];
-  };
-  // a drawing that can't load (offline, blocked): the still office the page shows without script (the same picture
-  // as its <noscript>, cloned from a <template>, so no text is turned into HTML) stands in, and the dashes' layer and
-  // the pause button go, so no beams hang over an empty stage. The next change of cut tries again.
-  /** @type {HTMLTemplateElement | null} */
-  const still = $('template.hero-still', stage);
-  const failed = (/** @type {boolean} */ on) => {
-    $$('svg.ob-over', stage).forEach((el) => {
-      el.style.display = on ? 'none' : '';
-    });
-    $$('.hero-pause', stage).forEach((el) => {
-      el.style.display = on ? 'none' : '';
-    });
-    if (on && still) {
-      const pic = /** @type {Element} */ (/** @type {Element} */ (still.content.firstElementChild).cloneNode(true));
-      stage.prepend(pic);
-      added = [pic];
-    }
-  };
-  const load = () => {
-    const cut = phone.matches ? 'phone' : tablet.matches ? 'tablet' : 'full';
-    if (cut === shown) return;
-    shown = cut;
-    const mine = ++ticket;
-    clear();
-    failed(false);
-    Promise.all(
-      files[cut].map((url) =>
-        window.fetch(url).then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status))))),
-      ),
-    )
-      .then((texts) => {
-        if (mine !== ticket) return; // the screen changed while it loaded (even if it has changed back since)
-        const before = stage.children.length;
-        stage.insertAdjacentHTML('afterbegin', html(texts.join('')));
-        added = Array.from(stage.children).slice(0, stage.children.length - before);
-        // paused: the drawing shows built, not its empty first frame (a reload, or a new cut after a resize)
-        settle(stage);
-        // looping animations pause off screen: the drawing, and the dashes' layer (the cut's own on phones)
-        const layers = cut === 'phone' ? added : [added[0], $('svg.ob-over:not(.ob-phone)', stage)];
-        observers = layers.map((el) => whenOnScreen(el));
-        // each layer's dashes keep the site's beat while that layer is on screen (core.js, the dash clock)
-        stopDashes = layers
-          .filter((el) => el !== null)
-          .map((el) => dashes($$('.ob-flow, .ob-link', el), () => !el.classList.contains('is-idle')));
-        /** @type {SVGGElement | null} */
-        const cloud = $('svg.ob .ob-cloud', stage);
-        const first = /** @type {SVGSVGElement} */ (added[0]);
-        if (cut === 'phone') {
-          if (first.dataset.items) stopCloud = startCaptions(first);
-        } else if (cloud) stopCloud = startCloud(cloud);
-      })
-      .catch(() => {
-        if (mine === ticket) {
-          shown = null;
-          failed(true);
-        }
-      });
-  };
-  load();
-  [phone, tablet].forEach((m) => m.addEventListener('change', load));
-  // paused mid-build: the drawing finishes building at once and its loops hold
-  held.ev.addEventListener('change', () => settle(stage));
+  settle(stage);
+  dashes($$('.ob-flow', stage), () => !stage.classList.contains('is-idle'));
 }
 
 /* ------------------------------------------------------------------

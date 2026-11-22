@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="hl-labels-tablet" viewBox="0 -130 1200 930" aria-hidden="true" focusable="false">
+<g class="co lbl" data-t="FIREWALL RACK">
+<polyline class="lt" points="1035.4,531.6 1052,728 1012,728" fill="none" stroke="#FFAD51" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>
+<circle class="lt" cx="1035.4" cy="531.6" r="8" fill="#FFAD51" stroke="#0E1A27" stroke-width="3.5"/>
+<text class="lt" x="994.0" y="740.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" letter-spacing="0.06em" fill="#FFAD51" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">FIREWALL RACK</text>
+<text class="lt" x="994.0" y="779.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28.5" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">core switch + backups</text>
+</g>
+<g class="co lbl" data-t="WI-FI ACCESS POINT">
+<polyline class="lt" points="796,435.3 796,70 756,70" fill="none" stroke="#FFAD51" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>
+<circle class="lt" cx="796.0" cy="435.3" r="8" fill="#FFAD51" stroke="#0E1A27" stroke-width="3.5"/>
+<text class="lt" x="738.0" y="82.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" letter-spacing="0.06em" fill="#FFAD51" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">WI-FI ACCESS POINT</text>
+<text class="lt" x="738.0" y="121.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28.5" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">Wi-Fi 6E, no dead spots</text>
+</g>
+<g class="co lbl" data-t="WORKSTATIONS">
+<polyline class="lt" points="726,416 527.7,640 487.7,640" fill="none" stroke="#97C8EA" stroke-width="2.6" stroke-opacity="0.65" stroke-linejoin="round"/>
+<circle class="lt" cx="726.0" cy="416.0" r="8" fill="#97C8EA" stroke="#0E1A27" stroke-width="3.5"/>
+<text class="lt" x="469.7" y="652.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="36" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">WORKSTATIONS</text>
+<text class="lt" x="469.7" y="691.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="28.5" font-weight="400" letter-spacing="0" fill="#BBC2C9" text-anchor="end" stroke="#0E1A27" stroke-width="7" stroke-linejoin="round" paint-order="stroke">managed + patched</text>
+</g>
+<g class="co lbl" data-t="CLOUD WORKSPACE">
+<polyline class="lt" points="950.1,-36 894.7,-82 854.7,-82" fill="none" stroke="#97C8EA" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle class="lt" cx="950.1" cy="-36.0" r="6" fill="#97C8EA" stroke="#0E1A27" stroke-width="3"/>
+<g transform="matrix(1.5 0 0 1.5 -421.4 41.0)">
+<text class="lt" x="842.7" y="-74.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="#97C8EA" text-anchor="end">CLOUD WORKSPACE</text>
+<g class="hl-app is-on" data-app="mail">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">EMAIL</tspan> · Spam and phishing filtered</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">ONLINE</text>
+<circle class="p-fa6c34" cx="767.0" cy="-23" r="4.5"/>
+</g>
+<g class="hl-app" data-app="files">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">FILES</tspan> · OneDrive and Drive backed up</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">SYNCED</text>
+<circle class="p-fa6c34" cx="762.0" cy="-23" r="4.5"/>
+</g>
+<g class="hl-app" data-app="meet">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">MEETINGS</tspan> · Teams and Meet, one-click join</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">READY</text>
+<circle class="p-fa6c34" cx="773.7" cy="-23" r="4.5"/>
+</g>
+<g class="hl-app" data-app="chat">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">CHAT</tspan> · Every channel watched</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">ONLINE</text>
+<circle class="p-fa6c34" cx="767.0" cy="-23" r="4.5"/>
+</g>
+<g class="hl-app" data-app="cal">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">CALENDAR</tspan> · Shared calendars in step</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">SYNCED</text>
+<circle class="p-fa6c34" cx="762.0" cy="-23" r="4.5"/>
+</g>
+<g class="hl-app" data-app="secure">
+<text x="842.7" y="-46" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="21" font-weight="400" fill="#BBC2C9" text-anchor="end"><tspan font-weight="600" fill="#F2F7FC">SIGN-IN</tspan> · MFA on for every user</text>
+<text x="842.7" y="-18" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="17" font-weight="600" letter-spacing="0.08em" fill="#A9E9C3" text-anchor="end">SECURED</text>
+<circle class="p-fa6c34" cx="750.9" cy="-23" r="4.5"/>
+</g>
+</g>
+
+</g>
+</svg>

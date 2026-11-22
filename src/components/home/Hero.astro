@@ -1,25 +1,30 @@
 ---
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
-// Drawing: one of three cuts (HERO, in src/lib/site.ts), fetched by home.js for the screen it's on: hero-office.svg, or its tablet
-// cut hero-office-tablet.svg, both under the moving dashes' own layer in hero-flows.svg, inlined here; phones get the animated
-// phone cut office-compact-build.svg with its own dashes (with reduced motion too: it stands still then). All written by
-// tools/gen_office.py; don't edit by hand.
-// The dashes come in as text (?raw): a plain import would also write a copy to dist/_astro that nothing uses.
-// Without script, office.svg shows (on phones hero-office-phone.svg, the phone cut as a still). Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
-import Drawing from '../Drawing.astro';
-import flows from './hero-flows.svg?raw';
+// Drawing: the office as a stack of layers (floor, walls, furniture, network, cloud, dashes, labels), each its own
+// <svg> written by tools/gen_office.py into ./hero/ (don't edit by hand) and inlined here, so it shows with the page,
+// script or not. hero.css builds it in layer by layer; home.js steps the cloud through its apps and moves the dashes.
+// Phones frame it closer (hero-crop.css) and show the cloud's app as words over it instead of the drawn labels.
+// Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
 // the light theme's colours for the drawings inside the page (this hero and Grow, both on Home only): written by
 // tools/gen_light.py, and first here so hero.css and grow.css still come after it
 import '../../styles/theme-drawings.css';
-import './hero-slab.css'; // the phone floor slab's shapes, written by tools/gen_office.py (hero.css draws them)
+import './hero-crop.css'; // the phone framing, written by tools/gen_office.py
 import './hero.css';
+import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
 import Sep from '../Sep.astro';
-import { HERO, fresh, getServices } from '../../lib/site';
+import { getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
-const t = (await copy('home')).hero;
+const { hero: t, cloud } = await copy('home');
+// the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist
+const layers = Object.entries(
+  import.meta.glob<string>('./hero/*.svg', { query: '?raw', import: 'default', eager: true }),
+)
+  .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))
+  .map(([, svg]) => svg);
+const apps = Object.entries(cloud.apps);
 // the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
 const news = [
@@ -48,7 +53,6 @@ const services = await getServices();
 const menu = [...services.filter((s) => s.data.featured), services.filter((s) => !s.data.featured)[0]].map(
   ({ id, data: s }) => ({ href: `/services/${id}`, icon: s.icon, title: s.title, sub: s.card }),
 );
-const still = t.alt;
 ---
 
 <section class="hero fold fold-always" id="top" aria-labelledby="hero-title">
@@ -84,31 +88,19 @@ const still = t.alt;
     </div>
 
     <div class="hero-art">
-      <div
-        class="stage"
-        data-hero={HERO.full}
-        data-hero-tablet={HERO.tablet}
-        data-hero-phone={HERO.phone}
-        data-hero-phone-flows={HERO.phoneFlows}
-        data-tablet={HERO.media.tablet}
-      >
-        <noscript
-          ><picture
-            ><source media={HERO.media.phone} srcset={HERO.still} width="962" height="900" />
-            <img class="hero-nojs" src={fresh('/assets/img/office.svg')} alt={still} width="1200" height="800"
-          /></picture></noscript
-        >
-        {/* the same still picture for home.js to clone when the drawings can't load (a template, so no text becomes HTML) */}
-        <template class="hero-still"
-          ><Drawing
-            src="/assets/img/office.svg"
-            sources={[{ media: HERO.media.phone, srcset: HERO.still, width: 962, height: 900 }]}
-            class="hero-nojs"
-            alt={still}
-            width="1200"
-            height="800"
-        /></template>
-        <Fragment set:html={flows} />
+      <div class="stage">
+        <div class="hl" role="img" aria-label={t.alt}>
+          {layers.map((svg) => (
+            <Fragment set:html={svg} />
+          ))}
+        </div>
+        {/* phones: the cloud's app in words over the drawing, which hides its own labels there; home.js shows one at a time */}
+        <p class="hero-cap" aria-hidden="true">
+          <span class="hero-cap-t">{cloud.title}</span>
+          {apps.map(([id, app], i) => <span class:list={['hero-cap-s', { 'is-on': i === 0 }]} data-app={id}
+            ><b class="hero-cap-app">{app.name}</b> · {app.detail}</span
+          >)}
+        </p>
         {/* stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion */}
         <HoldButton class="hero-pause" />
       </div>
