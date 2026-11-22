@@ -92,7 +92,8 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 ### Launch (about an hour)
 
 1. **Owner:** add `DOMAIN` as a Cloudflare zone, change nameservers, wait for Active.
-2. **Owner:** Full (strict), Always Use HTTPS, TLS 1.2 minimum, HTTP/3, Early Hints on; Auto Minify and Rocket Loader off (they break CSP hashes); DNSSEC on with the DS record.
+2. **Owner:** Full (strict), Always Use HTTPS, HTTP/3, Early Hints on; Auto Minify and Rocket Loader off (they break CSP hashes); DNSSEC on with the DS record.
+   - **TLS 1.2 minimum:** dashboard > the zone > SSL/TLS > Edge Certificates > Minimum TLS Version > TLS 1.2. Cloudflare still accepts TLS 1.0 and 1.1 by default, and SSL Labs caps the grade at B for that; workers.dev can't change it, so it waits for the zone. Check: SSL Labs on `DOMAIN` shows TLS 1.0 and 1.1 "No" and grade A or better (After launch).
 3. **Owner:** from the `launch` branch, `npx wrangler triggers deploy` (CI doesn't apply routes). `curl -sI` the PR preview for a Cloudflare `X-Robots-Tag`.
 4. **Owner:** custom domain Active with a certificate.
 5. **Claude:** merge; read the deploy summary.
