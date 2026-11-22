@@ -1,40 +1,19 @@
-// Cloudflare Workers, static assets: the built site in dist/ is served as is, _headers and _redirects included.
-//   npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787)
-//   npx wrangler deploy   deploy by hand, in one step. CI deploys on a push to main another way: versions upload, a
-//                         smoke check of that version, then versions deploy (scripts/deploy.mjs). That way doesn't
-//                         apply routes, custom domains, cron triggers, workers_dev or preview_urls from this file:
-//                         after a change to those, run `npx wrangler triggers deploy` or `npx wrangler deploy` once.
-//                         preview_urls must stay true: the deploy checks each version at its preview address.
-// The one script, worker/index.js, runs only where the files can't answer well on their own; everything else never
-// starts it (no Worker time, no log line, nothing counted against the free plan's 100,000 requests a day):
-//   run_worker_first   /404 by name (a file, so it would be 200). The site has no /api/ address.
-//   not_found_handling "none": an address with no file goes to the Worker, which answers with dist/404.html, a 404
-//                      status and /404's headers. "404-page" would serve that page from the assets without the Worker,
-//                      but with the _headers rules of the missing path (a missing .txt as text/plain, a missing
-//                      /_astro/ file cached for a year): review B8.
-// build.command runs before every wrangler dev, deploy and versions upload. It builds nothing: it refuses dist/ if
-// the build's last step (scripts/headers.mjs, called from astro.config.mjs) didn't finish, as after a build that
-// stopped part way, so _headers never ships with its placeholders in the CSP (scripts/check-dist.mjs).
+// Cloudflare Workers, static assets only: the built site in dist/ is served as it is, with public/_headers. No
+// Worker script runs.
+//   npm run build && npx wrangler dev      serve dist/ the way Cloudflare does (http://localhost:8787)
+//   npm run deploy                         build and deploy by hand; CI does the same on a push to main
+// not_found_handling "404-page": an address with no file gets dist/404.html with a 404 status.
+// html_handling (the default): /services serves services.html, and /services/ or /services.html redirect to it.
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uplink-site",
-  "main": "worker/index.js",
-  // Monthly: the newest date the installed wrangler's runtime supports (npm run serve refuses a later one), checked
-  // against Cloudflare's compatibility flags first; then npm run types. A later date waits for a wrangler update.
+  // The newest date the installed wrangler supports; bump it when wrangler is updated.
   "compatibility_date": "2026-11-11",
-  "build": { "command": "node scripts/check-dist.mjs" },
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "none",
-    "binding": "ASSETS",
-    "run_worker_first": ["/404"],
+    "not_found_handling": "404-page",
   },
+  // each uploaded version gets its own address (a pull request's preview uses it)
   "preview_urls": true,
-  // Worker Previews (CI's preview job runs `wrangler preview`): the block must be here, even empty. A preview takes the
-  // assets and the settings above, but not bindings (there are none)
   "previews": {},
-  // The script's own console lines (worker/index.js logs only an unexpected error: its message and the path) are kept,
-  // 3 days on the free plan. Cloudflare's own record of each run (the invocation log: the request and response, headers
-  // included) is off: we don't need it.
-  "observability": { "enabled": true, "logs": { "invocation_logs": false } },
 }

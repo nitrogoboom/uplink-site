@@ -1,35 +1,14 @@
-# Response headers for every file, read by Cloudflare (Workers static assets and Pages alike). Not served as a page.
-# This is the template: `npm run build` copies it to dist/_headers and scripts/headers.mjs fills in
-#   the script-hashes placeholder in the CSP   a hash for each inline <script> in the built pages (Base.astro's head script)
-#   the style-hashes placeholder   a hash for each inline <style> left in the built pages
-#   the Early Hints block   one rule per page
-#   the build placeholder   X-Build, the build's ID: a hash of dist/, these headers and the Worker. The deploy reads
-#                           it to tell which build the live address serves (scripts/deploy.mjs). Only a hash.
-#   the commit placeholder  X-Commit, the git commit the build was made from (7 characters, as git log --oneline
-#                           shows it; -dirty on a local build with uncommitted changes). After a push, one request to
-#                           the live address tells whether it serves that commit. The repository is public.
-# style-src has no 'unsafe-inline': nothing carries a style="" attribute (the build refuses one). The hero drawing
-# writes its timings as classes in a <style> block (tools/gen_office.py); scripts set styles through el.style.
-# font-src allows data: because each SVG carries its own letters as a data: font.
-# No outside script or connection: the site loads nothing from another host.
-# default-src 'none': a kind of file the policy doesn't name (a frame, video, worker, web manifest) is refused, even
-# from the site itself. A new kind needs its own directive here.
-# require-trusted-types-for / trusted-types: scripts may write HTML (innerHTML and the like) only through
-# the 'uplink' policy in core.js (its html() helper). A new innerHTML elsewhere fails until it goes through it.
-# No report-to or report-uri: the site has no address that takes reports. At launch, Cloudflare's client-side
-# security watches the scripts pages run, with its own header and endpoint (docs/release.md, "Before launch").
-# Strict-Transport-Security: a year, every subdomain, and "preload": the browser asks for https only. On the real
-# domain that covers mail and any other subdomain too, and "preload" lets the domain join the browsers' built-in
-# https-only lists (docs/release.md, "Before launch").
-# X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build (27 Oct 2026).
-# robots.txt still allows crawling, so search engines can read this, and names no sitemap (src/pages/robots.txt.ts).
-# At launch, delete the line and put the Sitemap line back in robots.txt (docs/release.md, "Launch day").
+# Response headers for every file, read by Cloudflare (Workers static assets). Not served as a page. Shipped as written:
+# nothing fills it in at build.
+# The pages' Content Security Policy (which scripts and styles may run) is a <meta> Astro writes into each page
+# (astro.config.mjs, security.csp). The header below adds what a <meta> can't carry:
+#   frame-ancestors 'none'          no other site may show these pages in a frame
+#   require-trusted-types-for / trusted-types   scripts may write HTML (innerHTML and the like) only through the
+#                                   'uplink' policy in core.js (its html() helper)
+# Strict-Transport-Security: a year, every subdomain, and "preload": the browser asks for https only.
+# X-Robots-Tag noindex: keeps the whole site out of search results while it is a test build. Delete the line at launch.
 # Speculation-Rules: Chrome and Edge fetch a page in the background when a pointer rests on a link to it (on phones,
-# when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json: our
-# own pages only, not the .txt files. A header, not an inline <script>, so the CSP needs nothing
-# new. Other browsers ignore it, and so does any response that isn't a page.
-# A missing address isn't served from this file's path rules: the Worker answers it with the 404 page and /404's
-# headers, so the rules below for a path (/*.txt, /_astro/*) never reach a 404 (wrangler.jsonc, not_found_handling).
+# when it comes into view), so the click doesn't wait for the HTML. The rules are public/speculation-rules.json.
 /*
   X-Robots-Tag: noindex
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
@@ -40,20 +19,21 @@
   Cross-Origin-Resource-Policy: same-origin
   X-Frame-Options: DENY
   Speculation-Rules: "/speculation-rules.json"
-  X-Build: {build}
-  X-Commit: {commit}
-  Content-Security-Policy: default-src 'none'; script-src 'self' {script-hashes}; style-src 'self' {style-hashes}; font-src 'self' data:; img-src 'self' data:; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; require-trusted-types-for 'script'; trusted-types uplink
-
-# Early Hints: Cloudflare sends these Link lines as a "103" before the page, so the browser starts on the
-# first-screen fonts while the HTML is still on its way. (On Workers the zone's Early Hints setting must be on.)
-# @early-hints (written by scripts/headers.mjs; it copies the font preloads in Base.astro; edit those, not these lines)
-# @end early-hints
+  Content-Security-Policy: frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types uplink
 
 # Cloudflare sends .txt as text/plain with no charset, and browsers then read it as windows-1252 ("doesnâ€™t").
-# The files are UTF-8: say so.
-/*.txt
+# The files are UTF-8: say so. Named one by one, so a missing .txt address still gets the 404 page as a page.
+/robots.txt
   ! Content-Type
   Content-Type: text/plain; charset=utf-8
+/llms.txt
+  ! Content-Type
+  Content-Type: text/plain; charset=utf-8
+# the commit the live build was made from: never kept, so a check after a deploy reads the new one
+/version.txt
+  ! Content-Type
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: no-store
 # Chrome reads speculation rules only under their own type (Cloudflare would send application/json).
 /speculation-rules.json
   ! Content-Type
@@ -66,20 +46,13 @@
 /
   Speculation-Rules: "/speculation-rules-home.json"
 
-# Astro names every bundled CSS and JS file, and every font (/_astro/fonts/), by its content hash
-# (/_astro/x.ab12cd34.css), so a year is safe.
+# Astro names every bundled JS file and every font (/_astro/fonts/) by its content hash, so a year is safe.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 # Drawings keep their names when they change (the generators overwrite them), but every address a page writes
 # carries a hash of the file (?v=, fresh() in src/lib/site.ts), so a changed drawing is a new address: a year.
-# Opened on their own, the drawings would get the pages' CSP, which blocks their <style> blocks (the embedded
-# letters, the hero's timings). A drawing runs no script, so its own policy allows inline styles and nothing else.
-# (In the page, <img> drawings are not held to the page's CSP; the drawings home.js and footer.js insert ship without
-# their <style>, which the build links as a CSS file instead: scripts/drawcss.mjs.)
 /assets/img/*
   Cache-Control: public, max-age=31536000, immutable
-  ! Content-Security-Policy
-  Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; font-src data:; img-src data:
 # The share picture is fetched by social sites by its plain name: a day only. Some apps show it straight from here
 # in their own pages, so it may be loaded cross-origin (every other file is same-origin only).
 /assets/img/og.png

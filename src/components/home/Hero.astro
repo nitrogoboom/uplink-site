@@ -1,7 +1,7 @@
 ---
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
 // Drawing: the office as a stack of layers (floor, walls, furniture, network, cloud, dashes, label lines), each its
-// own <svg> written by tools/gen_office.py into ./hero/ (don't edit by hand) and inlined here, so it shows with the
+// own <svg> written by tools/gen_office.py into ./hero/ (don't edit by hand) and inlined here as saved, so it shows with the
 // page, script or not. The labels' words are page text over it, from the copy, each set where its line ends
 // (hero-place.css, also written by gen_office.py). hero.css builds it in layer by layer; home.js steps the cloud
 // through its apps and moves the dashes. Phones frame it closer and keep only the cloud's label, in a corner.
@@ -9,6 +9,7 @@
 // the light theme's colours for the drawings inside the page (this hero and Grow, both on Home only): written by
 // tools/gen_light.py, and first here so hero.css and grow.css still come after it
 import '../../styles/theme-drawings.css';
+import '../../styles/hero-drawing.css'; // the layers' own rules, written by tools/gen_office.py
 import './hero-place.css'; // the phone framing and the labels' places, written by tools/gen_office.py
 import './hero.css';
 import Drawing from '../Drawing.astro';
@@ -18,15 +19,13 @@ import { getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
-import { shrink } from '../../../scripts/svgo-config.mjs';
 const { hero: t, cloud } = await copy('home');
-// the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist.
-// Shrunk with the site's SVGO settings, as Grow's world is (scripts/svgo-config.mjs)
+// the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist
 const layers = Object.entries(
   import.meta.glob<string>('./hero/*.svg', { query: '?raw', import: 'default', eager: true }),
 )
   .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))
-  .map(([path, svg]) => shrink(svg, `hero/${path.split('/').pop()}`));
+  .map(([, svg]) => svg);
 const apps = Object.entries(cloud.apps);
 // the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.

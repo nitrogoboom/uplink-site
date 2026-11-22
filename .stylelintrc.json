@@ -1,5 +1,6 @@
 {
   "extends": ["stylelint-config-standard"],
+  "ignoreFiles": ["src/styles/*-drawing.css"],
   "rules": {
     "declaration-block-single-line-max-declarations": null,
     "comment-empty-line-before": null,

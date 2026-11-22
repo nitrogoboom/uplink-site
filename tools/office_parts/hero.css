@@ -3,5 +3,5 @@
 .ob-led{animation:ob-led 3.2s step-end infinite}
 @keyframes ob-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.05)}}
 @keyframes ob-led{0%,62%{opacity:1}68%,80%{opacity:.25}86%,100%{opacity:1}}
-@media (prefers-reduced-motion:reduce){:root:not([data-motion=full]) .ob-pulse,:root:not([data-motion=full]) .ob-led{animation:none!important}}
+@media (prefers-reduced-motion: reduce){.ob-pulse,.ob-led{animation:none!important}}
 .hl-lit{opacity:0;transition:opacity .3s ease}.hl-lit.is-on{opacity:1}

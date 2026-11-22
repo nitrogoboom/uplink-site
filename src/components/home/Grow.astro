@@ -6,14 +6,13 @@
 // under its button; on phones and tablets the buttons hide and the open card sits under the picture. CSS shows the
 // dots or the buttons, so the steps are read once at every size. A button is named by its own words, the place.
 // Without script the whole world shows, finished, with every step's card in the list.
-// Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw) and shrunk
-// with the site's SVGO settings; its own <style> (the drawings' print rule) is dropped, nothing here needs it.
+// Drawing: grow-world.svg, written by tools/gen_grow.py. Don't edit it by hand. Inlined as text (?raw); its own
+// <style> (the drawings' print rule) is dropped, nothing here needs it.
 // It goes in as layers, one <svg> each in its drawing order: the ground (with the shared defs and the tags'
 // anchors), then each part (.pc) on its own. A part dropping in then moves as one box, which the browser moves
 // without drawing the rest again; one drawing, its parts would be redrawn every frame. Parts from different steps
 // sit in one another's depth order, so the layers follow the parts, not the steps.
 import raw from './grow-world.svg?raw';
-import { shrink } from '../../../scripts/svgo-config.mjs';
 import Icon from '../Icon.astro';
 import { getGrow } from '../../lib/site';
 import { copy, fill } from '../../lib/copy';
@@ -21,11 +20,11 @@ import './grow.css';
 
 const steps = await getGrow(); // src/data/grow.json, typed in content.config.ts
 
-const world = shrink(raw, 'grow-world.svg').replace(/<style>[\s\S]*?<\/style>/g, '');
+const world = raw.replace(/<style>[\s\S]*?<\/style>/g, '');
 const viewBox = /viewBox="([^"]+)"/.exec(world)?.[1];
 const label = /aria-label="([^"]+)"/.exec(world)?.[1];
 // the drawing's one outer group: its paint settings go on each layer's own
-const outer = /<title>[\s\S]*?<\/title>(<g\b[^>]*>)/.exec(world)?.[1];
+const outer = /<title>[\s\S]*?<\/title>\s*(<g\b[^>]*>)/.exec(world)?.[1];
 if (!viewBox || !label || !outer) throw new Error('grow-world.svg: no viewBox, aria-label or outer <g> to split by');
 const body = world.slice(world.indexOf(outer) + outer.length, world.lastIndexOf('</g>'));
 // a <g> that starts at i: where it ends (its matching </g>). An empty one is written <g …/> and opens nothing.

@@ -7,12 +7,10 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check && tsc -p worker && tsc -p scripts",
-    "types": "wrangler types worker/worker-configuration.d.ts",
+    "check": "astro check",
     "lint": "eslint . && stylelint \"src/**/*.css\" && prettier --check .",
     "format": "eslint --fix . && stylelint --fix \"src/**/*.css\" && prettier --write .",
-    "quick": "npm run check && npm run lint && npm run build && npm run types -- --check",
-    "smoke": "node scripts/check.mjs smoke",
+    "quick": "npm run check && npm run lint && npm run build",
     "serve": "wrangler dev",
     "deploy": "npm run build && wrangler deploy"
   },
@@ -29,11 +27,8 @@
   ],
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.6",
-    "@playwright/test": "^1.65.1",
     "astro": "^7.4.7",
-    "esbuild": "^0.28.2",
     "postcss-custom-media": "^12.0.3",
-    "svgo": "^4.1.0",
     "wrangler": "^4.158.0"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@
    the page (the Home hero and the Grow world); Hero.astro imports it, so only Home carries it. Attribute rules sit in
    :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
 
-/* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-leaders.svg */
+/* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-leaders.svg, hero-drawing.css */
 :where(:root[data-theme='light'] .hero-art) [fill='#05111d' i] {
   fill: #bbc2c9;
 }

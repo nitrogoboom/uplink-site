@@ -20,7 +20,7 @@ CSS_OUT = ROOT / 'src' / 'styles' / 'theme-drawings.css'
 
 # drawings that live inside the page, by the box that holds them (the CSS's scope); office: a gen_office.py drawing
 INLINE = [
-    ('.hero-art', True, sorted((HOME / 'hero').glob('*.svg'))),   # the hero's layers
+    ('.hero-art', True, sorted((HOME / 'hero').glob('*.svg')) + [ROOT / 'src' / 'styles' / 'hero-drawing.css']),   # the hero's layers and their CSS
     ('.grow-stage', False, [HOME / 'grow-world.svg']),
 ]
 _INLINE_NAMES = {p.name for _, _, files in INLINE for p in files}
@@ -155,7 +155,7 @@ def _css(hex_):
 
 
 def _forms(hex_):
-    """The colour as an attribute selector value. SVGO writes colours in lower case, and short where it can."""
+    """The colour as an attribute selector value: lower case, and its short form where it has one."""
     h = hex_.lower()
     short = '#' + h[1] + h[3] + h[5] if h[1] == h[2] and h[3] == h[4] and h[5] == h[6] else None
     return [h] + ([short] if short else [])
@@ -171,10 +171,10 @@ def inline_css():
         rules = []        # (selector, property, colour) from the drawings' own <style>
         for src in files:
             svg = src.read_text(encoding='utf-8')
-            for m in TAG.finditer(svg):
+            for m in ([] if src.suffix == '.css' else TAG.finditer(svg)):
                 for a in ATTR.finditer(m.group(0)):
                     uses.add((a.group(1), a.group(2).upper(), kind_of(a.group(1), m.group(1))))
-            for s in re.findall(r'<style[^>]*>(.*?)</style>', svg, flags=re.S):
+            for s in ([svg] if src.suffix == '.css' else re.findall(r'<style[^>]*>(.*?)</style>', svg, flags=re.S)):
                 for sel, body in re.findall(r'([^{}@]+)\{([^{}]*)\}', s):
                     for prop, col in CSS.findall(body):
                         rules.append((sel.strip(), prop, col.upper()))

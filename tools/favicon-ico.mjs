@@ -1,10 +1,10 @@
-// Writes public/favicon.ico from public/favicon.svg, by hand when the icon changes: node scripts/favicon-ico.mjs
+// Writes public/favicon.ico from public/favicon.svg, by hand when the icon changes: node tools/favicon-ico.mjs (needs Playwright: npm install --no-save playwright)
 // Base.astro links both (the .ico at sizes="32x32" for browsers without SVG icons, then the SVG), and some browsers and link previews ask for /favicon.ico
 // whatever the page says; without the file they got the whole 404 page. Chromium (Playwright) draws the SVG at 16,
 // 32 and 48 px on a clear background, and each PNG goes into the .ico as it is (every browser since Windows Vista
 // reads PNG inside an .ico).
 import { readFileSync, writeFileSync } from 'node:fs';
-import { chromium } from '@playwright/test';
+import { chromium } from 'playwright';
 
 const SVG = readFileSync('public/favicon.svg', 'utf8');
 const SIZES = [16, 32, 48];

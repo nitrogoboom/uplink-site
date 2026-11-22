@@ -866,8 +866,9 @@ def hero_layers():
 
 
 def hero_svgs():
-    """{file name: SVG} for the hero's layers. One <style> for all of them, in the first: the loops' CSS and the
-    classes hoist_styles and share_paint make (the same rules get the same name in every layer)."""
+    """({file name: SVG} for the hero's layers, their CSS). The layers carry no <style>: the loops' CSS and the classes
+    hoist_styles and share_paint make (the same rules get the same name in every layer) are one CSS file the page
+    imports, so the page's CSS is all in its stylesheets."""
     x, y, wd, ht = HERO_VIEW
     bodies, rules = {}, []
     for name, body in hero_layers().items():
@@ -877,10 +878,12 @@ def hero_svgs():
         rules += [r for r in re.findall(r'[^{}]+\{[^{}]*\}', css + paint_css) if r not in rules]
     out = {}
     for i, (name, body) in enumerate(bodies.items(), 1):
-        style = f'\n<style>{part("hero.css")}\n{"".join(rules)}</style>' if i == 1 else ''
         out[f'{i}-{name}.svg'] = (f'<svg xmlns="http://www.w3.org/2000/svg" class="hl-{name}" viewBox="{x} {y} {wd} {ht}" '
-                                  f'aria-hidden="true" focusable="false">{style}\n{body}\n</svg>\n')
-    return out
+                                  f'aria-hidden="true" focusable="false">\n{body}\n</svg>\n')
+    css = ('/* Written by tools/gen_office.py: do not edit by hand. The hero drawing\'s own rules: its loops, and the\n'
+           '   classes its layers share. Outside the cascade layers, so they win over the page\'s CSS as a drawing\'s own\n'
+           '   <style> would. The reduced-motion query is plain: postcss.config.mjs makes it follow Settings. */\n' + part('hero.css') + '\n' + '\n'.join(rules) + '\n')
+    return out, css
 
 
 def place_css():
@@ -917,15 +920,18 @@ if __name__ == '__main__':
     #   badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
     # src/components/home/hero/N-NAME.svg  the hero's layers (HERO_LAYERS), inlined by Hero.astro (page fonts apply)
     # src/components/home/hero-place.css  where the page puts things over the hero (place_css)
+    # src/styles/hero-drawing.css         the layers' own rules (hero_svgs); in src/styles/ so it stays outside the
+    #   cascade layers (postcss.config.mjs puts a component's CSS in one)
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
     home = pathlib.Path(__file__).resolve().parent.parent / 'src/components/home'
     (home / 'hero').mkdir(exist_ok=True)
-    svgs = hero_svgs()
+    svgs, drawing_css = hero_svgs()
     for old in (home / 'hero').glob('*.svg'):
         if old.name not in svgs:
             old.unlink()
     for name, text in svgs.items():
         (home / 'hero' / name).write_text(text, encoding='utf-8', newline='\n')
     (home / 'hero-place.css').write_text(place_css(), encoding='utf-8', newline='\n')
+    (home.parent.parent / 'styles' / 'hero-drawing.css').write_text(drawing_css, encoding='utf-8', newline='\n')

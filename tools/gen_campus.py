@@ -206,11 +206,17 @@ def build():
     s.append('<g class="mk"><g class="mk-bob"><line class="mk-line" x1="0" y1="14" x2="0" y2="52"/>'
              '<polygon class="mk-d" points="0,-15 11,0 0,15 -11,0"/><polygon class="mk-i" points="0,-6 4.5,0 0,6 -4.5,0"/></g></g>')
     body, css = hoist_styles('\n'.join(s))
-    return '\n'.join([
+    svg = '\n'.join([
         f'<svg xmlns="http://www.w3.org/2000/svg" class="fc-w" viewBox="{" ".join(map(str, VB0))}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">',
-        f'<style>{css}</style>', body, '</svg>', ''])
+        body, '</svg>', ''])
+    css = ('/* Written by tools/gen_campus.py: do not edit by hand. The footer map\'s timing classes. The map goes into\n'
+           '   the page without a <style> of its own (footer.js inserts it), so its rules are page CSS. */\n'
+           + css.replace('}', '}\n'))
+    return svg, css
 
 
 if __name__ == '__main__':
     root = pathlib.Path(__file__).resolve().parent.parent
-    open(root / 'public/assets/img/campus.svg', 'w', encoding='utf-8', newline='\n').write(build())
+    svg, css = build()
+    open(root / 'public/assets/img/campus.svg', 'w', encoding='utf-8', newline='\n').write(svg)
+    open(root / 'src/styles/campus-drawing.css', 'w', encoding='utf-8', newline='\n').write(css)

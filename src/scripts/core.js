@@ -74,9 +74,8 @@ const store = {
 /* ---------- Trusted Types ---------------------------------------------- */
 // The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like), so every HTML
 // write in the site's scripts is a call to html(). It passes the string on as it is. Every string is the site's own
-// file: the icons below, and the drawings home.js and footer.js fetch from /assets/img/. Those are checked where
-// they are made, not here: the build stops on a drawing that holds anything but drawing tags
-// (scripts/svgo-config.mjs). Words a visitor typed never come through here: they are set with textContent.
+// file: the icons below, and the drawings home.js and footer.js fetch from /assets/img/, which the drawing tools
+// write. Words a visitor typed never come through here: they are set with textContent.
 const ttPolicy = window.trustedTypes
   ? window.trustedTypes.createPolicy('uplink', { createHTML: (/** @type {string} */ s) => s })
   : null;

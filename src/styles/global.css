@@ -1,5 +1,5 @@
-/*--- The shared CSS. Imported once by src/layouts/Base.astro; the build writes them as one file every page links,
-   and puts it inside Home (astro.config.mjs, scripts/head.mjs). Colours, sizes and timings come from tokens.css.
+/*--- The shared CSS. Imported once by src/layouts/Base.astro; Astro writes it inside every page
+   (astro.config.mjs, inlineStylesheets). Colours, sizes and timings come from tokens.css.
    A section's own CSS, desktop layout included, sits next to its component (src/components/<page>/*.css) and is
    imported there; a block more than one page uses lives here.
    Cascade layers: a later layer wins, whatever the selectors' weight (docs/design.md, "Layers"). The order is

@@ -520,9 +520,8 @@ a.fc-cl:hover {
 }
 
 /* the campus map itself (drawn by tools/gen_campus.py; footer.js fetches it in and lights the picked spot). Its parts
-   are styled by class, never by tag: SVGO (scripts/svgo-config.mjs) writes its polygons and lines as paths. The
-   faces are .f-t, .f-l, .f-r, the windows .win, the marker .mk-d, .mk-i (every polygon gen_campus.py draws: a test in
-   scripts/test/ holds the list to the drawing); :where() keeps this base rule as weak as the tag rule it replaces. */
+   are styled by class, never by tag. The faces are .f-t, .f-l, .f-r, the windows .win, the marker .mk-d, .mk-i
+   (every polygon gen_campus.py draws); :where() keeps this base rule as weak as a tag rule. */
 .fc-w :where(.f-t, .f-l, .f-r, .win, .mk-d, .mk-i) {
   stroke: var(--iso-edge);
   stroke-opacity: 0.3;

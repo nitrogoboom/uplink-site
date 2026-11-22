@@ -2,7 +2,7 @@
 // The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it. Its props, and how a
 // page adds its own script (inside <Fragment slot="scripts">): src/README.md, "Pages". Anything else a
 // page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
-// the shared CSS: one file every page links, and Home carries inside itself (astro.config.mjs, scripts/head.mjs)
+// the shared CSS: Astro writes it inside every page (astro.config.mjs, inlineStylesheets)
 import '../styles/global.css';
 import { Font } from 'astro:assets';
 import Header from '../components/Header.astro';
@@ -14,6 +14,8 @@ import { breadcrumbs, businessNode, businessRef, jsonLd } from '../lib/site';
 import { footer as contact } from '../lib/footer';
 import Words from '../components/Words.astro';
 import { copy } from '../lib/copy';
+import { sha256 } from '../lib/csp';
+import themeInit from '../scripts/theme-init.js?raw';
 
 export type Page =
   'home' | 'services' | 'work' | 'about' | 'contact' | 'privacy' | 'accessibility' | 'soon' | 'notfound';
@@ -72,6 +74,7 @@ const jsonld = type &&
     ],
   };
 const ui = await copy('ui');
+Astro.csp?.insertScriptHash(sha256(themeInit));
 ---
 
 <!doctype html>
@@ -105,33 +108,15 @@ const ui = await copy('ui');
         visitor's choice; anything else, or no storage, follows the device. Reduce motion is "reduce" if the visitor
         turned it on (uplink.motion), or their device asks for less motion and they haven't turned it off; "full" if
         they turned it off. The light colours are in theme-light.css; #E8EFF7 is the light page colour, for the
-        browser's own bar. The script ships as written (is:inline), so it carries no comments but the one type. */}
-    <script is:inline>
-      (function (r) {
-        r.classList.add('js');
-        const kept = (/** @type {string} */ k) => {
-          try {
-            return localStorage.getItem(k);
-          } catch {
-            return null;
-          }
-        };
-        let t = kept('uplink.theme');
-        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-        r.dataset.theme = t;
-        const m = kept('uplink.motion');
-        if (m === 'reduce' || (m !== 'full' && matchMedia('(prefers-reduced-motion: reduce)').matches))
-          r.dataset.motion = 'reduce';
-        else if (m === 'full') r.dataset.motion = 'full';
-        if (t === 'light') document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#E8EFF7');
-      })(document.documentElement);
-    </script>
+        browser's own bar. The script is src/scripts/theme-init.js, written into the page as it is (so it carries no
+        comments but the one type); its hash goes in the page's CSP, since Astro hashes only the scripts it bundles. */}
+    <script is:inline set:html={themeInit} />
     {/* The fonts (astro.config.mjs, "fonts"). Preload the faces a page's first screen shows at every size, the page
         title (Condensed 700 italic) and body text (Barlow 400) first: four on every page, and Condensed 600 too on
         Home (elsewhere a phone's first screen has none of it, so it starts at the first layout). A face the head
         doesn't name counts as a chained request (PageSpeed, "Network dependency tree"); at about 10 KB a face, naming
         them costs the title and body faces little. Their fallbacks take the same room, so nothing moves when they
-        arrive. scripts/headers.mjs sends each page's list as Early Hints too. */}
+        arrive. */}
     <Font
       cssVariable="--font-barlow-condensed"
       preload={[

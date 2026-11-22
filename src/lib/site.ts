@@ -3,25 +3,20 @@
 import type { IconName } from '../components/Icon.astro';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { shipped } from '../../scripts/svgo-config.mjs';
 import { getCollection } from 'astro:content';
 import { byOrder } from '../content.config';
 import { copy } from './copy';
 
-// Drawings keep their names when they change, so every address a page writes carries a hash of the file as the site
-// serves it, after SVGO (?v=; shipped() in scripts/svgo-config.mjs): a changed drawing is a new address, even when
-// only SVGO's output changed, and the browser may keep each one for a year (_headers, /assets/img/*). Drawing.astro
-// does it for every picture; a new <img> of a drawing goes through it or through fresh(). SERVED changes when the
-// build changes what it does to a drawing after SVGO (scripts/drawcss.mjs takes the inserted drawings' <style> out),
-// so no browser keeps a copy made the old way.
-const SERVED = 'drawcss-1';
+// Drawings keep their names when they change, so every address a page writes carries a hash of the file (?v=): a
+// changed drawing is a new address, and the browser may keep each one for a year (public/_headers, /assets/img/*).
+// Drawing.astro does it for every picture; a new <img> of a drawing goes through it or through fresh().
 const stamps = new Map<string, string>();
 export const fresh = (path: string) => {
   if (!stamps.has(path))
     stamps.set(
       path,
       `${path}?v=${createHash('sha1')
-        .update(SERVED + shipped(path))
+        .update(readFileSync(`public${path}`))
         .digest('hex')
         .slice(0, 8)}`,
     );
@@ -109,8 +104,8 @@ export const getReviews = async () => (await getCollection('reviews')).sort(byOr
 
 // The /work filters (components/work/Projects.astro): "All" (label null: its word is the copy's, work.yaml), then one radio per project tag, in the order the projects
 // first use it, each with its count. No tag is listed by hand, so none can be empty. workFilterCss() hides the other
-// tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head>, and
-// scripts/headers.mjs hashes it for the CSP like any inline <style>. A browser without :has() ignores the rules and
+// tags' cards while one is checked, with :has() and no script; work.astro puts it in the page's <head> and
+// adds its hash to the page's CSP (src/lib/csp.ts). A browser without :has() ignores the rules and
 // shows every project (projects.css then hides the filters).
 export const WORK_FILTER = 'work-filter'; // the radios' name
 export const workFilters = async () => {

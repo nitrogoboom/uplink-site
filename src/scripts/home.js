@@ -50,31 +50,6 @@ if (stage) {
   dashes($$('.ob-flow', stage), () => !stage.classList.contains('is-idle'));
 }
 
-/* ------------------------------------------------------------------
-   The next page's CSS. Home carries its CSS inside the page; every other
-   page links one shared file, which the build names here in a
-   <meta name="later-css"> (scripts/head.mjs). Once Home has loaded and
-   the browser is idle, ask for that file quietly: the next page then
-   finds it in the browser's cache and shows at once.
-   Chrome, Edge and Firefox keep a fetched file for the next page's
-   <link>; the CSP needs nothing new for a fetch. Safari doesn't keep it
-   (seen in WebKit 27.2, November 17, 2026) but does keep one asked for
-   as a preload. Safari is also the one without <link rel="prefetch">,
-   which is how the script tells which to use.
-   ------------------------------------------------------------------ */
-const laterCss = /** @type {HTMLMetaElement | null} */ ($('meta[name="later-css"]'));
-if (laterCss) {
-  const href = laterCss.content;
-  const ask = () => {
-    const link = document.createElement('link');
-    if (link.relList.supports('prefetch')) void window.fetch(href, { priority: 'low' }).catch(() => {});
-    else document.head.append(Object.assign(link, { rel: 'preload', as: 'style', href }));
-  };
-  const idle = () => (window.requestIdleCallback ? window.requestIdleCallback(ask) : window.setTimeout(ask, 2000));
-  if (document.readyState === 'complete') idle();
-  else window.addEventListener('load', idle, { once: true });
-}
-
 /* ======================================================================
    Services on phones: mark the card in the middle (Home).
    The row swipes and snaps with no script. The card crossing a thin strip

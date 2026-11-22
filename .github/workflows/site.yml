@@ -1,7 +1,6 @@
 # Draft mode. A pull request: build (dist) and preview, in parallel; the gate (`build`, required on main) passes when
-# dist does. A push to main, or "Run workflow" on main: deploy builds and runs scripts/deploy.mjs (smoke check at the
-# new version's address, then live, rollback on failure). Nothing else is checked here: site checks are done by hand,
-# when the owner asks (the `check` skill).
+# dist does. A push to main, or "Run workflow" on main: deploy builds the site and runs `wrangler deploy`. Nothing
+# else is checked here: site checks are done by hand, when the owner asks (the `check` skill).
 # node_modules is cached by package-lock.json, so npm ci runs only when the packages change (57 s otherwise).
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
 # CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID.
@@ -72,12 +71,12 @@ jobs:
         env:
           DIST: ${{ needs.dist.result }}
 
-  # a push to main, or "Run workflow" on main: build here, then scripts/deploy.mjs (upload a version, smoke it at its own address, put it live,
-  # smoke the live site, roll back on failure). Missing secrets fail it. One deploy at a time
+  # a push to main, or "Run workflow" on main: build here, then wrangler deploy (the static files in dist/). Missing
+  # secrets fail it. One deploy at a time
   deploy:
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # about 1 minute; up to 25 when smoke runs retry
+    timeout-minutes: 10 # about 1 minute
     environment: cloudflare
     concurrency: deploy
     steps:
@@ -95,10 +94,10 @@ jobs:
       - if: steps.nm.outputs.cache-hit != 'true'
         run: npm ci --omit=dev # the build and deploy packages; lint and type tools stay on the owner's machine
       - run: npm run build
-      - name: Upload, check, deploy (rolled back if the live site then fails its smoke check)
+      - name: Deploy
         run: |
           [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ] || { echo "::error::cloudflare environment is missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID"; exit 1; }
-          node scripts/deploy.mjs https://uplink-site.johnoreilly.workers.dev
+          npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
