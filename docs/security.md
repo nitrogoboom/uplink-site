@@ -7,34 +7,29 @@ Controls, and every secret (names and places, never values). Reporting: [`SECURI
 ### HTTPS and HSTS
 
 - Every page and file sends `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` (owner, November 17, 2026: PageSpeed's HSTS check). On `workers.dev` the two extra words change nothing. On the real domain they cover every subdomain, mail included: before launch, confirm each one is HTTPS for good, or take the two words out of `public/_headers` until it is (`docs/release.md`, "Before launch"). Joining the browsers' lists at hstspreload.org is hard to undo.
-- The Worker redirects `http://` to `https://` with a `308` for the requests it sees: `/404` and missing addresses. Until launch an existing page still answers on plain `http://` with a `200` (seen November 17, 2026). At launch, Always Use HTTPS on the zone redirects everything first.
+- Nothing redirects `http://` to `https://` on `workers.dev`: a page still answers on plain `http://` (HSTS covers every visit after the first). At launch, Always Use HTTPS on the zone redirects everything.
 
 ### Content Security Policy
 
-No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. `public/_headers` is the template; `scripts/headers.mjs` fills in the hashes at build. Its shape:
+No `'unsafe-inline'`: inline code runs only by its SHA-256 hash. It comes in two parts, and nothing fills in either after the build:
 
-```http
-Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-…';
-  style-src 'self' 'sha256-…'; font-src 'self' data:; img-src 'self' data:; connect-src 'self';
-  form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none';
-  require-trusted-types-for 'script'; trusted-types uplink
-```
+- **A `<meta>` in each page, written by Astro** (`security.csp` in `astro.config.mjs`): `default-src 'none'`, `script-src 'self'` and `style-src 'self'` with a hash for every script and style Astro bundles, `font-src 'self'`, `img-src 'self' data:`, `connect-src 'self'`, `form-action 'self'`, `base-uri 'self'`, `object-src 'none'`. The two inline blocks Astro doesn't bundle add their own hash (`src/lib/csp.ts`): the theme script in `Base.astro` and the filter CSS on `/work`.
+- **A header, in `public/_headers`**, for what a `<meta>` can't carry: `frame-ancestors 'none'; require-trusted-types-for 'script'; trusted-types uplink`.
 
 - `default-src 'none'`: a kind of file the policy doesn't name (a frame, video, worker, web manifest) is refused, even from the site itself. A new kind needs its own directive.
 - The one inline script marks the page as script-enabled and applies the saved theme and motion choice before paint.
-- No element carries `style=""`; the build fails on one. Scripts set styles with `el.style.x = …`.
-- `font-src data:` is there because each SVG carries its own letters as a data font.
+- No element carries `style=""`: the policy would ignore it. Scripts set styles with `el.style.x = …`.
+- The policy is off in `npm run dev`. To check it: `npm run build`, `npm run serve`, and read the console.
 - A new outside host (fonts, analytics, a form service) means a CSP change. Forms with Turnstile will need `challenges.cloudflare.com` in `script-src` and `frame-src`.
 
 ### Trusted Types
 
-The CSP allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own icons and drawings, and words a visitor typed are set with `textContent`. The drawings are checked at build instead (owner, November 17, 2026): it stops on one that holds anything but drawing tags, an `on…=` handler or an address (`vet()` in `scripts/svgo-config.mjs`). The policy allows no script URLs.
+The header allows one policy, `uplink`, created in `src/scripts/core.js`. Every HTML write goes through its `html()` helper. The policy doesn't clean HTML: callers pass only the site's own icons and drawings (files the drawing tools write), and words a visitor typed are set with `textContent`.
 
 ### Other headers
 
 `public/_headers` sends `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()`, `Cross-Origin-Opener-Policy: same-origin`, and `Cross-Origin-Resource-Policy: same-origin` (`og.png` is `cross-origin`).
 
-- The Worker's own responses don't get `_headers` ([`ops.md`](ops.md#the-worker)).
 - Not sent on purpose: `X-Permitted-Cross-Domain-Policies` (only Flash and Acrobat read it) and `Cross-Origin-Embedder-Policy` (it could block an outside script added later, such as analytics).
 
 ### No reports from browsers
@@ -48,8 +43,8 @@ Actions pinned to commits, and GitHub refuses one that isn't pinned or isn't Git
 ## Privacy
 
 - **No cookies, no tracking.** Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
-- **What the site logs:** only the Worker's own failures, as the error message and the path. No IP address, nothing a visitor typed. The Workers logs keep them 3 days; the privacy page says "up to 7 days", to be safe.
-- **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/data/privacy.md` in the same commit.
+- **What the site logs:** nothing of ours. No Worker script runs, so there is no error log; Cloudflare serves the files. The privacy page still lists a site error log kept "up to 7 days": true again only if a script comes back (`notes.md`).
+- **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/content/en/privacy.md` in the same commit.
 
 ## Secrets
 
@@ -70,7 +65,7 @@ Planned, with the forms in [PR #38](https://github.com/nitrogoboom/uplink-site/p
 | `FORM_FROM` | The sending address, on a domain on Cloudflare. | Worker variable |
 | `EMAIL` binding | Cloudflare Email Service. Not a secret. | `wrangler.jsonc` |
 
-Not secrets: `GH_TOKEN` in CI is GitHub's short-lived token for the run. The placeholder inboxes (`privacy@`, `accessibility@`, `security@uplinkit.ca`) are under `inboxes` in `src/data/footer.json`.
+Not secrets: `GH_TOKEN` in CI is GitHub's short-lived token for the run. The placeholder inboxes (`privacy@`, `accessibility@`, `security@uplinkit.ca`) are under `inboxes` in `src/content/en/footer.json`.
 
 > **Note:** The environments `production` (deploys from `main` only) and `preview` exist but are empty. The Cloudflare secrets move there, with a separate preview token (`notes.md`).
 
@@ -78,4 +73,4 @@ If a secret may have leaked: make a new one, delete the old one, note it in the 
 
 ## Review checklist
 
-`curl -sI` for the `308` to HTTPS (before launch, only at a missing address) and HSTS; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console (one that isn't the site's: when Playwright takes a screenshot in WebKit it adds a `<style>` of its own, and the console says "Refused to apply a stylesheet", `style-src-elem` on the document; it comes only with the screenshot, seen November 17, 2026); `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.
+`curl -sI` for HSTS and the other headers; Observatory A+; CSP Evaluator with no high findings; no CSP violations in the console (one that isn't the site's: when Playwright takes a screenshot in WebKit it adds a `<style>` of its own, and the console says "Refused to apply a stylesheet", `style-src-elem` on the document; it comes only with the screenshot, seen November 17, 2026); `document.body.innerHTML = 'x'` is blocked; SSL Labs A; no cookies; `security.txt` unexpired; the privacy page matches what is collected.

@@ -4,17 +4,17 @@ Where things live in `src/`. Setup: [project README](../README.md).
 
 ## Pages
 
-One file in `pages/` per address; sections are components in `components/PAGE/`.
+One file in `pages/[...locale]/` per address, built once per language (English at `/`, any other at `/<language>/`; `lib/i18n.ts`); sections are components in `components/PAGE/`.
 
 | File | Address | Sections |
 | --- | --- | --- |
 | `index.astro` | `/` | Hero, Services, Grow, Work, Reviews (Proof, the check-up card, at its foot) |
-| `services.astro`, `services/[slug].astro` | `/services`, `/services/SLUG` | Overview, Faq; one page per `content/services/SLUG.json` |
-| `work.astro`, `work/[slug].astro` | `/work`, `/work/SLUG` | Projects (filters are radios; `workFilterCss()` in `lib/site.ts`); one page per `content/projects/SLUG.json` |
+| `services.astro`, `services/[slug].astro` | `/services`, `/services/SLUG` | Overview, Faq; one page per `content/en/services/SLUG.json` |
+| `work.astro`, `work/[slug].astro` | `/work`, `/work/SLUG` | Projects (filters are radios; `workFilterCss()` in `lib/site.ts`); one page per `content/en/projects/SLUG.json` |
 | `about.astro`, `contact.astro` | `/about`, `/contact` | Profile, Process, Team; Message, Support |
-| `privacy.astro`, `accessibility.astro` | | `data/*.md` through `components/TextPage.astro` |
-| `soon.astro`, `404.astro` | `/soon`, missing addresses | inline |
-| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `.well-known/security.txt.ts` | those files | from `lib/site.ts`, the collections, `data/*.md`; `llms.txt` tells AI tools what the site is and lists its pages |
+| `privacy.astro`, `accessibility.astro` | | `content/en/*.md` through `components/TextPage.astro` |
+| `soon.astro`; `pages/404.astro`, `pages/[locale]/404.astro` | `/soon`, missing addresses | inline; `components/NotFound.astro` |
+| `sitemap.xml.ts`, `robots.txt.ts`, `llms.txt.ts`, `version.txt.ts`, `.well-known/security.txt.ts` (in `pages/`) | those files | from `lib/site.ts` and the collections; `version.txt` is the build's commit; `llms.txt` tells AI tools what the site is and lists its pages |
 
 `layouts/Base.astro` is the shared head, header, footer, phone tab bar, pop-ups and toasts. Props: `title`, `description`, `page` (current tab), `path`, `robots`, `ogType`, `type` (schema.org), `ldPage`, `ldGraph`, `footer` (`false` on the 404). `PAGES` in `lib/site.ts` lists each static page's address; its name is `pages` in `ui.yaml` (`pageName('NAME')`), its title and description come from `pageMeta('NAME')`.
 
@@ -23,7 +23,7 @@ One file in `pages/` per address; sections are components in `components/PAGE/`.
 | Component | What |
 | --- | --- |
 | `Header.astro`, `BottomNav.astro` | Header and phone tab bar |
-| `Footer.astro` | Five `<details name="footer">` sections; data `data/footer.json` (import via `lib/footer.ts`), CSS `styles/footer.css`, map `tools/gen_campus.py`. Desktop: panel + map + tiles; tablet: map, panel, tiles; below 700px: rows, no map |
+| `Footer.astro` | Five `<details name="footer">` sections; data `content/en/footer.json` (import via `lib/footer.ts`), CSS `styles/footer.css`, map `tools/gen_campus.py`. Desktop: panel + map + tiles; tablet: map, panel, tiles; below 700px: rows, no map |
 | `BookDialog.astro`, `SettingsDialog.astro` | Pop-ups; Settings has theme and Reduce motion |
 | `Drawing.astro` | A drawing in both themes (`NAME.svg`, `NAME-light.svg`) |
 | `TextPage.astro` | Privacy and accessibility Markdown, placeholders filled |
@@ -35,8 +35,8 @@ Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a 
 
 ## Content and copy
 
-- Collections: `content.config.ts` (strict). Lists: `data/faq.json`, `team.json`, `grow.json`, `reviews.json`, `footer.json`.
-- Words in components and scripts: `data/copy/en/*.yaml` (`ui.yaml` shared, one per page, `text-pages.yaml`), with no schema: to add a string, add it to the YAML and read it. Read with `await copy('home')` (a key the YAML lacks stops the build); templates with `fill()`. Scripts get words via `<Words>` and `words()`.
+- Everything a visitor reads is in `content/en/` (a language a folder; `fr/` beside it would be French, falling back to English). Collections: `content.config.ts` (strict). Lists: `faq.json`, `team.json`, `grow.json`, `reviews.json`, `footer.json`.
+- Words in components and scripts: `content/en/copy/*.yaml` (`ui.yaml` shared, one per page, `text-pages.yaml`), with no schema: to add a string, add it to the YAML and read it. Read with `await copy('home', Astro.currentLocale)` (a key the YAML lacks stops the build); templates with `fill()`. Scripts get words via `<Words>` and `words()`.
 
 ## Styles
 

@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-The website for Uplink Technology, a made-up IT company, with placeholder content. Astro 7, plain CSS, and plain JavaScript; Cloudflare Workers serves it as static files.
+The website for Uplink Technology, a made-up IT company, with placeholder content. Astro 7, plain CSS, and plain JavaScript, built by `astro build` alone; Cloudflare serves the result as static files.
 
 - **Content is data.** Every service, project, and list is a typed JSON, YAML, or Markdown file. Pages, cards, menus, the sitemap, and the structured data read from those files.
 - **Drawings are code.** A Python script writes every illustration. Never edit an output SVG by hand.
@@ -15,8 +15,7 @@ The website for Uplink Technology, a made-up IT company, with placeholder conten
 | [`parked.md`](parked.md) | Open items on hold until the owner asks. |
 | [`src/README.md`](src/README.md) | A map of the source code. |
 | [`docs/drawing-tools.md`](docs/drawing-tools.md) | The drawing rules, generators, and checks. |
-| [`docs/site-checks.md`](docs/site-checks.md) | The smoke check the deploy runs. Every other check is a look done by hand: the `check` skill. |
-| [`docs/ops.md`](docs/ops.md) | The Worker, CI and deploys, previews, rollback, response headers. |
+| [`docs/ops.md`](docs/ops.md) | Hosting: what Astro does and what Cloudflare does, deploys, previews, rollback. |
 | [`docs/design.md`](docs/design.md) | Colour, spacing, line height, corners, and layout. |
 | [`docs/release.md`](docs/release.md) | The release checklist and launch day. |
 | [`docs/security.md`](docs/security.md), [`SECURITY.md`](SECURITY.md) | Security controls and secrets; how to report a problem. |
@@ -36,7 +35,7 @@ You need Node.js 24 (the exact version is in `.node-version`). The drawing tools
 
 2. Open http://localhost:4321.
 
-The development server doesn't apply the response headers, the 404 page, or the redirects. To see the site as Cloudflare serves it, run `npm run build` and then `npm run serve`, and open http://localhost:8787.
+The development server doesn't apply the response headers, the Content Security Policy, or the redirects. To see the site as Cloudflare serves it, run `npm run build` and then `npm run serve`, and open http://localhost:8787.
 
 ### Install Firefox and WebKit for a look
 
@@ -57,36 +56,42 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Starts the development server at http://localhost:4321. |
-| `npm run build` | Builds the site into `dist/`. Its last step (`astro:build:done` in `astro.config.mjs`) shrinks the drawings and writes `dist/_headers` and `dist/_redirects`. |
-| `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). Restart it after a rebuild: it keeps serving the `_headers` it started with. |
+| `npm run build` | Builds the site into `dist/` (Astro). Nothing runs after it: `dist/` is what ships. |
+| `npm run serve` | Serves `dist/` the way Cloudflare does, at http://localhost:8787 (`wrangler dev`). Restart it after a rebuild. |
 | `npm run preview` | Astro's own preview server. No headers or redirects: use `npm run serve`. |
-| `npm run check` | Type check and Astro's diagnostics for `src/`, then a type check of the Worker (`worker/tsconfig.json`) and the build scripts (`scripts/tsconfig.json`). |
-| `npm run types` | Writes the Worker's types (`Env`, the runtime) from `wrangler.jsonc` into `worker/worker-configuration.d.ts`. Run it after changing `wrangler.jsonc`; `npm run quick` fails until you do. |
+| `npm run check` | Type check and Astro's diagnostics. |
 | `npm run lint` | ESLint, Stylelint, and Prettier. |
 | `npm run format` | Fixes what the linters can, then formats with Prettier. `astroCompressHTML` in `.prettierrc.json` matches `compressHTML` in `astro.config.mjs`: change the two together. A commit that only reformats goes in `.git-blame-ignore-revs`. |
-| `npm run quick` | Type check, lint, build, and a check that the Worker's types match `wrangler.jsonc` (about 30 seconds). |
-| `npm run smoke -- ADDRESS` | Checks a deployed site over plain HTTP: [`docs/site-checks.md`](docs/site-checks.md). The deploy runs it. |
-| `npm run deploy` | Deploys the checked-out branch to the live Worker by hand: builds, then deploys. One step (`wrangler deploy`): no check of the new version first, and no rollback ([Deploys](docs/ops.md#deploys)). CI deploys on a merge to `main`, so you rarely need it; run it from `main`. |
+| `npm run quick` | Type check, lint, and build (about 30 seconds). |
+| `npm run deploy` | Builds, then deploys the checked-out branch by hand (`wrangler deploy`). CI deploys on a push to `main`, so you rarely need it; run it from `main` ([Deploys](docs/ops.md#deploys)). |
 
 ## How the repository is organized
 
 | Path | What it holds |
 | --- | --- |
 | `src/` | The site. [`src/README.md`](src/README.md) maps it. |
-| `public/` | Files served as they are: the `_headers` template, `speculation-rules.json`, the fonts' licence (the fonts are in `src/assets/fonts/`), the drawings in `assets/img/`, `og.png`, and the favicons. `favicon.ico` is made from `favicon.svg` by `node scripts/favicon-ico.mjs`; rerun it when the icon changes. |
-| `scripts/` | The build's last steps, in this order: `svgo.mjs` shrinks the drawings (settings in `svgo-config.mjs`, whose `shipped()` hash is the `?v=` on every drawing's address), and stops the build if a drawing's `<style>` names a tag, or if a drawing holds anything but drawing tags. `head.mjs` names each page's script files in its `<head>` and puts Home's CSS back inside Home (every other page links one shared CSS file). `headers.mjs` finishes `dist/_headers` and writes `dist/_redirects`. Also: `deploy.mjs`, CI's deploy ([Deploys](docs/ops.md#deploys)); `check-dist.mjs`, wrangler's build step, which refuses an unfinished `dist/`; `check.mjs`, which runs the smoke check. |
+| `public/` | Files served as they are: `_headers`, `speculation-rules.json`, the fonts' licence (the fonts are in `src/assets/fonts/`), the drawings in `assets/img/`, `og.png`, and the favicons. `favicon.ico` is made from `favicon.svg` by `node tools/favicon-ico.mjs`; rerun it when the icon changes. |
 | `tools/` | The drawing generators and their checks, in Python. [`docs/drawing-tools.md`](docs/drawing-tools.md). |
-| `checks/` | The smoke check (`smoke.spec.mjs`), its arguments (`lib.mjs`), and `playwright.config.mjs`. [`docs/site-checks.md`](docs/site-checks.md). |
-| `worker/index.js` | The Worker script ([`docs/ops.md`](docs/ops.md#the-worker)). |
-| `wrangler.jsonc` | The Cloudflare Worker configuration. |
+| `astro.config.mjs` | The site's settings: address, languages, CSS inlining, Content Security Policy, fonts. |
+| `wrangler.jsonc` | The Cloudflare configuration: serve `dist/` as static files. |
 | `.github/workflows/site.yml` | CI and deploys. |
 | `docs/` | The docs above. |
 
 ### Links and addresses
 
-Links between pages are root-relative and have no `.html`: `/services`, `/contact#message`. The build writes `dist/_redirects`, which sends `/services.html`, `/services/`, and `/index.html` to the clean address with a `308`.
+Addresses have no `.html`: `/services`, `/contact#message`. Cloudflare redirects `/services.html` and `/services/` to the clean address. In a component a link is written as in English and passed through `to()` (`linker()` in `src/lib/i18n.ts`), which gives the page's language its own address.
 
 The site's public address is `SITE_URL`: set it in the environment, or change the default in `astro.config.mjs`. At launch, set it to the real domain.
+
+### Languages
+
+English today, built the Astro way so French is an addition, not a rewrite:
+
+- `astro.config.mjs` lists the languages (`i18n`). English is at `/`; any other is at `/<language>/`.
+- Each page is one file in `src/pages/[...locale]/`, built once per language. A page knows its language from `Astro.currentLocale`.
+- Everything a visitor reads is in `src/content/en/`.
+
+To add French: add `'fr'` to `locales` in `astro.config.mjs`, copy what is translated into `src/content/fr/` (same file names), and import its `footer.json` in `src/lib/footer.ts`. Anything `fr/` lacks shows in English. A language switch link is still to add (`notes.md`).
 
 ### Content works without script
 
@@ -94,7 +99,7 @@ Every service and project is in the page's HTML in full. Every page reads and wo
 
 ## Add a service
 
-1. Copy a file in `src/content/services/` to `SLUG.json`. The slug becomes the address, `/services/SLUG`. The fields are typed in `src/content.config.ts`.
+1. Copy a file in `src/content/en/services/` to `SLUG.json`. The slug becomes the address, `/services/SLUG`. The fields are typed in `src/content.config.ts`.
 2. Copy `tools/gen_voip.py` to `tools/gen_NAME.py` and change the scene. It writes `public/assets/img/NAME.svg`, `NAME-compact.svg`, and `NAME-card.svg`. Set `image` in the JSON to `NAME`.
 3. Run the generator and its checks ([Check a drawing](docs/drawing-tools.md#check-a-drawing)).
 4. Run `npm run build`.
@@ -103,13 +108,13 @@ Everything else comes from the JSON file.
 
 ### Add a project
 
-The same, with `src/content/projects/SLUG.json` and `/work/SLUG`. `services` lists service slugs. Each `tag` a project uses gets a filter on `/work`, in the order the projects first use it.
+The same, with `src/content/en/projects/SLUG.json` and `/work/SLUG`. `services` lists service slugs. Each `tag` a project uses gets a filter on `/work`, in the order the projects first use it.
 
-The smaller lists are in `src/data/*.json`.
+The smaller lists are the other JSON files in `src/content/en/`.
 
 ### Change the site's words
 
-Every other word is in `src/data/copy/en/`: one YAML file a page, and `ui.yaml` for the shared parts. Edit the YAML and rebuild. To add a string, see [Copy](src/README.md#content-and-copy).
+Every other word is in `src/content/en/copy/`: one YAML file a page, and `ui.yaml` for the shared parts. Edit the YAML and rebuild. To add a string, see [Copy](src/README.md#content-and-copy).
 
 ## Drawing rules
 
@@ -117,7 +122,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#drawing-rules).
 
 ## Tools
 
-The drawing tools (Python, `tools/`) are in [`docs/drawing-tools.md`](docs/drawing-tools.md): the projection, Generators, Shared drawing code, and Check a drawing. The smoke check (Node, `checks/`) is in [`docs/site-checks.md`](docs/site-checks.md). Every tool runs from the project root.
+The drawing tools (Python, `tools/`) are in [`docs/drawing-tools.md`](docs/drawing-tools.md): the projection, Generators, Shared drawing code, and Check a drawing. Every tool runs from the project root.
 
 ## Browsers
 
@@ -125,4 +130,4 @@ Chrome, Edge, Firefox and Safari (Mac and iPhone), every version from the last y
 
 ## Hosting
 
-Cloudflare Workers with static assets, live at https://uplink-site.johnoreilly.workers.dev. See [`docs/ops.md`](docs/ops.md).
+Cloudflare Workers, static assets only (no Worker script), live at https://uplink-site.johnoreilly.workers.dev. See [`docs/ops.md`](docs/ops.md).

@@ -12,12 +12,12 @@ Layout and look:
 
 Content:
 
-- [ ] Home has two descriptions that differ: the page's ("Outsourced IT…", `description` in `src/data/copy/en/home.yaml`) and the business one ("Managed IT…", `business`). Decide when the real copy is written.
+- [ ] Home has two descriptions that differ: the page's ("Outsourced IT…", `description` in `src/content/en/copy/home.yaml`) and the business one ("Managed IT…", `business`). Decide when the real copy is written.
 - [ ] All pages: where the same text comes from two content entries (such as a separate phone line), merge them into one, as Home's hero lead (PR #160, `t.lead` only) (owner, November 10, 2026).
 - [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, Grow's six tags, the "Windows 10" hero card.
-- [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/data/reviews.json`. With the real Google reviews: their fields (photo, "2 months ago", rating shown per card if they vary), a score and count beside the stars, "Read reviews on Google" (now `/soon`) to the Google profile, quotes that don't retell "Our work", drop the "Sample reviews" line. Maybe fold the check-up band into this section (`.fold-foot`, as About Team).
+- [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/content/en/reviews.json`. With the real Google reviews: their fields (photo, "2 months ago", rating shown per card if they vary), a score and count beside the stars, "Read reviews on Google" (now `/soon`) to the Google profile, quotes that don't retell "Our work", drop the "Sample reviews" line. Maybe fold the check-up band into this section (`.fold-foot`, as About Team).
 - [ ] Home "Our work" row is a placeholder until its real section is decided (`src/components/home/Work.astro`).
-- [ ] Contact form: when it's wired to Cloudflare, make its sent message (`received` in `src/data/copy/en/contact.yaml`) match what really happens. Until then it says the message was received (thought-audit.md, problem 1).
+- [ ] Contact form: when it's wired to Cloudflare, make its sent message (`received` in `src/content/en/copy/contact.yaml`) match what really happens. Until then it says the message was received (thought-audit.md, problem 1).
 - [ ] Grow: final copy and team sizes, people drawn as more than blocks, timing on real phones (`DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`).
 
 ## Now: setup and code
@@ -31,7 +31,6 @@ Drawing generators (the owner directs drawing work):
 
 - [ ] `gen_office.py` and `gen_grow.py` write role classes, as `gen_campus.py` does; `theme-drawings.css` then goes.
 - [ ] The generators write the camera boxes into the drawings; the footer map camera becomes generated CSS with `:has()`.
-- [ ] Shrink a drawing when it's generated and commit that, so `scripts/svgo.mjs` leaves the build.
 
 PageSpeed (November 17, 2026: fonts 113 KB to 51 KB; forced reflow, network dependency tree, cache lifetimes, HSTS and unused CSS turned green):
 
@@ -44,3 +43,13 @@ PageSpeed (November 17, 2026: fonts 113 KB to 51 KB; forced reflow, network depe
 ## Parked until the owner says
 
 Not Home, not setup: `parked.md`.
+
+After the rebuild (Astro builds it alone; `docs/ops.md`):
+
+- [ ] First push: the deploy is now `wrangler deploy` with no Worker script. Watch that run, then check `/version.txt` and a made-up address (the 404 page).
+- [ ] Privacy page: its table lists a site error log kept "up to 7 days" (`src/content/en/privacy.md`). No script runs any more, so there is none. Owner to decide: remove the row, or leave it for when the forms bring a script back.
+- [ ] Home is about 3 KB heavier over the wire (43.6 KB, was 40.2): the hero and Grow drawings go in as the tools save them, no shrink at build. To win it back, round their numbers tighter in `tools/gen_office.py` and `gen_grow.py`.
+- [ ] `http://` and `/services/`-style addresses: Cloudflare's own handling now (no redirect of `http://` on workers.dev, a 307 for the spellings). At launch, Always Use HTTPS covers the first; decide whether the second needs 308s (`public/_redirects`).
+- [ ] French: a language switch link (footer or Settings) once `src/content/fr/` exists (README, "Languages").
+- [ ] Drawings as Astro assets (`src/assets/`, hashed names) instead of `public/assets/img/` with `?v=`: Astro's own way to cache-bust images. Left as is; worth it when the other pages are designed.
+

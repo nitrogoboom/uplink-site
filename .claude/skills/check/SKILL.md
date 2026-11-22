@@ -31,6 +31,6 @@ A helper script for one look (a link crawl, say) goes in the scratchpad and is t
 | Speed | A Lighthouse performance run on the built site at phone size. Report the LCP element and time, layout shift, and page weight. |
 | No script | Turn JavaScript off. The page reads, the menu and footer work, links go somewhere. |
 | Before and after | Screenshot the same pages at the same sizes from the live site and from local; look at each pair and list what moved. |
-| A deployed address | `npm run smoke -- ADDRESS` (`docs/site-checks.md`): Home up with its security headers, the https redirect, the 404. The one scripted check; the deploy runs it itself. |
+| A deployed address | By hand: `curl -sI ADDRESS` (200, the security headers of `public/_headers`), `curl -s ADDRESS/version.txt` (the commit), a made-up address (the 404 page, status 404), then Home in a browser with the console open (no CSP block). |
 
 Real phones, a real screen reader and Safari on a Mac are the owner's to try: give them the address and a short list of what to look at.

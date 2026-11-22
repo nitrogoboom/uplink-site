@@ -2,7 +2,7 @@
 
 Leave these alone unless the owner asks. The active list is `notes.md`.
 
-- [ ] French as `/fr/` addresses (decided): Astro's i18n routing. The copy files are in `src/data/copy/en/` now (#146); a `fr/` folder, the French words and the `/fr/` addresses are left.
+- [ ] French as `/fr/` addresses (decided): Astro's i18n routing is in (`src/lib/i18n.ts`, README "Languages"). Left: `'fr'` in `astro.config.mjs`, the French words in `src/content/fr/`, and a language switch link.
 
 ## Owner and accounts
 
@@ -18,9 +18,9 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 
 ## Privacy and accessibility pages
 
-- [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/data/footer.json`; its `uplinkit.ca` addresses are placeholders), and a postal code for the office.
+- [ ] Real inboxes for `privacy@`, `accessibility@`, `security@` (`inboxes` in `src/content/en/footer.json`; its `uplinkit.ca` addresses are placeholders), and a postal code for the office.
 - [ ] Name the Privacy Officer (the page gives the title only, which PIPEDA allows).
-- [ ] `/accessibility`, "How we check it" (`src/data/accessibility.md`) still says every change is checked automatically in three browsers; that stopped November 12, 2026 (checks are looks by hand now). Rewrite it to what's true before launch.
+- [ ] `/accessibility`, "How we check it" (`src/content/en/accessibility.md`) still says every change is checked automatically in three browsers; that stopped November 12, 2026 (checks are looks by hand now). Rewrite it to what's true before launch.
 - [ ] Before launch, `/accessibility` gets back two Ontario lines: what happens after feedback (O. Reg. 191/11 s. 80.50(2)) and free accessible formats on request (s. 12(3)).
 
 ## Forms
@@ -28,7 +28,7 @@ For launch (the owner): the split environments are under "Owner and accounts"; t
 - [ ] Forms are paused. PR #38 (`claude/sweet-chaum-b12ca0`) has the Worker endpoint, Turnstile, honeypot and rate limit, email a stub; leave it open. Needs `TURNSTILE_SECRET`, `FORM_TO`, a sending domain.
 - [ ] PR #38 conflicts with `main`: `main` has no `/api/` address since November 16, 2026 (`/api/report` and its `REPORTS` limit are gone). Its form routes bring `/api/*` back to `run_worker_first` (`["/api/*", "/404"]`, with `not_found_handling: "none"`) and its own `ratelimits`; adding them is the owner's decision.
 - [ ] With the endpoint: give the contact and newsletter fields their `name` back (without script they go to `/soon`); CSP and the Trusted Types policy allow Turnstile (`docs/security.md`).
-- [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/data/privacy.md` and `accessibility.md`, link privacy beside each Send.
+- [ ] When forms send: delete the "send nothing yet" lines and `FORMS-LIVE` comments in `src/content/en/privacy.md` and `accessibility.md`, link privacy beside each Send.
 - [ ] When forms send: the booking and newsletter toasts (`toast.booked`, `toast.subscribed` in `ui.yaml`) say "Prototype form: nothing is sent yet"; give them the real reply time.
 - [ ] Newsletter: a CASL consent line ("One email a month from Uplink Technology. Unsubscribe any time. Privacy."), what sends it (a processor to name), where consent records live.
 - [ ] Decide on Cloudflare Email Service's "Email preview" (keeps each sent message about 7 days; the privacy page says so).

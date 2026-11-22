@@ -3,52 +3,43 @@
 How the site is hosted and run. Secrets and security controls are in [`security.md`](security.md).
 
 - **Code:** the public GitHub repository `nitrogoboom/uplink-site`.
-- **Site:** a Worker named `uplink-site` serves `dist/` as static assets (`wrangler.jsonc`), at https://uplink-site.johnoreilly.workers.dev until the site has its own domain.
+- **Site:** Cloudflare Workers, static assets only (`wrangler.jsonc`): the files in `dist/`, exactly as `npm run build` (Astro) writes them. No Worker script runs and nothing changes the files after the build. Live at https://uplink-site.johnoreilly.workers.dev until the site has its own domain.
 
-## The Worker
+## What Astro does, and what Cloudflare does
 
-`worker/index.js` is the site's only server code. It takes no input: there is no `/api/` address, and it reads no request body. The static files answer most requests, with `_headers` and `_redirects` applied. `wrangler.jsonc` sends the Worker two kinds of request:
+| Job | Who | Where it is set |
+| --- | --- | --- |
+| Pages, one set per language | Astro | `src/pages/`, `i18n` in `astro.config.mjs` |
+| CSS inside each page (nothing blocks the first paint) | Astro | `build.inlineStylesheets: 'always'` |
+| The script and style hashes of the Content Security Policy, as a `<meta>` in each page | Astro | `security.csp` |
+| Fonts, with hashed names | Astro | `fonts` |
+| Every other response header, caching | Cloudflare | `public/_headers`, shipped as written |
+| `/services` for `services.html`; `/services/` and `/services.html` redirect there | Cloudflare | its default `html_handling` |
+| The 404 page for a missing address | Cloudflare | `not_found_handling: "404-page"` |
 
-- **`/404`** (`run_worker_first`). The Worker gives the 404 page a `404` status.
-- **An address with no file** (`not_found_handling: "none"`). The Worker answers with the same 404 page and headers as `/404`. Don't use `"404-page"`: the static files would answer with the `_headers` rules of the missing path.
-
-Also:
-
-- The Worker fetches the 404 page afresh and sends it without an `ETag`. Any method other than `GET` and `HEAD` to `/404` or a missing address gets a `405`.
-- For the requests it sees, it redirects `http://` to `https://` with a `308`, except for a local server (`localhost`, `*.localhost`, `*.local`, `0.0.0.0`, and private addresses). At launch, Always Use HTTPS on the zone redirects every request first.
-- `_headers` doesn't reach the Worker's own responses, so each carries `X-Content-Type-Options: nosniff`, `Cache-Control: no-store`, and a CSP that loads nothing. The 404 page keeps the headers it has as a file.
-- Anything that goes wrong is logged (the message and the path) and the request goes on to the static files. The Workers logs keep those lines 3 days (free plan). The invocation log is off (`observability.logs.invocation_logs`).
-
-> **Note:** Before `wrangler dev`, `deploy`, `versions upload`, and `preview`, wrangler runs `node scripts/check-dist.mjs` (`build.command`). It stops wrangler if `dist/_headers` still has its `{script-hashes}` or `{build}` placeholders, or `dist/_redirects` is missing. Run `npm run build` again and fix what it reports.
+The drawings are finished on the owner's machine (`tools/`, [`drawing-tools.md`](drawing-tools.md)) and committed; the build only copies them.
 
 ## Deploys
 
-`.github/workflows/site.yml`. A change normally goes straight to `main` (CLAUDE.md, "Check, ship"); a pull request is for when the owner wants a preview link. `node_modules` is cached by `package-lock.json`, so `npm ci` runs only when the packages change. A pull request runs:
+A push to `main` that changes the site runs `.github/workflows/site.yml`: `npm ci`, `npm run build`, `npx wrangler deploy`. About a minute. A push of only docs runs nothing. "Run workflow" on `main` deploys again.
 
-- `dist`: the build. It also decides the scope: docs-only (root `*.md`, `docs/`) skips the build.
-- `preview`: builds the commit itself and posts `https://pr-N-uplink-site.johnoreilly.workers.dev`. Waits for no job.
-- `build`: the gate the ruleset on `main` requires. Passes when `dist` passes.
-- `dependency-review`: a new dependency with a known high vulnerability fails the pull request. Pull requests only: a push to `main` skips it.
-- Always: `workflows` (zizmor; it runs beside the deploy and fails the run on a high finding, without holding the deploy).
+- **Is it live?** `curl -s https://uplink-site.johnoreilly.workers.dev/version.txt` prints the commit the live build was made from (7 characters, as `git log --oneline` shows it).
+- **By hand:** `npm run deploy` (build, then `wrangler deploy`), from `main`.
+- **Roll back:** `npx wrangler rollback` puts the previous version live; `npx wrangler deployments list` shows them. Then fix `main`.
+- **Previews:** a pull request gets `https://pr-N-uplink-site.johnoreilly.workers.dev` (the `preview` job).
+- **Secrets:** `CLOUDFLARE_API_TOKEN` ("Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`, in the GitHub environment `cloudflare`.
 
-A push to `main` (not docs-only) runs `deploy`; so does "Run workflow" on `main` (`gh workflow run site.yml --ref main`), for when a push's run was lost. It builds, then `node scripts/deploy.mjs LIVE_ADDRESS`:
+Nothing checks the site after a deploy, and nothing rolls it back by itself. A change a visitor can see gets a look in the browser.
 
-1. Uploads a version that takes no traffic and smoke-checks it at its own address. A failure stops here; the live site is unchanged.
-2. Puts it live, waits for the live address to serve that build (`X-Build` marker), and smoke-checks it.
-3. Rolls back to the previous version if the live check fails.
+## When the forms send
 
-The run summary names both versions. Timings: `DEPLOY_POLL`, `DEPLOY_WAIT`, `DEPLOY_SETTLE`, `DEPLOY_RETRY`.
-
-Secrets, in the `cloudflare` environment: `CLOUDFLARE_API_TOKEN` ("Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`. Without them the preview skips and a deploy fails.
-
-> **Note:** `wrangler versions deploy` doesn't apply routes, domains, crons, `workers_dev` or `preview_urls`. After changing those, run `npx wrangler triggers deploy`. Keep `preview_urls` on.
-
-> **Note:** With no live version to roll back to, or when `wrangler deployments status` fails, the script stops. Deploy by hand: `npm run build`, then `npx wrangler deploy`.
+A static site has no address that takes input. The Astro way to add one is the `@astrojs/cloudflare` adapter: the pages stay prerendered, and the form's endpoint is one on-demand route or Astro Action. That is the owner's decision (PR #38 holds the earlier Worker-script version).
 
 ## Dependency notes
 
-- After Dependabot bumps `wrangler` or `esbuild`, set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns and npm 12 won't run their install scripts.
+- After Dependabot bumps `wrangler`, set `allowScripts` in `package.json` to the versions in `package-lock.json` (`workerd`, `esbuild`, `fsevents`), or `npm ci` warns and npm 12 won't run their install scripts.
 - TypeScript 7: `astro check` refuses it, so `dependabot.yml` ignores TypeScript majors. Move when `@astrojs/check` supports 7.
+- `compatibility_date` in `wrangler.jsonc`: bump it when wrangler is updated.
 
 ## Repository rules
 
@@ -58,35 +49,8 @@ Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
 - **main: pull request and build.** A change reaches `main` through a pull request, and the `build` job must pass. Repository admins bypass it, and in draft mode the owner's pushes do: straight to `main`.
 
 Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
-
-## Roll back a bad deploy
-
-The deploy job rolls back on its own when the live site fails the smoke check. Roll back by hand when something breaks that the smoke check doesn't catch, or when the run's summary says "Rollback failed":
-
-1. List the recent deploys: `npx wrangler deployments list`.
-2. Put the previous version back live: `npx wrangler rollback` (for an older one, `npx wrangler rollback VERSION_ID`).
-3. Fix `main`. The next push to `main` deploys it again.
-
-## Response headers
-
-`public/_headers` sets the security headers on every static file, the cache rules, and the `Speculation-Rules` header. The Worker sets its own (see [The Worker](#the-worker)).
-
-The `Speculation-Rules` header points Chrome and Edge at `public/speculation-rules.json`: the browser prefetches a page of the site when a pointer rests on its link (on phones, when the link comes into view). Links to `.txt` files are left out. Home adds `/speculation-rules-home.json` (made from the menu list): the other menu pages are fetched as soon as Home opens. Both prefetch only, so nothing on a fetched page runs until it's opened.
-
-`public/_headers` is a template. The build's last step (`astro:build:done` in `astro.config.mjs`) runs `scripts/headers.mjs`, which writes `dist/_headers` with a hash for every inline `<script>` and `<style>` left in the built pages, `X-Build`, `X-Commit` (the git commit the build was made from, so one request shows whether the live address serves a push), and an Early Hints `Link` rule for each page (that page's font preloads). Before it, `scripts/drawcss.mjs` moves the `<style>` blocks of the drawings scripts insert (and of drawings written inside a page) into linked CSS files, so a new drawing adds no hash, and `scripts/head.mjs` names each page's script files in its `<head>` (`<link rel="modulepreload">`), so the browser fetches them as the page arrives, and puts Home's CSS back inside Home. Don't paste a hash in by hand.
-
-- **CSS: Home carries it, the rest link it** (owner, November 17, 2026). Astro writes the CSS as files: one every page shares, one of Home's own. Every page but Home links the shared file, which the browser fetches once and keeps a year, so a page fetched ahead is its HTML alone (it was about 18 KB of the same CSS in every page). Home is where a visitor arrives with nothing kept, so `scripts/head.mjs` puts its CSS back inside the page and nothing waits before the first paint. Once Home has loaded, `home.js` asks for the shared file so the next page has it. Each linking page's Early Hints line names the file.
-- **Drawings are kept a year.** They keep their names when they change, so every address a page writes carries a hash of the file (`?v=`, `fresh()` in `src/lib/site.ts`; `Drawing.astro` adds it). A new `<img>` of a drawing goes through `Drawing.astro` or `fresh()`, or a visitor keeps the old picture.
-
-- **Outside hosts.** Adding an outside host, such as fonts, analytics, or a form service, means adding it to the CSP.
-- **Trusted Types.** A script that writes HTML (`innerHTML`, `insertAdjacentHTML`) must pass the string through `html()` from `core.js`.
-- **No `style=""` attributes.** The build fails on one. Scripts set styles with `el.style.x = …`.
-- **Fonts are Astro's.** The five Barlow files live in `src/assets/fonts/`; Astro serves them from `/_astro/fonts/` under hashed names (cached a year), so a changed font is a new address. `astro.config.mjs` lists them; `Base.astro` preloads the faces every size of a page's first screen shows (four, and a fifth on Home). Each file is cut to what the site shows (owner, November 17, 2026): English and French letters and common punctuation, kerning, ligatures and tabular figures, and no hinting (the Windows-only sharpening), about 10 KB a file where Google's Latin file is 22 KB. A letter outside the cut shows in the fallback font. To cut a face again, from Google Fonts' Latin `.woff2`: `python -m fontTools.subset IN.woff2 --output-file=OUT.woff2 --flavor=woff2 --no-hinting --desubroutinize --layout-features=kern,liga,tnum --name-IDs=1,2,3,4,6 --unicodes="U+0020-007E,U+00A0,U+00A9,U+00AB,U+00AE,U+00B0,U+00B7,U+00BB,U+00C0,U+00C2,U+00C4,U+00C6-00CB,U+00CE,U+00CF,U+00D4,U+00D6,U+00D7,U+00D9,U+00DB,U+00DC,U+00E0,U+00E2,U+00E4,U+00E6-00EB,U+00EE,U+00EF,U+00F4,U+00F6,U+00F9,U+00FB,U+00FC,U+00FF,U+0152,U+0153,U+0178,U+2013,U+2014,U+2018,U+2019,U+201C,U+201D,U+2022,U+2026,U+20AC,U+2122"`.
-
 Every control and how to check it: [`security.md`](security.md).
 
 ## Search engines
 
 `public/_headers` sends `X-Robots-Tag: noindex` on every response, because the content is placeholder. Remove that line at launch.
-
-> **Note:** Each page takes one of Cloudflare's 100 `_headers` rules. `headers.mjs` stops the build past 100.
