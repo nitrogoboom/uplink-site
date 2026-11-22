@@ -12,6 +12,8 @@
 // anchors), then each part (.pc) on its own. A part dropping in then moves as one box, which the browser moves
 // without drawing the rest again; one drawing, its parts would be redrawn every frame. Parts from different steps
 // sit in one another's depth order, so the layers follow the parts, not the steps.
+// The drawing's outer group only sets how lines end and join: each layer's <svg> carries that itself (its shapes
+// inherit it the same way), so a layer needs no group of its own. Its font is dropped: the drawing has no text.
 import raw from './grow-world.svg?raw';
 import Icon from '../Icon.astro';
 import { getGrow } from '../../lib/site';
@@ -60,7 +62,12 @@ for (let at = 0; at < body.length;) {
   });
   at = end;
 }
-const layer = (inner: string) => `${outer}${inner}</g>`;
+if (/<text\b/.test(body)) throw new Error('grow-world.svg: it has text now, so its layers need the outer font-family');
+const paint = Object.fromEntries(
+  [...outer.matchAll(/([\w-]+)="([^"]*)"/g)]
+    .map(([, name, value]) => [name, value])
+    .filter(([name]) => name !== 'font-family'),
+);
 const last = steps.length - 1;
 const t = (await copy('home', Astro.currentLocale)).grow;
 ---
@@ -77,16 +84,17 @@ const t = (await copy('home', Astro.currentLocale)).grow;
         <div class="grow-stage">
           <span class="grow-place" aria-hidden="true">{steps[last].place}</span>
           <div class="grow-world" role="img" aria-label={label}>
-            <svg class="gw" viewBox={viewBox} aria-hidden="true" focusable="false" set:html={layer(ground)} />
+            <svg class="gw" viewBox={viewBox} {...paint} aria-hidden="true" focusable="false" set:html={ground} />
             {parts.map((pc) => (
               <svg
                 class="gw pc"
                 data-s={pc.s}
                 data-o={pc.o}
                 viewBox={viewBox}
+                {...paint}
                 aria-hidden="true"
                 focusable="false"
-                set:html={layer(pc.inner)}
+                set:html={pc.inner}
               />
             ))}
           </div>

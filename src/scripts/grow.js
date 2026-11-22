@@ -33,10 +33,10 @@ if (grow && world) {
   const steps = $$('.grow-card', grow);
   const N = steps.length,
     LAST = N - 1;
-  // each part's layer (g, which drops in) and its shapes (box, measured for the camera)
+  // each part's layer (g, which drops in) and its shapes (measured for the camera; a gradient or the like has no box)
   const pcs = /** @type {SVGSVGElement[]} */ ($$('svg.pc', world)).map((g) => ({
     g,
-    box: /** @type {SVGGElement} */ (g.firstElementChild),
+    shapes: /** @type {SVGGraphicsElement[]} */ (Array.from(g.children).filter((el) => 'getBBox' in el)),
     s: Number(g.dataset.s) - 1,
     o: Number(g.dataset.o),
   }));
@@ -163,13 +163,15 @@ if (grow && world) {
       y0 = Infinity,
       x1 = -Infinity,
       y1 = -Infinity;
-    pcs.forEach(({ box, s }) => {
+    pcs.forEach(({ shapes, s }) => {
       if (s > i) return;
-      const b = box.getBBox();
-      x0 = Math.min(x0, b.x);
-      y0 = Math.min(y0, b.y);
-      x1 = Math.max(x1, b.x + b.width);
-      y1 = Math.max(y1, b.y + b.height);
+      shapes.forEach((shape) => {
+        const b = shape.getBBox();
+        x0 = Math.min(x0, b.x);
+        y0 = Math.min(y0, b.y);
+        x1 = Math.max(x1, b.x + b.width);
+        y1 = Math.max(y1, b.y + b.height);
+      });
     });
     if (!Number.isFinite(x0)) return full;
     const side = Math.min(full[2], Math.max(full[2] * 0.6, (x1 - x0) * 1.45, (y1 - y0) * 1.45));
