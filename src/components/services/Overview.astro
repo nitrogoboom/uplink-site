@@ -28,8 +28,7 @@ const ui = await copy('ui', Astro.currentLocale);
       {services.map(({ id, data: s }) => <li>
         <div class="card">
           <span class="card-media well"
-            ><Drawing src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy" /><span
-              class="chip"
+            ><Drawing src={`${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy" /><span class="chip"
               >{s.chip}</span
             ></span
           >

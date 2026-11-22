@@ -6,7 +6,8 @@
 import { $, $$, toast, words } from './core.js';
 
 /** @typedef {import('../lib/copy').ContactWords} ContactWords */
-const T = /** @type {ContactWords} */ (words('words-page')); // src/content/en/copy/contact.yaml, toast
+// src/content/en/copy/contact.yaml, toast. Read when used: the words are on the Contact page, this file on every page
+const T = () => /** @type {ContactWords} */ (words('words-page'));
 
 /* ======================================================================
    Copy buttons (phone number, email)
@@ -23,10 +24,12 @@ $$('[data-copy]').forEach((btn) => {
         sel.removeAllRanges();
         sel.addRange(range);
       }
-      toast({ ...T.selected, tone: 'info', timeout: 4000 });
+      toast({ ...T().selected, tone: 'info', timeout: 4000 });
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(value).then(() => toast({ title: T.copied, text: value, timeout: 3000 }), fallback);
+      navigator.clipboard
+        .writeText(value)
+        .then(() => toast({ title: T().copied, text: value, timeout: 3000 }), fallback);
     } else {
       fallback();
     }
@@ -39,7 +42,7 @@ $$('[data-copy]').forEach((btn) => {
 const contactForm = $('form[data-validate="contact"]');
 if (contactForm) {
   contactForm.addEventListener('uplink:sent', () => {
-    toast(T.received);
+    toast(T().received);
     const q = $('[data-queue]');
     if (q) q.dataset.state = 'queued';
     const arc = $('[data-queue-arc]');

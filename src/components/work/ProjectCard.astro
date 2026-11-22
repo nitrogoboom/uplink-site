@@ -30,7 +30,7 @@ const H = level === 2 ? 'h2' : 'h3';
 <div class="card card--project">
   <span class="card-media well"
     ><Drawing
-      src={`/assets/img/${p.image}-card.svg`}
+      src={`${p.image}-card.svg`}
       alt=""
       {...cardSize(p.image)}
       fetchpriority={first ? 'high' : undefined}

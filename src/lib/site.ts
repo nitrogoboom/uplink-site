@@ -1,30 +1,22 @@
 // The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml,
 // speculation-rules-home.json) share. src/README.md, "Pages"; each export is described where it's defined.
 import type { IconName } from '../components/Icon.astro';
-import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { copy } from './copy';
 import { DEFAULT_LOCALE, linker, localeOf } from './i18n';
 
-// Drawings keep their names when they change, so every address a page writes carries a hash of the file (?v=): a
-// changed drawing is a new address, and the browser may keep each one for a year (public/_headers, /assets/img/*).
-// Drawing.astro does it for every picture; a new <img> of a drawing goes through it or through fresh().
-const stamps = new Map<string, string>();
-export const fresh = (path: string) => {
-  if (!stamps.has(path))
-    stamps.set(
-      path,
-      `${path}?v=${createHash('sha1')
-        .update(readFileSync(`public${path}`))
-        .digest('hex')
-        .slice(0, 8)}`,
-    );
-  return stamps.get(path)!;
+// The drawings (src/assets/img/*.svg, written by tools/) are Astro assets: the build gives each a hashed name under
+// /_astro/, so a changed drawing is a new address and the browser may keep each one for a year, and reads its size
+// from its <svg> tag. drawing('backup-card.svg') is { src, width, height }; Drawing.astro shows one in both themes.
+const DRAWINGS = import.meta.glob<ImageMetadata>('../assets/img/*.svg', { eager: true, import: 'default' });
+export const drawing = (file: string) => {
+  const image = DRAWINGS[`../assets/img/${file}`];
+  if (!image) throw new Error(`no drawing src/assets/img/${file} (tools/gen_*.py writes it)`);
+  return image;
 };
 
 // the footer's campus map, written by tools/gen_campus.py (footer.js fetches it on every page)
-export const CAMPUS = fresh('/assets/img/campus.svg');
+export const CAMPUS = drawing('campus.svg').src;
 
 // The static pages (five in the menu, plus privacy and accessibility): their addresses, as in the default language
 // (linker() in i18n.ts gives another language's). Their names are words, in ui.yaml's pages (pageName() below), and
@@ -73,12 +65,10 @@ export const tabCurrent = (tab: keyof typeof PAGES, current: string, pathname: s
   return bare(pathname) === bare(linker(locale)(PAGES[tab].path)) ? 'page' : 'true';
 };
 
-// A drawing's size from its own <svg> tag (written by the generators), so an <img> never guesses it from the
-// drawing's name. cardSize: the card cut, NAME-card.svg.
+// A drawing's size, for an <img>'s width and height. cardSize: the card cut, NAME-card.svg.
 export const svgSize = (file: string) => {
-  const head = readFileSync(`public/assets/img/${file}`, 'utf-8').slice(0, 400);
-  const n = (k: string) => Number(head.match(new RegExp(` ${k}="([0-9.]+)"`))?.[1]);
-  return { width: n('width'), height: n('height') };
+  const { width, height } = drawing(file);
+  return { width, height };
 };
 export const cardSize = (image: string) => svgSize(`${image}-card.svg`);
 

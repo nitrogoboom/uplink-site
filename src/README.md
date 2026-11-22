@@ -67,7 +67,7 @@ A few sizes stay written out where they are, each measured for one thing: the he
 
 ## Scripts
 
-ES modules in `scripts/`; each page script imports `core.js` first. Type-checked by JSDoc (`checkJs`); `void` an unawaited promise.
+ES modules in `scripts/`, bundled into one file the whole site loads (`site.js` imports them all; `Base.astro` has the one `<script>`). Each part starts only where its elements are, so it guards itself: `if (stage) { … }`. Type-checked by JSDoc (`checkJs`); `void` an unawaited promise.
 
 | Script | Runs on | Does |
 | --- | --- | --- |

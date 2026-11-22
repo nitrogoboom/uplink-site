@@ -24,6 +24,7 @@ def shrink(path):
 
 site = pathlib.Path(sys.argv[1]).resolve()
 assets = (site / 'assets').as_uri()
+drawings = (site.parent / 'src' / 'assets' / 'img').as_uri()   # the drawings are Astro's assets, in src/
 tokens = (pathlib.Path(__file__).resolve().parent.parent / 'src' / 'styles' / 'tokens.css').as_uri()
 
 HEAD = f'''<!doctype html><meta charset="utf-8">
@@ -57,7 +58,7 @@ OG = HEAD + f'''<style>
 <div class="brand"><span class="mark">{MARK}</span><div><div class="name">Uplink</div><div class="sub">Technology management</div></div></div>
 <div class="copy"><p class="eyebrow">Managed IT · Ontario</p><h1>Your IT team, <em>always online</em></h1>
 <p class="lead">Help desk, security, cloud, networks and phones.</p></div>
-<img class="art" src="{assets}/img/office-card.svg" alt="">'''
+<img class="art" src="{drawings}/office-card.svg" alt="">'''
 
 ICON = HEAD + f'''<style>
   body {{ width: 180px; height: 180px; }}

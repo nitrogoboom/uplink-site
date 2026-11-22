@@ -1,13 +1,13 @@
 """painter.py rules for office.svg: each box's base height, looked up from gen_office.py by its left face.
-usage: python tools/painter.py public/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py
-check: python tools/check.py public/assets/img/office.svg --step 1.758   (the props' 0.0625 grid is 1.758px here)
-check: python tools/check.py public/assets/img/office-card.svg --step 1.758
+usage: python tools/painter.py src/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py
+check: python tools/check.py src/assets/img/office.svg --step 1.758   (the props' 0.0625 grid is 1.758px here)
+check: python tools/check.py src/assets/img/office-card.svg --step 1.758
 check: python tools/check.py src/components/home/hero/3-back.svg --step 1.758
 check: python tools/check.py src/components/home/hero/4-front.svg --step 1.758
 check: python tools/check.py src/components/home/hero/5-net.svg --step 1.758
 The hero's layers and the card share the office's origin and unit (a crop changes only the viewBox), so the same rules
 read them; each layer is checked on its own (a later layer is drawn over an earlier one by the page):
-also: python tools/painter.py public/assets/img/office-card.svg 616.4 240.2 28.127 tools/rules_office.py
+also: python tools/painter.py src/assets/img/office-card.svg 616.4 240.2 28.127 tools/rules_office.py
 also: python tools/painter.py src/components/home/hero/2-walls.svg 616.4 240.2 28.127 tools/rules_office.py
 also: python tools/painter.py src/components/home/hero/3-back.svg 616.4 240.2 28.127 tools/rules_office.py
 also: python tools/painter.py src/components/home/hero/4-front.svg 616.4 240.2 28.127 tools/rules_office.py

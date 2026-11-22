@@ -1,6 +1,6 @@
 ---
 name: drawing
-description: Change, add or recolour one of the Uplink site's isometric drawings (service pictures, the hero office, Grow, the footer map), or change a colour token that drawings use. Use when the owner asks for a drawing change, or before you edit anything in tools/ or an SVG in public/assets/img/.
+description: Change, add or recolour one of the Uplink site's isometric drawings (service pictures, the hero office, Grow, the footer map), or change a colour token that drawings use. Use when the owner asks for a drawing change, or before you edit anything in tools/ or an SVG in src/assets/img/.
 ---
 
 # Change a drawing
@@ -11,15 +11,15 @@ Drawings change only on the owner's machine, and only when the owner asks. CI do
 
 ## Steps
 
-1. Find the script and how to run it. The "Generators" table in `docs/drawing-tools.md` lists each one, its arguments and every file it writes. A service scene is `python tools/gen_NAME.py public/assets/img/NAME.svg`; the office and hero are `python tools/gen_office.py public`; Grow (`gen_grow.py`) and the footer map (`gen_campus.py`) take no argument.
+1. Find the script and how to run it. The "Generators" table in `docs/drawing-tools.md` lists each one, its arguments and every file it writes. A service scene is `python tools/gen_NAME.py src/assets/img/NAME.svg`; the office and hero are `python tools/gen_office.py src`; Grow (`gen_grow.py`) and the footer map (`gen_campus.py`) take no argument.
 2. Make sure the tools are installed (docs/drawing-tools.md, "Install the Python drawing tools"). If `python tools/regen.py --check` fails before it draws anything, that's the cause.
 3. Change the numbers in the script. Colours come from `tools/palette.py`, which reads `src/styles/tokens.css`; don't type a hex value into a generator.
 4. Run the script, then both checks on what it wrote. The first lines of `tools/rules_NAME.py` give the exact commands for every cut, for example:
 
    ```bash
-   python tools/gen_office.py public
-   python tools/painter.py public/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py
-   python tools/check.py public/assets/img/office.svg --step 1.758
+   python tools/gen_office.py src
+   python tools/painter.py src/assets/img/office.svg 616.4 240.2 28.127 tools/rules_office.py
+   python tools/check.py src/assets/img/office.svg --step 1.758
    ```
 
    `check.py` reports edges off the isometric angles and near-miss joins. `painter.py` reports boxes drawn in the wrong order. Use them as help while you work and say what they report; they don't decide. The owner judges the drawing by eye and by its file size.

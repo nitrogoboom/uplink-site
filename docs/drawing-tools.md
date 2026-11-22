@@ -43,10 +43,10 @@ screen = origin + ((x − y) · cos30° · u,  (x + y) · u/2 − z · u)
 
 | Tool | What it writes |
 | --- | --- |
-| `gen_NAME.py public/assets/img/NAME.svg` | One scene: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, or `voip`. Also the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
-| `gen_office.py public` | `office.svg`, `office-card.svg`, and the hero: its layers in `src/components/home/hero/` (one `<svg>` each, inlined in order by `Hero.astro`) and `src/components/home/hero-place.css` (the phone framing, and where each label's words go). The hero draws no words: its labels' lines and dots are drawn, and the page sets the words (Home's copy) at each line's end. The loop CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
+| `gen_NAME.py src/assets/img/NAME.svg` | One scene: `hq`, `strategy`, `backup`, `helpdesk`, `network`, `security`, `cloud`, or `voip`. Also the phone cut `NAME-compact.svg` and the card cut `NAME-card.svg`. |
+| `gen_office.py src` | `office.svg`, `office-card.svg`, and the hero: its layers in `src/components/home/hero/` (one `<svg>` each, inlined in order by `Hero.astro`) and `src/components/home/hero-place.css` (the phone framing, and where each label's words go). The hero draws no words: its labels' lines and dots are drawn, and the page sets the words (Home's copy) at each line's end. The loop CSS and the cloud's frame are in `tools/office_parts/`; the cloud's shapes come from `hero_cloud.py`. |
 | `gen_grow.py` | `src/components/home/grow-world.svg`. Every part carries the step it arrives on (`data-s`); `src/scripts/grow.js` plays them. |
-| `gen_campus.py` | `public/assets/img/campus.svg`, the footer map. No phone cut. `src/styles/footer.css` styles its parts by class. It's decoration: `aria-hidden="true"`, no role or label. |
+| `gen_campus.py` | `src/assets/img/campus.svg`, the footer map. No phone cut. `src/styles/footer.css` styles its parts by class. It's decoration: `aria-hidden="true"`, no role or label. |
 | `gen_light.py` | The light drawings: `NAME-light.svg` beside each `NAME.svg`, and `src/styles/theme-drawings.css` for the drawings inside the page. `regen.py` runs it last. `--check` fails if an output is out of date. |
 | `gen_og.py public` | `og.png` (1200×630) and `apple-touch-icon.png` (180×180): screenshots of a page built from the tokens, fonts, and `office-card.svg`. Rerun it after you change any of those. |
 

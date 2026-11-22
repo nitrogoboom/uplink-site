@@ -24,13 +24,7 @@ const t = (await copy('work', Astro.currentLocale)).case;
   <div class="case">
     <div class="case-fig">
       <div class="case-img well">
-        <Drawing
-          src={`/assets/img/${p.image}.svg`}
-          alt={p.alt}
-          width={size.width}
-          height={size.height}
-          loading="lazy"
-        />
+        <Drawing src={`${p.image}.svg`} alt={p.alt} width={size.width} height={size.height} loading="lazy" />
       </div>
     </div>
     <div class="stack">

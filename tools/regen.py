@@ -15,8 +15,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TOOLS = ROOT / 'tools'
 SCENES = ['backup', 'cloud', 'helpdesk', 'hq', 'network', 'security', 'strategy', 'voip']
-GENERATORS = ([[f'tools/gen_{s}.py', f'public/assets/img/{s}.svg'] for s in SCENES]
-              + [['tools/gen_office.py', 'public'], ['tools/gen_grow.py'], ['tools/gen_campus.py'],
+GENERATORS = ([[f'tools/gen_{s}.py', f'src/assets/img/{s}.svg'] for s in SCENES]
+              + [['tools/gen_office.py', 'src'], ['tools/gen_grow.py'], ['tools/gen_campus.py'],
                  ['tools/gen_light.py']])   # last: the light copies are made from the SVGs above
 
 

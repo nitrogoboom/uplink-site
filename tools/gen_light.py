@@ -13,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import palette as pal  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-IMG = ROOT / 'public' / 'assets' / 'img'
+IMG = ROOT / 'src' / 'assets' / 'img'
 HOME = ROOT / 'src' / 'components' / 'home'
 
 CSS_OUT = ROOT / 'src' / 'styles' / 'theme-drawings.css'
@@ -27,7 +27,7 @@ _INLINE_NAMES = {p.name for _, _, files in INLINE for p in files}
 
 
 def picture_sources():
-    """Every drawing shown as a picture: the SVGs in public/assets/img/ that aren't inlined, the footer map (styled
+    """Every drawing shown as a picture: the SVGs in src/assets/img/ that aren't inlined, the footer map (styled
     by footer.css from the tokens) or a light copy."""
     return sorted(p for p in IMG.glob('*.svg')
                   if p.name not in _INLINE_NAMES and p.name != 'campus.svg' and not p.stem.endswith('-light'))

@@ -52,7 +52,7 @@ const tiles = [
       {tiles.map(({ id, size, data: s }) => <li class={`svc-${size}`}>
         <div class="svc-tile">
           <span class="svc-art"
-            ><Drawing src={`/assets/img/${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
+            ><Drawing src={`${s.image}-card.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="svc-icon"><Icon name={s.icon} /></span>
           <div class="svc-text">

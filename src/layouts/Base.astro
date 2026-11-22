@@ -1,6 +1,6 @@
 ---
 // The shared page: <head>, header, footer, the pop-ups and the toast region. Every page uses it. Its props, and how a
-// page adds its own script (inside <Fragment slot="scripts">): src/README.md, "Pages". Anything else a
+// page gives its script's words (<Words> inside <Fragment slot="scripts">): src/README.md, "Pages". Anything else a
 // page needs in its <head> (preloads, JSON-LD) goes in <Fragment slot="head">.
 // the shared CSS: Astro writes it inside every page (astro.config.mjs, inlineStylesheets)
 import '../styles/global.css';
@@ -166,8 +166,7 @@ Astro.csp?.insertScriptHash(sha256(themeInit));
 
     <Words id="words-ui" words={{ toast: ui.toast, emailError: ui.form.email.error }} />
     <script>
-      import '../scripts/core.js';
-      import '../scripts/footer.js';
+      import '../scripts/site.js';
     </script>
     <slot name="scripts" />
   </body>

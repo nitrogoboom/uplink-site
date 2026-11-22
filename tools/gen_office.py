@@ -1,6 +1,6 @@
 """Draws the office floor plan and the Home hero from one world-space description, in cuts that share every shape
 (docs/drawing-tools.md, "Generators" and "Which cut shows where"; each output is listed where it's written, at the end).
-usage: python tools/gen_office.py public
+usage: python tools/gen_office.py src
 Edit the numbers below and run again; don't hand-edit any of them. The hero is a stack of layers (HERO_LAYERS), each
 its own <svg> that the page builds in; keep the classes and data-app the page's JS and CSS expect. Its loop CSS and
 the cloud's frame are input parts in tools/office_parts/. The hero draws no words: it draws each label's line and
@@ -915,8 +915,8 @@ def place_css():
 
 if __name__ == '__main__':
     # The outputs:
-    # public/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
-    # public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
+    # src/assets/img/office.svg        static, loaded with <img> on the Work page (carries its Barlow letters)
+    # src/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
     #   badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
     # src/components/home/hero/N-NAME.svg  the hero's layers (HERO_LAYERS), inlined by Hero.astro (page fonts apply)
     # src/components/home/hero-place.css  where the page puts things over the hero (place_css)

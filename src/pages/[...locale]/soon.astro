@@ -25,8 +25,5 @@ const t = await copy('soon', Astro.currentLocale);
   </section>
   <Fragment slot="scripts">
     <Words id="words-page" words={{ pageTitle: t.pageTitle, names: t.names }} />
-    <script>
-      import '../../scripts/soon.js';
-    </script>
   </Fragment>
 </Base>

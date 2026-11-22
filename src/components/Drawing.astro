@@ -2,24 +2,23 @@
 // SHARED · A drawing shown as a picture, in the visitor's theme: the dark NAME.svg and the light NAME-light.svg, one
 // hidden by theme-light.css (src/README.md, "Components"). A lazy picture that isn't shown isn't fetched, so a
 // page loads one copy, and the theme changes at once with nothing for a script to swap. Without script: dark.
-//   src       the dark drawing's address, /assets/img/NAME.svg
+//   src       the dark drawing, by file name: NAME.svg (in src/assets/img/)
 //   sources   <source>s for a <picture> (another cut on narrower screens): { media, srcset, width?, height? }, dark
-//             addresses
+//             file names
 //   class     the <img>'s class (the theme's class goes on the <picture> when there is one)
 //   anything else goes on the <img> as written (alt, width, height, loading, fetchpriority)
-// Each address goes out with its ?v= (fresh(), src/lib/site.ts), so the browser can keep the file for a year.
+// Each goes out at its hashed address (drawing(), src/lib/site.ts), so the browser can keep the file for a year.
 import type { HTMLAttributes } from 'astro/types';
-import { fresh } from '../lib/site';
+import { drawing } from '../lib/site';
 
 interface Props extends Omit<HTMLAttributes<'img'>, 'src'> {
   src: string;
   sources?: { media: string; srcset: string; width?: number; height?: number }[];
 }
 const { src, sources, class: cls, ...img } = Astro.props;
-const bare = (path: string) => path.replace(/\?.*$/, ''); // an address that already has its ?v=
 const themes = [
-  { theme: 'th-dark', at: (p: string) => fresh(bare(p)) },
-  { theme: 'th-light', at: (p: string) => fresh(bare(p).replace(/\.svg$/, '-light.svg')) },
+  { theme: 'th-dark', at: (file: string) => drawing(file).src },
+  { theme: 'th-light', at: (file: string) => drawing(file.replace(/\.svg$/, '-light.svg')).src },
 ];
 ---
 

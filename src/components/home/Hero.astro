@@ -122,7 +122,7 @@ const menu = [...services.filter((s) => s.data.featured), services.filter((s) =>
       <div class="hero-dock">
         {news.map((n) => <a class="card news" href={n.href} data-open={n.book ? 'book-dialog' : undefined}>
           <span class="news-thumb well"
-            ><Drawing src={`/assets/img/${n.img}-card.svg`} alt="" width="640" height="480" loading="lazy"
+            ><Drawing src={`${n.img}-card.svg`} alt="" width="640" height="480" loading="lazy"
           /></span>
           <span class="news-text"
             ><span class="news-title">{n.title}</span

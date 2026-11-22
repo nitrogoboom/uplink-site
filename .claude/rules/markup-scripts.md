@@ -11,7 +11,7 @@ paths:
 # Markup and scripts
 
 - Links are root-relative and go through `to()` (`linker()` in `src/lib/i18n.ts`): `href={to('/services')}`, `href={to('/contact#message')}`. Files (`/assets/…`, `/favicon.ico`) are written as they are.
-- A page's own script goes inside `<Base>`: `<Fragment slot="scripts"><script>import '../scripts/x.js'</script></Fragment>`. Every page script imports `core.js`.
+- The site has one script file: `src/scripts/site.js` imports every part, and `Base.astro` holds the only `<script>`, so a page makes one script request with nothing chained behind it. A new page script is imported there and starts only where its elements are (`if (form) { … }`); it reads its words when it runs, never at the top of the file. A page hands its script's words over with `<Fragment slot="scripts"><Words id="words-page" … /></Fragment>`.
 - Icons: `<Icon name="…" />`.
 - HTML written by a script goes through `html()` from `core.js` (Trusted Types).
 - JavaScript in `src/` is type-checked (`checkJs`): JSDoc types on parameters and lookups (`src/README.md`, "Scripts"). Mark a promise you don't wait for with `void`.

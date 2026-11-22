@@ -5,7 +5,7 @@
 // one place. Read them through src/lib/site.ts and src/lib/copy.ts, which take the page's language.
 // Every object is strict: a key the schema doesn't name (a typo, a field left from a rename) stops the build
 // instead of being dropped. Icon names come from src/components/icons.ts; a drawing name must have its files in
-// public/assets/img/.
+// src/assets/img/.
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
@@ -25,10 +25,10 @@ const list = (name: string) =>
   glob({ pattern: `*/${name}.json`, base: BASE, generateId: ({ entry }) => entry.split('/')[0] });
 const items = <T extends z.ZodRawShape>(shape: T) => z.strictObject({ items: z.array(z.strictObject(shape)).min(1) });
 
-// A drawing's name, with the cuts the pages show (NAME.svg, NAME-compact.svg …) checked in public/assets/img/.
+// A drawing's name, with the cuts the pages show (NAME.svg, NAME-compact.svg …) checked in src/assets/img/.
 const drawing = (...cuts: string[]) =>
   z.string().superRefine((name, ctx) => {
-    const missing = cuts.map((c) => `public/assets/img/${name}${c}.svg`).filter((f) => !existsSync(f));
+    const missing = cuts.map((c) => `src/assets/img/${name}${c}.svg`).filter((f) => !existsSync(f));
     if (missing.length)
       ctx.addIssue({ code: 'custom', message: `no drawing ${missing.join(', ')} (tools/gen_*.py writes it)` });
   });
@@ -41,7 +41,7 @@ const services = defineCollection({
     title: z.string(), // "Managed help desk"
     chip: z.enum(['Support', 'Protect', 'Build', 'Connect', 'Plan']),
     tag: z.string(), // second chip on the drawing ("Starts day one")
-    image: drawing('', '-compact', '-card'), // drawing name in public/assets/img/ (NAME.svg, NAME-compact.svg, NAME-card.svg)
+    image: drawing('', '-compact', '-card'), // drawing name in src/assets/img/ (NAME.svg, NAME-compact.svg, NAME-card.svg)
     icon, // <Icon> name for the short home tile (src/components/Icon.astro)
     featured: z.boolean().optional(), // one of the three tall cards on the home page; the rest are short tiles
     alt: z.string(),

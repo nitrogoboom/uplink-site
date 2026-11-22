@@ -38,8 +38,8 @@ const t = (await copy('services', Astro.currentLocale)).page;
         <span class="chip">{fill(t.count, { n: two(n), total: two(total) })}</span><span class="chip">{s.tag}</span>
       </div>
       <Drawing
-        src={`/assets/img/${s.image}.svg`}
-        sources={[{ media: '(width < 75em)', srcset: `/assets/img/${s.image}-compact.svg` }]}
+        src={`${s.image}.svg`}
+        sources={[{ media: '(width < 75em)', srcset: `${s.image}-compact.svg` }]}
         fetchpriority={first ? 'high' : undefined}
         loading="lazy"
         alt={s.alt}

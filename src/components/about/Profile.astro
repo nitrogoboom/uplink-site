@@ -27,8 +27,8 @@ const { site } = await copy('ui', Astro.currentLocale);
       <aside class="profile-card panel" aria-label={t.card.label}>
         <div class="profile-art well">
           <Drawing
-            src="/assets/img/hq.svg"
-            sources={[{ media: '(width < 100em)', srcset: '/assets/img/hq-compact.svg' }]}
+            src="hq.svg"
+            sources={[{ media: '(width < 100em)', srcset: 'hq-compact.svg' }]}
             fetchpriority="high"
             loading="lazy"
             alt={t.card.alt}

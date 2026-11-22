@@ -43,7 +43,3 @@ PageSpeed (November 17, 2026: fonts 113 KB to 51 KB; forced reflow, network depe
 ## Parked until the owner says
 
 Not Home, not setup: `parked.md`.
-
-After the rebuild (Astro builds it alone; `docs/ops.md`):
-
-- [ ] Drawings as Astro assets (`src/assets/`, hashed file names) instead of `public/assets/img/` with `?v=`: Astro's own way to cache-bust pictures. Nothing is wrong today; worth doing when the other pages are designed, since it moves where the drawing tools write.
