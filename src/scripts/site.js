@@ -10,3 +10,4 @@ import './footer.js';
 import './home.js';
 import './contact.js';
 import './soon.js';
+import './analytics.js';

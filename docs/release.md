@@ -44,7 +44,7 @@ After launch, the client-side security dashboard for scripts the site doesn't lo
 
 **(you)** needs a person or sign-in, **(domain)** the domain, **(content)** real copy. Tick with date and proof.
 
-- [x] **(you)** Cloudflare Web Analytics for `DOMAIN`, manual setup: the beacon at the end of `Base.astro`, its two hosts in the CSP (`astro.config.mjs`), the lines on the privacy page.
+- [x] **(you)** Cloudflare Web Analytics for `DOMAIN`, manual setup: the beacon loaded by `src/scripts/analytics.js` once the page has loaded, its two hosts in the CSP (`astro.config.mjs`), the lines on the privacy page.
 - [ ] **(you)** Decide what gets a test: the "Set in stone" list in `CLAUDE.md`. Until then the repo has none, and nothing checks the site after a deploy.
 - [x] Narrow the Trusted Types policy: `html()` in `core.js` passes only the site's own drawings and icons, files the drawing tools write (review J6).
 - [x] Workers logs and traces: nothing to keep. No Worker script runs, so there is no log of ours.

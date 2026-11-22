@@ -75,12 +75,22 @@ const store = {
 // The CSP (public/_headers) lets only this policy write HTML into the page (innerHTML and the like), so every HTML
 // write in the site's scripts is a call to html(). It passes the string on as it is. Every string is the site's own
 // file: the icons below, and the drawings home.js and footer.js fetch (src/assets/img/), which the drawing tools
-// write. Words a visitor typed never come through here: they are set with textContent.
+// write. Words a visitor typed never come through here: they are set with textContent. The same policy vouches for one
+// script address, Cloudflare's analytics beacon (analytics.js), and refuses any other.
+const BEACON = 'https://static.cloudflareinsights.com/beacon.min.js';
 const ttPolicy = window.trustedTypes
-  ? window.trustedTypes.createPolicy('uplink', { createHTML: (/** @type {string} */ s) => s })
+  ? window.trustedTypes.createPolicy('uplink', {
+      createHTML: (/** @type {string} */ s) => s,
+      createScriptURL: (/** @type {string} */ s) => {
+        if (s !== BEACON) throw new TypeError(`not a script this site loads: ${s}`);
+        return s;
+      },
+    })
   : null;
 /** @type {(s: string) => string} */
 const html = (s) => (ttPolicy ? ttPolicy.createHTML(s) : s);
+/** @type {(s: string) => string} */
+const scriptURL = (s) => (ttPolicy ? ttPolicy.createScriptURL(s) : s);
 
 /* ---------- icons used by script-built UI ------------------------------ */
 const ICON = {
@@ -568,4 +578,4 @@ document.addEventListener(
 });
 
 /* ---------- shared with the page scripts ------------------------------ */
-export { $, $$, UI, dashes, held, html, reduceMotion, settle, theme, toast, whenOnScreen, words };
+export { $, $$, BEACON, UI, dashes, held, html, reduceMotion, scriptURL, settle, theme, toast, whenOnScreen, words };

@@ -15,7 +15,7 @@ export default defineConfig({
   i18n: { locales: ['en'], defaultLocale: 'en' },
   // Content Security Policy, written by Astro into each page as a <meta>: a hash for every script and style it
   // bundles (and the two a page adds itself: src/lib/csp.ts), plus the lines below. One other host: Cloudflare Web
-  // Analytics, its script from static.cloudflareinsights.com and its reports to cloudflareinsights.com (Base.astro).
+  // Analytics, its script from static.cloudflareinsights.com and its reports to cloudflareinsights.com (src/scripts/analytics.js).
   // What a <meta> can't carry (frame-ancestors, Trusted Types) is in public/_headers. Not active in `npm run dev`.
   security: {
     csp: {
