@@ -6,10 +6,3 @@
 <g>
 {{CLOUD_SHAPES}}
 </g>
-<g class="co lbl" data-t="CLOUD WORKSPACE">
-<polyline class="lt" points="950.1,-36.0 894.7,-82.0 854.7,-82.0" fill="none" stroke="{{pal:SKY}}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
-<circle class="lt" cx="950.1" cy="-36.0" r="6" fill="{{pal:SKY}}" stroke="{{pal:PAGE}}" stroke-width="3"/>
-<text class="lt" x="842.7" y="-74.0" font-family="Barlow, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" letter-spacing="0.06em" fill="{{pal:SKY}}" text-anchor="end">CLOUD WORKSPACE</text>
-{{APPS}}
-<g class="num"><circle cx="950.1" cy="-36.0" r="30" fill="{{pal:SKY}}" stroke="{{pal:PAGE}}" stroke-width="2"/><text x="950.1" y="-20.9" font-size="42" font-weight="600" fill="{{pal:PAGE}}" text-anchor="middle">#</text></g>
-</g>

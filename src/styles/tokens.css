@@ -215,7 +215,7 @@
   --dur-hero-in: 550ms;
   --hero-in-step: 300ms;
 
-  /* ---- home hero captions on phones (hero.css, .hero-cap) -- */
+  /* ---- home hero: the drawing's labels (hero.css, .hl-tag; --cap-* at phone size) -- */
   /* the home headline below its two-column layout (phones, portrait tablets): 40 on phones up to 27rem (432px), a step
      under --fs-8 so the hero fits one screen; wider, a share of the window up to --fs-8. All vw, no negative rem part,
      so a narrower window at zoom never makes it smaller on screen (review C1) */

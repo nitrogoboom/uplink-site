@@ -8,8 +8,6 @@ shapely==2.2.0
 numpy==2.5.4
 fonttools==4.68.0
 brotli==1.2.1
-# gen_office.py reads the hero cloud's words from Home's copy
-pyyaml==6.0.3
 # gen_og.py only: it screenshots a small page for the share picture and the home-screen icon
 playwright==1.64.1
 pillow==13.0.0

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="hl-leaders" viewBox="0 -130 1200 930" aria-hidden="true" focusable="false">
+<g data-tag="firewall">
+<polyline points="1035.4,531.6 1052,760 1012,760" fill="none" stroke="#FFAD51" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle cx="1035.4" cy="531.6" r="6" fill="#FFAD51" stroke="#0E1A27" stroke-width="3"/>
+</g>
+<g data-tag="wifi">
+<polyline points="796,435.3 796,60 756,60" fill="none" stroke="#FFAD51" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>
+<circle cx="796.0" cy="435.3" r="6" fill="#FFAD51" stroke="#0E1A27" stroke-width="3"/>
+</g>
+<g data-tag="workstations">
+<polyline class="p-f610eb" points="726,416 527.7,640 487.7,640"/>
+<circle class="p-c63862" cx="726.0" cy="416.0" r="6"/>
+</g>
+<g data-tag="teams">
+<polyline class="p-f610eb" points="336.3,345.7 290,345.7 250,345.7"/>
+<circle class="p-c63862" cx="336.3" cy="345.7" r="6"/>
+</g>
+<g data-tag="guest">
+<polyline class="p-f610eb" points="873.4,497.6 650,750 610,750"/>
+<circle class="p-c63862" cx="873.4" cy="497.6" r="6"/>
+</g>
+<g data-tag="cloud">
+<polyline class="p-f610eb" points="950.1,-36 894.7,-82 854.7,-82"/>
+<circle class="p-c63862" cx="950.1" cy="-36.0" r="6"/>
+</g>
+</svg>

@@ -1,14 +1,15 @@
 ---
 // HOME · 1. Hero (first screen): headline, "Get started" button, main menu, office drawing and news cards.
-// Drawing: the office as a stack of layers (floor, walls, furniture, network, cloud, dashes, labels), each its own
-// <svg> written by tools/gen_office.py into ./hero/ (don't edit by hand) and inlined here, so it shows with the page,
-// script or not. hero.css builds it in layer by layer; home.js steps the cloud through its apps and moves the dashes.
-// Phones frame it closer (hero-crop.css) and show the cloud's app as words over it instead of the drawn labels.
+// Drawing: the office as a stack of layers (floor, walls, furniture, network, cloud, dashes, label lines), each its
+// own <svg> written by tools/gen_office.py into ./hero/ (don't edit by hand) and inlined here, so it shows with the
+// page, script or not. The labels' words are page text over it, from the copy, each set where its line ends
+// (hero-place.css, also written by gen_office.py). hero.css builds it in layer by layer; home.js steps the cloud
+// through its apps and moves the dashes. Phones frame it closer and keep only the cloud's label, in a corner.
 // Styles: hero.css (imported here; layouts at its end), and .hero itself in src/styles/hero-section.css.
 // the light theme's colours for the drawings inside the page (this hero and Grow, both on Home only): written by
 // tools/gen_light.py, and first here so hero.css and grow.css still come after it
 import '../../styles/theme-drawings.css';
-import './hero-crop.css'; // the phone framing, written by tools/gen_office.py
+import './hero-place.css'; // the phone framing and the labels' places, written by tools/gen_office.py
 import './hero.css';
 import Drawing from '../Drawing.astro';
 import Icon from '../Icon.astro';
@@ -17,13 +18,15 @@ import { getServices } from '../../lib/site';
 import Pause from '../Pause.astro';
 import HoldButton from '../HoldButton.astro';
 import { copy } from '../../lib/copy';
+import { shrink } from '../../../scripts/svgo-config.mjs';
 const { hero: t, cloud } = await copy('home');
-// the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist
+// the layers, back to front (their files are numbered in that order); ?raw: the text, inlined, with no copy in dist.
+// Shrunk with the site's SVGO settings, as Grow's world is (scripts/svgo-config.mjs)
 const layers = Object.entries(
   import.meta.glob<string>('./hero/*.svg', { query: '?raw', import: 'default', eager: true }),
 )
   .sort(([a], [b]) => a.localeCompare(b, 'en', { numeric: true }))
-  .map(([, svg]) => svg);
+  .map(([path, svg]) => shrink(svg, `hero/${path.split('/').pop()}`));
 const apps = Object.entries(cloud.apps);
 // the two news cards under the drawing. The tag (a dot and a word) comes after the title in the markup, so a screen
 // reader says "IT and security check-up. Free. 30 minutes…"; hero.css puts it back on top on screen.
@@ -89,18 +92,29 @@ const menu = [...services.filter((s) => s.data.featured), services.filter((s) =>
 
     <div class="hero-art">
       <div class="stage">
-        <div class="hl" role="img" aria-label={t.alt}>
-          {layers.map((svg) => (
-            <Fragment set:html={svg} />
-          ))}
+        <div class="hl-box">
+          <div class="hl" role="img" aria-label={t.alt}>
+            {layers.map((svg) => (
+              <Fragment set:html={svg} />
+            ))}
+          </div>
+          {/* the labels' words, each where its drawn line ends (hero-place.css); the drawing's name says what it shows */}
+          <div class="hl-tags" aria-hidden="true">
+            {Object.entries(t.labels).map(([key, tag]) => <p class="hl-tag" data-tag={key}>
+              <span class="hl-tag-t">{tag.title}</span><span class="hl-tag-s">{tag.line}</span>
+            </p>)}
+            {/* the cloud's: one app at a time (home.js), each also lighting its tile in the drawing */}
+            <p class="hl-tag" data-tag="cloud">
+              <span class="hl-tag-t">{cloud.title}</span
+              ><span class="hl-apps"
+                >{apps.map(([id, app], i) => <span class:list={['hl-app', { 'is-on': i === 0 }]} data-app={id}
+                  ><span class="hl-tag-s"><b>{app.name}</b> · {app.detail}</span
+                  ><span class="hl-state">{app.state}</span></span
+                >)}</span
+              >
+            </p>
+          </div>
         </div>
-        {/* phones: the cloud's app in words over the drawing, which hides its own labels there; home.js shows one at a time */}
-        <p class="hero-cap" aria-hidden="true">
-          <span class="hero-cap-t">{cloud.title}</span>
-          {apps.map(([id, app], i) => <span class:list={['hero-cap-s', { 'is-on': i === 0 }]} data-app={id}
-            ><b class="hero-cap-app">{app.name}</b> · {app.detail}</span
-          >)}
-        </p>
         {/* stops every moving part on the page (WCAG 2.2.2); core.js wires it, so it shows only with script and motion */}
         <HoldButton class="hero-pause" />
       </div>

@@ -73,7 +73,7 @@
 }
 
 /* the office's shape: the drawing is 40 / 31 (HERO_VIEW in tools/gen_office.py); phones show the part of it in
-   PHONE_CROP (hero-crop.css). --art-tall is height per width. */
+   PHONE_CROP (hero-place.css). --art-tall is height per width. */
 .hero-art {
   --art-ratio: 40 / 31;
   --art-tall: calc(31 / 40);
@@ -101,14 +101,27 @@
   max-width: 100%;
   min-height: calc(min(100cqi, 28rem) * var(--art-tall));
   max-height: calc(100cqi * var(--art-tall));
+  container: hero-stage / size; /* its children are all placed over it, so its size never came from them */
 }
-/* The drawing: its layers (Hero.astro) stacked, each filling the stage. The drawn labels come in two sizes, and
-   where the drawing shows small the bigger ones stand in. */
-.hl {
+/* The drawing: its layers (Hero.astro) stacked, and over them the labels' words, in a box of the drawing's own
+   shape, as big as fits the stage and centred in it. Where the stage is another shape (the two-column layout
+   stretches it to its grid cell), the box, not the stage, is what the labels' places are a share of, so each stays
+   at the end of its line. */
+.hl-box {
   position: absolute;
   inset: 0;
-  overflow: hidden;
+  width: min(100cqw, 100cqh / var(--art-tall));
+  height: min(100cqh, 100cqw * var(--art-tall));
+  margin: auto;
   container: hero-drawing / inline-size;
+}
+.hl,
+.hl-tags {
+  position: absolute;
+  inset: 0;
+}
+.hl {
+  overflow: hidden;
 }
 .hl > svg {
   position: absolute;
@@ -116,24 +129,83 @@
   width: 100%;
   height: 100%;
 }
-.hl > .hl-labels-tablet {
-  display: none;
+/* The labels' words: each at the end of its drawn line, on the side hero-place.css gives (it writes the place, the
+   side and the colour from the drawing's own numbers), with its title's middle level with the line and a gap from
+   its end. Page text, so it is the same readable size however big the drawing shows, and grows with the visitor's
+   text size. A halo in the page's colour keeps a line of the drawing from cutting through the words. */
+.hl-tags {
+  pointer-events: none;
 }
+.hl-tag {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding-inline: var(--sp-2);
+  translate: 0 -0.5lh;
+  font-size: var(--fs-1);
+  line-height: var(--lh-title);
+  white-space: nowrap;
+  text-shadow:
+    0 0 var(--cap-halo) var(--c-bg),
+    0 0 var(--cap-halo) var(--c-bg),
+    0 0 var(--cap-halo) var(--c-bg);
+}
+.hl-tag-t {
+  font-weight: 600;
+  letter-spacing: var(--cap-tracking);
+  text-transform: uppercase;
+  color: var(--tag-c);
+}
+.hl-tag-s {
+  line-height: var(--lh-snug);
+  color: var(--c-muted);
+}
+.hl-tag-s b {
+  font-weight: 600;
+  letter-spacing: var(--cap-tracking);
+  text-transform: uppercase;
+  color: var(--c-text);
+}
+/* the cloud's apps share one place and take turns (home.js); the one shown lights its tile in the drawing */
+.hl-apps {
+  display: grid;
+}
+.hl-app {
+  grid-area: 1 / 1;
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease);
+}
+.hl-app.is-on {
+  opacity: 1;
+}
+.hl-app > span {
+  display: block;
+}
+.hl-state {
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--c-ok);
+}
+.hl-state::before {
+  content: '';
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-inline-end: var(--sp-1);
+  border-radius: 50%;
+  background: currentColor;
+}
+/* where the drawing shows small, the two labels that would crowd it go, words and line */
 @container hero-drawing (width < 45rem) {
-  .hl > .hl-labels {
+  [data-tag='teams'],
+  [data-tag='guest'] {
     display: none;
   }
-  .hl > .hl-labels-tablet {
-    display: block;
-  }
 }
-/* the drawing's words ask for Barlow by name (gen_office.py); the page's Barlow has an Astro-made name
-   (astro.config.mjs, "fonts"), so they take it from the token, which carries that name and the measured fallbacks */
-.hl [font-family] {
-  font-family: var(--font-body);
-}
-/* phones: the drawing framed closer (its box larger than the stage, which cuts it), no drawn labels: the cloud's
-   words come as a caption instead (below) */
+/* phones: the drawing framed closer (its box larger than the stage, which cuts it). Only the cloud's label stays,
+   without its line, in the top left corner at the captions' sizes, and wraps */
 @media (--small-phone) {
   .hl > svg {
     inset: auto;
@@ -142,17 +214,34 @@
     width: var(--crop-w);
     height: var(--crop-h);
   }
-  .hl > .hl-labels,
-  .hl > .hl-labels-tablet {
+  .hl > .hl-leaders,
+  .hl-tag:not([data-tag='cloud']),
+  .hl-state {
     display: none;
   }
+  .hl-tag[data-tag='cloud'] {
+    top: var(--cap-edge);
+    right: auto;
+    left: var(--cap-edge);
+    align-items: start;
+    gap: var(--cap-gap);
+    max-width: calc(100% - 2 * var(--cap-edge));
+    padding: 0;
+    translate: none;
+    font-size: var(--cap-sub);
+    text-align: start;
+    white-space: normal;
+  }
+  .hl-tag[data-tag='cloud'] .hl-tag-t {
+    font-size: var(--cap-title);
+  }
 }
-/* The build: one layer after another fades and drops into place (the floor and the moving dashes only fade). Each
-   layer is its own box, so the browser moves it whole, without drawing it again. With the pause on, home.js shows
-   it built at once (settle). */
+/* The build: one layer after another fades and drops into place (the floor, the moving dashes and the labels only
+   fade). Each layer is its own box, so the browser moves it whole, without drawing it again. With the pause on,
+   home.js shows it built at once (settle). */
 @media (prefers-reduced-motion: no-preference) {
   .hl > svg,
-  .hero-cap {
+  .hl-tags {
     animation: hero-in var(--dur-hero-in) var(--ease) calc(var(--hero-in-step) * var(--step, 0)) both;
   }
   .hl-walls {
@@ -170,17 +259,37 @@
   .hl-cloud {
     --step: 5;
   }
-  .hl-flows,
-  .hl-labels,
-  .hl-labels-tablet,
-  .hero-cap {
-    --step: 6;
-  }
   .hl-floor,
   .hl-flows,
-  .hl-labels,
-  .hl-labels-tablet {
+  .hl-leaders,
+  .hl-tags {
     --drop: 0;
+  }
+  .hl-flows,
+  .hl-leaders,
+  .hl-tags {
+    --step: 6;
+  }
+}
+/* phones open on the furnished room, so the first screen is never a bare floor: only the network and the cloud
+   come in */
+@media (--small-phone) and (prefers-reduced-motion: no-preference) {
+  .hl-floor,
+  .hl-walls,
+  .hl-back,
+  .hl-front {
+    animation: none;
+  }
+  .hl-net {
+    --step: 0;
+  }
+  .hl-cloud {
+    --step: 1;
+  }
+  .hl-flows,
+  .hl-leaders,
+  .hl-tags {
+    --step: 2;
   }
 }
 @keyframes hero-in {
@@ -372,55 +481,6 @@
   .hero-top .eyebrow {
     display: none;
   }
-}
-
-/* the phone caption (Hero.astro): the cloud's title and the app it names, top left over the drawing, in the drawings'
-   own label look at the sizes in tokens.css (--cap-*). Its words wrap and grow with the visitor's text size. The
-   apps sit in one grid cell and take turns (home.js); a tap goes through to the drawing. The halo is the page's
-   colour, so a line of the drawing under the words doesn't cut through them. */
-.hero-cap {
-  display: none;
-}
-@media (--small-phone) {
-  .hero-cap {
-    position: absolute;
-    top: var(--cap-edge);
-    left: var(--cap-edge);
-    display: grid;
-    gap: var(--cap-gap);
-    max-width: calc(100% - 2 * var(--cap-edge));
-    margin: 0;
-    pointer-events: none;
-    text-shadow:
-      0 0 var(--cap-halo) var(--c-bg),
-      0 0 var(--cap-halo) var(--c-bg),
-      0 0 var(--cap-halo) var(--c-bg);
-  }
-}
-.hero-cap-t {
-  font-size: var(--cap-title);
-  font-weight: 600;
-  letter-spacing: var(--cap-tracking);
-  line-height: var(--lh-title);
-  text-transform: uppercase;
-  color: var(--c-sky);
-}
-.hero-cap-s {
-  grid-area: 2 / 1;
-  font-size: var(--cap-sub);
-  line-height: var(--lh-snug);
-  color: var(--c-muted);
-  opacity: 0;
-  transition: opacity var(--dur-2) var(--ease);
-}
-.hero-cap-s.is-on {
-  opacity: 1;
-}
-.hero-cap-app {
-  font-weight: 600;
-  letter-spacing: var(--cap-tracking);
-  text-transform: uppercase;
-  color: var(--c-text);
 }
 
 /* ---- 2. two columns: every landscape window from 900 x 560 up -----------

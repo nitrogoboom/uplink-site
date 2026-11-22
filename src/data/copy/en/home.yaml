@@ -1,6 +1,5 @@
 # Home (/): every section's own words, in page order. The services, projects and Grow's six steps are data
-# (src/content/, src/data/grow.json). The Grow button's names are read by grow.js in the browser. `cloud` is drawn
-# into the hero by tools/gen_office.py: after changing it, run that again.
+# (src/content/, src/data/grow.json). The Grow button's names are read by grow.js in the browser.
 
 title: Uplink Technology · Managed IT for Ontario businesses # <title>
 description: 'Outsourced IT for Ontario businesses: help desk, security, cloud, networks and phones, run by one in-house team.'
@@ -17,7 +16,25 @@ hero:
   cta: Get started
   ctaNote: Free check-up. No contract needed.
   menu: Services # the list under the button
-  alt: Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace # the still picture
+  alt: Drawing of an office with desks, a firewall rack, Wi-Fi and a cloud workspace # the drawing, as one picture
+  # the words on the drawing, each set at the end of its line (the keys are HERO_TAGS in tools/gen_office.py; the
+  # cloud's label is `cloud`, below)
+  labels:
+    firewall:
+      title: Firewall rack
+      line: core switch + backups
+    wifi:
+      title: Wi-Fi access point
+      line: Wi-Fi 6E, no dead spots
+    workstations:
+      title: Workstations
+      line: managed + patched
+    teams:
+      title: Teams room
+      line: one-touch meeting join
+    guest:
+      title: Guest Wi-Fi
+      line: separate from staff
   news: # the two cards under the drawing
     checkup:
       tag: Free
@@ -28,8 +45,8 @@ hero:
       title: Windows 10 support has ended
       line: Your upgrade plan, step by step
 
-# the hero's cloud label (drawn by tools/gen_office.py) and its phone caption (Hero.astro), one entry per app, in the
-# order they show; the keys are the tiles' names in the drawing (TILES)
+# the hero's cloud label (Hero.astro; home.js shows one app at a time), one entry per app, in the order they show;
+# the keys are the tiles' names in the drawing (TILES in tools/gen_office.py)
 cloud:
   title: Cloud workspace
   apps:

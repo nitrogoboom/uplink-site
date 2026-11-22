@@ -2,7 +2,7 @@
    the page (the Home hero and the Grow world); Hero.astro imports it, so only Home carries it. Attribute rules sit in
    :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
 
-/* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-labels.svg, 9-labels-tablet.svg */
+/* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-leaders.svg */
 :where(:root[data-theme='light'] .hero-art) [fill='#182431' i] {
   fill: #dce2e8;
 }
@@ -144,21 +144,6 @@
 :where(:root[data-theme='light'] .hero-art) [stroke='#fff5ec' i] {
   stroke: #7c4900;
 }
-:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#97c8ea' i] {
-  fill: #005d8a;
-}
-:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#a9e9c3' i] {
-  fill: #004f2e;
-}
-:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#bbc2c9' i] {
-  fill: #4d5863;
-}
-:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#f2f7fc' i] {
-  fill: #0e1a27;
-}
-:where(:root[data-theme='light'] .hero-art) :is(text, tspan)[fill='#ffad51' i] {
-  fill: #88520a;
-}
 :root[data-theme='light'] .hero-art .p-4aab33 {
   stroke: #1f75a6;
 }
@@ -288,8 +273,12 @@
   fill: #e5eaf0;
   stroke: #e5eaf0;
 }
-:root[data-theme='light'] .hero-art .p-fa6c34 {
-  fill: #198152;
+:root[data-theme='light'] .hero-art .p-c63862 {
+  fill: #4a93c1;
+  stroke: #e8eff7;
+}
+:root[data-theme='light'] .hero-art .p-f610eb {
+  stroke: #1f75a6;
 }
 
 /* .grow-stage: grow-world.svg */

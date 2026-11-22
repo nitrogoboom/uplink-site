@@ -1,0 +1,52 @@
+/* Written by tools/gen_office.py: do not edit by hand. Where hero.css puts things over the hero drawing:
+   the phone framing (PHONE_CROP), and each label's words at the end of its line (HERO_TAGS). */
+.hero-art {
+  --crop-ratio: 962 / 900;
+  --crop-tall: calc(900 / 962);
+  --crop-x: -24.948%;
+  --crop-y: -1.333%;
+  --crop-w: 124.74%;
+  --crop-h: 103.333%;
+}
+.hl-tag[data-tag='firewall'] {
+  --tag-c: var(--c-accent-text);
+  top: 95.699%;
+  right: 15.667%;
+  align-items: end;
+  text-align: end;
+}
+.hl-tag[data-tag='wifi'] {
+  --tag-c: var(--c-accent-text);
+  top: 20.43%;
+  right: 36.996%;
+  align-items: end;
+  text-align: end;
+}
+.hl-tag[data-tag='workstations'] {
+  --tag-c: var(--c-sky);
+  top: 82.796%;
+  right: 59.355%;
+  align-items: end;
+  text-align: end;
+}
+.hl-tag[data-tag='teams'] {
+  --tag-c: var(--c-sky);
+  top: 51.148%;
+  right: 79.167%;
+  align-items: end;
+  text-align: end;
+}
+.hl-tag[data-tag='guest'] {
+  --tag-c: var(--c-sky);
+  top: 94.624%;
+  right: 49.167%;
+  align-items: end;
+  text-align: end;
+}
+.hl-tag[data-tag='cloud'] {
+  --tag-c: var(--c-sky);
+  top: 5.161%;
+  right: 28.775%;
+  align-items: end;
+  text-align: end;
+}

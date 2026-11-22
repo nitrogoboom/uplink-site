@@ -12,8 +12,8 @@ import './grow.js';
    Hero: the office drawing is in the page already (Hero.astro) and
    builds in by its own CSS. Here: its dashes keep the site's beat, its
    loops rest off screen, a load with the pause on shows it built, and
-   the cloud names one app at a time, lighting that app's tile (and, on
-   phones, its caption). Every part of an app carries data-app; the
+   the cloud's label names one app at a time, lighting that app's tile.
+   Every part of an app carries data-app (its words, its lit tile); the
    first shows until the timer starts. Reduced motion: no timer.
    ------------------------------------------------------------------ */
 const CLOUD_EVERY = 3200; // ms each app shows before the next

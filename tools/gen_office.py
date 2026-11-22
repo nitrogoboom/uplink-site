@@ -3,11 +3,10 @@
 usage: python tools/gen_office.py public
 Edit the numbers below and run again; don't hand-edit any of them. The hero is a stack of layers (HERO_LAYERS), each
 its own <svg> that the page builds in; keep the classes and data-app the page's JS and CSS expect. Its loop CSS and
-the cloud's frame are input parts in tools/office_parts/.
+the cloud's frame are input parts in tools/office_parts/. The hero draws no words: it draws each label's line and
+dot, and the page sets the label's words (Home's copy) where the line ends (HERO_TAGS, hero-place.css).
 """
 import math, pathlib, re, sys
-import yaml
-from fontTools.ttLib import TTFont
 from shapely.ops import unary_union
 from iso import W, fmt
 from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, cull_hidden, share_paint, tidy_numbers, card as card_cut, box as draw_box
@@ -171,31 +170,23 @@ def _along(dot, y):
 
 
 _TV_DOT = (WALL_T, MEET_TV[1], (MEET_TV[2] + MEET_TV[3]) / 2)   # the screen's left edge, so the call tiles stay clear
-HERO_LABELS = [((19.5, 2.3, 0.54), (1052.0, 760.0), pal.AMBER, 'FIREWALL RACK', 'core switch + backups', 2800, 'left'),
-               ((*HERO_APS[0], 4.625), (w.p(*HERO_APS[0], 4.625)[0], 60.0), pal.AMBER, 'WI-FI ACCESS POINT', 'Wi-Fi 6E, no dead spots', 2880),
-               ((9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), pal.SKY, 'WORKSTATIONS', 'managed + patched', 2960),
-               (_TV_DOT, (290.0, w.p(*_TV_DOT)[1]), pal.SKY, 'TEAMS ROOM', 'one-touch meeting join', 3040),
-               ((*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), pal.SKY, 'GUEST WI-FI', 'separate from staff', 3120)]
-
-# tablet cut ('tablet'): screens 600-1299px wide and under 1100px tall show the hero 440-680px wide, where 21-unit
-# sublines read 8-12px. Same scene, the three main labels at TABLET_K (sublines 19 x 1.5 units: 12-13px at
-# 1024-1180 wide) and the cloud's label text scaled by the same factor about its tail end.
-TABLET_K = 1.5
-TABLET_LABELS = [(HERO_LABELS[0][0], (1052.0, 728.0), *HERO_LABELS[0][2:]),
-                 (HERO_LABELS[1][0], (HERO_LABELS[1][1][0], 70.0), *HERO_LABELS[1][2:6], 'left'),
-                 (HERO_LABELS[2][0], _along(HERO_LABELS[2][0], 640.0), *HERO_LABELS[2][2:])]
-TABLET_CLOUD = (842.7, -82.0)          # the cloud label's text scales about this point (its right edge, at the tail)
+# The hero's labels: key (the label's words in src/data/copy/en/home.yaml, hero.labels, or cloud), the dot (a world
+# point, or a screen point for the cloud), the elbow (screen), colour, and the side of the line's end the words sit
+# on. The line runs dot, elbow, then TAIL level to its end; the words start a gap past it (hero.css).
+HERO_TAGS = [('firewall', (19.5, 2.3, 0.54), (1052.0, 760.0), pal.AMBER, 'left'),
+             ('wifi', (*HERO_APS[0], 4.625), (w.p(*HERO_APS[0], 4.625)[0], 60.0), pal.AMBER, 'left'),
+             ('workstations', (9.75, 5.25, 1.25), _along((9.75, 5.25, 1.25), 640.0), pal.SKY, 'left'),
+             ('teams', _TV_DOT, (290.0, w.p(*_TV_DOT)[1]), pal.SKY, 'left'),
+             ('guest', (*HERO_APS[GUEST_AP], 4.625), (650.0, 750.0), pal.SKY, 'left'),
+             ('cloud', (950.1, -36.0), (894.7, -82.0), pal.SKY, 'left')]
+TAG_INK = {pal.AMBER: '--c-accent-text', pal.SKY: '--c-sky'}   # each line colour's token for words
 
 # The hero's layers, back to front: each a slice of the scene in draw order, its own <svg> in the page, so the page
 # can build the office in by moving whole layers (hero.css). One drawing for every screen: on phones the page frames
-# it closer (PHONE_CROP, hero-crop.css) and hides the drawn labels; labels-tablet is the labels at TABLET_K, which
-# hero.css shows where the drawing is small.
+# it closer (PHONE_CROP, hero-place.css) and hides the label lines.
 HERO_VIEW = (0, -130, 1200, 930)       # x, y, width, height
-HERO_LAYERS = ('floor', 'walls', 'back', 'front', 'net', 'cloud', 'flows', 'labels', 'labels-tablet')
+HERO_LAYERS = ('floor', 'walls', 'back', 'front', 'net', 'cloud', 'flows', 'leaders')
 PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab
-# The cloud label names one app at a time (the page steps through them), in the words from Home's copy
-COPY = pathlib.Path(__file__).resolve().parent.parent / 'src/data/copy/en/home.yaml'
-APP_RIGHT = 842.7                      # the app lines' right edge, under the cloud label's title (office_parts/hero_cloud.svg)
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
@@ -759,50 +750,15 @@ def render(v):
 
 
 # ---- the hero: layers -------------------------------------------------------------
-def text_width(text, size, spacing):
-    """Width of text in Barlow SemiBold at size, with letter-spacing in em (kerning left out: under a pixel here)."""
-    font = TTFont(pathlib.Path(__file__).parent / 'fonts' / 'Barlow-SemiBold.ttf')
-    cmap, hmtx = font.getBestCmap(), font['hmtx']
-    return sum(hmtx[cmap[ord(c)]][0] for c in text) * size / font['head'].unitsPerEm + spacing * size * len(text)
-
-
-def cloud_apps():
-    """The cloud label's app lines, one group per app in Home's copy; the first shows until the page steps on. The
-    green dot sits 10 left of the state word, so its place is worked out from the word's width."""
-    apps = yaml.safe_load(COPY.read_text(encoding='utf-8'))['cloud']['apps']
-    assert list(apps) == TILES, 'the copy\'s cloud apps and TILES must name the same apps in the same order'
-    out = []
-    for i, (key, a) in enumerate(apps.items()):
-        state = a['state'].upper()
-        dot = APP_RIGHT - text_width(state, 17, 0.08) - 10
-        out.append(f'<g class="hl-app{" is-on" if i == 0 else ""}" data-app="{key}">\n'
-                   f'<text x="{APP_RIGHT}" y="-46" font-family="{FONT}" font-size="21" font-weight="400" fill="{pal.GREY}" text-anchor="end">'
-                   f'<tspan font-weight="600" fill="{pal.WHITE}">{esc(a["name"].upper())}</tspan> · {esc(a["detail"])}</text>\n'
-                   f'<text x="{APP_RIGHT}" y="-18" font-family="{FONT}" font-size="17" font-weight="600" letter-spacing="0.08em" fill="{pal.GREEN}" text-anchor="end">{esc(state)}</text>\n'
-                   f'<circle cx="{fmt(dot)}" cy="-23" r="4.5" fill="{pal.GREEN}"/>\n</g>')
-    return '\n'.join(out)
-
-
-def hero_cloud(scale=1.0):
-    """The cloud part, split: (the cloud and its sync lines, its label). At scale, the label's words grow about
-    TABLET_CLOUD, its tail end; the leader and dot stay."""
-    text = part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes()).replace('{{APPS}}', cloud_apps())
-    at = text.index('<g class="co lbl" data-t="CLOUD WORKSPACE"')
-    cloud, lab = text[:at], text[at:]
-    if scale != 1.0:
-        a = lab.index('<text class="lt"')
-        b = lab.index('<g class="num">', a)
-        cx, cy = TABLET_CLOUD
-        lab = (lab[:a] + f'<g transform="matrix({scale:g} 0 0 {scale:g} {fmt(cx * (1 - scale))} {fmt(cy * (1 - scale))})">\n'
-               + lab[a:b] + '</g>\n' + lab[b:])
-    return cloud, lab
-
-
-def labels(items, k=1.0):
-    out = []
-    for dot, elbow, colour, title, sub, _d, *side in items:
-        out += [f'<g class="co lbl" data-t="{esc(title)}">', *label(dot, elbow, colour, title, sub, *side, k=k), '</g>']
-    return out
+def leader(key, dot, elbow, colour, side):
+    """A label's line and dot (label() without its words), grouped under its key so the page can hide the pair."""
+    dx, dy = dot if len(dot) == 2 else w.p(*dot)
+    ex, ey = elbow
+    tx = ex + (-TAIL if side == 'left' else TAIL)
+    return [f'<g data-tag="{key}">',
+            f'<polyline points="{fmt(dx)},{fmt(dy)} {fmt(ex)},{fmt(ey)} {fmt(tx)},{fmt(ey)}" fill="none" stroke="{colour}" stroke-width="1.8" stroke-opacity="0.6" stroke-linejoin="round"/>',
+            f'<circle cx="{fmt(dx)}" cy="{fmt(dy)}" r="6" fill="{colour}" stroke="{pal.PAGE}" stroke-width="3"/>',
+            '</g>']
 
 
 def lit(i, name):
@@ -836,11 +792,9 @@ def hero_layers():
     for i, name in enumerate(TILES):
         net += cull_hidden(tile(i, False)) + lit(i, name)
     out['net'] = net
-    cloud, cloud_label = hero_cloud()
-    out['cloud'] = [cloud]
-    out['labels'] = labels(HERO_LABELS) + [cloud_label]
-    out['labels-tablet'] = labels(TABLET_LABELS, TABLET_K) + [hero_cloud(TABLET_K)[1]]
-    text = {name: crisp(number_badges('\n'.join(shapes))) for name, shapes in out.items()}
+    out['cloud'] = [part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes())]
+    out['leaders'] = [s for tag in HERO_TAGS for s in leader(*tag)]
+    text = {name: crisp('\n'.join(shapes)) for name, shapes in out.items()}
     # the moving dashes on a layer of their own over the rest: while they move, only that layer is drawn again
     flows = []
     for name in ('net', 'cloud'):
@@ -868,24 +822,31 @@ def hero_svgs():
     return out
 
 
-def crop_css():
-    """The phone framing as CSS: where the hero's layers sit, in % of a stage cut to PHONE_CROP, so the page shows
-    that part of the drawing. hero.css uses it on phones."""
+def place_css():
+    """Where the page puts things over the drawing, in % of the stage: the phone framing (PHONE_CROP: the layers' box
+    and the stage's shape) and each label's words, at its line's end (HERO_TAGS)."""
     x, y, wd, ht = HERO_VIEW
     cx, cy, cw, ch = PHONE_CROP
 
     def pct(v):
         return f'{round(v * 100, 3):g}%'
-    return ('/* Written by tools/gen_office.py: do not edit by hand. The hero\'s phone framing (PHONE_CROP): the\n'
-            '   layers\' box in % of the stage, and the stage\'s shape. hero.css uses it on phones. */\n'
-            '.hero-art {\n'
-            f'  --crop-ratio: {cw:g} / {ch:g};\n'
-            f'  --crop-tall: calc({ch:g} / {cw:g});\n'
-            f'  --crop-x: {pct((x - cx) / cw)};\n'
-            f'  --crop-y: {pct((y - cy) / ch)};\n'
-            f'  --crop-w: {pct(wd / cw)};\n'
-            f'  --crop-h: {pct(ht / ch)};\n'
-            '}\n')
+    out = ['/* Written by tools/gen_office.py: do not edit by hand. Where hero.css puts things over the hero drawing:',
+           '   the phone framing (PHONE_CROP), and each label\'s words at the end of its line (HERO_TAGS). */',
+           '.hero-art {',
+           f'  --crop-ratio: {cw:g} / {ch:g};',
+           f'  --crop-tall: calc({ch:g} / {cw:g});',
+           f'  --crop-x: {pct((x - cx) / cw)};',
+           f'  --crop-y: {pct((y - cy) / ch)};',
+           f'  --crop-w: {pct(wd / cw)};',
+           f'  --crop-h: {pct(ht / ch)};',
+           '}']
+    for key, _dot, (ex, ey), colour, side in HERO_TAGS:
+        end = (ex + (-TAIL if side == 'left' else TAIL) - x) / wd
+        at = f'right: {pct(1 - end)};' if side == 'left' else f'left: {pct(end)};'
+        out += [f".hl-tag[data-tag='{key}'] {{", f'  --tag-c: var({TAG_INK[colour]});', f'  top: {pct((ey - y) / ht)};', f'  {at}']
+        out += ['  align-items: end;', '  text-align: end;'] if side == 'left' else []
+        out += ['}']
+    return '\n'.join(out) + '\n'
 
 
 if __name__ == '__main__':
@@ -894,7 +855,7 @@ if __name__ == '__main__':
     # public/assets/img/office-card.svg   card cut: the compact cut ('compact': cropped 4:3 closer on the room, no card or
     #   badges) without its labels or their letters (isogen.card). The compact cut is not written on its own.
     # src/components/home/hero/N-NAME.svg  the hero's layers (HERO_LAYERS), inlined by Hero.astro (page fonts apply)
-    # src/components/home/hero-crop.css   the hero's phone framing (crop_css)
+    # src/components/home/hero-place.css  where the page puts things over the hero (place_css)
     site = pathlib.Path(sys.argv[1])
     (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
     (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
@@ -906,4 +867,4 @@ if __name__ == '__main__':
             old.unlink()
     for name, text in svgs.items():
         (home / 'hero' / name).write_text(text, encoding='utf-8', newline='\n')
-    (home / 'hero-crop.css').write_text(crop_css(), encoding='utf-8', newline='\n')
+    (home / 'hero-place.css').write_text(place_css(), encoding='utf-8', newline='\n')
