@@ -121,5 +121,5 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 ### Practise the rollback
 
 1. Note the version: `npx wrangler deployments list`.
-2. `npx wrangler rollback`, then look at https://uplink-site.johnoreilly.workers.dev and its `/version.txt`.
+2. `npx wrangler rollback`, then look at https://jodesign.ca and its `/version.txt`.
 3. `npx wrangler rollback VERSION_ID` (from step 1), look again. Tick it in Before launch.

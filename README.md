@@ -130,4 +130,4 @@ Chrome, Edge, Firefox and Safari (Mac and iPhone), every version from the last y
 
 ## Hosting
 
-Cloudflare Workers, static assets only (no Worker script), live at https://uplink-site.johnoreilly.workers.dev. See [`docs/ops.md`](docs/ops.md).
+Cloudflare Workers, static assets only (no Worker script), live at https://jodesign.ca. See [`docs/ops.md`](docs/ops.md).

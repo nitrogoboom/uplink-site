@@ -13,6 +13,15 @@
     "directory": "./dist",
     "not_found_handling": "404-page",
   },
+  // The site's address. Custom Domains: Cloudflare makes the DNS records and certificates. www answers only so the
+  // zone's redirect rule can send it to the bare name (docs/ops.md, "Domain"). Changing this list on deploy needs the
+  // token's "Workers Routes: Edit" on the zone.
+  "routes": [
+    { "pattern": "jodesign.ca", "custom_domain": true },
+    { "pattern": "www.jodesign.ca", "custom_domain": true },
+  ],
+  // the old address stays on until the site retires it (docs/release.md); previews live on workers.dev too
+  "workers_dev": true,
   // each uploaded version gets its own address (a pull request's preview uses it)
   "preview_urls": true,
   "previews": {},

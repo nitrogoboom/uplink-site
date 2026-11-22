@@ -1,6 +1,6 @@
 # Uplink Technology site
 
-Static mockup site for a made-up IT company. Astro, plain CSS and JS, served by Cloudflare as static files. Live at https://uplink-site.johnoreilly.workers.dev.
+Static mockup site for a made-up IT company. Astro, plain CSS and JS, served by Cloudflare as static files. Live at https://jodesign.ca (also still at https://uplink-site.johnoreilly.workers.dev).
 
 **Draft mode.** Only Home, the setup and the code base matter (owner, November 10, 2026). Other pages are placeholders: don't change their content or look unless asked. Shared code may change; they must still build.
 

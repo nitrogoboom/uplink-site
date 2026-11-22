@@ -4,9 +4,9 @@ import { satteri } from '@astrojs/markdown-satteri';
 import { placeholders } from './src/lib/placeholders.mjs';
 import { PLACEHOLDERS } from './src/lib/footer.ts';
 
-// The live address: Cloudflare's workers.dev name until the site has a domain. Set the real domain here (or SITE_URL
-// in the environment) at launch. It goes into canonicals, Open Graph, the sitemap and JSON-LD.
-const site = (process.env.SITE_URL || 'https://uplink-site.johnoreilly.workers.dev').replace(/\/$/, '');
+// The live address (wrangler.jsonc, routes). Set the launch domain here (or SITE_URL in the environment) at launch. It
+// goes into canonicals, Open Graph, the sitemap and JSON-LD.
+const site = (process.env.SITE_URL || 'https://jodesign.ca').replace(/\/$/, '');
 
 export default defineConfig({
   site,

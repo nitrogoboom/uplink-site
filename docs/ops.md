@@ -3,7 +3,8 @@
 How the site is hosted and run. Secrets and security controls are in [`security.md`](security.md).
 
 - **Code:** the public GitHub repository `nitrogoboom/uplink-site`.
-- **Site:** Cloudflare Workers, static assets only (`wrangler.jsonc`): the files in `dist/`, exactly as `npm run build` (Astro) writes them. No Worker script runs and nothing changes the files after the build. Live at https://uplink-site.johnoreilly.workers.dev until the site has its own domain.
+- **Site:** Cloudflare Workers, static assets only (`wrangler.jsonc`): the files in `dist/`, exactly as `npm run build` (Astro) writes them. No Worker script runs and nothing changes the files after the build. Live at https://jodesign.ca, and still at https://uplink-site.johnoreilly.workers.dev.
+- **Domain:** `jodesign.ca`, a Cloudflare zone (nameservers at Rebel.ca). Both names are Custom Domains in `wrangler.jsonc`; a Redirect Rule on the zone ("Redirect from WWW to root") sends `www` to the bare name with a 301. The zone has Email Address Obfuscation, Automatic HTTPS Rewrites, Rocket Loader, Cloudflare Fonts and Web Analytics off: each makes Cloudflare rewrite a page and drop its ETag, so a returning visitor would download the page again in full.
 
 ## What Astro does, and what Cloudflare does
 
@@ -23,11 +24,11 @@ The drawings are finished on the owner's machine (`tools/`, [`drawing-tools.md`]
 
 A push to `main` that changes the site runs `.github/workflows/site.yml`: `npm ci`, `npm run build`, `npx wrangler deploy`. About a minute. A push of only docs runs nothing. "Run workflow" on `main` deploys again.
 
-- **Is it live?** `curl -s https://uplink-site.johnoreilly.workers.dev/version.txt` prints the commit the live build was made from (7 characters, as `git log --oneline` shows it).
+- **Is it live?** `curl -s https://jodesign.ca/version.txt` prints the commit the live build was made from (7 characters, as `git log --oneline` shows it).
 - **By hand:** `npm run deploy` (build, then `wrangler deploy`), from `main`.
 - **Roll back:** `npx wrangler rollback` puts the previous version live; `npx wrangler deployments list` shows them. Then fix `main`.
 - **Previews:** a pull request gets `https://pr-N-uplink-site.johnoreilly.workers.dev` (the `preview` job).
-- **Secrets:** `CLOUDFLARE_API_TOKEN` ("Workers Scripts: Edit") and `CLOUDFLARE_ACCOUNT_ID`, in the GitHub environment `cloudflare`.
+- **Secrets:** `CLOUDFLARE_API_TOKEN` ("Workers Scripts: Edit", and "Workers Routes: Edit" on the `jodesign.ca` zone, which a deploy that changes `routes` needs) and `CLOUDFLARE_ACCOUNT_ID`, in the GitHub environment `cloudflare`.
 
 Nothing checks the site after a deploy, and nothing rolls it back by itself. A change a visitor can see gets a look in the browser.
 
