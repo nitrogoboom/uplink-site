@@ -14,14 +14,16 @@ export default defineConfig({
   // src/content/fr/ beside en/.
   i18n: { locales: ['en'], defaultLocale: 'en' },
   // Content Security Policy, written by Astro into each page as a <meta>: a hash for every script and style it
-  // bundles (and the two a page adds itself: src/lib/csp.ts), plus the lines below. Nothing loads from another host.
+  // bundles (and the two a page adds itself: src/lib/csp.ts), plus the lines below. One other host: Cloudflare Web
+  // Analytics, its script from static.cloudflareinsights.com and its reports to cloudflareinsights.com (Base.astro).
   // What a <meta> can't carry (frame-ancestors, Trusted Types) is in public/_headers. Not active in `npm run dev`.
   security: {
     csp: {
+      scriptDirective: { resources: ["'self'", 'https://static.cloudflareinsights.com'] },
       directives: [
         "default-src 'none'",
         "img-src 'self' data:",
-        "connect-src 'self'",
+        "connect-src 'self' https://cloudflareinsights.com",
         "form-action 'self'",
         "base-uri 'self'",
         "object-src 'none'",

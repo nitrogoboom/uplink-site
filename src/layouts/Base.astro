@@ -169,5 +169,17 @@ Astro.csp?.insertScriptHash(sha256(themeInit));
       import '../scripts/site.js';
     </script>
     <slot name="scripts" />
+    {/* Cloudflare Web Analytics, installed by hand (its "manual setup") so Cloudflare never rewrites a page to add it:
+        a rewrite slowed the first paint and dropped the page's ETag (docs/ops.md, "Domain"). It loads after the page
+        is drawn, sets no cookies or storage, and reports load times; the CSP allows its two hosts (astro.config.mjs).
+        Built pages only, so `npm run dev` sends nothing. The token is public: it names the jodesign.ca site. */}
+    {import.meta.env.PROD && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon='{"token": "6169396cdfc244dd9a084dbf544fbafe"}'
+      />
+    )}
   </body>
 </html>

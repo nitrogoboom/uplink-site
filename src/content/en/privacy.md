@@ -2,6 +2,7 @@
 
 - This page is about this website only: what it collects, who handles it, and how long it's kept.
 - The site sets no cookies. It doesn't follow you around the web, show ads, or sell anything about you.
+- To see how fast pages load, the site uses Cloudflare Web Analytics. It counts visits and load times without cookies, and doesn't identify you.
 - Our host, Cloudflare, sees each visit (your IP address, your browser, and the page you asked for) so it can deliver the page and keep the site safe.
 - Our forms don't send anything yet. When they do, what you type will reach us by email and nowhere else.
 - Questions? Write to [{privacy}](mailto:{privacy}).
@@ -97,7 +98,7 @@ We don't share personal information with anyone else, unless the law requires it
 
 ## How we protect it
 
-The site only works over a secure, encrypted connection (HTTPS). It runs no code from another company, except Cloudflare's bot check once the forms work. Once the forms send, only a few people at Uplink will be able to open the inbox where form messages arrive.
+The site only works over a secure, encrypted connection (HTTPS). It runs no code from another company except Cloudflare's: its Web Analytics now, and its bot check once the forms work. Once the forms send, only a few people at Uplink will be able to open the inbox where form messages arrive.
 
 ## Your choices and rights
 
