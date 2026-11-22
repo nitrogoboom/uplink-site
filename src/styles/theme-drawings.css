@@ -3,6 +3,9 @@
    :where(), so the class rules from the drawings and their light copies (at the end of each block) win. */
 
 /* .hero-art: 1-floor.svg, 2-walls.svg, 3-back.svg, 4-front.svg, 5-net.svg, 6-cloud.svg, 7-flows.svg, 8-leaders.svg */
+:where(:root[data-theme='light'] .hero-art) [fill='#05111d' i] {
+  fill: #bbc2c9;
+}
 :where(:root[data-theme='light'] .hero-art) [fill='#182431' i] {
   fill: #dce2e8;
 }
@@ -144,10 +147,10 @@
 :where(:root[data-theme='light'] .hero-art) [stroke='#fff5ec' i] {
   stroke: #7c4900;
 }
-:root[data-theme='light'] .hero-art .p-4aab33 {
-  stroke: #1f75a6;
+:root[data-theme='light'] .hero-art .p-096022 {
+  fill: #d2d8de;
 }
-:root[data-theme='light'] .hero-art .p-940b5b {
+:root[data-theme='light'] .hero-art .p-6ccc39 {
   fill: #dce2e8;
   stroke: #1f75a6;
 }
@@ -157,40 +160,55 @@
 :root[data-theme='light'] .hero-art .p-cd66c6 {
   fill: #c5cbd2;
 }
-:root[data-theme='light'] .hero-art .p-36360a {
-  fill: #bbc2c9;
-  stroke: #37424e;
+:root[data-theme='light'] .hero-art .p-f73462 {
+  stroke: #1f75a6;
 }
-:root[data-theme='light'] .hero-art .p-670f39 {
-  stroke: #37424e;
-}
-:root[data-theme='light'] .hero-art .p-6d9350 {
+:root[data-theme='light'] .hero-art .p-8e6588 {
   fill: #222e3a;
   stroke: #1f75a6;
 }
-:root[data-theme='light'] .hero-art .p-80bbca {
+:root[data-theme='light'] .hero-art .p-a934aa {
   fill: #d2d8de;
   stroke: #37424e;
 }
-:root[data-theme='light'] .hero-art .p-8e0d27 {
+:root[data-theme='light'] .hero-art .p-acb34b {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-b930b3 {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-bc7cab {
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-d361d6 {
   fill: #00683f;
   stroke: #37424e;
 }
-:root[data-theme='light'] .hero-art .p-ba2d77 {
+:root[data-theme='light'] .hero-art .p-df439b {
   fill: #fff;
-  stroke: #37424e;
-}
-:root[data-theme='light'] .hero-art .p-d06893 {
   stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-e5df56 {
   fill: #4a93c1;
 }
-:root[data-theme='light'] .hero-art .p-e89fbe {
+:root[data-theme='light'] .hero-art .p-ec8d87 {
+  fill: #bbc2c9;
   stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-071416 {
   stroke: #7c4900;
+}
+:root[data-theme='light'] .hero-art .p-36360a {
+  fill: #bbc2c9;
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-80bbca {
+  fill: #d2d8de;
+  stroke: #37424e;
+}
+:root[data-theme='light'] .hero-art .p-ba2d77 {
+  fill: #fff;
+  stroke: #37424e;
 }
 :root[data-theme='light'] .hero-art .p-ba6258 {
   stroke: #7c4900;

@@ -187,6 +187,15 @@ TAG_INK = {pal.AMBER: '--c-accent-text', pal.SKY: '--c-sky'}   # each line colou
 HERO_VIEW = (0, -130, 1200, 930)       # x, y, width, height
 HERO_LAYERS = ('floor', 'walls', 'back', 'front', 'net', 'cloud', 'flows', 'leaders')
 PHONE_CROP = (240, -118, 962, 900)     # x, y, width, height: the cloud's top to the slab
+# The hero's room recedes so the network and the cloud lead (Work's office.svg keeps its full weights): its face
+# outlines, glass and window lines and floor grid are drawn fainter, by these factors on their opacity (calm()).
+# Fainter outlines also soften the bright knots where two faces' outlines meet at a corner.
+CALM_EDGE, CALM_GLASS, CALM_GRID = 0.55, 0.6, 0.6
+# Light and shade, still (nothing moves, so they cost nothing after the first draw): a soft shade round the foot of
+# everything that stands on the floor (margin in world units, opacity), and daylight on the floor under each window
+# (how far it reaches across the floor, and its opacity).
+SHADE = (0.14, 0.32)
+DAYLIGHT = (3.0, 0.14)
 
 HALO = f'stroke="{pal.PAGE}" stroke-width="7" stroke-linejoin="round" paint-order="stroke"'   # page-colour halo: lines under the text break cleanly
 COMPACT_TEXT_W = {'FIREWALL RACK': 194, 'WORKSTATIONS': 187.1, 'core switch + backups': 181.2, 'managed + patched': 160.4}   # measured at 24 / 19
@@ -329,10 +338,10 @@ def back_wall(n=BACK_WINDOWS, win=WIN):
     return box((0, FLOOR[0], 0, WALL_T, 0, WALL_H)) + windows(n, lambda a, b, z0, z1: wall_y(WALL_T, a, b, z0, z1), win)
 
 
-def left_wall(n=LEFT_WINDOWS, win=WIN, tv=TV, call=False):
+def left_wall(n=LEFT_WINDOWS, win=WIN, tv=TV, call=False, screen=pal.AMBER):
     out = box((0, WALL_T, WALL_T, FLOOR[1], 0, WALL_H)) + windows(n, lambda a, b, z0, z1: wall_x(WALL_T, a, b, z0, z1), win)
     y0, y1, z0, z1 = tv
-    out.append(poly(wall_x(WALL_T, y0, y1, z0, z1), f'fill="{pal.AMBER}" fill-opacity="0.14" stroke="{pal.AMBER}" stroke-width="1.4" stroke-opacity="0.95"'))
+    out.append(poly(wall_x(WALL_T, y0, y1, z0, z1), f'fill="{screen}" fill-opacity="0.14" stroke="{screen}" stroke-width="1.4" stroke-opacity="0.95"'))
     return out + ([call_tiles(tv)] if call else [])
 
 
@@ -766,19 +775,69 @@ def lit(i, name):
     return [f'<g class="hl-lit{" is-on" if i == 0 else ""}" data-app="{name}">', *cull_hidden(tile(i, True)), '</g>']
 
 
+def calm(text):
+    """The room drawn quieter (CALM_*): face outlines, sky-blue lines and tints (glass, windows, doors) and the floor
+    grid at a share of their opacity."""
+    def fade(tag, attr, k):
+        m = re.search(rf' {attr}="([\d.]+)"', tag)
+        return tag.replace(m.group(0), f' {attr}="{float(m.group(1)) * k:.3g}"') if m else tag
+
+    def fix(m):
+        tag = m.group(0)
+        if f'stroke="{pal.EDGE}"' in tag:
+            tag = fade(tag, 'stroke-opacity', CALM_EDGE)
+        if f'stroke="{pal.SKY}"' in tag:
+            tag = fade(fade(tag, 'stroke-opacity', CALM_GLASS), 'fill-opacity', CALM_GLASS)
+        if 'class="floor"' in tag:
+            tag = fade(tag, 'stroke-opacity', CALM_GRID)
+        return tag
+    return _TAG.sub(fix, text)
+
+
+def shade(boxes):
+    """One soft shade on the floor round the foot of each box that stands on it (SHADE), kept inside the walls: drawn
+    before them, it shows only as a rim where they meet the floor."""
+    from shapely.geometry import box as rect_shape
+    m, op = SHADE
+    inside = rect_shape(WALL_T, WALL_T, FLOOR[0], FLOOR[1])
+    feet = [rect_shape(x0 - m, y0 - m, x1 + m, y1 + m) for x0, x1, y0, y1, z0, _z1 in boxes
+            if z0 == 0 and not (x1 - x0 <= WALL_T or y1 - y0 <= WALL_T)]
+    if not feet:
+        return []
+    area = unary_union(feet).intersection(inside)
+    rings = [g.exterior for g in getattr(area, 'geoms', [area])]
+    d = ''.join('M' + 'L'.join(f'{fmt(X)},{fmt(Y)}' for X, Y in (w.p(x, y, 0) for x, y in list(r.coords)[:-1])) + 'Z'
+                for r in rings)
+    return [f'<path class="floor" d="{d}" fill="{pal.DROP}" fill-opacity="{op}"/>']   # class: a floor marking to check.py
+
+
+def daylight():
+    """Daylight on the floor under each window: from the wall, DAYLIGHT[0] across the floor, as wide as the window."""
+    reach, op = DAYLIGHT
+    (back, width, _p, _s, _h), (left, lwidth, *_r) = HERO_WIN, HERO_LEFT_WIN
+    pools = [[(a, WALL_T), (a + width, WALL_T), (a + width, WALL_T + reach), (a, WALL_T + reach)] for a in back]
+    pools += [[(WALL_T, a), (WALL_T + reach, a), (WALL_T + reach, a + lwidth), (WALL_T, a + lwidth)] for a in left]
+    return [poly([(x, y, 0) for x, y in q], f'fill="{pal.LEFT}" fill-opacity="{op}" stroke="none"') for q in pools]
+
+
 def hero_layers():
     """{layer name: its shapes as SVG text}, in HERO_LAYERS order. Each part is culled on its own (cull_hidden): a
-    shape covered only by a later part is kept."""
+    shape covered only by a later part is kept. The room's layers are drawn quieter (calm()), and each layer of
+    furniture starts with the shade round its feet (shade())."""
     v = 'hero'
-    room = {
-        'floor': [floor(v, None) + entrance()],
-        'walls': [back_wall(0, HERO_WIN), left_wall(0, HERO_LEFT_WIN, MEET_TV, call=True)],
-        'back': [nook(), coffee(), *(desk(*d) for d in HERO_DESKS), glass_back(HERO_GLASS), rack(RACKS[0], v, *HERO_RACK),
-                 ups(), *(desk(*d) for d in HERO_DESKS_B), glass_front(HERO_GLASS)],
-        'front': [meeting_glass_back(), hero_meeting(), meeting_glass_front(), reception(), lounge(), plant(PLANT_AT),
-                  front_door()],
+    parts = {
+        'floor': lambda: [floor(v, None) + daylight() + entrance()],
+        'walls': lambda: [back_wall(0, HERO_WIN), left_wall(0, HERO_LEFT_WIN, MEET_TV, call=True, screen=pal.SKY)],
+        'back': lambda: [nook(), coffee(), *(desk(*d) for d in HERO_DESKS), glass_back(HERO_GLASS),
+                         rack(RACKS[0], v, *HERO_RACK), ups(), *(desk(*d) for d in HERO_DESKS_B), glass_front(HERO_GLASS)],
+        'front': lambda: [meeting_glass_back(), hero_meeting(), meeting_glass_front(), reception(), lounge(),
+                          plant(PLANT_AT), front_door()],
     }
-    out = {name: [s for p in parts for s in cull_hidden(p)] for name, parts in room.items()}
+    out = {}
+    for name, make in parts.items():
+        first = len(BOXES)
+        shapes = [s for p in make() for s in cull_hidden(p)]
+        out[name] = (shade(BOXES[first:]) if name in ('back', 'front') else []) + shapes
     net = []
     for i, ap in enumerate(HERO_APS):
         net += cable(ap, v, HERO_RACK[0], GUEST[2] if i == GUEST_AP else pal.AMBER)
@@ -795,6 +854,8 @@ def hero_layers():
     out['cloud'] = [part('hero_cloud.svg').replace('{{CLOUD_SHAPES}}', cloud_shapes())]
     out['leaders'] = [s for tag in HERO_TAGS for s in leader(*tag)]
     text = {name: crisp('\n'.join(shapes)) for name, shapes in out.items()}
+    for name in parts:
+        text[name] = calm(text[name])
     # the moving dashes on a layer of their own over the rest: while they move, only that layer is drawn again
     flows = []
     for name in ('net', 'cloud'):

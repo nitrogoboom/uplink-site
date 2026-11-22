@@ -140,6 +140,7 @@
   position: absolute;
   display: flex;
   flex-direction: column;
+  gap: calc(var(--sp-1) / 2);
   margin: 0;
   padding-inline: var(--sp-2);
   translate: 0 -0.5lh;
@@ -151,9 +152,10 @@
     0 0 var(--cap-halo) var(--c-bg),
     0 0 var(--cap-halo) var(--c-bg);
 }
+/* the titles in the site's small-label tracking, as the eyebrows */
 .hl-tag-t {
   font-weight: 600;
-  letter-spacing: var(--cap-tracking);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--tag-c);
 }
