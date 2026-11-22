@@ -34,7 +34,7 @@ export default defineConfig({
   build: { format: 'file', inlineStylesheets: 'always' },
   trailingSlash: 'never',
   // Astro 7's default ('jsx') drops the space between inline tags on separate lines, e.g. the hero title's
-  // "<span>Your IT team,</span> <em>always online</em>". true keeps whitespace as written.
+  // "<span>Your IT team,</span> <em>always online</em>". true trims whitespace but keeps one space where it shows.
   compressHTML: true,
   // Astro's own Markdown processor, plus the plugin that fills {phone}, {privacy} … in src/data/*.md from
   // footer.json (src/lib/placeholders.mjs). Restart `npm run dev` after changing footer.json to see it there.
