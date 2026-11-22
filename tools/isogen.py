@@ -1,6 +1,7 @@
 """Shared pieces for the gen_*.py drawing scripts: palette, faces, iso circles, labels, the SVG wrapper.
 Colours match docs/drawing-tools.md "Drawing rules" and the drawing palette in src/styles/tokens.css."""
 import hashlib, html, math, re
+from decimal import Decimal
 from shapely.geometry import LineString, MultiPoint, Point, Polygon, box as box_shape
 from iso import fmt
 from svgfont import font_style
@@ -310,17 +311,119 @@ def share_paint(text, min_uses=3):
     return out, ''.join(f'.{n}{{{";".join(f"{k}:{v}" for k, v in p)}}}' for p, n in sorted(names.items(), key=lambda x: x[1]))
 
 
-def tidy_numbers(text):
-    """Shorter numbers in points="" and d="", same values: 796.0 -> 796, 0.5 -> .5, -0.5 -> -.5."""
-    def nums(m):
-        v = re.sub(r'(\d)\.0+(?!\d)', r'\1', m.group(2))
-        v = re.sub(r'(?<![\d.])0\.(\d)', r'.\1', v)
-        return f'{m.group(1)}="{v}"'
-    return re.sub(r'\b(points|d)="([^"]*)"', nums, text)
+_NUM = re.compile(r'[-+]?(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?')
+_PATH_TOK = re.compile(r'[MLHVZmlhvz]|' + _NUM.pattern)
+_POLY = re.compile(r'<(polygon|polyline)\b([^>]*?) points="([^"]*)"([^>]*>)')
+
+
+def _num(v):
+    """A Decimal in as few characters as it takes: 0.50 -> .5, -0.5 -> -.5, 12.0 -> 12."""
+    s = format(v.normalize(), 'f') if v else '0'
+    if '.' in s:
+        s = s.rstrip('0').rstrip('.')
+    return re.sub(r'^(-?)0\.', r'\1.', s) or '0'
+
+
+def _join(nums):
+    """Numbers with only the separators SVG needs: none before a minus, none before a dot when the last number
+    already has one (".5.5" is .5 then .5)."""
+    out = ''
+    for n in nums:
+        if out and not n.startswith('-') and not (n.startswith('.') and '.' in re.split(r'[^\d.]', out)[-1]):
+            out += ' '
+        out += n
+    return out
+
+
+def _lean_d(points, closed):
+    """A straight-edged path through points (Decimals), each step written the shortest way: absolute or relative,
+    and H or V for a level or upright edge. The numbers are worked out in Decimal, so no value changes."""
+    out, prev, x, y = [], None, None, None
+    for nx, ny in points:
+        if x is None:
+            out.append('M' + _join([_num(nx), _num(ny)]))
+            prev = 'L'                                  # numbers straight after M are taken as L
+        else:
+            cands = [('L', [nx, ny]), ('l', [nx - x, ny - y])]
+            if ny == y:
+                cands += [('H', [nx]), ('h', [nx - x])]
+            if nx == x:
+                cands += [('V', [ny]), ('v', [ny - y])]
+            best = None
+            for c, v in cands:
+                body = _join([_num(t) for t in v])
+                txt = (body if body.startswith('-') else ' ' + body) if c == prev else c + body
+                if best is None or len(txt) < len(best[1]):
+                    best = (c, txt)
+            prev = best[0]
+            out.append(best[1])
+        x, y = nx, ny
+    return ''.join(out) + ('z' if closed else '')
+
+
+def _path_points(d):
+    """The points of a path made only of M, L, H, V and Z (absolute or relative), as Decimals, one list per M; None for
+    any other path (curves, arcs), which is left as it is."""
+    toks = _PATH_TOK.findall(d)
+    if ''.join(toks) != re.sub(r'[\s,]', '', d):
+        return None
+    subs, cmd, i = [], None, 0
+    x = y = sx = sy = Decimal(0)
+    while i < len(toks):
+        if toks[i].isalpha():
+            cmd = toks[i]
+            i += 1
+            if cmd in 'Zz':
+                subs[-1][1] = True
+                x, y = sx, sy
+                continue
+        if cmd is None:
+            return None
+        rel, c = cmd.islower(), cmd.upper()
+        n = 1 if c in 'HV' else 2
+        a = [Decimal(t) for t in toks[i:i + n]]
+        i += n
+        if c == 'H':
+            x = x + a[0] if rel else a[0]
+        elif c == 'V':
+            y = y + a[0] if rel else a[0]
+        else:
+            x, y = (x + a[0], y + a[1]) if rel else (a[0], a[1])
+        if c == 'M':
+            subs.append([[(x, y)], False])
+            sx, sy = x, y
+            cmd = 'l' if rel else 'L'
+        else:
+            subs[-1][0].append((x, y))
+    return subs
+
+
+def lean(text):
+    """The same drawing in fewer characters, for every file a generator writes: each straight-edged path, polygon and
+    polyline in its shortest form (a polygon or polyline becomes a path when that is shorter, which draws the same
+    shape), with relative steps and only the separators SVG needs. Every number keeps its exact value, and each element
+    stays on its own line, so check.py and painter.py still report line numbers."""
+    def path(m):
+        subs = _path_points(m.group(1))
+        if not subs:                                    # curves and arcs keep their commands; their numbers get shorter
+            d = re.sub(r'(\d)\.0+(?!\d)', r'\1', m.group(1))
+            return 'd="' + re.sub(r'(?<![\d.])0\.(\d)', r'.\1', d) + '"'
+        return 'd="' + ''.join(_lean_d(p, z) for p, z in subs) + '"'
+
+    def poly(m):
+        tag, before, pts, after = m.groups()
+        v = [Decimal(t) for t in _NUM.findall(pts)]
+        pairs = list(zip(v[0::2], v[1::2]))
+        as_poly = f'<{tag}{before} points="{_join([_num(t) for t in v])}"{after}'
+        as_path = f'<path{before} d="{_lean_d(pairs, tag == "polygon")}"{after}'
+        return as_path if len(as_path) < len(as_poly) else as_poly
+    text = re.sub(r'\bd="([^"]*)"', path, text)
+    return _POLY.sub(poly, text)
 
 
 def write(path, text, card_cut=True):
-    """Writes a drawing; a compact cut also gets its card cut next to it, unless no card shows it (card_cut=False)."""
-    open(path, 'w', encoding='utf-8', newline='\n').write(text)
+    """Writes a drawing (lean); a compact cut also gets its card cut next to it, unless no card shows it
+    (card_cut=False)."""
+    open(path, 'w', encoding='utf-8', newline='\n').write(lean(text))
     if card_cut and str(path).endswith('-compact.svg'):
         write(str(path).replace('-compact.svg', '-card.svg'), card(text))

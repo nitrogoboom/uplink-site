@@ -11,7 +11,8 @@ from shapely.ops import unary_union
 def boxes(path, w, text=None):
     text = text or open(path, encoding='utf-8').read()
     _, shapes = load(text)
-    polys = [s for s in shapes if s.tag == 'polygon' and len(s.subs[0]) == 4]
+    # a face is a closed four-point shape: a polygon, or the path isogen.lean writes for one
+    polys = [s for s in shapes if s.tag in ('polygon', 'path') and s.closed and len(s.subs) == 1 and len(s.subs[0]) == 4]
     out = []; i = 0
     while i < len(polys) - 2:
         P = [p.subs[0] for p in polys[i:i+3]]

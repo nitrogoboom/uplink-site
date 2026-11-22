@@ -6,7 +6,7 @@ blink, led, w2, dot, mast, beacon, sig, bob, tk-n, mk-*) and the group order: ba
 """
 import math, pathlib
 from decimal import Decimal, ROUND_HALF_UP
-from isogen import hoist_styles
+from isogen import hoist_styles, lean
 
 # World: screen = ((x - y) * cos30 * U, (x + y) * U / 2 - z * U) on a 16 x 16 platform; origin at its back corner, x
 # runs right-down, y left-down, z up. Each spot (<g class="dist" data-k="...">) carries its camera: data-vb, the viewBox
@@ -218,5 +218,5 @@ def build():
 if __name__ == '__main__':
     root = pathlib.Path(__file__).resolve().parent.parent
     svg, css = build()
-    open(root / 'src/assets/img/campus.svg', 'w', encoding='utf-8', newline='\n').write(svg)
+    open(root / 'src/assets/img/campus.svg', 'w', encoding='utf-8', newline='\n').write(lean(svg))
     open(root / 'src/styles/campus-drawing.css', 'w', encoding='utf-8', newline='\n').write(css)

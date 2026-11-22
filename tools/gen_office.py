@@ -9,7 +9,7 @@ dot, and the page sets the label's words (Home's copy) where the line ends (HERO
 import math, pathlib, re, sys
 from shapely.ops import unary_union
 from iso import W, fmt
-from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, cull_hidden, share_paint, tidy_numbers, card as card_cut, box as draw_box
+from isogen import FACES, HIGH, EDGE, FONT, silhouette, clip_out, seg_path, key_group, key_css, number_badges, hoist_styles, esc, cull_hidden, share_paint, lean, card as card_cut, box as draw_box
 from isoprops import chair, monitor, desk_phone, phone_face, screen_glass, rect, on_side
 from svgfont import font_style
 from hero_cloud import cloud_shapes
@@ -873,7 +873,7 @@ def hero_svgs():
     bodies, rules = {}, []
     for name, body in hero_layers().items():
         body, css = hoist_styles(body)
-        body, paint_css = share_paint(tidy_numbers(body))
+        body, paint_css = share_paint(body)
         bodies[name] = body
         rules += [r for r in re.findall(r'[^{}]+\{[^{}]*\}', css + paint_css) if r not in rules]
     out = {}
@@ -923,8 +923,8 @@ if __name__ == '__main__':
     # src/styles/hero-drawing.css         the layers' own rules (hero_svgs); in src/styles/ so it stays outside the
     #   cascade layers (postcss.config.mjs puts a component's CSS in one)
     site = pathlib.Path(sys.argv[1])
-    (site / 'assets/img/office.svg').write_text(render('office') + '\n', encoding='utf-8', newline='\n')
-    (site / 'assets/img/office-card.svg').write_text(card_cut(render('compact')) + '\n', encoding='utf-8', newline='\n')
+    (site / 'assets/img/office.svg').write_text(lean(render('office')) + '\n', encoding='utf-8', newline='\n')
+    (site / 'assets/img/office-card.svg').write_text(lean(card_cut(render('compact'))) + '\n', encoding='utf-8', newline='\n')
     home = pathlib.Path(__file__).resolve().parent.parent / 'src/components/home'
     (home / 'hero').mkdir(exist_ok=True)
     svgs, drawing_css = hero_svgs()
@@ -932,6 +932,6 @@ if __name__ == '__main__':
         if old.name not in svgs:
             old.unlink()
     for name, text in svgs.items():
-        (home / 'hero' / name).write_text(text, encoding='utf-8', newline='\n')
+        (home / 'hero' / name).write_text(lean(text), encoding='utf-8', newline='\n')
     (home / 'hero-place.css').write_text(place_css(), encoding='utf-8', newline='\n')
     (home.parent.parent / 'styles' / 'hero-drawing.css').write_text(drawing_css, encoding='utf-8', newline='\n')
