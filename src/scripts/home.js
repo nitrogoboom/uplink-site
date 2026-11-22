@@ -114,24 +114,11 @@ if (svcRow && svcDots.length) {
     });
     if (aim === current) aim = null;
   };
-  // a slide that ends (or a swipe that cuts it short) forgets its aim. Safari before 26.2 has no scrollend: there a
-  // scroll that has been still for 150ms has ended
-  const forgetAim = () => {
+  // a slide that ends (or a swipe that cuts it short) forgets its aim. Every supported browser has scrollend; one
+  // without it (Safari before 26.2) still forgets the aim when the slide reaches its card (centre, above)
+  svcRow.addEventListener('scrollend', () => {
     aim = null;
-  };
-  if ('onscrollend' in window) svcRow.addEventListener('scrollend', forgetAim);
-  else {
-    /** @type {ReturnType<typeof setTimeout> | undefined} */
-    let quiet; // (window is "never" here to the type check, which knows only browsers with scrollend)
-    svcRow.addEventListener(
-      'scroll',
-      () => {
-        clearTimeout(quiet);
-        quiet = setTimeout(forgetAim, 150);
-      },
-      { passive: true },
-    );
-  }
+  });
   steps.forEach((b) =>
     b.addEventListener('click', () => go((aim ?? current) + +(/** @type {string} */ (b.dataset.step)))),
   );
