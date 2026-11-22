@@ -14,7 +14,7 @@ How the site is hosted and run. Secrets and security controls are in [`security.
 | The script and style hashes of the Content Security Policy, as a `<meta>` in each page | Astro | `security.csp` |
 | Fonts, with hashed names | Astro | `fonts` |
 | Every other response header, caching | Cloudflare | `public/_headers`, shipped as written |
-| `/services` for `services.html`; `/services/` and `/services.html` redirect there | Cloudflare | its default `html_handling` |
+| `/services` for `services.html`; `/services/` and `/services.html` redirect there (a 307, Cloudflare's own; each page's canonical tag names the clean address for search engines) | Cloudflare | its default `html_handling` |
 | The 404 page for a missing address | Cloudflare | `not_found_handling: "404-page"` |
 
 The drawings are finished on the owner's machine (`tools/`, [`drawing-tools.md`](drawing-tools.md)) and committed; the build only copies them.
@@ -50,6 +50,10 @@ Two rulesets protect `main` (GitHub > Settings > Rules > Rulesets):
 
 Secret scanning with push protection, private vulnerability reporting, CodeQL (default setup), and the dependency graph are on under Settings > Code security.
 Every control and how to check it: [`security.md`](security.md).
+
+## Plain http
+
+On `workers.dev` a page still answers on `http://`; HSTS (`public/_headers`) moves a browser to `https://` after its first visit. At launch, Always Use HTTPS on the zone redirects every request (`release.md`, "Launch").
 
 ## Search engines
 

@@ -43,7 +43,7 @@ Actions pinned to commits, and GitHub refuses one that isn't pinned or isn't Git
 ## Privacy
 
 - **No cookies, no tracking.** Settings (theme, motion, pause) stay in the browser's own storage. There's no consent banner.
-- **What the site logs:** nothing of ours. No Worker script runs, so there is no error log; Cloudflare serves the files. The privacy page still lists a site error log kept "up to 7 days": true again only if a script comes back (`notes.md`).
+- **What the site logs:** nothing of ours. No Worker script runs, so there is no error log; Cloudflare serves the files and keeps its own visit details, as the privacy page says.
 - **Keep the privacy page true.** A change that starts collecting something, or adds a processor, updates `src/content/en/privacy.md` in the same commit.
 
 ## Secrets

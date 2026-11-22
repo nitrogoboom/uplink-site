@@ -46,10 +46,4 @@ Not Home, not setup: `parked.md`.
 
 After the rebuild (Astro builds it alone; `docs/ops.md`):
 
-- [ ] First push: the deploy is now `wrangler deploy` with no Worker script. Watch that run, then check `/version.txt` and a made-up address (the 404 page).
-- [ ] Privacy page: its table lists a site error log kept "up to 7 days" (`src/content/en/privacy.md`). No script runs any more, so there is none. Owner to decide: remove the row, or leave it for when the forms bring a script back.
-- [ ] Home is about 3 KB heavier over the wire (43.6 KB, was 40.2): the hero and Grow drawings go in as the tools save them, no shrink at build. To win it back, round their numbers tighter in `tools/gen_office.py` and `gen_grow.py`.
-- [ ] `http://` and `/services/`-style addresses: Cloudflare's own handling now (no redirect of `http://` on workers.dev, a 307 for the spellings). At launch, Always Use HTTPS covers the first; decide whether the second needs 308s (`public/_redirects`).
-- [ ] French: a language switch link (footer or Settings) once `src/content/fr/` exists (README, "Languages").
-- [ ] Drawings as Astro assets (`src/assets/`, hashed names) instead of `public/assets/img/` with `?v=`: Astro's own way to cache-bust images. Left as is; worth it when the other pages are designed.
-
+- [ ] Drawings as Astro assets (`src/assets/`, hashed file names) instead of `public/assets/img/` with `?v=`: Astro's own way to cache-bust pictures. Nothing is wrong today; worth doing when the other pages are designed, since it moves where the drawing tools write.

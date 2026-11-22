@@ -91,7 +91,6 @@ We don't share personal information with anyone else, unless the law requires it
 | What | Who holds it | How long |
 | --- | --- | --- |
 | Visit details (IP address, browser, page) | Cloudflare | As long as Cloudflare needs them to run and protect its network |
-| Our site's error log (the page address when our site fails, never your IP address) | Cloudflare, for us | Up to 7 days |
 | Form messages, once forms send | Our email | Until we no longer need them to help you |
 | Newsletter address and sign-up record, once it starts | Us | Until you unsubscribe, plus the record that you agreed |
 | Settings on your device | Your browser | Until you clear them |
