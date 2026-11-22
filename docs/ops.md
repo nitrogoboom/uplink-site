@@ -4,7 +4,7 @@ How the site is hosted and run. Secrets and security controls are in [`security.
 
 - **Code:** the public GitHub repository `nitrogoboom/uplink-site`.
 - **Site:** Cloudflare Workers, static assets only (`wrangler.jsonc`): the files in `dist/`, exactly as `npm run build` (Astro) writes them. No Worker script runs and nothing changes the files after the build. Live at https://jodesign.ca, and still at https://uplink-site.johnoreilly.workers.dev.
-- **Domain:** `jodesign.ca`, a Cloudflare zone (nameservers at Rebel.ca). Both names are Custom Domains in `wrangler.jsonc`; a Redirect Rule on the zone ("Redirect from WWW to root") sends `www` to the bare name with a 301. The zone has Email Address Obfuscation, Automatic HTTPS Rewrites, Rocket Loader, Cloudflare Fonts and Web Analytics off: each makes Cloudflare rewrite a page and drop its ETag, so a returning visitor would download the page again in full.
+- **Domain:** `jodesign.ca`, a Cloudflare zone (nameservers at Rebel.ca). Both names are Custom Domains in `wrangler.jsonc`; a Redirect Rule on the zone ("Redirect from WWW to root") sends `www` to the bare name with a 301. The zone has Email Address Obfuscation, Automatic HTTPS Rewrites, Rocket Loader, Cloudflare Fonts, Web Analytics and Replace insecure JavaScript libraries off (the last was the one stripping it): each makes Cloudflare rewrite a page and drop its ETag, so a returning visitor would download the page again in full.
 
 ## What Astro does, and what Cloudflare does
 

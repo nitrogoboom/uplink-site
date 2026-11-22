@@ -72,7 +72,7 @@ What to confirm on launch day, by hand unless the owner asks for a script:
 
 ## Launch day
 
-`DOMAIN` is the real domain (placeholder `uplinkit.ca`; confirm it). The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
+`DOMAIN` is `jodesign.ca`. It already serves the site, `noindex` still on (`docs/ops.md`, "Domain"), so launch is mostly the search and security steps below; if launch moves to another domain, run the zone steps for it too. The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
 
 Launch day is the one planned use of a pull request: the `launch` branch gets a PR so its preview can be read before it goes live. Every other change still goes straight to `main` (`CLAUDE.md`).
 
@@ -83,19 +83,17 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 1. **Owner:** DNS TTL to 300 s; list old addresses for redirects.
 2. **Claude:** on a `launch` branch, don't merge yet:
    - `public/_headers`: drop `X-Robots-Tag: noindex`. `src/pages/robots.txt.ts`: add the `Sitemap:` line back.
-   - `SITE_URL` = `https://DOMAIN`; `wrangler.jsonc`: `routes` with the custom domain.
-   - `SITE_URL` (or the default in `astro.config.mjs`) set to `https://DOMAIN`; the `noindex` line out of `public/_headers`; `SECURITY.md`'s `security.txt` link.
    - If Bot Fight Mode goes on: fix "sets no cookies" in `src/content/en/privacy.md` (`__cf_bm`).
    - Option B: 301 exactly the host `uplink-site.johnoreilly.workers.dev`, never all of `workers.dev` (previews live there).
 3. Open the PR, let CI pass, both read the preview once.
 
 ### Launch (about an hour)
 
-1. **Owner:** add `DOMAIN` as a Cloudflare zone, change nameservers, wait for Active.
-2. **Owner:** Full (strict), Always Use HTTPS, HTTP/3 on; Auto Minify and Rocket Loader off (they break CSP hashes); DNSSEC on with the DS record.
+1. **Owner:** `DOMAIN` is a Cloudflare zone, Active, with Full (strict), Always Use HTTPS and Rocket Loader off (done for `jodesign.ca`).
+2. **Owner:** HTTP/3 on; DNSSEC on with the DS record.
    - **TLS 1.2 minimum:** dashboard > the zone > SSL/TLS > Edge Certificates > Minimum TLS Version > TLS 1.2. Cloudflare still accepts TLS 1.0 and 1.1 by default, and SSL Labs caps the grade at B for that; workers.dev can't change it, so it waits for the zone. Check: SSL Labs on `DOMAIN` shows TLS 1.0 and 1.1 "No" and grade A or better (After launch).
-3. **Owner:** from the `launch` branch, `npx wrangler triggers deploy` (CI doesn't apply routes). `curl -sI` the PR preview for a Cloudflare `X-Robots-Tag`.
-4. **Owner:** custom domain Active with a certificate.
+3. **Claude:** `curl -sI` the PR preview for a Cloudflare `X-Robots-Tag`.
+4. **Claude:** `DOMAIN` and `www` answer with a certificate; `www` 301s to `DOMAIN` (CI applies `routes` on deploy).
 5. **Claude:** merge; read the deploy summary.
 6. **Claude:** the launch checks above, against `https://DOMAIN`.
 7. Retire the old address. A: turn `workers.dev` off, leave Preview URLs on, check a PR preview still works. B: check the old address redirects to `https://DOMAIN`.

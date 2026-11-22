@@ -7,7 +7,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, served by 
 ## How to work
 
 - No tests until launch: see "Tests" below.
-- No worker agents, review passes, reports or history files.
+- No worker agents for code, and no review passes, reports or history files. An agent may read web docs (official docs, an audit's sources) and hand back what they say.
 - Commit messages: one short line, what and why. Code comments say why the code is as it is: no dates, review IDs or the owner's words (git holds the history). Tidy old comments in a file you're already changing.
 - Read only the doc the job needs (table below).
 - `notes.md` is the to-do list: add or remove a line. Never reword the owner's lines without asking.
@@ -56,7 +56,7 @@ What runs today: lint, types and the build on this machine (`npm run quick`; the
 Each change:
 
 1. Make it and check it as the table says.
-2. Show the owner: the `astro` dev server (`.claude/launch.json`) in the app's browser pane, at localhost.
+2. Show the owner: the `astro` dev server (`.claude/launch.json`) in the app's browser pane, at localhost. A cloud session can't reach that pane: it shows screenshots it took of the dev server instead (phone, tablet, desktop; both themes when colour matters), and the live link once shipped.
 3. Commit on one local branch (`claude/…`). Later changes go on the same branch until it ships. A `notes.md` line goes in the same commit.
 
 | Change | Check locally |
@@ -70,7 +70,7 @@ Each change:
 When the owner says push, it goes straight to `main`, with no pull request (owner, November 12, 2026). About a minute:
 
 1. `npm run build` passes here first.
-2. `git checkout main`, `git pull --ff-only` (Dependabot merges on GitHub), `git merge --ff-only` the local branch, `git push origin main`. GitHub prints "Bypassed rule violations": expected, the owner's account may.
+2. `git checkout main`, `git pull --ff-only` (Dependabot merges on GitHub), `git merge --ff-only` the local branch, `git push origin main`, then `git push -u origin` the local branch too (the cloud workspace checks after every reply that the branch is on GitHub). GitHub prints "Bypassed rule violations": expected, the owner's account may.
 3. Wait for the deploy run on `main`, in the background (`gh run watch`), then check the live site serves it: `curl -s` the live address's `/version.txt`, which must print the pushed commit (7 characters, as `git log --oneline` shows it). A change a visitor can see gets a look in the browser too; never dig through the hashed `/_astro/` files. Only then say "deployed". A push of only docs (root `*.md`, `docs/`, `.claude/`, any `README.md`) runs nothing on purpose: no deploy to wait for. If a push that changes the site starts no run: `gh workflow run site.yml --ref main`.
 4. Nothing checks the site after a deploy. If it is broken: `npx wrangler rollback`, then fix `main` (`docs/ops.md`, "Deploys").
 
