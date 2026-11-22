@@ -1,5 +1,4 @@
-// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml,
-// speculation-rules-home.json) share. src/README.md, "Pages"; each export is described where it's defined.
+// The site's page table (PAGES, NAV) and the helpers the pages and generated files (sitemap.xml, llms.txt) share. src/README.md, "Pages"; each export is described where it's defined.
 import type { IconName } from '../components/Icon.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { copy } from './copy';
