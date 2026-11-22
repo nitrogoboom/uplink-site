@@ -47,7 +47,7 @@ Section CSS sits beside its component (`hero.css` by `Hero.astro`). A card in a 
 - Reduced motion: plain `prefers-reduced-motion` rules; `postcss.config.mjs` scopes them to the Settings choice. Scripts use `reduceMotion` from `core.js`.
 - Forced colours and `prefers-contrast: more`: handled beside each rule and in `tokens.css`.
 
-Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`, scripts `MEDIA`), in `em`:
+Breakpoints, named in `lib/media.js` (CSS `@media (--phone)`; the three a script asks about are its `PHONE`, `TABLET_UP` and `SHORT_WINDOW`), in `em`:
 
 | Name | Query | px at 16 |
 | --- | --- | --- |

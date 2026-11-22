@@ -9,7 +9,7 @@
    or when Ctrl / Cmd / Alt is held.
    ========================================================================== */
 
-import { MEDIA } from '../lib/media.js';
+import { PHONE, SHORT_WINDOW } from '../lib/media.js';
 
 const root = document.documentElement;
 // For the type check (JSDoc, tsconfig checkJs) what they find is an HTML element, or the type of the variable it goes
@@ -453,7 +453,7 @@ applyMotion();
 // Scrolling down slides a bar out of view (.is-hidden: bottom-nav.css, header.css); scrolling up brings it back. It
 // always shows at the top and end of the page and while one of its controls has focus, and only reacts while its
 // query holds: the phone tab bar on phones (it is hidden elsewhere), and the header on a short window, where its 4rem
-// would be over 12% of the height (MEDIA.shortWindow: 200% and 400% zoom, a phone on its side). Elsewhere the header
+// would be over 12% of the height (SHORT_WINDOW: 200% and 400% zoom, a phone on its side). Elsewhere the header
 // stays put. modern-web-guidance, content-first-noise-reduction: "Keep every fixed or sticky bar under 12%".
 const hideOnScroll = (/** @type {HTMLElement | null} */ bar, /** @type {MediaQueryList} */ when) => {
   if (!bar) return;
@@ -492,8 +492,8 @@ const hideOnScroll = (/** @type {HTMLElement | null} */ bar, /** @type {MediaQue
   });
   bar.addEventListener('focusin', () => show(true));
 };
-hideOnScroll($('.botnav'), window.matchMedia(MEDIA.phone));
-hideOnScroll($('.site-header'), window.matchMedia(MEDIA.shortWindow));
+hideOnScroll($('.botnav'), window.matchMedia(PHONE));
+hideOnScroll($('.site-header'), window.matchMedia(SHORT_WINDOW));
 
 /* ---------- settle ----------------------------------------------------- */
 // While the pause is on, jumps every animation in el (and inside it) that ends to its end, so a drawing that builds

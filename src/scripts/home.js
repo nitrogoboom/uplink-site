@@ -5,7 +5,7 @@
    ========================================================================== */
 
 import { $, $$, dashes, held, reduceMotion, settle, whenOnScreen } from './core.js';
-import { MEDIA } from '../lib/media.js';
+import { PHONE } from '../lib/media.js';
 import './grow.js';
 
 /* ------------------------------------------------------------------
@@ -72,7 +72,7 @@ if (svcRow && svcDots.length) {
   const cards = Array.from(svcRow.children);
   const hint = /** @type {HTMLElement} */ (svcHint); // Services.astro has it with the dots
   const steps = $$('.svc-step', hint);
-  const row = window.matchMedia(MEDIA.phone);
+  const row = window.matchMedia(PHONE);
   let current = 0;
   /** @type {number | null} */
   let aim = null; // the card a step is sliding to, so a quick second click steps on from there

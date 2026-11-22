@@ -8,7 +8,7 @@
    ========================================================================== */
 
 import { $, $$, UI, dashes, html, reduceMotion, toast, whenOnScreen } from './core.js';
-import { MEDIA } from '../lib/media.js';
+import { PHONE, TABLET_UP } from '../lib/media.js';
 
 /* ======================================================================
    Campus map (tablet and desktop; phones hide it). Decoration only.
@@ -101,7 +101,7 @@ if (fc) {
   // Tiles (tablet and up, where footer.css can place a panel): one section is always open, Contact unless another is
   // picked, so the panel on screen is always the one whose summary says it's open. Without script CSS shows Contact
   // anyway (its summary then says closed). Phones and the fallback rows start with every row shut.
-  const tiles = window.matchMedia(MEDIA.tabletUp);
+  const tiles = window.matchMedia(TABLET_UP);
   const placed = window.CSS?.supports?.('selector(::details-content)');
   const keepOne = () => {
     if (placed && tiles.matches && !sections.some((d) => d.open)) sections[0].open = true;
@@ -123,7 +123,7 @@ if (fc) {
      here. Without script, with reduced motion, and in the tiles the
      browser does it all, at once.
      ====================================================================== */
-  const rows = window.matchMedia(MEDIA.phone);
+  const rows = window.matchMedia(PHONE);
   const NAME = sections[0].getAttribute('name') ?? '';
   // a time token in ms: the build writes 320ms as .32s, so mind the unit. Read at a tap, never at load: asking for a
   // computed style before the first paint makes the browser style the whole page for it (PageSpeed, "Forced reflow")
