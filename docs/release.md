@@ -38,7 +38,7 @@ On the live site. About 25 minutes. Proof: one line per failure (page, problem, 
 
 ## Watch the live site
 
-After launch, the client-side security dashboard for scripts the site doesn't load itself; Dependabot monthly, merge on green.
+After launch: Dependabot monthly, merge on green.
 
 ## Before launch
 
@@ -50,7 +50,7 @@ After launch, the client-side security dashboard for scripts the site doesn't lo
 - [x] Workers logs and traces: nothing to keep. No Worker script runs, so there is no log of ours.
 - [x] CSS and the first paint: every page carries its CSS inside it (Astro's `inlineStylesheets: 'always'`), so nothing blocks the first paint. To trade that for one cached file, change the one setting and compare in PageSpeed.
 - [ ] **(domain)** HSTS already sends `includeSubDomains; preload` (owner, November 17, 2026). Before the real domain goes live, confirm every subdomain of it (mail, anything old) is HTTPS for good; if one isn't, take the two words out of `public/_headers` until it is.
-- [ ] **(domain)** Turn on Cloudflare client-side security (formerly Page Shield; Free plan): dashboard > the zone > Security > Settings > Client-side abuse > Continuous script monitoring. It needs the site on a Cloudflare zone, so not on workers.dev. Cloudflare adds its own report-only CSP header to some pages and collects the reports at its own endpoint: nothing to add to `public/_headers` and no endpoint of ours. Free shows the scripts in the dashboard (Security > Web assets > Client-side resources); email alerts for new scripts need Business. Check the list once after launch: only the site's own `/_astro/` scripts should be there.
+- [x] **(domain)** Cloudflare client-side security (formerly Page Shield; "Continuous script monitoring") stays off (owner, November 23, 2026). On the Free plan it only lists the scripts visitors' browsers load, with no alerts, and this site loads two: its own file and Cloudflare's beacon, and the CSP refuses any other. It would add a report from visitors' browsers to disclose and warnings in the console. Worth another look if the site takes on outside scripts (a chat widget, a tag manager, payments) or a paid plan.
 - [ ] If the forms come back (PR #38): review its `/api/` routes first (Turnstile, honeypot, rate limit, header injection); the site has none until then.
 - [ ] **(domain)** SSL Labs A+, securityheaders.com, Mozilla Observatory; registrar lock, auto-renew, 2FA.
 - [ ] **(content)** Social links and the ~20 `/soon` links per page get real targets; `Français` back with a real French page.
@@ -83,7 +83,7 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 1. **Owner:** DNS TTL to 300 s; list old addresses for redirects.
 2. **Claude:** on a `launch` branch, don't merge yet:
    - `public/_headers`: drop `X-Robots-Tag: noindex`. `src/pages/robots.txt.ts`: add the `Sitemap:` line back.
-   - If Bot Fight Mode goes on: fix "sets no cookies" in `src/content/en/privacy.md` (`__cf_bm`).
+   - Bot Fight Mode stays off (owner, November 23, 2026): it puts a Cloudflare script into every page, which drops the page's ETag, sets cookies (`__cf_bm`, `cf_clearance`), and can challenge our own checks, and the site has no login, form or API for it to protect. The forms' bot check, when they send, is Turnstile.
    - Option B: 301 exactly the host `uplink-site.johnoreilly.workers.dev`, never all of `workers.dev` (previews live there).
 3. Open the PR, let CI pass, both read the preview once.
 

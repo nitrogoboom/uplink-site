@@ -37,7 +37,7 @@ The header allows one policy, `uplink`, created in `src/scripts/core.js`. Every 
 
 ### No reports from browsers
 
-The site has no address that takes input, and no script of ours reports from a visitor's browser (removed November 16, 2026). The CSP has no `report-to` or `report-uri`: a block still happens, it just isn't sent anywhere. Script errors and CSP blocks are found by looking, in browsers on our own machines (the `check` skill). At launch, Cloudflare's client-side security watches which scripts the pages run, with its own report-only header and Cloudflare's endpoint (`release.md`, "Before launch").
+The site has no address that takes input, and no script of ours reports from a visitor's browser (removed November 16, 2026). The CSP has no `report-to` or `report-uri`: a block still happens, it just isn't sent anywhere. Script errors and CSP blocks are found by looking, in browsers on our own machines (the `check` skill). Cloudflare's client-side security (script monitoring) stays off: the site loads only its own script and Cloudflare's beacon, and the policy refuses any other (`release.md`, "Before launch").
 
 ### Supply chain
 
