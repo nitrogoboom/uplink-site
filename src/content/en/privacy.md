@@ -4,6 +4,7 @@
 - The site sets no cookies. It doesn't follow you around the web, show ads, or sell anything about you.
 - To see how fast pages load, the site uses Cloudflare Web Analytics. It counts visits and load times without cookies, and doesn't identify you.
 - Our host, Cloudflare, sees each visit (your IP address, your browser, and the page you asked for) so it can deliver the page and keep the site safe.
+- If a page fails to load, your browser may tell Cloudflare what went wrong. That report isn't tied to your IP address.
 - Our forms don't send anything yet. When they do, what you type will reach us by email and nowhere else.
 - Questions? Write to [{privacy}](mailto:{privacy}).
 
@@ -28,6 +29,17 @@ Every visit goes through Cloudflare, the company that hosts our site. To send yo
 - the address you asked for, and the page that sent you here, if your browser shares it
 
 We use this to deliver the site, keep it running, and protect it from attacks. We don't use it to find out who you are.
+
+### When a page fails to load
+
+If your browser can't reach the site, for example when a connection drops, it may send Cloudflare a short error report. This is a feature of your browser, called Network Error Logging, that Cloudflare switches on for our site. Nothing is sent when pages load normally.
+
+The report says:
+
+- what went wrong, and when
+- the address you asked for, and the page that sent you there, if your browser shares it
+
+Cloudflare uses your IP address only for a moment, to work out your country, your region, and your internet provider. It then drops the address and doesn't store it. Cloudflare uses these reports to find and fix problems on the network between you and our site.
 
 ### Settings saved on your device
 
@@ -92,6 +104,7 @@ We don't share personal information with anyone else, unless the law requires it
 | What | Who holds it | How long |
 | --- | --- | --- |
 | Visit details (IP address, browser, page) | Cloudflare | As long as Cloudflare needs them to run and protect its network |
+| Error reports, when a page fails to load (no IP address) | Cloudflare | As long as Cloudflare needs them to run its network |
 | Form messages, once forms send | Our email | Until we no longer need them to help you |
 | Newsletter address and sign-up record, once it starts | Us | Until you unsubscribe, plus the record that you agreed |
 | Settings on your device | Your browser | Until you clear them |
@@ -119,4 +132,4 @@ If you're not happy with our answer, you can complain to the Office of the Priva
 
 If the site starts collecting something new, we'll update this page first and change the date below. If a change affects how we use information you've already given us, we'll ask you again.
 
-Last updated: 16 November 2026
+Last updated: 23 November 2026
