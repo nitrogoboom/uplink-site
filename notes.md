@@ -25,7 +25,7 @@ Content:
 From the code audit of November 19, 2026:
 
 - [ ] Optional: split `footer.css` so the campus map's rules (about 270 lines) load with the map. No unused rules found; 7 KB compressed and cached, so the saving is small.
-- [ ] DNSSEC: add the DS record at Rebel.ca (Cloudflare > DNS > Settings > DNSSEC > "DS record" shows it: key tag 2371, algorithm 13, digest type 2). Until then the zone is signed but nothing checks it. Owner.
+- [ ] DNSSEC is off (owner, November 23, 2026: not through a support request). Rebel.ca has no page for a DS record: it takes one only by an email to service@rebel.ca from the account's address, and the .ca registry doesn't pick it up from Cloudflare by itself. To turn it on later: Cloudflare > DNS > Settings > Enable DNSSEC, then send Rebel the four values it shows. Owner to decide.
 - [ ] At launch: run lint and types (`npm run quick`'s checks) in CI before the deploy, so a direct push or a Dependabot merge can't ship a type break. Left out during draft mode.
 
 Drawing generators (the owner directs drawing work):
