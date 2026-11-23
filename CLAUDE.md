@@ -18,7 +18,7 @@ Static mockup site for a made-up IT company. Astro, plain CSS and JS, served by 
 | Next task | `notes.md` |
 | Setup, commands, layout | `README.md`, `src/README.md` |
 | Styling | `docs/design.md` |
-| HTML, CSS or a page script | the `modern-web-guidance` skill: search it before writing |
+| HTML, CSS or a page script | the `modern-web-guidance` guides: search them before writing (`npx -y modern-web-guidance@latest search "…"`, then `retrieve ID`; the skill of that name does the same where it is installed) |
 | An Astro question | the Astro Docs server (`.mcp.json`) |
 | A drawing | the `drawing` skill |
 | Hosting, CI, deploys | `docs/ops.md` |

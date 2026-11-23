@@ -1,5 +1,5 @@
 """Draws the footer's campus map, src/assets/img/campus.svg: one spot per footer section (docs/drawing-tools.md, "Generators";
-src/README.md, "The footer"; the words are in src/data/footer.json). Edit the numbers below and run again; don't hand-edit the SVG.
+src/README.md, "Components"; the words are in src/content/en/footer.json). Edit the numbers below and run again; don't hand-edit the SVG.
 usage: python tools/gen_campus.py
 Keep the classes footer.css and footer.js use (plat, grid, edge, ring, ring2, route, flow, dist, b, tree, win, lit,
 blink, led, w2, dot, mast, beacon, sig, bob, tk-n, mk-*) and the group order: back to front (painter.py).

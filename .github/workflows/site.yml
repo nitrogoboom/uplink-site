@@ -3,7 +3,7 @@
 # else is checked here: site checks are done by hand, when the owner asks (the `check` skill).
 # node_modules is cached by package-lock.json, so npm ci runs only when the packages change (57 s otherwise).
 # Actions are pinned to a commit; Dependabot updates them. Secrets in the "cloudflare" environment:
-# CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit") and CLOUDFLARE_ACCOUNT_ID.
+# CLOUDFLARE_API_TOKEN ("Workers Scripts: Edit" and "Workers Routes: Edit": docs/ops.md) and CLOUDFLARE_ACCOUNT_ID.
 name: site
 
 # a push to main of only notes (root Markdown, docs/, .claude/, any README.md) runs nothing

@@ -55,7 +55,7 @@ Keep secrets in GitHub environments, Worker secrets, or `.dev.vars` (ignored by 
 
 | Name | What it does | Where it's kept | Used by | How to change it |
 | --- | --- | --- | --- | --- |
-| `CLOUDFLARE_API_TOKEN` | Deploys the Worker and uploads previews. An account token, "uplink-site deploy (GitHub)", with only "Workers Scripts: Edit" (made November 13, 2026; a copy in the owner's 1Password). | GitHub > Settings > Environments > `cloudflare` | `site.yml` (deploy, preview) | Cloudflare > Manage account > Account API tokens: make a new one, save it in 1Password, paste it in, run a deploy, then delete the old one. |
+| `CLOUDFLARE_API_TOKEN` | Deploys the Worker and uploads previews. An account token, "uplink-site deploy (GitHub)", with only "Workers Scripts: Edit" and "Workers Routes: Edit" (made November 13, 2026; the second added November 22, 2026, for the `jodesign.ca` routes; a copy in the owner's 1Password). | GitHub > Settings > Environments > `cloudflare` | `site.yml` (deploy, preview) | Cloudflare > Manage account > Account API tokens: make a new one, save it in 1Password, paste it in, run a deploy, then delete the old one. |
 | `CLOUDFLARE_ACCOUNT_ID` | Which Cloudflare account. Not secret. | The same environment | The same jobs | Only if the site moves account. |
 | Your sign-ins | The GitHub and Cloudflare accounts that own the repository and Worker. | Your password manager, with 2FA | Everything | Move to a company account with 2FA (`notes.md`). |
 

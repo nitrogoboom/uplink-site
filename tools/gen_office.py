@@ -170,7 +170,7 @@ def _along(dot, y):
 
 
 _TV_DOT = (WALL_T, MEET_TV[1], (MEET_TV[2] + MEET_TV[3]) / 2)   # the screen's left edge, so the call tiles stay clear
-# The hero's labels: key (the label's words in src/data/copy/en/home.yaml, hero.labels, or cloud), the dot (a world
+# The hero's labels: key (the label's words in src/content/en/copy/home.yaml, hero.labels, or cloud), the dot (a world
 # point, or a screen point for the cloud), the elbow (screen), colour, and the side of the line's end the words sit
 # on. The line runs dot, elbow, then TAIL level to its end; the words start a gap past it (hero.css).
 HERO_TAGS = [('firewall', (19.5, 2.3, 0.54), (1052.0, 760.0), pal.AMBER, 'left'),
