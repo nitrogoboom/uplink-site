@@ -72,7 +72,7 @@ What to confirm on launch day, by hand unless the owner asks for a script:
 
 ## Launch day
 
-`DOMAIN` is `jodesign.ca`. It already serves the site, `noindex` still on (`docs/ops.md`, "Domain"), so launch is mostly the search and security steps below; if launch moves to another domain, run the zone steps for it too. The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
+`DOMAIN` is `jodesign.ca`, the project's primary domain (owner, November 23, 2026). It already serves the site, `noindex` still on (`docs/ops.md`, "Domain"), so launch is mostly the search steps below. The owner does sign-ins; Claude does code and checks. A quiet weekday morning.
 
 Launch day is the one planned use of a pull request: the `launch` branch gets a PR so its preview can be read before it goes live. Every other change still goes straight to `main` (`CLAUDE.md`).
 
@@ -90,8 +90,8 @@ Launch day is the one planned use of a pull request: the `launch` branch gets a 
 ### Launch (about an hour)
 
 1. **Owner:** `DOMAIN` is a Cloudflare zone, Active, with Full (strict), Always Use HTTPS and Rocket Loader off (done for `jodesign.ca`).
-2. **Owner:** HTTP/3 on; DNSSEC on with the DS record.
-   - **TLS 1.2 minimum:** dashboard > the zone > SSL/TLS > Edge Certificates > Minimum TLS Version > TLS 1.2. Cloudflare still accepts TLS 1.0 and 1.1 by default, and SSL Labs caps the grade at B for that; workers.dev can't change it, so it waits for the zone. Check: SSL Labs on `DOMAIN` shows TLS 1.0 and 1.1 "No" and grade A or better (After launch).
+2. **Owner:** HTTP/3 on (done). DNSSEC stays off: Rebel.ca takes the DS record only by an email to its support (`notes.md`).
+   - **TLS 1.2 minimum:** done November 23, 2026 (SSL/TLS > Edge Certificates > Minimum TLS Version); TLS 1.0 and 1.1 are refused on `jodesign.ca` and `www`. `workers.dev` can't change it. Check: SSL Labs on `DOMAIN` shows TLS 1.0 and 1.1 "No" and grade A or better (After launch).
 3. **Claude:** `curl -sI` the PR preview for a Cloudflare `X-Robots-Tag`.
 4. **Claude:** `DOMAIN` and `www` answer with a certificate; `www` 301s to `DOMAIN` (CI applies `routes` on deploy).
 5. **Claude:** merge; read the deploy summary.

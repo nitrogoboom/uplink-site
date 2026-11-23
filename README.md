@@ -81,7 +81,7 @@ See [`docs/drawing-tools.md`](docs/drawing-tools.md#install-the-python-drawing-t
 
 Addresses have no `.html`: `/services`, `/contact#message`. Cloudflare redirects `/services.html` and `/services/` to the clean address. In a component a link is written as in English and passed through `to()` (`linker()` in `src/lib/i18n.ts`), which gives the page's language its own address.
 
-The site's public address is `SITE_URL`: set it in the environment, or change the default in `astro.config.mjs`. At launch, set it to the real domain.
+The site's public address is `https://jodesign.ca`, the project's primary domain: the default in `astro.config.mjs`. `SITE_URL` in the environment overrides it.
 
 ### Languages
 
