@@ -17,12 +17,12 @@ Content:
 - [ ] Copy to confirm: VoIP wording, `gen_backup.py`'s "a separate, locked site", `gen_network.py`'s VOIP PHONES label, Grow's six tags, the "Windows 10" hero card.
 - [ ] Home "What clients say" (`Reviews.astro`): sample reviews in `src/content/en/reviews.json`. With the real Google reviews: their fields (photo, "2 months ago", rating shown per card if they vary), a score and count beside the stars, "Read reviews on Google" (now `/soon`) to the Google profile, quotes that don't retell "Our work", drop the "Sample reviews" line. Maybe fold the check-up band into this section (`.fold-foot`, as About Team).
 - [ ] Home "Our work" row is a placeholder until its real section is decided (`src/components/home/Work.astro`).
-- [ ] Contact form: when it's wired to Cloudflare, make its sent message (`received` in `src/content/en/copy/contact.yaml`) match what really happens. Until then it says the message was received (thought-audit.md, problem 1).
+- [ ] Contact form: when it's wired to Cloudflare, make its sent message (`received` in `src/content/en/copy/contact.yaml`) match what really happens. Until then it says the message was received.
 - [ ] Grow: final copy and team sizes, people drawn as more than blocks, timing on real phones (`DWELL`, `RISK_AT`, `FIX_AT` in `grow.js`).
 
 ## Now: setup and code
 
-From the audit (thought-audit.md):
+From the code audit of November 19, 2026:
 
 - [ ] Optional: split `footer.css` so the campus map's rules (about 270 lines) load with the map. No unused rules found; 7 KB compressed and cached, so the saving is small.
 - [ ] At launch: run lint and types (`npm run quick`'s checks) in CI before the deploy, so a direct push or a Dependabot merge can't ship a type break. Left out during draft mode.
